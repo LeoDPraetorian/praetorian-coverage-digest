@@ -1,0 +1,27 @@
+[submodule "modules/chariot"]
+	path = modules/chariot
+	url = https://github.com/praetorian-inc/chariot
+[submodule "modules/tabularium"]
+	path = modules/tabularium
+	url = https://github.com/praetorian-inc/tabularium
+[submodule "modules/janus-framework"]
+	path = modules/janus-framework
+	url = https://github.com/praetorian-inc/janus-framework
+[submodule "modules/janus"]
+	path = modules/janus
+	url = https://github.com/praetorian-inc/janus
+[submodule "modules/chariot-ui-components"]
+	path = modules/chariot-ui-components
+	url = https://github.com/praetorian-inc/chariot-ui-components
+[submodule "modules/nebula"]
+	path = modules/nebula
+	url = https://github.com/praetorian-inc/nebula
+[submodule "modules/praetorian-cli"]
+	path = modules/praetorian-cli
+	url = https://github.com/praetorian-inc/praetorian-cli
+[submodule "modules/praetorian-agent-workflows"]
+	path = modules/praetorian-agent-workflows
+	url = https://github.com/praetorian-inc/praetorian-agent-workflows
+[submodule "modules/nuclei-templates"]
+	path = modules/nuclei-templates
+	url = https://github.com/praetorian-inc/nuclei-templates
