@@ -4,7 +4,7 @@ A comprehensive super-repository containing all Chariot security platform compon
 
 ## Overview
 
-Chariot is an attack surface management platform that helps organizations discover, monitor, and secure their external-facing assets. This development platform unifies all related repositories and provides shared workflows for building security tools with AI assistance.
+This development platform unifies all Chariot repositories and provides shared workflows for building security tools with AI assistance.
 
 ## Repository Structure
 
