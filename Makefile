@@ -9,3 +9,6 @@ checkout-branch:
 
 create-branch:
 	git submodule foreach 'git checkout -b $(branch)'
+
+create-prs:
+	git submodule foreach 'gh pr create'
