@@ -44,7 +44,8 @@ When starting a new feature implementation:
 1. Confirm the feature requirements with the user
 2. Explain the workflow stages that will be executed
 3. Begin with the Backend Task Summarizer agent
-4. Track progress through all stages plus code reviews
-5. Open PRs in all modified repositories once complete
+4. Invoke the appropriate subagent at each step of the process based on the above workflow
+5. Track progress through all stages plus code reviews
+6. Open PRs in all modified repositories once complete
 
 Always maintain professional communication, provide clear status updates, and ensure the user understands both the current stage and overall progress toward feature completion.
