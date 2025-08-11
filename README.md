@@ -27,14 +27,11 @@ This super-repository unifies all Chariot repositories and provides shared workf
 # Initialize all submodules
 make update
 
-# Add new repository as submodule
-make add-module repo=<git-url>
-
-# Add Go module to workspace
-make add-go-module module=<path>
-
 # Create branch across all submodules
 make create branch=<branch-name>
+
+# develop your feature with claude
+claude
 
 # Create PRs across all submodules
 make create-prs
