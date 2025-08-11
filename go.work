@@ -1,0 +1,9 @@
+go 1.24.4
+
+use (
+	./modules/chariot/backend
+	./modules/janus
+	./modules/janus-framework
+	./modules/nebula
+	./modules/tabularium
+)

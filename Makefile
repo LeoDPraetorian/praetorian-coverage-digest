@@ -1,13 +1,16 @@
 add-module:
 	git submodule add $(repo) ./modules/$(notdir $(basename $(repo)))
 
+add-go-module:
+	go work use $(module)
+
 update:
 	git submodule update --init --recursive
 
-checkout-branch:
+checkout:
 	git submodule foreach 'git checkout $(branch) || true'
 
-create-branch:
+create:
 	git submodule foreach 'git checkout -b $(branch)'
 
 create-prs:
