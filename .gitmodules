@@ -25,3 +25,6 @@
 [submodule "modules/nuclei-templates"]
 	path = modules/nuclei-templates
 	url = https://github.com/praetorian-inc/nuclei-templates
+[submodule "modules/aegiscli"]
+	path = modules/aegiscli
+	url = https://github.com/praetorian-inc/aegiscli
