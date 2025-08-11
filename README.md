@@ -1,0 +1,43 @@
+# Chariot Development Platform
+
+A comprehensive super-repository containing all Chariot security platform components and AI-enhanced development workflows.
+
+## Overview
+
+Chariot is an attack surface management platform that helps organizations discover, monitor, and secure their external-facing assets. This development platform unifies all related repositories and provides shared workflows for building security tools with AI assistance.
+
+## Repository Structure
+
+### Core Platform
+- **[chariot/](modules/chariot/)** - Main Chariot application (backend API + React UI)
+- **[chariot-ui-components/](modules/chariot-ui-components/)** - Shared React component library with Storybook
+- **[tabularium/](modules/tabularium/)** - Universal data schema and models for Chariot systems
+
+### Security Frameworks
+- **[janus-framework/](modules/janus-framework/)** - Go framework for chaining security tools into workflows
+- **[janus/](modules/janus/)** - Tool orchestration system built on janus-framework
+- **[nebula/](modules/nebula/)** - Multi-cloud security scanning toolkit (AWS/Azure/GCP)
+
+### Templates & Tools
+- **[nuclei-templates/](modules/nuclei-templates/)** - Custom security scanning templates (synced from ProjectDiscovery)
+- **[praetorian-cli/](modules/praetorian-cli/)** - Python CLI and SDK for Chariot API access
+- **[praetorian-agent-workflows/](modules/praetorian-agent-workflows/)** - AI agent workflow orchestration
+
+## Quick Start
+
+```bash
+# Initialize all submodules
+make update
+
+# Add new repository as submodule
+make add-module repo=<git-url>
+
+# Add Go module to workspace
+make add-go-module module=<path>
+
+# Create branch across all submodules
+make create branch=<branch-name>
+
+# Create PRs across all submodules
+make create-prs
+```
