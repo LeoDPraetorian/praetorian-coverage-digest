@@ -1,10 +1,8 @@
 # Chariot Development Platform
 
-A comprehensive super-repository containing all Chariot security platform components and AI-enhanced development workflows.
-
 ## Overview
 
-This development platform unifies all Chariot repositories and provides shared workflows for building security tools with AI assistance.
+This super-repository unifies all Chariot repositories and provides shared workflows for building security tools with AI assistance.
 
 ## Repository Structure
 
