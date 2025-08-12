@@ -153,10 +153,10 @@ Phase 6: Task(backend-commit) → Complete → Feature Delivered ✅
 #### ⚠️ ALWAYS Follow These Patterns:
 - **Functional Pipeline Execution**: 6 phases execute sequentially, each completing before next
 - **Phase-Specific Expertise**: Each phase focuses on its specialized domain and responsibilities
-- **Quality Handoffs**: Complete deliverables before moving to next phase
+- **Quality Review Gates**: Use backend-reviewer agent between each phase to validate deliverables
 - **Context Preservation**: Pass all relevant information between phases
-- **Production Standards**: Every phase delivers production-quality work
-- **Test-Driven Development**: Comprehensive testing in dedicated testing phase
+- **Pattern Reuse First**: Every phase prioritizes reusing existing Chariot patterns over creating new ones
+- **Simplicity Bias**: All phases avoid overengineering and complex architectures
 - **Infrastructure as Code**: Use CloudFormation for all AWS resources
 
 ### Functional Pipeline Examples
@@ -167,31 +167,31 @@ Phase 6: Task(backend-commit) → Complete → Feature Delivered ✅
 1. **Claude** → Executes **Task(backend-summarize)**
    - **Business Analyst** analyzes requirements for new API endpoint
    - **Output**: Complete functional requirements with API specifications and acceptance criteria
-   - **Claude automatically proceeds to Phase 2**
+   - **Claude automatically executes Task(backend-reviewer) to validate requirements**
 
 2. **Claude** → Executes **Task(backend-plan)**  
    - **Solution Architect** creates technical implementation plan
    - **Research**: Technology choices, existing patterns, architecture design
    - **Output**: Detailed technical plan with Go/AWS implementation strategy
-   - **Claude automatically proceeds to Phase 3**
+   - **Claude automatically executes Task(backend-reviewer) to validate technical plan**
 
 3. **Claude** → Executes **Task(backend-implement)**
    - **Senior Developer** builds production-ready implementation
    - **Creates**: Go code, tabularium types, CloudFormation templates, API handlers
    - **Output**: Complete, working implementation with error handling
-   - **Claude automatically proceeds to Phase 4**
+   - **Claude automatically executes Task(backend-reviewer) to validate implementation**
 
 4. **Claude** → Executes **Task(backend-test)**
    - **Test Engineer** creates comprehensive test suite
    - **Creates**: Unit tests, integration tests, API endpoint tests, performance benchmarks
    - **Output**: High-coverage test suite validating all functionality
-   - **Claude automatically proceeds to Phase 5**
+   - **Claude automatically executes Task(backend-reviewer) to validate test suite**
 
 5. **Claude** → Executes **Task(backend-validate)**
    - **QA Engineer** validates feature in real technology stack
    - **Tests**: System integration, performance, security, real-world scenarios
    - **Output**: Validated feature confirmed to work with actual Chariot stack
-   - **Claude automatically proceeds to Phase 6**
+   - **Claude automatically executes Task(backend-reviewer) to validate system validation**
 
 6. **Claude** → Executes **Task(backend-commit)**
    - **DevOps Engineer** deploys and submits feature
@@ -199,13 +199,13 @@ Phase 6: Task(backend-commit) → Complete → Feature Delivered ✅
    - **Output**: Deployed feature with PRs created and ready for production
 
 #### Example 2: Complex Integration Feature (e.g., Okta SSO)
-**6-Phase Pipeline with External Service Integration:**
+**6-Phase Pipeline with External Service Integration and Review Gates:**
 
-1. **Phase 1**: Business Analyst breaks down SSO requirements, correlation logic, asset management
-2. **Phase 2**: Solution Architect designs OAuth2 integration, API patterns, data flow architecture
-3. **Phase 3**: Senior Developer implements Okta client, correlation services, tabularium types
-4. **Phase 4**: Test Engineer creates comprehensive tests including external service mocks
-5. **Phase 5**: QA Engineer validates integration with real Okta instance and end-to-end workflows
+1. **Phase 1**: Business Analyst breaks down SSO requirements, correlation logic, asset management → **Review Gate**
+2. **Phase 2**: Solution Architect designs OAuth2 integration, API patterns, data flow architecture → **Review Gate**
+3. **Phase 3**: Senior Developer implements Okta client, correlation services, tabularium types → **Review Gate**
+4. **Phase 4**: Test Engineer creates comprehensive tests including external service mocks → **Review Gate**
+5. **Phase 5**: QA Engineer validates integration with real Okta instance and end-to-end workflows → **Review Gate**
 6. **Phase 6**: DevOps Engineer deploys infrastructure, handles secrets management, creates PRs
 
 ### Success Criteria
@@ -231,8 +231,10 @@ Every backend development task is considered complete only when the **6-Phase Fu
 **Key Principles**:
 - **Sequential Execution**: Phases run one at a time, never in parallel
 - **Complete Handoffs**: Each team member finishes their work before next phase
+- **Quality Review Gates**: Backend-reviewer validates each deliverable before proceeding
 - **Specialized Expertise**: Each phase focuses on its specific domain and responsibilities
+- **Pattern Reuse Priority**: Every phase maximizes reuse of existing Chariot patterns
+- **Simplicity Enforcement**: All phases avoid overengineering and complex architectures
 - **Production Quality**: Every deliverable meets production standards
-- **Systematic Progress**: Predictable workflow with measurable milestones
 
-**Remember**: The 6-phase functional pipeline ensures systematic, high-quality backend development through proper sequential execution and clear handoffs. Following this structure is MANDATORY for all backend development tasks.
+**Remember**: The 6-phase functional pipeline with review gates ensures systematic, high-quality backend development through proper sequential execution, quality validation, and pattern reuse. Following this structure is MANDATORY for all backend development tasks.
