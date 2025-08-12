@@ -65,27 +65,37 @@ Chariot is a comprehensive attack surface management platform consisting of mult
 - **DELIVERABLE**: Deployed feature with PRs created and infrastructure validated
 - **FINAL RESULT**: Complete feature delivery ready for production
 
-### Backend Orchestrator Execution Model
+### Backend Workflow Auto-Orchestration
 
-#### Functional Pipeline Orchestration
-**ROLE**: Execute the 6 phases sequentially using functional pipeline pattern
-- **AUTO-DETECTION**: Automatically detects backend feature requests
-- **PHASE EXECUTION**: Launches each phase with Task tool, waits for completion
-- **CONTEXT PASSING**: Passes outputs from each phase to the next
-- **ERROR HANDLING**: Manages failures and retries within the pipeline
-- **PROGRESS REPORTING**: Provides clear status updates throughout execution
+#### Claude Direct Orchestration
+**CLAUDE AUTOMATICALLY DETECTS AND EXECUTES** the 6-phase pipeline when backend feature requests are detected:
 
-#### Execution Flow
+**Auto-Detection Triggers:**
+- "implement [API/endpoint/service] for [entity]"
+- "build a backend for [feature]"
+- "I need an API that [functionality]"
+- "add [authentication/integration/processing] to backend"
+- "create [data types/models] for [entities]"
+- "integrate [external service] with Chariot"
+
+**Automatic Execution Flow:**
 ```
-🏭 Backend Factory Detection → Launch 6-Phase Pipeline
+🏭 Claude detects backend request → Auto-launch 6-Phase Pipeline
 
-Phase 1: backend-summarize → Complete → Return to Orchestrator
-Phase 2: backend-plan → Complete → Return to Orchestrator  
-Phase 3: backend-implement → Complete → Return to Orchestrator
-Phase 4: backend-test → Complete → Return to Orchestrator
-Phase 5: backend-validate → Complete → Return to Orchestrator
-Phase 6: backend-commit → Complete → Feature Delivered ✅
+Phase 1: Task(backend-summarize) → Complete → Auto-proceed
+Phase 2: Task(backend-plan) → Complete → Auto-proceed
+Phase 3: Task(backend-implement) → Complete → Auto-proceed
+Phase 4: Task(backend-test) → Complete → Auto-proceed
+Phase 5: Task(backend-validate) → Complete → Auto-proceed
+Phase 6: Task(backend-commit) → Complete → Feature Delivered ✅
 ```
+
+**Claude's Orchestration Behavior:**
+- **AUTO-LAUNCH**: Immediately start Phase 1 upon detecting backend feature requests
+- **SEQUENTIAL EXECUTION**: Execute each phase completely before proceeding to next
+- **CONTEXT PASSING**: Pass all outputs from each phase to the next phase
+- **PROGRESS REPORTING**: Provide clear phase completion summaries
+- **QUALITY GATES**: Ensure each phase delivers quality work before proceeding
 
 ### Team Coordination Model
 
@@ -154,36 +164,36 @@ Phase 6: backend-commit → Complete → Feature Delivered ✅
 #### Example 1: New API Endpoint Implementation
 **6-Phase Functional Pipeline Execution:**
 
-1. **backend-orchestrator** → Executes **backend-summarize**
+1. **Claude** → Executes **Task(backend-summarize)**
    - **Business Analyst** analyzes requirements for new API endpoint
    - **Output**: Complete functional requirements with API specifications and acceptance criteria
-   - **Returns control to orchestrator**
+   - **Claude automatically proceeds to Phase 2**
 
-2. **backend-orchestrator** → Executes **backend-plan**  
+2. **Claude** → Executes **Task(backend-plan)**  
    - **Solution Architect** creates technical implementation plan
    - **Research**: Technology choices, existing patterns, architecture design
    - **Output**: Detailed technical plan with Go/AWS implementation strategy
-   - **Returns control to orchestrator**
+   - **Claude automatically proceeds to Phase 3**
 
-3. **backend-orchestrator** → Executes **backend-implement**
+3. **Claude** → Executes **Task(backend-implement)**
    - **Senior Developer** builds production-ready implementation
    - **Creates**: Go code, tabularium types, CloudFormation templates, API handlers
    - **Output**: Complete, working implementation with error handling
-   - **Returns control to orchestrator**
+   - **Claude automatically proceeds to Phase 4**
 
-4. **backend-orchestrator** → Executes **backend-test**
+4. **Claude** → Executes **Task(backend-test)**
    - **Test Engineer** creates comprehensive test suite
    - **Creates**: Unit tests, integration tests, API endpoint tests, performance benchmarks
    - **Output**: High-coverage test suite validating all functionality
-   - **Returns control to orchestrator**
+   - **Claude automatically proceeds to Phase 5**
 
-5. **backend-orchestrator** → Executes **backend-validate**
+5. **Claude** → Executes **Task(backend-validate)**
    - **QA Engineer** validates feature in real technology stack
    - **Tests**: System integration, performance, security, real-world scenarios
    - **Output**: Validated feature confirmed to work with actual Chariot stack
-   - **Returns control to orchestrator**
+   - **Claude automatically proceeds to Phase 6**
 
-6. **backend-orchestrator** → Executes **backend-commit**
+6. **Claude** → Executes **Task(backend-commit)**
    - **DevOps Engineer** deploys and submits feature
    - **Handles**: AWS deployment, git operations, PR creation, infrastructure validation
    - **Output**: Deployed feature with PRs created and ready for production
