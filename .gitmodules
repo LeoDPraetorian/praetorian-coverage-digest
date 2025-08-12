@@ -28,3 +28,6 @@
 [submodule "modules/aegiscli"]
 	path = modules/aegiscli
 	url = https://github.com/praetorian-inc/aegiscli
+[submodule "modules/chariot-aegis-capabilities"]
+	path = modules/chariot-aegis-capabilities
+	url = https://github.com/praetorian-inc/chariot-aegis-capabilities
