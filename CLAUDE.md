@@ -15,70 +15,97 @@ Chariot is a comprehensive attack surface management platform consisting of mult
 
 ## Backend Development Workflow
 
-**CRITICAL: ALL BACKEND DEVELOPMENT MUST FOLLOW THE STRUCTURED WORKFLOW BELOW**
+**CRITICAL: ALL BACKEND DEVELOPMENT MUST FOLLOW THE 4-AGENT PIPELINE BELOW**
 
-### 🚨 MANDATORY BACKEND DEVELOPMENT PROCESS
+### 🚨 MANDATORY 4-AGENT BACKEND PIPELINE
 
-**VERY IMPORTANT**: Every backend development task MUST be performed using the appropriate specialized subagents. The backend-orchestrator agent's ONLY role is to coordinate and delegate to other subagents - it should NEVER implement code directly.
+**VERY IMPORTANT**: Every backend development task MUST follow the streamlined 4-agent pipeline. Each agent's ONLY role is to coordinate and execute the appropriate specialized subagents - they should NEVER implement code directly except for the Submission Agent.
 
-### Backend Development Workflow Stages
+### 4-Agent Pipeline Structure
 
-#### 1. Requirements Analysis & Planning
-- **ALWAYS START HERE** for any backend task
-- Use `backend-requirements-analyzer` to break down feature descriptions into detailed functional requirements
-- Use `backend-implementation-planner` to create comprehensive implementation plans
-- Use `backend-functionality-analyzer` to identify reusable components and existing patterns
+#### 1. Backend Summarizer Agent
+**ROLE**: Requirements analysis and task breakdown coordination
+- **COORDINATES**: `backend-requirements-analyzer` for breaking down feature descriptions
+- **DELEGATES TO**: Requirements analysis subagents
+- **OUTPUTS**: Clear, structured requirements summary
+- **NEVER IMPLEMENTS**: Only coordinates analysis work through subagents
 
-#### 2. Research & Technology Selection
-- Use `backend-tech-research-advisor` for evaluating technology options and architectural decisions
-- Research existing codebase patterns and technologies before implementing
+#### 2. Backend Planner Agent  
+**ROLE**: Implementation strategy and research coordination
+- **COORDINATES**: 
+  - `backend-tech-research-advisor` for technology evaluation
+  - `backend-functionality-analyzer` for existing system analysis
+  - `backend-new-functionality-agent` for new component design
+  - `backend-unit-test-planner` for testing strategy
+  - `backend-implementation-planner` for comprehensive planning
+- **DELEGATES TO**: All research and planning subagents
+- **OUTPUTS**: Detailed implementation plan with technology choices
+- **NEVER IMPLEMENTS**: Only coordinates planning work through subagents
 
-#### 3. Data Types & Infrastructure
-- Use `backend-datatypes` for adding new data types to the tabularium system
-- Use `backend-cloud-infrastructure-architect` for adding cloud resources and AWS service integrations
+#### 3. Backend Implementer Agent
+**ROLE**: Core implementation coordination and execution management
+- **COORDINATES**:
+  - `backend-cloud-infrastructure-architect` for AWS resources
+  - `backend-datatypes` for tabularium data types
+  - `backend-feature-implementer` for feature implementation
+  - `backend-cli-implementer` for CLI functionality
+  - `backend-unit-test-generator` for test creation
+  - `backend-deployment-agent` for deployment setup
+  - `backend-validation-agent` for validation testing
+  - `backend-code-quality-reviewer` for code review
+- **DELEGATES TO**: All implementation and testing subagents
+- **OUTPUTS**: Complete, tested, and validated implementation
+- **NEVER IMPLEMENTS**: Only coordinates implementation work through subagents
 
-#### 4. Implementation
-- Use `backend-feature-implementer` for implementing specific features using existing infrastructure
-- Use `backend-cli-implementer` for CLI functionality and command implementations
-- **NEVER skip the implementation phase** - all code changes must go through proper implementation agents
+#### 4. Backend Submission Agent
+**ROLE**: Final submission and delivery (ONLY agent that can implement directly)
+- **CAN IMPLEMENT**: This agent can directly perform code operations
+- **HANDLES**:
+  - Git operations (commit, push, PR creation)
+  - Final code organization and cleanup
+  - Repository coordination across submodules
+  - Error resolution and final validation
+- **USES**: `git-commit-push-pr` when needed for multi-repository coordination
+- **OUTPUTS**: Deployed feature with PRs opened and ready for review
 
-#### 5. Testing Strategy & Implementation
-- Use `backend-unit-test-planner` to plan comprehensive unit test coverage
-- Use `backend-unit-test-generator` to create actual unit tests for implemented features
-- **ALL NEW BACKEND CODE MUST HAVE UNIT TESTS**
+### Backend Orchestrator Agent Rules
 
-#### 6. Quality Assurance & Validation
-- Use `backend-code-quality-reviewer` to review all code changes before committing
-- Use `backend-validation-agent` to test changes against the actual technology stack
-- **NEVER skip code review and validation**
+#### Primary Responsibility: 4-Agent Execution ONLY
+**ROLE**: Execute the 4 main pipeline agents in sequence
+- **ONLY EXECUTES**: Summarizer → Planner → Implementer → Submission
+- **NEVER IMPLEMENTS**: Does not coordinate subagents directly
+- **NEVER CREATES**: Does not create files or make code changes
+- **COORDINATES**: Only the 4 main pipeline agents, nothing else
+- **REPORTS**: Progress through the 4-agent pipeline to the user
 
-#### 7. Deployment
-- Use `backend-deployment-agent` for deploying to AWS infrastructure
-- Validate deployments and handle any deployment issues
+### Pipeline Agent Coordination Rules
 
-#### 8. Multi-Repository Coordination
-- Use `backend-feature-coordinator` when implementing features across multiple domains
-- Use `git-commit-push-pr` for committing changes across multiple submodules and creating PRs
+#### Summarizer, Planner, and Implementer Agents
+**CRITICAL COORDINATION ROLE**: Each of these 3 agents MUST:
+- **EXECUTE appropriate specialized subagents** for their domain
+- **SUMMARIZE results** from subagent execution
+- **REPORT BACK** to the orchestrator with clear outputs
+- **COORDINATE multiple subagents** within their domain as needed
+- **NEVER IMPLEMENT CODE** - all implementation through subagents only
 
-### Agent Usage Rules
+#### Submission Agent Exception
+**SPECIAL IMPLEMENTATION PERMISSION**: The Submission Agent ONLY can:
+- **DIRECTLY IMPLEMENT** git operations, file organization, and final submission tasks
+- **COORDINATE** `git-commit-push-pr` for complex multi-repository scenarios
+- **RESOLVE** final integration issues and deployment problems
+- **EXECUTE** all final delivery tasks without delegating
 
-#### Backend Orchestrator Agent
-**ROLE**: Coordination and delegation ONLY
-- **NEVER implement code directly**
-- **NEVER create files or make code changes**
-- **ONLY coordinate other specialized agents**
-- **MUST delegate all implementation work to appropriate subagents**
+### Workflow Enforcement Rules
 
-#### Implementation Workflow Enforcement
-**MANDATORY**: Every backend task must follow this pattern:
-
-1. **Start with Analysis**: Always begin with requirements analysis and planning agents
-2. **Research First**: Use research agents to understand existing patterns and technologies
-3. **Design Before Build**: Create implementation plans before writing any code
-4. **Implement Properly**: Use specialized implementation agents for actual coding
-5. **Test Everything**: Generate comprehensive unit tests for all new functionality
-6. **Review & Validate**: Use quality assurance agents before committing
-7. **Deploy Correctly**: Use deployment agents for production releases
+**MANDATORY PIPELINE EXECUTION**:
+1. **Backend-Orchestrator** executes Summarizer Agent
+2. **Summarizer Agent** coordinates requirements analysis subagents
+3. **Backend-Orchestrator** executes Planner Agent  
+4. **Planner Agent** coordinates research and planning subagents
+5. **Backend-Orchestrator** executes Implementer Agent
+6. **Implementer Agent** coordinates all implementation subagents
+7. **Backend-Orchestrator** executes Submission Agent
+8. **Submission Agent** directly handles final delivery and submission
 
 ### Technology Stack Context
 
@@ -126,33 +153,58 @@ Chariot is a comprehensive attack surface management platform consisting of mult
 
 ### Agent Coordination Examples
 
-#### Example 1: New API Endpoint
-1. `backend-requirements-analyzer` → Define functional requirements
-2. `backend-functionality-analyzer` → Check existing API patterns  
-3. `backend-implementation-planner` → Create implementation plan
-4. `backend-feature-implementer` → Implement the endpoint
-5. `backend-unit-test-generator` → Create comprehensive tests
-6. `backend-code-quality-reviewer` → Review implementation
-7. `backend-validation-agent` → Test against actual stack
-8. `backend-deployment-agent` → Deploy to AWS
+#### Example 1: New API Endpoint Implementation
+**4-Agent Pipeline Execution:**
 
-#### Example 2: Cross-Module Feature
-1. `backend-requirements-analyzer` → Break down requirements
-2. `backend-functionality-analyzer` → Identify reusable components
-3. `backend-feature-coordinator` → Coordinate implementation across modules
-4. `backend-unit-test-planner` → Plan testing strategy
-5. `backend-code-quality-reviewer` → Review all changes
-6. `git-commit-push-pr` → Commit across submodules and create PRs
+1. **Backend-Orchestrator** → Executes **Summarizer Agent**
+   - **Summarizer Agent** coordinates `backend-requirements-analyzer` 
+   - **Output**: Clear API endpoint requirements and specifications
+
+2. **Backend-Orchestrator** → Executes **Planner Agent**  
+   - **Planner Agent** coordinates:
+     - `backend-functionality-analyzer` → Check existing API patterns
+     - `backend-tech-research-advisor` → Research optimal approaches
+     - `backend-implementation-planner` → Create detailed implementation plan
+   - **Output**: Comprehensive implementation strategy
+
+3. **Backend-Orchestrator** → Executes **Implementer Agent**
+   - **Implementer Agent** coordinates:
+     - `backend-feature-implementer` → Implement the endpoint
+     - `backend-unit-test-generator` → Create comprehensive tests  
+     - `backend-code-quality-reviewer` → Review implementation
+     - `backend-validation-agent` → Test against actual stack
+   - **Output**: Complete, tested, validated implementation
+
+4. **Backend-Orchestrator** → Executes **Submission Agent**
+   - **Submission Agent** directly handles:
+     - Git operations (commit, push)
+     - PR creation and repository coordination
+     - Final deployment coordination
+   - **Output**: Deployed feature with PRs ready for review
+
+#### Example 2: Cross-Module Feature Development  
+**4-Agent Pipeline with Multi-Repository Coordination:**
+
+1. **Summarizer Agent** → Coordinates requirements analysis across modules
+2. **Planner Agent** → Coordinates research and planning for all affected components  
+3. **Implementer Agent** → Coordinates implementation across multiple domains
+4. **Submission Agent** → Uses `git-commit-push-pr` for cross-repository coordination
 
 ### Success Criteria
 
-Every backend development task is considered complete only when:
+Every backend development task is considered complete only when the **4-Agent Pipeline** has been fully executed:
 
-✅ **Requirements are fully analyzed and documented**  
-✅ **Implementation follows existing patterns and best practices**  
-✅ **Comprehensive unit tests are created and passing**  
-✅ **Code quality review is completed with no issues**  
-✅ **Changes are validated against the actual technology stack**  
-✅ **Deployment is successful and verified**  
+✅ **Summarizer Agent**: Requirements fully analyzed and documented by coordination subagents  
+✅ **Planner Agent**: Implementation strategy created through coordinated research subagents  
+✅ **Implementer Agent**: Complete implementation delivered through coordinated specialized subagents  
+✅ **Submission Agent**: Final delivery with PRs created and deployment verified  
 
-**Remember**: The backend development workflow exists to ensure high-quality, maintainable, and secure code. Following every step is not optional - it is MANDATORY for all backend development tasks.
+### Critical Reminders
+
+**COORDINATION IS KEY**: 
+- **Backend-Orchestrator**: ONLY executes the 4 main agents
+- **3 Pipeline Agents**: ONLY coordinate specialized subagents (never implement)
+- **Submission Agent**: ONLY agent allowed to implement directly
+- **All Implementation Work**: MUST be done by specialized subagents
+
+**Remember**: The 4-agent pipeline exists to ensure systematic, high-quality backend development through proper delegation and coordination. Following this structure is MANDATORY for all backend development tasks.
