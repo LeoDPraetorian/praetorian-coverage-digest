@@ -15,97 +15,93 @@ Chariot is a comprehensive attack surface management platform consisting of mult
 
 ## Backend Development Workflow
 
-**CRITICAL: ALL BACKEND DEVELOPMENT MUST FOLLOW THE 4-AGENT PIPELINE BELOW**
+**CRITICAL: ALL BACKEND DEVELOPMENT MUST FOLLOW THE 6-PHASE FUNCTIONAL PIPELINE BELOW**
 
-### 🚨 MANDATORY 4-AGENT BACKEND PIPELINE
+### 🏭 MANDATORY 6-PHASE BACKEND FUNCTIONAL PIPELINE
 
-**VERY IMPORTANT**: Every backend development task MUST follow the streamlined 4-agent pipeline. Each agent's ONLY role is to coordinate and execute the appropriate specialized subagents - they should NEVER implement code directly except for the Submission Agent.
+**VERY IMPORTANT**: Every backend development task MUST follow the streamlined 6-phase functional pipeline. Each phase executes completely, returns control to the orchestrator, which then launches the next phase in sequence.
 
-### 4-Agent Pipeline Structure
+### 6-Phase Functional Pipeline Structure
 
-#### 1. Backend Summarizer Agent
-**ROLE**: Requirements analysis and task breakdown coordination
-- **COORDINATES**: `backend-requirements-analyzer` for breaking down feature descriptions
-- **DELEGATES TO**: Requirements analysis subagents
-- **OUTPUTS**: Clear, structured requirements summary
-- **NEVER IMPLEMENTS**: Only coordinates analysis work through subagents
+#### Phase 1: backend-summarize (Business Analyst)
+**ROLE**: Requirements analysis and functional specification
+- **RESPONSIBILITY**: Break down feature requests into comprehensive functional requirements
+- **EXPERTISE**: Backend system requirements, API specifications, data modeling
+- **DELIVERABLE**: Complete functional requirements document with acceptance criteria
+- **NEXT PHASE**: Passes requirements to Solution Architect for technical planning
 
-#### 2. Backend Planner Agent  
-**ROLE**: Implementation strategy and research coordination
-- **COORDINATES**: 
-  - `backend-tech-research-advisor` for technology evaluation
-  - `backend-functionality-analyzer` for existing system analysis
-  - `backend-new-functionality-agent` for new component design
-  - `backend-unit-test-planner` for testing strategy
-  - `backend-implementation-planner` for comprehensive planning
-- **DELEGATES TO**: All research and planning subagents
-- **OUTPUTS**: Detailed implementation plan with technology choices
-- **NEVER IMPLEMENTS**: Only coordinates planning work through subagents
+#### Phase 2: backend-plan (Solution Architect)
+**ROLE**: Technical planning and architecture design
+- **RESPONSIBILITY**: Transform requirements into detailed technical implementation plans
+- **EXPERTISE**: Go/AWS architecture, technology selection, system design
+- **DELIVERABLE**: Comprehensive technical plan with component architecture and technology stack
+- **NEXT PHASE**: Passes implementation plan to Senior Developer
 
-#### 3. Backend Implementer Agent
-**ROLE**: Core implementation coordination and execution management
-- **COORDINATES**:
-  - `backend-cloud-infrastructure-architect` for AWS resources
-  - `backend-datatypes` for tabularium data types
-  - `backend-feature-implementer` for feature implementation
-  - `backend-cli-implementer` for CLI functionality
-  - `backend-unit-test-generator` for test creation
-  - `backend-deployment-agent` for deployment setup
-  - `backend-validation-agent` for validation testing
-  - `backend-code-quality-reviewer` for code review
-- **DELEGATES TO**: All implementation and testing subagents
-- **OUTPUTS**: Complete, tested, and validated implementation
-- **NEVER IMPLEMENTS**: Only coordinates implementation work through subagents
+#### Phase 3: backend-implement (Senior Developer)
+**ROLE**: Core implementation and feature development
+- **RESPONSIBILITY**: Build production-ready Go code, CloudFormation templates, and APIs
+- **EXPERTISE**: Go development, AWS services, tabularium types, API implementation
+- **DELIVERABLE**: Complete, working implementation with proper error handling
+- **NEXT PHASE**: Passes implemented code to Test Engineer
 
-#### 4. Backend Submission Agent
-**ROLE**: Final submission and delivery (ONLY agent that can implement directly)
-- **CAN IMPLEMENT**: This agent can directly perform code operations
-- **HANDLES**:
-  - Git operations (commit, push, PR creation)
-  - Final code organization and cleanup
-  - Repository coordination across submodules
-  - Error resolution and final validation
-- **USES**: `git-commit-push-pr` when needed for multi-repository coordination
-- **OUTPUTS**: Deployed feature with PRs opened and ready for review
+#### Phase 4: backend-test (Test Engineer)
+**ROLE**: Comprehensive testing and quality assurance
+- **RESPONSIBILITY**: Create thorough unit and integration test suites
+- **EXPERTISE**: Go testing patterns, API testing, test coverage analysis
+- **DELIVERABLE**: Comprehensive test suite with high coverage and quality validation
+- **NEXT PHASE**: Passes tested code to QA Engineer
 
-### Backend Orchestrator Agent Rules
+#### Phase 5: backend-validate (QA Engineer)
+**ROLE**: System validation and integration testing
+- **RESPONSIBILITY**: Validate feature works correctly in actual technology stack
+- **EXPERTISE**: System testing, performance validation, security testing
+- **DELIVERABLE**: Validated feature with real-world testing and quality confirmation
+- **NEXT PHASE**: Passes validated feature to DevOps Engineer
 
-#### Primary Responsibility: 4-Agent Execution ONLY
-**ROLE**: Execute the 4 main pipeline agents in sequence
-- **ONLY EXECUTES**: Summarizer → Planner → Implementer → Submission
-- **NEVER IMPLEMENTS**: Does not coordinate subagents directly
-- **NEVER CREATES**: Does not create files or make code changes
-- **COORDINATES**: Only the 4 main pipeline agents, nothing else
-- **REPORTS**: Progress through the 4-agent pipeline to the user
+#### Phase 6: backend-commit (DevOps Engineer)
+**ROLE**: Deployment and final submission
+- **RESPONSIBILITY**: Deploy infrastructure, handle git operations, create PRs
+- **EXPERTISE**: AWS deployment, SAM validation, git workflows, production deployment
+- **DELIVERABLE**: Deployed feature with PRs created and infrastructure validated
+- **FINAL RESULT**: Complete feature delivery ready for production
 
-### Pipeline Agent Coordination Rules
+### Backend Orchestrator Execution Model
 
-#### Summarizer, Planner, and Implementer Agents
-**CRITICAL COORDINATION ROLE**: Each of these 3 agents MUST:
-- **EXECUTE appropriate specialized subagents** for their domain
-- **SUMMARIZE results** from subagent execution
-- **REPORT BACK** to the orchestrator with clear outputs
-- **COORDINATE multiple subagents** within their domain as needed
-- **NEVER IMPLEMENT CODE** - all implementation through subagents only
+#### Functional Pipeline Orchestration
+**ROLE**: Execute the 6 phases sequentially using functional pipeline pattern
+- **AUTO-DETECTION**: Automatically detects backend feature requests
+- **PHASE EXECUTION**: Launches each phase with Task tool, waits for completion
+- **CONTEXT PASSING**: Passes outputs from each phase to the next
+- **ERROR HANDLING**: Manages failures and retries within the pipeline
+- **PROGRESS REPORTING**: Provides clear status updates throughout execution
 
-#### Submission Agent Exception
-**SPECIAL IMPLEMENTATION PERMISSION**: The Submission Agent ONLY can:
-- **DIRECTLY IMPLEMENT** git operations, file organization, and final submission tasks
-- **COORDINATE** `git-commit-push-pr` for complex multi-repository scenarios
-- **RESOLVE** final integration issues and deployment problems
-- **EXECUTE** all final delivery tasks without delegating
+#### Execution Flow
+```
+🏭 Backend Factory Detection → Launch 6-Phase Pipeline
 
-### Workflow Enforcement Rules
+Phase 1: backend-summarize → Complete → Return to Orchestrator
+Phase 2: backend-plan → Complete → Return to Orchestrator  
+Phase 3: backend-implement → Complete → Return to Orchestrator
+Phase 4: backend-test → Complete → Return to Orchestrator
+Phase 5: backend-validate → Complete → Return to Orchestrator
+Phase 6: backend-commit → Complete → Feature Delivered ✅
+```
 
-**MANDATORY PIPELINE EXECUTION**:
-1. **Backend-Orchestrator** executes Summarizer Agent
-2. **Summarizer Agent** coordinates requirements analysis subagents
-3. **Backend-Orchestrator** executes Planner Agent  
-4. **Planner Agent** coordinates research and planning subagents
-5. **Backend-Orchestrator** executes Implementer Agent
-6. **Implementer Agent** coordinates all implementation subagents
-7. **Backend-Orchestrator** executes Submission Agent
-8. **Submission Agent** directly handles final delivery and submission
+### Team Coordination Model
+
+#### Functional Pipeline Benefits
+- **Clear Handoffs**: Each phase completes before the next begins
+- **Specialized Expertise**: Each team member focuses on their domain
+- **Quality Gates**: No phase proceeds until previous phase delivers quality work
+- **Systematic Progress**: Predictable workflow with measurable milestones
+- **Error Isolation**: Issues contained within specific phases
+
+#### Phase Execution Standards
+- **Complete Execution**: Each phase must fully complete its responsibilities
+- **Quality Deliverables**: No shortcuts or incomplete work passed forward
+- **Clear Communication**: Status updates and deliverable summaries required
+- **Context Preservation**: All relevant information passed between phases
+- **Error Recovery**: Failed phases retry with feedback before escalation
 
 ### Technology Stack Context
 
@@ -145,66 +141,88 @@ Chariot is a comprehensive attack surface management platform consisting of mult
 6. **Proper Agent Usage**: Use the correct specialized agent for each task type
 
 #### ⚠️ ALWAYS Follow These Patterns:
-- **Backend-Orchestrator Delegates Only**: Never implements code directly
-- **Specialized Agents Implement**: Each agent handles its specific domain
-- **Human-in-the-Loop**: Pause for approval on significant architectural decisions
-- **Test-Driven Development**: Write tests alongside implementation
+- **Functional Pipeline Execution**: 6 phases execute sequentially, each completing before next
+- **Phase-Specific Expertise**: Each phase focuses on its specialized domain and responsibilities
+- **Quality Handoffs**: Complete deliverables before moving to next phase
+- **Context Preservation**: Pass all relevant information between phases
+- **Production Standards**: Every phase delivers production-quality work
+- **Test-Driven Development**: Comprehensive testing in dedicated testing phase
 - **Infrastructure as Code**: Use CloudFormation for all AWS resources
 
-### Agent Coordination Examples
+### Functional Pipeline Examples
 
 #### Example 1: New API Endpoint Implementation
-**4-Agent Pipeline Execution:**
+**6-Phase Functional Pipeline Execution:**
 
-1. **Backend-Orchestrator** → Executes **Summarizer Agent**
-   - **Summarizer Agent** coordinates `backend-requirements-analyzer` 
-   - **Output**: Clear API endpoint requirements and specifications
+1. **backend-orchestrator** → Executes **backend-summarize**
+   - **Business Analyst** analyzes requirements for new API endpoint
+   - **Output**: Complete functional requirements with API specifications and acceptance criteria
+   - **Returns control to orchestrator**
 
-2. **Backend-Orchestrator** → Executes **Planner Agent**  
-   - **Planner Agent** coordinates:
-     - `backend-functionality-analyzer` → Check existing API patterns
-     - `backend-tech-research-advisor` → Research optimal approaches
-     - `backend-implementation-planner` → Create detailed implementation plan
-   - **Output**: Comprehensive implementation strategy
+2. **backend-orchestrator** → Executes **backend-plan**  
+   - **Solution Architect** creates technical implementation plan
+   - **Research**: Technology choices, existing patterns, architecture design
+   - **Output**: Detailed technical plan with Go/AWS implementation strategy
+   - **Returns control to orchestrator**
 
-3. **Backend-Orchestrator** → Executes **Implementer Agent**
-   - **Implementer Agent** coordinates:
-     - `backend-feature-implementer` → Implement the endpoint
-     - `backend-unit-test-generator` → Create comprehensive tests  
-     - `backend-code-quality-reviewer` → Review implementation
-     - `backend-validation-agent` → Test against actual stack
-   - **Output**: Complete, tested, validated implementation
+3. **backend-orchestrator** → Executes **backend-implement**
+   - **Senior Developer** builds production-ready implementation
+   - **Creates**: Go code, tabularium types, CloudFormation templates, API handlers
+   - **Output**: Complete, working implementation with error handling
+   - **Returns control to orchestrator**
 
-4. **Backend-Orchestrator** → Executes **Submission Agent**
-   - **Submission Agent** directly handles:
-     - Git operations (commit, push)
-     - PR creation and repository coordination
-     - Final deployment coordination
-   - **Output**: Deployed feature with PRs ready for review
+4. **backend-orchestrator** → Executes **backend-test**
+   - **Test Engineer** creates comprehensive test suite
+   - **Creates**: Unit tests, integration tests, API endpoint tests, performance benchmarks
+   - **Output**: High-coverage test suite validating all functionality
+   - **Returns control to orchestrator**
 
-#### Example 2: Cross-Module Feature Development  
-**4-Agent Pipeline with Multi-Repository Coordination:**
+5. **backend-orchestrator** → Executes **backend-validate**
+   - **QA Engineer** validates feature in real technology stack
+   - **Tests**: System integration, performance, security, real-world scenarios
+   - **Output**: Validated feature confirmed to work with actual Chariot stack
+   - **Returns control to orchestrator**
 
-1. **Summarizer Agent** → Coordinates requirements analysis across modules
-2. **Planner Agent** → Coordinates research and planning for all affected components  
-3. **Implementer Agent** → Coordinates implementation across multiple domains
-4. **Submission Agent** → Uses `git-commit-push-pr` for cross-repository coordination
+6. **backend-orchestrator** → Executes **backend-commit**
+   - **DevOps Engineer** deploys and submits feature
+   - **Handles**: AWS deployment, git operations, PR creation, infrastructure validation
+   - **Output**: Deployed feature with PRs created and ready for production
+
+#### Example 2: Complex Integration Feature (e.g., Okta SSO)
+**6-Phase Pipeline with External Service Integration:**
+
+1. **Phase 1**: Business Analyst breaks down SSO requirements, correlation logic, asset management
+2. **Phase 2**: Solution Architect designs OAuth2 integration, API patterns, data flow architecture
+3. **Phase 3**: Senior Developer implements Okta client, correlation services, tabularium types
+4. **Phase 4**: Test Engineer creates comprehensive tests including external service mocks
+5. **Phase 5**: QA Engineer validates integration with real Okta instance and end-to-end workflows
+6. **Phase 6**: DevOps Engineer deploys infrastructure, handles secrets management, creates PRs
 
 ### Success Criteria
 
-Every backend development task is considered complete only when the **4-Agent Pipeline** has been fully executed:
+Every backend development task is considered complete only when the **6-Phase Functional Pipeline** has been fully executed:
 
-✅ **Summarizer Agent**: Requirements fully analyzed and documented by coordination subagents  
-✅ **Planner Agent**: Implementation strategy created through coordinated research subagents  
-✅ **Implementer Agent**: Complete implementation delivered through coordinated specialized subagents  
-✅ **Submission Agent**: Final delivery with PRs created and deployment verified  
+✅ **Phase 1 (backend-summarize)**: Complete functional requirements with acceptance criteria  
+✅ **Phase 2 (backend-plan)**: Detailed technical implementation plan with architecture decisions  
+✅ **Phase 3 (backend-implement)**: Production-ready code with proper error handling and patterns
+✅ **Phase 4 (backend-test)**: Comprehensive test suite with high coverage and quality validation
+✅ **Phase 5 (backend-validate)**: System validation with real-world testing confirmation  
+✅ **Phase 6 (backend-commit)**: Deployed feature with PRs created and infrastructure validated
 
 ### Critical Reminders
 
-**COORDINATION IS KEY**: 
-- **Backend-Orchestrator**: ONLY executes the 4 main agents
-- **3 Pipeline Agents**: ONLY coordinate specialized subagents (never implement)
-- **Submission Agent**: ONLY agent allowed to implement directly
-- **All Implementation Work**: MUST be done by specialized subagents
+**FUNCTIONAL PIPELINE EXECUTION**: 
+- **Backend-Orchestrator**: Executes 6 phases sequentially using Task tool
+- **Each Phase**: Completes fully before returning control to orchestrator
+- **Context Passing**: Each phase receives outputs from previous phase
+- **Quality Gates**: No phase proceeds until previous phase delivers quality work
+- **Error Handling**: Failed phases retry with feedback before escalation
 
-**Remember**: The 4-agent pipeline exists to ensure systematic, high-quality backend development through proper delegation and coordination. Following this structure is MANDATORY for all backend development tasks.
+**Key Principles**:
+- **Sequential Execution**: Phases run one at a time, never in parallel
+- **Complete Handoffs**: Each team member finishes their work before next phase
+- **Specialized Expertise**: Each phase focuses on its specific domain and responsibilities
+- **Production Quality**: Every deliverable meets production standards
+- **Systematic Progress**: Predictable workflow with measurable milestones
+
+**Remember**: The 6-phase functional pipeline ensures systematic, high-quality backend development through proper sequential execution and clear handoffs. Following this structure is MANDATORY for all backend development tasks.
