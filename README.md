@@ -23,6 +23,24 @@ This super-repository unifies all Chariot repositories and provides shared workf
 
 ## Quick Start
 
+### Setting Up Chariot Stack
+
+```bash
+# Deploy complete Chariot stack (CloudFormation + React UI)
+make chariot
+
+# Generate test user with UUID credentials
+make user
+
+# Credentials are automatically stored in .env:
+# PRAETORIAN_CLI_USERNAME={uuid}@praetorian.com
+# PRAETORIAN_CLI_PASSWORD={uuid-no-dashes}Aa1!
+```
+
+The UI will be available at https://localhost:3000 with the generated credentials.
+
+### Development Workflow
+
 ```bash
 # Initialize all submodules
 make update

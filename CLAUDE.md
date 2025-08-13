@@ -94,6 +94,33 @@ Instead of rigid phases, we have a **toolkit of specialized capabilities** that 
 - `/backend/cf-templates/`: CloudFormation infrastructure templates
 - `/cli/`: Command-line interface applications
 
+### Chariot Stack Setup
+
+#### Quick Stack Deployment
+For setting up a complete Chariot development environment:
+
+```bash
+# Deploy complete stack (CloudFormation backend + React UI)
+make chariot
+
+# Generate test user with UUID-based credentials
+make user
+```
+
+**What this does:**
+1. **make chariot**: Deploys AWS CloudFormation stack, builds Docker containers, starts React UI on https://localhost:3000
+2. **make user**: Creates AWS Cognito user with UUID-based email/password, stores credentials in root `.env` file
+
+**Credentials Format:**
+- Email: `{uuid}@praetorian.com`
+- Password: `{uuid-without-dashes}Aa1!` (meets AWS Cognito policy)
+- Environment variables: `PRAETORIAN_CLI_USERNAME` and `PRAETORIAN_CLI_PASSWORD`
+
+**Important Notes:**
+- `.env` file is gitignored to protect credentials
+- Credentials are compatible with Praetorian CLI authentication
+- UI accessible at https://localhost:3000 immediately after deployment
+
 ### Development Standards
 
 #### Code Quality Requirements
@@ -125,6 +152,8 @@ Instead of rigid phases, we have a **toolkit of specialized capabilities** that 
 - **Ignore agent recommendations**: Trust specialized agent expertise over general approaches
 
 ### Example Workflows
+
+**Note**: For all development work, ensure Chariot stack is set up first using `make chariot` and `make user` to provide a working environment for testing and validation.
 
 #### Backend API Development (Agent-First)
 1. **requirements-researcher** + **codebase-explorer** (concurrent) → analyze requirements and existing patterns
