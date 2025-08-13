@@ -44,14 +44,15 @@ create-prs:
 	git submodule foreach 'gh pr create'
 
 logs:
-	@echo "Collecting logs from all CHARIOT_STACK CloudWatch log groups..."
+	@echo "Collecting logs from all CHARIOT_STACK CloudWatch log groups using AWS Live Tail..."
 	@cd modules/chariot/backend && source .env && \
+	ACCOUNT_ID=$$(aws sts get-caller-identity --query Account --output text) && \
+	REGION=$$(aws configure get region || echo "us-east-2") && \
 	aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/$$CHARIOT_STACK" --query 'logGroups[].logGroupName' --output text | \
 	tr '\t' '\n' | \
 	while read -r group; do \
 		if [ -n "$$group" ]; then \
-			echo "Tailing $$group..."; \
-			aws logs tail "$$group" --follow & \
+			echo "arn:aws:logs:$$REGION:$$ACCOUNT_ID:log-group:$$group"; \
 		fi; \
-	done; \
-	wait
+	done | \
+	xargs -n 10 aws logs start-live-tail --log-group-identifiers
