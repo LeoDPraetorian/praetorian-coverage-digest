@@ -2,10 +2,9 @@ chariot:
 	open -ja Docker
 	@echo "Deploying backend."
 	cd modules/chariot/backend && make -j4 dev
-	@echo "Backend deployment complete. Deploying frontend."
+	@echo "Backend deployment complete. Starting local frontend."
 	cd modules/chariot/backend && make populate-env
 	cd modules/chariot/ui && npm i && npm run start
-	@echo "Deployment complete."
 
 user:
 	@UUID=$$(uuidgen | tr '[:upper:]' '[:lower:]') && \
@@ -43,3 +42,16 @@ create:
 
 create-prs:
 	git submodule foreach 'gh pr create'
+
+logs:
+	@echo "Collecting logs from all CHARIOT_STACK CloudWatch log groups..."
+	@cd modules/chariot/backend && source .env && \
+	aws logs describe-log-groups --log-group-name-prefix "/aws/lambda/$$CHARIOT_STACK" --query 'logGroups[].logGroupName' --output text | \
+	tr '\t' '\n' | \
+	while read -r group; do \
+		if [ -n "$$group" ]; then \
+			echo "Tailing $$group..."; \
+			aws logs tail "$$group" --follow & \
+		fi; \
+	done; \
+	wait

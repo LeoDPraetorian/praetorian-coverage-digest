@@ -108,13 +108,8 @@ make user
 ```
 
 **What this does:**
-1. **make chariot**: Deploys AWS CloudFormation stack, builds Docker containers, starts React UI on https://localhost:3000
-2. **make user**: Creates AWS Cognito user with UUID-based email/password, stores credentials in root `.env` file
-
-**Credentials Format:**
-- Email: `{uuid}@praetorian.com`
-- Password: `{uuid-without-dashes}Aa1!` (meets AWS Cognito policy)
-- Environment variables: `PRAETORIAN_CLI_USERNAME` and `PRAETORIAN_CLI_PASSWORD`
+1. **make chariot**: Deploys AWS CloudFormation stack, builds Docker containers, starts React UI on https://localhost:3000 (process runs in foreground - when you see the localhost:3000 prompt, the server is ready)
+2. **make user**: Creates AWS Cognito user with UUID-based credentials, stores credentials in root `.env` file
 
 **Important Notes:**
 - `.env` file is gitignored to protect credentials
