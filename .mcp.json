@@ -1,12 +1,22 @@
 {
   "mcpServers": {
-    "playwright": {
-      "type": "stdio",
+    "claude-flow": {
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest"
+        "claude-flow@alpha",
+        "mcp",
+        "start"
       ],
-      "env": {}
+      "type": "stdio"
+    },
+    "ruv-swarm": {
+      "command": "npx",
+      "args": [
+        "ruv-swarm@latest",
+        "mcp",
+        "start"
+      ],
+      "type": "stdio"
     }
   }
 }

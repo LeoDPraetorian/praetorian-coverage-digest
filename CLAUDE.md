@@ -1,237 +1,272 @@
-# Claude Configuration for Chariot Development Platform
+# Claude Code Configuration - SPARC Development Environment
 
-This file contains configuration and context for the Claude Code assistant working on the Chariot security platform development environment.
+## 🚨 CRITICAL: CONCURRENT EXECUTION & FILE MANAGEMENT
+
+**ABSOLUTE RULES**:
+1. ALL operations MUST be concurrent/parallel in a single message
+2. **NEVER save working files, text/mds and tests to the root folder**
+3. ALWAYS organize files in appropriate subdirectories
+
+### ⚡ GOLDEN RULE: "1 MESSAGE = ALL RELATED OPERATIONS"
+
+**MANDATORY PATTERNS:**
+- **TodoWrite**: ALWAYS batch ALL todos in ONE call (5-10+ todos minimum)
+- **Task tool**: ALWAYS spawn ALL agents in ONE message with full instructions
+- **File operations**: ALWAYS batch ALL reads/writes/edits in ONE message
+- **Bash commands**: ALWAYS batch ALL terminal operations in ONE message
+- **Memory operations**: ALWAYS batch ALL memory store/retrieve in ONE message
+
+### 📁 File Organization Rules
+
+**NEVER save to root folder. Use these directories:**
+- `/src` - Source code files
+- `/tests` - Test files
+- `/docs` - Documentation and markdown files
+- `/config` - Configuration files
+- `/scripts` - Utility scripts
+- `/examples` - Example code
 
 ## Project Overview
 
-Chariot is a comprehensive attack surface management platform consisting of multiple modules:
+This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Completion) methodology with Claude-Flow orchestration for systematic Test-Driven Development.
 
-- **chariot**: Core backend services (Go) and CLI tools
-- **janus**: Security testing frameworks and tools
-- **nebula**: Cloud security reconnaissance and analysis tools
-- **tabularium**: Data management and API layer
-- **nuclei-templates**: Security scanning templates
-- **praetorian-cli**: Command-line interface tools
+## SPARC Commands
 
-## Development Workflow Philosophy
+### Core Commands
+- `npx claude-flow sparc modes` - List available modes
+- `npx claude-flow sparc run <mode> "<task>"` - Execute specific mode
+- `npx claude-flow sparc tdd "<feature>"` - Run complete TDD workflow
+- `npx claude-flow sparc info <mode>` - Get mode details
 
-**NEW APPROACH**: We use an **organic, flexible development workflow** that adapts to the specific needs of each task rather than following a rigid predetermined sequence. This approach works effectively for backend and CLI development.
+### Batchtools Commands
+- `npx claude-flow sparc batch <modes> "<task>"` - Parallel execution
+- `npx claude-flow sparc pipeline "<task>"` - Full pipeline processing
+- `npx claude-flow sparc concurrent <mode> "<tasks-file>"` - Multi-task processing
 
-### Core Development Principles
+### Build Commands
+- `npm run build` - Build project
+- `npm run test` - Run tests
+- `npm run lint` - Linting
+- `npm run typecheck` - Type checking
 
-#### 🎯 Goal-Oriented Development
-- Start with **clear success criteria** and work backwards to determine the best approach
-- Allow the natural flow of the task to determine which tools and techniques to use
-- Adapt the process based on what the specific task requires
+## SPARC Workflow Phases
 
-#### 🧰 Tool-Based Rather Than Phase-Based
-Instead of rigid phases, we have a **toolkit of specialized capabilities** that can be used as needed:
+1. **Specification** - Requirements analysis (`sparc run spec-pseudocode`)
+2. **Pseudocode** - Algorithm design (`sparc run spec-pseudocode`)
+3. **Architecture** - System design (`sparc run architect`)
+4. **Refinement** - TDD implementation (`sparc tdd`)
+5. **Completion** - Integration (`sparc run integration`)
 
-**Research & Discovery Tools:**
-- **requirements-researcher**: Analyzes requirements, explores existing patterns, researches best practices
-- **codebase-explorer**: Investigates existing code, capabilities, and architectural patterns
-- **web-researcher**: Searches for external documentation, APIs, and integration patterns
+## Code Style & Best Practices
 
-**Implementation Tools:**
-- **go-developer**: Writes Go backend code, APIs, CLI tools, CloudFormation templates
-- **integration-specialist**: Handles external service integrations and data flows
-- **infrastructure-engineer**: Manages AWS resources, SAM templates, deployment configurations
+- **Modular Design**: Files under 500 lines
+- **Environment Safety**: Never hardcode secrets
+- **Test-First**: Write tests before implementation
+- **Clean Architecture**: Separate concerns
+- **Documentation**: Keep updated
 
-**Quality Assurance Tools:**
-- **test-engineer**: Creates unit tests, integration tests, and test automation
-- **code-reviewer**: Reviews code quality, security, and adherence to standards
-- **validator**: Tests features against real systems and validates end-to-end functionality
-- **deployment-manager**: Handles git operations, PR creation, and production deployment
+## 🚀 Available Agents (54 Total)
 
-### Flexible Workflow Process
+### Core Development
+`coder`, `reviewer`, `tester`, `planner`, `researcher`
 
-#### Phase 1: Discovery & Planning
-**Objective**: Understand the problem and define success criteria
+### Swarm Coordination
+`hierarchical-coordinator`, `mesh-coordinator`, `adaptive-coordinator`, `collective-intelligence-coordinator`, `swarm-memory-manager`
 
-**Available Tools**: Use any combination as needed
-- Research requirements and existing patterns
-- Explore codebase for reusable components
-- Define clear acceptance criteria
-- Create implementation strategy
-- Identify potential challenges and solutions
+### Consensus & Distributed
+`byzantine-coordinator`, `raft-manager`, `gossip-coordinator`, `consensus-builder`, `crdt-synchronizer`, `quorum-manager`, `security-manager`
 
-#### Phase 2: Dynamic Implementation
-**Objective**: Build the solution using the most appropriate tools for the task
+### Performance & Optimization
+`perf-analyzer`, `performance-benchmarker`, `task-orchestrator`, `memory-coordinator`, `smart-agent`
 
-**Adaptive Process**: 
-- Select tools based on what the task requires (backend, CLI, integration, etc.)
-- Use tools in whatever order makes sense for the specific problem
-- Switch between tools fluidly as needs evolve
-- Iterate on implementation based on feedback and discoveries
+### GitHub & Repository
+`github-modes`, `pr-manager`, `code-review-swarm`, `issue-tracker`, `release-manager`, `workflow-automation`, `project-board-sync`, `repo-architect`, `multi-repo-swarm`
 
-#### Phase 3: Validation & Delivery
-**Objective**: Ensure quality and deploy the solution
+### SPARC Methodology
+`sparc-coord`, `sparc-coder`, `specification`, `pseudocode`, `architecture`, `refinement`
 
-**Quality Gates**:
-- Comprehensive testing (unit, integration, end-to-end)
-- Code review and security validation
-- Real-world testing against actual systems
-- Deployment and final verification
+### Specialized Development
+`backend-dev`, `mobile-dev`, `ml-developer`, `cicd-engineer`, `api-docs`, `system-architect`, `code-analyzer`, `base-template-generator`
 
-### Technology Stack Context
+### Testing & Validation
+`tdd-london-swarm`, `production-validator`
 
-#### Backend Technologies
-- **Language**: Go
-- **Cloud**: AWS (Lambda, CloudFormation, S3, etc.)
-- **Data**: Tabularium types and interfaces
-- **Architecture**: Microservices with SAM (Serverless Application Model)
+### Migration & Planning
+`migration-planner`, `swarm-init`
 
-#### CLI Technologies
-- **Language**: Go
-- **CLI Framework**: Cobra or similar
-- **Configuration**: YAML/JSON config files
-- **Distribution**: Binary executables
+## 🎯 Claude Code vs MCP Tools
 
-#### Key Directories
-- `/backend/`: Go-based backend services
-- `/backend/pkg/`: Shared Go packages and utilities  
-- `/backend/cmd/`: Command-line applications
-- `/backend/cf-templates/`: CloudFormation infrastructure templates
-- `/cli/`: Command-line interface applications
+### Claude Code Handles ALL:
+- File operations (Read, Write, Edit, MultiEdit, Glob, Grep)
+- Code generation and programming
+- Bash commands and system operations
+- Implementation work
+- Project navigation and analysis
+- TodoWrite and task management
+- Git operations
+- Package management
+- Testing and debugging
 
-### Chariot Stack Setup
+### MCP Tools ONLY:
+- Coordination and planning
+- Memory management
+- Neural features
+- Performance tracking
+- Swarm orchestration
+- GitHub integration
 
-#### Quick Stack Deployment
-For setting up a complete Chariot development environment:
+**KEY**: MCP coordinates, Claude Code executes.
+
+## 🚀 Quick Setup
 
 ```bash
-# Deploy complete stack (CloudFormation backend + React UI)
-make chariot
-
-# Generate test user with UUID-based credentials
-make user
+# Add Claude Flow MCP server
+claude mcp add claude-flow npx claude-flow@alpha mcp start
 ```
 
-**What this does:**
-1. **make chariot**: Deploys AWS CloudFormation stack, builds Docker containers, starts React UI on https://localhost:3000 (process runs in foreground - when you see the localhost:3000 prompt, the server is ready)
-2. **make user**: Creates AWS Cognito user with UUID-based credentials, stores credentials in root `.env` file
+## MCP Tool Categories
 
-**Important Notes:**
-- `.env` file is gitignored to protect credentials
-- Credentials are compatible with Praetorian CLI authentication
-- UI accessible at https://localhost:3000 immediately after deployment
+### Coordination
+`swarm_init`, `agent_spawn`, `task_orchestrate`
 
-### Development Standards
+### Monitoring
+`swarm_status`, `agent_list`, `agent_metrics`, `task_status`, `task_results`
 
-#### Code Quality Requirements
-- **Linting**: Run `make lint` before committing
-- **Testing**: Run `make test` to execute all tests
-- **Type Checking**: Ensure code compiles without errors
-- **Documentation**: Follow language-specific documentation conventions
+### Memory & Neural
+`memory_usage`, `neural_status`, `neural_train`, `neural_patterns`
 
-#### Security Considerations
-- **Defensive Security Only**: Only assist with defensive security tasks
-- **No Malicious Code**: Refuse to create or improve potentially malicious code
-- **Security Best Practices**: Never expose secrets or credentials in code
+### GitHub Integration
+`github_swarm`, `repo_analyze`, `pr_enhance`, `issue_triage`, `code_review`
 
-### Workflow Guidelines
+### System
+`benchmark_run`, `features_detect`, `swarm_monitor`
 
-#### ✅ DO:
-- **Use agents proactively**: ALWAYS launch appropriate specialized agents for every task
-- **Start with success criteria**: Use requirements-researcher to define what "done" looks like
-- **Leverage agent expertise**: Trust agent specialization over general approaches
-- **Orchestrate multiple agents**: Use concurrent and sequential patterns for comprehensive results
-- **Reuse existing patterns**: Use codebase-explorer to discover and leverage existing components
-- **Maintain quality gates**: Use test-engineer, code-reviewer, and validator for all code
+## 📋 Agent Coordination Protocol
 
-#### ❌ DON'T:
-- **Skip agent usage**: Never perform tasks directly when a specialized agent is available
-- **Work without discovery**: Don't implement without using codebase-explorer to find existing patterns
-- **Force rigid sequences**: Don't follow a predetermined order if it doesn't fit the task
-- **Skip quality agents**: Never deploy code without test-engineer, code-reviewer, and validator
-- **Ignore agent recommendations**: Trust specialized agent expertise over general approaches
+### Every Agent MUST:
 
-### Example Workflows
+**1️⃣ BEFORE Work:**
+```bash
+npx claude-flow@alpha hooks pre-task --description "[task]"
+npx claude-flow@alpha hooks session-restore --session-id "swarm-[id]"
+```
 
-**Note**: For all development work, ensure Chariot stack is set up first using `make chariot` and `make user` to provide a working environment for testing and validation.
+**2️⃣ DURING Work:**
+```bash
+npx claude-flow@alpha hooks post-edit --file "[file]" --memory-key "swarm/[agent]/[step]"
+npx claude-flow@alpha hooks notify --message "[what was done]"
+```
 
-#### Backend API Development (Agent-First)
-1. **requirements-researcher** + **codebase-explorer** (concurrent) → analyze requirements and existing patterns
-2. **go-developer** + **test-engineer** (parallel) → implement handlers and tests simultaneously  
-3. **code-reviewer** + **validator** → quality assessment and real-world testing
-4. **deployment-manager** → CloudFormation deployment and documentation
+**3️⃣ AFTER Work:**
+```bash
+npx claude-flow@alpha hooks post-task --task-id "[task]"
+npx claude-flow@alpha hooks session-end --export-metrics true
+```
 
-#### CLI Tool Development (Agent-First)
-1. **requirements-researcher** → analyze CLI requirements and user experience needs
-2. **codebase-explorer** → identify existing CLI patterns and command structures
-3. **go-developer** + **test-engineer** (parallel) → implement commands and tests
-4. **validator** → test functionality and user experience
-5. **deployment-manager** → package, distribute, and document
+## 🎯 Concurrent Execution Examples
 
-#### Integration Project (Agent-First) 
-1. **web-researcher** → research external service APIs and best practices
-2. **codebase-explorer** → find existing integration patterns
-3. **integration-specialist** → implement data flow and authentication
-4. **go-developer** → create CLI management interfaces
-5. **test-engineer** + **validator** (parallel) → comprehensive testing
-6. **deployment-manager** → deploy and validate with real services
+### ✅ CORRECT (Single Message):
+```javascript
+[BatchTool]:
+  // Initialize swarm
+  mcp__claude-flow__swarm_init { topology: "mesh", maxAgents: 6 }
+  mcp__claude-flow__agent_spawn { type: "researcher" }
+  mcp__claude-flow__agent_spawn { type: "coder" }
+  mcp__claude-flow__agent_spawn { type: "tester" }
+  
+  // Spawn agents with Task tool
+  Task("Research agent: Analyze requirements...")
+  Task("Coder agent: Implement features...")
+  Task("Tester agent: Create test suite...")
+  
+  // Batch todos
+  TodoWrite { todos: [
+    {id: "1", content: "Research", status: "in_progress", priority: "high"},
+    {id: "2", content: "Design", status: "pending", priority: "high"},
+    {id: "3", content: "Implement", status: "pending", priority: "high"},
+    {id: "4", content: "Test", status: "pending", priority: "medium"},
+    {id: "5", content: "Document", status: "pending", priority: "low"}
+  ]}
+  
+  // File operations
+  Bash "mkdir -p app/{src,tests,docs}"
+  Write "app/src/index.js"
+  Write "app/tests/index.test.js"
+  Write "app/docs/README.md"
+```
 
-### Agent-First Development Approach
+### ❌ WRONG (Multiple Messages):
+```javascript
+Message 1: mcp__claude-flow__swarm_init
+Message 2: Task("agent 1")
+Message 3: TodoWrite { todos: [single todo] }
+Message 4: Write "file.js"
+// This breaks parallel coordination!
+```
 
-**CRITICAL: Agents should ALWAYS be used when applicable.** The specialized agent system is designed to provide superior results through expert knowledge and focused capabilities.
+## Performance Benefits
 
-#### Mandatory Agent Usage
-**Claude must proactively use specialized agents for all tasks that fall within their expertise areas:**
+- **84.8% SWE-Bench solve rate**
+- **32.3% token reduction**
+- **2.8-4.4x speed improvement**
+- **27+ neural models**
 
-- **ALL Research Tasks**: ALWAYS use requirements-researcher, codebase-explorer, or web-researcher
-- **ALL Implementation Tasks**: ALWAYS use go-developer, integration-specialist, or infrastructure-engineer  
-- **ALL Quality Assurance**: ALWAYS use test-engineer, code-reviewer, or validator
-- **ALL Deployment Tasks**: ALWAYS use deployment-manager
+## Hooks Integration
 
-#### When to Use Each Agent
+### Pre-Operation
+- Auto-assign agents by file type
+- Validate commands for safety
+- Prepare resources automatically
+- Optimize topology by complexity
+- Cache searches
 
-**Research & Discovery (Use First):**
-- **requirements-researcher**: ANY requirement analysis, success criteria definition, or pattern research
-- **codebase-explorer**: ANY code exploration, pattern identification, or architectural analysis
-- **web-researcher**: ANY external research, API documentation, or best practice investigation
+### Post-Operation
+- Auto-format code
+- Train neural patterns
+- Update memory
+- Analyze performance
+- Track token usage
 
-**Implementation (Use for All Development):**
-- **go-developer**: ANY Go code, backend services, CLI tools, or infrastructure code
-- **integration-specialist**: ANY external service connections, API integrations, or data flows
-- **infrastructure-engineer**: ANY AWS resources, CloudFormation, deployment configurations
+### Session Management
+- Generate summaries
+- Persist state
+- Track metrics
+- Restore context
+- Export workflows
 
-**Quality Assurance (Use for All Code):**
-- **test-engineer**: ANY testing requirements - unit, integration, or end-to-end tests
-- **code-reviewer**: ANY code quality assessment, security review, or standards compliance
-- **validator**: ANY real-world testing, system validation, or end-to-end verification
+## Advanced Features (v2.0.0)
 
-**Deployment & Operations:**
-- **deployment-manager**: ANY git operations, PR creation, CI/CD, or production deployment
+- 🚀 Automatic Topology Selection
+- ⚡ Parallel Execution (2.8-4.4x speed)
+- 🧠 Neural Training
+- 📊 Bottleneck Analysis
+- 🤖 Smart Auto-Spawning
+- 🛡️ Self-Healing Workflows
+- 💾 Cross-Session Memory
+- 🔗 GitHub Integration
 
-#### Agent Orchestration Patterns
+## Integration Tips
 
-**Concurrent Pattern**: Use multiple agents simultaneously
-- Launch requirements-researcher + codebase-explorer for comprehensive discovery
-- Run go-developer + test-engineer + code-reviewer in parallel during implementation
-- Coordinate validator + deployment-manager for release validation
+1. Start with basic swarm init
+2. Scale agents gradually
+3. Use memory for context
+4. Monitor progress regularly
+5. Train patterns from success
+6. Enable hooks automation
+7. Use GitHub tools first
 
-**Sequential Pattern**: Chain agents for dependent tasks
-- requirements-researcher → go-developer → test-engineer → validator → deployment-manager
+## Support
 
-**Group Chat Pattern**: Multiple agents collaborating on complex decisions
-- code-reviewer + test-engineer + validator for comprehensive quality assessment
+- Documentation: https://github.com/ruvnet/claude-flow
+- Issues: https://github.com/ruvnet/claude-flow/issues
 
-### Success Metrics
+---
 
-A development task is complete when:
+Remember: **Claude Flow coordinates, Claude Code creates!**
 
-✅ **Requirements are fully met** with clear acceptance criteria satisfied  
-✅ **Code quality standards** are maintained (tests, linting, security)  
-✅ **Integration works** with existing Chariot systems and patterns
-✅ **Documentation is complete** for significant changes or new features
-✅ **Deployment is successful** and validated in appropriate environments
-
-### Key Reminders
-
-- **Flexibility is key**: Adapt the process to fit the task, not the other way around
-- **Quality is non-negotiable**: Maintain high standards regardless of approach
-- **Collaboration over silos**: Tools work together fluidly rather than in isolation
-- **Continuous improvement**: Learn from each project to improve future workflows
-- **User-focused**: Always keep the end user and system reliability in mind
-
-This organic approach allows for maximum flexibility while maintaining the high quality and reliability that Chariot requires.
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+Never save working files, text/mds and tests to the root folder.
