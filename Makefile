@@ -17,6 +17,7 @@ create-prs:
 	git submodule foreach 'gh pr create'
 
 chariot:
+	open -ja Docker
 	cd modules/chariot/backend && make dev
 	cd modules/chariot/backend && make env-populate
 	cd modules/chariot/ui && npm i && npm run start
