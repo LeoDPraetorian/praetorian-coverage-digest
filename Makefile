@@ -15,3 +15,8 @@ create:
 
 create-prs:
 	git submodule foreach 'gh pr create'
+
+chariot:
+	cd modules/chariot/backend && make dev
+	cd modules/chariot/backend && make env-populate
+	cd modules/chariot/ui && npm i && npm run start
