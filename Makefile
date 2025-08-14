@@ -25,6 +25,9 @@ user:
       --password "$$PASSWORD" --permanent && \
     echo "User created successfully and credentials stored in .env"
 
+feature:
+	npx claude-flow@alpha sparc $(description)
+
 add-module:
 	git submodule add $(repo) ./modules/$(notdir $(basename $(repo)))
 

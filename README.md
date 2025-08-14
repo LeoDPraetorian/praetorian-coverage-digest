@@ -48,8 +48,8 @@ make update
 # Create branch across all submodules
 make create branch=<branch-name>
 
-# develop your feature with claude
-claude
+# develop your feature with claude-flow 
+make feature description="update the portscan capability to support ipv6"
 
 # Create PRs across all submodules
 make create-prs
