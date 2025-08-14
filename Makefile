@@ -25,6 +25,27 @@ user:
       --password "$$PASSWORD" --permanent && \
     echo "User created successfully and credentials stored in .env"
 
+configure-cli:
+	@UUID=$$(uuidgen | tr '[:upper:]' '[:lower:]') && \
+	echo "Setting up Praetorian CLI configuration..." && \
+	echo "Generated profile UUID: $$UUID" && \
+	echo "" && \
+	read -p "Enter username: " USERNAME && \
+	read -s -p "Enter password: " PASSWORD && \
+	echo "" && \
+	echo "" && \
+	echo "Creating keychain file..." && \
+	echo "[$$UUID]" > keychain.ini && \
+	echo "username = $$USERNAME" >> keychain.ini && \
+	echo "password = $$PASSWORD" >> keychain.ini && \
+	echo "Moving keychain file to ~/.keychain.ini..." && \
+	mv keychain.ini ~/.keychain.ini && \
+	echo "Configuration complete!" && \
+	echo "" && \
+	echo "Use this command prefix for Praetorian CLI:" && \
+	echo "  praetorian --profile $$UUID"
+
+
 feature:
 	npx claude-flow@alpha sparc $(description)
 
