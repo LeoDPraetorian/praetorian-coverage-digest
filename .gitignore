@@ -1,7 +1,9 @@
 .idea/
 .env
+# ignore some flow stuff for now
 .claude-flow/
 memory/
+docs/ 
 
 
 # Claude Flow generated files
