@@ -4,7 +4,8 @@ chariot:
 	cd modules/chariot/backend && make dev
 	@echo "Backend deployment complete. Starting local frontend."
 	cd modules/chariot/backend && make populate-env
-	cd modules/chariot/ui && npm i && npm run start
+	cd modules/chariot/ui && npm i && npm run start &
+	echo "Deployment complete"
 
 user:
 	@UUID=$$(uuidgen | tr '[:upper:]' '[:lower:]') && \
