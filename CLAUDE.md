@@ -20,6 +20,84 @@
 
 **NEVER save to root folder. ALL feature development should occur within the modules in /modules**
 
+## 📦 Core Repository Modules
+
+This super-repository contains multiple specialized modules that form the Chariot Development Platform ecosystem. Each module serves a distinct purpose in the security testing and attack surface management workflow:
+
+### 🛡️ Security Platforms & UIs
+
+**`chariot/`** - The core Chariot attack surface management platform
+- Comprehensive monorepo containing backend (Go), frontend (React/TypeScript), and E2E tests
+- Attack surface discovery, monitoring, and vulnerability management
+- Production-ready platform for external-facing asset security
+
+**`chariot-ui-components/`** - Reusable UI component library
+- React/TypeScript component library with Storybook documentation
+- Shared design system components (LeftNav, Button, Table, Modal, etc.)
+- Tailwind CSS integration and Chariot-specific theming
+- NPM package for consistent UI across Chariot applications
+
+### 🔧 Agent & Orchestration Systems
+
+**`aegiscli/`** - Velociraptor-based security orchestration middleware
+- Docker-containerized API for managing Aegis agents across client environments
+- RESTful API with Swagger documentation for endpoint management
+- Multi-tenant architecture supporting multiple Velociraptor organizations
+- Web interface for intuitive security operations management
+
+**`chariot-aegis-capabilities/`** - VQL-based security capabilities repository
+- Offensive security capabilities for Praetorian Aegis Agent (Velociraptor-based)
+- Pre-built security assessment tools organized by attack surface (AD, network, web, cloud)
+- Capability development workflow with peer review and testing requirements
+- S3-based tool management and automated deployment pipeline
+
+### ⚡ Security Testing Frameworks
+
+**`janus-framework/`** - Go library for chaining security tools
+- Powerful framework for creating reusable security workflows at scale
+- Link-based architecture for connecting disparate security tools
+- Configuration system with CLI args, environment variables, and type safety
+- Foundation for building complex, testable security automation
+
+**`janus/`** - Security tool orchestration platform
+- Framework for chaining security tools into complex workflows
+- Uniform interface for connecting tools not designed to work together
+- Scale security operations against large environments
+- Template-based approach for common security testing scenarios
+
+**`nebula/`** - Multi-cloud security scanning CLI
+- Command-line tool built on Janus framework for cloud security testing
+- Support for AWS, Azure, GCP, and SaaS platform reconnaissance
+- Resource discovery, secret detection, and public exposure analysis
+- MCP (Model Context Protocol) server integration for AI assistants
+
+### 🧪 Testing & Templates
+
+**`nuclei-templates/`** - Security vulnerability detection templates
+- Internal fork of ProjectDiscovery Nuclei Templates with daily upstream sync
+- Custom Praetorian-specific templates in `praetorian/` directory
+- Automated vulnerability scanning across web applications and services
+- Case-reviewed templates with validation workflow
+
+**`praetorian-cli/`** - Python CLI and SDK for Chariot platform
+- Open-source command-line interface for Chariot API access
+- Full SDK exposing all Chariot UI APIs for scripting and automation
+- Authentication via API keys and keychain file management
+- External script integration capability for custom workflows
+
+### 📊 Data & Infrastructure
+
+**`tabularium/`** - Universal data schema and code generation
+- Single source of truth for data structures across Chariot systems
+- Go struct definitions with automatic OpenAPI schema generation
+- Multi-language client library generation (Python, future TypeScript/Java)
+- Schema validation and testing infrastructure
+
+**`praetorian-agent-workflows/`** - Agentic workflow orchestration
+- Repository for managing orchestration of AI agent workflows
+- Coordination system for multi-agent security testing scenarios
+- Integration point for advanced automation and intelligent task distribution
+
 ## Project Overview
 
 This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Completion) methodology with Claude-Flow orchestration for systematic Test-Driven Development.
