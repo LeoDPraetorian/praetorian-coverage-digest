@@ -35,7 +35,7 @@ add-go-module:
 	go work use $(module)
 
 update:
-	git submodule update --init --recursive --depth 1
+	git submodule update --init --recursive --depth 1 -j 4
 
 checkout:
 	git submodule foreach 'git checkout $(branch) || true'
