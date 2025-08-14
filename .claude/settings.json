@@ -36,7 +36,9 @@
       "Bash(rm -rf /)",
       "Bash(curl * | bash)",
       "Bash(wget * | sh)",
-      "Bash(eval *)"
+      "Bash(eval *)",
+      "Bash(make play)",
+      "Bash(make dev)"
     ]
   },
   "hooks": {
