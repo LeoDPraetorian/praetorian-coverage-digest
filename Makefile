@@ -59,3 +59,29 @@ logs:
 		fi; \
 	done | \
 	xargs -n 10 aws logs start-live-tail --log-group-identifiers
+
+.PHONY: submodule-init
+submodule-init: ## Initialize all submodules
+	@echo "Initializing all submodules..."
+	git submodule update --init --recursive
+
+.PHONY: submodule-pull
+submodule-pull: ## Pull latest changes from all submodules
+	@echo "Pulling latest changes from all submodules..."
+	git submodule foreach 'git pull origin $$(git symbolic-ref --short HEAD 2>/dev/null || echo "main")'
+
+.PHONY: submodule-status
+submodule-status: ## Show status of all submodules
+	@echo "Submodule status:"
+	git submodule status
+
+.PHONY: submodule-update
+submodule-update: submodule-init submodule-pull submodule-status ## Complete submodule update workflow
+	@echo "Submodule update completed"
+
+.PHONY: help
+help: ## Show this help message
+	@echo 'Usage: make [target]'
+	@echo ''
+	@echo 'Targets:'
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)

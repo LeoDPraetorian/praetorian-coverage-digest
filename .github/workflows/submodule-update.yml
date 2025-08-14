@@ -1,0 +1,91 @@
+name: Update Git Submodules
+
+on:
+  schedule:
+    # Run every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Configure Git
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Update all submodules
+      run: |
+        echo "Starting submodule update process..."
+        
+        # Use Makefile target for submodule update
+        make submodule-update
+        
+        # Check if there are any changes
+        if git diff --quiet --exit-code; then
+          echo "No submodule updates available"
+          echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
+        else
+          echo "Submodule updates detected"
+          echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
+          
+          # Show what changed
+          echo "Changed files:"
+          git diff --name-only
+        fi
+
+    - name: Commit and push changes
+      if: env.CHANGES_DETECTED == 'true'
+      run: |
+        # Add all changes
+        git add .
+        
+        # Create commit message with timestamp and submodule info
+        TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        COMMIT_MSG="chore: update submodules - $TIMESTAMP"
+        
+        # Add detailed info about which submodules were updated
+        echo "" >> commit_details.tmp
+        echo "Updated submodules:" >> commit_details.tmp
+        git submodule foreach --quiet 'echo "- $displaypath: $(git log -1 --format="%h %s")"' >> commit_details.tmp
+        
+        # Combine commit message
+        {
+          echo "$COMMIT_MSG"
+          echo ""
+          cat commit_details.tmp
+        } > final_commit_msg.tmp
+        
+        # Commit with detailed message
+        git commit -F final_commit_msg.tmp
+        
+        # Push changes
+        git push origin main
+        
+        # Cleanup
+        rm -f commit_details.tmp final_commit_msg.tmp
+        
+        echo "Successfully pushed submodule updates"
+
+    - name: Log completion
+      run: |
+        if [ "$CHANGES_DETECTED" = "true" ]; then
+          echo "✅ Submodule update workflow completed successfully with changes"
+        else
+          echo "✅ Submodule update workflow completed - no updates needed"
+        fi
+        
+        echo "Workflow finished at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
