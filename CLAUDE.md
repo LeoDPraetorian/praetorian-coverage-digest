@@ -121,6 +121,20 @@ make chariot
 
 This is the ONLY supported way to deploy the Chariot platform. Any other deployment method will cause system failures, configuration issues, and security vulnerabilities.
 
+**🎯 DEPLOYMENT COMPLETION INDICATOR:**
+
+When you see the localhost:3000 prompt appear in your terminal, the deployment is COMPLETE and ready for interaction:
+
+```bash
+✅ Chariot is now running at: http://localhost:3000
+```
+
+**Once this message appears, you can:**
+- ✅ Open http://localhost:3000 in your browser
+- ✅ Begin using the Chariot platform
+- ✅ The deployment process is fully finished
+- ✅ All services are running and ready
+
 ## SPARC Commands
 
 ### Core Commands
