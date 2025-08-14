@@ -18,13 +18,7 @@
 
 ### 📁 File Organization Rules
 
-**NEVER save to root folder. Use these directories:**
-- `/src` - Source code files
-- `/tests` - Test files
-- `/docs` - Documentation and markdown files
-- `/config` - Configuration files
-- `/scripts` - Utility scripts
-- `/examples` - Example code
+**NEVER save to root folder. ALL feature development should occur within the modules in /modules**
 
 ## Project Overview
 
