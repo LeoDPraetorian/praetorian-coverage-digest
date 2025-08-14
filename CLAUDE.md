@@ -102,6 +102,25 @@ This super-repository contains multiple specialized modules that form the Chario
 
 This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Completion) methodology with Claude-Flow orchestration for systematic Test-Driven Development.
 
+## 🚨 CHARIOT DEPLOYMENT - CRITICAL REQUIREMENT
+
+**⚠️ MANDATORY DEPLOYMENT COMMAND:**
+
+```bash
+make chariot
+```
+
+**🚨 NEVER USE ANY OTHER DEPLOYMENT COMMANDS:**
+- ❌ DO NOT use `docker-compose up`
+- ❌ DO NOT use `npm start`
+- ❌ DO NOT use `go run`
+- ❌ DO NOT use any manual deployment scripts
+- ❌ DO NOT use any other make targets for deployment
+
+**✅ ONLY USE: `make chariot`**
+
+This is the ONLY supported way to deploy the Chariot platform. Any other deployment method will cause system failures, configuration issues, and security vulnerabilities.
+
 ## SPARC Commands
 
 ### Core Commands
