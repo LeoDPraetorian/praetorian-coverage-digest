@@ -102,6 +102,196 @@ This super-repository contains multiple specialized modules that form the Chario
 
 This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Completion) methodology with Claude-Flow orchestration for systematic Test-Driven Development.
 
+## Project Context
+
+Chariot is a comprehensive attack surface management platform that helps organizations discover, monitor, and secure their external-facing assets. The project consists of:
+
+- **Backend**: Go-based API and services
+- **UI**: React/TypeScript frontend application
+- **E2E Tests**: Playwright-based end-to-end testing suite
+
+## Development Workflow
+
+When working on this codebase, please follow these guidelines:
+
+#### Automated Testing Trigger Detection
+
+**AUTO-DETECTION PATTERNS**: When Claude detects frontend changes in ANY repository:
+- File patterns: `**/{ui}/**/*.{ts,tsx,js,jsx,css}`
+- Page modifications: Route changes, new pages, UI updates
+- API integration: Frontend-backend integration points
+
+**IMMEDIATE ACTION REQUIRED**: Upon detecting frontend changes:
+
+1. **AUTOMATICALLY GENERATE E2E TESTS** - No permission required, mandatory execution
+2. **FOLLOW ESTABLISHED PATTERNS** - Use repository-specific or Chariot patterns as fallback
+3. **CROSS-REPOSITORY CONSISTENCY** - Ensure testing standards across all modules
+
+#### Frontend Testing Workflow (Chariot Repository)
+
+**CRITICAL WORKFLOW**: When any frontend files are modified, AUTOMATICALLY generate or update regression tests:
+
+**MANDATORY Actions for ANY Frontend Code Changes:**
+
+1. **IMMEDIATELY** after modifying/creating ANY UI file in ANY repository:
+
+   - **NEVER** skip test generation for frontend changes
+   - **ALWAYS** create comprehensive E2E tests following established patterns
+   - **ADAPT** to repository-specific patterns while maintaining consistency
+
+2. **Universal Test Generation Requirements**:
+
+   - Use `user_tests.TEST_USER_1` or `user_tests.LONG_TERM_USER` fixtures
+   - Import and use page objects from `src/pages/` or equivalent
+   - Import components (`Table`, `Filters`, `Drawer`, `Modal`, `Toast`)
+   - Use data-driven testing with `import { data } from 'src/data'`
+   - Follow comprehensive testing patterns for all functionality
+
+3. **Universal Test Coverage Requirements**:
+   - Basic functionality (navigation, data loading, component rendering)
+   - Interactive elements (buttons, forms, modals, dropdowns)
+   - Data display and manipulation (tables, lists, filters, search)
+   - User workflows (complete user journeys, multi-step processes)
+   - Error states and edge cases (network failures, validation errors)
+   - Responsive behavior and accessibility compliance
+   - Integration points (API calls, external services)
+
+**Cross-Repository Frontend Engineer Mindset**: You are an experienced frontend engineer who believes in thorough, reliable, and maintainable tests that mirror real user workflows. Every code change MUST have corresponding test coverage, regardless of the repository or framework used.
+
+### Code Quality Standards
+
+- Run linting and a build before committing changes
+- Follow existing code conventions and patterns
+- Use the established page object model for E2E tests
+- Maintain comprehensive test coverage for new features
+
+### Testing Commands
+
+- E2E Tests: `npm run test` (in e2e directory)
+- UI Tests: Check package.json for available test scripts
+- Backend Tests: `make test` (in backend directory)
+
+
+**REPOSITORY PATTERN DETECTION**: Before generating tests, Claude analyzes:
+1. Existing test file structure and naming conventions
+2. Import patterns and fixture usage
+3. Page object models and helper utilities
+4. Data management and test data patterns
+5. Custom commands and reusable components
+
+### Required Test Structure Templates
+
+**Primary pattern for Chariot ecosystem repositories:**
+
+```typescript
+import { expect } from '@playwright/test';
+import { user_tests } from 'src/fixtures';
+import { waitForAllLoader } from 'src/helpers/loader';
+import { [PageClass] } from 'src/pages/[page].page';
+import { Table } from 'src/pages/components/table';
+import { Filters } from 'src/pages/components/filters';
+import { data } from 'src/data';
+
+user_tests.TEST_USER_1.describe('Component/Feature Tests', () => {
+  user_tests.TEST_USER_1('should verify basic functionality', async ({ page }) => {
+    const featurePage = new FeaturePage(page);
+    const table = new Table(page);
+    const filters = new Filters(page);
+
+    await featurePage.goto();
+    await filters.clickClear();
+    await table.verifyRowsMinCount(1);
+    await waitForAllLoader(page);
+  });
+});
+```
+
+
+### Mandatory Testing Patterns
+
+- **Table Testing**: Always use `await table.verifyRowsMinCount()` and `await table.verifyColumnValues()`
+- **Filter Testing**: Start with `await filters.clickClear()` then test specific filters  
+- **Navigation**: Use page objects for navigation (e.g., `await assetPage.goto()`)
+- **Loader Handling**: Always `await waitForAllLoader(page)` after operations
+- **Data-Driven**: Reference `data.asset.filters`, `data.risk.drawer.searchFor` from test data
+- **Drawer Testing**: Click table rows, verify drawer tabs and content
+- **Error Handling**: Use try/catch for complex setup, set failure flags appropriately
+
+### Automated Test Generation Execution
+
+**TRIGGER CONDITIONS**: Claude automatically generates tests when detecting:
+- New UI components or pages created
+- Existing UI components or pages modified
+- New interactive features added
+- API integration points changed
+- User workflow modifications
+- Bug fixes affecting UI behavior
+- Data model changes
+- Core scanner changes causing data model updates
+
+**EXECUTION PROTOCOL**: When auto-generation triggers:
+
+1. **Analyze Repository Context**:
+   - Detect testing framework and patterns
+   - Identify existing page objects and utilities
+   - Map data fixtures and test helpers
+   - Understand component architecture
+
+2. **Generate Comprehensive Test Files**:
+   - Follow detected/established patterns exactly
+   - Include full test coverage per requirements above
+   - Use proper imports and fixtures from analysis
+   - Adapt to repository's naming conventions
+
+3. **Validate Test Integration**:
+   - Ensure tests integrate with existing test suite
+   - Verify all imports and dependencies resolve
+   - Check test data requirements and availability
+   - Validate page object and helper usage
+
+4. **Cross-Repository Consistency**:
+   - Maintain testing quality standards across all repos
+   - Ensure test reliability and maintainability
+   - Follow established debugging and error handling patterns
+   - Document repository-specific testing requirements
+
+**NO PERMISSION REQUIRED**: Test generation is mandatory and automatic. Claude does not ask for permission to generate tests - it's a required workflow step.
+
+## Integration Requirements
+
+### Claude Behavior Override
+
+**CRITICAL**: This configuration OVERRIDES default behavior. Claude MUST:
+
+#### 🚀 Cross-Repository Frontend Feature Auto-Detection & Workflow
+
+**AUTO-DETECTION PATTERNS**: Claude automatically detects frontend feature requests containing:
+- "create a [page/interface/feature] for [entity]" 
+- "build a frontend for [entity]"
+- "I need a [page/component] that shows [data]"
+- "add a [management/admin] interface for [entities]"
+- "implement [UI/dashboard/portal] for [domain]"
+- "build [component/widget/module] that [functionality]"
+
+
+**MANDATORY PRINCIPLES**:
+- **Follow test-driven development** throughout implementation phases
+- **Use established repository patterns** for consistency within each module
+- **Maintain cross-repository quality standards** 
+- **Adapt to repository's technology stack** while preserving workflow integrity
+
+
+#### Test Generation Requirements
+
+- **Proactively generate tests** for ANY frontend code change
+- **Never ask for permission** to generate tests - it's mandatory
+- **Always follow the complete testing patterns** from `generate_test.md`
+- **Generate tests immediately** after any UI file modification
+- **Use the established page object model** and component patterns
+- **Include comprehensive test scenarios** for the modified functionality
+
+This ensures that frontend feature requests automatically trigger the factory workflow with proper human validation, and every change gets proper test coverage.
+
 ## 🚨 CHARIOT DEPLOYMENT - CRITICAL REQUIREMENT
 
 **⚠️ MANDATORY DEPLOYMENT COMMAND:**
