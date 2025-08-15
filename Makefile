@@ -56,8 +56,9 @@ add-module:
 add-go-module:
 	go work use $(module)
 
-update:
+setup:
 	git submodule update --init --recursive --depth 1 -j 4
+	cd modules/chariot/ui && npm run setup
 
 checkout:
 	git submodule foreach 'git checkout $(branch) || true'

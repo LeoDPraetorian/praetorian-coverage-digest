@@ -26,7 +26,7 @@ This super-repository unifies all Chariot repositories and provides shared workf
 ### Development Workflow
 
 ```bash
-# Initialize all submodules
+# set up the repository
 make update
 
 # Create branch across all submodules
@@ -42,8 +42,8 @@ make create-prs
 ### Setting Up A Chariot Stack
 
 ```bash
-# Initialize all submodules
-make update
+# set up the repository
+make setup
 
 # Deploy complete Chariot stack (CloudFormation + React UI)
 make chariot
