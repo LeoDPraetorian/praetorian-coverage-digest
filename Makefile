@@ -90,7 +90,7 @@ submodule-init: ## Initialize all submodules
 .PHONY: submodule-pull
 submodule-pull: ## Pull latest changes from all submodules
 	@echo "Pulling latest changes from all submodules..."
-	git submodule foreach 'git pull origin $$(git symbolic-ref --short HEAD 2>/dev/null || echo "main")'
+	git submodule foreach 'git pull origin main'
 
 .PHONY: submodule-status
 submodule-status: ## Show status of all submodules
