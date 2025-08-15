@@ -1,10 +1,10 @@
 chariot:
-	open -ja Docker
-	@echo "Deploying backend."
-	cd modules/chariot/backend && make dev
-	@echo "Backend deployment complete. Starting local frontend."
-	cd modules/chariot/backend && make populate-env
-	cd modules/chariot/ui && npm i && npm run start &
+	#open -ja Docker
+	#@echo "Deploying backend."
+	#cd modules/chariot/backend && make dev
+	#@echo "Backend deployment complete. Starting local frontend."
+	#cd modules/chariot/backend && make populate-env
+	cd modules/chariot/ui && npm i && (npm run start &)
 	echo "Deployment complete"
 
 user:
