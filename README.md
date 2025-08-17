@@ -27,7 +27,7 @@ This super-repository unifies all Chariot repositories and provides shared workf
 
 ```bash
 # set up the repository
-make update
+make setup
 
 # Create branch across all submodules
 make create branch=<branch-name>
