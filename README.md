@@ -63,4 +63,7 @@ The UI will be available at https://localhost:3000 with the generated credential
 ```bash
 # pull all submodule branches
 make submodule-pull
+
+# check out a branch in all submodules
+make checkout branch=main
 ```
