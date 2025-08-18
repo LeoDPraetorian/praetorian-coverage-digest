@@ -63,7 +63,7 @@ setup:
 	cd modules/chariot/ui && npm run setup
 	aws configure
 	read -p "Enter github username: " GITHUB_USERNAME
-	gh auth login --scopes read:packages && gh auth token | docker login ghcr.io -u <GITHUB_USERNAME> --password-stdin
+	gh auth login --scopes read:packages && gh auth token | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
 
 checkout:
 	git submodule foreach 'git checkout $(branch) || true'
