@@ -108,3 +108,78 @@ help: ## Show this help message
 	@echo ''
 	@echo 'Targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+tree-add:
+ifndef NAME
+	$(error NAME is required. Usage: make tree-add NAME=<branch-name>)
+endif
+	@echo "Creating worktree: chariot-$(NAME) from main"
+	@git worktree add -b chariot-$(NAME) ../chariot-$(NAME) origin/main
+	@echo "Opening worktree in Cursor..."
+	@cursor ../chariot-$(NAME)
+	@echo "Installing UI dependencies..."
+	@cd ../chariot-$(NAME)/ui && npm i
+	@echo "Installing E2E dependencies and Playwright..."
+	@cd ../chariot-$(NAME)/e2e && npm i && npx playwright install
+	@echo "Worktree 'chariot-$(NAME)' setup complete!"
+
+tree-remove:
+ifdef NAME
+	@echo "Removing worktree: $(NAME)"
+	@git worktree remove ../$(NAME) --force 2>/dev/null || git worktree remove ../$(NAME) 2>/dev/null || true
+	@echo "Pruning worktree references..."
+	@git worktree prune
+	@echo "Worktree 'chariot-$(NAME)' has been removed!"
+else
+	@echo "Finding and removing all worktrees starting with 'chariot-'..."
+	@git worktree list --porcelain | grep "^worktree" | cut -d' ' -f2 | grep "/chariot-" | while read -r worktree_path; do \
+		worktree_name=$$(basename "$$worktree_path"); \
+		echo "Removing worktree: $$worktree_name at $$worktree_path"; \
+		git worktree remove "$$worktree_path" --force 2>/dev/null || git worktree remove "$$worktree_path" 2>/dev/null || true; \
+	done
+	@echo "Pruning worktree references..."
+	@git worktree prune
+	@echo "All chariot-* worktrees have been removed!"
+endif
+
+tree-list:
+	@echo "Listing all worktrees starting with 'chariot-':"
+	@echo "================================================"
+	@found=0; \
+	git worktree list --porcelain | awk ' \
+		BEGIN { found=0 } \
+		/^worktree/ { \
+			path=$$2; \
+			if (path ~ /\/chariot-/) { \
+				found=1; \
+				name=path; \
+				gsub(/.*\//, "", name); \
+				printf "%-30s %s\n", "Name:", name; \
+				printf "%-30s %s\n", "Path:", path; \
+			} \
+		} \
+		/^HEAD/ && found { \
+			commit=$$2; \
+			printf "%-30s %s\n", "Commit:", substr(commit, 1, 8); \
+		} \
+		/^branch/ && found { \
+			branch=$$2; \
+			gsub(/refs\/heads\//, "", branch); \
+			printf "%-30s %s\n", "Branch:", branch; \
+			print "------------------------------------------------"; \
+			found=0; \
+		} \
+		/^detached/ && found { \
+			printf "%-30s %s\n", "Branch:", "(detached HEAD)"; \
+			print "------------------------------------------------"; \
+			found=0; \
+		} \
+	' | { \
+		if read -r line; then \
+			echo "$$line"; \
+			cat; \
+		else \
+			echo "No worktrees found starting with 'chariot-'"; \
+		fi \
+	}
+
