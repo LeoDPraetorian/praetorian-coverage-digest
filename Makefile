@@ -114,6 +114,8 @@ help: ## Show this help message
 	@echo 'Targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
+
+
 tree-add:
 ifndef NAME
 	$(error NAME is required. Usage: make tree-add NAME=<branch-name>)
@@ -188,3 +190,18 @@ tree-list:
 		fi \
 	}
 
+# Start the UI in the background
+start-ui:
+	@echo "Starting UI on https://localhost:3000 as a background task..."
+	cd modules/chariot/ui && npm i && (npm run start &)
+
+# Kill the background UI process
+stop-ui:
+	@echo "Stopping the UI background task..."
+	@ps aux | grep chariot/ui | grep vite | grep -v grep | awk '{print $$2}' | xargs -r kill
+
+# Restart the background UI process
+restart-ui:
+	@make stop-ui
+	@make start-ui
+	
