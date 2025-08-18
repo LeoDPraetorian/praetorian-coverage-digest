@@ -1,6 +1,8 @@
 go 1.24.4
 
 use (
+	./modules/aegiscli
+	./modules/chariot-aegis-capabilities/aegis-registry
 	./modules/chariot/backend
 	./modules/janus
 	./modules/janus-framework
