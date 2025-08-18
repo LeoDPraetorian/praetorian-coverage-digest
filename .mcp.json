@@ -17,6 +17,27 @@
         "start"
       ],
       "type": "stdio"
+    },
+    "chariot": {
+      "command": "go",
+      "args": ["run", "./modules/chariot/backend/cmd/tools/chariot-mcp"],
+      "type": "stdio"
+    },
+    "praetorian-cli": {
+      "command": "python",
+      "args": ["-m", "praetorian_cli.sdk.mcp_server"],
+      "type": "stdio",
+      "cwd": "./modules/praetorian-cli"
+    },
+    "nebula": {
+      "command": "go", 
+      "args": ["run", "./modules/nebula/cmd/mcp-server.go"],
+      "type": "stdio"
+    },
+    "atlassian": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"],
+      "type": "stdio"
     }
   }
 }
