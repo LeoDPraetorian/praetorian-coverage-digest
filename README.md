@@ -57,3 +57,10 @@ make user
 ```
 
 The UI will be available at https://localhost:3000 with the generated credentials.
+
+### Common Operations
+
+```bash
+# pull all submodule branches
+make submodule-pull
+```
