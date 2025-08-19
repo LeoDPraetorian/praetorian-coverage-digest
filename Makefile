@@ -62,7 +62,7 @@ setup:
 		echo "export GOPRIVATE=github.com/praetorian-inc" >> ~/.zshrc; \
 		echo "Added GOPRIVATE to ~/.zshrc"; \
 	fi
-	git submodule update --init --recursive --depth 1 -j 4
+	git submodule update --init --recursive -j 4
 	cd modules/chariot/ui && npm run setup
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
 		echo "AWS credentials not found, running aws configure..."; \
