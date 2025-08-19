@@ -638,7 +638,6 @@ github.com/praetorian-inc/chariot-aegis-capabilities/configs v0.0.0-202506271253
 github.com/praetorian-inc/janus-core v0.0.0-20250729210455-b0761f38ac15 h1:/pbv7LmEp4n04TCx4UV3Zy9vuINSEci524uNEbjkkws=
 github.com/praetorian-inc/janus-core v0.0.0-20250729210455-b0761f38ac15/go.mod h1:t7TLldscnXAwUWOcAYpJ4o3Szmd6fm6v9RFjtC9Fwiw=
 github.com/praetorian-inc/nebula v0.0.0-20250312155925-2571108869b8/go.mod h1:XIQBHvIXL4suIlb5X6aNz+U0L7hMKnFvGmAJev5vQJM=
-github.com/praetorian-inc/tabularium v1.0.11-pre-capdev-devicecodephish/go.mod h1:7TpFxGVAoy1md1+QfQI8TpwHc5Hxui720cMcbzBDXEk=
 github.com/projectdiscovery/fastdialer v0.3.0 h1:/wMptjdsrAU/wiaA/U3lSgYGaYCGJH6xm0mLei6oMxk=
 github.com/projectdiscovery/fastdialer v0.3.0/go.mod h1:Q0YLArvpx9GAfY/NcTPMCA9qZuVOGnuVoNYWzKBwxdQ=
 github.com/projectdiscovery/fdmax v0.0.4 h1:K9tIl5MUZrEMzjvwn/G4drsHms2aufTn1xUdeVcmhmc=
