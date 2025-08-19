@@ -8,4 +8,5 @@ use (
 	./modules/janus-framework
 	./modules/nebula
 	./modules/tabularium
+	modules/chariot-devops/chariot-utils/user-purge
 )

@@ -38,7 +38,9 @@
       "Bash(wget * | sh)",
       "Bash(eval *)",
       "Bash(make play)",
-      "Bash(make dev)"
+      "Bash(make dev)",
+      "Bash(make purge)",
+      "Bash(go run */user-purge/*"
     ]
   },
   "hooks": {

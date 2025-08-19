@@ -31,3 +31,6 @@
 [submodule "modules/chariot-aegis-capabilities"]
 	path = modules/chariot-aegis-capabilities
 	url = https://github.com/praetorian-inc/chariot-aegis-capabilities
+[submodule "modules/chariot-devops"]
+	path = modules/chariot-devops
+	url = https://github.com/praetorian-inc/chariot-devops
