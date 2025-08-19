@@ -46,7 +46,6 @@ configure-cli:
 	echo "Use this command prefix for Praetorian CLI:" && \
 	echo "  praetorian --profile $$UUID"
 
-
 feature:
 	npx claude-flow@alpha sparc $(description)
 
@@ -113,8 +112,6 @@ help: ## Show this help message
 	@echo ''
 	@echo 'Targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
-
-
 
 tree-add:
 ifndef NAME
@@ -190,17 +187,14 @@ tree-list:
 		fi \
 	}
 
-# Start the UI in the background
-start-ui:
+start-ui: ## Start the UI in the background
 	@echo "Starting UI as a background task on https://localhost:3000..."
 	cd modules/chariot/ui && npm i && (npm run start &)
 
-# Kill the background UI process
-stop-ui:
+stop-ui: ## Stop the UI background task
 	@echo "Stopping the UI background task..."
 	@ps aux | grep chariot/ui | grep vite | grep -v grep | awk '{print $$2}' | xargs -r kill
 
-# Restart the background UI process
-restart-ui:
+restart-ui: ## Restart the UI background task
 	@make stop-ui
 	@make start-ui
