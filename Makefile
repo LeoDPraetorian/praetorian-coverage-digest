@@ -108,7 +108,7 @@ logs:
 	xargs -n 10 aws logs start-live-tail --log-group-identifiers
 
 purge:
-	go run modules/chariot-devops/chariot-utils/user-purge/main.go -stack $(stack) -u $(user) -neo4j-mode delete
+	go run modules/chariot-devops/chariot-utils/user-purge/main.go -stack $(stack) -u $(user) -neo4j-mode delete -keep-user
 
 .PHONY: submodule-init
 submodule-init: ## Initialize all submodules
