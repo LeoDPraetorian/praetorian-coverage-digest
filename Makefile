@@ -52,6 +52,8 @@ feature:
 
 add-module:
 	git submodule add $(repo) ./modules/$(notdir $(basename $(repo)))
+	git submodule set-branch --branch main -- ./modules/$(notdir $(basename $(repo)))
+
 
 add-go-module:
 	go work use $(module)

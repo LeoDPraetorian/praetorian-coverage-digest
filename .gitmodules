@@ -1,36 +1,48 @@
 [submodule "modules/chariot"]
 	path = modules/chariot
 	url = https://github.com/praetorian-inc/chariot
+	branch = main
 [submodule "modules/tabularium"]
 	path = modules/tabularium
 	url = https://github.com/praetorian-inc/tabularium
+	branch = main
 [submodule "modules/janus-framework"]
 	path = modules/janus-framework
 	url = https://github.com/praetorian-inc/janus-framework
+	branch = main
 [submodule "modules/janus"]
 	path = modules/janus
 	url = https://github.com/praetorian-inc/janus
+	branch = main
 [submodule "modules/chariot-ui-components"]
 	path = modules/chariot-ui-components
 	url = https://github.com/praetorian-inc/chariot-ui-components
+	branch = main
 [submodule "modules/nebula"]
 	path = modules/nebula
 	url = https://github.com/praetorian-inc/nebula
+	branch = main
 [submodule "modules/praetorian-cli"]
 	path = modules/praetorian-cli
 	url = https://github.com/praetorian-inc/praetorian-cli
+	branch = main
 [submodule "modules/praetorian-agent-workflows"]
 	path = modules/praetorian-agent-workflows
 	url = https://github.com/praetorian-inc/praetorian-agent-workflows
+	branch = main
 [submodule "modules/nuclei-templates"]
 	path = modules/nuclei-templates
 	url = https://github.com/praetorian-inc/nuclei-templates
+	branch = main
 [submodule "modules/aegiscli"]
 	path = modules/aegiscli
 	url = https://github.com/praetorian-inc/aegiscli
+	branch = main
 [submodule "modules/chariot-aegis-capabilities"]
 	path = modules/chariot-aegis-capabilities
 	url = https://github.com/praetorian-inc/chariot-aegis-capabilities
+	branch = main
 [submodule "modules/chariot-devops"]
 	path = modules/chariot-devops
 	url = https://github.com/praetorian-inc/chariot-devops
+	branch = main
