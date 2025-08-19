@@ -4,7 +4,7 @@ chariot:
 	cd modules/chariot/backend && make dev
 	@echo "Backend deployment complete. Starting local frontend."
 	cd modules/chariot/backend && make populate-env
-	cd modules/chariot/ui && npm i && (npm run start &)
+	@make start-ui
 	echo "Deployment complete"
 
 user:
@@ -192,7 +192,7 @@ tree-list:
 
 # Start the UI in the background
 start-ui:
-	@echo "Starting UI on https://localhost:3000 as a background task..."
+	@echo "Starting UI as a background task on https://localhost:3000..."
 	cd modules/chariot/ui && npm i && (npm run start &)
 
 # Kill the background UI process
