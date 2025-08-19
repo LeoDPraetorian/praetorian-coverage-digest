@@ -58,12 +58,29 @@ add-go-module:
 
 setup:
 	brew install awscli aws-sam-cli jq docker go npm
-	echo "export GOPRIVATE=github.com/praetorian-inc" >> ~/.zshrc
+	@if ! grep -q "export GOPRIVATE=github.com/praetorian-inc" ~/.zshrc 2>/dev/null; then \
+		echo "export GOPRIVATE=github.com/praetorian-inc" >> ~/.zshrc; \
+		echo "Added GOPRIVATE to ~/.zshrc"; \
+	fi
 	git submodule update --init --recursive --depth 1 -j 4
 	cd modules/chariot/ui && npm run setup
-	aws configure
-	read -p "Enter github username: " GITHUB_USERNAME
-	gh auth login --scopes read:packages && gh auth token | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
+	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
+		echo "AWS credentials not found, running aws configure..."; \
+		aws configure; \
+	else \
+		echo "AWS credentials already configured, skipping aws configure"; \
+	fi
+	@if ! gh auth status >/dev/null 2>&1; then \
+		echo "GitHub not authenticated, setting up GitHub and Docker login..."; \
+		read -p "Enter github username: " GITHUB_USERNAME; \
+		gh auth login --scopes read:packages && gh auth token | docker login ghcr.io -u $$GITHUB_USERNAME --password-stdin; \
+	elif ! docker info >/dev/null 2>&1 || ! echo "" | docker login ghcr.io >/dev/null 2>&1; then \
+		echo "GitHub authenticated but Docker/GHCR login needed..."; \
+		read -p "Enter github username: " GITHUB_USERNAME; \
+		gh auth token | docker login ghcr.io -u $$GITHUB_USERNAME --password-stdin; \
+	else \
+		echo "GitHub and Docker already authenticated, skipping setup"; \
+	fi
 
 checkout:
 	git submodule foreach 'git checkout $(branch) || true'
