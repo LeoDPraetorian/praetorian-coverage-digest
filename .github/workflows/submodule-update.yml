@@ -27,6 +27,11 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+    - name: Configure git with read-only PAT for submodules
+      run: |
+        # Configure git to use WORKFLOW_PAT for pulling from other repos
+        git config --global url."https://${{ secrets.WORKFLOW_PAT }}@github.com/".insteadOf "https://github.com/"
+
     - name: Update all submodules
       run: |
         echo "Starting submodule update process..."
@@ -46,6 +51,13 @@ jobs:
           echo "Changed files:"
           git diff --name-only
         fi
+
+    - name: Reconfigure git with default token for pushing
+      if: env.CHANGES_DETECTED == 'true'
+      run: |
+        # Switch back to GITHUB_TOKEN for push operations
+        git config --global --unset url."https://${{ secrets.WORKFLOW_PAT }}@github.com/".insteadOf
+        git config --global url."https://${{ github.token }}@github.com/".insteadOf "https://github.com/"
 
     - name: Commit and push changes
       if: env.CHANGES_DETECTED == 'true'
