@@ -4,7 +4,7 @@ chariot:
 	cd modules/chariot/backend && make dev
 	@echo "Backend deployment complete. Starting local frontend."
 	cd modules/chariot/backend && make populate-env
-	@make start-ui
+	@make restart-ui
 	echo "Deployment complete"
 
 user:
