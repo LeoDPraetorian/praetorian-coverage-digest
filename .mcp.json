@@ -1,43 +1,63 @@
 {
   "mcpServers": {
     "claude-flow": {
+      "type": "stdio",
       "command": "npx",
       "args": [
         "claude-flow@alpha",
         "mcp",
         "start"
-      ],
-      "type": "stdio"
+      ]
     },
     "ruv-swarm": {
+      "type": "stdio",
       "command": "npx",
       "args": [
         "ruv-swarm@latest",
         "mcp",
         "start"
-      ],
-      "type": "stdio"
+      ]
     },
     "chariot": {
+      "type": "stdio",
       "command": "go",
-      "args": ["run", "./modules/chariot/backend/cmd/tools/chariot-mcp"],
-      "type": "stdio"
+      "args": [
+        "run",
+        "./modules/chariot/backend/cmd/tools/chariot-mcp"
+      ]
     },
     "praetorian-cli": {
-      "command": "python",
-      "args": ["-m", "praetorian_cli.sdk.mcp_server"],
       "type": "stdio",
-      "cwd": "./modules/praetorian-cli"
+      "command": "python",
+      "args": [
+        "-m",
+        "praetorian_cli.sdk.mcp_server"
+      ]
     },
     "nebula": {
-      "command": "go", 
-      "args": ["run", "./modules/nebula/cmd/mcp-server.go"],
-      "type": "stdio"
+      "type": "stdio",
+      "command": "go",
+      "args": [
+        "run",
+        "./modules/nebula/cmd/mcp-server.go"
+      ]
     },
     "atlassian": {
+      "type": "stdio",
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"],
-      "type": "stdio"
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.atlassian.com/v1/sse"
+      ]
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
     }
   }
 }
