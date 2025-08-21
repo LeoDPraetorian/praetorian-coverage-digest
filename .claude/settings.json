@@ -40,7 +40,8 @@
       "Bash(make play)",
       "Bash(make dev)",
       "Bash(make purge)",
-      "Bash(go run */user-purge/*"
+      "Bash(go run */user-purge/*)",
+      "Bash(git push * --tags *)"
     ]
   },
   "hooks": {
