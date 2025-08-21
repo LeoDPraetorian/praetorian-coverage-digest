@@ -25,7 +25,7 @@ npm run build && npm link
 ### Step 2: Link in Main Chariot App
 Navigate to the main chariot application and link the local UI package:
 ```bash
-cd modules/chariot
+cd modules/chariot/ui
 npm link "@praetorian-chariot/ui"
 ```
 
@@ -45,7 +45,7 @@ After linking, verify the connection by checking:
 
 **To unlink:**
 ```bash
-cd modules/chariot
+cd modules/chariot/ui
 npm unlink "@praetorian-chariot/ui"
 npm install  # Restore npm registry version
 ```
