@@ -4,7 +4,7 @@ chariot:
 	cd modules/chariot/backend && make dev
 	@echo "Backend deployment complete. Starting local frontend."
 	cd modules/chariot/backend && make populate-env
-	cd modules/chariot/ui && npm i && (npm run start &)
+	@make restart-ui
 	echo "Deployment complete"
 
 user:
@@ -45,7 +45,6 @@ configure-cli:
 	echo "" && \
 	echo "Use this command prefix for Praetorian CLI:" && \
 	echo "  praetorian --profile $$UUID"
-
 
 feature:
 	npx claude-flow@alpha sparc $(description)
@@ -210,3 +209,14 @@ tree-list:
 		fi \
 	}
 
+start-ui: ## Start the UI in the background
+	@echo "Starting UI as a background task on https://localhost:3000..."
+	cd modules/chariot/ui && npm i && (npm run start &)
+
+stop-ui: ## Stop the UI background task
+	@echo "Stopping the UI background task..."
+	@ps aux | grep chariot/ui | grep vite | grep -v grep | awk '{print $$2}' | xargs -r kill
+
+restart-ui: ## Restart the UI background task
+	@make stop-ui
+	@make start-ui
