@@ -28,10 +28,12 @@
     },
     "praetorian-cli": {
       "type": "stdio",
-      "command": "python",
+      "command": "praetorian",
       "args": [
-        "-m",
-        "praetorian_cli.sdk.mcp_server"
+        "chariot",
+        "agents",
+        "mcp",
+        "start"
       ]
     },
     "nebula": {
