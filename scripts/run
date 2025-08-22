@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Execute any command on all submodules recursively
+# Usage: ./run <command>
+# Examples:
+#   ./run git checkout main
+#   ./run git checkout -b new-branch
+#   ./run git status
+#   ./run npm install
+#   ./run ls -la
+
+if [ $# -eq 0 ]; then
+    echo "Error: command is required"
+    echo "Usage: ./run <command>"
+    echo "Examples:"
+    echo "  ./run git checkout main"
+    echo "  ./run git checkout -b new-branch"
+    echo "  ./run git status"
+    echo "  ./run npm install"
+    echo "  ./run ls -la"
+    exit 1
+fi
+
+echo "Executing '$*' in all submodules..."
+git submodule foreach --recursive "$*"
