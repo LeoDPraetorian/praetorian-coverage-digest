@@ -24,7 +24,13 @@ user:
       --user-pool-id $$CHARIOT_POOL \
       --username "$$EMAIL" \
       --password "$$PASSWORD" --permanent && \
-    echo "User created successfully and credentials stored in .env"
+    echo "User created successfully and credentials stored in .env" && \
+    echo "" && \
+    KEYCHAIN_CONTENT="[United States]\nname = $$CHARIOT_STACK\nclient_id = $$CHARIOT_CLIENT\napi = $$CHARIOT_API\nuser_pool_id = $$CHARIOT_POOL\nusername = $$EMAIL\npassword = $$PASSWORD" && \
+    ENCODED_KEYCHAIN=$$(echo "$$KEYCHAIN_CONTENT" | python3 -c "import sys, urllib.parse; print(urllib.parse.quote(sys.stdin.read()))") && \
+    echo "🔑 Quick Login URL:" && \
+    echo "https://localhost:3000/login-with-keychain?keychain=$$ENCODED_KEYCHAIN" && \
+    cd ../../.. && echo "CHARIOT_LOGIN_URL=https://localhost:3000/login-with-keychain?keychain=$$ENCODED_KEYCHAIN" >> .env
 
 configure-cli:
 	@UUID=$$(uuidgen | tr '[:upper:]' '[:lower:]') && \
