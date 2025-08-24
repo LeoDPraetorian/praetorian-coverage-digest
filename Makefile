@@ -72,6 +72,10 @@ setup:
 	fi
 	git submodule update --init --recursive -j 4
 	cd modules/chariot/ui && npm run setup
+	@echo "Setting up chariot-ui-components local linking..."
+	cd modules/chariot-ui-components && npm link
+	cd modules/chariot/ui && npm link "@praetorian-chariot/ui"
+	@echo "Chariot UI components linked successfully for local development"
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
 		echo "AWS credentials not found, running aws configure..."; \
 		aws configure; \
