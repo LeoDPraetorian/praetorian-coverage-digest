@@ -64,6 +64,7 @@ add-go-module:
 	go work use $(module)
 
 setup:
+	open -ja Docker
 	brew install awscli aws-sam-cli jq docker go npm
 	@if ! grep -q "export GOPRIVATE=github.com/praetorian-inc" ~/.zshrc 2>/dev/null; then \
 		echo "export GOPRIVATE=github.com/praetorian-inc" >> ~/.zshrc; \
