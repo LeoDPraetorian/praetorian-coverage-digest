@@ -78,7 +78,7 @@ setup:
 	fi
 	cd modules/chariot/ui && npm i && npm run setup
 	@echo "Setting up chariot-ui-components local linking..."
-	cd modules/chariot-ui-components && npm link
+	cd modules/chariot-ui-components && npm i && npm link
 	cd modules/chariot/ui && npm link "@praetorian-chariot/ui"
 	@echo "Chariot UI components linked successfully for local development"
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
