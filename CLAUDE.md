@@ -567,7 +567,6 @@ ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
 Never save working files, text/mds and tests to the root folder.
 
-
 ## CODE REVIEW PROCEDURE
 
 ### Types of code changes
@@ -600,4 +599,3 @@ Has Automated Tests: Yes/No
 - **Focus**: Critical issues and actionable improvements only
 - **Style**: Direct bullet points, no explanatory paragraphs
 - **Remove**: Any "Todo:", "Security Assessment", or "Quality Assessment" sections
-
