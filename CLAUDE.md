@@ -566,3 +566,36 @@ NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
 Never save working files, text/mds and tests to the root folder.
+
+## CODE REVIEW PROCEDURE
+
+### Types of code changes
+
+IMPORTANT: Do not read previous PR comments to help with the review. Evaluate the code changes independently.
+
+Review this PR and determine:
+
+1. Does it contain Go (\*.go) or TypeScript (\*.ts) changes?
+2. Does it contain significant code changes?
+3. Does it include corresponding automated tests?
+
+For backend changes, (Go files), look for changes in \*\_test.go files in this PR.
+For frontend changes (JS/TS files), look for changes in \*.spec.ts files in this PR.
+
+Output format:
+Has Go or TypeScript Changes: Yes/No
+Has Significant Changes: Yes/No
+Has Automated Tests: Yes/No
+
+### Tool to use
+
+- Use the local `gh` command to access PR's
+- Use the local `gh` command to retrieve the diffs and write PR comments.
+
+### In the final review comment to the user, format it as follows
+
+- **Format**: Use **ONLY** "Findings" and "Recommendations" sections
+- **Length**: Maximum 10 bullet points total across both sections
+- **Focus**: Critical issues and actionable improvements only
+- **Style**: Direct bullet points, no explanatory paragraphs
+- **Remove**: Any "Todo:", "Security Assessment", or "Quality Assessment" sections
