@@ -82,8 +82,19 @@ setup:
 	else \
 		echo "AWS credentials already configured, skipping aws configure"; \
 	fi
-	@read -p "Enter github username: " GITHUB_USERNAME
-	@gh auth login --scopes read:packages && gh auth token | docker login ghcr.io -u $$GITHUB_USERNAME --password-stdin
+	@echo "Checking GitHub authentication status..."
+	@if ! gh auth status >/dev/null 2>&1; then \
+		echo "GitHub not logged in. Logging in with read:packages scope..."; \
+		gh auth login --scopes read:packages; \
+	elif ! gh auth status 2>&1 | grep -q "read:packages"; then \
+		echo "GitHub logged in but missing read:packages scope. Refreshing authentication..."; \
+		gh auth refresh --scopes read:packages; \
+	else \
+		echo "GitHub already authenticated with read:packages scope"; \
+	fi
+	@echo "Setting up Docker registry authentication..."
+	@GITHUB_USERNAME=$$(gh auth status 2>&1 | grep "Logged in to github.com as" | sed 's/.*as \([^ ]*\).*/\1/'); \
+	gh auth token | docker login ghcr.io -u $$GITHUB_USERNAME --password-stdin
 
 checkout:
 	git submodule foreach 'git checkout $(branch) || true'
