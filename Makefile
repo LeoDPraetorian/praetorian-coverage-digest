@@ -70,12 +70,7 @@ setup:
 		echo "export GOPRIVATE=github.com/praetorian-inc" >> ~/.zshrc; \
 		echo "Added GOPRIVATE to ~/.zshrc"; \
 	fi
-	@if [ -z "$$(git submodule status 2>/dev/null | grep -v '^ ')" ]; then \
-		echo "No submodules found, initializing submodules..."; \
-		git submodule update --init --recursive -j 4; \
-	else \
-		echo "Submodules already initialized, skipping submodule update"; \
-	fi
+	git submodule update --init --recursive -j 4; \
 	cd modules/chariot/ui && npm i && npm run setup
 	@echo "Setting up chariot-ui-components local linking..."
 	cd modules/chariot-ui-components && npm i && npm link
