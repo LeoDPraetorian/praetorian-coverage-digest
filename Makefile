@@ -82,17 +82,7 @@ setup:
 	else \
 		echo "AWS credentials already configured, skipping aws configure"; \
 	fi
-	@if ! gh auth status >/dev/null 2>&1; then \
-		echo "GitHub not authenticated, setting up GitHub and Docker login..."; \
-		read -p "Enter github username: " GITHUB_USERNAME; \
-		gh auth login --scopes read:packages && gh auth token | docker login ghcr.io -u $$GITHUB_USERNAME --password-stdin; \
-	elif ! docker info >/dev/null 2>&1 || ! echo "" | docker login ghcr.io >/dev/null 2>&1; then \
-		echo "GitHub authenticated but Docker/GHCR login needed..."; \
-		read -p "Enter github username: " GITHUB_USERNAME; \
-		gh auth token | docker login ghcr.io -u $$GITHUB_USERNAME --password-stdin; \
-	else \
-		echo "GitHub and Docker already authenticated, skipping setup"; \
-	fi
+	gh auth login --scopes read:packages && gh auth token | docker login ghcr.io -u $$GITHUB_USERNAME --password-stdin; \
 
 checkout:
 	git submodule foreach 'git checkout $(branch) || true'
