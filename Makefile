@@ -33,6 +33,53 @@ user:
     cd ../../.. && echo "CHARIOT_LOGIN_URL=https://localhost:3000/login-with-keychain?keychain=$$ENCODED_KEYCHAIN" >> .env
 
 configure-cli:
+	@echo "Ensuring Praetorian CLI is installed and accessible..."
+	@if ! command -v praetorian >/dev/null 2>&1; then \
+		echo "Praetorian CLI not found in PATH. Installing with architecture compatibility..."; \
+		ARCH=$$(uname -m); \
+		echo "Detected architecture: $$ARCH"; \
+		pip install praetorian-cli; \
+		if [ "$$ARCH" = "x86_64" ]; then \
+			echo "Checking for architecture compatibility issues on x86_64..."; \
+			if ! python3 -c "import rpds" 2>/dev/null; then \
+				echo "Fixing rpds-py architecture compatibility..."; \
+				pip uninstall rpds-py -y 2>/dev/null || true; \
+				pip install --force-reinstall --no-binary rpds-py rpds-py || pip install --force-reinstall rpds-py; \
+			else \
+				echo "rpds-py is compatible"; \
+			fi; \
+		fi; \
+		echo "Finding praetorian binary location..."; \
+		PRAETORIAN_PATH=$$(pip show -f praetorian-cli | grep -E "^Location:" | cut -d' ' -f2); \
+		if [ -n "$$PRAETORIAN_PATH" ]; then \
+			BIN_PATH="$$PRAETORIAN_PATH/../../../bin"; \
+			if [ -f "$$BIN_PATH/praetorian" ]; then \
+				echo "Found praetorian at $$BIN_PATH/praetorian"; \
+			else \
+				BIN_PATH=$$(python3 -c "import site; print(site.USER_BASE + '/bin')"); \
+				echo "Checking user site bin path: $$BIN_PATH"; \
+			fi; \
+		else \
+			BIN_PATH=$$(python3 -c "import site; print(site.USER_BASE + '/bin')"); \
+		fi; \
+		echo "Adding $$BIN_PATH to PATH in shell profile..."; \
+		if [ -f ~/.zshrc ]; then \
+			if ! grep -q "$$BIN_PATH" ~/.zshrc 2>/dev/null; then \
+				echo "export PATH=\"$$BIN_PATH:\$$PATH\"" >> ~/.zshrc; \
+				echo "Added $$BIN_PATH to ~/.zshrc"; \
+			fi; \
+		fi; \
+		if [ -f ~/.bash_profile ]; then \
+			if ! grep -q "$$BIN_PATH" ~/.bash_profile 2>/dev/null; then \
+				echo "export PATH=\"$$BIN_PATH:\$$PATH\"" >> ~/.bash_profile; \
+				echo "Added $$BIN_PATH to ~/.bash_profile"; \
+			fi; \
+		fi; \
+		export PATH="$$BIN_PATH:$$PATH"; \
+		echo "Please restart your terminal or run 'source ~/.zshrc' (or ~/.bash_profile) to use praetorian command"; \
+	else \
+		echo "Praetorian CLI is already accessible in PATH"; \
+	fi
 	@UUID=$$(uuidgen | tr '[:upper:]' '[:lower:]') && \
 	echo "Setting up Praetorian CLI configuration..." && \
 	echo "Generated profile UUID: $$UUID" && \
@@ -95,6 +142,39 @@ setup:
 	@echo "Setting up Docker registry authentication..."
 	@GITHUB_USERNAME=$$(gh auth status 2>&1 | grep "Logged in to github.com as" | sed 's/.*as \([^ ]*\).*/\1/'); \
 	gh auth token | docker login ghcr.io -u $$GITHUB_USERNAME --password-stdin
+	@echo "Installing Praetorian CLI..."
+	@if ! command -v praetorian >/dev/null 2>&1; then \
+		echo "Installing praetorian-cli with architecture compatibility..."; \
+		ARCH=$$(uname -m); \
+		echo "Detected architecture: $$ARCH"; \
+		pip install praetorian-cli; \
+		if [ "$$ARCH" = "x86_64" ]; then \
+			echo "Checking for architecture compatibility issues on x86_64..."; \
+			if ! python3 -c "import rpds" 2>/dev/null; then \
+				echo "Fixing rpds-py architecture compatibility..."; \
+				pip uninstall rpds-py -y 2>/dev/null || true; \
+				pip install --force-reinstall --no-binary rpds-py rpds-py || pip install --force-reinstall rpds-py; \
+			fi; \
+		fi; \
+		echo "Finding praetorian binary location..."; \
+		BIN_PATH=$$(python3 -c "import site; print(site.USER_BASE + '/bin')"); \
+		echo "Adding $$BIN_PATH to PATH in shell profile..."; \
+		if [ -f ~/.zshrc ]; then \
+			if ! grep -q "$$BIN_PATH" ~/.zshrc 2>/dev/null; then \
+				echo "export PATH=\"$$BIN_PATH:\$$PATH\"" >> ~/.zshrc; \
+				echo "Added $$BIN_PATH to ~/.zshrc"; \
+			fi; \
+		fi; \
+		if [ -f ~/.bash_profile ]; then \
+			if ! grep -q "$$BIN_PATH" ~/.bash_profile 2>/dev/null; then \
+				echo "export PATH=\"$$BIN_PATH:\$$PATH\"" >> ~/.bash_profile; \
+				echo "Added $$BIN_PATH to ~/.bash_profile"; \
+			fi; \
+		fi; \
+		echo "Praetorian CLI installed. Please restart your terminal or run 'source ~/.zshrc' to use the 'praetorian' command"; \
+	else \
+		echo "Praetorian CLI is already installed and accessible"; \
+	fi
 
 checkout:
 	git submodule foreach 'git checkout $(branch) || true'
