@@ -115,11 +115,12 @@
         ]
       }
     ],
-    "UserPromptSubmit": [
+    "Notification": [
       {
+        "matcher": "",
         "hooks": [
           {
-            "type": "command",
+            "type": "command", 
             "command": "bash .claude/helpers/sound-notification.sh play"
           }
         ]
