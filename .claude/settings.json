@@ -114,6 +114,16 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/helpers/sound-notification.sh play"
+          }
+        ]
+      }
     ]
   },
   "includeCoAuthoredBy": true,
