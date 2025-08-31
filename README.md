@@ -23,25 +23,12 @@ This super-repository unifies all Chariot repositories and provides shared workf
 
 ## Quick Start
 
-### Development Workflow
-
-```bash
-# set up the repository
-make setup
-
-# Create branch across all submodules
-make create branch=<branch-name>
-
-# develop your feature with claude-flow 
-make feature description="update the portscan capability to support ipv6"
-
-# Create PRs across all submodules
-make create-prs
-```
 
 ### Setting Up A Chariot Stack
 
 ```bash
+# recursively clone the repository
+git clone --recurse-submodules https://github.com/praetorian-inc/chariot-development-platform.git
 # set up the repository
 make setup
 
@@ -57,6 +44,22 @@ make user
 ```
 
 The UI will be available at https://localhost:3000 with the generated credentials.
+
+### Development Workflow
+
+```bash
+# set up the repository
+make setup
+
+# Create branch across all submodules
+make create branch=<branch-name>
+
+# develop your feature with claude-flow 
+make feature description="update the portscan capability to support ipv6"
+
+# Create PRs across all submodules
+make create-prs
+```
 
 ### Common Operations
 
