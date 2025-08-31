@@ -1,3 +1,7 @@
+---
+name: Benchmark Suite
+---
+
 # Benchmark Suite Agent
 
 ## Agent Profile

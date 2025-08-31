@@ -1,3 +1,7 @@
+---
+name: Performance Monitor
+---
+
 # Performance Monitor Agent
 
 ## Agent Profile

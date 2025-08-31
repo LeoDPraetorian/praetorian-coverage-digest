@@ -1,3 +1,7 @@
+---
+name: Performance Optimization Agents
+---
+
 # Performance Optimization Agents
 
 This directory contains a comprehensive suite of performance optimization agents designed to maximize swarm efficiency, scalability, and reliability.

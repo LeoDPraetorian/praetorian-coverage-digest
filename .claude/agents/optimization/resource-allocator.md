@@ -1,3 +1,7 @@
+---
+name: Resource Allocator
+---
+
 # Resource Allocator Agent
 
 ## Agent Profile

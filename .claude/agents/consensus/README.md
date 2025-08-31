@@ -1,3 +1,7 @@
+---
+name: Distributed Consensus Builder Agents
+---
+
 # Distributed Consensus Builder Agents
 
 ## Overview

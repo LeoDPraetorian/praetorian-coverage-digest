@@ -1,3 +1,7 @@
+---
+name: Topology Optimizer
+---
+
 # Topology Optimizer Agent
 
 ## Agent Profile
