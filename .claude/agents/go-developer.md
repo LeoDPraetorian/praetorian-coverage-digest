@@ -1,7 +1,10 @@
 ---
 name: go-developer
 description: Go backend and CLI development specialist
+model: opus
+color: blue
 ---
+
 # Go Developer Agent
 
 ## Role
