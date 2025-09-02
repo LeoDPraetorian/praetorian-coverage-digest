@@ -140,8 +140,8 @@ setup:
 		echo "GitHub already authenticated with read:packages scope"; \
 	fi
 	@echo "Setting up Docker registry authentication..."
-	@GITHUB_USERNAME=$$(gh auth status 2>&1 | grep "Logged in to github.com as" | sed 's/.*as \([^ ]*\).*/\1/'); \
-	gh auth token | docker login ghcr.io -u $$GITHUB_USERNAME --password-stdin
+	$(eval GITHUB_USERNAME := $(shell gh auth status 2>&1 | grep "Logged" | cut -d ' ' -f 9))
+	gh auth token | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
 	@echo "Installing Praetorian CLI..."
 	@if ! command -v praetorian >/dev/null 2>&1; then \
 		echo "Installing praetorian-cli with architecture compatibility..."; \
