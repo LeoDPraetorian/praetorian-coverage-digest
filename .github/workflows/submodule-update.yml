@@ -57,7 +57,7 @@ jobs:
       run: |
         # Switch back to GITHUB_TOKEN for push operations
         git config --global --unset url."https://${{ secrets.WORKFLOW_PAT }}@github.com/".insteadOf
-        git config --global url."https://${{ github.token }}@github.com/".insteadOf "https://github.com/"
+        git config --global url."https://${{ secrets.WRITE_WORKFLOW_PAT }}@github.com/".insteadOf "https://github.com/"
 
     - name: Commit and push changes
       if: env.CHANGES_DETECTED == 'true'
