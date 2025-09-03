@@ -118,11 +118,7 @@ setup:
 		echo "Added GOPRIVATE to ~/.zshrc"; \
 	fi
 	git submodule update --init --recursive -j 4; \
-	cd modules/chariot/ui && npm i && npm run setup
-	@echo "Setting up chariot-ui-components local linking..."
-	cd modules/chariot-ui-components && npm i && npm link
-	cd modules/chariot/ui && npm link "@praetorian-chariot/ui"
-	@echo "Chariot UI components linked successfully for local development"
+	@make setup-ui
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
 		echo "AWS credentials not found, running aws configure..."; \
 		aws configure; \
@@ -313,3 +309,8 @@ stop-ui: ## Stop the UI background task
 restart-ui: ## Restart the UI background task
 	@make stop-ui
 	@make start-ui
+
+setup-ui: ## Install UI dependencies and run setup
+	@echo "Setting up UI dependencies..."
+	cd modules/chariot/ui && npm run install-link && npm run setup
+	@echo "UI setup completed successfully"
