@@ -34,7 +34,7 @@ user:
 
 install-cli:
 	@if ! command -v praetorian >/dev/null 2>&1; then \
-  		arch -arm64 python3 -m pip install --upgrade --no-cache praetorian-cli; \
+  		python3 -m pip install --upgrade --no-cache praetorian-cli; \
   	fi
 
 configure-cli: install-cli
