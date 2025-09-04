@@ -49,3 +49,4 @@
 [submodule "modules/claude-flow"]
 	path = modules/claude-flow
 	url = https://github.com/praetorian-inc/claude-flow.git
+        branch = main

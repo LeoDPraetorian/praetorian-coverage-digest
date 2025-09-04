@@ -58,7 +58,7 @@ configure-cli: install-cli
 	echo "  praetorian --profile $$UUID"
 
 feature:
-	npx claude-flow@alpha sparc $(description)
+	./modules/claude-flow/claude-flow sparc $(description)
 
 add-module:
 	git submodule add $(repo) ./modules/$(notdir $(basename $(repo)))
@@ -241,9 +241,7 @@ setup-ui: ## Install UI dependencies and run setup
 	cd modules/chariot/ui && npm run setup
 	@echo "UI setup completed successfully"
 
-setup-claude-flow: ## Install claude-flow dependencies including better-sqlite3
+setup-claude-flow: ## Install claude-flow dependencies
 	@echo "Installing claude-flow dependencies..."
 	cd modules/claude-flow && npm install
-	@echo "Installing better-sqlite3 for claude-flow..."
-	cd modules/claude-flow && npm install better-sqlite3
 	@echo "Claude-flow dependencies setup completed successfully"
