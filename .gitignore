@@ -26,7 +26,7 @@ coordination/orchestration/*
 *.sqlite
 *.sqlite-journal
 *.sqlite-wal
-claude-flow
+/claude-flow
 claude-flow.bat
 claude-flow.ps1
 hive-mind-prompt-*.txt
