@@ -77,6 +77,7 @@ setup: install-cli
 	fi
 	git submodule update --init --recursive -j 4
 	@make setup-ui
+	@make setup-claude-flow
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
 		echo "AWS credentials not found, running aws configure..."; \
 		aws configure; \
@@ -239,3 +240,10 @@ setup-ui: ## Install UI dependencies and run setup
 	@echo "Setting up UI dependencies..."
 	cd modules/chariot/ui && npm run setup
 	@echo "UI setup completed successfully"
+
+setup-claude-flow: ## Install claude-flow dependencies including better-sqlite3
+	@echo "Installing claude-flow dependencies..."
+	cd modules/claude-flow && npm install
+	@echo "Installing better-sqlite3 for claude-flow..."
+	cd modules/claude-flow && npm install better-sqlite3
+	@echo "Claude-flow dependencies setup completed successfully"
