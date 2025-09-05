@@ -104,6 +104,7 @@ This super-repository contains multiple specialized modules that form the Chario
 
 **MANDATORY SETUP**: After Claude Squad creates a worktree, run:
 ```bash
+./setup-worktree.sh
 make submodule-init
 ```
 
@@ -112,6 +113,122 @@ This initializes all git submodules for full repository access. Without this ste
 **What the script does**:
 - Runs `git submodule update --init --recursive`
 - Populates all submodule directories with their respective codebases
+- Creates feature branches for all submodules to avoid working on main
+- Provides confirmation and context awareness helpers
+
+## 🧭 NAVIGATION & CONTEXT AWARENESS
+
+**CRITICAL**: Multi-repository navigation requires constant context awareness to avoid confusion.
+
+### Repository Structure Overview
+```
+chariot-development-platform/                    # SUPER-REPO (this repo)
+├── modules/                                    # Submodule container (13 total)
+│   ├── aegiscli/                              # Velociraptor-based security orchestration middleware
+│   ├── chariot/                               # Core Chariot attack surface management platform
+│   ├── chariot-aegis-capabilities/            # VQL-based security capabilities repository
+│   ├── chariot-devops/                        # DevOps and infrastructure automation
+│   ├── chariot-ui-components/                 # Reusable React/TypeScript UI component library
+│   ├── claude-flow/                           # AI workflow orchestration and agent coordination
+│   ├── janus/                                 # Security tool orchestration platform
+│   ├── janus-framework/                       # Go library for chaining security tools
+│   ├── nebula/                                # Multi-cloud security scanning CLI
+│   ├── nuclei-templates/                      # Security vulnerability detection templates
+│   ├── praetorian-agent-workflows/            # Agentic workflow orchestration
+│   ├── praetorian-cli/                        # Python CLI and SDK for Chariot platform
+│   └── tabularium/                            # Universal data schema and code generation
+├── setup-worktree.sh                         # Worktree initialization with branch management
+├── where-am-i.sh                             # Context checker and navigation helper
+└── CLAUDE.md                                 # This file (project instructions)
+```
+
+### Context Awareness Commands
+
+**ALWAYS run these when unsure of location:**
+
+1. **Ultimate context checker:**
+   ```bash
+   ./where-am-i.sh
+   ```
+   
+2. **Quick context check:**
+   ```bash
+   pwd && git remote get-url origin && git branch --show-current
+   ```
+
+3. **Repository type detection:**
+   ```bash
+   if [ -f .gitmodules ]; then echo "SUPER-REPO"; else echo "SUBMODULE"; fi
+   ```
+
+### Navigation Best Practices
+
+**🚨 CRITICAL RULES:**
+
+1. **Before ANY git operation, check context:**
+   ```bash
+   ./where-am-i.sh
+   ```
+
+2. **Repository identification patterns:**
+   - **SUPER-REPO**: URL contains `chariot-development-platform`
+   - **SUBMODULE**: URL contains individual repo names (`chariot`, `nebula`, etc.)
+   - **Has .gitmodules**: You're in the super-repo
+   - **Path contains `/modules/`**: You're likely in a submodule
+
+3. **Safe navigation commands:**
+   ```bash
+   # Go to super-repo root from anywhere in worktree
+   cd $(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
+   
+   # Go to worktree root (works from any submodule)
+   cd $(git rev-parse --show-toplevel)
+   
+   # List all submodules (from super-repo)
+   git submodule status
+   ```
+
+4. **Common mistakes to avoid:**
+   - **DON'T** assume `pwd` shows which repo you're in
+   - **DON'T** run git commands without checking context first  
+   - **DON'T** navigate with `cd ..` without knowing where you'll end up
+   - **DON'T** make commits without verifying the correct repository
+
+### Context-Aware Workflow
+
+**Standard workflow for any task:**
+
+1. **Orient yourself:**
+   ```bash
+   ./where-am-i.sh
+   ```
+
+2. **Navigate to correct repository:**
+   - Super-repo tasks: Ensure you're in root with `.gitmodules`
+   - Submodule tasks: Navigate to `modules/[specific-module]/`
+
+3. **Verify before action:**
+   ```bash
+   git remote get-url origin  # Confirm correct repo
+   git status                 # Check current state
+   ```
+
+4. **Perform task with context checks**
+
+5. **Re-verify after major operations**
+
+### Quick Reference
+
+**Context Commands:**
+- `./where-am-i.sh` - Full context report
+- `git remote get-url origin` - Show repo URL
+- `git branch --show-current` - Current branch
+- `git rev-parse --show-toplevel` - Git root directory
+
+**Navigation Commands:**
+- `cd $(git rev-parse --show-toplevel)` - Go to current git root
+- `cd modules/chariot` - Navigate to Chariot submodule
+- `ls modules/` - List all available submodules
 - Provides confirmation that all modules are now available
 
 ## Project Overview
