@@ -104,7 +104,7 @@ This super-repository contains multiple specialized modules that form the Chario
 
 **MANDATORY SETUP**: After Claude Squad creates a worktree, run:
 ```bash
-./setup-worktree.sh
+make submodule-init
 ```
 
 This initializes all git submodules for full repository access. Without this step, all module directories in `/modules` will appear empty.
