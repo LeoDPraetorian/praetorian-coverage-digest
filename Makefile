@@ -194,8 +194,8 @@ submodule-fix: ## Fix corrupted or failed submodules
 	@echo "🔧 Attempting to fix submodule issues..."
 	@echo "🧹 Cleaning submodule directories..."
 	git submodule foreach --recursive 'git clean -xfd'
-	@echo "🔄 Resetting submodule state..."
-	git submodule foreach --recursive 'git reset --hard HEAD'
+	@echo "🔄 Resetting submodule state (ignoring failures)..."
+	git submodule foreach --recursive 'git reset --hard HEAD || true'
 	@echo "📤 Deinitializing all submodules..."
 	git submodule deinit --all --force
 	@echo "📥 Re-initializing submodules with force (sequential for large repos)..."
