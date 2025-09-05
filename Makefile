@@ -81,7 +81,7 @@ setup: install-cli
 		echo "export GOPRIVATE=github.com/praetorian-inc" >> ~/.zshrc; \
 		echo "Added GOPRIVATE to ~/.zshrc"; \
 	fi
-	git submodule update --init --recursive -j 4
+	@make submodule-init-robust
 	@make setup-ui
 	@make setup-claude-flow
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
@@ -133,7 +133,47 @@ purge:
 .PHONY: submodule-init
 submodule-init: ## Initialize all submodules
 	@echo "Initializing all submodules..."
-	git submodule update --init --recursive
+	git submodule update --init --recursive --progress
+
+
+.PHONY: submodule-init-robust
+submodule-init-robust: ## Initialize submodules with retry logic, progress tracking, and error handling
+	@echo "🚀 Initializing submodules with robust error handling and progress tracking..."
+	@echo "📊 Repository sizes: chariot(2GB), chariot-aegis-capabilities(813MB), claude-flow(311MB)"
+	@echo "Note: Using sequential downloads for large repositories (2GB+ total)"
+	@echo ""
+	@for i in 1 2 3; do \
+		echo "🔄 Attempt $$i: Initializing submodules..."; \
+		SUBMODULES=$$(git config --file .gitmodules --get-regexp path | awk '{ print $$2 }' | sort); \
+		TOTAL=$$(echo "$$SUBMODULES" | wc -l | tr -d ' '); \
+		COUNT=0; \
+		SUCCESS=true; \
+		for submodule in $$SUBMODULES; do \
+			COUNT=$$((COUNT + 1)); \
+			REPO_NAME=$$(basename $$submodule); \
+			echo "📦 [$$COUNT/$$TOTAL] Initializing $$REPO_NAME..."; \
+			if git submodule update --init --progress "$$submodule"; then \
+				echo "✅ [$$COUNT/$$TOTAL] $$REPO_NAME completed"; \
+			else \
+				echo "❌ [$$COUNT/$$TOTAL] $$REPO_NAME failed"; \
+				SUCCESS=false; \
+				break; \
+			fi; \
+			echo ""; \
+		done; \
+		if [ "$$SUCCESS" = "true" ]; then \
+			echo "🎉 All $$TOTAL submodules initialized successfully!"; \
+			break; \
+		else \
+			echo "❌ Attempt $$i failed, waiting 10 seconds before retry..."; \
+			sleep 10; \
+			if [ $$i -eq 3 ]; then \
+				echo "💥 All attempts failed. Manual intervention required."; \
+				echo "Try running: make submodule-fix"; \
+				exit 1; \
+			fi; \
+		fi; \
+	done
 
 .PHONY: submodule-pull
 submodule-pull: ## Pull latest changes from all submodules
@@ -146,8 +186,22 @@ submodule-status: ## Show status of all submodules
 	git submodule status
 
 .PHONY: submodule-update
-submodule-update: submodule-init submodule-pull submodule-status ## Complete submodule update workflow
+submodule-update: submodule-init-robust submodule-pull submodule-status ## Complete submodule update workflow
 	@echo "Submodule update completed"
+
+.PHONY: submodule-fix
+submodule-fix: ## Fix corrupted or failed submodules
+	@echo "🔧 Attempting to fix submodule issues..."
+	@echo "🧹 Cleaning submodule directories..."
+	git submodule foreach --recursive 'git clean -xfd'
+	@echo "🔄 Resetting submodule state..."
+	git submodule foreach --recursive 'git reset --hard HEAD'
+	@echo "📤 Deinitializing all submodules..."
+	git submodule deinit --all --force
+	@echo "📥 Re-initializing submodules with force (sequential for large repos)..."
+	@echo "Note: This may take 10-15 minutes for 2GB+ of repositories"
+	git submodule update --init --recursive --force --progress --jobs 1
+	@echo "✅ Submodule fix completed"
 
 .PHONY: help
 help: ## Show this help message
