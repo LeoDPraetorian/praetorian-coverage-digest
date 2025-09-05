@@ -98,6 +98,22 @@ This super-repository contains multiple specialized modules that form the Chario
 - Coordination system for multi-agent security testing scenarios
 - Integration point for advanced automation and intelligent task distribution
 
+## Claude Squad Worktree Setup
+
+**CRITICAL**: When working in a Claude Squad worktree, all git submodules need to be initialized manually.
+
+**MANDATORY SETUP**: After Claude Squad creates a worktree, run:
+```bash
+./setup-worktree.sh
+```
+
+This initializes all git submodules for full repository access. Without this step, all module directories in `/modules` will appear empty.
+
+**What the script does**:
+- Runs `git submodule update --init --recursive`
+- Populates all submodule directories with their respective codebases
+- Provides confirmation that all modules are now available
+
 ## Project Overview
 
 This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Completion) methodology with Claude-Flow orchestration for systematic Test-Driven Development.
