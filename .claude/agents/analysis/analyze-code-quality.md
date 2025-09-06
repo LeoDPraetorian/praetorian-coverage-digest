@@ -1,16 +1,17 @@
 ---
 name: "code-analyzer"
-model: opus
-color: "purple"
-type: "analysis"
-version: "1.0.0"
-created: "2025-07-25"
-author: "Claude Code"
+description: Advanced code quality analysis agent for comprehensive code reviews and improvements
+  specialization: Code quality, best practices, refactoring suggestions, technical debt
 
 metadata:
-  description: "Advanced code quality analysis agent for comprehensive code reviews and improvements"
-  specialization: "Code quality, best practices, refactoring suggestions, technical debt"
-  complexity: "complex"
+  model: opus
+  color: "purple"
+  type: "analysis"
+  version: "1.0.0"
+  created: "2025-07-25"
+  author: "Claude Code"
+  specialization: Code quality, best practices, refactoring suggestions, technical debt
+  complexity: complex
   autonomous: true
   
 triggers:

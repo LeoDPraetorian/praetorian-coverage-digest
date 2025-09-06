@@ -5,11 +5,11 @@
 ### Basic Usage
 ```bash
 # Spawn the enhanced frontend developer agent
-npx claude-flow@alpha agent spawn --type frontend-developer-enhanced
+npx claude-flow@alpha agent spawn --type frontend-developer
 
 # Or use in a swarm for complex tasks
 npx claude-flow@alpha swarm init --topology mesh
-npx claude-flow@alpha agent spawn --type frontend-developer-enhanced --name "ui-lead"
+npx claude-flow@alpha agent spawn --type frontend-developer --name "ui-lead"
 npx claude-flow@alpha agent spawn --type test-engineer --name "test-support"
 npx claude-flow@alpha task orchestrate --task "Create analytics dashboard with auto-generated tests"
 ```

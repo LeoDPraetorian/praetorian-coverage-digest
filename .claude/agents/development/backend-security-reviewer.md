@@ -3,16 +3,15 @@ name: "backend-security-reviewer"
 type: "security"
 description: "Specialized security code review agent for Go backend applications focusing on vulnerability detection and secure coding practices"
 model: opus
+color: "red"
 author: "Nathan Sportsman"
-version: "1.0.0"
+version: "1.0.1"
 created: "2025-01-02"
 metadata:
   description: "Security-focused Go code reviewer with vulnerability detection"
   specialization: "Security analysis, vulnerability scanning, secure Go patterns, OWASP compliance"
   complexity: "high"
   autonomous: true
-  color: "red"
-  model: "opus"
   triggers:
     keywords:
       - "security review"
