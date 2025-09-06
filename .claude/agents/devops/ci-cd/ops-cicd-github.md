@@ -1,5 +1,6 @@
 ---
 name: "cicd-engineer"
+model: opus
 type: "devops"
 color: "cyan"
 version: "1.0.0"
