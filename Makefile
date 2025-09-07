@@ -57,14 +57,8 @@ configure-cli: install-cli
 	echo "Use this command prefix for Praetorian CLI:" && \
 	echo "  praetorian --profile $$UUID"
 
-claude-flow: ## Build claude-flow binary for local development
-	@echo "Building claude-flow binary..."
-	cd modules/claude-flow && npm install
-	cd modules/claude-flow && npm run build
-	@echo "Claude-flow binary built successfully at modules/claude-flow/bin/claude-flow"
-
 feature:
-	./modules/claude-flow/bin/claude-flow sparc $(description)
+	npx claude-flow@alpha sparc $(description)
 
 add-module:
 	git submodule add $(repo) ./modules/$(notdir $(basename $(repo)))
@@ -83,7 +77,6 @@ setup: install-cli
 	fi
 	@make submodule-init-robust
 	@make setup-ui
-	@make setup-claude-flow
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
 		echo "AWS credentials not found, running aws configure..."; \
 		aws configure; \
@@ -139,7 +132,7 @@ submodule-init: ## Initialize all submodules
 .PHONY: submodule-init-robust
 submodule-init-robust: ## Initialize submodules with retry logic, progress tracking, and error handling
 	@echo "🚀 Initializing submodules with robust error handling and progress tracking..."
-	@echo "📊 Repository sizes: chariot(2GB), chariot-aegis-capabilities(813MB), claude-flow(311MB)"
+	@echo "📊 Repository sizes: chariot(2GB), chariot-aegis-capabilities(813MB)"
 	@echo "Note: Using sequential downloads for large repositories (2GB+ total)"
 	@echo ""
 	@for i in 1 2 3; do \
@@ -301,12 +294,3 @@ setup-ui: ## Install UI dependencies and run setup
 	cd modules/chariot/ui && npm run setup
 	@echo "UI setup completed successfully"
 
-setup-claude-flow: ## Install claude-flow dependencies for local development
-	@echo "Setting up claude-flow for local development..."
-	@echo "Removing any globally installed claude-flow package to avoid confusion..."
-	@npm uninstall -g claude-flow 2>/dev/null || true
-	@echo "Installing better-sqlite3 globally for claude-flow local builds..."
-	@npm install -g better-sqlite3
-	@echo "Installing claude-flow local dependencies..."
-	cd modules/claude-flow && npm install
-	@echo "Claude-flow local development setup completed successfully"
