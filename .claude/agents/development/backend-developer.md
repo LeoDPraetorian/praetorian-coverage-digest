@@ -9,6 +9,7 @@ metadata:
   version: "2.0.0"
   created: "2025-09-02"
   complexity: "high"
+  priority: critical
   autonomous: true
 
 triggers:

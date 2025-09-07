@@ -1,5 +1,6 @@
 ---
-name: Performance Monitor
+name: "performance-monitor"
+description: "Real-time performance monitoring and metrics collection"
 ---
 
 # Performance Monitor Agent

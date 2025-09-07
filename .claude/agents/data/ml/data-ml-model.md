@@ -1,5 +1,6 @@
 ---
-name: "ml-developer"
+name: "data-ml-model"
+description: "Specialized agent for machine learning model development, training, and deployment"
 type: data
 color: cyan
 model: opus

@@ -1,13 +1,19 @@
 ---
 name: frontend-developer
 description: Elite frontend specialist with automatic E2E test generation, performance optimization, and Chariot UI component expertise. This agent automatically generates comprehensive tests for any UI changes, optimizes bundle sizes, and ensures accessibility compliance. Examples:\n\n<example>\nContext: Creating a new dashboard page\nuser: "Build a dashboard for user analytics with charts and filters"\nassistant: "I'll create an analytics dashboard with the frontend-developer-enhanced agent, which will automatically generate E2E tests, optimize performance, and ensure responsive design."\n<commentary>\nThe enhanced agent handles complex UI creation with automatic test generation and performance optimization.\n</commentary>\n</example>\n\n<example>\nContext: UI component modification triggers auto-testing\nuser: "Update the user table to include sorting and filtering"\nassistant: "I'll enhance the user table with the frontend-developer-enhanced agent. It will automatically generate E2E tests for the new functionality and ensure performance remains optimal."\n<commentary>\nAny UI modification automatically triggers comprehensive test generation and performance checks.\n</commentary>\n</example>\n\n<example>\nContext: Performance optimization needed\nuser: "The product page is loading slowly with large datasets"\nassistant: "The frontend-developer-enhanced agent will implement virtualization, optimize bundle sizes, and add lazy loading while maintaining test coverage."\n<commentary>\nPerformance issues trigger automatic optimization with validation through generated tests.\n</commentary>\n</example>
-model: opus
-type: developer
-category: frontend
-priority: critical
-version: "2.0.0"
-color: purple
 tools: Write, Read, MultiEdit, Edit, Bash, Grep, Glob, TodoWrite, WebSearch, WebFetch, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_take_screenshot, mcp__figma-reader__get_code, mcp__tailwind__get_docs, mcp__claude-flow__task_orchestrate
+
+metadata:
+  type: "development"
+  model: "opus"
+  color: "blue"
+  author: "Nathan Sportsman"
+  version: "2.0.0"
+  created: "2025-09-02"
+  complexity: "high"
+  priority: critical
+  autonomous: true
+
 triggers:
   auto_test_generation:
     - pattern: "**/{ui,frontend,src}/**/*.{ts,tsx,js,jsx}"

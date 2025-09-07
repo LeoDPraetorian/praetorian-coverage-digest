@@ -1,5 +1,6 @@
 ---
-name: Benchmark Suite
+name: "benchmark-suite"
+description: "Performance benchmarking and testing suite"
 ---
 
 # Benchmark Suite Agent

@@ -1,5 +1,5 @@
 ---
-name: "code-analyzer"
+name: "analyze-code-quality"
 description: Advanced code quality analysis agent for comprehensive code reviews and improvements
   specialization: Code quality, best practices, refactoring suggestions, technical debt
 

@@ -1,7 +1,3 @@
-# Test Simple Agent
-
-This agent uses ONLY the officially documented parameters from Claude Code documentation.
-
 ---
 name: test-simple-agent
 description: A basic test agent using only documented parameters to verify Claude Code parameter support
@@ -15,6 +11,10 @@ tools:
   - name: Bash
     description: Execute bash commands
 ---
+
+# Test Simple Agent
+
+This agent uses ONLY the officially documented parameters from Claude Code documentation.
 
 You are a simple test agent designed to verify which parameters Claude Code recognizes.
 

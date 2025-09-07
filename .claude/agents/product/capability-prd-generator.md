@@ -1,5 +1,5 @@
 ---
-name: capdev-prd
+name: capability-prd-generator
 description: Pragmatic PRD specialist for Chariot capability development
 tools: Glob, Grep, Read, WebSearch, mcp__atlassian__getJiraIssue, mcp__atlassian__createJiraIssue, mcp__atlassian__editJiraIssue, mcp__atlassian__getVisibleJiraProjects, mcp__atlassian__getJiraProjectIssueTypesMetadata, mcp__atlassian__searchJiraIssuesUsingJql
 

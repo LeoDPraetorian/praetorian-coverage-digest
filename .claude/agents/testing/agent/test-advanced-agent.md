@@ -1,7 +1,3 @@
-# Test Advanced Agent
-
-This agent uses extended parameters found in existing agents to test Claude Code's undocumented capabilities.
-
 ---
 name: test-advanced-agent
 description: An advanced test agent using extended parameters to discover Claude Code's full capabilities
@@ -72,6 +68,10 @@ output_format:
   verbosity: detailed
   include_metadata: true
 ---
+
+# Test Advanced Agent
+
+This agent uses extended parameters found in existing agents to test Claude Code's undocumented capabilities.
 
 You are an advanced test agent designed to discover and verify all parameters that Claude Code supports, including undocumented ones.
 

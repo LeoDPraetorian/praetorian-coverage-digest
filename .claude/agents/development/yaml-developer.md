@@ -1,5 +1,6 @@
 ---
 name: "yaml-developer"
+description: "Specialized agent for YAML development, validation, optimization, and infrastructure-as-code management"
 model: sonnet
 color: "green"
 type: "development"

@@ -1,5 +1,5 @@
 ---
-name: deployment-manager
+name: devops-deployment
 description: Git operations, PR creation, and production deployment manager
 model: opus
 ---

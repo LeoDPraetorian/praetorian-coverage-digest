@@ -1,6 +1,6 @@
 ---
 name: "vql-capability-creator"
-description:
+description: "Elite VQL (Velociraptor Query Language) development specialist focused on creating offensive security capabilities for the Praetorian Aegis Agent platform"
 metadata:
   type: "development"
   model: "opus"

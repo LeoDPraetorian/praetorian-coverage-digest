@@ -1,5 +1,6 @@
 ---
-name: Load Balancing Coordinator
+name: "load-balancer"
+description: "Load balancing coordinator for distributed system optimization"
 ---
 
 # Load Balancing Coordinator Agent

@@ -1,5 +1,6 @@
 ---
-name: "system-architect"
+name: "arch-system-design"
+description: "Expert agent for system architecture design, patterns, and high-level technical decisions"
 model: opus
 type: "architecture"
 color: "purple"

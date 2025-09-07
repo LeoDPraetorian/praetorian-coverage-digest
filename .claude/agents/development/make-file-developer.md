@@ -1,8 +1,9 @@
 ---
-name: makefile-expert
-type: coder
-color: green
+name: make-file-developer
 description: Expert Makefile developer specializing in build automation, dependency management, and cross-platform build systems
+metadata:
+type: coder
+color: blue
 model: opus
 capabilities:
   - makefile_creation

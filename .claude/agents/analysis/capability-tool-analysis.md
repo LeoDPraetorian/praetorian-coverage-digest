@@ -1,5 +1,5 @@
 ---
-name: capdev-ta
+name: capability-tool-analysis
 description: Tool analysis and comprehensive report generation specialist
 ---
 # Capability Tool Analysis & Report Generator

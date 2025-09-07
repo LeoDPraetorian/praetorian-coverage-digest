@@ -1,5 +1,6 @@
 ---
-name: "cicd-engineer"
+name: "ops-cicd-github"
+description: "Specialized agent for GitHub Actions CI/CD pipeline creation and optimization"
 model: opus
 type: "devops"
 color: "cyan"

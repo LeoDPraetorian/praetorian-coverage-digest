@@ -1,11 +1,9 @@
 ---
 name: technical-debt-planner
-type: optimization
-color: bluw
 description: Planning technical debt reduction strategies then coordinating refactoring efforts
 
 metadata:
-  type: "development"
+  type: optimization
   model: "opusplan"
   color: "blue"
   author: "Nathan Sportsman"

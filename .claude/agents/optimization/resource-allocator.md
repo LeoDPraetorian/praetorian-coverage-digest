@@ -1,5 +1,6 @@
 ---
-name: Resource Allocator
+name: "resource-allocator"
+description: "Resource allocation optimizer for swarm coordination"
 ---
 
 # Resource Allocator Agent

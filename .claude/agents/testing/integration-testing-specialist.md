@@ -1,3 +1,8 @@
+---
+name: "integration-testing-specialist"
+description: "Comprehensive integration testing specialist for 3rd party service integrations and API validation"
+---
+
 # Integration Testing Specialist Agent
 
 ## Agent Profile

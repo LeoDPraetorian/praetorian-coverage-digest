@@ -1,5 +1,6 @@
 ---
-name: Topology Optimizer
+name: "topology-optimizer"
+description: "Swarm topology optimization for performance enhancement"
 ---
 
 # Topology Optimizer Agent
