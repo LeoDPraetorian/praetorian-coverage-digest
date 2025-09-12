@@ -1,23 +1,5 @@
 {
   "mcpServers": {
-    "claude-flow": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "claude-flow@alpha",
-        "mcp",
-        "start"
-      ]
-    },
-    "ruv-swarm": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "ruv-swarm@latest",
-        "mcp",
-        "start"
-      ]
-    },
     "chariot": {
       "type": "stdio",
       "command": "go",
@@ -30,6 +12,8 @@
       "type": "stdio",
       "command": "praetorian",
       "args": [
+        "--profile",
+        "demo",
         "chariot",
         "agent",
         "mcp",
@@ -57,7 +41,8 @@
       "type": "stdio",
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest"
+        "@playwright/mcp@latest",
+        "--isolated"
       ],
       "env": {}
     }
