@@ -121,7 +121,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/sound/sound-notification.sh play"
+            "command": "cd $(git rev-parse --show-toplevel) && bash scripts/sound/sound-notification.sh play"
           }
         ]
       }
