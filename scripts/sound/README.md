@@ -55,7 +55,7 @@ Sound settings are stored in `scripts/sound/sound-config.json`:
 
 ## Hook Integration
 
-This command works with the `UserPromptSubmit` hook in `.claude/settings.json` to automatically play sounds when agents complete tasks and wait for user input.
+This command works with Claude Code hooks to automatically play sounds when agents complete tasks and wait for user input.
 
 ## Cross-Platform Support
 
