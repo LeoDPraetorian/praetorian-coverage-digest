@@ -45,14 +45,14 @@ else
 fi
 
 # Check configuration
-if [ -f ".roo/mcp.json" ]; then
-    if grep -q "context7" ".roo/mcp.json" 2>/dev/null; then
-        echo -e "${GREEN}✓${NC} Context7 configured in .roo/mcp.json"
+if [ -f ".mcp.json" ]; then
+    if grep -q "context7" ".mcp.json" 2>/dev/null; then
+        echo -e "${GREEN}✓${NC} Context7 configured in .mcp.json"
     else
-        echo -e "${YELLOW}⚠${NC} Context7 not found in .roo/mcp.json (run setup script)"
+        echo -e "${YELLOW}⚠${NC} Context7 not found in .mcp.json (run setup script)"
     fi
 else
-    echo -e "${YELLOW}⚠${NC} No .roo/mcp.json file found (run setup script)"
+    echo -e "${YELLOW}⚠${NC} No .mcp.json file found (run setup script)"
 fi
 
 # Check API key

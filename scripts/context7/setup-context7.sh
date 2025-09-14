@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 # Configuration
 CONTEXT7_VERSION="latest"
 MIN_NODE_VERSION="18.0.0"
-CONFIG_DIR="$(pwd)/.roo"
+CONFIG_DIR="$(pwd)"
 ENV_FILE="$(pwd)/.env"
 ENV_EXAMPLE_FILE="$(pwd)/.env.example"
 

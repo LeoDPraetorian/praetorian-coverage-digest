@@ -14,9 +14,9 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Configuration
-TEMPLATES_DIR="scripts/context7-templates"
-CONFIG_DIR=".roo"
-BACKUP_DIR=".roo/backups"
+TEMPLATES_DIR="scripts/context7"
+CONFIG_DIR="."
+BACKUP_DIR=".backups"
 
 # Function to print colored output
 print_info() {
