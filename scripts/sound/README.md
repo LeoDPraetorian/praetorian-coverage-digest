@@ -43,7 +43,7 @@ Control sound notifications for Claude Code agent completion events.
 
 ## Configuration
 
-Sound settings are stored in `.claude/sound-config.json`:
+Sound settings are stored in `scripts/sound/sound-config.json`:
 
 ```json
 {

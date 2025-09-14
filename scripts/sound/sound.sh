@@ -2,7 +2,7 @@
 # Claude Code slash command for sound notifications
 # Usage: /sound [on|off|test|status|volume <0.0-1.0>|file <path>]
 
-SOUND_SCRIPT="$(dirname "$0")/../helpers/sound-notification.sh"
+SOUND_SCRIPT="$(dirname "$0")/sound-notification.sh"
 
 # Make sure sound script exists and is executable
 if [ ! -f "$SOUND_SCRIPT" ]; then

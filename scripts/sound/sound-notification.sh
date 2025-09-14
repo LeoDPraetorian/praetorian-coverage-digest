@@ -2,7 +2,7 @@
 # Sound notification system for Claude Code hooks
 # Plays sound when agent finishes and waits for user input
 
-SOUND_CONFIG_FILE=".claude/sound-config.json"
+SOUND_CONFIG_FILE="scripts/sound/sound-config.json"
 DEFAULT_SOUND_FILE="$HOME/.claude/sounds/completion.aiff"
 
 # Initialize sound config if it doesn't exist
