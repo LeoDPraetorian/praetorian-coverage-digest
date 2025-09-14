@@ -121,7 +121,7 @@
         "hooks": [
           {
             "type": "command", 
-            "command": "bash .claude/helpers/sound-notification.sh play"
+            "command": "bash scripts/sound/sound-notification.sh play"
           }
         ]
       }
