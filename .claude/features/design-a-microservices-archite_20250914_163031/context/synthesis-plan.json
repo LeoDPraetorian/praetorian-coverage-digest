@@ -1,0 +1,67 @@
+{
+  "research_needed": true,
+  "rationale": "The microservices architecture design requires extensive research to align with the Chariot platform's existing AWS serverless architecture, security requirements, and Go-based ecosystem. Need to understand how to evolve from the current Lambda-based serverless approach to a full microservices architecture while maintaining security and performance standards.",
+  "recommended_research": [
+    {
+      "agent": "code-explorer",
+      "focus": "Analyze existing Chariot platform architecture patterns, especially Lambda handlers, DynamoDB access patterns, Janus framework orchestration, and current service boundaries in modules/chariot/backend",
+      "priority": "high",
+      "reason": "Must understand current serverless architecture to design compatible microservices that can coexist and migrate gradually"
+    },
+    {
+      "agent": "web-research-specialist",
+      "focus": "Research AWS EKS best practices for migrating from Lambda to containerized microservices, including Fargate integration, service mesh options (AWS App Mesh vs Istio), and cost optimization strategies",
+      "priority": "high",
+      "reason": "Critical for determining the most efficient path from serverless to microservices on AWS infrastructure"
+    },
+    {
+      "agent": "code-explorer",
+      "focus": "Examine Janus framework capabilities for service orchestration, existing SQS/Kinesis event patterns, and how security capabilities are currently implemented",
+      "priority": "high",
+      "reason": "Janus framework may provide existing patterns for microservice orchestration that should be leveraged"
+    },
+    {
+      "agent": "context7-search-specialist",
+      "focus": "Search for Go microservices patterns with AWS SDK v2, particularly around Lambda to container migration, DynamoDB single-table design in microservices, and Neo4j integration patterns",
+      "priority": "medium",
+      "reason": "Need specific implementation patterns for Go-based microservices using AWS services already in the stack"
+    },
+    {
+      "agent": "web-research-specialist",
+      "focus": "Research security patterns for zero-trust architecture in AWS with Cognito, mTLS implementation with service mesh, and vulnerability scanning for container images in AWS ECR",
+      "priority": "high",
+      "reason": "Security is critical for the Chariot platform - need AWS-specific security patterns for microservices"
+    },
+    {
+      "agent": "code-explorer",
+      "focus": "Analyze current API Gateway patterns, authentication flows with Cognito, and how the React frontend interacts with backend services",
+      "priority": "medium",
+      "reason": "Understanding current API patterns will inform API gateway design and service boundaries"
+    },
+    {
+      "agent": "context7-search-specialist",
+      "focus": "Research distributed tracing with OpenTelemetry in Go, integration with AWS X-Ray, and CloudWatch metrics for comprehensive observability",
+      "priority": "medium",
+      "reason": "Observability is crucial for microservices - need AWS-native solutions that work with existing monitoring"
+    },
+    {
+      "agent": "web-research-specialist",
+      "focus": "Research saga pattern implementation in Go for distributed transactions, especially with DynamoDB and event-driven architectures using SQS/Kinesis",
+      "priority": "medium",
+      "reason": "Need to handle distributed transactions across microservices while maintaining data consistency"
+    }
+  ],
+  "synthesis_approach": "parallel",
+  "expected_outputs": [
+    "Current Chariot platform architecture patterns and service boundaries",
+    "Migration path from AWS Lambda to EKS/Fargate with minimal disruption",
+    "Security implementation patterns for zero-trust architecture on AWS",
+    "Service mesh comparison and recommendation (AWS App Mesh vs Istio)",
+    "Janus framework integration opportunities for service orchestration",
+    "Distributed tracing and observability strategy with AWS tools",
+    "Event-driven architecture patterns using existing SQS/Kinesis infrastructure",
+    "Cost optimization strategies for running microservices on AWS",
+    "Database per service pattern implementation with DynamoDB and Neo4j",
+    "API gateway and service discovery patterns compatible with current setup"
+  ]
+}

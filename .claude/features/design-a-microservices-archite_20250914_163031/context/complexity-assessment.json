@@ -1,0 +1,104 @@
+{
+  "level": "Complex",
+  "score": 87,
+  "breakdown": {
+    "file_impact": 30,
+    "code_volume": 30,
+    "architectural_impact": 20,
+    "risk_factors": 7
+  },
+  "factors": [
+    "Complete architectural transformation from serverless Lambda to containerized microservices",
+    "Requires modification of 50+ Lambda function handlers across 6 major domains",
+    "Need to implement service mesh (AWS App Mesh or Istio) for inter-service communication",
+    "Migration from single AWS Lambda monolith to 8-10 independent microservices",
+    "Implementation of distributed tracing, logging, and monitoring infrastructure",
+    "Database strategy refactoring to implement bounded contexts per service",
+    "Zero-trust security implementation with mTLS between all services",
+    "Complex orchestration patterns using existing Janus framework",
+    "Integration of multiple AWS services (EKS, Fargate, App Mesh, X-Ray)",
+    "Gradual migration strategy required to maintain 99.9% availability"
+  ],
+  "affected_domains": [
+    "backend",
+    "infrastructure",
+    "database",
+    "security",
+    "networking",
+    "frontend"
+  ],
+  "estimated_effort": "4-6 months",
+  "risk_level": "High",
+  "risks": [
+    {
+      "area": "Operational Complexity",
+      "description": "Moving from managed serverless to containerized microservices significantly increases operational overhead",
+      "mitigation": "Implement comprehensive automation, GitOps practices, and team training"
+    },
+    {
+      "area": "Data Consistency",
+      "description": "Distributed transactions across microservices risk data integrity issues",
+      "mitigation": "Implement saga pattern, event sourcing, and eventual consistency models"
+    },
+    {
+      "area": "Network Latency",
+      "description": "Inter-service communication adds 10-50ms latency compared to in-process Lambda calls",
+      "mitigation": "Service mesh optimization, caching strategies, and request batching"
+    },
+    {
+      "area": "Security Surface",
+      "description": "Each microservice increases attack vectors and authentication complexity",
+      "mitigation": "Zero-trust architecture with mTLS, service mesh security policies, and comprehensive audit logging"
+    },
+    {
+      "area": "Cost Escalation",
+      "description": "Container orchestration may cost 20-40% more than serverless for sporadic workloads",
+      "mitigation": "Hybrid approach keeping appropriate workloads in Lambda, auto-scaling optimization"
+    }
+  ],
+  "migration_complexity": "Very High - Requires complete rearchitecture of current serverless platform while maintaining production operations. The platform has 50+ Lambda handlers, complex DynamoDB single-table design, and tightly coupled service interactions that need careful decomposition.",
+  "technical_debt": "Medium to High - While microservices provide better separation of concerns, they introduce distributed system complexity, eventual consistency challenges, and require significant investment in observability and orchestration tooling.",
+  "team_skills_required": [
+    "Kubernetes/EKS administration and troubleshooting",
+    "Service mesh configuration (AWS App Mesh/Istio)",
+    "Distributed systems architecture and design patterns",
+    "Container security and vulnerability management",
+    "Distributed tracing and observability (X-Ray/Jaeger)",
+    "Event-driven architecture and messaging patterns",
+    "Database per service pattern implementation",
+    "Zero-trust security architecture",
+    "Go microservices development",
+    "Infrastructure as Code (Terraform/CloudFormation)",
+    "GitOps and CI/CD for microservices",
+    "Performance optimization for distributed systems"
+  ],
+  "dependencies": {
+    "internal": [
+      "Janus framework adaptation for service orchestration",
+      "Tabularium schema evolution for service boundaries",
+      "Authentication service extraction from Cognito integration",
+      "DynamoDB single-table design refactoring per service"
+    ],
+    "external": [
+      "AWS EKS cluster provisioning and management",
+      "Service mesh implementation (App Mesh/Istio)",
+      "Container registry (ECR) with vulnerability scanning",
+      "Distributed tracing infrastructure (X-Ray/Jaeger)",
+      "ELK stack or similar for centralized logging",
+      "Prometheus/Grafana for metrics collection"
+    ]
+  },
+  "justification": "This is a complex undertaking that fundamentally transforms the architecture from a serverless monolith to distributed microservices. The existing platform has 50+ Lambda handlers tightly coupled through shared DynamoDB tables and synchronous invocations. Decomposing this into 8-10 microservices requires careful service boundary definition, data consistency strategies, and comprehensive security implementation. The Janus framework provides orchestration capabilities but needs significant extension for microservices. The 4-6 month timeline accounts for gradual migration maintaining 99.9% availability, team training, and establishing new operational practices.",
+  "recommendations": [
+    "Start with a proof-of-concept extracting the Authentication service as it has clear boundaries",
+    "Maintain hybrid architecture initially - keep latency-sensitive operations in Lambda",
+    "Implement comprehensive observability infrastructure before service extraction",
+    "Use Fargate for simple stateless services to reduce Kubernetes complexity",
+    "Leverage existing Janus framework for service orchestration rather than building new",
+    "Create dedicated DevOps team for platform operations and automation",
+    "Implement feature flags for gradual rollout and quick rollback capabilities",
+    "Conduct load testing at each migration phase to validate performance",
+    "Consider hiring or training specialists in Kubernetes and distributed systems",
+    "Document service contracts and API specifications comprehensively"
+  ]
+}

@@ -1,12 +1,8 @@
 .idea/
 .env
-# ignore some flow stuff for now
-.claude-flow/
-memory/
-docs/ 
-
-
 # Claude Flow generated files
+.claude-flow/
+.root
 .claude/settings.local.json
 .mcp.json
 claude-flow.config.json
@@ -20,13 +16,15 @@ memory/agents/*
 coordination/memory_bank/*
 coordination/subtasks/*
 coordination/orchestration/*
+
+.claude/features/*
 *.db
 *.db-journal
 *.db-wal
 *.sqlite
 *.sqlite-journal
 *.sqlite-wal
-/claude-flow
+claude-flow
 claude-flow.bat
 claude-flow.ps1
 hive-mind-prompt-*.txt

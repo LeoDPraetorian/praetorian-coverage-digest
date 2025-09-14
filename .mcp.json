@@ -1,12 +1,19 @@
 {
   "mcpServers": {
+    "claude-flow": {
+      "command": "npx",
+      "args": ["claude-flow@alpha", "mcp", "start"],
+      "type": "stdio"
+    },
+    "ruv-swarm": {
+      "command": "npx",
+      "args": ["ruv-swarm@latest", "mcp", "start"],
+      "type": "stdio"
+    },
     "chariot": {
       "type": "stdio",
       "command": "go",
-      "args": [
-        "run",
-        "./modules/chariot/backend/cmd/tools/chariot-mcp"
-      ]
+      "args": ["run", "./modules/chariot/backend/cmd/tools/chariot-mcp"]
     },
     "praetorian-cli": {
       "type": "stdio",
@@ -23,19 +30,12 @@
     "nebula": {
       "type": "stdio",
       "command": "go",
-      "args": [
-        "run",
-        "./modules/nebula/cmd/mcp-server.go"
-      ]
+      "args": ["run", "./modules/nebula/cmd/mcp-server.go"]
     },
     "atlassian": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://mcp.atlassian.com/v1/sse"
-      ]
+      "args": ["-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"]
     },
     "playwright": {
       "type": "stdio",
@@ -45,6 +45,14 @@
         "--isolated"
       ],
       "env": {}
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "env": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      }
     }
   }
 }

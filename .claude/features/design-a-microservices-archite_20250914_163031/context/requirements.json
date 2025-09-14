@@ -1,0 +1,352 @@
+{
+  "feature_name": "microservices-architecture-design",
+  "original_request": "Design a microservices architecture with security and performance considerations",
+  "interpretation": "Design and implement a distributed microservices architecture with emphasis on security measures, performance optimization, and scalability patterns",
+  "clarification_needed": [
+    {
+      "priority": "critical",
+      "question": "What is the target application domain?",
+      "options": [
+        "E-commerce platform",
+        "Financial services",
+        "Healthcare system",
+        "Media streaming service",
+        "IoT platform",
+        "Generic enterprise application"
+      ],
+      "impact": "Determines compliance requirements, data sensitivity, and performance characteristics",
+      "default_recommendation": "Generic enterprise application with standard security requirements"
+    },
+    {
+      "priority": "critical",
+      "question": "What is the expected scale of the system?",
+      "options": [
+        "Small (< 1000 concurrent users)",
+        "Medium (1000-10000 concurrent users)",
+        "Large (10000-100000 concurrent users)",
+        "Enterprise (> 100000 concurrent users)"
+      ],
+      "impact": "Affects architecture patterns, infrastructure choices, and scaling strategies",
+      "default_recommendation": "Medium scale with ability to scale to large"
+    },
+    {
+      "priority": "high",
+      "question": "Which cloud platform should be targeted?",
+      "options": [
+        "AWS",
+        "Azure",
+        "Google Cloud Platform",
+        "Multi-cloud",
+        "On-premises",
+        "Hybrid cloud"
+      ],
+      "impact": "Determines available services, tools, and deployment patterns",
+      "default_recommendation": "AWS with potential for multi-cloud expansion"
+    },
+    {
+      "priority": "high",
+      "question": "What orchestration platform should be used?",
+      "options": [
+        "Kubernetes",
+        "Docker Swarm",
+        "AWS ECS/Fargate",
+        "Azure Container Instances",
+        "Nomad",
+        "Serverless (Lambda/Functions)"
+      ],
+      "impact": "Affects deployment complexity, scaling patterns, and operational overhead",
+      "default_recommendation": "Kubernetes for maximum flexibility and portability"
+    },
+    {
+      "priority": "high",
+      "question": "Which service mesh technology should be implemented?",
+      "options": [
+        "Istio",
+        "Linkerd",
+        "Consul Connect",
+        "AWS App Mesh",
+        "None (manage manually)",
+        "Custom solution"
+      ],
+      "impact": "Determines inter-service communication patterns and observability capabilities",
+      "default_recommendation": "Istio for comprehensive features and community support"
+    },
+    {
+      "priority": "medium",
+      "question": "What communication patterns should be supported?",
+      "options": [
+        "Synchronous REST only",
+        "Asynchronous messaging only",
+        "Mixed (REST + messaging)",
+        "GraphQL federation",
+        "gRPC for internal services",
+        "Event-driven architecture"
+      ],
+      "impact": "Affects service coupling, latency, and complexity",
+      "default_recommendation": "Mixed with REST for external APIs and async messaging for internal events"
+    },
+    {
+      "priority": "medium",
+      "question": "How many initial microservices are expected?",
+      "options": [
+        "3-5 services",
+        "6-10 services",
+        "11-20 services",
+        "20+ services"
+      ],
+      "impact": "Determines initial complexity and operational overhead",
+      "default_recommendation": "6-10 services with clear boundaries"
+    }
+  ],
+  "user_stories": [
+    {
+      "id": "US-001",
+      "role": "DevOps Engineer",
+      "want": "to deploy microservices independently",
+      "benefit": "I can release features without affecting other services"
+    },
+    {
+      "id": "US-002",
+      "role": "Developer",
+      "want": "to develop services in different programming languages",
+      "benefit": "I can use the best tool for each specific problem"
+    },
+    {
+      "id": "US-003",
+      "role": "Security Engineer",
+      "want": "to implement zero-trust networking between services",
+      "benefit": "I can ensure all inter-service communication is authenticated and encrypted"
+    },
+    {
+      "id": "US-004",
+      "role": "System Administrator",
+      "want": "to monitor all services from a central dashboard",
+      "benefit": "I can quickly identify and resolve issues"
+    },
+    {
+      "id": "US-005",
+      "role": "Application User",
+      "want": "to experience consistent performance",
+      "benefit": "I can rely on the application even during peak usage"
+    },
+    {
+      "id": "US-006",
+      "role": "Product Owner",
+      "want": "to scale specific features independently",
+      "benefit": "I can optimize costs while meeting demand"
+    },
+    {
+      "id": "US-007",
+      "role": "Site Reliability Engineer",
+      "want": "to implement circuit breakers and retry mechanisms",
+      "benefit": "I can prevent cascade failures across services"
+    },
+    {
+      "id": "US-008",
+      "role": "Data Engineer",
+      "want": "to implement distributed tracing",
+      "benefit": "I can track requests across multiple services"
+    }
+  ],
+  "acceptance_criteria": [
+    "Each microservice can be deployed independently without downtime",
+    "All inter-service communication is encrypted using mTLS",
+    "Services automatically scale based on load (CPU/memory/custom metrics)",
+    "Circuit breakers prevent cascade failures with < 100ms detection time",
+    "Distributed tracing covers 100% of service interactions",
+    "Centralized logging aggregates logs from all services within 5 seconds",
+    "API gateway handles authentication and rate limiting for external requests",
+    "Service discovery automatically registers/deregisters services",
+    "Health checks detect service failures within 30 seconds",
+    "Rollback capability exists for all service deployments",
+    "Load balancing distributes traffic evenly across service instances",
+    "Services recover from failures without manual intervention",
+    "Monitoring alerts trigger within 1 minute of threshold breach",
+    "Database per service pattern is implemented where appropriate",
+    "API versioning supports backward compatibility"
+  ],
+  "affected_systems": [
+    "API Gateway",
+    "Service Registry/Discovery",
+    "Configuration Management",
+    "Message Queue/Event Bus",
+    "Container Orchestration Platform",
+    "Service Mesh",
+    "Monitoring/Observability Stack",
+    "CI/CD Pipeline",
+    "Secret Management System",
+    "Load Balancers",
+    "Databases (per service)",
+    "Caching Layer",
+    "Identity Provider/Auth Service",
+    "Log Aggregation System",
+    "Distributed Tracing System"
+  ],
+  "constraints": [
+    "Must support horizontal scaling",
+    "Services must be stateless where possible",
+    "Maximum service startup time of 30 seconds",
+    "Minimum 99.9% availability SLA per service",
+    "Must comply with data residency requirements",
+    "Container images must be under 500MB",
+    "Must support blue-green or canary deployments",
+    "Network latency between services < 10ms (same region)",
+    "Must support both Linux and Windows containers",
+    "Database connections must use connection pooling"
+  ],
+  "security_requirements": [
+    "Implement mTLS for all inter-service communication",
+    "Use OAuth 2.0/OIDC for external authentication",
+    "Implement API key management for service-to-service auth",
+    "Encrypt all data at rest using AES-256",
+    "Implement network segmentation using VPCs/subnets",
+    "Use least privilege IAM roles for all services",
+    "Implement DDoS protection at edge",
+    "Regular security scanning of container images",
+    "Implement secrets rotation every 90 days",
+    "Use Web Application Firewall (WAF) for public endpoints",
+    "Implement audit logging for all API calls",
+    "Use private container registry with vulnerability scanning",
+    "Implement zero-trust network architecture",
+    "Regular penetration testing of services",
+    "Compliance with OWASP Top 10 mitigations"
+  ],
+  "performance_requirements": [
+    "API response time < 200ms for 95th percentile",
+    "Support 1000 requests per second per service instance",
+    "Database query response time < 50ms",
+    "Message processing latency < 100ms",
+    "Cache hit ratio > 80% for frequently accessed data",
+    "Service startup time < 30 seconds",
+    "Graceful degradation under 2x expected load",
+    "Memory usage < 512MB per service instance",
+    "CPU utilization < 70% under normal load",
+    "Network throughput > 100 Mbps between services",
+    "Support burst traffic of 5x normal load for 5 minutes",
+    "Automatic scaling triggers at 60% resource utilization",
+    "Connection pool size optimized for concurrent requests",
+    "Batch processing for bulk operations > 100 items",
+    "Async processing for operations > 1 second"
+  ],
+  "technical_requirements": [
+    "Implement service mesh for traffic management",
+    "Use container orchestration for deployment",
+    "Implement API gateway for edge routing",
+    "Set up service registry for discovery",
+    "Configure distributed configuration management",
+    "Implement event-driven communication via message bus",
+    "Set up centralized logging with ELK or similar",
+    "Implement distributed tracing with OpenTelemetry",
+    "Configure Prometheus/Grafana for metrics",
+    "Implement circuit breakers with Hystrix pattern",
+    "Set up rate limiting at API gateway",
+    "Configure health checks and readiness probes",
+    "Implement saga pattern for distributed transactions",
+    "Use CQRS where appropriate for read/write separation",
+    "Implement database per service pattern"
+  ],
+  "assumed_requirements": {
+    "functional": [
+      "Services communicate via REST APIs and async messaging",
+      "Each service owns its data and database",
+      "Services are independently deployable",
+      "Configuration is externalized and environment-specific",
+      "Services implement health check endpoints",
+      "API documentation is auto-generated (OpenAPI)",
+      "Services support multiple deployment environments"
+    ],
+    "non_functional": [
+      "Services are containerized using Docker",
+      "Infrastructure is defined as code (Terraform/CloudFormation)",
+      "Automated testing includes unit, integration, and contract tests",
+      "Monitoring covers metrics, logs, and traces",
+      "Backup and disaster recovery procedures exist",
+      "Documentation is maintained for each service",
+      "Cost optimization through resource right-sizing"
+    ]
+  },
+  "risks": [
+    {
+      "risk": "Network complexity increases with service count",
+      "impact": "Difficult troubleshooting and increased latency",
+      "mitigation": "Implement service mesh and comprehensive observability"
+    },
+    {
+      "risk": "Data consistency across services",
+      "impact": "Potential for data integrity issues",
+      "mitigation": "Implement saga pattern and eventual consistency"
+    },
+    {
+      "risk": "Service versioning and compatibility",
+      "impact": "Breaking changes affect dependent services",
+      "mitigation": "Implement API versioning and contract testing"
+    },
+    {
+      "risk": "Increased operational complexity",
+      "impact": "Higher maintenance overhead",
+      "mitigation": "Automate operations and implement GitOps"
+    },
+    {
+      "risk": "Security surface area expansion",
+      "impact": "More potential attack vectors",
+      "mitigation": "Implement zero-trust architecture and regular security audits"
+    }
+  ],
+  "recommended_approach": "Start with a monolith-first approach and gradually extract microservices based on domain boundaries. Implement Kubernetes with Istio service mesh on AWS EKS. Use a combination of REST APIs for synchronous communication and Apache Kafka for asynchronous events. Begin with 5-7 core services and expand as needed. Prioritize observability and security from day one.",
+  "out_of_scope": [
+    "Specific business logic implementation",
+    "Frontend application architecture",
+    "Mobile application considerations",
+    "Multi-region deployment (phase 2)",
+    "Advanced ML/AI service integration (phase 2)",
+    "Blockchain integration",
+    "Legacy system migration strategies",
+    "Detailed cost analysis"
+  ],
+  "implementation_phases": [
+    {
+      "phase": 1,
+      "name": "Foundation",
+      "duration": "4-6 weeks",
+      "deliverables": [
+        "Infrastructure setup (Kubernetes cluster)",
+        "CI/CD pipeline configuration",
+        "Service mesh installation",
+        "Monitoring stack deployment"
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Core Services",
+      "duration": "6-8 weeks",
+      "deliverables": [
+        "API gateway implementation",
+        "Authentication service",
+        "First 3-5 business services",
+        "Message bus setup"
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Observability & Security",
+      "duration": "4-6 weeks",
+      "deliverables": [
+        "Distributed tracing implementation",
+        "Security policies enforcement",
+        "Performance testing framework",
+        "Disaster recovery procedures"
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Optimization",
+      "duration": "Ongoing",
+      "deliverables": [
+        "Performance tuning",
+        "Cost optimization",
+        "Additional service extraction",
+        "Advanced patterns implementation"
+      ]
+    }
+  ]
+}
