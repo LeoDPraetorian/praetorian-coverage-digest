@@ -120,13 +120,13 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "command", 
+            "type": "command",
             "command": "bash scripts/sound/sound-notification.sh play"
           }
         ]
       }
     ]
   },
-  "includeCoAuthoredBy": true,
-  "enabledMcpjsonServers": ["claude-flow", "ruv-swarm"]
+  "includeCoAuthoredBy": false,
+  "enabledMcpjsonServers": ["claude-flow", "ruv-swarm", "chariot", "praetorian-cli", "nebula", "atlassian", "playwright", "context7"]
 }
