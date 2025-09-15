@@ -100,65 +100,173 @@ Based on the complexity level and architecture decisions, determine the implemen
 
 Based on the affected domains and technical requirements, create specific recommendations for agent utilization:
 
-#### Development Agents by Domain
+#### Analysis & Code Review Agents
+
+**Code Analysis**:
+- `code-pattern-analyzer` - Analyze code patterns and architectural consistency
+- `general-code-review` - Language-agnostic comprehensive code quality reviews
+- `integration-pattern-discoverer` - Discover integration patterns and dependencies
+- `workflow-understanding-agent` - Analyze development workflows and team practices
+- `parathinker-integration-analysis` - ParaThinker methodology integration analysis
+
+**Go-Specific Analysis**:
+- `go-code-review` - Golang-specific comprehensive code quality reviews
+- `go-security-review` - Go backend security vulnerability analysis
+
+**Frontend Analysis**:
+- `react-security-reviewer` - React/TypeScript security and XSS prevention
+
+#### Architecture Agents
+
+**System Architecture**:
+- `general-system-architect` - High-level system design and architectural decisions
+- `security-architect` - Security design patterns and threat modeling
+- `information-architect` - Project structure and information organization
+
+**Technology-Specific Architecture**:
+- `react-typescript-architect` - React TypeScript architecture and component design
+- `go-backend-architect` - Go backend architecture and system design
+- `database-neo4j-architect` - Graph database schema design for tabularium data models
+- `cloud-aws-architect` - AWS cloud architecture and infrastructure design
+
+#### Core Coordination Agents
+
+**Planning & Coordination**:
+- `architecture-coordinator` - Coordinate architectural analysis across multiple domains
+- `knowledge-synthesizer` - Consolidate information from multiple sources
+- `intent-translator` - Clarify vague or incomplete requirements
+- `complexity-assessor` - Assess implementation complexity and planning requirements
+- `implementation-planner` - Transform requirements into detailed execution plans
+
+#### Development Agents
 
 **Frontend Development**:
-
-- `react-developer` - React/TypeScript components and features
-- `react-typescript-architect` - Complex React architecture decisions
-- `designer` - UI/UX design guidance and component design
+- `react-developer` - React/TypeScript components and UI features
 
 **Backend Development**:
+- `golang-api-developer` - Go REST APIs, GraphQL resolvers, and backend services
+- `golang-developer` - Expert-level Go development and advanced patterns
+- `python-developer` - Expert Python development for CLI tools and scripts
+- `integration-developer` - Third-party service integrations and API connections
+- `vql-developer` - Velociraptor Query Language for security capabilities
 
-- `go-api-developer` - REST API endpoints and GraphQL resolvers
-- `go-developer` - Core Go application logic and services
-- `python-developer` - Python CLI tools and scripts
-- `integration-developer` - Third-party service integrations
-- `vql-developer` - Velociraptor security capability development
+**Configuration & Infrastructure**:
+- `makefile-developer` - Build automation and dependency management
+- `yaml-developer` - Infrastructure-as-code and configuration management
 
-**Infrastructure & DevOps**:
+#### DevOps & Infrastructure Agents
 
-- `aws-infrastructure-specialist` - AWS resource management and optimization
-- `devops-automator` - CI/CD pipeline setup and automation
-- `infrastructure-engineer` - CloudFormation and infrastructure as code
-- `yaml-developer` - Configuration and deployment YAML files
+**Cloud Infrastructure**:
+- `aws-infrastructure-specialist` - AWS resource management and cost optimization
+- `devops-automator` - CI/CD pipelines and deployment automation
 
-**Data**:
+#### Data & AI Agents
 
-- `database-neo4j-architect` - Graph database schema design
-
-**Security**:
-
-- `security-architect` - Security design patterns and threat modeling
-- `go-security-reviewer` - Go security vulnerability analysis
-- `react-security-reviewer` - React security and XSS prevention
+**Machine Learning**:
+- `ai-engineer` - AI/ML features, language models, and intelligent automation
+- `data-ml-model` - Machine learning model development and training
 
 #### Testing & Quality Assurance Agents
 
 **Testing Strategy**:
-
-- `unit-test-engineer` - Go and Python unit test suites
-- `e2e-test-engineer` - Comprehensive Playwright test automation
+- `unit-test-engineer` - Go and Python unit test suites with security focus
+- `e2e-test-engineer` - Comprehensive Playwright E2E test automation
 - `integration-test-engineer` - Third-party service integration validation
-- `chromatic-test-engineer` - Visual regression testing workflows
+- `chromatic-test-engineer` - Visual regression testing with Chromatic platform
+- `playwright-explorer` - Frontend application exploration and testing
+- `tdd-london-swarm` - TDD London School mock-driven development
+- `production-validator` - Production readiness validation and deployment checks
 
-**Code Quality & Review**:
+#### Optimization & Performance Agents
 
-- `go-code-quality-reviewer` - Go code quality and refactoring
-- `react-code-quality-reviewer` - React/TypeScript code quality
-- `code-review-swarm` - Multi-agent comprehensive code review
+**Performance Analysis**:
+- `performance-analyzer` - System bottleneck identification and workflow optimization
+- `go-api-optimizer` - Go API performance optimization and concurrency patterns
+- `performance-monitor` - Real-time metrics and bottleneck analysis
 
-#### Specialized Domain Agents
+**System Optimization**:
+- `benchmark-suite` - Comprehensive performance benchmarking
+- `load-balancer` - Dynamic task distribution and load balancing
+- `resource-allocator` - Adaptive resource allocation and capacity planning
+- `topology-optimizer` - Dynamic topology reconfiguration and optimization
+
+#### Product Management & Documentation Agents
+
+**Jira Integration**:
+- `jira-epic-writer` - Create and improve Jira epics with company templates
+- `jira-bug-filer` - Structured bug reports and bug analysis
+- `jira-story-writer` - User stories, tasks, and subtasks creation
+- `jira-reader` - Jira data retrieval, analysis, and JQL queries
 
 **Documentation**:
-
 - `openapi-writer` - API documentation and schema generation
+- `uiux-designer` - UI/UX design guidance and accessibility improvements
 
-**Performance & Analysis**:
+#### Research & Information Gathering Agents
 
-- `go-api-optimizer` - Go API performance optimization
-- `performance-analyzer` - System bottleneck identification
-- `code-explorer` - Codebase pattern analysis and discovery
+**Information Discovery**:
+- `context7-search-specialist` - Library documentation and technical resources
+- `web-research-specialist` - Web-based information gathering and analysis
+
+#### Orchestration & Coordination Agents
+
+**High-Level Orchestration**:
+- `orchestration-planner` - Comprehensive orchestration plans and agent selection
+- `solution-architecture-coordinator` - Master orchestration for complete development cycles
+- `planner` - Strategic planning and task orchestration
+- `orchestrator-task` - Central coordination for task decomposition and execution
+
+**Specialized Coordination**:
+- `memory-coordinator` - Persistent memory management across sessions
+- `context-coordination-manager` - Advanced context sharing and agent communication
+- `hybrid-coordination-bridge` - Integration between Claude Code and MCP coordination
+- `automation-smart-agent` - Intelligent agent coordination and dynamic spawning
+- `sparc-coordinator` - SPARC methodology orchestration
+- `codebase-exploration-swarm` - Orchestrate code analysis across multiple agents
+
+**GitHub Integration**:
+- `github-pr-manager` - Pull request lifecycle management and workflows
+- `migration-plan` - Migration planning for agent-based systems
+
+#### Swarm Coordination Agents
+
+**Coordination Patterns**:
+- `hierarchical-coordinator` - Multi-agent workflows with hierarchical command structure
+- `mesh-coordinator` - Peer-to-peer mesh network architectures
+- `adaptive-coordinator` - Dynamic topology switching with self-organizing patterns
+
+#### Distributed Systems & Consensus Agents
+
+**Consensus Mechanisms**:
+- `byzantine-coordinator` - Byzantine fault-tolerant consensus protocols
+- `raft-manager` - Raft consensus algorithm with leader election
+- `gossip-coordinator` - Gossip-based consensus for scalable systems
+- `quorum-manager` - Dynamic quorum adjustment and membership management
+- `security-manager` - Comprehensive security for distributed consensus
+- `crdt-synchronizer` - Conflict-free Replicated Data Types for state sync
+
+**Performance & Benchmarking**:
+- `performance-benchmarker` - Performance benchmarking for distributed systems
+
+#### Hive-Mind Intelligence Agents
+
+**Collective Intelligence**:
+- `collective-intelligence-coordinator` - Neural center for collective decision-making
+- `consensus-builder` - Byzantine fault-tolerant consensus and voting mechanisms  
+- `swarm-memory-manager` - Distributed memory coordination and optimization
+
+#### SPARC Methodology Agents
+
+**Development Phases**:
+- `specification` - SPARC Specification phase for requirements analysis
+- `architecture` - SPARC Architecture phase for system design
+- `pseudocode` - SPARC Pseudocode phase for algorithm design
+- `refinement` - SPARC Refinement phase for iterative improvement
+
+#### Platform-Specific Agents
+
+**Praetorian Platform**:
+- `praetorian-cli-expert` - Chariot API interactions through Praetorian CLI
 
 ### Step 5: Structure Implementation Plan Output
 
