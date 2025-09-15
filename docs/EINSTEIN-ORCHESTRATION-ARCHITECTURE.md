@@ -1,8 +1,8 @@
-# Ultrathink Feature Orchestration Architecture
+# Einstein Feature Orchestration Architecture
 
 ## Overview
 
-The **Ultrathink Feature System** is a comprehensive multi-phase orchestration platform that transforms natural language feature requests into fully implemented, production-ready code. Built on Claude Code's Task tool and specialized AI agents, it provides a systematic approach to feature development through intelligent workflow orchestration.
+The **Einstein Feature System** is a comprehensive multi-phase orchestration platform that transforms natural language feature requests into fully implemented, production-ready code. Built on Claude Code's Task tool and specialized AI agents, it provides a systematic approach to feature development through intelligent workflow orchestration.
 
 ## Architecture Philosophy
 
@@ -17,6 +17,7 @@ The **Ultrathink Feature System** is a comprehensive multi-phase orchestration p
 ### Workflow Integration
 
 The system integrates with:
+
 - **Jira Integration**: Automatic ticket resolution and preprocessing
 - **Claude Code Task Tool**: Primary agent spawning mechanism
 - **Chariot Development Platform**: Aligned with repository patterns and tech stack
@@ -38,14 +39,14 @@ graph TD
     E -->|No| G[Phase 5: Implementation Planning]
     F --> G
     G --> H[Implementation Execution]
-    
+
     subgraph "Feature Workspace"
         I[Context Files]
         J[Research Files]
         K[Architecture Files]
         L[Output Files]
     end
-    
+
     B --> I
     C --> J
     F --> K
@@ -57,6 +58,7 @@ graph TD
 The system employs **66+ specialized agents** organized into functional categories:
 
 #### Core Orchestration Agents
+
 - **preprocessing-orchestration**: Handles Jira reference detection and resolution with intelligent agent routing
 - **intent-translator**: Transforms vague requests into structured requirements
 - **knowledge-synthesizer**: Coordinates research and consolidates findings
@@ -65,12 +67,14 @@ The system employs **66+ specialized agents** organized into functional categori
 - **implementation-planner**: Creates detailed execution plans with agent assignments
 
 #### Research & Analysis Agents
+
 - **jira-reader**: Resolves Jira ticket references and provides context
 - **context7-search-specialist**: Finds official library documentation and APIs
 - **web-research-specialist**: Gathers industry best practices and current information
 - **code-pattern-analyzer**: Analyzes existing codebase patterns and consistency
 
 #### Specialized Development Agents
+
 - **golang-api-developer**: Go backend APIs and GraphQL resolvers
 - **react-developer**: React/TypeScript components and UI features
 - **security-architect**: Security design patterns and threat modeling
@@ -88,12 +92,15 @@ The system employs **66+ specialized agents** organized into functional categori
 **Purpose**: Automatically detect and resolve Jira ticket references before main workflow execution.
 
 **Process**:
+
 1. **Reference Detection**:
+
    - Scan input for patterns like `CHA-1232`, `PROJ-123`
    - Detect Jira URLs with `atlassian.net/browse/` patterns
    - Use regex patterns: `\b[A-Z]{2,10}-\d+\b`
 
 2. **Conditional Execution**:
+
    ```javascript
    if (hasJiraRefs || hasJiraUrls) {
      return sequentialExecution(); // Resolve first, then continue
@@ -103,6 +110,7 @@ The system employs **66+ specialized agents** organized into functional categori
    ```
 
 3. **Reference Resolution**:
+
    - Use `jira-reader` in preprocessing mode
    - Fetch full ticket details via Atlassian MCP tools
    - Replace references with structured content
@@ -114,6 +122,7 @@ The system employs **66+ specialized agents** organized into functional categori
    - Route directly to implementation agents if clear
 
 **Example Transformations**:
+
 ```
 Input:  "Implement the feature from CHA-1232"
 Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication System]
@@ -129,20 +138,20 @@ Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication S
 **Purpose**: Transform ambiguous user requests into precise, actionable specifications.
 
 **Process**:
+
 1. **Jira Preprocessing** (if references detected):
    - Detect patterns like `CHA-1232`, `PROJ-123`
    - Use `jira-reader` to fetch full ticket details
    - Replace references with structured content
-   
 2. **Requirements Decomposition**:
    - Extract functional and non-functional requirements
    - Identify assumptions and constraints
    - Create user stories and acceptance criteria
-   
 3. **Output Generation**:
    - Save structured requirements to `.claude/features/{FEATURE_ID}/context/requirements.json`
 
 **Example Output Structure**:
+
 ```json
 {
   "feature_name": "dark-mode-toggle",
@@ -163,6 +172,7 @@ Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication S
 **Research Strategy**:
 
 **Third-Party Integration Pattern** (Systematic context7-first approach):
+
 ```json
 {
   "recommended_research": [
@@ -173,7 +183,7 @@ Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication S
       "reason": "Need structured official documentation first"
     },
     {
-      "agent": "web-research-specialist", 
+      "agent": "web-research-specialist",
       "focus": "[LIBRARY] best practices, security considerations, common pitfalls",
       "priority": "medium",
       "reason": "Supplement official docs with implementation best practices"
@@ -181,7 +191,7 @@ Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication S
     {
       "agent": "code-pattern-analyzer",
       "focus": "Existing [SIMILAR_INTEGRATION] patterns in codebase",
-      "priority": "high", 
+      "priority": "high",
       "reason": "Leverage existing architecture and maintain consistency"
     }
   ]
@@ -190,22 +200,21 @@ Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication S
 
 **Research Agent Capabilities**:
 
-- **context7-search-specialist**: 
+- **context7-search-specialist**:
   - Resolves library names to Context7-compatible IDs
   - Fetches up-to-date official documentation
   - Specializes in API references and technical documentation
-  
 - **web-research-specialist**:
   - Conducts targeted web searches with source verification
   - Gathers industry best practices and tutorials
   - Provides research gaps and conflicting information analysis
-  
 - **code-pattern-analyzer**:
   - Scans codebase for recurring patterns and anti-patterns
   - Evaluates architectural consistency
   - Identifies reusability opportunities
 
 **Process**:
+
 1. Read requirements and detect integration needs
 2. Create synthesis plan with agent recommendations
 3. Main Claude spawns research agents concurrently
@@ -219,17 +228,20 @@ Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication S
 **Purpose**: Quantify implementation complexity and determine resource allocation.
 
 **Scoring Framework**:
+
 - **File Impact** (0-30 points): Number of files requiring changes
 - **Code Volume** (0-30 points): Estimated lines of code
 - **Architectural Impact** (0-20 points): Level of architectural changes
 - **Risk Factors** (0-20 points): Security, performance, external dependencies
 
 **Complexity Levels**:
+
 - **Simple (0-30)**: Single component changes, existing patterns
-- **Medium (31-70)**: Multiple components, some new patterns  
+- **Medium (31-70)**: Multiple components, some new patterns
 - **Complex (71-100)**: System-wide changes, new architectural patterns
 
 **Output**:
+
 ```json
 {
   "level": "Medium",
@@ -251,10 +263,11 @@ Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication S
 **Coordination Strategies**:
 
 1. **spawn_architects**: Multi-domain features requiring specialized expertise
-2. **single_architect**: Features primarily affecting one domain  
+2. **single_architect**: Features primarily affecting one domain
 3. **skip_architecture**: Simple features following existing patterns
 
 **Specialized Architects Available**:
+
 - **react-typescript-architect**: Frontend component design and state management
 - **go-backend-architect**: Backend API design and data processing
 - **security-architect**: Security requirements and threat modeling
@@ -262,6 +275,7 @@ Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication S
 - **cloud-aws-architect**: Infrastructure and scaling design
 
 **Example Coordination Plan**:
+
 ```json
 {
   "recommendation": "spawn_architects",
@@ -272,7 +286,7 @@ Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication S
       "priority": "high"
     },
     {
-      "agent": "go-backend-architect", 
+      "agent": "go-backend-architect",
       "reason": "WebSocket infrastructure requires scalable design",
       "priority": "high"
     }
@@ -290,44 +304,52 @@ Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication S
 **Planning Strategy by Complexity**:
 
 - **Simple Features**: Direct implementation with minimal coordination
-- **Medium Features**: Multi-phase approach with clear dependencies  
+- **Medium Features**: Multi-phase approach with clear dependencies
 - **Complex Features**: Orchestrated implementation with parallel tracks
 
 **Agent Assignment Matrix**: 65+ agents categorized by specialty:
 
 **Development Agents**:
+
 - Frontend: `react-developer`
 - Backend: `golang-api-developer`, `golang-developer`, `python-developer`
 - Infrastructure: `makefile-developer`, `yaml-developer`, `vql-developer`
 
 **Testing Agents**:
+
 - `unit-test-engineer`: Go and Python unit tests with security focus
 - `e2e-test-engineer`: Comprehensive Playwright E2E automation
 - `integration-test-engineer`: Third-party service validation
 - `production-validator`: Production readiness validation
 
-**Architecture Agents**: 
+**Architecture Agents**:
+
 - `general-system-architect`, `security-architect`, `information-architect`
 - Technology-specific: `react-typescript-architect`, `go-backend-architect`
 
 **Quality & Analysis Agents**:
+
 - Code Review: `go-code-review`, `react-security-reviewer`, `general-code-review`
 - Pattern Analysis: `code-pattern-analyzer`, `integration-pattern-discoverer`
 - Performance: `performance-analyzer`, `go-api-optimizer`
 
 **Output Structure**:
+
 ```markdown
 # Implementation Plan: [Feature Name]
 
 ## Executive Summary
+
 - Complexity: Medium
-- Estimated Effort: 2-3 days  
+- Estimated Effort: 2-3 days
 - Primary Domains: frontend, design-system
 
 ## Phase Breakdown
 
 ### Phase 1: Foundation Setup
+
 #### Tasks:
+
 1. **Theme System Architecture**
    - Agent: `react-typescript-architect`
    - Input: Requirements and existing patterns
@@ -335,18 +357,21 @@ Output: "Implement the following feature: [TICKET CHA-1232: JWT Authentication S
    - Success Criteria: Architecture approved and documented
 
 ### Phase 2: Implementation
+
 #### Tasks:
+
 1. **Theme Provider Implementation**
    - Agent: `react-developer`
    - Dependencies: Phase 1 completion
    - Output: Working theme context and provider
 
 ## Agent Assignment Matrix
-| Task | Agent | Priority | Dependencies |
-|------|-------|----------|------------- |
-| Architecture | `react-typescript-architect` | High | None |
-| Implementation | `react-developer` | High | Architecture complete |
-| Testing | `e2e-test-engineer` | Medium | Implementation complete |
+
+| Task           | Agent                        | Priority | Dependencies            |
+| -------------- | ---------------------------- | -------- | ----------------------- |
+| Architecture   | `react-typescript-architect` | High     | None                    |
+| Implementation | `react-developer`            | High     | Architecture complete   |
+| Testing        | `e2e-test-engineer`          | Medium   | Implementation complete |
 ```
 
 ---
@@ -399,7 +424,7 @@ Each feature receives an isolated workspace:
 ```javascript
 // ✅ CORRECT: Single message with multiple Task calls
 [Single Message]:
-  Task("context7-search-specialist", "Research Stripe API v4...", "context7-search-specialist")  
+  Task("context7-search-specialist", "Research Stripe API v4...", "context7-search-specialist")
   Task("web-research-specialist", "Research payment best practices...", "web-research-specialist")
   Task("code-pattern-analyzer", "Analyze payment patterns...", "code-pattern-analyzer")
 ```
@@ -407,8 +432,9 @@ Each feature receives an isolated workspace:
 ### Research Strategy Optimization
 
 **Third-Party Integration Pattern**: Systematic approach for external API integrations:
+
 1. **Primary**: `context7-search-specialist` for official documentation
-2. **Fallback**: `web-research-specialist` for best practices  
+2. **Fallback**: `web-research-specialist` for best practices
 3. **Context**: `code-pattern-analyzer` for existing patterns
 
 This ensures structured, official documentation is prioritized while gathering comprehensive implementation context.
@@ -430,16 +456,19 @@ The system automatically adjusts orchestration complexity:
 The system is deeply integrated with the Chariot Development Platform tech stack:
 
 **Backend Technologies**:
+
 - Go 1.24.6 with AWS Serverless (Lambda, DynamoDB, Neo4j)
 - Security-focused patterns for attack surface management
 - Repository pattern with interface-based design
 
-**Frontend Technologies**: 
+**Frontend Technologies**:
+
 - React 18 + TypeScript with Tailwind CSS and Vite
 - TanStack Query for data fetching
 - Feature-based organization with shared components
 
 **Testing Strategy**:
+
 - Comprehensive unit tests with 80%+ coverage
 - E2E tests with Playwright and automatic generation
 - Security-focused testing for all implementations
@@ -467,7 +496,8 @@ The `jira-reader` agent provides **preprocessing mode** that:
 4. **Seamless Handoff**: Passes enriched content to next phase
 
 This enables natural language requests like:
-- "Implement the feature from CHA-1232"  
+
+- "Implement the feature from CHA-1232"
 - "Fix the bug described in PROJ-456"
 
 ### Dynamic Agent Selection
@@ -484,7 +514,7 @@ The system intelligently selects agents based on:
 Each phase includes validation checkpoints:
 
 - **Requirements Validation**: Completeness and clarity checks
-- **Research Validation**: Source verification and gap analysis  
+- **Research Validation**: Source verification and gap analysis
 - **Complexity Validation**: Risk assessment and effort estimation
 - **Architecture Validation**: Design consistency and scalability
 - **Implementation Validation**: Code quality, testing, and production readiness
@@ -529,7 +559,7 @@ cat .claude/features/${FEATURE_ID}/output/implementation-plan.md
 When working with the system, understand agent specializations:
 
 - **Research Questions** → Use `context7-search-specialist` for official docs
-- **Implementation Context** → Use `code-pattern-analyzer` for existing patterns  
+- **Implementation Context** → Use `code-pattern-analyzer` for existing patterns
 - **Best Practices** → Use `web-research-specialist` for industry knowledge
 - **Complex Architecture** → Use specialized architects (`react-typescript-architect`, etc.)
 - **Production Readiness** → Use `production-validator` for deployment validation
@@ -547,16 +577,16 @@ When working with the system, understand agent specializations:
 
 ### For Agent Interaction
 
-1. **Trust the Process**: Let each phase complete before proceeding  
+1. **Trust the Process**: Let each phase complete before proceeding
 2. **Review Research**: Check individual research files before implementation
 3. **Validate Architecture**: Ensure complex features get proper architectural review
 4. **Monitor Quality Gates**: Don't skip validation checkpoints
 
-### For System Administration  
+### For System Administration
 
 1. **Regular Cleanup**: Archive completed features older than 30 days
 2. **Pattern Mining**: Review successful features to improve agent recommendations
-3. **Performance Monitoring**: Track agent execution times and bottlenecks  
+3. **Performance Monitoring**: Track agent execution times and bottlenecks
 4. **Context Optimization**: Refine research strategies based on outcomes
 
 ---
@@ -566,16 +596,19 @@ When working with the system, understand agent specializations:
 ### Common Issues
 
 **Phase Failures**:
+
 - Check that required context files exist from previous phases
 - Verify agent outputs match expected JSON/Markdown formats
 - Review error messages in feature logs directory
 
-**Research Quality**:  
+**Research Quality**:
+
 - Ensure third-party integrations use context7-first pattern
 - Validate that web research includes authoritative sources
 - Check that code pattern analysis covers relevant existing implementations
 
 **Implementation Planning**:
+
 - Verify complexity assessment aligns with actual feature scope
 - Confirm agent assignments match technical requirements
 - Review timeline estimates against team capacity
@@ -625,7 +658,7 @@ The system is designed for extensibility:
 
 ## Conclusion
 
-The Ultrathink Feature Orchestration Architecture represents a systematic approach to feature development that combines AI agent specialization with intelligent workflow orchestration. By providing structured phases, isolated workspaces, and adaptive complexity management, it enables consistent, high-quality feature implementation while reducing cognitive load and coordination overhead.
+The Einstein Feature Orchestration Architecture represents a systematic approach to feature development that combines AI agent specialization with intelligent workflow orchestration. By providing structured phases, isolated workspaces, and adaptive complexity management, it enables consistent, high-quality feature implementation while reducing cognitive load and coordination overhead.
 
 The system's strength lies in its balance of automation and human insight - it handles the research, analysis, and planning phases systematically while enabling developers to focus on creative problem-solving and implementation quality. With 66+ specialized agents and comprehensive integration with the Chariot platform, it provides a robust foundation for scalable feature development.
 
@@ -636,14 +669,16 @@ For developers, the system transforms feature requests from "figure it out" task
 ## Appendix: Agent Reference
 
 ### Core Orchestration Agents (6)
+
 - `preprocessing-orchestration`: Jira reference detection and intelligent agent routing
 - `intent-translator`: Requirements analysis and clarification
-- `knowledge-synthesizer`: Research coordination and synthesis  
+- `knowledge-synthesizer`: Research coordination and synthesis
 - `complexity-assessor`: Implementation complexity evaluation
 - `architecture-coordinator`: Architectural analysis coordination
 - `implementation-planner`: Detailed execution plan creation
 
 ### Research & Analysis Agents (8)
+
 - `jira-reader`: Jira integration and ticket resolution
 - `context7-search-specialist`: Official documentation and APIs
 - `web-research-specialist`: Web research and best practices
@@ -654,6 +689,7 @@ For developers, the system transforms feature requests from "figure it out" task
 - `go-security-reviewer`: Backend security analysis
 
 ### Architecture Agents (7)
+
 - `general-system-architect`: High-level system design
 - `security-architect`: Security design and threat modeling
 - `information-architect`: Project structure organization
@@ -663,6 +699,7 @@ For developers, the system transforms feature requests from "figure it out" task
 - `cloud-aws-architect`: AWS infrastructure design
 
 ### Development Agents (12)
+
 - `react-developer`: React/TypeScript development
 - `golang-api-developer`: Go API development
 - `golang-developer`: Advanced Go development
@@ -674,6 +711,7 @@ For developers, the system transforms feature requests from "figure it out" task
 - `ai-engineer`: AI/ML feature implementation
 
 ### Testing & Quality Agents (10)
+
 - `unit-test-engineer`: Unit test suites
 - `e2e-test-engineer`: End-to-end test automation
 - `integration-test-engineer`: Integration test validation
@@ -686,10 +724,12 @@ For developers, the system transforms feature requests from "figure it out" task
 - `go-code-review`: Go code quality review
 
 ### Infrastructure & DevOps Agents (3)
+
 - `aws-infrastructure-specialist`: AWS resource management
 - `devops-automator`: CI/CD and deployment automation
 
 ### Product & Documentation Agents (6)
+
 - `jira-epic-writer`: Epic creation and management
 - `jira-bug-filer`: Bug report management
 - `jira-story-writer`: User story creation
@@ -697,6 +737,7 @@ For developers, the system transforms feature requests from "figure it out" task
 - `uiux-designer`: UI/UX design guidance
 
 ### Coordination & Orchestration Agents (14)
+
 Including swarm coordinators, consensus mechanisms, and distributed systems agents for advanced orchestration patterns.
 
-*Total: 66+ specialized agents providing comprehensive coverage across all aspects of feature development.*
+_Total: 66+ specialized agents providing comprehensive coverage across all aspects of feature development._
