@@ -1,9 +1,9 @@
 ---
-description: Transform feature description into actionable implementation plan
+description: Transform user prompt / feature description into actionable implementation plan
 model: claude-opus-4-1-20250805
 ---
 
-# Feature Implementation Workflow
+# Einstein Implementation Workflow
 
 You are orchestrating a multi-phase feature planning workflow. Your goal is to transform the user's feature description into a comprehensive, actionable implementation plan.
 
