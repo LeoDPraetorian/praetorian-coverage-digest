@@ -22,7 +22,7 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 FEATURE_ID="${FEATURE_NAME}_${TIMESTAMP}"
 
 # Create feature-specific directory structure
-mkdir -p .claude/features/${FEATURE_ID}/{context,output,logs,architecture}
+mkdir -p .claude/features/${FEATURE_ID}/{context,research,output,logs,architecture}
 
 # Save feature metadata
 cat > .claude/features/${FEATURE_ID}/metadata.json << EOF
@@ -42,6 +42,7 @@ echo "FEATURE_ID=${FEATURE_ID}" > .claude/features/current_feature.env
 echo "=== Feature Workspace Paths ==="
 echo "Requirements: .claude/features/${FEATURE_ID}/context/requirements.json"
 echo "Knowledge Base: .claude/features/${FEATURE_ID}/context/knowledge-base.md"
+echo "Research Dir: .claude/features/${FEATURE_ID}/research/"
 echo "Complexity: .claude/features/${FEATURE_ID}/context/complexity-assessment.json"
 echo "Architecture Dir: .claude/features/${FEATURE_ID}/architecture/"
 echo "Plan Output: .claude/features/${FEATURE_ID}/output/implementation-plan.md"
@@ -126,22 +127,34 @@ Your output should be a JSON file with this structure:
   "rationale": "Explanation of why research is needed",
   "recommended_research": [
     {
-      "agent": "web-research-specialist",
+      "agent": "AGENT_TYPE_TO_SELECT",
       "focus": "What specific information to gather",
       "priority": "high|medium|low",
-      "reason": "Why this research is important"
-    },
-    {
-      "agent": "code-pattern-analyzer",
-      "focus": "What patterns to look for in codebase",
-      "priority": "high",
-      "reason": "Need to find existing implementations"
+      "reason": "Why this research is important",
+      "output_file": "filename-for-research-output.md"
     }
   ],
   "synthesis_approach": "sequential|parallel",
   "expected_outputs": ["list of expected findings"]
 }
 ```
+
+CRITICAL: Choose the optimal agent type for each research need:
+
+**Available Research Agents:**
+
+- `code-pattern-analyzer` - For analyzing existing codebase patterns and implementations
+- `context7-search-specialist` - BEST for 3rd party integrations, library documentation, API references, SDK docs (e.g., Cloudflare API, AWS SDK, React docs)
+- `web-research-specialist` - For industry practices, tutorials, best practices, general research, and as a fall back if context7, is not available
+
+**Agent Selection Guidelines:**
+
+- 3rd party integrations, library documentation, API references, SDK docs (e.g., Cloudflare API, AWS SDK, React docs) → USE `context7-search-specialist`
+- For implementation patterns in codebase → USE `code-pattern-analyzer`
+- For industry best practices and tutorials → USE `web-research-specialist`
+- For security architecture and threats → USE `security-architect`
+
+Do NOT use biased examples - evaluate each research need independently and select the most appropriate agent.
 
 Also create your initial knowledge synthesis and save to: ${OUTPUT_KNOWLEDGE}"
 
@@ -167,37 +180,65 @@ fi
 
 **Based on the synthesis plan generated above, spawn the recommended research agents:**
 
-For each agent in the synthesis plan with priority "high":
+First, create the research directory structure:
+
+```bash
+source .claude/features/current_feature.env
+RESEARCH_DIR=".claude/features/${FEATURE_ID}/research"
+mkdir -p "${RESEARCH_DIR}"
+echo "Created research directory: ${RESEARCH_DIR}"
+```
+
+**CRITICAL: Spawn ALL high-priority agents in a SINGLE MESSAGE for true parallel execution:**
 
 1. Read the high-priority agents from the synthesis plan
-2. Use the Task tool to spawn each high-priority agent concurrently
+2. In ONE message, use multiple Task tool calls to spawn ALL high-priority agents simultaneously
 3. Provide each agent with:
    - Their specific focus from the plan
-   - The path to append findings: ${OUTPUT_KNOWLEDGE}
+   - Their dedicated output file path in the research directory
    - Context from the feature requirements
+
+**Example of correct parallel spawning:**
+
+```
+[Single Message with Multiple Task Calls]:
+Task("context7-search-specialist", "Research Cloudflare API...", "context7-search-specialist")
+Task("web-research-specialist", "Research security best practices...", "web-research-specialist")
+Task("code-pattern-analyzer", "Analyze existing patterns...", "code-pattern-analyzer")
+```
 
 After spawning agents, wait for them to complete before continuing.
 
 Example spawning based on recommendations:
 
-- If "web-research-specialist" is recommended for "React 18 best practices":
-  Tell the agent: "Research current React 18 concurrent features best practices.
-  Focus on: [specific focus from plan]. Append findings to: [knowledge base path]"
+- If "context7-search-specialist" is recommended with output_file "cloudflare-api-documentation.md":
+  Tell the agent: "Research Cloudflare WAF API v4 official documentation.
+  Focus on: [specific focus from plan].
+  Save your complete findings to: ${RESEARCH_DIR}/cloudflare-api-documentation.md"
 
-- If "code-pattern-analyzer" is recommended for "existing patterns":
+- If "web-research-specialist" is recommended with output_file "web-research-findings.md":
+  Tell the agent: "Research security testing best practices for WAF integrations.
+  Focus on: [specific focus from plan].
+  Save your complete findings to: ${RESEARCH_DIR}/web-research-findings.md"
+
+- If "code-pattern-analyzer" is recommended with output_file "code-patterns-analysis.md":
   Tell the agent: "Analyze our codebase for [specific patterns from plan].
-  Look for reusable components related to [feature]. Document findings in: [path]"
-
-DO NOT PROCEED TO PHASE 3 until all research agents are spawned and their tasking has completed.
+  Look for reusable components related to [feature].
+  Save your complete analysis to: ${RESEARCH_DIR}/code-patterns-analysis.md"
 
 ```bash
-# Verify research was conducted
-echo "Checking if research agents have appended to knowledge base..."
-KNOWLEDGE_SIZE_AFTER=$(wc -l < "${OUTPUT_KNOWLEDGE}" 2>/dev/null || echo "0")
-if [ "$KNOWLEDGE_SIZE_AFTER" -le "50" ]; then
-    echo "⚠️ Knowledge base appears incomplete. Ensure research agents have completed."
+# Verify individual research files were created
+echo "Checking individual research outputs..."
+RESEARCH_FILES=$(find "${RESEARCH_DIR}" -name "*.md" -type f | wc -l)
+if [ "$RESEARCH_FILES" -eq "0" ]; then
+    echo "⚠️ No research files found. Ensure research agents have completed."
+else
+    echo "✓ Found ${RESEARCH_FILES} research output files:"
+    ls -la "${RESEARCH_DIR}/"*.md
 fi
 ```
+
+DO NOT PROCEED TO PHASE 3 until all research agents are spawned and their tasking has completed.
 
 ### Phase 3: Complexity Assessment
 

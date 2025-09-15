@@ -51,9 +51,66 @@ Extract key information:
 - Technical scope and affected systems
 - **Actual technologies in use** (from TECH-STACK.md)
 
-### Step 2: Analyze and Create Research Recommendations
+### Step 2: Set Up Research Directory Structure
 
-Instead of directly spawning research agents, analyze the requirements and create a research plan. Based on the actual technology stack you just read, consider:
+Create a dedicated research directory for individual agent outputs:
+
+```bash
+# Extract feature ID and create research subdirectory
+RESEARCH_DIR=".claude/features/${FEATURE_ID}/research"
+mkdir -p "${RESEARCH_DIR}"
+
+echo "Research outputs will be organized as:"
+echo "- ${RESEARCH_DIR}/web-research-findings.md"
+echo "- ${RESEARCH_DIR}/code-patterns-analysis.md"
+echo "- ${RESEARCH_DIR}/context7-documentation.md"
+echo "etc. (one file per research agent)"
+```
+
+### Step 3: Analyze and Create Research Recommendations
+
+Based on the actual technology stack you just read, analyze what research is needed:
+
+**FIRST: Detect Third-Party Integrations**
+
+Scan the requirements for mentions of:
+
+- External APIs (Cloudflare, AWS, Stripe, GitHub, Okta, etc.)
+- SDKs and libraries (React, GraphQL, Socket.io, etc.)
+- Cloud services (DynamoDB, S3, Azure, GCP, etc.)
+- Integration keywords ("integrate with", "API", "SDK", "service", "connect to")
+
+**For ANY Third-Party Integration Detected:**
+
+Apply the **systematic context7-first pattern**:
+
+```json
+[
+  {
+    "agent": "context7-search-specialist",
+    "focus": "[SPECIFIC_LIBRARY/API] official documentation, authentication, API endpoints, rate limits, SDKs",
+    "priority": "high",
+    "reason": "Need official structured documentation for [INTEGRATION_NAME]",
+    "output_file": "[library-name]-documentation.md"
+  },
+  {
+    "agent": "web-research-specialist",
+    "focus": "[SPECIFIC_LIBRARY/API] integration best practices, security considerations, common pitfalls",
+    "priority": "medium",
+    "reason": "Supplement official docs with implementation best practices and lessons learned",
+    "output_file": "[library-name]-best-practices.md"
+  },
+  {
+    "agent": "code-pattern-analyzer",
+    "focus": "Existing [SIMILAR_INTEGRATION] patterns in codebase, credential management, error handling",
+    "priority": "high",
+    "reason": "Leverage existing integration architecture and maintain consistency",
+    "output_file": "[library-name]-patterns-analysis.md"
+  }
+]
+```
+
+**For Non-Integration Features:**
 
 1. **What clarification questions need research?**
 
@@ -75,7 +132,7 @@ Instead of directly spawning research agents, analyze the requirements and creat
    - Architecture patterns
    - Integration approaches
 
-### Step 3: Generate Research Plan (synthesis-plan.json)
+### Step 4: Generate Research Plan (synthesis-plan.json)
 
 Create a structured research plan and save it to the synthesis plan path. The structure must be:
 
@@ -88,19 +145,22 @@ Create a structured research plan and save it to the synthesis plan path. The st
       "agent": "web-research-specialist",
       "focus": "Specific information to gather (e.g., 'React 18 concurrent rendering patterns for dashboard updates')",
       "priority": "high",
-      "reason": "Why this is critical for the feature implementation"
+      "reason": "Why this is critical for the feature implementation",
+      "output_file": "web-research-findings.md"
     },
     {
       "agent": "code-pattern-analyzer",
       "focus": "Specific patterns to find (e.g., 'existing WebSocket implementations in our codebase')",
       "priority": "high",
-      "reason": "Need to understand current architecture before adding new features"
+      "reason": "Need to understand current architecture before adding new features",
+      "output_file": "code-patterns-analysis.md"
     },
     {
       "agent": "context7-search-specialist",
       "focus": "Library documentation needed (e.g., 'Socket.io configuration for real-time updates')",
       "priority": "medium",
-      "reason": "Need detailed API documentation for implementation"
+      "reason": "Need detailed API documentation for implementation",
+      "output_file": "context7-documentation.md"
     }
   ],
   "synthesis_approach": "parallel",
@@ -120,7 +180,17 @@ Key points for research recommendations:
 - Include diverse research types (codebase, web, documentation)
 - Focus on the actual feature requirements, not generic research
 
-### Step 4: Create Initial Knowledge Synthesis
+**CRITICAL: Third-Party Integration Research Pattern**
+
+For ANY third-party integration (APIs, SDKs, libraries), ALWAYS use this systematic approach:
+
+1. **Primary Research**: `context7-search-specialist` for official documentation (high priority)
+2. **Fallback Research**: `web-research-specialist` for practices/tutorials (medium priority)
+3. **Codebase Analysis**: `code-pattern-analyzer` for existing integration patterns (high priority)
+
+This ensures structured, official documentation is obtained first, with web research only for gaps or best practices.
+
+### Step 5: Create Initial Knowledge Synthesis
 
 Even without the research results, create an initial knowledge base with:
 
@@ -128,10 +198,11 @@ Even without the research results, create an initial knowledge base with:
 - Key questions that need answers
 - Assumptions that need validation
 - Initial implementation considerations
+- Structure for incorporating individual research findings
 
-Save this to the knowledge base output path.
+Save this to the knowledge base output path. This will serve as the consolidated synthesis that references individual research files.
 
-### Step 5: Structure Your Knowledge Base Output
+### Step 6: Structure Your Knowledge Base Output
 
 Your knowledge base should adapt to the specific feature but generally include:
 
@@ -166,6 +237,16 @@ Your knowledge base should adapt to the specific feature but generally include:
 
 [Summary of the synthesis-plan.json recommendations]
 
+## Individual Research Outputs
+
+The following research files will be created by specialized agents:
+
+[List each research agent and their dedicated output file from the research plan]
+
+## Integration Strategy
+
+[How individual research findings will be consolidated into final implementation guidance]
+
 ## Next Steps
 
 [What should happen after research agents complete their work]
@@ -183,12 +264,46 @@ Remember: You cannot use the Task tool. Your role is to:
 The main Claude instance will:
 
 1. Read your synthesis-plan.json
-2. Spawn the recommended agents
-3. Have them append their findings to your knowledge base
+2. Create the research directory structure
+3. Spawn the recommended agents with individual output files
+4. Have each agent save their findings to their dedicated research file
+5. Optionally consolidate findings into the main knowledge base
 
 ## Examples of Feature-Specific Research Plans
 
-### Example 1: Dark Mode Feature
+### Example 1: Stripe Payment Integration (Third-Party Integration)
+
+```json
+{
+  "research_needed": true,
+  "rationale": "Third-party integration requiring systematic context7-first research approach",
+  "recommended_research": [
+    {
+      "agent": "context7-search-specialist",
+      "focus": "Stripe API official documentation, payment flows, webhooks, authentication, rate limits",
+      "priority": "high",
+      "reason": "Need official structured documentation for Stripe integration",
+      "output_file": "stripe-documentation.md"
+    },
+    {
+      "agent": "web-research-specialist",
+      "focus": "Stripe integration best practices, security considerations, PCI compliance, common pitfalls",
+      "priority": "medium",
+      "reason": "Supplement official docs with implementation best practices and lessons learned",
+      "output_file": "stripe-best-practices.md"
+    },
+    {
+      "agent": "code-pattern-analyzer",
+      "focus": "Existing payment integration patterns, credential management, webhook handling",
+      "priority": "high",
+      "reason": "Leverage existing integration architecture and maintain consistency",
+      "output_file": "payment-patterns-analysis.md"
+    }
+  ]
+}
+```
+
+### Example 2: Dark Mode Feature (Non-Integration)
 
 ```json
 {
@@ -199,36 +314,22 @@ The main Claude instance will:
       "agent": "code-pattern-analyzer",
       "focus": "Find existing theme providers, CSS variables, and color token systems",
       "priority": "high",
-      "reason": "Must integrate with current styling architecture"
-    },
-    {
-      "agent": "web-research-specialist",
-      "focus": "Modern dark mode implementation patterns for React applications",
-      "priority": "medium",
-      "reason": "Ensure we follow current best practices"
-    }
-  ]
-}
-```
-
-### Example 2: Real-time Dashboard
-
-```json
-{
-  "research_needed": true,
-  "rationale": "Complex feature requiring WebSocket integration and state management",
-  "recommended_research": [
-    {
-      "agent": "code-pattern-analyzer",
-      "focus": "Existing WebSocket implementations, state management patterns, dashboard components",
-      "priority": "high",
-      "reason": "Need to understand current real-time capabilities"
+      "reason": "Must integrate with current styling architecture",
+      "output_file": "theme-patterns-analysis.md"
     },
     {
       "agent": "context7-search-specialist",
-      "focus": "Socket.io or native WebSocket documentation for React integration",
-      "priority": "high",
-      "reason": "Technical implementation details needed"
+      "focus": "React context patterns, CSS-in-JS theming, Tailwind dark mode documentation",
+      "priority": "medium",
+      "reason": "Official documentation for theming frameworks in use",
+      "output_file": "react-theming-docs.md"
+    },
+    {
+      "agent": "web-research-specialist",
+      "focus": "Modern dark mode implementation patterns and accessibility best practices",
+      "priority": "medium",
+      "reason": "Ensure we follow current best practices for dark mode UX",
+      "output_file": "dark-mode-best-practices.md"
     }
   ]
 }

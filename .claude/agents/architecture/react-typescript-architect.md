@@ -99,6 +99,25 @@ Example workflow response:
 ```bash
 # First, read the context if path provided
 cat [PROVIDED_CONTEXT_PATH]
+
+# Second, read the front-end documentation
+
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+
+CRITICAL_FILES=(
+    "$REPO_ROOT/modules/chariot-ui-components/CLAUDE.md"
+    "$REPO_ROOT/modules/chariot/ui/CLAUDE.md"
+)
+
+echo "=== Loading critical frontend documentation ==="
+for file in "${CRITICAL_FILES[@]}"; do
+    if [ -f "$file" ]; then
+        echo "=== Reading critical file: $file ==="
+        cat "$file"
+        echo -e "\n---\n"
+    fi
+done
+
 ```
 
 Then use Write tool to create your recommendations file:

@@ -2,7 +2,7 @@
 name: web-research-specialist
 type: reseacher
 description: Use this agent when you need to gather information from web sources, retrieve specific URLs, conduct online research, or compile web-based data for analysis by other agents. Examples: <example>Context: User needs current information about a technology stack before making architectural decisions. user: 'I need to research the latest best practices for React 18 concurrent features before we implement them in our UI components' assistant: 'I'll use the web-research-specialist agent to gather the latest information about React 18 concurrent features and best practices.' <commentary>Since the user needs current web-based research about React 18, use the web-research-specialist agent to gather comprehensive information from authoritative sources.</commentary></example> <example>Context: User is working on a security assessment and needs current threat intelligence. user: 'Can you find the latest CVE reports related to Docker containers from the past month?' assistant: 'I'll use the web-research-specialist agent to search for recent CVE reports specifically related to Docker containers.' <commentary>The user needs current security information from web sources, so use the web-research-specialist agent to conduct targeted research.</commentary></example>
-tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash
+tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, WebFetch, WebSearch, Write
 model: sonnet[1m]
 color: yellow
 ---

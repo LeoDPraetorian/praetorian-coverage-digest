@@ -55,13 +55,13 @@ Generate a coordination plan that recommends the architectural approach. Save th
   "rationale": "Clear explanation of why this approach is recommended",
   "suggested_agents": [
     {
-      "agent": "frontend-architect",
+      "agent": "react-typescript-architect",
       "reason": "UI components need complete redesign for responsive behavior",
       "context": "Focus on component architecture, state management, and responsive design patterns",
       "priority": "high"
     },
     {
-      "agent": "backend-architect",
+      "agent": "go-backend-architect",
       "reason": "New API endpoints and data processing pipelines required",
       "context": "Design RESTful APIs, implement caching strategy, optimize database queries",
       "priority": "high"
@@ -143,13 +143,13 @@ Even before specialist architects provide input, create an initial synthesis bas
   "rationale": "Real-time features require coordination across frontend state management, WebSocket backend, and security considerations",
   "suggested_agents": [
     {
-      "agent": "react-architect",
+      "agent": "react-typescript-architect",
       "reason": "Need reactive UI updates and state synchronization",
       "context": "Design real-time state management with WebSocket integration",
       "priority": "high"
     },
     {
-      "agent": "backend-architect",
+      "agent": "go-backend-architect",
       "reason": "WebSocket server and message queue architecture needed",
       "context": "Design scalable WebSocket infrastructure with failover",
       "priority": "high"
