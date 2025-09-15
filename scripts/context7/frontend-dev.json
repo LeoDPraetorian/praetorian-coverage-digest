@@ -1,0 +1,59 @@
+{
+  "name": "Frontend Development Configuration",
+  "description": "Optimized Context7 configuration for React/TypeScript frontend development",
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest",
+        "--api-key",
+        "${env:CONTEXT7_API_KEY}",
+        "--focus",
+        "react,typescript,tailwind,nextjs,vite"
+      ],
+      "alwaysAllow": [
+        "get_documentation",
+        "search_documentation",
+        "get_examples",
+        "get_latest_version",
+        "get_component_patterns",
+        "get_hooks_documentation"
+      ]
+    },
+    "context7-ui": {
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${env:CONTEXT7_API_KEY}",
+        "CONTEXT7_FOCUS": "ui-frameworks"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "figma": {
+      "command": "mcp-exec",
+      "args": ["npx", "-y", "figma-developer-mcp", "--stdio"],
+      "env": {
+        "FIGMA_API_KEY": "${env:FIGMA_API_KEY}"
+      }
+    }
+  },
+  "settings": {
+    "cacheTimeout": 3600,
+    "maxConcurrentRequests": 5,
+    "priorityLibraries": [
+      "react",
+      "react-dom",
+      "typescript",
+      "@types/react",
+      "tailwindcss",
+      "next",
+      "vite",
+      "@tanstack/react-query",
+      "react-hook-form",
+      "zod"
+    ]
+  }
+}

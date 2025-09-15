@@ -1,0 +1,86 @@
+{
+  "name": "Backend Development Configuration",
+  "description": "Optimized Context7 configuration for Go/Python backend development",
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest",
+        "--api-key",
+        "${env:CONTEXT7_API_KEY}",
+        "--focus",
+        "go,python,postgresql,redis,aws"
+      ],
+      "alwaysAllow": [
+        "get_documentation",
+        "search_documentation",
+        "get_examples",
+        "get_latest_version",
+        "get_api_patterns",
+        "get_database_schemas"
+      ]
+    },
+    "context7-backend": {
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${env:CONTEXT7_API_KEY}",
+        "CONTEXT7_FOCUS": "backend-frameworks"
+      }
+    },
+    "aws": {
+      "command": "mcp-exec",
+      "args": [
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "AWS_ACCESS_KEY_ID",
+        "-e",
+        "AWS_SECRET_ACCESS_KEY",
+        "-e",
+        "AWS_DEFAULT_REGION",
+        "-v",
+        "$HOME/.aws:/home/appuser/.aws:ro",
+        "ghcr.io/alexei-led/aws-mcp-server:latest"
+      ],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "${env:AWS_ACCESS_KEY_ID}",
+        "AWS_SECRET_ACCESS_KEY": "${env:AWS_SECRET_ACCESS_KEY}",
+        "AWS_DEFAULT_REGION": "${env:AWS_DEFAULT_REGION}"
+      }
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "${env:SUPABASE_ACCESS_TOKEN}"
+      ],
+      "alwaysAllow": [
+        "list_tables",
+        "execute_sql",
+        "list_projects",
+        "execute_query"
+      ]
+    }
+  },
+  "settings": {
+    "cacheTimeout": 7200,
+    "maxConcurrentRequests": 3,
+    "priorityLibraries": [
+      "go",
+      "gin-gonic/gin",
+      "gorilla/mux",
+      "aws-sdk-go",
+      "python",
+      "fastapi",
+      "sqlalchemy",
+      "redis",
+      "postgresql",
+      "docker"
+    ]
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "name": "DevOps Configuration",
+  "description": "Optimized Context7 configuration for DevOps and infrastructure automation",
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest",
+        "--api-key",
+        "${env:CONTEXT7_API_KEY}",
+        "--focus",
+        "terraform,kubernetes,docker,github-actions,aws"
+      ],
+      "alwaysAllow": [
+        "get_documentation",
+        "search_documentation",
+        "get_examples",
+        "get_latest_version",
+        "get_infrastructure_patterns",
+        "get_ci_cd_templates"
+      ]
+    },
+    "context7-devops": {
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${env:CONTEXT7_API_KEY}",
+        "CONTEXT7_FOCUS": "devops-tools"
+      }
+    },
+    "github": {
+      "command": "mcp-exec",
+      "args": [
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "-e",
+        "GITHUB_TOOLSETS=repos,pull_requests,actions",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "aws": {
+      "command": "mcp-exec",
+      "args": [
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "AWS_ACCESS_KEY_ID",
+        "-e",
+        "AWS_SECRET_ACCESS_KEY",
+        "-e",
+        "AWS_DEFAULT_REGION",
+        "-v",
+        "$HOME/.aws:/home/appuser/.aws:ro",
+        "ghcr.io/alexei-led/aws-mcp-server:latest"
+      ],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "${env:AWS_ACCESS_KEY_ID}",
+        "AWS_SECRET_ACCESS_KEY": "${env:AWS_SECRET_ACCESS_KEY}",
+        "AWS_DEFAULT_REGION": "${env:AWS_DEFAULT_REGION}"
+      }
+    },
+    "atlassian": {
+      "command": "mcp-exec",
+      "args": [
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "JIRA_URL",
+        "-e",
+        "JIRA_USERNAME",
+        "-e",
+        "JIRA_API_TOKEN",
+        "-e",
+        "JIRA_READ_ONLY_MODE",
+        "ghcr.io/sooperset/mcp-atlassian:latest"
+      ],
+      "env": {
+        "JIRA_URL": "${env:JIRA_URL}",
+        "JIRA_USERNAME": "${env:JIRA_USERNAME}",
+        "JIRA_API_TOKEN": "${env:JIRA_API_TOKEN}",
+        "JIRA_READ_ONLY_MODE": "${env:JIRA_READ_ONLY_MODE}"
+      }
+    }
+  },
+  "settings": {
+    "cacheTimeout": 1800,
+    "maxConcurrentRequests": 10,
+    "priorityLibraries": [
+      "terraform",
+      "kubernetes",
+      "docker",
+      "docker-compose",
+      "github-actions",
+      "aws-cli",
+      "aws-cdk",
+      "helm",
+      "prometheus",
+      "grafana",
+      "datadog"
+    ]
+  }
+}

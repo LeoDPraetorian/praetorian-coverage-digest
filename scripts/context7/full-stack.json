@@ -1,0 +1,120 @@
+{
+  "name": "Full-Stack Development Configuration",
+  "description": "Comprehensive Context7 configuration for full-stack development",
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest",
+        "--api-key",
+        "${env:CONTEXT7_API_KEY}"
+      ],
+      "alwaysAllow": [
+        "get_documentation",
+        "search_documentation",
+        "get_examples",
+        "get_latest_version",
+        "get_component_patterns",
+        "get_api_patterns",
+        "get_database_schemas",
+        "get_testing_patterns"
+      ]
+    },
+    "context7-http": {
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${env:CONTEXT7_API_KEY}"
+      }
+    },
+    "chariot": {
+      "command": "chariot-mcp",
+      "env": {
+        "AWS_ACCESS_KEY_ID": "${env:AWS_ACCESS_KEY_ID}",
+        "AWS_SECRET_ACCESS_KEY": "${env:AWS_SECRET_ACCESS_KEY}",
+        "AWS_DEFAULT_REGION": "${env:AWS_DEFAULT_REGION}"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "playwright-enhanced": {
+      "command": "npx",
+      "args": ["@executeautomation/playwright-mcp-server", "--stdio"]
+    },
+    "github": {
+      "command": "mcp-exec",
+      "args": [
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "-e",
+        "GITHUB_TOOLSETS=repos,pull_requests,issues",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "aws": {
+      "command": "mcp-exec",
+      "args": [
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "AWS_ACCESS_KEY_ID",
+        "-e",
+        "AWS_SECRET_ACCESS_KEY",
+        "-e",
+        "AWS_DEFAULT_REGION",
+        "-v",
+        "$HOME/.aws:/home/appuser/.aws:ro",
+        "ghcr.io/alexei-led/aws-mcp-server:latest"
+      ],
+      "env": {
+        "AWS_ACCESS_KEY_ID": "${env:AWS_ACCESS_KEY_ID}",
+        "AWS_SECRET_ACCESS_KEY": "${env:AWS_SECRET_ACCESS_KEY}",
+        "AWS_DEFAULT_REGION": "${env:AWS_DEFAULT_REGION}"
+      }
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "${env:SUPABASE_ACCESS_TOKEN}"
+      ],
+      "alwaysAllow": [
+        "list_tables",
+        "execute_sql",
+        "listTables",
+        "list_projects",
+        "execute_query",
+        "generate_typescript_types"
+      ]
+    }
+  },
+  "settings": {
+    "cacheTimeout": 3600,
+    "maxConcurrentRequests": 8,
+    "priorityLibraries": [
+      "react",
+      "typescript",
+      "go",
+      "python",
+      "postgresql",
+      "redis",
+      "docker",
+      "kubernetes",
+      "aws",
+      "playwright"
+    ]
+  }
+}

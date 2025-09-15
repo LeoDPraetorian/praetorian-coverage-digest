@@ -1,0 +1,87 @@
+#!/bin/bash
+# Claude Code slash command for sound notifications
+# Usage: /sound [on|off|test|status|volume <0.0-1.0>|file <path>]
+
+SOUND_SCRIPT="$(dirname "$0")/sound-notification.sh"
+
+# Make sure sound script exists and is executable
+if [ ! -f "$SOUND_SCRIPT" ]; then
+    echo "❌ Sound notification script not found at: $SOUND_SCRIPT"
+    exit 1
+fi
+
+if [ ! -x "$SOUND_SCRIPT" ]; then
+    chmod +x "$SOUND_SCRIPT"
+fi
+
+# Handle command arguments
+case "$1" in
+    "on")
+        # Enable sound if it's currently disabled
+        current_state=$("$SOUND_SCRIPT" status | grep "Enabled:" | awk '{print $2}')
+        if [ "$current_state" = "false" ]; then
+            "$SOUND_SCRIPT" toggle
+        else
+            echo "🔊 Sound notifications are already enabled"
+        fi
+        ;;
+    "off")
+        # Disable sound if it's currently enabled
+        current_state=$("$SOUND_SCRIPT" status | grep "Enabled:" | awk '{print $2}')
+        if [ "$current_state" = "true" ]; then
+            "$SOUND_SCRIPT" toggle
+        else
+            echo "🔇 Sound notifications are already disabled"
+        fi
+        ;;
+    "toggle")
+        "$SOUND_SCRIPT" toggle
+        ;;
+    "test")
+        "$SOUND_SCRIPT" test
+        ;;
+    "status")
+        "$SOUND_SCRIPT" status
+        ;;
+    "volume")
+        if [ -z "$2" ]; then
+            echo "❌ Please specify a volume level (0.0 to 1.0)"
+            echo "Usage: /sound volume 0.5"
+            exit 1
+        fi
+        "$SOUND_SCRIPT" set-volume "$2"
+        ;;
+    "file")
+        if [ -z "$2" ]; then
+            echo "❌ Please specify a sound file path"
+            echo "Usage: /sound file /path/to/sound.wav"
+            exit 1
+        fi
+        "$SOUND_SCRIPT" set-file "$2"
+        ;;
+    "help"|"")
+        echo "🔊 Sound Notification Commands"
+        echo ""
+        echo "Usage: /sound <command> [options]"
+        echo ""
+        echo "Commands:"
+        echo "  on         - Enable sound notifications"
+        echo "  off        - Disable sound notifications"
+        echo "  toggle     - Toggle sound on/off"
+        echo "  test       - Play test sound"
+        echo "  status     - Show current settings"
+        echo "  volume <n> - Set volume (0.0 to 1.0)"
+        echo "  file <path>- Set custom sound file"
+        echo "  help       - Show this help"
+        echo ""
+        echo "Examples:"
+        echo "  /sound on"
+        echo "  /sound volume 0.3"
+        echo "  /sound file ~/Downloads/notification.wav"
+        ;;
+    *)
+        echo "❌ Unknown command: $1"
+        echo "Use '/sound help' for available commands"
+        exit 1
+        ;;
+esac
