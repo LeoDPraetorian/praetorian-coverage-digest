@@ -63,10 +63,73 @@ REQUIREMENTS_FILE=".claude/features/${FEATURE_ID}/context/requirements.json"
 echo "Requirements will be saved to: ${REQUIREMENTS_FILE}"
 ```
 
+#### Jira Reference Preprocessing
+
+First, check if the feature description contains Jira ticket references:
+
+```bash
+# Check for Jira ticket patterns (e.g., CHA-1232, PROJ-123)
+if echo "$ARGUMENTS" | grep -qE '\b[A-Z]{2,10}-[0-9]+\b'; then
+    echo "🎫 Jira references detected in feature description"
+    echo "Resolving ticket details before analysis..."
+    
+    # Create preprocessing output file
+    JIRA_RESOLVED_FILE=".claude/features/${FEATURE_ID}/context/jira-resolved.md"
+    
+    echo "Jira resolution output: ${JIRA_RESOLVED_FILE}"
+else
+    echo "No Jira references detected - proceeding with direct analysis"
+fi
+```
+
+If Jira references are found, resolve them first:
+
+Tell the jira-reader (if Jira references detected):
+"Resolve all Jira ticket references in this feature request: $ARGUMENTS
+
+Use your preprocessing mode to:
+1. Detect all Jira ticket references (CHA-1232, PROJ-123, etc.)
+2. Fetch full ticket details using Atlassian MCP tools
+3. Replace references with structured ticket content
+4. Save the enriched feature description to: ${JIRA_RESOLVED_FILE}
+
+Format the enriched content as:
+```
+# Enhanced Feature Request
+
+## Original Request
+$ARGUMENTS
+
+## Resolved Jira Tickets
+[For each resolved ticket, include full details]
+
+## Final Enhanced Description
+[Original request with Jira references replaced by full ticket content]
+```"
+
+Wait for jira-reader to complete, then prepare the content for intent analysis:
+
+```bash
+# Determine which content to use for intent analysis
+if [ -f "${JIRA_RESOLVED_FILE}" ]; then
+    echo "✓ Jira references resolved successfully"
+    # Extract the enhanced description for intent analysis
+    ENHANCED_ARGUMENTS=$(grep -A 1000 "## Final Enhanced Description" "${JIRA_RESOLVED_FILE}" | tail -n +2)
+    echo "Using enhanced content with resolved Jira tickets"
+else
+    ENHANCED_ARGUMENTS="$ARGUMENTS"
+    echo "Using original arguments (no Jira resolution)"
+fi
+
+echo "Content prepared for intent analysis"
+```
+
+#### Intent Analysis
+
 Use the `intent-translator` subagent to parse and structure the feature request.
 
 Tell the intent-translator:
-"Analyze this feature request: $ARGUMENTS
+"Analyze this feature request: ${ENHANCED_ARGUMENTS}
 
 Save your analysis as JSON to the file path shown above (the one that ends with /requirements.json).
 
