@@ -103,6 +103,9 @@ checkout:
 create:
 	git submodule foreach 'git checkout -b $(branch)'
 
+current-branch:
+	git submodule foreach 'git branch --show-current'
+
 create-prs:
 	git submodule foreach 'gh pr create'
 
