@@ -5,6 +5,84 @@ description: Complete a security review of the pending changes on the current br
 
 You are a senior security engineer conducting a focused security review of the changes on this branch.
 
+## Context Detection and Analysis Mode Selection
+
+**Arguments provided**: $ARGUMENTS
+
+```bash
+# Intelligent context detection for dual-mode operation
+SECURITY_CONTEXT_MODE="standalone"
+FEATURE_CONTEXT_AVAILABLE=false
+
+echo "=== Security Review Context Detection ==="
+
+# Mode 1: Explicit feature ID provided (Einstein pipeline)
+if [[ "$ARGUMENTS" =~ ^[a-z0-9-]+_[0-9]{8}_[0-9]{6}$ ]]; then
+    FEATURE_ID="$ARGUMENTS"
+    FEATURE_DIR=".claude/features/${FEATURE_ID}"
+    if [ -d "$FEATURE_DIR" ]; then
+        SECURITY_CONTEXT_MODE="einstein_pipeline"
+        FEATURE_CONTEXT_AVAILABLE=true
+        echo "🎯 **EINSTEIN PIPELINE MODE**: Feature workspace detected"
+        echo "   Feature ID: ${FEATURE_ID}"
+        echo "   Workspace: ${FEATURE_DIR}"
+    fi
+
+# Mode 2: Current feature active (Einstein pipeline)
+elif [ -f ".claude/features/current_feature.env" ]; then
+    source .claude/features/current_feature.env
+    if [ -d ".claude/features/${FEATURE_ID}" ]; then
+        FEATURE_DIR=".claude/features/${FEATURE_ID}"
+        SECURITY_CONTEXT_MODE="einstein_pipeline"
+        FEATURE_CONTEXT_AVAILABLE=true
+        echo "🎯 **EINSTEIN PIPELINE MODE**: Current feature workspace detected"
+        echo "   Feature ID: ${FEATURE_ID}"
+        echo "   Workspace: ${FEATURE_DIR}"
+    fi
+
+# Mode 3: Check if recent changes match any feature (Smart detection)
+elif [ -d ".claude/features" ]; then
+    echo "🔍 Checking if git changes match any recent feature development..."
+    
+    # Get changed files
+    CHANGED_FILES=$(git diff --name-only origin/HEAD... 2>/dev/null || git diff --name-only HEAD~1 2>/dev/null || echo "")
+    
+    # Look for features with recent implementation activity
+    RECENT_FEATURE=$(find .claude/features -name "metadata.json" -newermt "$(date -d '7 days ago' +%Y-%m-%d)" -exec dirname {} \; | head -1 | xargs basename 2>/dev/null || echo "")
+    
+    if [ -n "$RECENT_FEATURE" ] && [ -d ".claude/features/${RECENT_FEATURE}/implementation" ]; then
+        echo "   📋 Recent feature found: ${RECENT_FEATURE}"
+        echo "   Checking if changes relate to this feature..."
+        
+        # Basic heuristic: if some changed files are in implementation workspace, likely related
+        IMPLEMENTATION_DIR=".claude/features/${RECENT_FEATURE}/implementation"
+        if [ -d "$IMPLEMENTATION_DIR" ]; then
+            FEATURE_ID="$RECENT_FEATURE"
+            FEATURE_DIR=".claude/features/${FEATURE_ID}"
+            SECURITY_CONTEXT_MODE="einstein_pipeline"
+            FEATURE_CONTEXT_AVAILABLE=true
+            echo "🎯 **EINSTEIN PIPELINE MODE**: Changes appear related to recent feature"
+            echo "   Feature ID: ${FEATURE_ID}"
+        fi
+    fi
+fi
+
+# Mode 4: Standalone mode (existing behavior)
+if [ "$FEATURE_CONTEXT_AVAILABLE" = false ]; then
+    echo "📋 **STANDALONE MODE**: No feature context detected"
+    echo "   Using git-only security analysis (existing behavior)"
+    echo "   This maintains full backward compatibility"
+fi
+
+echo "========================================"
+```
+
+## Security Analysis Context
+
+**Security Review Mode**: ${SECURITY_CONTEXT_MODE}
+
+### Git Changes Analysis (Always Available)
+
 GIT STATUS:
 
 ```
@@ -30,6 +108,37 @@ DIFF CONTENT:
 ```
 
 Review the complete diff above. This contains all code changes in the PR.
+
+### Feature Context Analysis (When Available)
+
+```bash
+if [ "$FEATURE_CONTEXT_AVAILABLE" = true ]; then
+    echo "=== ENHANCED CONTEXT AVAILABLE ==="
+    echo "Feature workspace: ${FEATURE_DIR}"
+    
+    # Display available context sources
+    echo "Available context sources:"
+    [ -f "${FEATURE_DIR}/context/requirements.json" ] && echo "  ✅ Feature requirements"
+    [ -f "${FEATURE_DIR}/context/knowledge-base.md" ] && echo "  ✅ Knowledge base and research"  
+    [ -f "${FEATURE_DIR}/context/complexity-assessment.json" ] && echo "  ✅ Complexity assessment"
+    [ -d "${FEATURE_DIR}/architecture" ] && echo "  ✅ Architecture decisions"
+    [ -f "${FEATURE_DIR}/output/implementation-plan.md" ] && echo "  ✅ Implementation plan"
+    [ -d "${FEATURE_DIR}/implementation/agent-outputs" ] && echo "  ✅ Individual agent tracking"
+    [ -d "${FEATURE_DIR}/implementation/validation" ] && echo "  ✅ Implementation validation reports"
+    
+    echo "===================================="
+    
+    # Create security workspace structure
+    SECURITY_WORKSPACE="${FEATURE_DIR}/security-review"
+    mkdir -p "${SECURITY_WORKSPACE}"/{analysis,findings,context}
+    
+    echo "Security workspace created: ${SECURITY_WORKSPACE}"
+else
+    echo "=== STANDALONE MODE ==="
+    echo "No feature context available - using git-only analysis"
+    echo "=========================="
+fi
+```
 
 
 OBJECTIVE:
@@ -200,13 +309,84 @@ Focus on:
 
 Save your analysis of security patterns and provide context for the security review."
 
-## Step 2: Multi-Domain Security Analysis  
+## Step 2: Context-Aware Multi-Domain Security Analysis  
 
-Based on the files modified in the PR, spawn the appropriate security review agents **IN PARALLEL using multiple Task calls in a single message**:
+```bash
+# Prepare context-specific analysis approach
+if [ "$FEATURE_CONTEXT_AVAILABLE" = true ]; then
+    echo "=== ENHANCED SECURITY ANALYSIS WITH FEATURE CONTEXT ==="
+    echo "Using comprehensive feature workspace for security analysis"
+    
+    # Create context consolidation for security agents
+    SECURITY_CONTEXT_FILE="${SECURITY_WORKSPACE}/context/consolidated-security-context.md"
+    
+    cat > "${SECURITY_CONTEXT_FILE}" << EOSC
+# Consolidated Security Context for Review
+
+## Feature Information
+$(cat "${FEATURE_DIR}/metadata.json" | jq -r '"- **Feature ID**: " + .id, "- **Description**: " + .description, "- **Phase**: " + .phase')
+
+## Original Security Requirements
+$(cat "${FEATURE_DIR}/context/requirements.json" | jq -r '.security_requirements[]? // "No explicit security requirements documented"' | sed 's/^/- /')
+
+## Design Phase Security Considerations
+$([ -f "${FEATURE_DIR}/architecture/security-architecture.md" ] && echo "Security architecture decisions available" || echo "No security architecture documentation")
+
+## Implementation Context
+$([ -d "${FEATURE_DIR}/implementation/agent-outputs" ] && echo "Individual agent implementations available for security analysis" || echo "No individual agent tracking available")
+
+## Complexity and Risk Assessment
+$(cat "${FEATURE_DIR}/context/complexity-assessment.json" | jq -r '"- **Complexity**: " + .level, "- **Risk Level**: " + .risk_level, "- **Security Factors**: " + (.factors[] | select(test("security|auth|crypto")))')
+
+EOSC
+    
+    echo "Security context consolidated at: ${SECURITY_CONTEXT_FILE}"
+else
+    echo "=== STANDARD GIT-ONLY SECURITY ANALYSIS ==="
+    echo "Using existing git-only workflow (maintaining backward compatibility)"
+fi
+```
+
+Based on the context mode and files modified in the PR, spawn the appropriate security review agents **IN PARALLEL using multiple Task calls in a single message**:
 
 ### For Go Backend Files (.go files):
-Use the `go-security-reviewer` subagent:
-"Conduct focused security review of the Go code changes in this PR.
+
+**Enhanced Instructions (when feature context available):**
+```bash
+if [ "$FEATURE_CONTEXT_AVAILABLE" = true ]; then
+    GO_SECURITY_TASK="Conduct comprehensive context-aware security review of Go code changes.
+
+**Enhanced Context Available:**
+- Feature requirements: ${FEATURE_DIR}/context/requirements.json
+- Security context: ${SECURITY_WORKSPACE}/context/consolidated-security-context.md
+- Implementation plan: ${FEATURE_DIR}/output/implementation-plan.md
+- Individual agent tracking: ${FEATURE_DIR}/implementation/agent-outputs/
+- Git changes: [standard git diff analysis]
+
+**CRITICAL: Save your analysis to: ${SECURITY_WORKSPACE}/analysis/go-security-analysis.md**
+
+**Enhanced Security Analysis Approach:**
+
+1. **Design-Implementation Security Gap Analysis**
+   - Compare security implementation against original feature requirements
+   - Validate that security patterns match architectural decisions
+   - Identify gaps between designed security and implemented security
+
+2. **Agent-Specific Security Review**
+   - Review golang-api-developer agent's security decisions and implementations
+   - Analyze database-architect agent's security patterns if present
+   - Validate consistent security approach across agents
+
+3. **Context-Aware Vulnerability Assessment**
+   - Use feature context to better understand intended behavior vs security risk
+   - Assess vulnerabilities in context of feature's threat model and usage
+   - Prioritize vulnerabilities based on feature's actual attack surface
+
+Analyze for: SQL injection, command injection, authentication bypass, authorization flaws, crypto issues, unsafe deserialization.
+
+Apply FALSE POSITIVE FILTERING with confidence scoring >8."
+else
+    GO_SECURITY_TASK="Conduct focused security review of the Go code changes in this PR.
 
 Analyze for:
 - SQL injection vulnerabilities
@@ -218,10 +398,50 @@ Analyze for:
 
 Include all git diff content and security analysis methodology from above.
 Apply the FALSE POSITIVE FILTERING criteria with confidence scoring >8."
+fi
+```
+
+Use the `go-security-reviewer` subagent with context-appropriate instructions:
+"${GO_SECURITY_TASK}"
 
 ### For React/TypeScript Files (.ts, .tsx, .js, .jsx files):
-Use the `react-security-reviewer` subagent:
-"Review React/TypeScript changes for frontend security vulnerabilities.
+
+**Enhanced Instructions (when feature context available):**
+```bash
+if [ "$FEATURE_CONTEXT_AVAILABLE" = true ]; then
+    REACT_SECURITY_TASK="Conduct comprehensive context-aware security review of React/TypeScript changes.
+
+**Enhanced Context Available:**
+- Feature requirements: ${FEATURE_DIR}/context/requirements.json
+- Security context: ${SECURITY_WORKSPACE}/context/consolidated-security-context.md
+- Frontend architecture: ${FEATURE_DIR}/architecture/react-typescript-architecture.md (if available)
+- Individual agent tracking: ${FEATURE_DIR}/implementation/agent-outputs/
+- Git changes: [standard git diff analysis]
+
+**CRITICAL: Save your analysis to: ${SECURITY_WORKSPACE}/analysis/react-security-analysis.md**
+
+**Enhanced Security Analysis Approach:**
+
+1. **Component Security Design Validation**
+   - Validate frontend security implementation against component architecture decisions
+   - Review authentication/authorization flow implementation vs design
+   - Assess data handling patterns against security requirements
+
+2. **Agent-Specific Frontend Security Review** 
+   - Review react-developer agent's security implementation decisions
+   - Analyze react-typescript-architect security patterns if present
+   - Validate consistent security approach in UI components
+
+3. **Context-Aware Frontend Vulnerability Assessment**
+   - Assess XSS risk in context of actual data flows and user interactions
+   - Evaluate client-side security in context of feature's authentication model
+   - Prioritize based on feature's actual frontend attack surface
+
+Focus on: XSS vulnerabilities (dangerouslySetInnerHTML), client-side auth bypasses, sensitive data exposure, unsafe DOM manipulation.
+
+Apply FALSE POSITIVE FILTERING criteria with confidence scoring >8."
+else
+    REACT_SECURITY_TASK="Review React/TypeScript changes for frontend security vulnerabilities.
 
 Focus on:
 - XSS vulnerabilities (especially dangerouslySetInnerHTML)
@@ -231,10 +451,50 @@ Focus on:
 - Security configuration issues
 
 Include all security analysis methodology and FALSE POSITIVE FILTERING criteria."
+fi
+```
+
+Use the `react-security-reviewer` subagent with context-appropriate instructions:
+"${REACT_SECURITY_TASK}"
 
 ### For Architecture/Infrastructure Changes:
-Use the `security-architect` subagent:  
-"Evaluate architectural security implications of these changes.
+
+**Enhanced Instructions (when feature context available):**
+```bash
+if [ "$FEATURE_CONTEXT_AVAILABLE" = true ]; then
+    ARCH_SECURITY_TASK="Conduct comprehensive context-aware architectural security review.
+
+**Enhanced Context Available:**
+- Feature requirements: ${FEATURE_DIR}/context/requirements.json
+- Security context: ${SECURITY_WORKSPACE}/context/consolidated-security-context.md
+- Architecture decisions: ${FEATURE_DIR}/architecture/
+- Implementation validation: ${FEATURE_DIR}/implementation/validation/
+- Git changes: [standard git diff analysis]
+
+**CRITICAL: Save your analysis to: ${SECURITY_WORKSPACE}/analysis/architecture-security-analysis.md**
+
+**Enhanced Architectural Security Analysis:**
+
+1. **Security Architecture Validation**
+   - Compare implemented security architecture against design decisions
+   - Validate threat model implementation vs original security requirements
+   - Assess whether security boundaries are properly implemented
+
+2. **Implementation Security Impact Assessment**
+   - Analyze how architectural changes affect overall security posture
+   - Review security implications of infrastructure modifications
+   - Validate security integration across system components
+
+3. **Feature-Specific Security Architecture Review**
+   - Assess new attack surfaces in context of feature's intended use
+   - Evaluate privilege boundaries and access control implementation
+   - Review security implications of data flow changes
+
+Assess: New attack surfaces, security boundary violations, privilege escalation, data flow security, infrastructure impacts.
+
+Apply security analysis methodology and confidence scoring requirements."
+else
+    ARCH_SECURITY_TASK="Evaluate architectural security implications of these changes.
 
 Assess:
 - New attack surfaces introduced
@@ -244,25 +504,323 @@ Assess:
 - Infrastructure security impacts
 
 Apply security analysis methodology and confidence scoring requirements."
+fi
+```
 
-## Step 3: Vulnerability Validation & Consolidation
+Use the `security-architect` subagent with context-appropriate instructions:
+"${ARCH_SECURITY_TASK}"
 
-After all security review agents complete, consolidate findings and apply final filtering:
+## Step 3: Context-Aware Vulnerability Validation & Consolidation
+
+After all security review agents complete, consolidate findings with context-aware filtering:
+
+```bash
+if [ "$FEATURE_CONTEXT_AVAILABLE" = true ]; then
+    echo "=== ENHANCED CONSOLIDATION WITH FEATURE CONTEXT ==="
+    
+    # Create comprehensive security findings report
+    SECURITY_FINDINGS_REPORT="${SECURITY_WORKSPACE}/findings/comprehensive-security-findings.md"
+    
+    cat > "${SECURITY_FINDINGS_REPORT}" << EOSR
+# Comprehensive Security Review Findings
+
+**Feature ID**: ${FEATURE_ID}
+**Review Date**: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+**Review Mode**: Einstein Pipeline (Enhanced Context)
+
+## Security Review Summary
+
+### Context-Enhanced Analysis Results
+[Summary of findings from all security agents with feature context]
+
+### Design-Implementation Security Gap Analysis
+[Analysis of security gaps between original design and actual implementation]
+
+### Agent-Specific Security Assessment
+[Security analysis of individual agent implementations]
+
+### Feature-Specific Threat Model Updates
+[Updates to threat model based on actual implementation]
+
+EOSR
+    
+    echo "Enhanced findings report initialized: ${SECURITY_FINDINGS_REPORT}"
+    
+    # Cross-phase integration with implementation validation
+    if [ -f "${FEATURE_DIR}/implementation/validation/production-ready-gate-report.md" ]; then
+        echo "🔗 Integration with Implementation Validation:"
+        echo "   Production Ready Gate found - security findings will integrate"
+        
+        # Create integration notes for implementation validation
+        SECURITY_INTEGRATION_NOTES="${SECURITY_WORKSPACE}/context/implementation-integration.md"
+        cat > "${SECURITY_INTEGRATION_NOTES}" << EOSI
+# Security Review Integration Notes
+
+## For Implementation Validation Integration
+
+### Security Review Status
+- **Completed**: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+- **Mode**: Enhanced (Feature Context Available)
+- **Findings Report**: ${SECURITY_FINDINGS_REPORT}
+
+### Key Security Metrics for Production Gate
+[Summary of security metrics that implementation validation should consider]
+
+### Critical Security Actions Required
+[Any security issues that must be resolved before production deployment]
+
+### Security Recommendations for Production
+[Security monitoring, configuration, and operational recommendations]
+
+EOSI
+        
+        echo "   Security integration notes: ${SECURITY_INTEGRATION_NOTES}"
+    fi
+else
+    echo "=== STANDARD CONSOLIDATION (GIT-ONLY MODE) ==="
+    echo "Using existing consolidation workflow"
+fi
+```
+
+### Consolidation Criteria (All Modes)
 
 1. **Confidence Filtering**: Only include findings with confidence ≥8/10
 2. **Deduplication**: Remove duplicate findings across agents  
 3. **Impact Assessment**: Prioritize HIGH and MEDIUM severity findings
 4. **Final Validation**: Ensure each finding meets the "HIGH-CONFIDENCE security vulnerabilities" criteria
 
+### Enhanced Consolidation (Einstein Pipeline Mode Only)
+
+When feature context is available, additional consolidation includes:
+
+5. **Design Intent Validation**: Verify findings against original security requirements
+6. **Agent Context Analysis**: Consider which agent introduced potential vulnerabilities  
+7. **Implementation Gap Assessment**: Identify security gaps between design and implementation
+8. **Feature-Specific Risk Prioritization**: Prioritize based on feature's actual threat model and usage patterns
+
 ## Critical Agent Spawning Pattern
 
 **IMPORTANT**: Spawn security review agents in parallel using this pattern:
 
-```
-[Single Message with Multiple Task Calls]:
-Task("go-security-reviewer", "Review Go code for security vulnerabilities...", "go-security-reviewer")  
-Task("react-security-reviewer", "Review React code for security issues...", "react-security-reviewer")
-Task("security-architect", "Assess architectural security implications...", "security-architect")
+```bash
+# Context-aware agent spawning
+if [ "$FEATURE_CONTEXT_AVAILABLE" = true ]; then
+    echo "Spawning agents with enhanced feature context..."
+    
+    # [Single Message with Multiple Task Calls - Enhanced Mode]:
+    # Task("go-security-reviewer", "${GO_SECURITY_TASK}", "go-security-reviewer")  
+    # Task("react-security-reviewer", "${REACT_SECURITY_TASK}", "react-security-reviewer")
+    # Task("security-architect", "${ARCH_SECURITY_TASK}", "security-architect")
+else
+    echo "Spawning agents with standard git-only analysis..."
+    
+    # [Single Message with Multiple Task Calls - Standard Mode]:
+    # Task("go-security-reviewer", "Standard git-only Go security review...", "go-security-reviewer")  
+    # Task("react-security-reviewer", "Standard git-only React security review...", "react-security-reviewer")
+    # Task("security-architect", "Standard git-only architecture review...", "security-architect")
+fi
 ```
 
-Your final reply must contain the consolidated markdown report and nothing else.
+## Final Security Review Output
+
+### For Einstein Pipeline Mode (Enhanced Context)
+
+When feature context is available, provide comprehensive output:
+
+```bash
+if [ "$FEATURE_CONTEXT_AVAILABLE" = true ]; then
+    echo "=== COMPREHENSIVE SECURITY REVIEW OUTPUT ==="
+    
+    # Generate final consolidated security report
+    FINAL_SECURITY_REPORT="${SECURITY_WORKSPACE}/findings/final-security-report.md"
+    
+    cat > "${FINAL_SECURITY_REPORT}" << EOFR
+# Security Review Final Report
+
+**Feature**: ${FEATURE_ID}
+**Review Mode**: Einstein Pipeline (Enhanced Context)
+**Review Date**: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+## Security Review Summary
+
+### Overall Security Assessment
+[High-level security posture assessment based on feature context and implementation]
+
+### Context-Enhanced Findings
+[Security vulnerabilities found with feature context for better accuracy]
+
+### Design-Implementation Security Gaps  
+[Gaps between intended security design and actual implementation]
+
+### Agent-Specific Security Analysis
+[Security assessment of each implementation agent's work]
+
+### Feature Security Recommendations
+[Feature-specific security recommendations for production deployment]
+
+## Detailed Vulnerability Findings
+[Standard vulnerability reports from security agents - consolidated and context-filtered]
+
+## Integration with Implementation Validation
+- **Implementation Status**: [Status from implementation validation gates]
+- **Security Integration**: Security findings integrated into production readiness assessment
+- **Required Actions**: [Security actions required before production deployment]
+
+## Cross-Phase Security Context
+### Security Requirements Validation
+[Validation that security requirements from design phase were met]
+
+### Threat Model Updates
+[Updates to threat model based on actual implementation details]
+
+### Security Architecture Validation
+[Validation that security architecture decisions were properly implemented]
+
+EOFR
+    
+    echo "Comprehensive security report generated: ${FINAL_SECURITY_REPORT}"
+    
+    # Update feature metadata with security review completion
+    jq '.security_review_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" | .security_review_mode = "enhanced_context"' \
+       "${FEATURE_DIR}/metadata.json" > "${FEATURE_DIR}/metadata.json.tmp" && \
+       mv "${FEATURE_DIR}/metadata.json.tmp" "${FEATURE_DIR}/metadata.json"
+    
+    echo "✅ Security review integrated into feature lifecycle"
+    
+    # Provide consolidated report AND workspace info
+    echo ""
+    echo "**DUAL OUTPUT FOR EINSTEIN PIPELINE MODE:**"
+    echo "1. **Standard Vulnerability Report**: [Consolidated markdown findings for immediate review]"
+    echo "2. **Comprehensive Security Workspace**: ${SECURITY_WORKSPACE}/"
+    echo "   - Individual agent analyses: ${SECURITY_WORKSPACE}/analysis/"
+    echo "   - Security findings: ${SECURITY_WORKSPACE}/findings/"
+    echo "   - Context and integration: ${SECURITY_WORKSPACE}/context/"
+fi
+```
+
+### For Standalone Mode (Git-Only)
+
+When no feature context is available, maintain existing behavior:
+
+```bash
+if [ "$FEATURE_CONTEXT_AVAILABLE" = false ]; then
+    echo "=== STANDARD SECURITY REVIEW OUTPUT ==="
+    echo "Providing standard git-only security analysis (existing behavior)"
+fi
+```
+
+**Final Output Requirement:**
+
+Your final reply must contain:
+
+**For Einstein Pipeline Mode:**
+1. **Consolidated markdown vulnerability report** (for immediate review)
+2. **Security workspace summary** (for integration with implementation validation)
+
+**For Standalone Mode:**  
+1. **Consolidated markdown vulnerability report** (existing behavior - UNCHANGED)
+
+This ensures that:
+- ✅ **Standalone developers** get exactly what they expect (no changes)
+- ✅ **Einstein pipeline** gets enhanced analysis plus integration capabilities
+- ✅ **Full backward compatibility** maintained
+- ✅ **No breaking changes** to existing usage patterns
+
+## Dual-Mode Usage Examples
+
+### Example 1: Standalone Developer Security Review
+
+**Scenario**: Developer implements authentication feature on their own, wants security review
+
+```bash
+# Developer commits their changes and runs:
+npx claude-code command security-review
+
+# Result: 
+# ✅ STANDALONE MODE activated automatically
+# ✅ Existing git-only workflow (unchanged behavior)
+# ✅ Standard vulnerability report output
+# ✅ No feature workspace dependencies
+```
+
+**Output**: Standard markdown vulnerability report (exactly as before Phase 3)
+
+### Example 2: Einstein Pipeline Security Review  
+
+**Scenario**: Security review as part of comprehensive feature development pipeline
+
+```bash
+# After implementation phase:
+npx claude-code command security-review "auth-system_20240115_143022"
+
+# Or automatically as part of Einstein pipeline:
+npx claude-code command einstein "auth-system_20240115_143022"
+
+# Result:
+# ✅ EINSTEIN PIPELINE MODE activated automatically  
+# ✅ Enhanced context-aware security analysis
+# ✅ Design-implementation gap analysis
+# ✅ Agent-specific security assessment
+# ✅ Cross-phase integration with implementation validation
+```
+
+**Output**: 
+1. Standard vulnerability report (for immediate review)
+2. Comprehensive security workspace with enhanced analysis
+
+### Example 3: Smart Detection Mode
+
+**Scenario**: Developer working on recent Einstein feature but didn't specify feature ID
+
+```bash
+# Developer has been working on Einstein feature, commits changes:
+npx claude-code command security-review
+
+# Result:
+# ✅ Smart detection finds recent Einstein feature
+# ✅ EINSTEIN PIPELINE MODE activated automatically
+# ✅ Enhanced analysis using available feature context
+```
+
+## Backward Compatibility Verification
+
+### ✅ Existing Workflow Preserved
+
+**Before Phase 3:**
+```bash
+npx claude-code command security-review
+→ Git analysis → Security agents → Vulnerability report
+```
+
+**After Phase 3:**
+```bash
+npx claude-code command security-review  
+→ Context detection → Git analysis → Security agents → Vulnerability report
+```
+
+**Result**: Identical output for standalone usage (no feature context detected)
+
+### ✅ No Breaking Changes
+
+- **Same command syntax**: No new required parameters
+- **Same output format**: Standard vulnerability markdown report
+- **Same agent behavior**: Git-only analysis when no feature context
+- **Same performance**: No additional overhead for standalone usage
+
+### ✅ Enhanced Capabilities (When Context Available)
+
+- **Smarter security analysis**: Uses feature context for better accuracy
+- **Design validation**: Compares implementation against security requirements
+- **Agent insights**: Leverages individual agent tracking for security assessment
+- **Cross-phase integration**: Integrates with implementation validation gates
+
+## Summary: Best of Both Worlds
+
+Phase 3 provides **intelligent dual-mode operation**:
+
+1. **🎯 Smart Context Detection**: Automatically chooses best analysis approach
+2. **🔄 Backward Compatibility**: Zero impact on existing usage patterns  
+3. **🚀 Enhanced Capabilities**: Significantly better analysis when context available
+4. **💡 Graceful Degradation**: Always provides valuable security analysis regardless of context
+
+**The security review command now adapts intelligently to provide the best possible security analysis in any scenario.**
