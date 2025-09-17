@@ -51,16 +51,15 @@ Extract key information:
 - Technical scope and affected systems
 - **Actual technologies in use** (from TECH-STACK.md)
 
-### Step 1.5: Discover Available Research and Analysis Agents
+### Step 1.5: Discover Available Research Agents
 
-Before making research recommendations, discover all available research and analysis agents:
+Before making research recommendations, discover all available research agents:
 
 ```bash
-# Auto-discover research agents
+# Auto-discover research agents (research folder only)
 RESEARCH_AGENTS_DIR=".claude/agents/research"
-ANALYSIS_AGENTS_DIR=".claude/agents/analysis"
 
-echo "=== Available Research and Analysis Agents ==="
+echo "=== Available Research Agents ==="
 
 if [ -d "${RESEARCH_AGENTS_DIR}" ]; then
     echo "Research Agents:"
@@ -73,22 +72,10 @@ else
     echo "Research agents directory not found: ${RESEARCH_AGENTS_DIR}"
 fi
 
-if [ -d "${ANALYSIS_AGENTS_DIR}" ]; then
-    echo "Analysis Agents:"
-    find "${ANALYSIS_AGENTS_DIR}" -name "*.md" -type f | while read agent_file; do
-        agent_name=$(basename "$agent_file" .md)
-        agent_desc=$(head -10 "$agent_file" | grep "^description:" | cut -d':' -f2- | xargs)
-        echo "- ${agent_name}: ${agent_desc}"
-    done
-else
-    echo "Analysis agents directory not found: ${ANALYSIS_AGENTS_DIR}"
-fi
-
-# Combine all available agents for selection
+# Get all available research agents for selection
 AVAILABLE_RESEARCH_AGENTS=$(
-    find "${RESEARCH_AGENTS_DIR}" -name "*.md" -type f -exec basename {} .md \; 2>/dev/null;
-    find "${ANALYSIS_AGENTS_DIR}" -name "*.md" -type f -exec basename {} .md \; 2>/dev/null
-) | sort | uniq)
+    find "${RESEARCH_AGENTS_DIR}" -name "*.md" -type f -exec basename {} .md \; 2>/dev/null
+) | sort | uniq
 
 echo "====================================="
 echo "Available agents for research recommendations: ${AVAILABLE_RESEARCH_AGENTS}"
@@ -104,10 +91,10 @@ RESEARCH_DIR=".claude/features/${FEATURE_ID}/research"
 mkdir -p "${RESEARCH_DIR}"
 
 echo "Research outputs will be organized as:"
-echo "- ${RESEARCH_DIR}/web-research-findings.md"
-echo "- ${RESEARCH_DIR}/code-patterns-analysis.md"
-echo "- ${RESEARCH_DIR}/context7-documentation.md"
-echo "etc. (one file per research agent)"
+echo "- ${RESEARCH_DIR}/[agent-name]-findings.md"
+echo "- ${RESEARCH_DIR}/[agent-name]-analysis.md"
+echo "- ${RESEARCH_DIR}/[agent-name]-documentation.md"
+echo "etc. (one file per research agent from discovered list)"
 ```
 
 ### Step 2.5: Map Research Needs to Available Agents
@@ -115,20 +102,24 @@ echo "etc. (one file per research agent)"
 Map each type of research need to available agents discovered in Step 1.5:
 
 **Research-Type-to-Agent Mapping Guidelines:**
-- **Third-party integrations/APIs/SDKs** → context7-search-specialist (official docs), web-research-specialist (best practices)
-- **Codebase patterns/existing implementations** → code-pattern-analyzer
-- **Industry best practices/tutorials** → web-research-specialist  
-- **Library documentation/frameworks** → context7-search-specialist
-- **Security considerations** → web-research-specialist, code-pattern-analyzer (existing security patterns)
-- **Performance optimization** → web-research-specialist, code-pattern-analyzer (existing performance patterns)
 
-**Agent Selection Strategy:**
+Based on discovered agents from Step 1.5, match research needs to available capabilities:
+
+- **Third-party integrations/APIs/SDKs** → Look for agents specialized in documentation research or web research from discovered list
+- **Codebase patterns/existing implementations** → Look for agents specialized in code analysis or pattern discovery from discovered list
+- **Industry best practices/tutorials** → Look for agents specialized in web research or best practices from discovered list
+- **Library documentation/frameworks** → Look for agents specialized in documentation research from discovered list
+- **Security considerations** → Look for agents specialized in security research or code analysis from discovered list
+- **Performance optimization** → Look for agents specialized in performance research or code analysis from discovered list
+
+**Dynamic Agent Selection Strategy:**
+
 1. **Cross-reference research needs** with agents discovered in Step 1.5
-2. **Prioritize context7-search-specialist** for any third-party integration (official documentation first)
-3. **Use code-pattern-analyzer** for understanding existing codebase implementations
-4. **Apply web-research-specialist** for best practices, tutorials, and general research
+2. **Prioritize documentation specialists** for any third-party integration (official documentation first) - if available
+3. **Use code analysis specialists** for understanding existing codebase implementations - if available
+4. **Apply web research specialists** for best practices, tutorials, and general research - if available
 5. **Only recommend agents that exist** in the discovered agents list
-6. **Follow systematic context7-first pattern** for all external integrations
+6. **Create fallback strategies** when preferred agent types aren't available
 
 **Critical Rule**: Only recommend agents that were discovered in Step 1.5 - never hardcode agent names.
 
@@ -178,11 +169,13 @@ Apply the **systematic context7-first pattern using discovered agents**:
 ```
 
 **Dynamic Selection Rules for Third-Party Integrations:**
+
 1. **Check discovered agents** before recommending any agent
-2. **Prefer context7-search-specialist** for official documentation (if discovered)
-3. **Include web-research-specialist** for best practices (if discovered)
-4. **Add code-pattern-analyzer** for existing patterns (if discovered)
+2. **Prefer documentation specialists** for official documentation (if available in discovered agents)
+3. **Include web research specialists** for best practices (if available in discovered agents)
+4. **Add code analysis specialists** for existing patterns (if available in discovered agents)
 5. **Skip agents that weren't discovered** in Step 1.5
+6. **Adapt strategy based on available agents** - use what's actually discovered
 
 **For Non-Integration Features:**
 
@@ -231,12 +224,13 @@ Create a structured research plan using **ONLY agents discovered in Step 1.5**. 
 ```
 
 **Dynamic Research Plan Rules:**
+
 1. **ONLY recommend agents discovered in Step 1.5** - never hardcode agent names
 2. **Map research needs** to available agents using Step 2.5 guidelines
 3. **Prioritize based on feature criticality** - high for core requirements, medium for enhancements
 4. **Use specific focus descriptions** - avoid generic research requests
 5. **Create meaningful output filenames** - descriptive of the research content
-6. **Follow context7-first pattern** for all third-party integrations (if context7-search-specialist is discovered)
+6. **Follow documentation-first pattern** for all third-party integrations (if documentation specialists are discovered)
 
 Key points for research recommendations:
 
@@ -247,13 +241,14 @@ Key points for research recommendations:
 
 **CRITICAL: Third-Party Integration Research Pattern**
 
-For ANY third-party integration (APIs, SDKs, libraries), ALWAYS use this systematic approach:
+For ANY third-party integration (APIs, SDKs, libraries), ALWAYS use this systematic approach with discovered agents:
 
-1. **Primary Research**: `context7-search-specialist` for official documentation (high priority)
-2. **Fallback Research**: `web-research-specialist` for practices/tutorials (medium priority)
-3. **Codebase Analysis**: `code-pattern-analyzer` for existing integration patterns (high priority)
+1. **Primary Research**: Documentation specialist from discovered agents for official documentation (high priority)
+2. **Fallback Research**: Web research specialist from discovered agents for practices/tutorials (medium priority)
+3. **Codebase Analysis**: Code analysis specialist from discovered agents for existing integration patterns (high priority)
+4. **Adaptation**: If specific specialist types aren't available, assign tasks to available agents with expanded focus
 
-This ensures structured, official documentation is obtained first, with web research only for gaps or best practices.
+This ensures structured, official documentation is obtained first (when possible), with web research only for gaps or best practices.
 
 ### Step 5: Create Initial Knowledge Synthesis
 
@@ -339,31 +334,32 @@ The main Claude instance will:
 These examples demonstrate the dynamic approach using discovered agents:
 
 ### Example 1: Third-Party Payment Integration
+
 **Scenario**: Stripe payment processing integration
-**Discovered Agents**: [context7-search-specialist, web-research-specialist, code-pattern-analyzer]
-**Research Type**: Third-party integration (follows context7-first pattern)
+**Discovered Agents**: [stripe-docs-researcher, web-research-specialist, code-explorer]
+**Research Type**: Third-party integration (follows documentation-first pattern)
 
 ```json
 {
   "research_needed": true,
-  "rationale": "Third-party Stripe integration with all required agents discovered (context7-search-specialist, web-research-specialist, code-pattern-analyzer)",
+  "rationale": "Third-party Stripe integration with documentation, web research, and code analysis agents discovered",
   "recommended_research": [
     {
-      "agent": "context7-search-specialist",
+      "agent": "stripe-docs-researcher",
       "focus": "Stripe API official documentation, payment flows, webhooks, authentication, rate limits",
       "priority": "high",
-      "reason": "Discovered agent specializes in official documentation for Stripe integration",
+      "reason": "Discovered agent specializes in documentation research for API integrations",
       "output_file": "stripe-documentation.md"
     },
     {
-      "agent": "web-research-specialist", 
+      "agent": "web-research-specialist",
       "focus": "Stripe integration best practices, security considerations, PCI compliance, common pitfalls",
       "priority": "medium",
       "reason": "Discovered agent can supplement official docs with implementation best practices",
       "output_file": "stripe-best-practices.md"
     },
     {
-      "agent": "code-pattern-analyzer",
+      "agent": "code-explorer",
       "focus": "Existing payment integration patterns, credential management, webhook handling",
       "priority": "high",
       "reason": "Discovered agent can analyze existing integration architecture for consistency",
@@ -374,9 +370,10 @@ These examples demonstrate the dynamic approach using discovered agents:
 ```
 
 ### Example 2: UI Feature Development
+
 **Scenario**: Dark mode theme system implementation  
-**Discovered Agents**: [code-pattern-analyzer, web-research-specialist]
-**Research Type**: Non-integration (context7-search-specialist not discovered or needed)
+**Discovered Agents**: [code-explorer, ui-patterns-researcher]
+**Research Type**: Non-integration (documentation specialist not needed)
 
 ```json
 {
@@ -384,38 +381,39 @@ These examples demonstrate the dynamic approach using discovered agents:
   "rationale": "UI feature requiring codebase analysis and best practices with discovered agents matching needs",
   "recommended_research": [
     {
-      "agent": "code-pattern-analyzer",
+      "agent": "code-explorer",
       "focus": "Find existing theme providers, CSS variables, and color token systems in codebase",
       "priority": "high",
       "reason": "Discovered agent can analyze current styling architecture for integration points",
       "output_file": "theme-patterns-analysis.md"
     },
     {
-      "agent": "web-research-specialist",
+      "agent": "ui-patterns-researcher",
       "focus": "Modern dark mode implementation patterns and accessibility best practices",
-      "priority": "medium", 
-      "reason": "Discovered agent provides best practices research for dark mode UX patterns",
+      "priority": "medium",
+      "reason": "Discovered agent specializes in UI/UX research for design system patterns",
       "output_file": "dark-mode-best-practices.md"
     }
   ]
 }
 ```
 
-### Example 3: Agent Not Available Scenario
+### Example 3: Limited Agent Discovery Scenario
+
 **Scenario**: Third-party API integration with limited agent discovery
-**Discovered Agents**: [web-research-specialist]  
-**Research Type**: Third-party integration (context7-search-specialist not discovered)
+**Discovered Agents**: [general-researcher]  
+**Research Type**: Third-party integration (documentation specialist not discovered)
 
 ```json
 {
   "research_needed": true,
-  "rationale": "Third-party integration but context7-search-specialist not discovered - using available web-research-specialist",
+  "rationale": "Third-party integration but documentation specialist not discovered - adapting to use available general researcher",
   "recommended_research": [
     {
-      "agent": "web-research-specialist",
+      "agent": "general-researcher",
       "focus": "API official documentation, integration tutorials, authentication patterns, and best practices",
       "priority": "high",
-      "reason": "Only discovered research agent - must handle both official documentation and best practices research",
+      "reason": "Only discovered research agent - must handle comprehensive research across all areas",
       "output_file": "api-comprehensive-research.md"
     }
   ]
@@ -426,15 +424,16 @@ These examples demonstrate the dynamic approach using discovered agents:
 
 **Before creating any research plan, ensure:**
 
-- **Agent Discovery Completed**: Step 1.5 executed to discover all available research/analysis agents
+- **Agent Discovery Completed**: Step 1.5 executed to discover all available research agents
 - **Dynamic Selection**: Only recommend agents from the discovered agents list
 - **Mapping Validation**: Research needs properly mapped to available agent capabilities (Step 2.5)
-- **Context7-First Applied**: For third-party integrations, prioritize context7-search-specialist if discovered
+- **Documentation-First Applied**: For third-party integrations, prioritize documentation specialists if discovered
 - **Specific Focus**: Each agent has clear, specific research objectives (not generic requests)
 - **Meaningful Filenames**: Output files descriptively named for research content
 - **Priority Justified**: Agent priority levels based on feature implementation criticality
 
 **Critical Rules:**
+
 - **Never hardcode agent names** - always use discovered agents
 - **Verify agent existence** before recommendation
 - **Match research type to agent capability** using mapping guidelines
@@ -445,7 +444,7 @@ These examples demonstrate the dynamic approach using discovered agents:
 Your dynamic research outputs enable:
 
 1. **Main Claude**: Reads your discovery-based plan to spawn only available agents
-2. **complexity-assessor**: Uses your validated research findings for accurate complexity evaluation  
+2. **complexity-assessor**: Uses your validated research findings for accurate complexity evaluation
 3. **architecture-coordinator**: Leverages your agent-verified technical analysis
 4. **implementation-planner**: Builds on patterns from confirmed available research agents
 
