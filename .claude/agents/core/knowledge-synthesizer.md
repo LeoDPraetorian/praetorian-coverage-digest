@@ -51,6 +51,49 @@ Extract key information:
 - Technical scope and affected systems
 - **Actual technologies in use** (from TECH-STACK.md)
 
+### Step 1.5: Discover Available Research and Analysis Agents
+
+Before making research recommendations, discover all available research and analysis agents:
+
+```bash
+# Auto-discover research agents
+RESEARCH_AGENTS_DIR=".claude/agents/research"
+ANALYSIS_AGENTS_DIR=".claude/agents/analysis"
+
+echo "=== Available Research and Analysis Agents ==="
+
+if [ -d "${RESEARCH_AGENTS_DIR}" ]; then
+    echo "Research Agents:"
+    find "${RESEARCH_AGENTS_DIR}" -name "*.md" -type f | while read agent_file; do
+        agent_name=$(basename "$agent_file" .md)
+        agent_desc=$(head -10 "$agent_file" | grep "^description:" | cut -d':' -f2- | xargs)
+        echo "- ${agent_name}: ${agent_desc}"
+    done
+else
+    echo "Research agents directory not found: ${RESEARCH_AGENTS_DIR}"
+fi
+
+if [ -d "${ANALYSIS_AGENTS_DIR}" ]; then
+    echo "Analysis Agents:"
+    find "${ANALYSIS_AGENTS_DIR}" -name "*.md" -type f | while read agent_file; do
+        agent_name=$(basename "$agent_file" .md)
+        agent_desc=$(head -10 "$agent_file" | grep "^description:" | cut -d':' -f2- | xargs)
+        echo "- ${agent_name}: ${agent_desc}"
+    done
+else
+    echo "Analysis agents directory not found: ${ANALYSIS_AGENTS_DIR}"
+fi
+
+# Combine all available agents for selection
+AVAILABLE_RESEARCH_AGENTS=$(
+    find "${RESEARCH_AGENTS_DIR}" -name "*.md" -type f -exec basename {} .md \; 2>/dev/null;
+    find "${ANALYSIS_AGENTS_DIR}" -name "*.md" -type f -exec basename {} .md \; 2>/dev/null
+) | sort | uniq)
+
+echo "====================================="
+echo "Available agents for research recommendations: ${AVAILABLE_RESEARCH_AGENTS}"
+```
+
 ### Step 2: Set Up Research Directory Structure
 
 Create a dedicated research directory for individual agent outputs:
@@ -67,6 +110,28 @@ echo "- ${RESEARCH_DIR}/context7-documentation.md"
 echo "etc. (one file per research agent)"
 ```
 
+### Step 2.5: Map Research Needs to Available Agents
+
+Map each type of research need to available agents discovered in Step 1.5:
+
+**Research-Type-to-Agent Mapping Guidelines:**
+- **Third-party integrations/APIs/SDKs** → context7-search-specialist (official docs), web-research-specialist (best practices)
+- **Codebase patterns/existing implementations** → code-pattern-analyzer
+- **Industry best practices/tutorials** → web-research-specialist  
+- **Library documentation/frameworks** → context7-search-specialist
+- **Security considerations** → web-research-specialist, code-pattern-analyzer (existing security patterns)
+- **Performance optimization** → web-research-specialist, code-pattern-analyzer (existing performance patterns)
+
+**Agent Selection Strategy:**
+1. **Cross-reference research needs** with agents discovered in Step 1.5
+2. **Prioritize context7-search-specialist** for any third-party integration (official documentation first)
+3. **Use code-pattern-analyzer** for understanding existing codebase implementations
+4. **Apply web-research-specialist** for best practices, tutorials, and general research
+5. **Only recommend agents that exist** in the discovered agents list
+6. **Follow systematic context7-first pattern** for all external integrations
+
+**Critical Rule**: Only recommend agents that were discovered in Step 1.5 - never hardcode agent names.
+
 ### Step 3: Analyze and Create Research Recommendations
 
 Based on the actual technology stack you just read, analyze what research is needed:
@@ -82,26 +147,28 @@ Scan the requirements for mentions of:
 
 **For ANY Third-Party Integration Detected:**
 
-Apply the **systematic context7-first pattern**:
+Apply the **systematic context7-first pattern using discovered agents**:
+
+**CRITICAL**: Only use agents discovered in Step 1.5. Select from available agents based on integration needs:
 
 ```json
 [
   {
-    "agent": "context7-search-specialist",
+    "agent": "[SELECT FROM DISCOVERED AGENTS - prioritize context7-search-specialist if available]",
     "focus": "[SPECIFIC_LIBRARY/API] official documentation, authentication, API endpoints, rate limits, SDKs",
     "priority": "high",
     "reason": "Need official structured documentation for [INTEGRATION_NAME]",
     "output_file": "[library-name]-documentation.md"
   },
   {
-    "agent": "web-research-specialist",
+    "agent": "[SELECT web-research-specialist IF DISCOVERED]",
     "focus": "[SPECIFIC_LIBRARY/API] integration best practices, security considerations, common pitfalls",
     "priority": "medium",
     "reason": "Supplement official docs with implementation best practices and lessons learned",
     "output_file": "[library-name]-best-practices.md"
   },
   {
-    "agent": "code-pattern-analyzer",
+    "agent": "[SELECT code-pattern-analyzer IF DISCOVERED]",
     "focus": "Existing [SIMILAR_INTEGRATION] patterns in codebase, credential management, error handling",
     "priority": "high",
     "reason": "Leverage existing integration architecture and maintain consistency",
@@ -109,6 +176,13 @@ Apply the **systematic context7-first pattern**:
   }
 ]
 ```
+
+**Dynamic Selection Rules for Third-Party Integrations:**
+1. **Check discovered agents** before recommending any agent
+2. **Prefer context7-search-specialist** for official documentation (if discovered)
+3. **Include web-research-specialist** for best practices (if discovered)
+4. **Add code-pattern-analyzer** for existing patterns (if discovered)
+5. **Skip agents that weren't discovered** in Step 1.5
 
 **For Non-Integration Features:**
 
@@ -134,44 +208,35 @@ Apply the **systematic context7-first pattern**:
 
 ### Step 4: Generate Research Plan (synthesis-plan.json)
 
-Create a structured research plan and save it to the synthesis plan path. The structure must be:
+Create a structured research plan using **ONLY agents discovered in Step 1.5**. Save it to the synthesis plan path:
 
 ```json
 {
   "research_needed": true,
-  "rationale": "Clear explanation of why research is needed based on the specific feature",
+  "rationale": "Clear explanation based on specific feature and available discovered agents",
   "recommended_research": [
     {
-      "agent": "web-research-specialist",
-      "focus": "Specific information to gather (e.g., 'React 18 concurrent rendering patterns for dashboard updates')",
-      "priority": "high",
-      "reason": "Why this is critical for the feature implementation",
-      "output_file": "web-research-findings.md"
-    },
-    {
-      "agent": "code-pattern-analyzer",
-      "focus": "Specific patterns to find (e.g., 'existing WebSocket implementations in our codebase')",
-      "priority": "high",
-      "reason": "Need to understand current architecture before adding new features",
-      "output_file": "code-patterns-analysis.md"
-    },
-    {
-      "agent": "context7-search-specialist",
-      "focus": "Library documentation needed (e.g., 'Socket.io configuration for real-time updates')",
-      "priority": "medium",
-      "reason": "Need detailed API documentation for implementation",
-      "output_file": "context7-documentation.md"
+      "agent": "[SELECT FROM DISCOVERED AGENTS ONLY]",
+      "focus": "Specific information to gather based on feature requirements",
+      "priority": "high|medium|low",
+      "reason": "Justification based on feature needs and agent capabilities",
+      "output_file": "[descriptive-filename].md"
     }
   ],
-  "synthesis_approach": "parallel",
+  "synthesis_approach": "parallel|sequential",
   "expected_outputs": [
-    "Current implementation patterns in codebase",
-    "Best practices for the specific technology",
-    "Security considerations for the feature",
-    "Performance optimization strategies"
+    "List outputs based on discovered agents and research needs"
   ]
 }
 ```
+
+**Dynamic Research Plan Rules:**
+1. **ONLY recommend agents discovered in Step 1.5** - never hardcode agent names
+2. **Map research needs** to available agents using Step 2.5 guidelines
+3. **Prioritize based on feature criticality** - high for core requirements, medium for enhancements
+4. **Use specific focus descriptions** - avoid generic research requests
+5. **Create meaningful output filenames** - descriptive of the research content
+6. **Follow context7-first pattern** for all third-party integrations (if context7-search-specialist is discovered)
 
 Key points for research recommendations:
 
@@ -269,79 +334,121 @@ The main Claude instance will:
 4. Have each agent save their findings to their dedicated research file
 5. Optionally consolidate findings into the main knowledge base
 
-## Examples of Feature-Specific Research Plans
+## Dynamic Feature-Specific Research Plan Examples
 
-### Example 1: Stripe Payment Integration (Third-Party Integration)
+These examples demonstrate the dynamic approach using discovered agents:
+
+### Example 1: Third-Party Payment Integration
+**Scenario**: Stripe payment processing integration
+**Discovered Agents**: [context7-search-specialist, web-research-specialist, code-pattern-analyzer]
+**Research Type**: Third-party integration (follows context7-first pattern)
 
 ```json
 {
   "research_needed": true,
-  "rationale": "Third-party integration requiring systematic context7-first research approach",
+  "rationale": "Third-party Stripe integration with all required agents discovered (context7-search-specialist, web-research-specialist, code-pattern-analyzer)",
   "recommended_research": [
     {
       "agent": "context7-search-specialist",
       "focus": "Stripe API official documentation, payment flows, webhooks, authentication, rate limits",
       "priority": "high",
-      "reason": "Need official structured documentation for Stripe integration",
+      "reason": "Discovered agent specializes in official documentation for Stripe integration",
       "output_file": "stripe-documentation.md"
     },
     {
-      "agent": "web-research-specialist",
+      "agent": "web-research-specialist", 
       "focus": "Stripe integration best practices, security considerations, PCI compliance, common pitfalls",
       "priority": "medium",
-      "reason": "Supplement official docs with implementation best practices and lessons learned",
+      "reason": "Discovered agent can supplement official docs with implementation best practices",
       "output_file": "stripe-best-practices.md"
     },
     {
       "agent": "code-pattern-analyzer",
       "focus": "Existing payment integration patterns, credential management, webhook handling",
       "priority": "high",
-      "reason": "Leverage existing integration architecture and maintain consistency",
+      "reason": "Discovered agent can analyze existing integration architecture for consistency",
       "output_file": "payment-patterns-analysis.md"
     }
   ]
 }
 ```
 
-### Example 2: Dark Mode Feature (Non-Integration)
+### Example 2: UI Feature Development
+**Scenario**: Dark mode theme system implementation  
+**Discovered Agents**: [code-pattern-analyzer, web-research-specialist]
+**Research Type**: Non-integration (context7-search-specialist not discovered or needed)
 
 ```json
 {
   "research_needed": true,
-  "rationale": "Need to understand existing theme system and UI component structure",
+  "rationale": "UI feature requiring codebase analysis and best practices with discovered agents matching needs",
   "recommended_research": [
     {
       "agent": "code-pattern-analyzer",
-      "focus": "Find existing theme providers, CSS variables, and color token systems",
+      "focus": "Find existing theme providers, CSS variables, and color token systems in codebase",
       "priority": "high",
-      "reason": "Must integrate with current styling architecture",
+      "reason": "Discovered agent can analyze current styling architecture for integration points",
       "output_file": "theme-patterns-analysis.md"
-    },
-    {
-      "agent": "context7-search-specialist",
-      "focus": "React context patterns, CSS-in-JS theming, Tailwind dark mode documentation",
-      "priority": "medium",
-      "reason": "Official documentation for theming frameworks in use",
-      "output_file": "react-theming-docs.md"
     },
     {
       "agent": "web-research-specialist",
       "focus": "Modern dark mode implementation patterns and accessibility best practices",
-      "priority": "medium",
-      "reason": "Ensure we follow current best practices for dark mode UX",
+      "priority": "medium", 
+      "reason": "Discovered agent provides best practices research for dark mode UX patterns",
       "output_file": "dark-mode-best-practices.md"
     }
   ]
 }
 ```
 
+### Example 3: Agent Not Available Scenario
+**Scenario**: Third-party API integration with limited agent discovery
+**Discovered Agents**: [web-research-specialist]  
+**Research Type**: Third-party integration (context7-search-specialist not discovered)
+
+```json
+{
+  "research_needed": true,
+  "rationale": "Third-party integration but context7-search-specialist not discovered - using available web-research-specialist",
+  "recommended_research": [
+    {
+      "agent": "web-research-specialist",
+      "focus": "API official documentation, integration tutorials, authentication patterns, and best practices",
+      "priority": "high",
+      "reason": "Only discovered research agent - must handle both official documentation and best practices research",
+      "output_file": "api-comprehensive-research.md"
+    }
+  ]
+}
+```
+
+## Quality Validation Criteria
+
+**Before creating any research plan, ensure:**
+
+- **Agent Discovery Completed**: Step 1.5 executed to discover all available research/analysis agents
+- **Dynamic Selection**: Only recommend agents from the discovered agents list
+- **Mapping Validation**: Research needs properly mapped to available agent capabilities (Step 2.5)
+- **Context7-First Applied**: For third-party integrations, prioritize context7-search-specialist if discovered
+- **Specific Focus**: Each agent has clear, specific research objectives (not generic requests)
+- **Meaningful Filenames**: Output files descriptively named for research content
+- **Priority Justified**: Agent priority levels based on feature implementation criticality
+
+**Critical Rules:**
+- **Never hardcode agent names** - always use discovered agents
+- **Verify agent existence** before recommendation
+- **Match research type to agent capability** using mapping guidelines
+- **Provide fallback strategies** when preferred agents aren't discovered
+
 ## Integration with Feature Workflow
 
-Your outputs directly feed into:
+Your dynamic research outputs enable:
 
-1. **Main Claude**: Uses your research plan to spawn agents
-2. **complexity-assessor**: Uses your findings to evaluate implementation complexity
-3. **architecture-coordinator**: Leverages your technical analysis
-4. **implementation-planner**: Builds on your identified patterns
+1. **Main Claude**: Reads your discovery-based plan to spawn only available agents
+2. **complexity-assessor**: Uses your validated research findings for accurate complexity evaluation  
+3. **architecture-coordinator**: Leverages your agent-verified technical analysis
+4. **implementation-planner**: Builds on patterns from confirmed available research agents
 
-Remember: Every feature is different. Read the requirements carefully and create research plans specific to what's being built.
+**Consistency**: This approach matches the dynamic discovery pattern used by architecture-coordinator, ensuring unified agent management across the orchestration workflow.
+
+Remember: Every feature is different, and agent availability may vary. Always discover first, then create research plans specific to what's being built and what agents are actually available.
