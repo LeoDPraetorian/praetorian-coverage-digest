@@ -17,7 +17,7 @@ The Einstein system implements a systematic **9-phase feature development pipeli
 ⚙️ **Implementation Phase** (Phase 6): `/implement` command  
 🛡️ **Security Review Phase** (Phase 8): `/security-review` command  
 📊 **Quality Review Phase** (Phase 7): `/quality-review` command  
-🧪 **Testing Phase** (Phase 9): `/test` command  
+🧪 **Testing Phase** (Phase 9): `/test` command
 
 **Quality Gates**: Each phase includes validation checkpoints ensuring systematic quality assurance.
 
@@ -58,19 +58,19 @@ echo "===============================" | tee -a "${PIPELINE_LOG}"
 if [ "${EXECUTION_MODE}" = "resume" ]; then
     # Resuming existing feature - detect current phase
     FEATURE_DIR=".claude/features/${FEATURE_ID}"
-    
+
     if [ ! -d "${FEATURE_DIR}" ]; then
         echo "❌ Feature workspace not found: ${FEATURE_DIR}" | tee -a "${PIPELINE_LOG}"
         exit 1
     fi
-    
+
     # Read current status from metadata
     CURRENT_STATUS=$(cat "${FEATURE_DIR}/metadata.json" | jq -r '.status')
     CURRENT_PHASE=$(cat "${FEATURE_DIR}/metadata.json" | jq -r '.phase')
-    
+
     echo "📍 Current Status: ${CURRENT_STATUS}" | tee -a "${PIPELINE_LOG}"
     echo "📍 Current Phase: ${CURRENT_PHASE}" | tee -a "${PIPELINE_LOG}"
-    
+
     # Determine next phase
     case "${CURRENT_STATUS}" in
         "design_completed")
@@ -112,16 +112,16 @@ fi
 ```bash
 if [ "${NEXT_PHASE}" = "design" ] || [ "${EXECUTION_MODE}" = "new" ]; then
     echo "🎯 Phase 1-5: DESIGN PHASE" | tee -a "${PIPELINE_LOG}"
-    
+
     # Create feature workspace for new features
     if [ "${EXECUTION_MODE}" = "new" ]; then
         FEATURE_NAME=$(echo "$ARGUMENTS" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//' | cut -c1-30)
         TIMESTAMP=$(date +%Y%m%d_%H%M%S)
         FEATURE_ID="${FEATURE_NAME}_${TIMESTAMP}"
-        
+
         # Create feature workspace
         mkdir -p .claude/features/${FEATURE_ID}/{context,research,output,logs,architecture}
-        
+
         # Save feature metadata
         cat > .claude/features/${FEATURE_ID}/metadata.json << EOF
 {
@@ -133,11 +133,11 @@ if [ "${NEXT_PHASE}" = "design" ] || [ "${EXECUTION_MODE}" = "new" ]; then
   "pipeline": "einstein"
 }
 EOF
-        
+
         echo "FEATURE_ID=${FEATURE_ID}" > .claude/features/current_feature.env
         echo "📁 Feature workspace created: ${FEATURE_ID}" | tee -a "${PIPELINE_LOG}"
     fi
-    
+
     DESIGN_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     echo "Design started: ${DESIGN_START}" | tee -a "${PIPELINE_LOG}"
 fi
@@ -158,10 +158,10 @@ First, check if the feature description contains Jira ticket references:
 if echo "$ARGUMENTS" | grep -qE '\b[A-Z]{2,10}-[0-9]+\b'; then
     echo "🎫 Jira references detected in feature description"
     echo "Resolving ticket details before analysis..."
-    
+
     # Create preprocessing output file
     JIRA_RESOLVED_FILE=".claude/features/${FEATURE_ID}/context/jira-resolved.md"
-    
+
     echo "Jira resolution output: ${JIRA_RESOLVED_FILE}"
 else
     echo "No Jira references detected - proceeding with direct analysis"
@@ -174,13 +174,15 @@ Tell the jira-reader (if Jira references detected):
 "Resolve all Jira ticket references in this feature request: $ARGUMENTS
 
 Use your preprocessing mode to:
+
 1. Detect all Jira ticket references (CHA-1232, PROJ-123, etc.)
 2. Fetch full ticket details using Atlassian MCP tools
 3. Replace references with structured ticket content
 4. Save the enriched feature description to: ${JIRA_RESOLVED_FILE}
 
 Format the enriched content as:
-```
+
+````
 # Enhanced Feature Request
 
 ## Original Request
@@ -208,7 +210,7 @@ else
 fi
 
 echo "Content prepared for intent analysis"
-```
+````
 
 #### Intent Analysis
 
@@ -264,12 +266,12 @@ cat "${INPUT_REQUIREMENTS}" | jq -r '.feature_name, .affected_systems[]' 2>/dev/
 Use the `knowledge-synthesizer` subagent to analyze requirements and recommend research approach.
 
 Instruct the knowledge-synthesizer:
-"Analyze the requirements and determine what research is needed for this feature.
+"ultrathink. Analyze the requirements and determine what research is needed for this feature.
 
 **CRITICAL: Perform dynamic agent discovery first:**
 
 1. Discover all available research agents from `.claude/agents/research/` directory
-2. Only recommend agents that actually exist in your discovery results  
+2. Only recommend agents that actually exist in your discovery results
 3. Map research needs to discovered agent capabilities, not hardcoded agent names
 
 Read the requirements from: ${INPUT_REQUIREMENTS}
@@ -305,13 +307,14 @@ Before making any agent recommendations, the knowledge-synthesizer will discover
 **Capability-Based Agent Selection Guidelines:**
 
 - **Third-party integrations, APIs, SDKs** → Look for agents with documentation/API research capabilities from discovered list
-- **Library documentation and frameworks** → Look for agents specialized in documentation research from discovered list  
+- **Library documentation and frameworks** → Look for agents specialized in documentation research from discovered list
 - **Codebase patterns and implementations** → Look for agents with code analysis capabilities from discovered list
 - **Industry best practices and tutorials** → Look for agents with web research capabilities from discovered list
 - **Security architecture and threats** → Look for agents with security analysis capabilities from discovered list
 - **Performance optimization** → Look for agents with performance analysis capabilities from discovered list
 
 **Critical Rules:**
+
 - ONLY recommend agents discovered dynamically from the research agents directory
 - Match research needs to available agent capabilities, not hardcoded agent names
 - Provide fallback strategies when preferred capability types aren't available
@@ -430,8 +433,8 @@ grep -A 3 "## Similar Patterns Found" "${KNOWLEDGE_PATH}" 2>/dev/null | head -10
 
 Use the `complexity-assessor` subagent to evaluate implementation complexity.
 
-Tell the complexity-assessor:
-"Assess the complexity of implementing this feature.
+Instruct the complexity-assessor:
+"ultrathink. Assess the complexity of implementing this feature.
 
 Read context from:
 
@@ -522,7 +525,7 @@ fi
 If architecture planning is required, use the `architecture-coordinator`:
 
 Instruct the architecture-coordinator:
-"Analyze this complex feature and recommend an architecture approach.
+"ultrathink. Analyze this complex feature and recommend an architecture approach.
 
 Read context from: ${CONTEXT_FILE}
 
@@ -646,7 +649,7 @@ echo "==================================="
 Use the `implementation-planner` subagent to create the final plan.
 
 Instruct the implementation-planner:
-"Create a detailed implementation plan for this feature.
+"ultrathink. Create a detailed implementation plan for this feature.
 
 Read the complete context from the Context path shown above (ending with /planning-context.md).
 
@@ -826,18 +829,18 @@ fi
 ```bash
 if [ "${NEXT_PHASE}" = "implement" ]; then
     echo "⚙️ Phase 6: IMPLEMENTATION PHASE" | tee -a "${PIPELINE_LOG}"
-    
+
     # Initialize implementation workspace
     IMPL_DIR=".claude/features/${FEATURE_ID}/implementation"
     mkdir -p "${IMPL_DIR}"/{progress,code-changes,validation,logs,agent-outputs}
-    
+
     # Create agent tracking structure
     AGENT_OUTPUT_DIR="${IMPL_DIR}/agent-outputs"
     mkdir -p "${AGENT_OUTPUT_DIR}"
-    
+
     IMPL_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     echo "Implementation started: ${IMPL_START}" | tee -a "${PIPELINE_LOG}"
-    
+
     # Update metadata
     jq '.status = "implementation_in_progress" | .phase = "implementation" | .implementation_started = "'${IMPL_START}'"' \
        ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
@@ -866,18 +869,21 @@ Task("implementation-planner", "Extract comprehensive implementation context fro
 **Read and analyze multiple context sources:**
 
 1. **Complexity Assessment**: .claude/features/${FEATURE_ID}/context/complexity-assessment.json
+
    - Extract: affected_domains array (frontend, backend, database, etc.)
    - Extract: complexity level and risk factors
 
 2. **Requirements Analysis**: .claude/features/${FEATURE_ID}/context/requirements.json
+
    - Extract: affected_systems array (APIs, services, databases)
    - Extract: user_stories and acceptance_criteria
 
 3. **Implementation Plan**: .claude/features/${FEATURE_ID}/output/implementation-plan.md
+
    - Extract: recommended agent assignments and task breakdown
    - Extract: technology stack requirements
 
-4. **Architecture Context** (if exists): .claude/features/${FEATURE_ID}/architecture/*.md
+4. **Architecture Context** (if exists): .claude/features/${FEATURE_ID}/architecture/\*.md
    - Extract: implementation patterns and design decisions
    - Extract: architecture file to agent domain mappings
 
@@ -885,6 +891,7 @@ Task("implementation-planner", "Extract comprehensive implementation context fro
 
 1. **Implementation Context Summary**: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
    Format:
+
    ```json
    {
      \"affected_domains\": [\"frontend\", \"backend\", \"database\"],
@@ -900,6 +907,7 @@ Task("implementation-planner", "Extract comprehensive implementation context fro
 
 2. **Agent Assignments**: .claude/features/${FEATURE_ID}/implementation/progress/agent-assignments.json
    Format with:
+
    - implementation_tracks with agents, dependencies, parallel_safe flags
    - specific tasks with agent assignments, file targets, completion criteria
    - estimated duration and critical path analysis
@@ -918,6 +926,7 @@ Task("implementation-planner", "Extract comprehensive implementation context fro
    ```
 
 **Instructions:**
+
 - Only map architecture files that actually exist in .claude/features/${FEATURE_ID}/architecture/
 - Match agent types to relevant architecture domains (backend agents get backend architecture files)
 - Create fallback strategies if expected architecture files don't exist", "implementation-planner")
@@ -933,7 +942,7 @@ echo "Validating implementation context extraction..."
 # Define required context files
 CONTEXT_FILES=(
     "implementation-context.json"
-    "agent-assignments.json" 
+    "agent-assignments.json"
     "architecture-mapping.json"
 )
 
@@ -943,14 +952,14 @@ CONTEXT_DIR=".claude/features/${FEATURE_ID}/implementation/context"
 # Validate each required context file exists and has valid structure
 for context_file in "${CONTEXT_FILES[@]}"; do
     CONTEXT_PATH="${CONTEXT_DIR}/${context_file}"
-    
+
     if [ -f "${CONTEXT_PATH}" ]; then
         echo "✓ ${context_file} exists"
-        
+
         # Validate JSON structure
         if jq empty "${CONTEXT_PATH}" 2>/dev/null; then
             echo "✓ ${context_file} contains valid JSON"
-            
+
             # Validate specific content based on file type
             case "${context_file}" in
                 "implementation-context.json")
@@ -964,14 +973,14 @@ for context_file in "${CONTEXT_FILES[@]}"; do
                             VALIDATION_PASSED=false
                         fi
                     done
-                    
+
                     # Show extracted domains for verification
                     DOMAINS=$(jq -r '.affected_domains[]' "${CONTEXT_PATH}" 2>/dev/null | tr '\n' ', ' | sed 's/,$//')
                     COMPLEXITY=$(jq -r '.complexity_level' "${CONTEXT_PATH}" 2>/dev/null)
                     echo "   → Extracted domains: ${DOMAINS}"
                     echo "   → Complexity level: ${COMPLEXITY}"
                     ;;
-                    
+
                 "agent-assignments.json")
                     # Validate agent assignments structure
                     if jq -e '.implementation_tracks' "${CONTEXT_PATH}" >/dev/null 2>&1; then
@@ -981,12 +990,12 @@ for context_file in "${CONTEXT_FILES[@]}"; do
                         VALIDATION_PASSED=false
                     fi
                     ;;
-                    
+
                 "architecture-mapping.json")
                     # Validate architecture file mappings and verify files exist
                     if jq -e '.agent_architecture_files' "${CONTEXT_PATH}" >/dev/null 2>&1; then
                         echo "✓ architecture-mapping.json contains agent_architecture_files"
-                        
+
                         # Verify mapped architecture files actually exist
                         ARCH_DIR=".claude/features/${FEATURE_ID}/architecture"
                         if [ -d "${ARCH_DIR}" ]; then
@@ -1054,7 +1063,7 @@ if [ -f "${IMPL_CONTEXT}" ]; then
     AFFECTED_DOMAINS=$(cat "${IMPL_CONTEXT}" | jq -r '.affected_domains[]' | tr '\n' ', ' | sed 's/,$//')
     echo "Complexity Level: ${COMPLEXITY}"
     echo "Affected Domains: ${AFFECTED_DOMAINS}"
-    
+
     echo "Discovering available development agents..."
 else
     echo "⚠️ Context analysis not found - using default agent set"
@@ -1080,7 +1089,7 @@ if [ -d "${DEV_AGENTS_DIR}" ]; then
         domains=$(grep "^domains:" "$agent_file" | cut -d':' -f2- | xargs)
         capabilities=$(grep "^capabilities:" "$agent_file" | cut -d':' -f2- | xargs)
         specializations=$(grep "^specializations:" "$agent_file" | cut -d':' -f2- | xargs)
-        
+
         echo "- ${agent_name}:"
         echo "  * Type: ${agent_type}"
         echo "  * Domains: ${domains}"
@@ -1118,24 +1127,24 @@ if [ -f "${IMPL_CONTEXT}" ]; then
     AFFECTED_DOMAINS_JSON=$(cat "${IMPL_CONTEXT}" | jq -r '.affected_domains[]' 2>/dev/null)
     COMPLEXITY_LEVEL=$(cat "${IMPL_CONTEXT}" | jq -r '.complexity_level' 2>/dev/null)
     RECOMMENDED_AGENTS=$(cat "${IMPL_CONTEXT}" | jq -r '.recommended_agents[]?.agent_type' 2>/dev/null)
-    
+
     echo "Feature Requirements:"
     echo "• Complexity: ${COMPLEXITY_LEVEL}"
     echo "• Affected Domains: ${AFFECTED_DOMAINS_JSON}"
     echo "• Recommended Agents: ${RECOMMENDED_AGENTS}"
     echo ""
-    
+
     # Initialize selected agents array
     SELECTED_AGENTS=()
     SELECTION_REASONS=()
-    
+
     # Map domains to agent capabilities using discovered agents
     echo "Mapping domains to available agents..."
-    
+
     # Backend Development Domain Mapping
     if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "backend\|api\|server\|microservice"; then
         echo "🔍 Backend domain detected - searching for backend developers..."
-        
+
         # Search for golang-api-developer if available
         if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "golang-api-developer"; then
             SELECTED_AGENTS+=("golang-api-developer")
@@ -1147,7 +1156,7 @@ if [ -f "${IMPL_CONTEXT}" ]; then
             SELECTION_REASONS+=("golang-developer: fallback for backend development needs")
             echo "✅ Selected: golang-developer (backend development fallback)"
         fi
-        
+
         # Add Python support if Python domain detected or CLI development needed
         if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "python\|cli" || echo "${AVAILABLE_DEV_AGENTS}" | grep -q "python-developer"; then
             SELECTED_AGENTS+=("python-developer")
@@ -1155,11 +1164,11 @@ if [ -f "${IMPL_CONTEXT}" ]; then
             echo "✅ Selected: python-developer (Python/CLI backend support)"
         fi
     fi
-    
+
     # Frontend Development Domain Mapping
     if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "frontend\|ui\|react\|component\|dashboard"; then
         echo "🔍 Frontend domain detected - searching for frontend developers..."
-        
+
         # Search for react-developer if available
         if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "react-developer"; then
             SELECTED_AGENTS+=("react-developer")
@@ -1167,33 +1176,33 @@ if [ -f "${IMPL_CONTEXT}" ]; then
             echo "✅ Selected: react-developer (frontend development capabilities)"
         fi
     fi
-    
+
     # Integration Development Domain Mapping
     if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "integration\|webhook\|api.*integration\|third.*party" || echo "${RECOMMENDED_AGENTS}" | grep -qi "integration"; then
         echo "🔍 Integration domain detected - searching for integration developers..."
-        
+
         if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "integration-developer"; then
             SELECTED_AGENTS+=("integration-developer")
             SELECTION_REASONS+=("integration-developer: domains service-integration,api-integration,third-party-integration match integration requirements")
             echo "✅ Selected: integration-developer (integration capabilities)"
         fi
     fi
-    
+
     # Security/VQL Development Domain Mapping
     if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "security\|vql\|threat\|detection\|forensic" || echo "${RECOMMENDED_AGENTS}" | grep -qi "vql"; then
         echo "🔍 Security/VQL domain detected - searching for security developers..."
-        
+
         if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "vql-developer"; then
             SELECTED_AGENTS+=("vql-developer")
             SELECTION_REASONS+=("vql-developer: domains vql-development,security-automation,threat-hunting match security requirements")
             echo "✅ Selected: vql-developer (security/VQL capabilities)"
         fi
     fi
-    
+
     # Complexity-Aware Agent Count Adjustment
     AGENT_COUNT=${#SELECTED_AGENTS[@]}
     MAX_AGENTS=3  # Default for Simple
-    
+
     case "${COMPLEXITY_LEVEL}" in
         "Simple")
             MAX_AGENTS=3
@@ -1218,14 +1227,14 @@ if [ -f "${IMPL_CONTEXT}" ]; then
             echo "📊 Unknown complexity: Defaulting to 3 agents"
             ;;
     esac
-    
+
     # Trim agent list if exceeding max for complexity level
     if [ $AGENT_COUNT -gt $MAX_AGENTS ]; then
         echo "⚠️ Trimming agent selection from $AGENT_COUNT to $MAX_AGENTS agents for $COMPLEXITY_LEVEL complexity"
         SELECTED_AGENTS=("${SELECTED_AGENTS[@]:0:$MAX_AGENTS}")
         SELECTION_REASONS=("${SELECTION_REASONS[@]:0:$MAX_AGENTS}")
     fi
-    
+
     echo ""
     echo "🎯 Final Agent Selection Summary:"
     for i in "${!SELECTED_AGENTS[@]}"; do
@@ -1234,7 +1243,7 @@ if [ -f "${IMPL_CONTEXT}" ]; then
     done
     echo ""
     echo "Total agents selected: ${#SELECTED_AGENTS[@]} (max: $MAX_AGENTS for $COMPLEXITY_LEVEL complexity)"
-    
+
 else
     echo "❌ No implementation context available - cannot perform dynamic selection"
     # Fallback to minimal agent set
@@ -1262,6 +1271,7 @@ if [[ " ${SELECTED_AGENTS[@]} " =~ " golang-api-developer " ]]; then
 Task("golang-api-developer", "Implement backend API components with architecture context.
 
 **Core Context:**
+
 - Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
 - Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Agent assignments: .claude/features/${FEATURE_ID}/implementation/progress/agent-assignments.json
@@ -1273,15 +1283,18 @@ $([ -f .claude/features/${FEATURE_ID}/architecture/api-architecture.md ] && echo
 $([ -f .claude/features/${FEATURE_ID}/architecture/database-architecture.md ] && echo "- Database Architecture: .claude/features/${FEATURE_ID}/architecture/database-architecture.md" || echo "- No database architecture file found")
 
 **Your workspace:**
+
 - Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/backend/
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/golang-api-developer/tracking-report.md
 - Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
 
 **Coordination Context:**
+
 - Shared API contracts: .claude/features/${FEATURE_ID}/implementation/coordination/api-contracts/
 - Inter-agent communication: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
 
 **Instructions:**
+
 1. Read implementation context to understand complexity and requirements
 2. If architecture files are available, apply architectural decisions to your implementation
 3. Focus on domains specified in affected_domains from implementation-context.json
@@ -1298,7 +1311,7 @@ fi
 **React Developer** (spawn if selected):
 
 ```bash
-# Check if react-developer was selected  
+# Check if react-developer was selected
 if [[ " ${SELECTED_AGENTS[@]} " =~ " react-developer " ]]; then
     echo "🚀 Spawning react-developer..."
 ```
@@ -1306,6 +1319,7 @@ if [[ " ${SELECTED_AGENTS[@]} " =~ " react-developer " ]]; then
 Task("react-developer", "Implement frontend UI components with architecture context.
 
 **Core Context:**
+
 - Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
 - Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Agent assignments: .claude/features/${FEATURE_ID}/implementation/progress/agent-assignments.json
@@ -1317,15 +1331,18 @@ $([ -f .claude/features/${FEATURE_ID}/architecture/ui-architecture.md ] && echo 
 $([ -f .claude/features/${FEATURE_ID}/architecture/component-architecture.md ] && echo "- Component Architecture: .claude/features/${FEATURE_ID}/architecture/component-architecture.md" || echo "- No component architecture file found")
 
 **Your workspace:**
+
 - Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/frontend/
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/react-developer/tracking-report.md
 - Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
 
 **Coordination Context:**
+
 - Shared API contracts: .claude/features/${FEATURE_ID}/implementation/coordination/api-contracts/
 - Inter-agent communication: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
 
 **Instructions:**
+
 1. Read implementation context to understand UI requirements and complexity
 2. If frontend architecture files exist, follow architectural decisions for component design
 3. Focus on user stories and acceptance criteria from requirements.json
@@ -1350,6 +1367,7 @@ if [[ " ${SELECTED_AGENTS[@]} " =~ " integration-developer " ]]; then
 Task("integration-developer", "Implement service integrations and API connections.
 
 **Core Context:**
+
 - Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
 - Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
@@ -1359,15 +1377,18 @@ $([ -f .claude/features/${FEATURE_ID}/architecture/integration-architecture.md ]
 $([ -f .claude/features/${FEATURE_ID}/architecture/api-architecture.md ] && echo "- API Architecture: .claude/features/${FEATURE_ID}/architecture/api-architecture.md" || echo "- No API architecture file found")
 
 **Your workspace:**
+
 - Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/integrations/
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/integration-developer/tracking-report.md
 - Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
 
 **Coordination Context:**
+
 - Integration contracts: .claude/features/${FEATURE_ID}/implementation/coordination/integration-contracts/
 - Service communication: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
 
 **Instructions:**
+
 1. Focus on integration-specific domains from implementation-context.json
 2. Apply integration architecture patterns and authentication flows
 3. Implement webhook handling, API client code, and service orchestration
@@ -1391,16 +1412,19 @@ if [[ " ${SELECTED_AGENTS[@]} " =~ " python-developer " ]]; then
 Task("python-developer", "Implement Python components and CLI tooling.
 
 **Core Context:**
+
 - Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
 - Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
 
 **Your workspace:**
+
 - Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/python/
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/python-developer/tracking-report.md
 - Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
 
 **Instructions:**
+
 1. Focus on Python-specific requirements from implementation context
 2. Implement CLI interfaces, data processing pipelines, or Python services
 3. Follow Praetorian CLI patterns and enterprise Python best practices
@@ -1423,16 +1447,19 @@ if [[ " ${SELECTED_AGENTS[@]} " =~ " vql-developer " ]]; then
 Task("vql-developer", "Implement VQL security capabilities and detection logic.
 
 **Core Context:**
+
 - Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
 - Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
 
 **Your workspace:**
+
 - Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/vql/
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/vql-developer/tracking-report.md
 - Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
 
 **Instructions:**
+
 1. Focus on security-specific domains from implementation context
 2. Develop VQL artifacts, detection rules, and security automation capabilities
 3. Follow Praetorian Aegis platform patterns for threat hunting and incident response
@@ -1510,6 +1537,7 @@ if [ "${SPAWN_TESTING_AGENT}" = true ]; then
 Task("integration-test-engineer", "Create integration tests with architecture-aware context.
 
 **Core Context:**
+
 - Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
 - Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
@@ -1521,14 +1549,17 @@ $([ -f .claude/features/${FEATURE_ID}/architecture/integration-architecture.md ]
 $([ -f .claude/features/${FEATURE_ID}/architecture/testing-architecture.md ] && echo "- Testing Architecture: .claude/features/${FEATURE_ID}/architecture/testing-architecture.md" || echo "- No testing architecture file found")
 
 **Your workspace:**
+
 - Test code: .claude/features/${FEATURE_ID}/implementation/code-changes/tests/
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/integration-test-engineer/tracking-report.md
 
 **Coordination Context:**
+
 - Test coordination: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
 - Integration results: .claude/features/${FEATURE_ID}/implementation/coordination/progress/
 
 **Instructions:**
+
 1. Read affected_systems from implementation context to understand integration points
 2. Apply testing architecture patterns if available
 3. Create comprehensive integration tests covering API, database, and service interactions
@@ -1618,30 +1649,30 @@ done
 if [ ${CONTEXT_FILES_CREATED} -eq 3 ]; then
     echo "✅ All context files created - agents have comprehensive context access"
     echo "📊 Context Summary:"
-    
+
     # Display extracted context summary
     if [ -f ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" ]; then
         COMPLEXITY=$(cat ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" | jq -r '.complexity_level')
         DOMAINS=$(cat ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" | jq -r '.affected_domains[]' | tr '\n' ', ' | sed 's/,$//')
         AGENTS=$(cat ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" | jq -r '.recommended_agents[].agent_type' | tr '\n' ', ' | sed 's/,$//')
-        
+
         echo "   • Complexity: ${COMPLEXITY}"
         echo "   • Domains: ${DOMAINS}"
         echo "   • Agents: ${AGENTS}"
     fi
-    
+
     # Display architecture file mapping summary
     if [ -f ".claude/features/${FEATURE_ID}/implementation/context/architecture-mapping.json" ]; then
         echo "📁 Architecture Files Distribution:"
         cat ".claude/features/${FEATURE_ID}/implementation/context/architecture-mapping.json" | jq -r '.agent_architecture_files | to_entries[] | "   • \(.key): \(.value | join(", "))"' 2>/dev/null || echo "   • No architecture mappings found"
     fi
-    
+
     echo "🎯 Benefits Achieved:"
     echo "   • ✅ Parallel Implementation: Each agent works independently with targeted context"
     echo "   • ✅ Context Minimization: Einstein orchestrates, agents consume specific architecture"
     echo "   • ✅ Architecture Integration: Design phase decisions flow directly to implementation"
     echo "   • ✅ Domain Expertise: Specialist agents get relevant architecture files only"
-    
+
 else
     echo "⚠️ Context distribution incomplete - some agents may lack full context"
 fi
@@ -1665,6 +1696,7 @@ Task("production-validator", "Conduct final production readiness validation at 1
 Review all implementation artifacts in: .claude/features/${FEATURE_ID}/implementation/
 
 Validate:
+
 - Code quality and testing completeness
 - Security implementation
 - Performance requirements
@@ -1695,14 +1727,14 @@ fi
 ```bash
 if [ "${NEXT_PHASE}" = "security-review" ]; then
     echo "🛡️ Phase 8: SECURITY REVIEW PHASE" | tee -a "${PIPELINE_LOG}"
-    
+
     # Initialize security review workspace
     SECURITY_WORKSPACE=".claude/features/${FEATURE_ID}/security-review"
     mkdir -p "${SECURITY_WORKSPACE}"/{analysis,findings,context}
-    
+
     SECURITY_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     echo "Security review started: ${SECURITY_START}" | tee -a "${PIPELINE_LOG}"
-    
+
     # Update metadata
     jq '.security_review_started = "'${SECURITY_START}'"' \
        ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
@@ -1719,6 +1751,7 @@ Conduct comprehensive security review using Einstein pipeline context:
 Task("code-pattern-analyzer", "Analyze security patterns and establish security baseline.
 
 Focus on:
+
 - Existing security frameworks and patterns in codebase
 - Authentication mechanisms in use
 - Input validation patterns
@@ -1729,6 +1762,7 @@ Save analysis: .claude/features/${FEATURE_ID}/security-review/context/security-p
 Task("go-security-reviewer", "Conduct comprehensive Go backend security review.
 
 Enhanced context available:
+
 - Feature requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/backend/
 - Individual agent tracking: .claude/features/${FEATURE_ID}/implementation/agent-outputs/golang-api-developer/
@@ -1736,6 +1770,7 @@ Enhanced context available:
 Save analysis: .claude/features/${FEATURE_ID}/security-review/analysis/go-security-analysis.md
 
 Focus on:
+
 - SQL injection vulnerabilities
 - Command injection in system calls
 - Authentication bypass logic
@@ -1746,6 +1781,7 @@ Focus on:
 Task("react-security-reviewer", "Conduct comprehensive React frontend security review.
 
 Enhanced context available:
+
 - Feature requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Frontend code: .claude/features/${FEATURE_ID}/implementation/code-changes/frontend/
 - Individual agent tracking: .claude/features/${FEATURE_ID}/implementation/agent-outputs/react-developer/
@@ -1753,6 +1789,7 @@ Enhanced context available:
 Save analysis: .claude/features/${FEATURE_ID}/security-review/analysis/react-security-analysis.md
 
 Focus on:
+
 - XSS vulnerabilities (especially dangerouslySetInnerHTML)
 - Client-side authentication bypasses
 - Sensitive data exposure
@@ -1762,6 +1799,7 @@ Focus on:
 Task("security-architect", "Evaluate architectural security implications with feature context.
 
 Enhanced context available:
+
 - Feature requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Architecture decisions: .claude/features/${FEATURE_ID}/architecture/
 - Implementation validation: .claude/features/${FEATURE_ID}/implementation/validation/
@@ -1769,6 +1807,7 @@ Enhanced context available:
 Save analysis: .claude/features/${FEATURE_ID}/security-review/analysis/architecture-security-analysis.md
 
 Assess:
+
 - Security architecture validation against design
 - New attack surfaces introduced by implementation
 - Security boundary violations
@@ -1797,14 +1836,14 @@ fi
 ```bash
 if [ "${NEXT_PHASE}" = "quality-review" ]; then
     echo "📊 Phase 7: QUALITY REVIEW PHASE" | tee -a "${PIPELINE_LOG}"
-    
+
     # Initialize quality review workspace
     QUALITY_WORKSPACE=".claude/features/${FEATURE_ID}/quality-review"
     mkdir -p "${QUALITY_WORKSPACE}"/{analysis,reports,metrics}
-    
+
     QUALITY_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     echo "Quality review started: ${QUALITY_START}" | tee -a "${PIPELINE_LOG}"
-    
+
     # Update metadata
     jq '.quality_review_started = "'${QUALITY_START}'"' \
        ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
@@ -1819,6 +1858,7 @@ fi
 Task("code-quality", "Conduct comprehensive code quality analysis.
 
 Context:
+
 - Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
 - Feature requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Security findings: .claude/features/${FEATURE_ID}/security-review/findings/
@@ -1826,6 +1866,7 @@ Context:
 Save analysis: .claude/features/${FEATURE_ID}/quality-review/analysis/code-quality-analysis.md
 
 Focus on:
+
 - Code quality metrics and standards compliance
 - Architecture pattern adherence
 - Code maintainability and readability
@@ -1834,12 +1875,14 @@ Focus on:
 Task("go-code-reviewer", "Review Go code quality and best practices.
 
 Context:
+
 - Go implementation: .claude/features/${FEATURE_ID}/implementation/code-changes/backend/
 - Go agent tracking: .claude/features/${FEATURE_ID}/implementation/agent-outputs/golang-api-developer/
 
 Save analysis: .claude/features/${FEATURE_ID}/quality-review/analysis/go-code-review.md
 
 Focus on:
+
 - Go idioms and best practices
 - Performance optimization opportunities
 - Error handling patterns
@@ -1848,12 +1891,14 @@ Focus on:
 Task("performance-analyzer", "Analyze performance characteristics and optimization opportunities.
 
 Context:
+
 - Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
 - Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 
 Save analysis: .claude/features/${FEATURE_ID}/quality-review/metrics/performance-analysis.md
 
 Focus on:
+
 - Performance bottleneck identification
 - Optimization recommendations
 - Scalability assessment
@@ -1884,14 +1929,14 @@ fi
 ```bash
 if [ "${NEXT_PHASE}" = "test" ]; then
     echo "🧪 Phase 9: TESTING PHASE" | tee -a "${PIPELINE_LOG}"
-    
+
     # Initialize testing workspace
     TESTING_WORKSPACE=".claude/features/${FEATURE_ID}/testing"
     mkdir -p "${TESTING_WORKSPACE}"/{unit,integration,e2e,reports}
-    
+
     TESTING_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     echo "Testing started: ${TESTING_START}" | tee -a "${PIPELINE_LOG}"
-    
+
     # Update metadata
     jq '.testing_started = "'${TESTING_START}'"' \
        ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
@@ -1906,6 +1951,7 @@ fi
 Task("unit-test-engineer", "Create comprehensive unit test suite.
 
 Context:
+
 - Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
 - Feature requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Quality analysis: .claude/features/${FEATURE_ID}/quality-review/analysis/
@@ -1920,6 +1966,7 @@ Target 85%+ coverage with language-specific frameworks.", "unit-test-engineer")
 Task("integration-test-engineer", "Create comprehensive integration test suite.
 
 Context:
+
 - Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
 - API endpoints: .claude/features/${FEATURE_ID}/implementation/code-changes/backend/
 - Frontend components: .claude/features/${FEATURE_ID}/implementation/code-changes/frontend/
@@ -1934,6 +1981,7 @@ Validate API, database, and service integrations.", "integration-test-engineer")
 Task("e2e-test-engineer", "Create comprehensive end-to-end test suite.
 
 Context:
+
 - Feature requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
 - User stories: .claude/features/${FEATURE_ID}/context/requirements.json
@@ -1946,7 +1994,7 @@ Create complete user journey tests with accessibility compliance.", "e2e-test-en
 **Validate testing completion:**
 
 ```bash
-# Update metadata after testing  
+# Update metadata after testing
 jq '.status = "testing_completed" | .testing_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" | .test_coverage = 92 | .tests_passing = 47 | .tests_total = 47' \
    ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
    mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
@@ -1969,16 +2017,16 @@ fi
 
 ### Step 8: Generate Pipeline Success Summary
 
-```bash
+````bash
 if [ "${NEXT_PHASE}" = "complete" ]; then
     echo "🎉 EINSTEIN PIPELINE COMPLETE!" | tee -a "${PIPELINE_LOG}"
-    
+
     PIPELINE_SUMMARY=".claude/features/${FEATURE_ID}/output/pipeline-summary.md"
     PIPELINE_END=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-    
+
     # Update final metadata
     jq '.status = "pipeline_completed" | .phase = "production_ready" | .pipeline_completed = "'${PIPELINE_END}'"' ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-    
+
     # Generate comprehensive pipeline summary
     cat > "${PIPELINE_SUMMARY}" << EOFS
 # 🎉 Einstein Pipeline Complete - Production Ready Feature
@@ -2034,11 +2082,12 @@ if [ "${NEXT_PHASE}" = "complete" ]; then
 # Implementation code location
 ls -la .claude/features/${FEATURE_ID}/implementation/code-changes/
 
-# Test suites location  
+# Test suites location
 ls -la .claude/features/${FEATURE_ID}/testing/
-```
+````
 
 ### Integration Commands
+
 ```bash
 # Create feature branch
 git checkout -b feature/$(echo "${FEATURE_ID}" | sed 's/_.*$//')
@@ -2055,13 +2104,15 @@ git push origin feature/$(echo "${FEATURE_ID}" | sed 's/_.*$//')
 ```
 
 ### Quality Metrics Summary
+
 - **Overall Quality Score**: $(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.quality_score')/100
 - **Security Vulnerabilities**: 0 high-confidence issues
 - **Test Coverage**: $(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.test_coverage')% across all test levels
-- **Code Files**: $(find ".claude/features/${FEATURE_ID}/implementation/code-changes" -name "*.go" -o -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.py" | wc -l) implementation files
+- **Code Files**: $(find ".claude/features/${FEATURE_ID}/implementation/code-changes" -name "_.go" -o -name "_.ts" -o -name "_.tsx" -o -name "_.js" -o -name "_.jsx" -o -name "_.py" | wc -l) implementation files
 - **Test Files**: $(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.tests_total') comprehensive tests
 
 ### Generated Artifacts
+
 - **📋 Design Documents**: `.claude/features/${FEATURE_ID}/context/`
 - **⚙️ Implementation Code**: `.claude/features/${FEATURE_ID}/implementation/code-changes/`
 - **🛡️ Security Reports**: `.claude/features/${FEATURE_ID}/security/`
@@ -2074,9 +2125,10 @@ git push origin feature/$(echo "${FEATURE_ID}" | sed 's/_.*$//')
 
 **Phases Completed**: 9/9 ✅  
 **Quality Gates Passed**: All ✅  
-**Production Readiness**: Validated ✅  
+**Production Readiness**: Validated ✅
 
 The feature has successfully completed the Einstein systematic development pipeline with:
+
 - **Systematic Quality**: Every phase includes validation checkpoints
 - **Comprehensive Testing**: Unit, integration, and E2E test coverage
 - **Security Validation**: Zero vulnerabilities for production deployment
@@ -2096,8 +2148,10 @@ EOFS
     echo "🧪 Test Coverage: $(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.test_coverage')%" | tee -a "${PIPELINE_LOG}"
     echo "⏱️  Duration: $(cat "${PIPELINE_LOG}" | grep "Started:" | cut -d' ' -f2-) → ${PIPELINE_END}" | tee -a "${PIPELINE_LOG}"
     echo "🚀 Status: PRODUCTION READY" | tee -a "${PIPELINE_LOG}"
+
 fi
-```
+
+````
 
 ## Pipeline Management Commands
 
@@ -2109,7 +2163,7 @@ Users can resume the pipeline from any phase:
 # Einstein executes all phases internally using agent coordination
 # Individual command files (design.md, implement.md, etc.) can be run standalone
 # All phases communicate through .claude/features/${FEATURE_ID}/ workspace files
-```
+````
 
 ### Pipeline Status Monitoring
 
@@ -2149,7 +2203,7 @@ phase_failure_recovery() {
     local phase=$1
     local feature_id=$2
     local error_context=$3
-    
+
     echo "❌ Phase ${phase} failed for ${feature_id}"
     echo "Error context: ${error_context}"
     echo ""
@@ -2164,9 +2218,9 @@ phase_failure_recovery() {
 pipeline_health_check() {
     local feature_id=$1
     local feature_dir=".claude/features/${feature_id}"
-    
+
     echo "🏥 Pipeline Health Check: ${feature_id}"
-    
+
     # Check workspace integrity
     local required_dirs=("context" "output")
     for dir in "${required_dirs[@]}"; do
@@ -2176,11 +2230,11 @@ pipeline_health_check() {
             echo "❌ Missing ${dir}/ directory"
         fi
     done
-    
+
     # Check phase completion
     local status=$(cat "${feature_dir}/metadata.json" | jq -r '.status')
     echo "📊 Current Status: ${status}"
-    
+
     # Validate phase artifacts
     case "${status}" in
         "design_completed")
@@ -2206,23 +2260,27 @@ pipeline_health_check() {
 **The Einstein system now provides a complete feature development pipeline:**
 
 ### **Command Structure**:
+
 - **`/design`**: Phases 1-5 (Requirements → Implementation Plan)
-- **`/implement`**: Phase 6 (Systematic Code Development) 
+- **`/implement`**: Phase 6 (Systematic Code Development)
 - **`/security-review`**: Phase 8 (Security Validation)
 - **`/quality-review`**: Phase 7 (Code Quality Gates)
 - **`/test`**: Phase 9 (Comprehensive Testing)
 - **`/einstein`**: **Complete Pipeline Orchestration**
 
-### **Quality Gates**: 
+### **Quality Gates**:
+
 Every phase includes systematic validation ensuring enterprise-grade quality standards.
 
 ### **Developer Control**:
+
 - **Full Pipeline**: Einstein orchestrates all phases internally using agent coordination
 - **Phase-by-Phase**: Individual command files available for granular control
 - **Resume Capability**: Continue from any phase using Feature ID
 - **Error Recovery**: Automatic retry with context-aware debugging
 
 ### **Production Readiness**:
+
 Features completing the full pipeline are **systematically validated** and ready for production deployment with comprehensive documentation, tests, and quality assurance.
 
 **🎯 The Einstein system transforms feature development from ad-hoc coding into systematic, quality-assured, production-ready implementations.**
