@@ -847,65 +847,233 @@ fi
 
 **Execute Implementation Phase Using Internal Agents:**
 
-**Sub-Phase 6.1: Parse Implementation Plan**
+**Sub-Phase 6.1: Pre-Implementation Context Analysis**
 
-Extract agent assignments from the implementation plan:
+Extract comprehensive implementation context from design phase artifacts:
 
-Task("implementation-planner", "Extract structured task assignments from the implementation plan.
+```bash
+# Create implementation context workspace
+IMPL_CONTEXT_DIR=".claude/features/${FEATURE_ID}/implementation/context"
+mkdir -p "${IMPL_CONTEXT_DIR}"
 
-Read implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
+echo "=== Pre-Implementation Context Analysis ==="
+echo "Extracting context from design phase artifacts..."
+echo "Context workspace: ${IMPL_CONTEXT_DIR}"
+```
 
-Create agent assignments file: .claude/features/${FEATURE_ID}/implementation/progress/agent-assignments.json
+Task("implementation-planner", "Extract comprehensive implementation context from design phase artifacts.
 
-Format with:
-- implementation_tracks with agents, dependencies, parallel_safe flags
-- specific tasks with agent assignments, file targets, completion criteria
-- estimated duration and critical path analysis", "implementation-planner")
+**Read and analyze multiple context sources:**
 
-**Sub-Phase 6.2: Parallel Implementation Orchestration**
+1. **Complexity Assessment**: .claude/features/${FEATURE_ID}/context/complexity-assessment.json
+   - Extract: affected_domains array (frontend, backend, database, etc.)
+   - Extract: complexity level and risk factors
 
-Based on agent assignments, spawn implementation agents in parallel:
+2. **Requirements Analysis**: .claude/features/${FEATURE_ID}/context/requirements.json
+   - Extract: affected_systems array (APIs, services, databases)
+   - Extract: user_stories and acceptance_criteria
 
-Task("golang-api-developer", "Implement backend API components.
+3. **Implementation Plan**: .claude/features/${FEATURE_ID}/output/implementation-plan.md
+   - Extract: recommended agent assignments and task breakdown
+   - Extract: technology stack requirements
 
-Context:
+4. **Architecture Context** (if exists): .claude/features/${FEATURE_ID}/architecture/*.md
+   - Extract: implementation patterns and design decisions
+   - Extract: architecture file to agent domain mappings
+
+**Create comprehensive context analysis files:**
+
+1. **Implementation Context Summary**: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
+   Format:
+   ```json
+   {
+     \"affected_domains\": [\"frontend\", \"backend\", \"database\"],
+     \"affected_systems\": [\"API\", \"UI\", \"Database\"],
+     \"complexity_level\": \"Medium|Complex|Simple\",
+     \"recommended_agents\": [
+       {\"agent_type\": \"golang-api-developer\", \"domain\": \"backend\", \"focus\": \"REST APIs\"},
+       {\"agent_type\": \"react-developer\", \"domain\": \"frontend\", \"focus\": \"UI components\"}
+     ],
+     \"technology_requirements\": {\"backend\": \"Go\", \"frontend\": \"React\", \"database\": \"Neo4j\"}
+   }
+   ```
+
+2. **Agent Assignments**: .claude/features/${FEATURE_ID}/implementation/progress/agent-assignments.json
+   Format with:
+   - implementation_tracks with agents, dependencies, parallel_safe flags
+   - specific tasks with agent assignments, file targets, completion criteria
+   - estimated duration and critical path analysis
+
+3. **Architecture Context Mapping**: .claude/features/${FEATURE_ID}/implementation/context/architecture-mapping.json
+   Format:
+   ```json
+   {
+     \"agent_architecture_files\": {
+       \"golang-api-developer\": [\"backend-architecture.md\", \"api-architecture.md\"],
+       \"react-developer\": [\"frontend-architecture.md\", \"ui-architecture.md\"],
+       \"database-neo4j-architect\": [\"database-architecture.md\", \"graph-schema.md\"]
+     },
+     \"available_architecture_files\": [\"list of actual .md files found\"]
+   }
+   ```
+
+**Instructions:**
+- Only map architecture files that actually exist in .claude/features/${FEATURE_ID}/architecture/
+- Match agent types to relevant architecture domains (backend agents get backend architecture files)
+- Create fallback strategies if expected architecture files don't exist", "implementation-planner")
+
+**Sub-Phase 6.2: Context-Aware Parallel Implementation Orchestration**
+
+Read extracted context and spawn implementation agents with relevant architecture files:
+
+```bash
+# Read context analysis results
+IMPL_CONTEXT=".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json"
+ARCH_MAPPING=".claude/features/${FEATURE_ID}/implementation/context/architecture-mapping.json"
+
+echo "=== Context-Aware Agent Spawning ==="
+if [ -f "${IMPL_CONTEXT}" ]; then
+    COMPLEXITY=$(cat "${IMPL_CONTEXT}" | jq -r '.complexity_level')
+    AFFECTED_DOMAINS=$(cat "${IMPL_CONTEXT}" | jq -r '.affected_domains[]' | tr '\n' ', ' | sed 's/,$//')
+    echo "Complexity Level: ${COMPLEXITY}"
+    echo "Affected Domains: ${AFFECTED_DOMAINS}"
+    
+    echo "Spawning agents based on extracted context..."
+else
+    echo "⚠️ Context analysis not found - using default agent set"
+fi
+```
+
+**Backend Implementation Agent** (spawn if backend domain detected):
+
+Task("golang-api-developer", "Implement backend API components with architecture context.
+
+**Core Context:**
 - Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
 - Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Agent assignments: .claude/features/${FEATURE_ID}/implementation/progress/agent-assignments.json
+- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
 
-Your workspace:
+**Architecture Context** (read if available):
+$([ -f .claude/features/${FEATURE_ID}/architecture/backend-architecture.md ] && echo "- Backend Architecture: .claude/features/${FEATURE_ID}/architecture/backend-architecture.md" || echo "- No backend architecture file found")
+$([ -f .claude/features/${FEATURE_ID}/architecture/api-architecture.md ] && echo "- API Architecture: .claude/features/${FEATURE_ID}/architecture/api-architecture.md" || echo "- No API architecture file found")
+$([ -f .claude/features/${FEATURE_ID}/architecture/database-architecture.md ] && echo "- Database Architecture: .claude/features/${FEATURE_ID}/architecture/database-architecture.md" || echo "- No database architecture file found")
+
+**Your workspace:**
 - Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/backend/
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/golang-api-developer/tracking-report.md
 - Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
 
-Implement your assigned tasks and maintain detailed progress tracking.", "golang-api-developer")
+**Instructions:**
+1. Read implementation context to understand complexity and requirements
+2. If architecture files are available, apply architectural decisions to your implementation
+3. Focus on domains specified in affected_domains from implementation-context.json
+4. Implement your assigned tasks and maintain detailed progress tracking
+5. Coordinate with other agents through file-based communication", "golang-api-developer")
 
-Task("react-developer", "Implement frontend UI components.
+**Frontend Implementation Agent** (spawn if frontend domain detected):
 
-Context:
+Task("react-developer", "Implement frontend UI components with architecture context.
+
+**Core Context:**
 - Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
 - Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Agent assignments: .claude/features/${FEATURE_ID}/implementation/progress/agent-assignments.json
+- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
 
-Your workspace:
+**Architecture Context** (read if available):
+$([ -f .claude/features/${FEATURE_ID}/architecture/frontend-architecture.md ] && echo "- Frontend Architecture: .claude/features/${FEATURE_ID}/architecture/frontend-architecture.md" || echo "- No frontend architecture file found")
+$([ -f .claude/features/${FEATURE_ID}/architecture/ui-architecture.md ] && echo "- UI Architecture: .claude/features/${FEATURE_ID}/architecture/ui-architecture.md" || echo "- No UI architecture file found")
+$([ -f .claude/features/${FEATURE_ID}/architecture/component-architecture.md ] && echo "- Component Architecture: .claude/features/${FEATURE_ID}/architecture/component-architecture.md" || echo "- No component architecture file found")
+
+**Your workspace:**
 - Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/frontend/
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/react-developer/tracking-report.md
 - Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
 
-Implement your assigned tasks and coordinate with backend agent through file-based communication.", "react-developer")
+**Instructions:**
+1. Read implementation context to understand UI requirements and complexity
+2. If frontend architecture files exist, follow architectural decisions for component design
+3. Focus on user stories and acceptance criteria from requirements.json
+4. Implement responsive, accessible UI components following established patterns
+5. Coordinate with backend agent for API integration through tracking files", "react-developer")
 
-Task("integration-test-engineer", "Create integration tests for the implementation.
+**Integration Testing Agent** (always spawn for comprehensive coverage):
 
-Context:
+Task("integration-test-engineer", "Create integration tests with architecture-aware context.
+
+**Core Context:**
 - Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
+- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
+- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
 - Backend code: .claude/features/${FEATURE_ID}/implementation/code-changes/backend/
 - Frontend code: .claude/features/${FEATURE_ID}/implementation/code-changes/frontend/
 
-Your workspace:
+**Architecture Context** (read if available):
+$([ -f .claude/features/${FEATURE_ID}/architecture/integration-architecture.md ] && echo "- Integration Architecture: .claude/features/${FEATURE_ID}/architecture/integration-architecture.md" || echo "- No integration architecture file found")
+$([ -f .claude/features/${FEATURE_ID}/architecture/testing-architecture.md ] && echo "- Testing Architecture: .claude/features/${FEATURE_ID}/architecture/testing-architecture.md" || echo "- No testing architecture file found")
+
+**Your workspace:**
 - Test code: .claude/features/${FEATURE_ID}/implementation/code-changes/tests/
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/integration-test-engineer/tracking-report.md
 
-Create comprehensive integration tests for the feature implementation.", "integration-test-engineer")
+**Instructions:**
+1. Read affected_systems from implementation context to understand integration points
+2. Apply testing architecture patterns if available
+3. Create comprehensive integration tests covering API, database, and service interactions
+4. Focus on user stories from requirements for end-to-end test scenarios
+5. Validate implementation against acceptance criteria", "integration-test-engineer")
+
+**Context Distribution Validation:**
+
+```bash
+# Validate context distribution success
+echo "=== Context Distribution Validation ==="
+
+# Check if context files were created
+CONTEXT_FILES_CREATED=0
+CONTEXT_FILES=("implementation-context.json" "architecture-mapping.json" "agent-assignments.json")
+
+for context_file in "${CONTEXT_FILES[@]}"; do
+    if [ -f ".claude/features/${FEATURE_ID}/implementation/context/${context_file}" ]; then
+        echo "✅ ${context_file} created successfully"
+        ((CONTEXT_FILES_CREATED++))
+    else
+        echo "❌ ${context_file} missing"
+    fi
+done
+
+if [ ${CONTEXT_FILES_CREATED} -eq 3 ]; then
+    echo "✅ All context files created - agents have comprehensive context access"
+    echo "📊 Context Summary:"
+    
+    # Display extracted context summary
+    if [ -f ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" ]; then
+        COMPLEXITY=$(cat ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" | jq -r '.complexity_level')
+        DOMAINS=$(cat ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" | jq -r '.affected_domains[]' | tr '\n' ', ' | sed 's/,$//')
+        AGENTS=$(cat ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" | jq -r '.recommended_agents[].agent_type' | tr '\n' ', ' | sed 's/,$//')
+        
+        echo "   • Complexity: ${COMPLEXITY}"
+        echo "   • Domains: ${DOMAINS}"
+        echo "   • Agents: ${AGENTS}"
+    fi
+    
+    # Display architecture file mapping summary
+    if [ -f ".claude/features/${FEATURE_ID}/implementation/context/architecture-mapping.json" ]; then
+        echo "📁 Architecture Files Distribution:"
+        cat ".claude/features/${FEATURE_ID}/implementation/context/architecture-mapping.json" | jq -r '.agent_architecture_files | to_entries[] | "   • \(.key): \(.value | join(", "))"' 2>/dev/null || echo "   • No architecture mappings found"
+    fi
+    
+    echo "🎯 Benefits Achieved:"
+    echo "   • ✅ Parallel Implementation: Each agent works independently with targeted context"
+    echo "   • ✅ Context Minimization: Einstein orchestrates, agents consume specific architecture"
+    echo "   • ✅ Architecture Integration: Design phase decisions flow directly to implementation"
+    echo "   • ✅ Domain Expertise: Specialist agents get relevant architecture files only"
+    
+else
+    echo "⚠️ Context distribution incomplete - some agents may lack full context"
+fi
+```
 
 **Sub-Phase 6.3: Implementation Progress Gates**
 
