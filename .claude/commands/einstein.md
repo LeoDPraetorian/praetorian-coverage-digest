@@ -481,9 +481,13 @@ echo "Complexity file: ${COMPLEXITY_FILE}"
 echo "Thinking allocation output: ${ARCH_THINKING_ALLOCATION}"
 ```
 
-Task("thinking-budget-allocator", "ultrathink. Optimize thinking budget allocation for architecture phase agents.
+Use the `thinking-budget-allocator` subagent to determine thinking assignment levels for architecture subagents
+
+Instruct the thinking-budget-allocator:
+"ultrathink. Optimize thinking budget allocation for architecture phase agents.
 
 Context:
+
 - Complexity assessment: ${COMPLEXITY_FILE}
 - Agent context: Architecture specialists will be spawned based on coordination plan
 - User preference: balanced (can be overridden with --thinking=speed|quality)
@@ -491,12 +495,16 @@ Context:
 Output allocation plan to: ${ARCH_THINKING_ALLOCATION}
 
 Focus on:
+
 - Architecture specialist thinking levels based on complexity
 - Cost estimates for user transparency
 - Alternative strategies for different cost/quality preferences
 
 Generate thinking level recommendations for potential architecture agents:
-- react-typescript-architect, go-backend-architect, security-architect, cloud-aws-architect, database-neo4j-architect, general-system-architect, information-architect", "thinking-budget-allocator")
+
+- react-typescript-architect, go-backend-architect, security-architect, cloud-aws-architect, database-neo4j-architect, general-system-architect, information-architect
+
+Save your thinking allocation recommendations to: ${ARCH_THINKING_ALLOCATION}"
 
 ```bash
 # Validate thinking allocation exists
@@ -1307,9 +1315,13 @@ echo "Implementation context: ${IMPL_CONTEXT}"
 echo "Thinking allocation output: ${IMPL_THINKING_ALLOCATION}"
 ```
 
-Task("thinking-budget-allocator", "ultrathink. Optimize thinking budget allocation for implementation phase agents.
+Use the `thinking-budget-allocator` subagent to optimize thinking budget allocation for implementation phase agents.
+
+Instruct the thinking-budget-allocator:
+"ultrathink. Optimize thinking budget allocation for implementation phase agents.
 
 Context:
+
 - Complexity assessment: .claude/features/${FEATURE_ID}/context/complexity-assessment.json
 - Implementation context: ${IMPL_CONTEXT}
 - Planned agents: Read recommended_agents from implementation context
@@ -1318,12 +1330,13 @@ Context:
 Output allocation plan to: ${IMPL_THINKING_ALLOCATION}
 
 Focus on:
+
 - Implementation agent thinking levels based on complexity and domains
 - Testing agent thinking levels based on risk assessment
 - Cost optimization for development phase efficiency
 - User transparency with cost estimates and alternative strategies
 
-Analyze planned agents from implementation context and provide thinking level recommendations.", "thinking-budget-allocator")
+Analyze planned agents from implementation context and provide thinking level recommendations."
 
 ```bash
 # Validate implementation thinking allocation
@@ -1349,7 +1362,7 @@ For each selected agent, spawn with appropriate context, architecture files, and
 # Check if golang-api-developer was selected
 if [[ " ${SELECTED_AGENTS[@]} " =~ " golang-api-developer " ]]; then
     echo "🚀 Spawning golang-api-developer..."
-    
+
     # Read thinking allocation for this agent
     IMPL_THINKING=$(cat ${IMPL_THINKING_ALLOCATION} | jq -r '.thinking_allocations.golang_api_developer' 2>/dev/null || echo "think")
 ```
@@ -1400,7 +1413,7 @@ fi
 # Check if react-developer was selected
 if [[ " ${SELECTED_AGENTS[@]} " =~ " react-developer " ]]; then
     echo "🚀 Spawning react-developer..."
-    
+
     # Read thinking allocation for this agent
     IMPL_THINKING=$(cat ${IMPL_THINKING_ALLOCATION} | jq -r '.thinking_allocations.react_developer' 2>/dev/null || echo "think")
 ```
@@ -2197,7 +2210,7 @@ git push origin feature/$(echo "${FEATURE_ID}" | sed 's/_.*$//')
 - **Overall Quality Score**: $(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.quality_score')/100
 - **Security Vulnerabilities**: 0 high-confidence issues
 - **Test Coverage**: $(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.test_coverage')% across all test levels
-- **Code Files**: $(find ".claude/features/${FEATURE_ID}/implementation/code-changes" -name "_.go" -o -name "_.ts" -o -name "_.tsx" -o -name "_.js" -o -name "_.jsx" -o -name "_.py" | wc -l) implementation files
+- **Code Files**: $(find ".claude/features/${FEATURE*ID}/implementation/code-changes" -name "*.go" -o -name "_.ts" -o -name "_.tsx" -o -name "_.js" -o -name "_.jsx" -o -name "\_.py" | wc -l) implementation files
 - **Test Files**: $(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.tests_total') comprehensive tests
 
 ### Generated Artifacts
