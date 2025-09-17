@@ -266,6 +266,12 @@ Use the `knowledge-synthesizer` subagent to analyze requirements and recommend r
 Instruct the knowledge-synthesizer:
 "Analyze the requirements and determine what research is needed for this feature.
 
+**CRITICAL: Perform dynamic agent discovery first:**
+
+1. Discover all available research agents from `.claude/agents/research/` directory
+2. Only recommend agents that actually exist in your discovery results  
+3. Map research needs to discovered agent capabilities, not hardcoded agent names
+
 Read the requirements from: ${INPUT_REQUIREMENTS}
 
 Instead of spawning agents directly, create a research plan and save it to: ${SYNTHESIS_PLAN}
@@ -290,22 +296,28 @@ Your output should be a JSON file with this structure:
 }
 ```
 
-CRITICAL: Choose the optimal agent type for each research need:
+CRITICAL: Use dynamic agent discovery to choose the optimal agent type for each research need:
 
-**Available Research Agents:**
+**Dynamic Research Agent Discovery:**
 
-- `code-pattern-analyzer` - For analyzing existing codebase patterns and implementations
-- `context7-search-specialist` - BEST for 3rd party integrations, library documentation, API references, SDK docs (e.g., Cloudflare API, AWS SDK, React docs)
-- `web-research-specialist` - For industry practices, tutorials, best practices, general research, and as a fall back if context7, is not available
+Before making any agent recommendations, the knowledge-synthesizer will discover all available research agents from `.claude/agents/research/` directory and only recommend agents that actually exist.
 
-**Agent Selection Guidelines:**
+**Capability-Based Agent Selection Guidelines:**
 
-- 3rd party integrations, library documentation, API references, SDK docs (e.g., Cloudflare API, AWS SDK, React docs) → USE `context7-search-specialist`
-- For implementation patterns in codebase → USE `code-pattern-analyzer`
-- For industry best practices and tutorials → USE `web-research-specialist`
-- For security architecture and threats → USE `security-architect`
+- **Third-party integrations, APIs, SDKs** → Look for agents with documentation/API research capabilities from discovered list
+- **Library documentation and frameworks** → Look for agents specialized in documentation research from discovered list  
+- **Codebase patterns and implementations** → Look for agents with code analysis capabilities from discovered list
+- **Industry best practices and tutorials** → Look for agents with web research capabilities from discovered list
+- **Security architecture and threats** → Look for agents with security analysis capabilities from discovered list
+- **Performance optimization** → Look for agents with performance analysis capabilities from discovered list
 
-Do NOT use biased examples - evaluate each research need independently and select the most appropriate agent.
+**Critical Rules:**
+- ONLY recommend agents discovered dynamically from the research agents directory
+- Match research needs to available agent capabilities, not hardcoded agent names
+- Provide fallback strategies when preferred capability types aren't available
+- Adapt recommendations based on what agents are actually discovered
+
+Do NOT use biased examples - evaluate each research need independently and select from actually discovered agents based on their capabilities.
 
 Also create your initial knowledge synthesis and save to: ${OUTPUT_KNOWLEDGE}"
 
@@ -360,22 +372,26 @@ Task("code-pattern-analyzer", "Analyze existing patterns...", "code-pattern-anal
 
 After spawning agents, wait for them to complete before continuing.
 
-Example spawning based on recommendations:
+Example spawning based on dynamic recommendations:
 
-- If "context7-search-specialist" is recommended with output_file "cloudflare-api-documentation.md":
-  Tell the agent: "Research Cloudflare WAF API v4 official documentation.
-  Focus on: [specific focus from plan].
-  Save your complete findings to: ${RESEARCH_DIR}/cloudflare-api-documentation.md"
+**CRITICAL: Use agents dynamically discovered by knowledge-synthesizer:**
 
-- If "web-research-specialist" is recommended with output_file "web-research-findings.md":
-  Tell the agent: "Research security testing best practices for WAF integrations.
-  Focus on: [specific focus from plan].
-  Save your complete findings to: ${RESEARCH_DIR}/web-research-findings.md"
+- If documentation research agent is recommended with output_file "api-documentation.md":
+  Tell the agent: "Research [SPECIFIC_API] official documentation.
+  Focus on: [specific focus from synthesis plan].
+  Save your complete findings to: ${RESEARCH_DIR}/[output_file from plan]"
 
-- If "code-pattern-analyzer" is recommended with output_file "code-patterns-analysis.md":
-  Tell the agent: "Analyze our codebase for [specific patterns from plan].
-  Look for reusable components related to [feature].
-  Save your complete analysis to: ${RESEARCH_DIR}/code-patterns-analysis.md"
+- If web research agent is recommended with output_file "best-practices.md":
+  Tell the agent: "Research [SPECIFIC_TOPIC] best practices and implementation patterns.
+  Focus on: [specific focus from synthesis plan].
+  Save your complete findings to: ${RESEARCH_DIR}/[output_file from plan]"
+
+- If code analysis agent is recommended with output_file "code-patterns-analysis.md":
+  Tell the agent: "Analyze our codebase for [specific patterns from synthesis plan].
+  Look for reusable components related to [feature context].
+  Save your complete analysis to: ${RESEARCH_DIR}/[output_file from plan]"
+
+**Important:** Replace bracketed placeholders with actual values from the synthesis plan. The agent names and focus areas will be dynamically determined by knowledge-synthesizer based on discovered agents and feature requirements.
 
 ```bash
 # Verify individual research files were created

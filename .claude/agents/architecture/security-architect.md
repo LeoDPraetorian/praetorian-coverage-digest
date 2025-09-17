@@ -2,6 +2,9 @@
 name: security-architect
 type: architect
 description: Use this agent when you need expert guidance on secure platform architecture, security design patterns, threat modeling, security implementation roadmaps, risk assessments, or security reviews of cybersecurity platforms and systems within the Chariot platform ecosystem. Examples: <example>Context: User is designing a new security platform and needs architectural guidance. user: 'I'm building a vulnerability management platform that will handle sensitive security data. What security architecture patterns should I follow?' assistant: 'I'll use the security-architect agent to provide expert guidance on secure platform design patterns and architecture.' <commentary>The user needs expert security architecture guidance for platform design, which is exactly what the security-architect agent specializes in.</commentary></example> <example>Context: User has implemented security features and wants a security review. user: 'I've implemented authentication and authorization for our security platform. Can you review the security implications?' assistant: 'Let me use the security-architect agent to conduct a thorough security review of your authentication and authorization implementation.' <commentary>This requires expert security assessment and review capabilities that the security-architect agent provides.</commentary></example>
+domains: security-architecture, threat-modeling, cybersecurity-platforms, risk-assessment, compliance
+capabilities: secure-architecture-design, defense-in-depth, zero-trust-architecture, security-patterns, threat-assessment
+specializations: chariot-platform-ecosystem, attack-surface-management, vulnerability-scanning, enterprise-security-operations
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write, Edit
 model: sonnet[1m]
 color: red

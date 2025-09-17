@@ -56,29 +56,43 @@ Extract key information:
 Before making research recommendations, discover all available research agents:
 
 ```bash
-# Auto-discover research agents (research folder only)
+# Auto-discover research agents with comprehensive metadata parsing
 RESEARCH_AGENTS_DIR=".claude/agents/research"
 
 echo "=== Available Research Agents ==="
 
 if [ -d "${RESEARCH_AGENTS_DIR}" ]; then
-    echo "Research Agents:"
+    echo "Research Agents with Full Metadata:"
     find "${RESEARCH_AGENTS_DIR}" -name "*.md" -type f | while read agent_file; do
         agent_name=$(basename "$agent_file" .md)
-        agent_desc=$(head -10 "$agent_file" | grep "^description:" | cut -d':' -f2- | xargs)
-        echo "- ${agent_name}: ${agent_desc}"
+        agent_type=$(grep "^type:" "$agent_file" | cut -d':' -f2- | xargs)
+        agent_desc=$(grep "^description:" "$agent_file" | cut -d':' -f2- | xargs | cut -c1-100)
+        domains=$(grep "^domains:" "$agent_file" | cut -d':' -f2- | xargs)
+        capabilities=$(grep "^capabilities:" "$agent_file" | cut -d':' -f2- | xargs)
+        specializations=$(grep "^specializations:" "$agent_file" | cut -d':' -f2- | xargs)
+        
+        echo "- ${agent_name}:"
+        echo "  * Type: ${agent_type}"
+        echo "  * Domains: ${domains}"
+        echo "  * Capabilities: ${capabilities}"
+        echo "  * Specializations: ${specializations}"
+        echo "  * Description: ${agent_desc}..."
+        echo ""
     done
 else
     echo "Research agents directory not found: ${RESEARCH_AGENTS_DIR}"
 fi
 
-# Get all available research agents for selection
+# Get all available research agents for selection with metadata
+echo "====================================="
+echo "Agent Discovery Complete. Available agents for capability-based selection:"
+
 AVAILABLE_RESEARCH_AGENTS=$(
     find "${RESEARCH_AGENTS_DIR}" -name "*.md" -type f -exec basename {} .md \; 2>/dev/null
 ) | sort | uniq
 
+echo "${AVAILABLE_RESEARCH_AGENTS}"
 echo "====================================="
-echo "Available agents for research recommendations: ${AVAILABLE_RESEARCH_AGENTS}"
 ```
 
 ### Step 2: Set Up Research Directory Structure
@@ -101,23 +115,35 @@ echo "etc. (one file per research agent from discovered list)"
 
 Map each type of research need to available agents discovered in Step 1.5:
 
-**Research-Type-to-Agent Mapping Guidelines:**
+**Capability-Based Agent Mapping Guidelines:**
 
-Based on discovered agents from Step 1.5, match research needs to available capabilities:
+Using comprehensive metadata from Step 1.5, match research needs to agent capabilities:
 
-- **Third-party integrations/APIs/SDKs** → Look for agents specialized in documentation research or web research from discovered list
-- **Codebase patterns/existing implementations** → Look for agents specialized in code analysis or pattern discovery from discovered list
-- **Industry best practices/tutorials** → Look for agents specialized in web research or best practices from discovered list
-- **Library documentation/frameworks** → Look for agents specialized in documentation research from discovered list
-- **Security considerations** → Look for agents specialized in security research or code analysis from discovered list
-- **Performance optimization** → Look for agents specialized in performance research or code analysis from discovered list
+**By Domain Matching:**
+- **Third-party integrations/APIs/SDKs** → Match domains: `documentation, api-reference, library-integration`
+- **Codebase patterns/existing implementations** → Match domains: `codebase-analysis, architectural-patterns, code-quality`  
+- **Industry best practices/tutorials** → Match domains: `web-research, industry-analysis, best-practices`
+- **Security considerations** → Match domains: `security-intelligence, web-research`
+- **Performance optimization** → Match domains: `code-quality, architectural-patterns`
 
-**Dynamic Agent Selection Strategy:**
+**By Capability Matching:**
+- **Documentation Research** → Match capabilities: `structured-documentation-search, api-reference-lookup, library-documentation-retrieval`
+- **Code Analysis** → Match capabilities: `pattern-detection, architectural-consistency-analysis, code-structure-analysis`
+- **Web Research** → Match capabilities: `web-scraping, source-verification, multi-source-research`
+- **Security Research** → Match capabilities: `security-research, trend-analysis`
 
-1. **Cross-reference research needs** with agents discovered in Step 1.5
-2. **Prioritize documentation specialists** for any third-party integration (official documentation first) - if available
-3. **Use code analysis specialists** for understanding existing codebase implementations - if available
-4. **Apply web research specialists** for best practices, tutorials, and general research - if available
+**By Specialization Matching:**
+- **Official Documentation** → Match specializations: `official-documentation, framework-docs, context7-mcp-integration`
+- **Code Patterns** → Match specializations: `design-patterns, architectural-consistency, SOLID-principles`
+- **Current Intelligence** → Match specializations: `current-threat-intelligence, technology-best-practices, emerging-technologies`
+
+**Advanced Selection Strategy:**
+
+1. **Primary Match**: Match research need to agent **domains** first
+2. **Capability Filter**: Refine selection using required **capabilities**  
+3. **Specialization Refinement**: Select based on specific **specializations**
+4. **Fallback Logic**: Use **type** and **description** when metadata matching is insufficient
+5. **Multi-Agent Strategy**: Select multiple agents for comprehensive coverage when needed
 5. **Only recommend agents that exist** in the discovered agents list
 6. **Create fallback strategies** when preferred agent types aren't available
 
@@ -336,33 +362,38 @@ These examples demonstrate the dynamic approach using discovered agents:
 ### Example 1: Third-Party Payment Integration
 
 **Scenario**: Stripe payment processing integration
-**Discovered Agents**: [stripe-docs-researcher, web-research-specialist, code-explorer]
-**Research Type**: Third-party integration (follows documentation-first pattern)
+**Discovered Agents**: [context7-search-specialist, web-research-specialist, code-pattern-analyzer]
+**Research Type**: Third-party integration (follows capability-based selection)
+
+**Capability Matching Process:**
+1. **Domain Match**: Third-party integration → `documentation, api-reference` and `web-research`
+2. **Capability Match**: Documentation research → `structured-documentation-search, api-reference-lookup`
+3. **Specialization Match**: Official docs → `official-documentation, context7-mcp-integration`
 
 ```json
 {
   "research_needed": true,
-  "rationale": "Third-party Stripe integration with documentation, web research, and code analysis agents discovered",
+  "rationale": "Third-party Stripe integration requiring documentation research (context7-search-specialist: domains include documentation/api-reference), web research (web-research-specialist: domains include web-research), and codebase analysis (code-pattern-analyzer: domains include codebase-analysis)",
   "recommended_research": [
     {
-      "agent": "stripe-docs-researcher",
+      "agent": "context7-search-specialist",
       "focus": "Stripe API official documentation, payment flows, webhooks, authentication, rate limits",
       "priority": "high",
-      "reason": "Discovered agent specializes in documentation research for API integrations",
+      "reason": "Agent domains documentation, api-reference and capabilities structured-documentation-search, api-reference-lookup match third-party integration needs",
       "output_file": "stripe-documentation.md"
     },
     {
-      "agent": "web-research-specialist",
+      "agent": "web-research-specialist", 
       "focus": "Stripe integration best practices, security considerations, PCI compliance, common pitfalls",
       "priority": "medium",
-      "reason": "Discovered agent can supplement official docs with implementation best practices",
+      "reason": "Agent domains web-research, best-practices and capabilities source-verification, security-research supplement official documentation",
       "output_file": "stripe-best-practices.md"
     },
     {
-      "agent": "code-explorer",
+      "agent": "code-pattern-analyzer",
       "focus": "Existing payment integration patterns, credential management, webhook handling",
-      "priority": "high",
-      "reason": "Discovered agent can analyze existing integration architecture for consistency",
+      "priority": "high", 
+      "reason": "Agent domains codebase-analysis and capabilities pattern-detection, architectural-consistency-analysis identify existing integration patterns",
       "output_file": "payment-patterns-analysis.md"
     }
   ]
@@ -372,26 +403,31 @@ These examples demonstrate the dynamic approach using discovered agents:
 ### Example 2: UI Feature Development
 
 **Scenario**: Dark mode theme system implementation  
-**Discovered Agents**: [code-explorer, ui-patterns-researcher]
-**Research Type**: Non-integration (documentation specialist not needed)
+**Discovered Agents**: [code-pattern-analyzer, web-research-specialist]
+**Research Type**: Non-integration (codebase + web research)
+
+**Capability Matching Process:**
+1. **Domain Match**: UI feature → `codebase-analysis` and `web-research, best-practices`
+2. **Capability Match**: Pattern analysis → `pattern-detection` and trend research → `trend-analysis`
+3. **Specialization Match**: Design patterns → `design-patterns` and best practices → `technology-best-practices`
 
 ```json
 {
   "research_needed": true,
-  "rationale": "UI feature requiring codebase analysis and best practices with discovered agents matching needs",
+  "rationale": "UI feature requiring codebase analysis (code-pattern-analyzer: domains include codebase-analysis, architectural-patterns) and best practices research (web-research-specialist: domains include best-practices, technology-trends)",
   "recommended_research": [
     {
-      "agent": "code-explorer",
+      "agent": "code-pattern-analyzer",
       "focus": "Find existing theme providers, CSS variables, and color token systems in codebase",
       "priority": "high",
-      "reason": "Discovered agent can analyze current styling architecture for integration points",
+      "reason": "Agent domains codebase-analysis, architectural-patterns and capabilities pattern-detection, code-structure-analysis match UI pattern analysis needs",
       "output_file": "theme-patterns-analysis.md"
     },
     {
-      "agent": "ui-patterns-researcher",
+      "agent": "web-research-specialist",
       "focus": "Modern dark mode implementation patterns and accessibility best practices",
       "priority": "medium",
-      "reason": "Discovered agent specializes in UI/UX research for design system patterns",
+      "reason": "Agent domains best-practices, technology-trends and capabilities trend-analysis provide current UI/UX patterns and standards",
       "output_file": "dark-mode-best-practices.md"
     }
   ]
@@ -401,19 +437,24 @@ These examples demonstrate the dynamic approach using discovered agents:
 ### Example 3: Limited Agent Discovery Scenario
 
 **Scenario**: Third-party API integration with limited agent discovery
-**Discovered Agents**: [general-researcher]  
-**Research Type**: Third-party integration (documentation specialist not discovered)
+**Discovered Agents**: [web-research-specialist]  
+**Research Type**: Third-party integration (fallback to available capabilities)
+
+**Capability Matching Process:**
+1. **Ideal Match**: Documentation specialist with `documentation, api-reference` domains - **NOT DISCOVERED**
+2. **Fallback Match**: Web research with `web-research, industry-analysis` domains - **AVAILABLE**
+3. **Adaptation**: Expand web research agent focus to cover documentation needs
 
 ```json
 {
   "research_needed": true,
-  "rationale": "Third-party integration but documentation specialist not discovered - adapting to use available general researcher",
+  "rationale": "Third-party integration with only web-research-specialist discovered - adapting to comprehensive research approach using available agent capabilities web-scraping, source-verification, multi-source-research",
   "recommended_research": [
     {
-      "agent": "general-researcher",
-      "focus": "API official documentation, integration tutorials, authentication patterns, and best practices",
+      "agent": "web-research-specialist",
+      "focus": "API official documentation, integration tutorials, authentication patterns, security best practices, and implementation examples",
       "priority": "high",
-      "reason": "Only discovered research agent - must handle comprehensive research across all areas",
+      "reason": "Only discovered research agent with domains web-research, best-practices and capabilities source-verification, multi-source-research - expanding scope to cover comprehensive API research",
       "output_file": "api-comprehensive-research.md"
     }
   ]

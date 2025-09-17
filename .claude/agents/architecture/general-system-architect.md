@@ -2,6 +2,9 @@
 name: general-system-architect
 type: architect
 description: Use this agent when you need to design system architecture, make high-level technical decisions, evaluate architectural patterns, plan scalable solutions, or review system design for complex applications. Examples: <example>Context: User is building a new microservices platform and needs architectural guidance. user: 'I need to design a scalable e-commerce platform that can handle 10k concurrent users' assistant: 'I'll use the system-architect agent to design a comprehensive architecture for your e-commerce platform' <commentary>Since the user needs architectural design for a complex scalable system, use the system-architect agent to provide comprehensive technical architecture guidance.</commentary></example> <example>Context: User has written a monolithic application and wants to evaluate breaking it into microservices. user: 'Should I break this monolith into microservices? Here's my current architecture...' assistant: 'Let me use the system-architect agent to analyze your current architecture and provide recommendations on microservices decomposition' <commentary>The user needs high-level architectural evaluation and decision-making about system design patterns, which is perfect for the system-architect agent.</commentary></example>
+domains: system-architecture, architectural-patterns, scalability-planning, technical-decision-making, system-design
+capabilities: high-level-architecture-design, pattern-evaluation, scalability-assessment, microservices-decomposition, technical-strategy
+specializations: complex-distributed-systems, enterprise-architecture, system-integration, architectural-evolution
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
 model: sonnet[1m]
 color: blue

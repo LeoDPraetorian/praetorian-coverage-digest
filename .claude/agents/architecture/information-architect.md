@@ -2,6 +2,9 @@
 name: information-architect
 type: architect
 description: Use this agent when you need to organize, restructure, or design project directory layouts, establish file naming conventions, create logical information hierarchies, or evaluate existing project structures for improvements. Examples: <example>Context: User wants to reorganize a messy codebase with files scattered across directories. user: 'My project has become a mess with files everywhere. Can you help me organize it better?' assistant: 'I'll use the project-structure-architect agent to analyze your current structure and propose a better organization.' <commentary>The user needs help with project organization, which is exactly what the project-structure-architect specializes in.</commentary></example> <example>Context: User is starting a new multi-module project and wants to establish good structure from the beginning. user: 'I'm starting a new microservices project with multiple APIs and shared libraries. What's the best way to structure this?' assistant: 'Let me use the project-structure-architect agent to design an optimal directory structure for your microservices architecture.' <commentary>This requires expertise in scalable project structures and industry standards, perfect for the project-structure-architect.</commentary></example>
+domains: information-architecture, project-structure, directory-organization, file-naming-conventions, information-hierarchy
+capabilities: directory-structure-design, file-organization, naming-convention-development, structural-analysis, hierarchy-optimization
+specializations: multi-module-projects, microservices-organization, scalable-project-structures, industry-standards
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
 model: sonnet[1m]
 color: blue

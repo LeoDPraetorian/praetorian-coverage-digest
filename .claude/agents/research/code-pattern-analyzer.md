@@ -2,6 +2,9 @@
 name: code-pattern-analyzer
 type: researcher
 description: Use this agent when you need to analyze code for patterns, architectural consistency, or reusability opportunities. Examples: <example>Context: User has written several similar API handlers and wants to identify common patterns for refactoring. user: 'I've created multiple handlers that seem to follow similar patterns but I'm not sure if they're consistent' assistant: 'Let me use the code-pattern-analyzer agent to examine your handlers and identify common patterns and inconsistencies' <commentary>Since the user wants pattern analysis of their code, use the code-pattern-analyzer agent to discover patterns and suggest improvements.</commentary></example> <example>Context: User is working on a large codebase and wants to establish coding standards based on existing patterns. user: 'Can you help me identify the most common patterns in our React components so we can create coding guidelines?' assistant: 'I'll use the code-pattern-analyzer agent to analyze your React components and extract the dominant patterns for your coding standards' <commentary>The user needs pattern discovery for standardization, so use the code-pattern-analyzer agent to identify and document patterns.</commentary></example>
+domains: codebase-analysis, architectural-patterns, code-quality, refactoring-analysis
+capabilities: pattern-detection, anti-pattern-identification, architectural-consistency-analysis, code-structure-analysis, refactoring-recommendations
+specializations: design-patterns, architectural-consistency, code-smells, SOLID-principles, framework-patterns
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, WebFetch, WebSearch, Write
 model: sonnet
 ---

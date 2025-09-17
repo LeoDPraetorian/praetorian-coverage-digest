@@ -2,6 +2,9 @@
 name: database-neo4j-architect
 type: architect
 description: Use this agent when you need to design, optimize, or troubleshoot Neo4j graph database schemas, particularly for Chariot's tabularium data models within the Chariot platform ecosystem. Examples include: designing node and relationship structures for attack surface data, optimizing Cypher queries for performance, creating graph traversal patterns for security analysis, migrating relational schemas to graph models, implementing graph-based security workflows, or integrating Neo4j with Chariot's existing data architecture.
+domains: graph-databases, neo4j, data-modeling, schema-design, database-optimization
+capabilities: graph-schema-design, cypher-query-optimization, relationship-modeling, graph-traversal-patterns, data-migration
+specializations: chariot-tabularium-models, attack-surface-data, security-analysis-workflows, graph-based-security
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write, Edit
 model: sonnet[1m]
 color: cyan

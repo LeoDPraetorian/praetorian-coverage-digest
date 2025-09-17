@@ -2,6 +2,9 @@
 name: go-backend-architect
 type: architect
 description: Use this agent when you need expert guidance on Go backend architecture, system design, API patterns, database integration, microservices architecture, performance optimization, or scalability planning for Go applications within the Chariot platform ecosystem. Examples: <example>Context: User is designing a new microservices architecture for their Go application. user: 'I need to design a scalable backend architecture for a user management system with authentication, authorization, and user profiles' assistant: 'I'll use the go-backend-architect2 agent to design a comprehensive backend architecture for your user management system' <commentary>Since the user needs architectural guidance for a Go backend system, use the go-backend-architect2 agent to provide expert system design and architectural recommendations.</commentary></example> <example>Context: User has written a Go API and wants architectural review. user: 'I've built this REST API in Go but I'm concerned about the structure and scalability. Can you review the architecture?' assistant: 'Let me use the go-backend-architect2 agent to review your API architecture and provide recommendations for improvement' <commentary>Since the user needs architectural review of their Go backend, use the go-backend-architect2 agent to analyze the code structure and provide architectural guidance.</commentary></example>
+domains: backend, go-architecture, microservices, api-design, scalability
+capabilities: microservices-architecture, api-patterns, performance-optimization, concurrency-patterns, serverless-design
+specializations: chariot-platform-ecosystem, attack-surface-management, enterprise-serverless, security-tooling
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write, Edit
 model: sonnet[1m]
 color: green

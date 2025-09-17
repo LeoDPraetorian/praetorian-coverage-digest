@@ -39,23 +39,38 @@ cat DESIGN-PATTERNS.md
 Before making recommendations, discover all available architecture agents:
 
 ```bash
-# Auto-discover all available architecture agents
+# Auto-discover architecture agents with comprehensive metadata parsing
 ARCH_AGENTS_DIR=".claude/agents/architecture"
 if [ -d "${ARCH_AGENTS_DIR}" ]; then
     echo "=== Available Architecture Agents ==="
+    echo "Architecture Agents with Full Metadata:"
     find "${ARCH_AGENTS_DIR}" -name "*.md" -type f | while read agent_file; do
         agent_name=$(basename "$agent_file" .md)
-        agent_desc=$(head -10 "$agent_file" | grep "^description:" | cut -d':' -f2- | xargs)
-        echo "- ${agent_name}: ${agent_desc}"
+        agent_type=$(grep "^type:" "$agent_file" | cut -d':' -f2- | xargs)
+        agent_desc=$(grep "^description:" "$agent_file" | cut -d':' -f2- | xargs | cut -c1-100)
+        domains=$(grep "^domains:" "$agent_file" | cut -d':' -f2- | xargs)
+        capabilities=$(grep "^capabilities:" "$agent_file" | cut -d':' -f2- | xargs)
+        specializations=$(grep "^specializations:" "$agent_file" | cut -d':' -f2- | xargs)
+        
+        echo "- ${agent_name}:"
+        echo "  * Type: ${agent_type}"
+        echo "  * Domains: ${domains}"
+        echo "  * Capabilities: ${capabilities}"
+        echo "  * Specializations: ${specializations}"
+        echo "  * Description: ${agent_desc}..."
+        echo ""
     done
-    echo "=================================="
 else
     echo "Architecture agents directory not found: ${ARCH_AGENTS_DIR}"
 fi
 
-# List discovered agents for selection
+# Get all available architecture agents for selection with metadata
+echo "====================================="
+echo "Agent Discovery Complete. Available agents for capability-based selection:"
+
 AVAILABLE_AGENTS=$(find "${ARCH_AGENTS_DIR}" -name "*.md" -type f -exec basename {} .md \; | sort)
-echo "Available architecture agents: ${AVAILABLE_AGENTS}"
+echo "${AVAILABLE_AGENTS}"
+echo "====================================="
 ```
 
 ### Step 2: Analyze Feature Complexity
@@ -73,19 +88,41 @@ Read the architect context file and analyze:
 
 Map each affected domain from the complexity assessment to available architecture agents:
 
-**Domain-to-Agent Mapping Guidelines:**
-- **frontend** → react-typescript-architect, information-architect
-- **backend** → go-backend-architect, general-system-architect  
-- **database** → database-neo4j-architect
-- **security** → security-architect
-- **infrastructure/cloud** → cloud-aws-architect
-- **system/general** → general-system-architect
+**Capability-Based Agent Mapping Guidelines:**
 
-**Agent Selection Strategy:**
-1. Cross-reference affected domains with discovered agents from `.claude/agents/architecture/`
-2. Prioritize agents that directly match the affected domains
-3. Include general-system-architect for complex multi-domain features
-4. Only recommend agents that actually exist in the agents directory
+Using comprehensive metadata from Step 1.5, match architectural needs to agent capabilities:
+
+**By Domain Matching:**
+- **frontend** → Match domains: `frontend, react-architecture, typescript, component-design, ui-systems`
+- **backend** → Match domains: `backend, go-architecture, microservices, api-design, scalability`
+- **database** → Match domains: `graph-databases, neo4j, data-modeling, schema-design, database-optimization`
+- **security** → Match domains: `security-architecture, threat-modeling, cybersecurity-platforms, risk-assessment`
+- **infrastructure/cloud** → Match domains: `cloud-infrastructure, aws-services, serverless-architecture`
+- **project-structure** → Match domains: `information-architecture, project-structure, directory-organization`
+- **system-design** → Match domains: `system-architecture, architectural-patterns, scalability-planning`
+
+**By Capability Matching:**
+- **Component Architecture** → Match capabilities: `component-architecture, state-management, performance-optimization`
+- **API Design** → Match capabilities: `microservices-architecture, api-patterns, concurrency-patterns`
+- **Data Architecture** → Match capabilities: `graph-schema-design, cypher-query-optimization, relationship-modeling`
+- **Security Architecture** → Match capabilities: `secure-architecture-design, defense-in-depth, zero-trust-architecture`
+- **Infrastructure Design** → Match capabilities: `infrastructure-design, service-selection, serverless-patterns`
+- **System Architecture** → Match capabilities: `high-level-architecture-design, pattern-evaluation, scalability-assessment`
+
+**By Specialization Matching:**
+- **Chariot Platform** → Match specializations: `chariot-platform-ecosystem, chariot-platform-patterns, attack-surface-management`
+- **Enterprise Architecture** → Match specializations: `enterprise-architecture, enterprise-security-operations, complex-distributed-systems`
+- **Specialized Domains** → Match specializations: `real-time-data-visualization, security-analysis-workflows, aws-solutions-architecture`
+
+**Advanced Selection Strategy:**
+
+1. **Primary Match**: Match architectural need to agent **domains** first
+2. **Capability Filter**: Refine selection using required **capabilities**
+3. **Specialization Refinement**: Select based on specific **specializations**
+4. **Fallback Logic**: Use **type** and **description** when metadata matching is insufficient
+5. **Multi-Agent Strategy**: Select multiple agents for comprehensive architecture coverage when needed
+6. **Only recommend agents that exist** in the discovered agents list
+7. **Create fallback strategies** when preferred agent types aren't available
 5. Consider existing patterns before recommending new architecture
 
 ### Step 3: Create Coordination Plan
@@ -176,26 +213,31 @@ These examples demonstrate the dynamic approach using discovered agents:
 **Discovered Agents**: [react-typescript-architect, go-backend-architect, cloud-aws-architect, security-architect]
 **Affected Domains**: [frontend, backend, infrastructure, security]
 
+**Capability Matching Process:**
+1. **Domain Match**: Frontend → `frontend, react-architecture, typescript` | Backend → `backend, go-architecture, microservices` | Infrastructure → `cloud-infrastructure, aws-services`
+2. **Capability Match**: State management → `state-management` | API patterns → `api-patterns` | Infrastructure → `infrastructure-design`
+3. **Specialization Match**: Real-time → `real-time-data-visualization` | Platform → `chariot-platform-ecosystem`
+
 ```json
 {
   "recommendation": "spawn_architects",
-  "rationale": "Multi-domain feature with discovered agents matching all affected domains (frontend, backend, infrastructure)",
+  "rationale": "Multi-domain feature requiring react-typescript-architect (domains frontend, react-architecture match UI needs), go-backend-architect (domains backend, microservices match WebSocket server needs), and cloud-aws-architect (domains cloud-infrastructure, serverless-architecture match scaling needs)",
   "suggested_agents": [
     {
       "agent": "react-typescript-architect",
-      "reason": "Frontend domain affected - discovered agent matches requirement for reactive UI",
+      "reason": "Agent domains frontend, react-architecture, typescript and capabilities component-architecture, state-management match real-time UI requirements",
       "context": "Design real-time state management with WebSocket integration",
       "priority": "high"
     },
     {
       "agent": "go-backend-architect", 
-      "reason": "Backend domain affected - discovered agent needed for WebSocket server architecture",
+      "reason": "Agent domains backend, go-architecture, microservices and capabilities microservices-architecture, api-patterns match WebSocket server architecture needs",
       "context": "Design scalable WebSocket infrastructure with message queuing",
       "priority": "high"
     },
     {
       "agent": "cloud-aws-architect",
-      "reason": "Infrastructure domain affected - discovered agent required for scaling persistent connections",
+      "reason": "Agent domains cloud-infrastructure, aws-services and capabilities infrastructure-design, scalability-planning match persistent connection scaling requirements",
       "context": "Design auto-scaling and load balancing for WebSocket connections",
       "priority": "medium"
     }
@@ -209,14 +251,19 @@ These examples demonstrate the dynamic approach using discovered agents:
 **Discovered Agents**: [react-typescript-architect, information-architect]
 **Affected Domains**: [frontend]
 
+**Capability Matching Process:**
+1. **Domain Match**: Frontend → `frontend, react-architecture, typescript, component-design`
+2. **Capability Match**: Component design → `component-architecture, scalable-frontend-design`
+3. **Specialization Match**: UI systems → `chariot-platform-patterns, enterprise-security-ui`
+
 ```json
 {
   "recommendation": "single_architect",
-  "rationale": "Single frontend domain with react-typescript-architect discovered and matching requirement",
+  "rationale": "Single frontend domain with react-typescript-architect discovered matching needs (domains frontend, react-architecture, component-design and capabilities component-architecture, scalable-frontend-design)",
   "suggested_agents": [
     {
       "agent": "react-typescript-architect",
-      "reason": "Frontend domain only - discovered agent specializes in React component architecture",
+      "reason": "Agent domains frontend, react-architecture, component-design and capabilities component-architecture, scalable-frontend-design match component library enhancement requirements",
       "context": "Design component library structure, TypeScript patterns, and reusable patterns",
       "priority": "high"
     }
@@ -227,16 +274,21 @@ These examples demonstrate the dynamic approach using discovered agents:
 
 #### Example 3: No Architecture Required
 **Scenario**: Simple CRUD endpoint addition
-**Discovered Agents**: [Any available]
+**Discovered Agents**: [go-backend-architect, general-system-architect]
 **Affected Domains**: [backend] - but following existing patterns
+
+**Capability Matching Process:**
+1. **Domain Match**: Backend → `backend, go-architecture, api-design` - **AGENTS AVAILABLE**
+2. **Complexity Assessment**: Simple CRUD → **NO NEW ARCHITECTURAL PATTERNS NEEDED**
+3. **Pattern Analysis**: Existing patterns → **SUFFICIENT EXISTING IMPLEMENTATION GUIDANCE**
 
 ```json
 {
   "recommendation": "skip_architecture", 
-  "rationale": "Simple backend change following established REST patterns - no architectural planning needed",
+  "rationale": "Simple backend change following established REST patterns - while go-backend-architect available (domains backend, go-architecture, api-design), no new architectural planning needed due to existing pattern sufficiency",
   "suggested_agents": [],
   "execution_strategy": "none",
-  "guidance": "Follow existing patterns in current backend handlers and data models"
+  "guidance": "Follow existing patterns in current backend handlers and data models - refer to DESIGN-PATTERNS.md repository pattern"
 }
 ```
 
