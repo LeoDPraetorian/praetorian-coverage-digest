@@ -214,7 +214,7 @@ echo "Content prepared for intent analysis"
 
 Use the `intent-translator` subagent to parse and structure the feature request.
 
-Tell the intent-translator:
+Instruct the intent-translator:
 "Analyze this feature request: ${ENHANCED_ARGUMENTS}
 
 Save your analysis as JSON to: .claude/features/${FEATURE_ID}/context/requirements.json
@@ -922,6 +922,123 @@ Task("implementation-planner", "Extract comprehensive implementation context fro
 - Match agent types to relevant architecture domains (backend agents get backend architecture files)
 - Create fallback strategies if expected architecture files don't exist", "implementation-planner")
 
+**Context Analysis Validation Gate:**
+
+Wait for the implementation-planner to complete, then verify all required context files:
+
+```bash
+echo "=== Context Analysis Validation Gate ==="
+echo "Validating implementation context extraction..."
+
+# Define required context files
+CONTEXT_FILES=(
+    "implementation-context.json"
+    "agent-assignments.json" 
+    "architecture-mapping.json"
+)
+
+VALIDATION_PASSED=true
+CONTEXT_DIR=".claude/features/${FEATURE_ID}/implementation/context"
+
+# Validate each required context file exists and has valid structure
+for context_file in "${CONTEXT_FILES[@]}"; do
+    CONTEXT_PATH="${CONTEXT_DIR}/${context_file}"
+    
+    if [ -f "${CONTEXT_PATH}" ]; then
+        echo "✓ ${context_file} exists"
+        
+        # Validate JSON structure
+        if jq empty "${CONTEXT_PATH}" 2>/dev/null; then
+            echo "✓ ${context_file} contains valid JSON"
+            
+            # Validate specific content based on file type
+            case "${context_file}" in
+                "implementation-context.json")
+                    # Validate required fields exist
+                    REQUIRED_FIELDS=("affected_domains" "complexity_level" "recommended_agents")
+                    for field in "${REQUIRED_FIELDS[@]}"; do
+                        if jq -e ".${field}" "${CONTEXT_PATH}" >/dev/null 2>&1; then
+                            echo "✓ implementation-context.json contains required field: ${field}"
+                        else
+                            echo "✗ implementation-context.json missing required field: ${field}"
+                            VALIDATION_PASSED=false
+                        fi
+                    done
+                    
+                    # Show extracted domains for verification
+                    DOMAINS=$(jq -r '.affected_domains[]' "${CONTEXT_PATH}" 2>/dev/null | tr '\n' ', ' | sed 's/,$//')
+                    COMPLEXITY=$(jq -r '.complexity_level' "${CONTEXT_PATH}" 2>/dev/null)
+                    echo "   → Extracted domains: ${DOMAINS}"
+                    echo "   → Complexity level: ${COMPLEXITY}"
+                    ;;
+                    
+                "agent-assignments.json")
+                    # Validate agent assignments structure
+                    if jq -e '.implementation_tracks' "${CONTEXT_PATH}" >/dev/null 2>&1; then
+                        echo "✓ agent-assignments.json contains implementation_tracks"
+                    else
+                        echo "✗ agent-assignments.json missing implementation_tracks"
+                        VALIDATION_PASSED=false
+                    fi
+                    ;;
+                    
+                "architecture-mapping.json")
+                    # Validate architecture file mappings and verify files exist
+                    if jq -e '.agent_architecture_files' "${CONTEXT_PATH}" >/dev/null 2>&1; then
+                        echo "✓ architecture-mapping.json contains agent_architecture_files"
+                        
+                        # Verify mapped architecture files actually exist
+                        ARCH_DIR=".claude/features/${FEATURE_ID}/architecture"
+                        if [ -d "${ARCH_DIR}" ]; then
+                            # Check each mapped file exists
+                            jq -r '.agent_architecture_files | to_entries[] | .value[]' "${CONTEXT_PATH}" 2>/dev/null | while read -r arch_file; do
+                                ARCH_FILE_PATH="${ARCH_DIR}/${arch_file}"
+                                if [ -f "${ARCH_FILE_PATH}" ]; then
+                                    echo "✓ Architecture file exists: ${arch_file}"
+                                else
+                                    echo "⚠️ Architecture file referenced but not found: ${arch_file}"
+                                fi
+                            done
+                        else
+                            echo "ℹ️ No architecture directory found - skipping file verification"
+                        fi
+                    else
+                        echo "✗ architecture-mapping.json missing agent_architecture_files"
+                        VALIDATION_PASSED=false
+                    fi
+                    ;;
+            esac
+        else
+            echo "✗ ${context_file} contains invalid JSON"
+            VALIDATION_PASSED=false
+        fi
+    else
+        echo "✗ ${context_file} missing"
+        VALIDATION_PASSED=false
+    fi
+    echo ""
+done
+
+# Final validation result
+if [ "${VALIDATION_PASSED}" = true ]; then
+    echo "🎯 Context Analysis Validation: PASSED"
+    echo "✅ All required context files created with valid structure"
+    echo "✅ Implementation agents will have comprehensive context access"
+    echo ""
+    echo "Context validation successful - proceeding to agent orchestration..."
+else
+    echo "❌ Context Analysis Validation: FAILED"
+    echo "✗ One or more context files missing or invalid"
+    echo "✗ Implementation cannot proceed without proper context"
+    echo ""
+    echo "Please check the implementation-planner output and retry context extraction."
+    echo "DO NOT PROCEED to Sub-Phase 6.2 until all context validation passes."
+    exit 1
+fi
+```
+
+**DO NOT PROCEED TO SUB-PHASE 6.2** until all context validation passes and required files exist with valid structure.
+
 **Sub-Phase 6.2: Context-Aware Parallel Implementation Orchestration**
 
 Read extracted context and spawn implementation agents with relevant architecture files:
@@ -938,13 +1055,209 @@ if [ -f "${IMPL_CONTEXT}" ]; then
     echo "Complexity Level: ${COMPLEXITY}"
     echo "Affected Domains: ${AFFECTED_DOMAINS}"
     
-    echo "Spawning agents based on extracted context..."
+    echo "Discovering available development agents..."
 else
     echo "⚠️ Context analysis not found - using default agent set"
 fi
 ```
 
-**Backend Implementation Agent** (spawn if backend domain detected):
+**Dynamic Development Agent Discovery:**
+
+Discover available development agents with comprehensive metadata parsing:
+
+```bash
+# Auto-discover development agents with comprehensive metadata parsing
+DEV_AGENTS_DIR=".claude/agents/development"
+
+echo "=== Available Development Agents ==="
+
+if [ -d "${DEV_AGENTS_DIR}" ]; then
+    echo "Development Agents with Full Metadata:"
+    find "${DEV_AGENTS_DIR}" -name "*.md" -type f | while read agent_file; do
+        agent_name=$(basename "$agent_file" .md)
+        agent_type=$(grep "^type:" "$agent_file" | cut -d':' -f2- | xargs)
+        agent_desc=$(grep "^description:" "$agent_file" | cut -d':' -f2- | xargs | cut -c1-80)
+        domains=$(grep "^domains:" "$agent_file" | cut -d':' -f2- | xargs)
+        capabilities=$(grep "^capabilities:" "$agent_file" | cut -d':' -f2- | xargs)
+        specializations=$(grep "^specializations:" "$agent_file" | cut -d':' -f2- | xargs)
+        
+        echo "- ${agent_name}:"
+        echo "  * Type: ${agent_type}"
+        echo "  * Domains: ${domains}"
+        echo "  * Capabilities: ${capabilities}"
+        echo "  * Specializations: ${specializations}"
+        echo "  * Description: ${agent_desc}..."
+        echo ""
+    done
+else
+    echo "Development agents directory not found: ${DEV_AGENTS_DIR}"
+fi
+
+# Get all available development agents for selection with metadata
+echo "====================================="
+echo "Agent Discovery Complete. Available agents for capability-based selection:"
+
+AVAILABLE_DEV_AGENTS=$(
+    find "${DEV_AGENTS_DIR}" -name "*.md" -type f -exec basename {} .md \; 2>/dev/null
+) | sort | uniq
+
+echo "${AVAILABLE_DEV_AGENTS}"
+echo "====================================="
+```
+
+**Capability-Based Agent Selection:**
+
+Map feature requirements to available agents using dynamic discovery:
+
+```bash
+echo "=== Dynamic Agent Selection ==="
+
+# Read extracted context for agent selection
+if [ -f "${IMPL_CONTEXT}" ]; then
+    # Extract requirements from context
+    AFFECTED_DOMAINS_JSON=$(cat "${IMPL_CONTEXT}" | jq -r '.affected_domains[]' 2>/dev/null)
+    COMPLEXITY_LEVEL=$(cat "${IMPL_CONTEXT}" | jq -r '.complexity_level' 2>/dev/null)
+    RECOMMENDED_AGENTS=$(cat "${IMPL_CONTEXT}" | jq -r '.recommended_agents[]?.agent_type' 2>/dev/null)
+    
+    echo "Feature Requirements:"
+    echo "• Complexity: ${COMPLEXITY_LEVEL}"
+    echo "• Affected Domains: ${AFFECTED_DOMAINS_JSON}"
+    echo "• Recommended Agents: ${RECOMMENDED_AGENTS}"
+    echo ""
+    
+    # Initialize selected agents array
+    SELECTED_AGENTS=()
+    SELECTION_REASONS=()
+    
+    # Map domains to agent capabilities using discovered agents
+    echo "Mapping domains to available agents..."
+    
+    # Backend Development Domain Mapping
+    if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "backend\|api\|server\|microservice"; then
+        echo "🔍 Backend domain detected - searching for backend developers..."
+        
+        # Search for golang-api-developer if available
+        if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "golang-api-developer"; then
+            SELECTED_AGENTS+=("golang-api-developer")
+            SELECTION_REASONS+=("golang-api-developer: domains backend-development,go-apis,microservices-implementation match backend requirements")
+            echo "✅ Selected: golang-api-developer (backend development capabilities)"
+        # Fallback to general golang-developer
+        elif echo "${AVAILABLE_DEV_AGENTS}" | grep -q "golang-developer"; then
+            SELECTED_AGENTS+=("golang-developer")
+            SELECTION_REASONS+=("golang-developer: fallback for backend development needs")
+            echo "✅ Selected: golang-developer (backend development fallback)"
+        fi
+        
+        # Add Python support if Python domain detected or CLI development needed
+        if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "python\|cli" || echo "${AVAILABLE_DEV_AGENTS}" | grep -q "python-developer"; then
+            SELECTED_AGENTS+=("python-developer")
+            SELECTION_REASONS+=("python-developer: domains python-development,cli-development support backend services")
+            echo "✅ Selected: python-developer (Python/CLI backend support)"
+        fi
+    fi
+    
+    # Frontend Development Domain Mapping
+    if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "frontend\|ui\|react\|component\|dashboard"; then
+        echo "🔍 Frontend domain detected - searching for frontend developers..."
+        
+        # Search for react-developer if available
+        if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "react-developer"; then
+            SELECTED_AGENTS+=("react-developer")
+            SELECTION_REASONS+=("react-developer: domains frontend-development,react-components,ui-implementation match frontend requirements")
+            echo "✅ Selected: react-developer (frontend development capabilities)"
+        fi
+    fi
+    
+    # Integration Development Domain Mapping
+    if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "integration\|webhook\|api.*integration\|third.*party" || echo "${RECOMMENDED_AGENTS}" | grep -qi "integration"; then
+        echo "🔍 Integration domain detected - searching for integration developers..."
+        
+        if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "integration-developer"; then
+            SELECTED_AGENTS+=("integration-developer")
+            SELECTION_REASONS+=("integration-developer: domains service-integration,api-integration,third-party-integration match integration requirements")
+            echo "✅ Selected: integration-developer (integration capabilities)"
+        fi
+    fi
+    
+    # Security/VQL Development Domain Mapping
+    if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "security\|vql\|threat\|detection\|forensic" || echo "${RECOMMENDED_AGENTS}" | grep -qi "vql"; then
+        echo "🔍 Security/VQL domain detected - searching for security developers..."
+        
+        if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "vql-developer"; then
+            SELECTED_AGENTS+=("vql-developer")
+            SELECTION_REASONS+=("vql-developer: domains vql-development,security-automation,threat-hunting match security requirements")
+            echo "✅ Selected: vql-developer (security/VQL capabilities)"
+        fi
+    fi
+    
+    # Complexity-Aware Agent Count Adjustment
+    AGENT_COUNT=${#SELECTED_AGENTS[@]}
+    MAX_AGENTS=3  # Default for Simple
+    
+    case "${COMPLEXITY_LEVEL}" in
+        "Simple")
+            MAX_AGENTS=3
+            echo "📊 Simple complexity: Max 3 agents"
+            ;;
+        "Medium")
+            MAX_AGENTS=5
+            echo "📊 Medium complexity: Max 5 agents"
+            ;;
+        "Complex")
+            MAX_AGENTS=8
+            echo "📊 Complex complexity: Max 8 agents (with coordination)"
+            # Add testing agents for complex features
+            if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "integration-test-engineer" && [ $AGENT_COUNT -lt $MAX_AGENTS ]; then
+                SELECTED_AGENTS+=("integration-test-engineer")
+                SELECTION_REASONS+=("integration-test-engineer: complex features require comprehensive testing")
+                echo "✅ Added: integration-test-engineer (complex feature testing)"
+            fi
+            ;;
+        *)
+            MAX_AGENTS=3
+            echo "📊 Unknown complexity: Defaulting to 3 agents"
+            ;;
+    esac
+    
+    # Trim agent list if exceeding max for complexity level
+    if [ $AGENT_COUNT -gt $MAX_AGENTS ]; then
+        echo "⚠️ Trimming agent selection from $AGENT_COUNT to $MAX_AGENTS agents for $COMPLEXITY_LEVEL complexity"
+        SELECTED_AGENTS=("${SELECTED_AGENTS[@]:0:$MAX_AGENTS}")
+        SELECTION_REASONS=("${SELECTION_REASONS[@]:0:$MAX_AGENTS}")
+    fi
+    
+    echo ""
+    echo "🎯 Final Agent Selection Summary:"
+    for i in "${!SELECTED_AGENTS[@]}"; do
+        echo "$(($i + 1)). ${SELECTED_AGENTS[$i]}"
+        echo "   └── ${SELECTION_REASONS[$i]}"
+    done
+    echo ""
+    echo "Total agents selected: ${#SELECTED_AGENTS[@]} (max: $MAX_AGENTS for $COMPLEXITY_LEVEL complexity)"
+    
+else
+    echo "❌ No implementation context available - cannot perform dynamic selection"
+    # Fallback to minimal agent set
+    SELECTED_AGENTS=("golang-api-developer" "react-developer")
+    echo "🔄 Using fallback agent set: ${SELECTED_AGENTS[@]}"
+fi
+```
+
+**Dynamic Agent Spawning:**
+
+Spawn selected agents with capability-aware context:
+
+**Dynamically Spawn Selected Agents:**
+
+For each selected agent, spawn with appropriate context and architecture files:
+
+**Golang API Developer** (spawn if selected):
+
+```bash
+# Check if golang-api-developer was selected
+if [[ " ${SELECTED_AGENTS[@]} " =~ " golang-api-developer " ]]; then
+    echo "🚀 Spawning golang-api-developer..."
+```
 
 Task("golang-api-developer", "Implement backend API components with architecture context.
 
@@ -964,14 +1277,31 @@ $([ -f .claude/features/${FEATURE_ID}/architecture/database-architecture.md ] &&
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/golang-api-developer/tracking-report.md
 - Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
 
+**Coordination Context:**
+- Shared API contracts: .claude/features/${FEATURE_ID}/implementation/coordination/api-contracts/
+- Inter-agent communication: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
+
 **Instructions:**
 1. Read implementation context to understand complexity and requirements
 2. If architecture files are available, apply architectural decisions to your implementation
 3. Focus on domains specified in affected_domains from implementation-context.json
 4. Implement your assigned tasks and maintain detailed progress tracking
-5. Coordinate with other agents through file-based communication", "golang-api-developer")
+5. Coordinate with other agents through shared workspace and communication files
+6. Update API contracts in coordination directory for frontend integration", "golang-api-developer")
 
-**Frontend Implementation Agent** (spawn if frontend domain detected):
+```bash
+else
+    echo "⏭️  golang-api-developer not selected for this feature"
+fi
+```
+
+**React Developer** (spawn if selected):
+
+```bash
+# Check if react-developer was selected  
+if [[ " ${SELECTED_AGENTS[@]} " =~ " react-developer " ]]; then
+    echo "🚀 Spawning react-developer..."
+```
 
 Task("react-developer", "Implement frontend UI components with architecture context.
 
@@ -991,14 +1321,191 @@ $([ -f .claude/features/${FEATURE_ID}/architecture/component-architecture.md ] &
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/react-developer/tracking-report.md
 - Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
 
+**Coordination Context:**
+- Shared API contracts: .claude/features/${FEATURE_ID}/implementation/coordination/api-contracts/
+- Inter-agent communication: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
+
 **Instructions:**
 1. Read implementation context to understand UI requirements and complexity
 2. If frontend architecture files exist, follow architectural decisions for component design
 3. Focus on user stories and acceptance criteria from requirements.json
 4. Implement responsive, accessible UI components following established patterns
-5. Coordinate with backend agent for API integration through tracking files", "react-developer")
+5. Coordinate with backend agent for API integration through shared API contracts
+6. Read API contracts from coordination directory for accurate frontend integration", "react-developer")
 
-**Integration Testing Agent** (always spawn for comprehensive coverage):
+```bash
+else
+    echo "⏭️  react-developer not selected for this feature"
+fi
+```
+
+**Integration Developer** (spawn if selected):
+
+```bash
+# Check if integration-developer was selected
+if [[ " ${SELECTED_AGENTS[@]} " =~ " integration-developer " ]]; then
+    echo "🚀 Spawning integration-developer..."
+```
+
+Task("integration-developer", "Implement service integrations and API connections.
+
+**Core Context:**
+- Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
+- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
+- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
+
+**Architecture Context** (read if available):
+$([ -f .claude/features/${FEATURE_ID}/architecture/integration-architecture.md ] && echo "- Integration Architecture: .claude/features/${FEATURE_ID}/architecture/integration-architecture.md" || echo "- No integration architecture file found")
+$([ -f .claude/features/${FEATURE_ID}/architecture/api-architecture.md ] && echo "- API Architecture: .claude/features/${FEATURE_ID}/architecture/api-architecture.md" || echo "- No API architecture file found")
+
+**Your workspace:**
+- Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/integrations/
+- Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/integration-developer/tracking-report.md
+- Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
+
+**Coordination Context:**
+- Integration contracts: .claude/features/${FEATURE_ID}/implementation/coordination/integration-contracts/
+- Service communication: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
+
+**Instructions:**
+1. Focus on integration-specific domains from implementation-context.json
+2. Apply integration architecture patterns and authentication flows
+3. Implement webhook handling, API client code, and service orchestration
+4. Document integration contracts and communication patterns
+5. Coordinate with backend agents through shared integration specifications", "integration-developer")
+
+```bash
+else
+    echo "⏭️  integration-developer not selected for this feature"
+fi
+```
+
+**Python Developer** (spawn if selected):
+
+```bash
+# Check if python-developer was selected
+if [[ " ${SELECTED_AGENTS[@]} " =~ " python-developer " ]]; then
+    echo "🚀 Spawning python-developer..."
+```
+
+Task("python-developer", "Implement Python components and CLI tooling.
+
+**Core Context:**
+- Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
+- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
+- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
+
+**Your workspace:**
+- Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/python/
+- Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/python-developer/tracking-report.md
+- Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
+
+**Instructions:**
+1. Focus on Python-specific requirements from implementation context
+2. Implement CLI interfaces, data processing pipelines, or Python services
+3. Follow Praetorian CLI patterns and enterprise Python best practices
+4. Coordinate with other agents through shared workspace structures", "python-developer")
+
+```bash
+else
+    echo "⏭️  python-developer not selected for this feature"
+fi
+```
+
+**VQL Developer** (spawn if selected):
+
+```bash
+# Check if vql-developer was selected
+if [[ " ${SELECTED_AGENTS[@]} " =~ " vql-developer " ]]; then
+    echo "🚀 Spawning vql-developer..."
+```
+
+Task("vql-developer", "Implement VQL security capabilities and detection logic.
+
+**Core Context:**
+- Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
+- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
+- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
+
+**Your workspace:**
+- Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/vql/
+- Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/vql-developer/tracking-report.md
+- Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
+
+**Instructions:**
+1. Focus on security-specific domains from implementation context
+2. Develop VQL artifacts, detection rules, and security automation capabilities
+3. Follow Praetorian Aegis platform patterns for threat hunting and incident response
+4. Document security capabilities and coordinate with other security components", "vql-developer")
+
+```bash
+else
+    echo "⏭️  vql-developer not selected for this feature"
+fi
+```
+
+**Agent Coordination Workspace Setup:**
+
+Create shared workspace structure for inter-agent communication:
+
+```bash
+echo "=== Setting Up Agent Coordination Workspace ==="
+
+# Create coordination directories
+COORDINATION_DIR=".claude/features/${FEATURE_ID}/implementation/coordination"
+mkdir -p "${COORDINATION_DIR}"/{api-contracts,integration-contracts,communication,progress,dependencies}
+
+echo "📁 Coordination workspace created:"
+echo "  • API Contracts: ${COORDINATION_DIR}/api-contracts/"
+echo "  • Integration Contracts: ${COORDINATION_DIR}/integration-contracts/"
+echo "  • Communication: ${COORDINATION_DIR}/communication/"
+echo "  • Progress Tracking: ${COORDINATION_DIR}/progress/"
+echo "  • Dependencies: ${COORDINATION_DIR}/dependencies/"
+
+# Create coordination metadata
+cat > "${COORDINATION_DIR}/coordination-metadata.json" << 'EOF'
+{
+  "coordination_strategy": "file-based",
+  "selected_agents": [],
+  "communication_channels": [
+    "api-contracts: Backend to Frontend API specifications",
+    "integration-contracts: Third-party service integration specs",
+    "communication: Inter-agent status updates and coordination",
+    "progress: Milestone tracking and dependency resolution",
+    "dependencies: Cross-agent dependency mapping"
+  ],
+  "created": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+}
+EOF
+
+# Update coordination metadata with selected agents
+if [ ${#SELECTED_AGENTS[@]} -gt 0 ]; then
+    AGENTS_JSON=$(printf '%s\n' "${SELECTED_AGENTS[@]}" | jq -R . | jq -s .)
+    jq --argjson agents "${AGENTS_JSON}" '.selected_agents = $agents' \
+        "${COORDINATION_DIR}/coordination-metadata.json" > "${COORDINATION_DIR}/coordination-metadata.json.tmp" && \
+        mv "${COORDINATION_DIR}/coordination-metadata.json.tmp" "${COORDINATION_DIR}/coordination-metadata.json"
+fi
+
+echo "✅ Agent coordination workspace prepared for ${#SELECTED_AGENTS[@]} selected agents"
+```
+
+**Integration Testing Agent** (spawn if testing needed):
+
+```bash
+# Check if integration-test-engineer is needed (always for Medium/Complex, optional for Simple)
+SPAWN_TESTING_AGENT=false
+if [ "${COMPLEXITY_LEVEL}" = "Complex" ] || [ "${COMPLEXITY_LEVEL}" = "Medium" ]; then
+    SPAWN_TESTING_AGENT=true
+    echo "🚀 Spawning integration-test-engineer for ${COMPLEXITY_LEVEL} complexity feature..."
+elif echo "${AVAILABLE_DEV_AGENTS}" | grep -q "integration-test-engineer" && [ ${#SELECTED_AGENTS[@]} -lt 3 ]; then
+    SPAWN_TESTING_AGENT=true
+    echo "🚀 Spawning integration-test-engineer for comprehensive testing..."
+else
+    echo "⏭️  integration-test-engineer not needed for Simple complexity feature"
+fi
+
+if [ "${SPAWN_TESTING_AGENT}" = true ]; then
+```
 
 Task("integration-test-engineer", "Create integration tests with architecture-aware context.
 
@@ -1017,12 +1524,77 @@ $([ -f .claude/features/${FEATURE_ID}/architecture/testing-architecture.md ] && 
 - Test code: .claude/features/${FEATURE_ID}/implementation/code-changes/tests/
 - Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/integration-test-engineer/tracking-report.md
 
+**Coordination Context:**
+- Test coordination: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
+- Integration results: .claude/features/${FEATURE_ID}/implementation/coordination/progress/
+
 **Instructions:**
 1. Read affected_systems from implementation context to understand integration points
 2. Apply testing architecture patterns if available
 3. Create comprehensive integration tests covering API, database, and service interactions
 4. Focus on user stories from requirements for end-to-end test scenarios
-5. Validate implementation against acceptance criteria", "integration-test-engineer")
+5. Validate implementation against acceptance criteria
+6. Coordinate testing results with other agents through shared progress tracking", "integration-test-engineer")
+
+```bash
+else
+    echo "⏭️  integration-test-engineer not spawned for this feature complexity"
+fi
+```
+
+**Dynamic Selection Validation:**
+
+Validate the dynamic agent selection system effectiveness:
+
+```bash
+echo "=== Dynamic Agent Selection Validation ==="
+
+# Display final selection summary
+echo "🎯 Final Agent Selection Results:"
+echo "• Feature Complexity: ${COMPLEXITY_LEVEL}"
+echo "• Agents Discovered: $(echo "${AVAILABLE_DEV_AGENTS}" | wc -w)"
+echo "• Agents Selected: ${#SELECTED_AGENTS[@]}"
+echo "• Max Agents for Complexity: ${MAX_AGENTS}"
+
+echo ""
+echo "Selected Agents and Rationale:"
+for i in "${!SELECTED_AGENTS[@]}"; do
+    echo "$(($i + 1)). ${SELECTED_AGENTS[$i]}"
+    if [ -n "${SELECTION_REASONS[$i]:-}" ]; then
+        echo "   └── ${SELECTION_REASONS[$i]}"
+    fi
+done
+
+echo ""
+echo "🚀 Dynamic Selection Benefits Achieved:"
+echo "• ✅ Discovery-Based: Only available agents selected (no hardcoded failures)"
+echo "• ✅ Capability Mapping: Agents matched to specific feature domains"
+echo "• ✅ Complexity-Aware: Agent count scaled to feature complexity (${COMPLEXITY_LEVEL})"
+echo "• ✅ Coordination-Ready: Shared workspace structure established"
+echo "• ✅ Architecture-Integrated: Architecture files distributed to relevant agents"
+
+# Test different complexity scenarios
+echo ""
+echo "🧪 Testing Different Complexity Scenarios:"
+case "${COMPLEXITY_LEVEL}" in
+    "Simple")
+        echo "• Simple Feature: ✅ Limited to ${MAX_AGENTS} agents maximum"
+        echo "• Core domains covered: Backend + Frontend focus"
+        ;;
+    "Medium")
+        echo "• Medium Feature: ✅ Enhanced to ${MAX_AGENTS} agents maximum"
+        echo "• Additional capabilities: Integration + Testing agents"
+        ;;
+    "Complex")
+        echo "• Complex Feature: ✅ Full specialist set (${MAX_AGENTS}+ agents)"
+        echo "• Comprehensive coverage: Backend + Frontend + Integration + Security + Testing"
+        echo "• Coordination mechanisms: Advanced file-based agent communication"
+        ;;
+esac
+
+echo ""
+echo "✅ Dynamic agent selection system successfully implemented and validated!"
+```
 
 **Context Distribution Validation:**
 

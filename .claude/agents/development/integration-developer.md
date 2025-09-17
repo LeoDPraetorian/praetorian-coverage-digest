@@ -2,6 +2,9 @@
 name: integration-developer
 type: developer
 description: Use this agent when you need to integrate with third-party services, external APIs, or establish connections between different systems. This includes designing API integrations, troubleshooting connection issues, implementing authentication flows, handling webhooks, managing API rate limits, or architecting service-to-service communication patterns. Examples: <example>Context: User needs to integrate a payment processing service into their application. user: 'I need to add Stripe payment processing to our checkout flow' assistant: 'I'll use the integration-specialist agent to help design and implement the Stripe integration with proper error handling and security considerations.'</example> <example>Context: User is experiencing issues with a third-party API integration. user: 'Our Salesforce API integration is failing intermittently with 429 errors' assistant: 'Let me use the integration-specialist agent to analyze the rate limiting issues and implement proper retry logic and request throttling.'</example> <example>Context: User needs to set up webhook handling for external service notifications. user: 'We need to receive and process webhooks from GitHub for our CI/CD pipeline' assistant: 'I'll use the integration-specialist agent to design a robust webhook handler with proper validation and processing logic.'</example>
+domains: service-integration, api-integration, webhook-development, third-party-integration, microservice-communication
+capabilities: integration-patterns, authentication-flows, rate-limiting, error-handling, webhook-processing, api-client-implementation, service-orchestration, data-transformation, retry-logic
+specializations: security-tool-integration, enterprise-integrations, payment-processing, cloud-service-integration, chariot-platform-integrations
 tools: Bash, Glob, Grep, Read, Edit, MultiEdit, Write, TodoWrite, BashOutput, KillBash
 model: sonnet[1m]
 color: green

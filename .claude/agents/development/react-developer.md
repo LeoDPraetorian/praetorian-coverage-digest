@@ -1,6 +1,10 @@
 ---
 name: react-developer
+type: developer
 description: Use this agent when you need to develop, modify, or enhance React frontend applications. This includes creating new components, implementing UI features, fixing frontend bugs, optimizing performance, integrating with APIs, or updating existing React codebases. Examples: <example>Context: User needs to implement a new dashboard component for displaying security metrics. user: "I need to create a dashboard component that shows real-time security scan results with charts and filtering" assistant: "I'll use the Task tool to launch the frontend-developer agent to create this dashboard component with React, TypeScript, and the appropriate charting libraries."</example> <example>Context: User wants to fix a bug in the asset management UI where the search functionality isn't working properly. user: "The search in the assets page isn't filtering results correctly" assistant: "I'll use the frontend-developer agent to debug and fix the search functionality in the assets page component."</example>
+domains: frontend-development, react-components, typescript-development, ui-implementation, component-architecture
+capabilities: component-implementation, state-management-integration, api-integration, responsive-design, performance-optimization, accessibility-implementation, form-handling, data-visualization, real-time-updates
+specializations: chariot-platform-ui, security-dashboard-components, enterprise-react-applications, data-heavy-components, security-visualization, attack-surface-ui
 tools: Bash, Glob, Grep, Read, Edit, MultiEdit, Write, TodoWrite, BashOutput, KillBash, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
 model: sonnet[1m]
 color: green

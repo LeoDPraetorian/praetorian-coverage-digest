@@ -2,6 +2,9 @@
 name: golang-api-developer
 type: developer
 description: Use this agent when developing, modifying, or troubleshooting Go backend APIs, including REST endpoints, GraphQL resolvers, middleware, authentication, database integrations, and API documentation. Examples: <example>Context: User needs to create a new REST endpoint for user management. user: 'I need to add a POST /api/users endpoint that creates a new user with validation' assistant: 'I'll use the golang-api-developer agent to create this REST endpoint with proper validation and error handling' <commentary>Since the user needs Go API development work, use the golang-api-developer agent to handle the endpoint creation.</commentary></example> <example>Context: User is implementing GraphQL mutations for data updates. user: 'Can you help me implement GraphQL mutations for updating product information?' assistant: 'Let me use the golang-api-developer agent to implement these GraphQL mutations with proper schema validation' <commentary>GraphQL API development requires the golang-api-developer agent's expertise in Go backend patterns.</commentary></example>
+domains: backend-development, go-apis, rest-development, graphql-development, microservices-implementation
+capabilities: endpoint-implementation, middleware-development, authentication-integration, database-integration, api-documentation, error-handling, validation-implementation, json-marshalling, concurrent-programming
+specializations: chariot-platform-apis, security-tool-apis, enterprise-go-development, serverless-apis, attack-surface-management-apis
 tools: Bash, Glob, Grep, Read, Edit, MultiEdit, Write, TodoWrite, BashOutput, KillBash
 model: sonnet[1m]
 color: green
