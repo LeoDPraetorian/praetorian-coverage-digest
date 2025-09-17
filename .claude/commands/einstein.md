@@ -467,6 +467,47 @@ else
 fi
 ```
 
+**Phase 3.5: Thinking Budget Optimization for Architecture Phase**
+
+Optimize thinking budget allocation for architecture specialists:
+
+```bash
+source .claude/features/current_feature.env
+COMPLEXITY_FILE=".claude/features/${FEATURE_ID}/context/complexity-assessment.json"
+ARCH_THINKING_ALLOCATION=".claude/features/${FEATURE_ID}/context/architecture-thinking-allocation.json"
+
+echo "=== Architecture Phase Thinking Budget Optimization ==="
+echo "Complexity file: ${COMPLEXITY_FILE}"
+echo "Thinking allocation output: ${ARCH_THINKING_ALLOCATION}"
+```
+
+Task("thinking-budget-allocator", "ultrathink. Optimize thinking budget allocation for architecture phase agents.
+
+Context:
+- Complexity assessment: ${COMPLEXITY_FILE}
+- Agent context: Architecture specialists will be spawned based on coordination plan
+- User preference: balanced (can be overridden with --thinking=speed|quality)
+
+Output allocation plan to: ${ARCH_THINKING_ALLOCATION}
+
+Focus on:
+- Architecture specialist thinking levels based on complexity
+- Cost estimates for user transparency
+- Alternative strategies for different cost/quality preferences
+
+Generate thinking level recommendations for potential architecture agents:
+- react-typescript-architect, go-backend-architect, security-architect, cloud-aws-architect, database-neo4j-architect, general-system-architect, information-architect", "thinking-budget-allocator")
+
+```bash
+# Validate thinking allocation exists
+if [ -f "${ARCH_THINKING_ALLOCATION}" ]; then
+    echo "✓ Architecture thinking allocation completed"
+    cat "${ARCH_THINKING_ALLOCATION}" | jq -r '.cost_estimate'
+else
+    echo "✗ Architecture thinking allocation failed - using defaults"
+fi
+```
+
 **Phase 4: Architecture Planning (If Complex)**
 
 Check if architecture planning is needed:
@@ -1252,13 +1293,55 @@ else
 fi
 ```
 
+**Sub-Phase 6.1.5: Thinking Budget Optimization for Implementation Phase**
+
+Optimize thinking budget allocation for implementation agents:
+
+```bash
+source .claude/features/current_feature.env
+IMPL_CONTEXT=".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json"
+IMPL_THINKING_ALLOCATION=".claude/features/${FEATURE_ID}/implementation/thinking-allocation.json"
+
+echo "=== Implementation Phase Thinking Budget Optimization ==="
+echo "Implementation context: ${IMPL_CONTEXT}"
+echo "Thinking allocation output: ${IMPL_THINKING_ALLOCATION}"
+```
+
+Task("thinking-budget-allocator", "ultrathink. Optimize thinking budget allocation for implementation phase agents.
+
+Context:
+- Complexity assessment: .claude/features/${FEATURE_ID}/context/complexity-assessment.json
+- Implementation context: ${IMPL_CONTEXT}
+- Planned agents: Read recommended_agents from implementation context
+- User preference: balanced (detect from --thinking= flags if provided)
+
+Output allocation plan to: ${IMPL_THINKING_ALLOCATION}
+
+Focus on:
+- Implementation agent thinking levels based on complexity and domains
+- Testing agent thinking levels based on risk assessment
+- Cost optimization for development phase efficiency
+- User transparency with cost estimates and alternative strategies
+
+Analyze planned agents from implementation context and provide thinking level recommendations.", "thinking-budget-allocator")
+
+```bash
+# Validate implementation thinking allocation
+if [ -f "${IMPL_THINKING_ALLOCATION}" ]; then
+    echo "✓ Implementation thinking allocation completed"
+    cat "${IMPL_THINKING_ALLOCATION}" | jq -r '.cost_estimate // "Cost estimate not available"'
+else
+    echo "✗ Implementation thinking allocation failed - using defaults"
+fi
+```
+
 **Dynamic Agent Spawning:**
 
-Spawn selected agents with capability-aware context:
+Spawn selected agents with capability-aware context and optimized thinking levels:
 
 **Dynamically Spawn Selected Agents:**
 
-For each selected agent, spawn with appropriate context and architecture files:
+For each selected agent, spawn with appropriate context, architecture files, and thinking optimization:
 
 **Golang API Developer** (spawn if selected):
 
@@ -1266,9 +1349,12 @@ For each selected agent, spawn with appropriate context and architecture files:
 # Check if golang-api-developer was selected
 if [[ " ${SELECTED_AGENTS[@]} " =~ " golang-api-developer " ]]; then
     echo "🚀 Spawning golang-api-developer..."
+    
+    # Read thinking allocation for this agent
+    IMPL_THINKING=$(cat ${IMPL_THINKING_ALLOCATION} | jq -r '.thinking_allocations.golang_api_developer' 2>/dev/null || echo "think")
 ```
 
-Task("golang-api-developer", "Implement backend API components with architecture context.
+Task("golang-api-developer", "${IMPL_THINKING}. Implement backend API components with architecture context.
 
 **Core Context:**
 
@@ -1314,9 +1400,12 @@ fi
 # Check if react-developer was selected
 if [[ " ${SELECTED_AGENTS[@]} " =~ " react-developer " ]]; then
     echo "🚀 Spawning react-developer..."
+    
+    # Read thinking allocation for this agent
+    IMPL_THINKING=$(cat ${IMPL_THINKING_ALLOCATION} | jq -r '.thinking_allocations.react_developer' 2>/dev/null || echo "think")
 ```
 
-Task("react-developer", "Implement frontend UI components with architecture context.
+Task("react-developer", "${IMPL_THINKING}. Implement frontend UI components with architecture context.
 
 **Core Context:**
 

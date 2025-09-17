@@ -733,8 +733,8 @@ This ensures that:
 **Scenario**: Developer implements authentication feature on their own, wants security review
 
 ```bash
-# Developer commits their changes and runs:
-npx claude-code command security-review
+# Developer commits their changes and runs security-review command:
+# (command execution details handled by Claude Code)
 
 # Result: 
 # ✅ STANDALONE MODE activated automatically
@@ -747,14 +747,11 @@ npx claude-code command security-review
 
 ### Example 2: Einstein Pipeline Security Review  
 
-**Scenario**: Security review as part of comprehensive feature development pipeline
+**Scenario**: Security review with feature context from Einstein pipeline
 
 ```bash
-# After implementation phase:
-npx claude-code command security-review "auth-system_20240115_143022"
-
-# Or automatically as part of Einstein pipeline:
-npx claude-code command einstein "auth-system_20240115_143022"
+# When called with feature ID (typically by Einstein orchestration):
+# security-review command detects feature context automatically
 
 # Result:
 # ✅ EINSTEIN PIPELINE MODE activated automatically  
@@ -774,7 +771,7 @@ npx claude-code command einstein "auth-system_20240115_143022"
 
 ```bash
 # Developer has been working on Einstein feature, commits changes:
-npx claude-code command security-review
+# (security-review command execution handled by Claude Code)
 
 # Result:
 # ✅ Smart detection finds recent Einstein feature
@@ -788,13 +785,13 @@ npx claude-code command security-review
 
 **Before Phase 3:**
 ```bash
-npx claude-code command security-review
+security-review execution
 → Git analysis → Security agents → Vulnerability report
 ```
 
 **After Phase 3:**
 ```bash
-npx claude-code command security-review  
+security-review execution
 → Context detection → Git analysis → Security agents → Vulnerability report
 ```
 
