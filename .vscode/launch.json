@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Dev Server (:3000)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "https://localhost:3000",
+      "webRoot": "${workspaceFolder}/modules/chariot/ui/src",
+      "sourceMaps": true,
+    }
+  ]
+}
