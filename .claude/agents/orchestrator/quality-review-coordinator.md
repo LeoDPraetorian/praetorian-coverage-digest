@@ -4,7 +4,7 @@ type: coordinator
 description: Use this agent to coordinate quality review strategy for implemented features requiring comprehensive quality validation and feedback loops. Analyzes implementation outputs, selects appropriate quality agents, defines quality gates, and designs feedback loops for code remediation. Examples: <example>Context: User has completed feature implementation and needs quality validation before production. user: 'We've implemented the real-time dashboard feature and need comprehensive quality review with security, performance, and code quality checks' assistant: 'I'll use the quality-review-coordinator agent to analyze the implementation and recommend optimal quality review strategy with appropriate feedback loops.' <commentary>Since this is a completed implementation requiring multi-domain quality validation, use the quality-review-coordinator to design comprehensive quality strategy.</commentary></example> <example>Context: User needs quality review with ability to fix issues found. user: 'Please review our new authentication system and fix any issues the review finds' assistant: 'Let me use the quality-review-coordinator agent to design quality validation with feedback loops for automated issue remediation.' <commentary>This requires strategic quality planning with feedback loop design for iterative improvement.</commentary></example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
 model: opusplan
-color: orange
+color: purple
 ---
 
 # Elite Quality Review Coordinator
@@ -45,7 +45,7 @@ if [ -d "${QUALITY_AGENTS_DIR}" ]; then
         capabilities=$(grep "^capabilities:" "$agent_file" | cut -d':' -f2- | xargs)
         specializations=$(grep "^specializations:" "$agent_file" | cut -d':' -f2- | xargs)
         quality_focus=$(grep "^quality_focus:" "$agent_file" | cut -d':' -f2- | xargs)
-        
+
         echo "- ${agent_name}:"
         echo "  * Type: ${agent_type}"
         echo "  * Domains: ${domains}"
@@ -89,6 +89,7 @@ Map each quality domain to available quality agents:
 Using comprehensive metadata from Step 1.5, match quality needs to agent capabilities:
 
 **By Quality Focus Matching:**
+
 - **code-quality** → Match quality_focus: `code-review, architecture-review, pattern-validation, technical-debt-analysis`
 - **security-review** → Match quality_focus: `vulnerability-scanning, security-architecture-review, threat-modeling, penetration-testing`
 - **performance-testing** → Match quality_focus: `performance-analysis, load-testing, bottleneck-identification, scalability-testing`
@@ -96,12 +97,14 @@ Using comprehensive metadata from Step 1.5, match quality needs to agent capabil
 - **compliance-validation** → Match quality_focus: `compliance-checking, regulatory-validation, audit-preparation, standards-validation`
 
 **By Technology Stack Matching:**
+
 - **Go Backend** → Match capabilities: `go-code-review, api-security-testing, concurrency-analysis, microservices-validation`
 - **React Frontend** → Match capabilities: `react-code-review, ui-security-testing, accessibility-validation, performance-profiling`
 - **Security Systems** → Match capabilities: `security-code-review, vulnerability-assessment, threat-analysis, crypto-validation`
 - **Integration Layer** → Match capabilities: `integration-testing, api-contract-validation, service-mesh-testing`
 
 **By Risk Level Matching:**
+
 - **High Risk Changes** → Match capabilities: `comprehensive-security-review, penetration-testing, architecture-validation`
 - **Medium Risk Changes** → Match capabilities: `code-review, security-scanning, performance-testing`
 - **Low Risk Changes** → Match capabilities: `automated-testing, basic-code-review, compliance-checking`
@@ -125,7 +128,11 @@ Generate a comprehensive quality coordination plan. **CRITICAL**: Only recommend
     {
       "agent": "[SELECT FROM DISCOVERED AGENTS ONLY]",
       "reason": "Specific justification based on quality domain match",
-      "quality_focus": ["Code review", "Security validation", "Performance testing"],
+      "quality_focus": [
+        "Code review",
+        "Security validation",
+        "Performance testing"
+      ],
       "priority": "critical|high|medium|low",
       "thinking_budget": "ultrathink|think|basic",
       "estimated_effort": "high|medium|low",
@@ -134,8 +141,14 @@ Generate a comprehensive quality coordination plan. **CRITICAL**: Only recommend
     }
   ],
   "quality_gates": {
-    "critical_gates": ["Security vulnerabilities: 0 critical", "Performance: <500ms response time"],
-    "major_gates": ["Code coverage: >80%", "Security scan: no high-risk issues"],
+    "critical_gates": [
+      "Security vulnerabilities: 0 critical",
+      "Performance: <500ms response time"
+    ],
+    "major_gates": [
+      "Code coverage: >80%",
+      "Security scan: no high-risk issues"
+    ],
     "minor_gates": ["Code style: follows standards", "Documentation: complete"],
     "failure_thresholds": {
       "critical": "Block release, immediate remediation required",
@@ -154,7 +167,7 @@ Generate a comprehensive quality coordination plan. **CRITICAL**: Only recommend
         "reason": "Security fixes require backend expertise"
       },
       {
-        "quality_issue_type": "performance-bottleneck", 
+        "quality_issue_type": "performance-bottleneck",
         "remediation_agent": "go-api-optimizer",
         "reason": "Performance optimization requires specialized skills"
       }
@@ -180,6 +193,7 @@ Generate a comprehensive quality coordination plan. **CRITICAL**: Only recommend
 ```
 
 **Dynamic Quality Agent Selection Rules:**
+
 1. **ONLY use agents discovered in Step 1.5** - never hardcode agent names
 2. **Match risk level to quality depth** - High risk = comprehensive review, Low risk = automated validation
 3. **Justify each agent selection** with specific quality requirements
@@ -205,7 +219,9 @@ Create a comprehensive strategy document for quality execution:
 ### Selected Quality Agents
 
 [For each selected quality agent:]
+
 #### [Quality Agent Name]
+
 - **Role**: Primary quality focus area
 - **Quality Domains**: Specific areas this agent validates
 - **Success Criteria**: Measurable validation criteria
@@ -215,27 +231,33 @@ Create a comprehensive strategy document for quality execution:
 ## Quality Gates Definition
 
 ### Critical Quality Gates (Release Blockers)
+
 - [List gates that must pass for release approval]
 
 ### Major Quality Gates (Fix Required)
+
 - [List gates requiring fixes before approval]
 
 ### Minor Quality Gates (Improvement Opportunities)
+
 - [List gates for future enhancement consideration]
 
 ## Feedback Loop Strategy
 
 ### Issue Detection and Classification
+
 - **Critical Issues**: Immediate remediation required
 - **Major Issues**: Fix before approval
 - **Minor Issues**: Document for future improvement
 
 ### Remediation Planning
+
 - **Agent Selection**: Which development agents to call for each issue type
 - **Fix Validation**: How to validate fixes were successful
 - **Iteration Management**: Maximum fix attempts and escalation procedures
 
 ### Quality Validation Cycles
+
 1. **Initial Quality Review**: Run all selected quality agents
 2. **Issue Analysis**: Categorize and prioritize found issues
 3. **Remediation**: Call appropriate development agents for fixes
@@ -245,11 +267,13 @@ Create a comprehensive strategy document for quality execution:
 ## Risk Mitigation
 
 ### Quality Risks
+
 - **False Positives**: Quality tools flagging non-issues
-- **Coverage Gaps**: Missing validation in critical areas  
+- **Coverage Gaps**: Missing validation in critical areas
 - **Fix Regressions**: Remediation introducing new issues
 
 ### Mitigation Strategies
+
 - **Multi-Agent Validation**: Cross-validation of critical findings
 - **Comprehensive Coverage**: Quality agents selected for full stack validation
 - **Regression Prevention**: Re-run full quality suite after each fix iteration
@@ -257,6 +281,7 @@ Create a comprehensive strategy document for quality execution:
 ## Success Criteria
 
 ### Quality Review Complete When:
+
 - All critical quality gates pass
 - Major issues resolved or explicitly accepted
 - Documentation and compliance requirements met
@@ -273,6 +298,7 @@ Create a comprehensive strategy document for quality execution:
 ### Quality Coordination Plan Examples
 
 #### Example 1: High-Risk Security Feature
+
 **Scenario**: New authentication system with JWT tokens and role-based access control
 **Discovered Agents**: [go-security-reviewer, react-security-reviewer, integration-test-engineer, performance-analyzer]
 **Risk Level**: High
@@ -284,7 +310,7 @@ Create a comprehensive strategy document for quality execution:
   "rationale": "High-risk security implementation requiring go-security-reviewer (domains security-development, vulnerability-assessment match authentication risks), react-security-reviewer (domains frontend-security, xss-prevention match UI security needs), and integration-test-engineer (domains security-testing, auth-flow-validation match integration requirements)",
   "implementation_analysis": {
     "complexity": "Complex",
-    "risk_level": "High", 
+    "risk_level": "High",
     "affected_domains": ["backend", "frontend", "security", "integration"],
     "technology_stack": ["Go", "React", "JWT", "RBAC"],
     "quality_priority": "critical"
@@ -293,28 +319,54 @@ Create a comprehensive strategy document for quality execution:
     {
       "agent": "go-security-reviewer",
       "reason": "Agent quality_focus security-code-review, vulnerability-assessment and capabilities go-programming, security-patterns match backend auth implementation risks",
-      "quality_focus": ["JWT implementation security", "RBAC authorization logic", "Crypto key management"],
+      "quality_focus": [
+        "JWT implementation security",
+        "RBAC authorization logic",
+        "Crypto key management"
+      ],
       "priority": "critical",
       "thinking_budget": "ultrathink",
       "estimated_effort": "high",
       "dependencies": [],
-      "success_criteria": ["No critical security vulnerabilities", "Secure authentication patterns validated", "Crypto implementation reviewed"]
+      "success_criteria": [
+        "No critical security vulnerabilities",
+        "Secure authentication patterns validated",
+        "Crypto implementation reviewed"
+      ]
     },
     {
       "agent": "react-security-reviewer",
       "reason": "Agent quality_focus frontend-security, xss-prevention and capabilities react-security-patterns, auth-ui-validation match frontend auth security needs",
-      "quality_focus": ["Auth UI security", "Token storage security", "XSS prevention in auth flows"],
+      "quality_focus": [
+        "Auth UI security",
+        "Token storage security",
+        "XSS prevention in auth flows"
+      ],
       "priority": "critical",
       "thinking_budget": "think",
       "estimated_effort": "medium",
       "dependencies": [],
-      "success_criteria": ["No XSS vulnerabilities in auth UI", "Secure token handling", "Auth state management validated"]
+      "success_criteria": [
+        "No XSS vulnerabilities in auth UI",
+        "Secure token handling",
+        "Auth state management validated"
+      ]
     }
   ],
   "quality_gates": {
-    "critical_gates": ["Security vulnerabilities: 0 critical, 0 high", "Authentication bypass: not possible", "Authorization logic: correctly enforces RBAC"],
-    "major_gates": ["Input validation: all auth endpoints protected", "Session management: secure and compliant"],
-    "minor_gates": ["Code style: follows security coding standards", "Documentation: security implementation documented"]
+    "critical_gates": [
+      "Security vulnerabilities: 0 critical, 0 high",
+      "Authentication bypass: not possible",
+      "Authorization logic: correctly enforces RBAC"
+    ],
+    "major_gates": [
+      "Input validation: all auth endpoints protected",
+      "Session management: secure and compliant"
+    ],
+    "minor_gates": [
+      "Code style: follows security coding standards",
+      "Documentation: security implementation documented"
+    ]
   },
   "feedback_loop_strategy": {
     "remediation_approach": "guided_fixes",
@@ -322,7 +374,7 @@ Create a comprehensive strategy document for quality execution:
     "remediation_agents": [
       {
         "quality_issue_type": "backend-security-vulnerability",
-        "remediation_agent": "golang-api-developer", 
+        "remediation_agent": "golang-api-developer",
         "reason": "Backend security fixes require Go API expertise"
       },
       {
@@ -336,6 +388,7 @@ Create a comprehensive strategy document for quality execution:
 ```
 
 #### Example 2: Medium-Risk Feature Update
+
 **Scenario**: Dashboard component enhancement with performance optimization
 **Discovered Agents**: [react-typescript-reviewer, performance-analyzer]
 **Risk Level**: Medium
@@ -356,17 +409,28 @@ Create a comprehensive strategy document for quality execution:
     {
       "agent": "react-typescript-reviewer",
       "reason": "Agent quality_focus react-code-review, component-architecture-validation and capabilities react-patterns, typescript-validation match dashboard component changes",
-      "quality_focus": ["Component architecture", "TypeScript implementation", "React best practices"],
+      "quality_focus": [
+        "Component architecture",
+        "TypeScript implementation",
+        "React best practices"
+      ],
       "priority": "high",
       "thinking_budget": "basic",
       "estimated_effort": "medium",
       "dependencies": [],
-      "success_criteria": ["Component follows established patterns", "TypeScript types are correct", "No anti-patterns detected"]
+      "success_criteria": [
+        "Component follows established patterns",
+        "TypeScript types are correct",
+        "No anti-patterns detected"
+      ]
     }
   ],
   "quality_gates": {
     "critical_gates": ["Performance regression: none detected"],
-    "major_gates": ["Code quality: meets standards", "Component reusability: maintained"],
+    "major_gates": [
+      "Code quality: meets standards",
+      "Component reusability: maintained"
+    ],
     "minor_gates": ["Documentation: component usage documented"]
   },
   "feedback_loop_strategy": {
