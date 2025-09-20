@@ -2561,23 +2561,26 @@ echo "✅ Mandatory security architect oversight integration" | tee -a "${PIPELI
 echo "✅ Advanced security validation with penetration testing readiness" | tee -a "${PIPELINE_LOG}"
 ```
 
-**Phase 11: Testing Phase**
+**Phase 11: Dynamic Testing Orchestration with Feedback Loops**
 
 ```bash
 if [ "${NEXT_PHASE}" = "test" ]; then
-    echo "🧪 Phase 9: TESTING PHASE" | tee -a "${PIPELINE_LOG}"
+    echo "🧪 Phase 11: DYNAMIC TESTING ORCHESTRATION PHASE" | tee -a "${PIPELINE_LOG}"
     source .claude/features/current_feature.env
     INPUT_REQUIREMENTS=".claude/features/${FEATURE_ID}/context/requirements.json"
-    # Initialize testing workspace
+    
+    # Initialize comprehensive testing workspace with orchestration support
     TESTING_WORKSPACE=".claude/features/${FEATURE_ID}/testing"
-    mkdir -p "${TESTING_WORKSPACE}"/{unit,integration,e2e,reports}
+    mkdir -p "${TESTING_WORKSPACE}"/{unit,integration,e2e,reports,orchestration,refinement}
     OUTPUT_TEST="${TESTING_WORKSPACE}/test-base.md"
     TEST_PLAN="${TESTING_WORKSPACE}/test-plan.json"
+    TEST_EXECUTION_LOG="${TESTING_WORKSPACE}/orchestration/test-execution.log"
 
-    echo "=== Test Coordinator Paths ==="
+    echo "=== Dynamic Testing Orchestration Paths ===" | tee -a "${PIPELINE_LOG}"
     echo "Requirements: ${INPUT_REQUIREMENTS}"
-    echo "Output: ${TESTING_WORKSPACE}"
-    echo "Test Plan: ${TEST_PLAN}"
+    echo "Testing workspace: ${TESTING_WORKSPACE}"
+    echo "Test execution plan: ${TEST_PLAN}"
+    echo "Execution log: ${TEST_EXECUTION_LOG}"
 
     if [ ! -f "${INPUT_REQUIREMENTS}" ]; then
         echo "❌ Requirements file not found: ${INPUT_REQUIREMENTS}" | tee -a "${PIPELINE_LOG}"
@@ -2593,224 +2596,569 @@ if [ "${NEXT_PHASE}" = "test" ]; then
         exit 1
     fi
 
-    echo "Requirements Summary:"
+    echo "Requirements Summary:" | tee -a "${PIPELINE_LOG}"
     echo "• Feature: ${FEATURE_NAME}"
     cat "${INPUT_REQUIREMENTS}" | jq -r '.affected_systems[]' 2>/dev/null | sed 's/^/• Affected System: /' || echo "• No affected systems found"
 
     TEST_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-    echo "Testing started: ${TEST_START}" | tee -a "${PIPELINE_LOG}"
+    echo "Dynamic testing orchestration started: ${TEST_START}" | tee -a "${PIPELINE_LOG}"
 
-    # Update metadata
-    jq '.status = "testing_in_progress" | .phase = "testing" | .testing_started = "'${TEST_START}'"' \
+    # Update metadata for testing orchestration
+    jq '.status = "testing_orchestration_in_progress" | 
+        .phase = "testing" | 
+        .testing_started = "'${TEST_START}'" |
+        .testing_orchestration_enabled = true' \
         ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
         mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
 fi
 ```
 
-Use the `test-coordinator` subagent to execute feature-specific live testing.
+**Execute Dynamic Testing Orchestration Phase Using Feedback Loops:**
+
+**Sub-Phase 11.1: Testing Strategy & Agent Discovery**
+
+Initialize comprehensive testing orchestration with agent discovery:
+
+```bash
+# Initialize execution tracking
+echo "🚀 DYNAMIC TESTING ORCHESTRATION" | tee -a "${TEST_EXECUTION_LOG}"
+echo "Started: $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee -a "${TEST_EXECUTION_LOG}"
+echo "Feature: ${FEATURE_NAME}" | tee -a "${TEST_EXECUTION_LOG}"
+echo "===============================" | tee -a "${TEST_EXECUTION_LOG}"
+```
+
+Use the `test-coordinator` subagent to create comprehensive testing strategy with refinement capabilities.
 
 Instruct the test-coordinator:
-"ultrathink. Orchestrate comprehensive testing for any implemented feature.
+"ultrathink. Orchestrate comprehensive testing with iterative refinement capabilities.
 
-\*CRITICAL: Perform dynamic agent discovery first:\*\*
+**CRITICAL: Enhanced Testing Orchestration with Feedback Loops**
+
+**Dynamic Agent Discovery Requirements:**
 
 1. Discover all available test agents from `.claude/agents/testing/` directory
 2. Only recommend agents that actually exist in your discovery results
-3. Map testing needs to discovered agent capabilities, not hardcoded agent names
+3. Map testing needs to discovered agent capabilities for both initial testing AND refinement
+4. Plan for iterative test execution with failure remediation
 
-Read all of the relevant files from
+**Comprehensive Context Analysis:**
 
 - Feature ID: ${FEATURE_ID}
 - Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 - Implementation Plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
 - Implementation Code: .claude/features/${FEATURE_ID}/implementation/code-changes/
+- Security Fixes: .claude/features/${FEATURE_ID}/security-gates/refinement/ (if exists)
 - Complexity Level: Extract from .claude/features/${FEATURE_ID}/context/complexity-assessment.json
 
-Instead of spawning agents directly, create a test plan and save it to: ${TEST_PLAN}
+**Enhanced Test Planning Output:**
 
-Your output should be a JSON file with this structure:
+Create comprehensive test orchestration plan: ${TEST_PLAN}
 
+**Required Structure with Refinement Support:**
 ```json
 {
-  "testing_needed": true,
-  "rationale": "Explanation of why testing is needed",
-  "recommended_testing": [
+  \"testing_orchestration_needed\": true,
+  \"testing_approach\": \"comprehensive_with_refinement\",
+  \"max_test_iterations\": 3,
+  \"rationale\": \"Explanation including why iterative refinement is needed\",
+  \"discovered_test_agents\": [
     {
-      "agent": "AGENT_TYPE_TO_SELECT",
-      "focus": "What specific information to gather",
-      "priority": "high|medium|low",
-      "reason": "Why this test is important",
-      "output_file": "filename-for-test-output.md"
+      \"agent_type\": \"DISCOVERED_AGENT_NAME\",
+      \"capabilities\": [...],
+      \"testing_domains\": [...],
+      \"refinement_capable\": true
     }
   ],
-  "synthesis_approach": "sequential|parallel",
-  "expected_outputs": ["list of expected findings"]
+  \"testing_phases\": [
+    {
+      \"phase\": \"initial_test_creation\",
+      \"agents\": [
+        {
+          \"agent\": \"DISCOVERED_AGENT_TYPE\",
+          \"focus\": \"Create comprehensive tests\",
+          \"priority\": \"high|medium|low\",
+          \"test_types\": [\"unit\", \"integration\", \"e2e\"],
+          \"output_file\": \"test-creation-results.md\",
+          \"success_criteria\": \"Tests created and executable\"
+        }
+      ]
+    },
+    {
+      \"phase\": \"test_execution_validation\",
+      \"agents\": [
+        {
+          \"agent\": \"EXECUTION_CAPABLE_AGENT\",
+          \"focus\": \"Execute tests and identify failures\",
+          \"priority\": \"high\",
+          \"validation_approach\": \"automated_execution\",
+          \"output_file\": \"test-execution-results.md\",
+          \"success_criteria\": \"All tests passing OR failure analysis complete\"
+        }
+      ]
+    },
+    {
+      \"phase\": \"failure_remediation\",
+      \"condition\": \"if_tests_fail\",
+      \"agents\": [
+        {
+          \"agent\": \"REMEDIATION_CAPABLE_AGENT\",
+          \"focus\": \"Fix failing tests by improving code or tests\",
+          \"priority\": \"high\",
+          \"remediation_approach\": \"code_fixes_and_test_improvements\",
+          \"output_file\": \"test-remediation-results.md\",
+          \"success_criteria\": \"Failing tests remediated\"
+        }
+      ]
+    }
+  ],
+  \"refinement_strategy\": {
+    \"max_iterations\": 3,
+    \"failure_threshold\": \"any_failing_tests\",
+    \"remediation_approach\": \"fix_code_and_improve_tests\",
+    \"escalation_criteria\": \"max_iterations_reached_with_failures\"
+  },
+  \"testing_domains\": [...],
+  \"expected_test_coverage\": {
+    \"unit_tests\": \"business_logic_validation\",
+    \"integration_tests\": \"api_and_service_validation\", 
+    \"e2e_tests\": \"user_workflow_validation\"
+  }
 }
 ```
 
-CRITICAL: Use dynamic agent discovery to choose the optimal agent type for each testing need:
+**Enhanced Capability-Based Agent Selection:**
 
-**Dynamic TestAgent Discovery:**
+Map testing needs to discovered agents with refinement capabilities:
 
-Before making any agent recommendations, the test-coordinator will discover all available testing agents from `.claude/agents/testing/` directory and only recommend agents that actually exist.
+- **Unit Test Creation & Refinement** → Agents with isolated testing, mocking, and failure remediation
+- **Integration Test Orchestration** → Agents with API testing, service validation, and integration debugging
+- **E2E Test Development & Execution** → Agents with browser automation, user scenario testing, and workflow debugging
+- **Test Execution & Analysis** → Agents with test running, result analysis, and failure diagnosis
+- **Code & Test Remediation** → Development agents with testing expertise for fixing failing tests
+- **Performance Test Validation** → Agents with load testing and performance debugging capabilities
 
-**Capability-Based Agent Selection Guidelines for Test Coordinator:**
+**Critical Refinement Requirements:**
 
-- **Unit testing and business logic validation** → Look for agents with isolated testing and mocking capabilities from discovered list
-- **API endpoints and service integration**→ Look for agents with REST/GraphQL testing and service communication validation capabilities from discovered list
-- **End-to-end user workflows and journeys** → Look for agents with browser automation and user scenario testing capabilities from discovered list
-- **Frontend components and UI interactions** → Look for agents with React/TypeScript component testing and UI validation capabilities from discovered list
-- **Backend services and data processing** → Look for agents with Go/Python testing and data validation capabilities from discovered list
-- **Security vulnerabilities and authentication** → Look for agents with security testing and penetration testing capabilities from discovered list
-- **Performance and scalability requirements** → Look for agents with load testing and performance benchmarking capabilities from discovered list
-- **Visual design and accessibility compliance** → Look for agents with UI/UX testing and WCAG validation capabilities from discovered list
-- **Database operations and data integrity** → Look for agents with database testing and data validation capabilities from discovered list
-- **Cross-browser and responsive design** → Look for agents with multi-device testing and compatibility validation capabilities from discovered list
-- **Error handling and edge case scenarios** → Look for agents with boundary testing and error scenario validation capabilities from discovered list
-- **Test automation and CI/CD integration** → Look for agents with test automation and continuous integration capabilities from discovered list
+- Plan for multiple test iterations (max 3 for testing vs 2 for security)
+- Include agents capable of BOTH creating AND executing tests
+- Include development agents capable of fixing failing tests
+- Design feedback loops: Test → Execute → Analyze Failures → Fix → Re-test
+- Define clear success criteria: \"All tests passing\" vs \"Analysis complete\"
 
-**Critical Rules:**
+**Testing-Specific Discovery Guidelines:**
 
-- ONLY recommend agents discovered dynamically from the test agents directory
-- Match testing needs to available agent capabilities, not hardcoded agent names
-- Provide fallback strategies when preferred capability types aren't available
-- Adapt recommendations based on what agents are actually discovered
+- ONLY recommend agents discovered from `.claude/agents/testing/` and `.claude/agents/development/`
+- Prioritize agents with execution capabilities over analysis-only agents  
+- Include development agents with testing expertise for remediation phase
+- Plan for both test creation and test execution in the same orchestration
 
-Do NOT use biased examples - evaluate each test need independently and select from actually discovered agents based on their capabilities.
+Create initial testing foundation synthesis: ${OUTPUT_TEST}"
 
-Also create your initial test synthesis and save to: ${OUTPUT_TEST}"
+**Sub-Phase 11.2: Testing Orchestration Decision Logic**
 
-Check test plan and execute recommended tests:
+Process test orchestration plan and initialize iterative testing:
 
 ```bash
 if [ -f "${TEST_PLAN}" ]; then
     # Validate JSON structure
     if ! jq empty "${TEST_PLAN}" 2>/dev/null; then
-        echo "❌ Test plan contains invalid JSON"
+        echo "❌ Test orchestration plan contains invalid JSON" | tee -a "${TEST_EXECUTION_LOG}"
         exit 1
     fi
-    echo "✓ Test plan created successfully"
+    echo "✓ Test orchestration plan created successfully" | tee -a "${TEST_EXECUTION_LOG}"
 
-    TESTING_NEEDED=$(cat "${TEST_PLAN}" | jq -r '.testing_needed')
-    if [ "${TESTING_NEEDED}" = "true" ]; then
-        echo "Test coordinator recommends testing."
-        echo "Based on the test plan above, I'll now spawn the recommended testing agents:"
+    TESTING_ORCHESTRATION_NEEDED=$(cat "${TEST_PLAN}" | jq -r '.testing_orchestration_needed // .testing_needed')
+    if [ "${TESTING_ORCHESTRATION_NEEDED}" = "true" ]; then
+        echo "🎯 Test coordinator recommends comprehensive testing with refinement capabilities" | tee -a "${TEST_EXECUTION_LOG}"
+        
+        # Extract testing orchestration parameters
+        MAX_TEST_ITERATIONS=$(cat "${TEST_PLAN}" | jq -r '.max_test_iterations // 3')
+        TESTING_APPROACH=$(cat "${TEST_PLAN}" | jq -r '.testing_approach // "comprehensive_with_refinement"')
+        
+        echo "📊 Testing Orchestration Configuration:" | tee -a "${TEST_EXECUTION_LOG}"
+        echo "   • Max Test Iterations: ${MAX_TEST_ITERATIONS}"
+        echo "   • Testing Approach: ${TESTING_APPROACH}"
+        
+        # Update metadata with testing orchestration parameters
+        jq '.testing_orchestration_config = {
+            "max_iterations": '${MAX_TEST_ITERATIONS}',
+            "approach": "'${TESTING_APPROACH}'",
+            "feedback_loops_enabled": true
+        }' \
+        ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
+        mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+        
+    else
+        echo "⚠️ Test coordinator determined testing not needed" | tee -a "${TEST_EXECUTION_LOG}"
+        exit 1
     fi
 else
-    echo "❌ Test coordinator failed to create test plan"
+    echo "❌ Test coordinator failed to create test orchestration plan" | tee -a "${TEST_EXECUTION_LOG}"
     exit 1
 fi
 ```
 
-**CRITICAL: Spawn ALL high-priority testing agents in a SINGLE MESSAGE for true parallel execution:**
+**Sub-Phase 11.3: Iterative Testing Execution with Feedback Loops**
 
-1. Read the high-priority agents from the test plan
-2. In ONE message, use multiple Task tool calls to spawn ALL high-priority testing agents simultaneously
-3. Provide each agent with:
-   - Their specific focus from the plan
-   - Their dedicated output file path in the testing directory
-   - Context from the feature requirements
-
-**Example of correct parallel testing agent spawning:**
-
-[Single Message with Multiple Task Calls]:
-Task("unit-test-engineer", "Create comprehensive unit tests for [feature]. Save results to: ${TESTING_WORKSPACE}/unit/unit-test-results.md",
-"unit-test-engineer")
-Task("integration-test-engineer", "Test API and service integrations. Save results to: ${TESTING_WORKSPACE}/integration/integration-test-results.md",
-"integration-test-engineer")
-Task("e2e-test-engineer", "Create end-to-end user workflow tests. Save results to: ${TESTING_WORKSPACE}/e2e/e2e-test-results.md", "e2e-test-engineer")
-
-After spawning agents, wait for them to complete before continuing.
-
-Example spawning based on dynamic recommendations:
-
-**CRITICAL: Use agents dynamically discovered by test-coordinator:**
-
-- If unit-test-engineer is recommended with output_file "unit-test-results.md":
-  Tell the agent: "Create comprehensive unit tests for [SPECIFIC_FEATURE] business logic.
-  Focus on: [specific focus from test plan].
-  Target coverage: [coverage requirement from plan].
-  Save your complete test suite to: ${TESTING_WORKSPACE}/unit/[output_file from plan]"
-
-- If e2e-test-engineer is recommended with output_file "e2e-test-results.md":
-  Tell the agent: "Create end-to-end tests for [SPECIFIC_USER_WORKFLOWS] workflows.
-  Focus on: [specific focus from test plan].
-  User stories to validate: [user stories from requirements].
-  Save your complete test suite to: ${TESTING_WORKSPACE}/e2e/[output_file from plan]"
-
-- If integration-test-engineer is recommended with output_file "integration-test-results.md":
-  Tell the agent: "Test [SPECIFIC_API_ENDPOINTS] and service integrations.
-  Focus on: [specific focus from test plan].
-  Validate: [integration points from plan].
-  Save your complete test results to: ${TESTING_WORKSPACE}/integration/[output_file from plan]"
-
-**Important:** Replace bracketed placeholders with actual values from the synthesis plan. The agent names and focus areas will be dynamically determined by test-coordinator based on discovered agents and feature requirements.
-
-### Validate testing completion
-
-**Validate testing completion:**
+Execute comprehensive testing orchestration with refinement capabilities:
 
 ```bash
-echo "=== Testing Phase Validation Gate ==="
+echo "" | tee -a "${TEST_EXECUTION_LOG}"
+echo "🔄 ITERATIVE TESTING EXECUTION WITH FEEDBACK LOOPS" | tee -a "${TEST_EXECUTION_LOG}"
+echo "=================================================" | tee -a "${TEST_EXECUTION_LOG}"
 
-# 1. Specific deliverable validation (plan compliance)
-echo "Checking plan compliance - validating recommended test outputs..."
-if [ -f "${TEST_PLAN}" ]; then
-    RECOMMENDED_FILES=$(cat "${TEST_PLAN}" | jq -r '.recommended_testing[].output_file' 2>/dev/null)
-    PLAN_COMPLIANCE_COUNT=0
-    TOTAL_RECOMMENDED=$(echo "$RECOMMENDED_FILES" | grep -c .)
+# Initialize testing refinement workspace
+TEST_REFINEMENT_DIR="${TESTING_WORKSPACE}/refinement"
+mkdir -p "${TEST_REFINEMENT_DIR}"/{iteration-1,iteration-2,iteration-3,execution-results,remediation}
 
-    echo "Validating ${TOTAL_RECOMMENDED} dynamically recommended test outputs:"
-    while IFS= read -r test_file; do
-        if [ -n "$test_file" ] && [ "$test_file" != "null" ]; then
-            FULL_PATH="${TESTING_WORKSPACE}/${test_file}"
-            if [ -f "$FULL_PATH" ]; then
-                echo "✓ Plan deliverable found: ${test_file}"
-                ((PLAN_COMPLIANCE_COUNT++))
-            else
-                echo "✗ Plan deliverable missing: ${test_file}"
+# Testing Iteration Loop (up to 3 iterations for testing vs 2 for security)
+for TEST_ITERATION in $(seq 1 ${MAX_TEST_ITERATIONS}); do
+    echo "" | tee -a "${TEST_EXECUTION_LOG}"
+    echo "🧪 Testing Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}" | tee -a "${TEST_EXECUTION_LOG}"
+    echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) - Starting test iteration ${TEST_ITERATION}" | tee -a "${TEST_EXECUTION_LOG}"
+    
+    # Update current iteration in metadata
+    jq '.testing_current_iteration = '${TEST_ITERATION}' |
+        .testing_iteration_'${TEST_ITERATION}'_started = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
+       ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
+       mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+    
+    ITERATION_DIR="${TEST_REFINEMENT_DIR}/iteration-${TEST_ITERATION}"
+    mkdir -p "${ITERATION_DIR}"/{test-creation,test-execution,test-remediation}
+    
+    echo "📁 Test iteration workspace: ${ITERATION_DIR}" | tee -a "${TEST_EXECUTION_LOG}"
+    
+    # Phase 1: Test Creation (First iteration) or Test Updates (Subsequent iterations)
+    if [ ${TEST_ITERATION} -eq 1 ]; then
+        echo "🔨 Phase 1: Initial Test Creation" | tee -a "${TEST_EXECUTION_LOG}"
+        TEST_CREATION_PHASE="initial_test_creation"
+    else
+        echo "🔄 Phase 1: Test Updates Based on Previous Failures" | tee -a "${TEST_EXECUTION_LOG}"
+        TEST_CREATION_PHASE="test_update_refinement"
+    fi
+    
+    # Get test creation agents from test plan
+    TEST_CREATION_AGENTS=$(cat "${TEST_PLAN}" | jq -r --arg phase "${TEST_CREATION_PHASE}" '
+        .testing_phases[]? | select(.phase == $phase or .phase == "initial_test_creation") | 
+        .agents[]? | .agent' 2>/dev/null || echo "")
+    
+    if [ -n "${TEST_CREATION_AGENTS}" ]; then
+        echo "🤖 Deploying test creation agents:" | tee -a "${TEST_EXECUTION_LOG}"
+        echo "${TEST_CREATION_AGENTS}" | sed 's/^/  • /' | tee -a "${TEST_EXECUTION_LOG}"
+        
+        # Spawn test creation agents dynamically
+        while read -r AGENT_TYPE; do
+            if [ -n "${AGENT_TYPE}" ] && [ "${AGENT_TYPE}" != "null" ]; then
+                echo "🚀 Spawning ${AGENT_TYPE} for test creation..." | tee -a "${TEST_EXECUTION_LOG}"
+                
+Task("${AGENT_TYPE}", "COMPREHENSIVE TEST CREATION - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
+
+**CRITICAL: Create executable tests with validation capabilities**
+
+**Testing Mission for Iteration ${TEST_ITERATION}:**
+$(if [ ${TEST_ITERATION} -eq 1 ]; then
+    echo "Create comprehensive test suite from scratch covering all implemented functionality"
+else
+    echo "Update and improve existing tests based on previous iteration failures"
+    echo "Previous iteration results: ${TEST_REFINEMENT_DIR}/iteration-$((TEST_ITERATION-1))/test-execution/"
+fi)
+
+**Comprehensive Context:**
+- Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
+- Feature requirements: .claude/features/${FEATURE_ID}/context/requirements.json
+- Security fixes: .claude/features/${FEATURE_ID}/security-gates/refinement/ (if exists)
+- Architecture decisions: .claude/features/${FEATURE_ID}/architecture/
+$(if [ ${TEST_ITERATION} -gt 1 ]; then
+    echo "- Previous test results: ${TEST_REFINEMENT_DIR}/iteration-$((TEST_ITERATION-1))/"
+fi)
+
+**Test Creation Requirements:**
+1. **Unit Tests**: Comprehensive business logic validation with mocking
+2. **Integration Tests**: API endpoints, database operations, service interactions  
+3. **E2E Tests**: Complete user workflows and acceptance criteria validation
+4. **Executable Tests**: All tests must be runnable with clear pass/fail results
+5. **Test Documentation**: Clear test descriptions and expected outcomes
+
+**Your Specialized Focus:**
+$(case "${AGENT_TYPE}" in
+    *"unit"*|*"test-engineer"*) echo "- Focus on unit test creation with comprehensive coverage
+- Create isolated tests for business logic components
+- Implement proper mocking for external dependencies" ;;
+    *"integration"*) echo "- Focus on integration test creation for APIs and services  
+- Test database operations and external service integrations
+- Validate data flow between system components" ;;
+    *"e2e"*|*"playwright"*) echo "- Focus on end-to-end user workflow testing
+- Create browser automation tests for complete user journeys
+- Validate acceptance criteria through user interface interactions" ;;
+    *) echo "- Create comprehensive tests based on your specialized capabilities
+- Ensure tests cover critical functionality and edge cases" ;;
+esac)
+
+**Output Requirements:**
+- Test files: ${ITERATION_DIR}/test-creation/${AGENT_TYPE}-tests/
+- Test documentation: ${ITERATION_DIR}/test-creation/${AGENT_TYPE}-test-documentation.md
+- Test execution instructions: Include commands to run your tests
+
+**Success Criteria:**
+- Tests created and properly structured
+- Tests are executable with clear pass/fail results
+- Comprehensive coverage of implemented functionality
+- Clear documentation for test execution", "${AGENT_TYPE}")
+
             fi
+        done <<< "${TEST_CREATION_AGENTS}"
+        
+        echo "⏳ Waiting for test creation agents to complete..." | tee -a "${TEST_EXECUTION_LOG}"
+    fi
+    
+    # Phase 2: Test Execution & Validation
+    echo "" | tee -a "${TEST_EXECUTION_LOG}"
+    echo "🏃 Phase 2: Test Execution & Failure Analysis" | tee -a "${TEST_EXECUTION_LOG}"
+    
+    # Get test execution agents
+    TEST_EXECUTION_AGENTS=$(cat "${TEST_PLAN}" | jq -r '
+        .testing_phases[]? | select(.phase == "test_execution_validation") | 
+        .agents[]? | .agent' 2>/dev/null || echo "playwright-explorer")
+    
+    if [ -n "${TEST_EXECUTION_AGENTS}" ]; then
+        while read -r EXEC_AGENT; do
+            if [ -n "${EXEC_AGENT}" ] && [ "${EXEC_AGENT}" != "null" ]; then
+                echo "🚀 Spawning ${EXEC_AGENT} for test execution..." | tee -a "${TEST_EXECUTION_LOG}"
+                
+Task("${EXEC_AGENT}", "TEST EXECUTION & FAILURE ANALYSIS - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
+
+**CRITICAL: Execute tests and provide detailed failure analysis**
+
+**Test Execution Mission:**
+1. Execute all tests created in this iteration
+2. Identify and analyze any test failures
+3. Determine if failures are due to code issues or test issues
+4. Provide actionable remediation recommendations
+
+**Test Sources:**
+- Created tests: ${ITERATION_DIR}/test-creation/
+- Test documentation: ${ITERATION_DIR}/test-creation/*-test-documentation.md
+$(if [ ${TEST_ITERATION} -gt 1 ]; then
+    echo "- Previous iteration tests: ${TEST_REFINEMENT_DIR}/iteration-$((TEST_ITERATION-1))/test-creation/"
+fi)
+
+**Execution Context:**
+- Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
+- Live system: https://localhost:3000 (if available)
+- Test environment setup instructions from test documentation
+
+**Execution & Analysis Requirements:**
+1. **Execute All Tests**: Run unit, integration, and E2E tests systematically
+2. **Document Results**: Record pass/fail status for each test
+3. **Analyze Failures**: Categorize failures as code issues vs test issues
+4. **Provide Remediation Guidance**: Specific recommendations for fixing failures
+5. **Performance Assessment**: Note any performance issues during test execution
+
+**Output Requirements:**
+- Execution report: ${ITERATION_DIR}/test-execution/test-execution-report.md
+- Failure analysis: ${ITERATION_DIR}/test-execution/failure-analysis.md  
+- Remediation recommendations: ${ITERATION_DIR}/test-execution/remediation-recommendations.md
+
+**Success Criteria Determination:**
+- ALL_TESTS_PASSING: All tests executed successfully
+- TESTS_FAILING_WITH_ANALYSIS: Tests failed but failure analysis is complete
+- EXECUTION_ERROR: Tests could not be executed (escalation needed)", "${EXEC_AGENT}")
+
+            fi
+        done <<< "${TEST_EXECUTION_AGENTS}"
+        
+        echo "⏳ Waiting for test execution analysis..." | tee -a "${TEST_EXECUTION_LOG}"
+    fi
+    
+    # Phase 3: Analyze Iteration Results & Decide Next Steps
+    echo "" | tee -a "${TEST_EXECUTION_LOG}"
+    echo "📊 Phase 3: Iteration Results Analysis" | tee -a "${TEST_EXECUTION_LOG}"
+    
+    # Check test execution results
+    EXECUTION_REPORT="${ITERATION_DIR}/test-execution/test-execution-report.md"
+    FAILURE_ANALYSIS="${ITERATION_DIR}/test-execution/failure-analysis.md"
+    
+    if [ -f "${EXECUTION_REPORT}" ]; then
+        echo "✓ Test execution report found" | tee -a "${TEST_EXECUTION_LOG}"
+        
+        # Simple pattern matching for test results (in real implementation, this would be more sophisticated)
+        if grep -qi "all.*tests.*pass\|success\|✅.*pass" "${EXECUTION_REPORT}" 2>/dev/null; then
+            echo "🎉 Test Iteration ${TEST_ITERATION}: ALL TESTS PASSING" | tee -a "${TEST_EXECUTION_LOG}"
+            
+            # Update metadata with success
+            jq '.testing_status = "all_tests_passing" |
+                .testing_completed_iteration = '${TEST_ITERATION}' |
+                .testing_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
+               ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
+               mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+            
+            echo "✅ Testing orchestration successful - all tests passing!" | tee -a "${TEST_EXECUTION_LOG}"
+            break  # Exit iteration loop - success achieved
+            
+        elif grep -qi "fail\|error\|❌" "${EXECUTION_REPORT}" 2>/dev/null && [ ${TEST_ITERATION} -lt ${MAX_TEST_ITERATIONS} ]; then
+            echo "🔄 Test Iteration ${TEST_ITERATION}: TESTS FAILING - Proceeding to remediation" | tee -a "${TEST_EXECUTION_LOG}"
+            
+            # Phase 4: Test Remediation (only if not final iteration)
+            echo "" | tee -a "${TEST_EXECUTION_LOG}"
+            echo "🔧 Phase 4: Test Failure Remediation" | tee -a "${TEST_EXECUTION_LOG}"
+            
+            # Get remediation agents from test plan or fall back to development agents
+            REMEDIATION_AGENTS=$(cat "${TEST_PLAN}" | jq -r '
+                .testing_phases[]? | select(.phase == "failure_remediation") | 
+                .agents[]? | .agent' 2>/dev/null || echo "golang-api-developer react-developer")
+            
+            while read -r REMEDIATION_AGENT; do
+                if [ -n "${REMEDIATION_AGENT}" ] && [ "${REMEDIATION_AGENT}" != "null" ]; then
+                    echo "🚀 Spawning ${REMEDIATION_AGENT} for test remediation..." | tee -a "${TEST_EXECUTION_LOG}"
+                    
+Task("${REMEDIATION_AGENT}", "TEST FAILURE REMEDIATION - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
+
+**CRITICAL: Fix failing tests by improving code or tests**
+
+**Remediation Mission:**
+Fix failing tests identified in this iteration through code improvements and test refinements.
+
+**Failure Analysis Context:**
+- Test execution report: ${EXECUTION_REPORT}
+- Failure analysis: ${FAILURE_ANALYSIS}
+- Remediation recommendations: ${ITERATION_DIR}/test-execution/remediation-recommendations.md
+
+**Your Remediation Focus:**
+$(case "${REMEDIATION_AGENT}" in
+    *"golang"*|*"go"*) echo "- Fix Go backend code issues causing test failures
+- Improve API endpoints, business logic, and database operations
+- Ensure Go code follows best practices and handles edge cases properly" ;;
+    *"react"*|*"frontend"*) echo "- Fix React/TypeScript frontend issues causing test failures
+- Improve UI components, event handling, and state management  
+- Ensure frontend code handles user interactions and edge cases properly" ;;
+    *"integration"*) echo "- Fix integration issues between services and components
+- Improve API contracts, data flow, and service communication
+- Ensure proper error handling and fallback mechanisms" ;;
+    *) echo "- Fix code issues in your domain of expertise
+- Apply best practices and improve error handling" ;;
+esac)
+
+**Remediation Approach:**
+1. **Analyze Failures**: Review test failure details and root cause analysis
+2. **Code Fixes**: Make targeted improvements to fix failing functionality
+3. **Test Improvements**: Enhance tests if they are flawed or incomplete
+4. **Validation**: Ensure fixes don't break existing functionality
+5. **Documentation**: Document all remediation changes and rationale
+
+**Context Available:**
+- Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
+- Previous fixes: ${TEST_REFINEMENT_DIR}/iteration-*/test-remediation/
+- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
+
+**Output Requirements:**
+- Code fixes: ${ITERATION_DIR}/test-remediation/${REMEDIATION_AGENT}-code-fixes.md
+- Test improvements: ${ITERATION_DIR}/test-remediation/${REMEDIATION_AGENT}-test-improvements.md  
+- Remediation summary: ${ITERATION_DIR}/test-remediation/${REMEDIATION_AGENT}-remediation-summary.md
+
+**Success Criteria:**
+- Root cause of test failures addressed
+- Code improvements implemented
+- Test issues resolved or improved  
+- Ready for next iteration execution", "${REMEDIATION_AGENT}")
+
+                fi
+            done <<< "${REMEDIATION_AGENTS}"
+            
+            echo "⏳ Waiting for test remediation completion..." | tee -a "${TEST_EXECUTION_LOG}"
+            
+            # Update metadata for this iteration
+            jq '.testing_iteration_'${TEST_ITERATION}'_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
+                .testing_iteration_'${TEST_ITERATION}'_result = "tests_failed_remediation_attempted"' \
+               ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
+               mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+            
+        elif [ ${TEST_ITERATION} -eq ${MAX_TEST_ITERATIONS} ]; then
+            echo "⚠️ Test Iteration ${TEST_ITERATION}: FINAL ITERATION - TESTS STILL FAILING" | tee -a "${TEST_EXECUTION_LOG}"
+            echo "🚨 Max test iterations reached with failing tests - escalation needed" | tee -a "${TEST_EXECUTION_LOG}"
+            
+            # Update metadata with final failure state
+            jq '.testing_status = "max_iterations_reached_with_failures" |
+                .testing_escalation_needed = true |
+                .testing_final_iteration = '${TEST_ITERATION}' |
+                .testing_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
+               ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
+               mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+            
+            break  # Exit iteration loop - max iterations reached
         fi
-    done <<< "$RECOMMENDED_FILES"
-
-    echo "📋 Plan Compliance: ${PLAN_COMPLIANCE_COUNT}/${TOTAL_RECOMMENDED} recommended files delivered"
-else
-    echo "❌ No test plan found - cannot validate plan compliance"
-    exit 1
-fi
-
-# 2. General activity validation (ensure work happened)
-echo ""
-echo "Checking general testing activity..."
-UNIT_FILES=$(find "${TESTING_WORKSPACE}/unit" -name "*.md" -type f 2>/dev/null | wc -l)
-INTEGRATION_FILES=$(find "${TESTING_WORKSPACE}/integration" -name "*.md" -type f 2>/dev/null | wc -l)
-E2E_FILES=$(find "${TESTING_WORKSPACE}/e2e" -name "*.md" -type f 2>/dev/null | wc -l)
-TOTAL_FILES=$((UNIT_FILES + INTEGRATION_FILES + E2E_FILES))
-
-echo "📊 Testing Activity Summary:"
-echo "   • Unit Tests: ${UNIT_FILES} files"
-echo "   • Integration Tests: ${INTEGRATION_FILES} files"
-echo "   • E2E Tests: ${E2E_FILES} files"
-echo "   • Total Activity: ${TOTAL_FILES} test files created"
-
-# 3. Final validation decision
-if [ ${PLAN_COMPLIANCE_COUNT} -gt 0 ] && [ ${TOTAL_FILES} -gt 0 ]; then
-    echo "✅ Testing Phase Validation: PASSED"
-    echo "   ✓ Plan compliance achieved (${PLAN_COMPLIANCE_COUNT} deliverables)"
-    echo "   ✓ Testing activity confirmed (${TOTAL_FILES} files)"
-else
-    echo "❌ Testing Phase Validation: FAILED"
-    if [ ${PLAN_COMPLIANCE_COUNT} -eq 0 ]; then
-        echo "   ✗ No planned deliverables found"
+    else
+        echo "❌ No test execution report found - test execution failed" | tee -a "${TEST_EXECUTION_LOG}"
+        break
     fi
-    if [ ${TOTAL_FILES} -eq 0 ]; then
-        echo "   ✗ No testing activity detected"
-    fi
-    exit 1
-fi
+done
 ```
 
-DO NOT PROCEED TO PHASE 10 until all testing agents are spawned and their tasking has completed.
+**Sub-Phase 11.4: Testing Orchestration Completion**
+
+Finalize testing phase with comprehensive results:
+
+```bash
+echo "" | tee -a "${TEST_EXECUTION_LOG}"
+echo "🏁 TESTING ORCHESTRATION COMPLETION" | tee -a "${TEST_EXECUTION_LOG}"
+echo "===================================" | tee -a "${TEST_EXECUTION_LOG}"
+
+# Read final testing status
+FINAL_TESTING_STATUS=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.testing_status // "unknown"')
+COMPLETED_ITERATIONS=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.testing_completed_iteration // .testing_final_iteration // 0')
+
+echo "📊 Testing Orchestration Final Results:" | tee -a "${TEST_EXECUTION_LOG}"
+echo "   • Final Status: ${FINAL_TESTING_STATUS}"
+echo "   • Completed Iterations: ${COMPLETED_ITERATIONS}/${MAX_TEST_ITERATIONS}"
+echo "   • Testing Approach: ${TESTING_APPROACH}"
+
+case "${FINAL_TESTING_STATUS}" in
+    "all_tests_passing")
+        echo "✅ TESTING ORCHESTRATION: SUCCESS" | tee -a "${PIPELINE_LOG}"
+        echo "All tests passing after ${COMPLETED_ITERATIONS} iterations" | tee -a "${PIPELINE_LOG}"
+        
+        # Update metadata for successful completion
+        jq '.status = "testing_completed" | 
+            .testing_success = true |
+            .phase = "testing_complete"' \
+           ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
+           mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+        
+        NEXT_PHASE="deploy"
+        ;;
+    "max_iterations_reached_with_failures")
+        echo "⚠️ TESTING ORCHESTRATION: PARTIAL SUCCESS" | tee -a "${PIPELINE_LOG}"
+        echo "Max iterations (${MAX_TEST_ITERATIONS}) reached with some failing tests" | tee -a "${PIPELINE_LOG}"
+        echo "Manual review recommended before deployment" | tee -a "${PIPELINE_LOG}"
+        
+        # Continue to deployment with warning
+        jq '.status = "testing_completed_with_warnings" | 
+            .testing_warnings = true |
+            .phase = "testing_complete_with_warnings"' \
+           ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
+           mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+        
+        NEXT_PHASE="deploy"
+        ;;
+    *)
+        echo "❌ TESTING ORCHESTRATION: FAILED" | tee -a "${PIPELINE_LOG}"
+        echo "Testing orchestration failed with status: ${FINAL_TESTING_STATUS}" | tee -a "${PIPELINE_LOG}"
+        
+        jq '.status = "testing_failed" | 
+            .testing_failed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
+           ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
+           mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+        
+        exit 1
+        ;;
+esac
+
+echo "" | tee -a "${PIPELINE_LOG}"
+echo "🧪 Dynamic Testing Orchestration Phase Complete" | tee -a "${PIPELINE_LOG}"
+echo "✅ Comprehensive testing with iterative refinement capabilities" | tee -a "${PIPELINE_LOG}"
+echo "✅ Test creation, execution, and failure remediation coordination" | tee -a "${PIPELINE_LOG}"
+echo "✅ Feedback loops for continuous test improvement" | tee -a "${PIPELINE_LOG}"
+echo "✅ Multi-iteration testing with bounded refinement (max ${MAX_TEST_ITERATIONS} iterations)" | tee -a "${PIPELINE_LOG}"
+```
 
 **Phase 12: Deployment**
 
