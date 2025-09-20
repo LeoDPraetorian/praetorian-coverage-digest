@@ -2052,100 +2052,15 @@ fi
 Use the `security-gate-orchestrator` subagent to execute comprehensive security vulnerability orchestration.
 
 Instruct the security-gate-orchestrator:
-"ultrathink. Execute comprehensive security vulnerability orchestration using Einstein context.
+"ultrathink. Execute security vulnerability orchestration for this feature.
 
-**CRITICAL: Enhanced Security Orchestration with Refinement Loops**
-
-**Available Mechanical Infrastructure:**
-
+Read mechanical infrastructure results from:
 - Security agent discovery: .claude/features/${FEATURE_ID}/security-gates/agent-discovery.json
-- Vulnerability analysis: .claude/features/${FEATURE_ID}/security-gates/issue-analysis.json  
-- Security workspace: .claude/features/${FEATURE_ID}/security-gates/
+- Vulnerability analysis: .claude/features/${FEATURE_ID}/security-gates/issue-analysis.json
 
-**Your Strategic Mission:**
+Create comprehensive security refinement plan and save to: ${SECURITY_REFINEMENT_PLAN}
 
-1. **Vulnerability Classification & Risk Assessment**
-   - Analyze mechanical vulnerability counts from issue-analysis.json
-   - Classify vulnerabilities: CRITICAL/HIGH (production blocking), MEDIUM (refinement needed)
-   - Map vulnerabilities to affected domains (backend/frontend/infrastructure)
-   - Identify high-risk patterns (RCE, privilege escalation, authentication bypass)
-
-2. **Dynamic Security-Capable Agent Selection**
-   - Use discovered agents from agent-discovery.json for capability-based selection
-   - Select only security-capable developers for vulnerability remediation
-   - Ensure mandatory security architect oversight for all critical fixes
-   - Map vulnerability types to specialized security agents (Go security → go-security-reviewer, etc.)
-
-3. **Security Refinement Plan Creation**
-   - Generate iterative security refinement plan (max 2 iterations - conservative for security)
-   - Create specific vulnerability remediation tasks with target files and security requirements
-   - Define success criteria for each vulnerability fix
-   - Establish mandatory security architect approval gates
-
-4. **Enhanced Security Validation Strategy**
-   - Design post-remediation security validation using penetration testing
-   - Coordinate security regression testing to prevent new vulnerabilities
-   - Establish attack surface minimization requirements
-   - Define escalation criteria for unresolvable vulnerabilities
-
-Instead of spawning agents directly, create a comprehensive security refinement plan and save it to: ${SECURITY_REFINEMENT_PLAN}
-
-**Required Structure:**
-```json
-{
-  \"security_refinement_needed\": true,
-  \"vulnerability_summary\": {
-    \"critical_count\": N,
-    \"high_count\": N, 
-    \"medium_count\": N,
-    \"affected_domains\": [...],
-    \"technology_stack\": [...],
-    \"high_risk_patterns\": [...]
-  },
-  \"recommended_security_refinement\": [
-    {
-      \"agent_type\": \"DISCOVERED_SECURITY_CAPABLE_AGENT\",
-      \"role\": \"security_developer|security_analyst|security_architect\", 
-      \"vulnerabilities_to_address\": [...],
-      \"target_files\": [...],
-      \"security_requirements\": [...],
-      \"priority\": \"critical|high|medium\",
-      \"estimated_effort\": \"X hours\"
-    }
-  ],
-  \"mandatory_oversight\": {
-    \"security_architect_required\": true,
-    \"approval_authority\": true,
-    \"oversight_requirements\": [...]
-  },
-  \"validation_strategy\": {
-    \"penetration_testing\": true,
-    \"regression_testing\": true,
-    \"attack_surface_analysis\": true
-  },
-  \"escalation_criteria\": {
-    \"max_iterations\": 2,
-    \"immediate_escalation_triggers\": [...],
-    \"human_security_review_needed\": false
-  }
-}
-```
-
-**Enhanced Context Integration:**
-
-- Einstein feature context: .claude/features/${FEATURE_ID}/context/requirements.json
-- Implementation artifacts: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- Architecture decisions: .claude/features/${FEATURE_ID}/architecture/
-- Quality review findings: .claude/features/${FEATURE_ID}/quality-review/
-
-**Security-First Principles:**
-
-- Production-blocking approach for CRITICAL/HIGH vulnerabilities
-- Mandatory architect oversight for all security fixes
-- Enhanced validation including penetration testing
-- Conservative iteration limits (2 max vs 3 for quality)
-- Attack surface minimization requirements
-- Crypto safety enforcement"
+Use your established security orchestration capabilities to analyze vulnerabilities and recommend security-capable agent selection with iterative refinement strategy (max 2 iterations - conservative for security)."
 
 **Sub-Phase 10.4: Security Orchestration Completion**
 
