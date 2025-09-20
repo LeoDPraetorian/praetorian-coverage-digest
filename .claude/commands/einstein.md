@@ -890,29 +890,29 @@ fi
 ```bash
 if [ "${NEXT_PHASE}" = "implement" ]; then
     echo "⚙️ Phase 8: IMPLEMENTATION EXECUTION" | tee -a "${PIPELINE_LOG}"
-    
+
     # Run mechanical setup operations
     SETUP_OUTPUT=$(.claude/scripts/phases/implementation/setup-implementation-phase.sh "${FEATURE_ID}")
     echo "${SETUP_OUTPUT}"
-    
+
     # Extract file paths from setup output
     IMPL_CONTEXT_FILE=$(echo "${SETUP_OUTPUT}" | grep "IMPL_CONTEXT_FILE=" | cut -d'=' -f2)
     IMPL_DIR=$(echo "${SETUP_OUTPUT}" | grep "IMPL_DIR=" | cut -d'=' -f2)
-    
+
     # Read the implementation plan created by implementation-planner
     IMPLEMENTATION_PLAN=".claude/features/${FEATURE_ID}/output/implementation-plan.md"
-    
+
     # Validate required files exist
     if [ ! -f "${IMPLEMENTATION_PLAN}" ]; then
         echo "❌ Implementation plan not found: ${IMPLEMENTATION_PLAN}" | tee -a "${PIPELINE_LOG}"
         exit 1
     fi
-    
+
     if [ ! -f "${IMPL_CONTEXT_FILE}" ]; then
         echo "❌ Implementation context not found: ${IMPL_CONTEXT_FILE}" | tee -a "${PIPELINE_LOG}"
         exit 1
     fi
-    
+
     echo "✅ Implementation execution ready" | tee -a "${PIPELINE_LOG}"
     echo "📋 Implementation Plan: ${IMPLEMENTATION_PLAN}"
     echo "📄 Context File: ${IMPL_CONTEXT_FILE}"
@@ -960,17 +960,17 @@ echo "=== Spawning Development Agents ==="
 
 if [ "${PARALLEL_EXECUTION}" = "true" ]; then
     echo "🚀 Executing parallel agent spawning strategy"
-    
+
     # Get primary group agents (first wave - parallel execution)
     PRIMARY_AGENTS=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[] | select(.parallel_group == "primary") | .agent')
     SECONDARY_AGENTS=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[] | select(.parallel_group == "secondary") | .agent')
-    
+
     echo ""
     echo "## Phase 1: Primary Agent Spawning (Parallel)"
     echo ""
     echo "Spawn these agents simultaneously using Claude Code's Task tool:"
     echo ""
-    
+
     # Generate parallel spawning instructions for primary agents
     for agent in ${PRIMARY_AGENTS}; do
         echo "### Spawn ${agent}"
@@ -997,7 +997,7 @@ if [ "${PARALLEL_EXECUTION}" = "true" ]; then
         echo "5. Follow success criteria defined in implementation plan\""
         echo ""
     done
-    
+
     # Secondary agents (if any) spawn after primary completion
     if [ -n "${SECONDARY_AGENTS}" ]; then
         echo ""
@@ -1005,7 +1005,7 @@ if [ "${PARALLEL_EXECUTION}" = "true" ]; then
         echo ""
         echo "After primary agents complete their initial tasks, spawn these additional agents:"
         echo ""
-        
+
         for agent in ${SECONDARY_AGENTS}; do
             echo "### Spawn ${agent} (Sequential)"
             echo ""
@@ -1027,11 +1027,11 @@ if [ "${PARALLEL_EXECUTION}" = "true" ]; then
             echo ""
         done
     fi
-    
+
 else
     # Single agent execution
     SINGLE_AGENT=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[0].agent')
-    
+
     echo "📍 Single Agent Execution"
     echo ""
     echo "## Implementation Agent Spawning"
@@ -1083,105 +1083,241 @@ echo "✅ Ready for ${NEXT_PHASE} phase"
 
 ```bash
 if [ "${NEXT_PHASE}" = "quality-review" ]; then
-    echo "📊 Phase 7: QUALITY REVIEW PHASE" | tee -a "${PIPELINE_LOG}"
+    echo "📊 Phase 9: QUALITY REVIEW PHASE" | tee -a "${PIPELINE_LOG}"
 
-    # Initialize quality review workspace
-    QUALITY_WORKSPACE=".claude/features/${FEATURE_ID}/quality-review"
-    mkdir -p "${QUALITY_WORKSPACE}"/{analysis,reports,metrics}
+    # Run mechanical setup operations
+    SETUP_OUTPUT=$(.claude/scripts/phases/quality-review/setup-quality-review-phase.sh "${FEATURE_ID}")
+    echo "${SETUP_OUTPUT}"
 
-    QUALITY_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-    echo "Quality review started: ${QUALITY_START}" | tee -a "${PIPELINE_LOG}"
+    # Extract file paths from setup output
+    QUALITY_CONTEXT_FILE=$(echo "${SETUP_OUTPUT}" | grep "QUALITY_CONTEXT_FILE=" | cut -d'=' -f2)
+    QUALITY_COORDINATION_PLAN=$(echo "${SETUP_OUTPUT}" | grep "QUALITY_COORDINATION_PLAN=" | cut -d'=' -f2)
+    QUALITY_STRATEGY=$(echo "${SETUP_OUTPUT}" | grep "QUALITY_STRATEGY=" | cut -d'=' -f2)
+    FEEDBACK_LOOP_DIR=$(echo "${SETUP_OUTPUT}" | grep "FEEDBACK_LOOP_DIR=" | cut -d'=' -f2)
+    FEEDBACK_ITERATION_TRACKER=$(echo "${SETUP_OUTPUT}" | grep "FEEDBACK_ITERATION_TRACKER=" | cut -d'=' -f2)
 
-    # Update metadata
-    jq '.quality_review_started = "'${QUALITY_START}'"' \
-       ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-       mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+    # Extract implementation analysis from setup
+    RISK_LEVEL=$(echo "${SETUP_OUTPUT}" | grep "RISK_LEVEL=" | cut -d'=' -f2)
+    TECH_STACK=$(echo "${SETUP_OUTPUT}" | grep "TECH_STACK=" | cut -d'=' -f2)
+
+    # Validate setup was successful
+    if [ ! -f "${QUALITY_CONTEXT_FILE}" ]; then
+        echo "❌ Quality review setup failed - context file not found" | tee -a "${PIPELINE_LOG}"
+        exit 1
+    fi
+
+    echo "✅ Quality review workspace ready" | tee -a "${PIPELINE_LOG}"
+    echo "📊 Risk Level: ${RISK_LEVEL}, Tech Stack: ${TECH_STACK}"
 fi
 ```
 
-**Execute Quality Review Phase Using Internal Agents:**
-
-**Static Code Analysis and Pattern Validation**
-
-Use the `code-quality` subagent to conduct comprehensive code quality analysis.
-
-Instruct the code-quality:
-"Conduct comprehensive code quality analysis.
-
-Context:
-
-- Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- Feature requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Security findings: .claude/features/${FEATURE_ID}/security-review/findings/
-
-Save analysis: .claude/features/${FEATURE_ID}/quality-review/analysis/code-quality-analysis.md
-
-Focus on:
-
-- Code quality metrics and standards compliance
-- Architecture pattern adherence
-- Code maintainability and readability
-- Technical debt identification"
-
-Use the `go-code-reviewer` subagent to review Go code quality and best practices.
-
-Instruct the go-code-reviewer:
-"Review Go code quality and best practices.
-
-Context:
-
-- Go implementation: .claude/features/${FEATURE_ID}/implementation/code-changes/backend/
-- Go agent tracking: .claude/features/${FEATURE_ID}/implementation/agent-outputs/golang-api-developer/
-
-Save analysis: .claude/features/${FEATURE_ID}/quality-review/analysis/go-code-review.md
-
-Focus on:
-
-- Go idioms and best practices
-- Performance optimization opportunities
-- Error handling patterns
-- Code organization and structure"
-
-Use the `performance-analyzer` subagent to analyze performance characteristics and optimization opportunities.
-
-Instruct the performance-analyzer:
-"Analyze performance characteristics and optimization opportunities.
-
-Context:
-
-- Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-
-Save analysis: .claude/features/${FEATURE_ID}/quality-review/metrics/performance-analysis.md
-
-Focus on:
-
-- Performance bottleneck identification
-- Optimization recommendations
-- Scalability assessment
-- Resource utilization analysis"
-
-**Validate quality review completion:**
+### Delegate to Quality Review Coordinator
 
 ```bash
-# Update metadata after quality review
-jq '.status = "quality_review_completed" | .quality_review_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" | .quality_score = 95' \
-   ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-   mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+# Use quality-review-coordinator to analyze and recommend quality strategy
+echo "=== Quality Review Coordination Analysis ==="
+```
 
-QUALITY_STATUS=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.status')
-QUALITY_SCORE=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.quality_score')
+Instruct the quality-review-coordinator:
+"ultrathink. Analyze this implementation and recommend a comprehensive quality review approach with feedback loops.
 
-if [ "${QUALITY_STATUS}" = "quality_review_completed" ]; then
-    echo "✅ Quality Review Phase Complete (Score: ${QUALITY_SCORE}/100)" | tee -a "${PIPELINE_LOG}"
-    NEXT_PHASE="security-review"
+**Read quality context from:** ${QUALITY_CONTEXT_FILE}
+
+**Also read these context sources:**
+
+- Implementation outputs: .claude/features/${FEATURE_ID}/implementation/agent-outputs/
+- Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/
+- Requirements (for validation): .claude/features/${FEATURE_ID}/context/requirements.json
+- Architecture compliance: .claude/features/${FEATURE_ID}/architecture/\*.md
+
+**Save your recommendations to:** ${QUALITY_COORDINATION_PLAN}
+
+**Create quality strategy at:** ${QUALITY_STRATEGY}
+
+**Output format for coordination plan:**
+
+```json
+{
+  \"recommendation\": \"comprehensive_quality|focused_quality|basic_validation|skip_quality\",
+  \"rationale\": \"Why this approach based on risk level and implementation scope\",
+  \"implementation_analysis\": {
+    \"complexity\": \"Simple|Medium|Complex\",
+    \"risk_level\": \"Low|Medium|High|Critical\",
+    \"affected_domains\": [\"backend\", \"frontend\", \"security\"],
+    \"technology_stack\": [\"Go\", \"React\", \"Python\"],
+    \"quality_priority\": \"critical|high|medium|low\"
+  },
+  \"suggested_quality_agents\": [
+    {
+      \"agent\": \"[ONLY FROM DISCOVERED AGENTS]\",
+      \"reason\": \"Specific quality domain match justification\",
+      \"quality_focus\": [\"Code review\", \"Security validation\"],
+      \"priority\": \"critical|high|medium|low\",
+      \"thinking_budget\": \"ultrathink|think|basic\",
+      \"success_criteria\": [\"Measurable validation criteria\"]
+    }
+  ],
+  \"quality_gates\": {
+    \"critical_gates\": [\"Release blocker criteria\"],
+    \"major_gates\": [\"Fix required criteria\"],
+    \"minor_gates\": [\"Improvement opportunity criteria\"]
+  },
+  \"feedback_loop_strategy\": {
+    \"max_iterations\": 3,
+    \"remediation_agents\": [
+      {
+        \"quality_issue_type\": \"security-vulnerability\",
+        \"remediation_agent\": \"golang-api-developer\",
+        \"reason\": \"Backend security fixes require Go expertise\"
+      }
+    ]
+  }
+}
+```
+
+**Focus on:**
+
+- Risk-appropriate quality depth (${RISK_LEVEL} risk level detected)
+- Technology-specific quality agents (${TECH_STACK} stack detected)
+- Measurable quality gates with clear pass/fail criteria
+- Intelligent feedback loops for iterative improvement"
+
+### Process Coordinator Recommendations
+
+```bash
+# After quality-review-coordinator completes, process recommendations
+if [ -f "${QUALITY_COORDINATION_PLAN}" ]; then
+    RECOMMENDATION=$(cat "${QUALITY_COORDINATION_PLAN}" | jq -r '.recommendation')
+
+    if [ "${RECOMMENDATION}" = "comprehensive_quality" ] || [ "${RECOMMENDATION}" = "focused_quality" ]; then
+        echo "Quality coordinator recommends: ${RECOMMENDATION}"
+        cat "${QUALITY_COORDINATION_PLAN}" | jq -r '.suggested_quality_agents[] | "- \(.agent): \(.reason) [\(.priority)]"'
+        echo ""
+        echo "Based on the coordination plan, spawn the recommended quality agents using Task tool."
+
+    else
+        echo "Quality coordinator recommends: ${RECOMMENDATION}"
+        echo "Reason: $(cat "${QUALITY_COORDINATION_PLAN}" | jq -r '.rationale')"
+        if [ "${RECOMMENDATION}" = "skip_quality" ]; then
+            echo "Guidance: $(cat "${QUALITY_COORDINATION_PLAN}" | jq -r '.guidance // "Minimal quality validation required"')"
+        fi
+    fi
+
 else
-    echo "❌ Quality Review Phase Failed: ${QUALITY_STATUS}" | tee -a "${PIPELINE_LOG}"
+    echo "❌ Quality coordination failed - coordination plan not found"
     exit 1
 fi
 ```
 
-**Phase 10: Dynamic Security Orchestration**
+### Quality Review Feedback Loop
+
+```bash
+# Initialize feedback loop for iterative quality improvement
+echo ""
+echo "=== Quality Review Feedback Loop ==="
+
+# Check if comprehensive quality review was recommended
+RECOMMENDATION=$(cat "${QUALITY_COORDINATION_PLAN}" | jq -r '.recommendation')
+if [ "${RECOMMENDATION}" = "comprehensive_quality" ] || [ "${RECOMMENDATION}" = "focused_quality" ]; then
+
+    echo "🔄 Initiating quality feedback loop with universal coordinator"
+    echo ""
+    echo "After quality agents complete their analysis:"
+    echo "1. Call feedback-loop-coordinator to analyze results and create iteration plan"
+    echo "2. If iteration plan recommends 'spawn_remediation_agents', spawn the specified agents"
+    echo "3. If iteration plan recommends 're_validate', re-run quality agents"
+    echo "4. If iteration plan recommends 'complete', proceed to next phase"
+    echo "5. If iteration plan recommends 'escalate', manual review required"
+
+else
+    echo "ℹ️ Basic validation - no feedback loop required"
+fi
+```
+
+### Feedback Loop Execution Pattern
+
+After quality agents complete, Einstein executes this feedback loop pattern:
+
+```bash
+# Feedback Loop Execution (Einstein orchestrates, main Claude spawns)
+ITERATION_COMPLETE=false
+ITERATION_COUNT=0
+MAX_ITERATIONS=3
+
+while [ "${ITERATION_COMPLETE}" = false ] && [ ${ITERATION_COUNT} -lt ${MAX_ITERATIONS} ]; do
+    ITERATION_COUNT=$((ITERATION_COUNT + 1))
+    echo "🔄 Feedback Loop Iteration ${ITERATION_COUNT}/${MAX_ITERATIONS}"
+
+    # Call feedback-loop-coordinator to analyze current state
+    echo "Calling feedback-loop-coordinator to analyze results and create iteration plan..."
+
+    # feedback-loop-coordinator outputs iteration plan
+    ITERATION_PLAN=".claude/features/${FEATURE_ID}/quality-review/feedback-loop/iteration-${ITERATION_COUNT}-plan.json"
+
+    # Process coordinator recommendation
+    if [ -f "${ITERATION_PLAN}" ]; then
+        ACTION=$(cat "${ITERATION_PLAN}" | jq -r '.einstein_instructions.action')
+
+        case "${ACTION}" in
+            "spawn_remediation_agents")
+                echo "📝 Iteration plan recommends: Spawn remediation agents"
+                cat "${ITERATION_PLAN}" | jq -r '.einstein_instructions.execution_summary'
+                echo ""
+                echo "Based on iteration plan, spawn the following remediation agents:"
+                cat "${ITERATION_PLAN}" | jq -r '.einstein_instructions.spawning_details[] | "- \(.agent): \(.instruction)"'
+                echo ""
+                echo "After remediation agents complete, continue feedback loop..."
+                ;;
+
+            "re_run_validation")
+                echo "🔍 Iteration plan recommends: Re-run quality validation"
+                echo "Re-spawn quality agents to verify fixes were successful"
+                ;;
+
+            "complete")
+                echo "✅ Iteration plan recommends: Quality validation complete"
+                ITERATION_COMPLETE=true
+                ;;
+
+            "escalate")
+                echo "🚨 Iteration plan recommends: Escalation required"
+                echo "Reason: $(cat "${ITERATION_PLAN}" | jq -r '.iteration_management.escalation_reason')"
+                ITERATION_COMPLETE=true
+                ESCALATION_REQUIRED=true
+                ;;
+        esac
+    else
+        echo "❌ Iteration plan not found - ending feedback loop"
+        ITERATION_COMPLETE=true
+    fi
+done
+
+# Handle completion or escalation
+if [ "${ESCALATION_REQUIRED}" = true ]; then
+    echo "🚨 Quality review requires manual intervention"
+    NEXT_PHASE="manual-quality-review"
+elif [ "${ITERATION_COMPLETE}" = true ]; then
+    echo "✅ Quality review feedback loop complete"
+    NEXT_PHASE="deployment"
+else
+    echo "⚠️ Maximum iterations reached - escalating to manual review"
+    NEXT_PHASE="manual-quality-review"
+fi
+```
+
+### Quality Review Completion
+
+```bash
+# Complete quality review phase
+QUALITY_END=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+jq '.status = "quality_review_completed" | .quality_review_completed = "'${QUALITY_END}'"' \
+   ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
+   mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+
+echo "🎯 Quality review complete - proceeding to ${NEXT_PHASE}"
+```
+
+**Phase 10: Security Review**
 
 ```bash
 if [ "${NEXT_PHASE}" = "security-review" ]; then
