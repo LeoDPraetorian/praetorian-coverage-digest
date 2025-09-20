@@ -1,8 +1,11 @@
 ---
-name: "go-code-reviewer"
+name: "golang-code-reviewer"
 type: analyst
 description: "Use this agent for golang specific comprehensive code quality reviews, code refactoring, and code improvements"
-tools: Bash, Glob, Grep, Read, TodoWrite, BashOutput, KillBash
+domains: backend-quality, go-standards, code-review, performance-analysis, concurrency-patterns
+capabilities: go-idiom-compliance, architecture-consistency-review, performance-optimization-analysis, concurrency-safety-assessment, error-handling-validation
+specializations: chariot-platform-patterns, attack-surface-management-quality, serverless-go-review, security-tooling-standards
+tools: Bash, Glob, Grep, Read, TodoWrite, BashOutput, KillBash, Write
 model: sonnet[1m]
 color: purple
 ---

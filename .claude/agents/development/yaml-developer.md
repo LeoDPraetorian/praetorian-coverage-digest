@@ -2,6 +2,9 @@
 name: yaml-developer
 type: developer
 description: Use this agent when working with YAML files for infrastructure-as-code, configuration management, or deployment automation. Examples: <example>Context: User is working on Kubernetes manifests and needs validation. user: 'I need to create a deployment YAML for my microservice with proper resource limits and health checks' assistant: 'I'll use the yaml-infrastructure-specialist agent to create a properly structured Kubernetes deployment with best practices for resource management and health monitoring.'</example> <example>Context: User has written Docker Compose configuration and wants optimization. user: 'Here's my docker-compose.yml file, can you review it for best practices?' assistant: 'Let me use the yaml-infrastructure-specialist agent to analyze your Docker Compose configuration for optimization opportunities and security improvements.'</example> <example>Context: User is setting up CI/CD pipeline configuration. user: 'I'm getting syntax errors in my GitHub Actions workflow file' assistant: 'I'll use the yaml-infrastructure-specialist agent to validate and fix the YAML syntax issues in your GitHub Actions workflow.'</example>
+domains: infrastructure-as-code, configuration-management, deployment-automation, kubernetes-orchestration, ci-cd-pipelines
+capabilities: yaml-validation, kubernetes-manifest-creation, docker-compose-optimization, ci-cd-configuration, infrastructure-templating, security-hardening
+specializations: chariot-platform-deployments, aws-cloudformation, helm-charts, enterprise-kubernetes, security-platform-automation
 tools: Bash, Glob, Grep, Read, Edit, MultiEdit, Write, TodoWrite, BashOutput, KillBash
 model: sonnet[1m]
 color: green

@@ -4,7 +4,7 @@ type: coordinator
 description: Use this agent when you need to consolidate information from multiple sources before beginning implementation. Examples: <example>Context: User is planning to implement a complex authentication system and needs comprehensive guidance from multiple sources. user: 'I need to implement OAuth2 with RBAC for our platform. Can you help me understand the best approach?' assistant: 'I'll use the knowledge-synthesizer agent to gather and consolidate information from our codebase, documentation, and best practices to provide comprehensive implementation guidance.' <commentary>The user needs consolidated knowledge from multiple sources before implementation, so use the knowledge-synthesizer agent.</commentary></example> <example>Context: User is researching how to integrate a new technology stack component. user: 'We're considering adding GraphQL to our API layer. What do I need to know about implementation patterns, existing code integration, and best practices?' assistant: 'Let me use the knowledge-synthesizer agent to consolidate information from our current architecture, GraphQL documentation, and industry best practices to give you comprehensive guidance.' <commentary>This requires synthesizing knowledge from multiple sources including codebase analysis, documentation, and external research.</commentary></example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, List, Read, Search, TodoWrite, Write
 model: opusplan
-color: red
+color: purple
 ---
 
 # Elite Knowledge Synthesis Specialist

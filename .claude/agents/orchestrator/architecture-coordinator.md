@@ -2,9 +2,9 @@
 name: architecture-coordinator
 type: coordinator
 description: Use this agent to coordinate architectural analysis for complex features requiring multiple architectural perspectives. Examples: <example>Context: User is implementing a feature that affects multiple system layers. user: 'We need to add real-time notifications that work across web, mobile, and integrate with our existing email system' assistant: 'I'll use the architecture-coordinator agent to analyze the architectural implications across all affected systems.' <commentary>Since this affects multiple architectural domains (frontend, backend, messaging, mobile), use the architecture-coordinator to coordinate comprehensive analysis.</commentary></example> <example>Context: User needs to design a complex data processing pipeline. user: 'I need to design a system that ingests data from multiple sources, processes it in real-time, and stores it in different formats for various consumers' assistant: 'Let me use the architecture-coordinator agent to coordinate the analysis of this complex multi-component architecture.' <commentary>This requires coordination across data ingestion, processing, storage, and API architectures.</commentary></example>
-tools: Read, Write, Search, List
+tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
 model: opusplan
-color: blue
+color: purple
 ---
 
 # Elite Architecture Coordinator

@@ -4,7 +4,7 @@ type: coordinator
 description: Use this agent when you need to transform requirements, research, and architectural decisions into detailed, executable implementation plans with specific tasks and agent assignments. Examples: <example>Context: The user has completed requirements analysis and architecture design for a new security scanning feature and needs a comprehensive implementation plan. user: 'I need to implement a new vulnerability scanner integration for our security platform' assistant: 'Let me use the implementation-planner agent to create a detailed execution plan with specific tasks and agent assignments' <commentary>Since the user needs to transform high-level requirements into actionable development tasks, use the implementation-planner agent to create comprehensive implementation roadmap.</commentary></example> <example>Context: After completing research on API patterns and database design, the user needs a structured plan to build the feature. user: 'We've analyzed the requirements for the new asset discovery system. Now I need a step-by-step implementation plan' assistant: 'I'll use the implementation-planner agent to break this down into executable tasks with clear success criteria and agent assignments' <commentary>The user has completed analysis phases and needs concrete implementation planning, so use the implementation-planner agent.</commentary></example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
 model: opusplan
-color: red
+color: purple
 ---
 
 # Elite Implementation Planning Specialist

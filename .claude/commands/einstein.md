@@ -414,7 +414,7 @@ else
 fi
 ```
 
-DO NOT PROCEED TO PHASE 3 until all research agents are spawned and their tasking has completed.
+DO NOT PROCEED TO PHASE 4 until all research agents are spawned and their tasking has completed.
 
 **Phase 4: Complexity Assessment**
 
@@ -863,7 +863,7 @@ $(head -50 "${SOURCE_PLAN}" | grep -A 20 "## Implementation Overview" | head -15
 
 ---
 
-**🚀 Design Phase Successfully Completed - Ready for Production Implementation!**
+**🚀 Design Phase Successfully Completed - Ready for Implementation!**
 
 EOFS
 
@@ -889,1001 +889,194 @@ fi
 
 ```bash
 if [ "${NEXT_PHASE}" = "implement" ]; then
-    echo "⚙️ Phase 6: IMPLEMENTATION PHASE" | tee -a "${PIPELINE_LOG}"
-
-    # Initialize implementation workspace
-    IMPL_DIR=".claude/features/${FEATURE_ID}/implementation"
-    mkdir -p "${IMPL_DIR}"/{progress,code-changes,validation,logs,agent-outputs}
-
-    # Create agent tracking structure
-    AGENT_OUTPUT_DIR="${IMPL_DIR}/agent-outputs"
-    mkdir -p "${AGENT_OUTPUT_DIR}"
-
-    IMPL_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-    echo "Implementation started: ${IMPL_START}" | tee -a "${PIPELINE_LOG}"
-
-    # Update metadata
-    jq '.status = "implementation_in_progress" | .phase = "implementation" | .implementation_started = "'${IMPL_START}'"' \
-       ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-       mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+    echo "⚙️ Phase 8: IMPLEMENTATION EXECUTION" | tee -a "${PIPELINE_LOG}"
+    
+    # Run mechanical setup operations
+    SETUP_OUTPUT=$(.claude/scripts/phases/implementation/setup-implementation-phase.sh "${FEATURE_ID}")
+    echo "${SETUP_OUTPUT}"
+    
+    # Extract file paths from setup output
+    IMPL_CONTEXT_FILE=$(echo "${SETUP_OUTPUT}" | grep "IMPL_CONTEXT_FILE=" | cut -d'=' -f2)
+    IMPL_DIR=$(echo "${SETUP_OUTPUT}" | grep "IMPL_DIR=" | cut -d'=' -f2)
+    
+    # Read the implementation plan created by implementation-planner
+    IMPLEMENTATION_PLAN=".claude/features/${FEATURE_ID}/output/implementation-plan.md"
+    
+    # Validate required files exist
+    if [ ! -f "${IMPLEMENTATION_PLAN}" ]; then
+        echo "❌ Implementation plan not found: ${IMPLEMENTATION_PLAN}" | tee -a "${PIPELINE_LOG}"
+        exit 1
+    fi
+    
+    if [ ! -f "${IMPL_CONTEXT_FILE}" ]; then
+        echo "❌ Implementation context not found: ${IMPL_CONTEXT_FILE}" | tee -a "${PIPELINE_LOG}"
+        exit 1
+    fi
+    
+    echo "✅ Implementation execution ready" | tee -a "${PIPELINE_LOG}"
+    echo "📋 Implementation Plan: ${IMPLEMENTATION_PLAN}"
+    echo "📄 Context File: ${IMPL_CONTEXT_FILE}"
 fi
 ```
 
-**Execute Implementation Phase Using Internal Agents:**
-
-**Sub-Phase 8.1: Pre-Implementation Context Analysis**
-
-Extract comprehensive implementation context from design phase artifacts:
+### Extract Agent Assignments from Implementation Plan
 
 ```bash
-# Create implementation context workspace
-IMPL_CONTEXT_DIR=".claude/features/${FEATURE_ID}/implementation/context"
-mkdir -p "${IMPL_CONTEXT_DIR}"
+# Run agent extraction and coordination setup script
+echo "=== Extracting Agent Assignments and Setting Up Coordination ==="
 
-echo "=== Pre-Implementation Context Analysis ==="
-echo "Extracting context from design phase artifacts..."
-echo "Context workspace: ${IMPL_CONTEXT_DIR}"
-```
+AGENT_OUTPUT=$(.claude/scripts/phases/implementation/extract-and-setup-agents.sh "${FEATURE_ID}")
+echo "${AGENT_OUTPUT}"
 
-Task("implementation-planner", "Extract comprehensive implementation context from design phase artifacts.
+# Extract key variables from script output
+TOTAL_AGENTS=$(echo "${AGENT_OUTPUT}" | grep "TOTAL_AGENTS=" | cut -d'=' -f2)
+PARALLEL_EXECUTION=$(echo "${AGENT_OUTPUT}" | grep "PARALLEL_EXECUTION=" | cut -d'=' -f2)
+PRIMARY_AGENTS=$(echo "${AGENT_OUTPUT}" | grep "PRIMARY_AGENTS=" | cut -d'=' -f2)
+SECONDARY_AGENTS=$(echo "${AGENT_OUTPUT}" | grep "SECONDARY_AGENTS=" | cut -d'=' -f2)
+AGENT_ASSIGNMENTS=$(echo "${AGENT_OUTPUT}" | grep "AGENT_ASSIGNMENTS=" | cut -d'=' -f2)
+COORDINATION_DIR=$(echo "${AGENT_OUTPUT}" | grep "COORDINATION_DIR=" | cut -d'=' -f2)
 
-**Read and analyze multiple context sources:**
-
-1. **Complexity Assessment**: .claude/features/${FEATURE_ID}/context/complexity-assessment.json
-
-   - Extract: affected_domains array (frontend, backend, database, etc.)
-   - Extract: complexity level and risk factors
-
-2. **Requirements Analysis**: .claude/features/${FEATURE_ID}/context/requirements.json
-
-   - Extract: affected_systems array (APIs, services, databases)
-   - Extract: user_stories and acceptance_criteria
-
-3. **Implementation Plan**: .claude/features/${FEATURE_ID}/output/implementation-plan.md
-
-   - Extract: recommended agent assignments and task breakdown
-   - Extract: technology stack requirements
-
-4. **Architecture Context** (if exists): .claude/features/${FEATURE_ID}/architecture/\*.md
-   - Extract: implementation patterns and design decisions
-   - Extract: architecture file to agent domain mappings
-
-**Create comprehensive context analysis files:**
-
-1. **Implementation Context Summary**: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
-   Format:
-
-   ```json
-   {
-     \"affected_domains\": [\"frontend\", \"backend\", \"database\"],
-     \"affected_systems\": [\"API\", \"UI\", \"Database\"],
-     \"complexity_level\": \"Medium|Complex|Simple\",
-     \"recommended_agents\": [
-       {\"agent_type\": \"golang-api-developer\", \"domain\": \"backend\", \"focus\": \"REST APIs\"},
-       {\"agent_type\": \"react-developer\", \"domain\": \"frontend\", \"focus\": \"UI components\"}
-     ],
-     \"technology_requirements\": {\"backend\": \"Go\", \"frontend\": \"React\", \"database\": \"Neo4j\"}
-   }
-   ```
-
-2. **Agent Assignments**: .claude/features/${FEATURE_ID}/implementation/progress/agent-assignments.json
-   Format with:
-
-   - implementation_tracks with agents, dependencies, parallel_safe flags
-   - specific tasks with agent assignments, file targets, completion criteria
-   - estimated duration and critical path analysis
-
-3. **Architecture Context Mapping**: .claude/features/${FEATURE_ID}/implementation/context/architecture-mapping.json
-   Format:
-   ```json
-   {
-     \"agent_architecture_files\": {
-       \"golang-api-developer\": [\"backend-architecture.md\", \"api-architecture.md\"],
-       \"react-developer\": [\"frontend-architecture.md\", \"ui-architecture.md\"],
-       \"database-neo4j-architect\": [\"database-architecture.md\", \"graph-schema.md\"]
-     },
-     \"available_architecture_files\": [\"list of actual .md files found\"]
-   }
-   ```
-
-**Instructions:**
-
-- Only map architecture files that actually exist in .claude/features/${FEATURE_ID}/architecture/
-- Match agent types to relevant architecture domains (backend agents get backend architecture files)
-- Create fallback strategies if expected architecture files don't exist", "implementation-planner")
-
-**Context Analysis Validation Gate:**
-
-Wait for the implementation-planner to complete, then verify all required context files:
-
-```bash
-echo "=== Context Analysis Validation Gate ==="
-echo "Validating implementation context extraction..."
-
-# Define required context files
-CONTEXT_FILES=(
-    "implementation-context.json"
-    "agent-assignments.json"
-    "architecture-mapping.json"
-)
-
-VALIDATION_PASSED=true
-CONTEXT_DIR=".claude/features/${FEATURE_ID}/implementation/context"
-
-# Validate each required context file exists and has valid structure
-for context_file in "${CONTEXT_FILES[@]}"; do
-    CONTEXT_PATH="${CONTEXT_DIR}/${context_file}"
-
-    if [ -f "${CONTEXT_PATH}" ]; then
-        echo "✓ ${context_file} exists"
-
-        # Validate JSON structure
-        if jq empty "${CONTEXT_PATH}" 2>/dev/null; then
-            echo "✓ ${context_file} contains valid JSON"
-
-            # Validate specific content based on file type
-            case "${context_file}" in
-                "implementation-context.json")
-                    # Validate required fields exist
-                    REQUIRED_FIELDS=("affected_domains" "complexity_level" "recommended_agents")
-                    for field in "${REQUIRED_FIELDS[@]}"; do
-                        if jq -e ".${field}" "${CONTEXT_PATH}" >/dev/null 2>&1; then
-                            echo "✓ implementation-context.json contains required field: ${field}"
-                        else
-                            echo "✗ implementation-context.json missing required field: ${field}"
-                            VALIDATION_PASSED=false
-                        fi
-                    done
-
-                    # Show extracted domains for verification
-                    DOMAINS=$(jq -r '.affected_domains[]' "${CONTEXT_PATH}" 2>/dev/null | tr '\n' ', ' | sed 's/,$//')
-                    COMPLEXITY=$(jq -r '.complexity_level' "${CONTEXT_PATH}" 2>/dev/null)
-                    echo "   → Extracted domains: ${DOMAINS}"
-                    echo "   → Complexity level: ${COMPLEXITY}"
-                    ;;
-
-                "agent-assignments.json")
-                    # Validate agent assignments structure
-                    if jq -e '.implementation_tracks' "${CONTEXT_PATH}" >/dev/null 2>&1; then
-                        echo "✓ agent-assignments.json contains implementation_tracks"
-                    else
-                        echo "✗ agent-assignments.json missing implementation_tracks"
-                        VALIDATION_PASSED=false
-                    fi
-                    ;;
-
-                "architecture-mapping.json")
-                    # Validate architecture file mappings and verify files exist
-                    if jq -e '.agent_architecture_files' "${CONTEXT_PATH}" >/dev/null 2>&1; then
-                        echo "✓ architecture-mapping.json contains agent_architecture_files"
-
-                        # Verify mapped architecture files actually exist
-                        ARCH_DIR=".claude/features/${FEATURE_ID}/architecture"
-                        if [ -d "${ARCH_DIR}" ]; then
-                            # Check each mapped file exists
-                            jq -r '.agent_architecture_files | to_entries[] | .value[]' "${CONTEXT_PATH}" 2>/dev/null | while read -r arch_file; do
-                                ARCH_FILE_PATH="${ARCH_DIR}/${arch_file}"
-                                if [ -f "${ARCH_FILE_PATH}" ]; then
-                                    echo "✓ Architecture file exists: ${arch_file}"
-                                else
-                                    echo "⚠️ Architecture file referenced but not found: ${arch_file}"
-                                fi
-                            done
-                        else
-                            echo "ℹ️ No architecture directory found - skipping file verification"
-                        fi
-                    else
-                        echo "✗ architecture-mapping.json missing agent_architecture_files"
-                        VALIDATION_PASSED=false
-                    fi
-                    ;;
-            esac
-        else
-            echo "✗ ${context_file} contains invalid JSON"
-            VALIDATION_PASSED=false
-        fi
-    else
-        echo "✗ ${context_file} missing"
-        VALIDATION_PASSED=false
-    fi
-    echo ""
-done
-
-# Final validation result
-if [ "${VALIDATION_PASSED}" = true ]; then
-    echo "🎯 Context Analysis Validation: PASSED"
-    echo "✅ All required context files created with valid structure"
-    echo "Proceeding to agent orchestration..."
-else
-    echo "❌ Context Analysis Validation: FAILED"
-    echo "✗ One or more context files missing or invalid"
-    echo "✗ Implementation phase cannot proceed without proper context"
-    echo ""
-    echo "Terminating Einstein pipeline due to validation failure."
+# Validate extraction was successful
+if [ ! -f "${AGENT_ASSIGNMENTS}" ]; then
+    echo "❌ Agent extraction failed - assignments file not found" | tee -a "${PIPELINE_LOG}"
     exit 1
 fi
-```
 
-**Sub-Phase 6.2: Context-Aware Parallel Implementation Orchestration**
-
-Read extracted context and spawn implementation agents with relevant architecture files:
-
-```bash
-# Read context analysis results
-IMPL_CONTEXT=".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json"
-ARCH_MAPPING=".claude/features/${FEATURE_ID}/implementation/context/architecture-mapping.json"
-
-echo "=== Context-Aware Agent Spawning ==="
-if [ -f "${IMPL_CONTEXT}" ]; then
-    COMPLEXITY=$(cat "${IMPL_CONTEXT}" | jq -r '.complexity_level')
-    AFFECTED_DOMAINS=$(cat "${IMPL_CONTEXT}" | jq -r '.affected_domains[]' | tr '\n' ', ' | sed 's/,$//')
-    echo "Complexity Level: ${COMPLEXITY}"
-    echo "Affected Domains: ${AFFECTED_DOMAINS}"
-
-    echo "Discovering available development agents..."
-else
-    echo "⚠️ Context analysis not found - using default agent set"
+if [ "${TOTAL_AGENTS}" -eq 0 ]; then
+    echo "⚠️ No agents extracted from implementation plan" | tee -a "${PIPELINE_LOG}"
+    echo "Implementation plan may need agent assignments added"
+    exit 1
 fi
+
+echo "✅ Agent extraction and coordination setup complete"
 ```
 
-**Dynamic Development Agent Discovery:**
-
-Discover available development agents with comprehensive metadata parsing:
+### Intelligent Parallel Agent Spawning
 
 ```bash
-# Auto-discover development agents with comprehensive metadata parsing
-DEV_AGENTS_DIR=".claude/agents/development"
+# Spawn agents based on extracted assignments with intelligent parallelization
+echo ""
+echo "=== Spawning Development Agents ==="
 
-echo "=== Available Development Agents ==="
-
-if [ -d "${DEV_AGENTS_DIR}" ]; then
-    echo "Development Agents with Full Metadata:"
-    find "${DEV_AGENTS_DIR}" -name "*.md" -type f | while read agent_file; do
-        agent_name=$(basename "$agent_file" .md)
-        agent_type=$(grep "^type:" "$agent_file" | cut -d':' -f2- | xargs)
-        agent_desc=$(grep "^description:" "$agent_file" | cut -d':' -f2- | xargs | cut -c1-80)
-        domains=$(grep "^domains:" "$agent_file" | cut -d':' -f2- | xargs)
-        capabilities=$(grep "^capabilities:" "$agent_file" | cut -d':' -f2- | xargs)
-        specializations=$(grep "^specializations:" "$agent_file" | cut -d':' -f2- | xargs)
-
-        echo "- ${agent_name}:"
-        echo "  * Type: ${agent_type}"
-        echo "  * Domains: ${domains}"
-        echo "  * Capabilities: ${capabilities}"
-        echo "  * Specializations: ${specializations}"
-        echo "  * Description: ${agent_desc}..."
+if [ "${PARALLEL_EXECUTION}" = "true" ]; then
+    echo "🚀 Executing parallel agent spawning strategy"
+    
+    # Get primary group agents (first wave - parallel execution)
+    PRIMARY_AGENTS=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[] | select(.parallel_group == "primary") | .agent')
+    SECONDARY_AGENTS=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[] | select(.parallel_group == "secondary") | .agent')
+    
+    echo ""
+    echo "## Phase 1: Primary Agent Spawning (Parallel)"
+    echo ""
+    echo "Spawn these agents simultaneously using Claude Code's Task tool:"
+    echo ""
+    
+    # Generate parallel spawning instructions for primary agents
+    for agent in ${PRIMARY_AGENTS}; do
+        echo "### Spawn ${agent}"
+        echo ""
+        echo "Use the \`${agent}\` subagent for implementation."
+        echo ""
+        echo "Instruct the ${agent}:"
+        echo "\"Implement your assigned tasks from the implementation plan."
+        echo ""
+        echo "**Core Context:**"
+        echo "- Implementation Plan: ${IMPLEMENTATION_PLAN}"
+        echo "- Implementation Context: ${IMPL_CONTEXT_FILE}"
+        echo "- Your assignments: Read implementation plan for specific tasks assigned to ${agent}"
+        echo ""
+        echo "**Your workspace:**"
+        echo "- Code changes: ${IMPL_DIR}/code-changes/${agent}/"
+        echo "- Progress tracking: ${IMPL_DIR}/agent-outputs/${agent}/"
+        echo ""
+        echo "**Instructions:**"
+        echo "1. Read the implementation plan to find tasks specifically assigned to ${agent}"
+        echo "2. Implement assigned features following established patterns"
+        echo "3. Create necessary files and coordinate with other agents as needed"
+        echo "4. Track progress in your designated workspace"
+        echo "5. Follow success criteria defined in implementation plan\""
         echo ""
     done
+    
+    # Secondary agents (if any) spawn after primary completion
+    if [ -n "${SECONDARY_AGENTS}" ]; then
+        echo ""
+        echo "## Phase 2: Secondary Agent Spawning (After Primary Completion)"
+        echo ""
+        echo "After primary agents complete their initial tasks, spawn these additional agents:"
+        echo ""
+        
+        for agent in ${SECONDARY_AGENTS}; do
+            echo "### Spawn ${agent} (Sequential)"
+            echo ""
+            echo "Use the \`${agent}\` subagent for implementation."
+            echo ""
+            echo "Instruct the ${agent}:"
+            echo "\"Implement your assigned tasks, building on work completed by primary agents."
+            echo ""
+            echo "**Core Context:**"
+            echo "- Implementation Plan: ${IMPLEMENTATION_PLAN}"
+            echo "- Implementation Context: ${IMPL_CONTEXT_FILE}"
+            echo "- Primary Agent Outputs: ${IMPL_DIR}/agent-outputs/"
+            echo "- Your assignments: Read implementation plan for specific tasks assigned to ${agent}"
+            echo ""
+            echo "**Coordination:**"
+            echo "- Review primary agent outputs before starting"
+            echo "- Build upon existing implementations"
+            echo "- Ensure integration with completed work\""
+            echo ""
+        done
+    fi
+    
 else
-    echo "Development agents directory not found: ${DEV_AGENTS_DIR}"
-fi
-
-# Get all available development agents for selection with metadata
-echo "====================================="
-echo "Agent Discovery Complete. Available agents for capability-based selection:"
-
-AVAILABLE_DEV_AGENTS=$(
-    find "${DEV_AGENTS_DIR}" -name "*.md" -type f -exec basename {} .md \; 2>/dev/null
-) | sort | uniq
-
-echo "${AVAILABLE_DEV_AGENTS}"
-echo "====================================="
-```
-
-**Capability-Based Agent Selection:**
-
-Map feature requirements to available agents using dynamic discovery:
-
-```bash
-echo "=== Dynamic Agent Selection ==="
-
-# Read extracted context for agent selection
-if [ -f "${IMPL_CONTEXT}" ]; then
-    # Extract requirements from context
-    AFFECTED_DOMAINS_JSON=$(cat "${IMPL_CONTEXT}" | jq -r '.affected_domains | join(", ")' 2>/dev/null)
-    COMPLEXITY_LEVEL=$(cat "${IMPL_CONTEXT}" | jq -r '.complexity_level' 2>/dev/null)
-    RECOMMENDED_AGENTS=$(cat "${IMPL_CONTEXT}" | jq -r '.recommended_agents[]?.agent_type' 2>/dev/null)
-
-    echo "Feature Requirements:"
-    echo "• Complexity: ${COMPLEXITY_LEVEL}"
-    echo "• Affected Domains: ${AFFECTED_DOMAINS_JSON}"
-    echo "• Recommended Agents: ${RECOMMENDED_AGENTS}"
+    # Single agent execution
+    SINGLE_AGENT=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[0].agent')
+    
+    echo "📍 Single Agent Execution"
     echo ""
-
-    # Initialize selected agents array
-    SELECTED_AGENTS=()
-    SELECTION_REASONS=()
-
-    # Map domains to agent capabilities using discovered agents
-    echo "Mapping domains to available agents..."
-
-    # Backend Development Domain Mapping
-    if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "backend\|api\|server\|microservice"; then
-        echo "🔍 Backend domain detected - searching for backend developers..."
-
-        # Search for golang-api-developer if available
-        if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "golang-api-developer"; then
-            SELECTED_AGENTS+=("golang-api-developer")
-            SELECTION_REASONS+=("golang-api-developer: domains backend-development,go-apis,microservices-implementation match backend requirements")
-            echo "✅ Selected: golang-api-developer (backend development capabilities)"
-        # Fallback to general golang-developer
-        elif echo "${AVAILABLE_DEV_AGENTS}" | grep -q "golang-developer"; then
-            SELECTED_AGENTS+=("golang-developer")
-            SELECTION_REASONS+=("golang-developer: fallback for backend development needs")
-            echo "✅ Selected: golang-developer (backend development fallback)"
-        fi
-
-        # Add Python support if Python domain detected or CLI development needed
-        if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "python\|cli" || echo "${AVAILABLE_DEV_AGENTS}" | grep -q "python-developer"; then
-            SELECTED_AGENTS+=("python-developer")
-            SELECTION_REASONS+=("python-developer: domains python-development,cli-development support backend services")
-            echo "✅ Selected: python-developer (Python/CLI backend support)"
-        fi
-    fi
-
-    # Frontend Development Domain Mapping
-    if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "frontend\|ui\|react\|component\|dashboard"; then
-        echo "🔍 Frontend domain detected - searching for frontend developers..."
-
-        # Search for react-developer if available
-        if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "react-developer"; then
-            SELECTED_AGENTS+=("react-developer")
-            SELECTION_REASONS+=("react-developer: domains frontend-development,react-components,ui-implementation match frontend requirements")
-            echo "✅ Selected: react-developer (frontend development capabilities)"
-        fi
-    fi
-
-    # Integration Development Domain Mapping
-    if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "integration\|webhook\|api.*integration\|third.*party" || echo "${RECOMMENDED_AGENTS}" | grep -qi "integration"; then
-        echo "🔍 Integration domain detected - searching for integration developers..."
-
-        if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "integration-developer"; then
-            SELECTED_AGENTS+=("integration-developer")
-            SELECTION_REASONS+=("integration-developer: domains service-integration,api-integration,third-party-integration match integration requirements")
-            echo "✅ Selected: integration-developer (integration capabilities)"
-        fi
-    fi
-
-    # Security/VQL Development Domain Mapping
-    if echo "${AFFECTED_DOMAINS_JSON}" | grep -qi "security\|vql\|threat\|detection\|forensic" || echo "${RECOMMENDED_AGENTS}" | grep -qi "vql"; then
-        echo "🔍 Security/VQL domain detected - searching for security developers..."
-
-        if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "vql-developer"; then
-            SELECTED_AGENTS+=("vql-developer")
-            SELECTION_REASONS+=("vql-developer: domains vql-development,security-automation,threat-hunting match security requirements")
-            echo "✅ Selected: vql-developer (security/VQL capabilities)"
-        fi
-    fi
-
-    # Complexity-Aware Agent Count Adjustment
-    AGENT_COUNT=${#SELECTED_AGENTS[@]}
-    MAX_AGENTS=3  # Default for Simple
-
-    case "${COMPLEXITY_LEVEL}" in
-        "Simple")
-            MAX_AGENTS=3
-            echo "📊 Simple complexity: Max 3 agents"
-            ;;
-        "Medium")
-            MAX_AGENTS=5
-            echo "📊 Medium complexity: Max 5 agents"
-            ;;
-        "Complex")
-            MAX_AGENTS=8
-            echo "📊 Complex complexity: Max 8 agents (with coordination)"
-            # Add testing agents for complex features
-            if echo "${AVAILABLE_DEV_AGENTS}" | grep -q "integration-test-engineer" && [ $AGENT_COUNT -lt $MAX_AGENTS ]; then
-                SELECTED_AGENTS+=("integration-test-engineer")
-                SELECTION_REASONS+=("integration-test-engineer: complex features require comprehensive testing")
-                echo "✅ Added: integration-test-engineer (complex feature testing)"
-            fi
-            ;;
-        *)
-            MAX_AGENTS=3
-            echo "📊 Unknown complexity: Defaulting to 3 agents"
-            ;;
-    esac
-
-    # Trim agent list if exceeding max for complexity level
-    if [ $AGENT_COUNT -gt $MAX_AGENTS ]; then
-        echo "⚠️ Trimming agent selection from $AGENT_COUNT to $MAX_AGENTS agents for $COMPLEXITY_LEVEL complexity"
-        SELECTED_AGENTS=("${SELECTED_AGENTS[@]:0:$MAX_AGENTS}")
-        SELECTION_REASONS=("${SELECTION_REASONS[@]:0:$MAX_AGENTS}")
-    fi
-
+    echo "## Implementation Agent Spawning"
     echo ""
-    echo "🎯 Final Agent Selection Summary:"
-    for i in "${!SELECTED_AGENTS[@]}"; do
-        echo "$(($i + 1)). ${SELECTED_AGENTS[$i]}"
-        echo "   └── ${SELECTION_REASONS[$i]}"
-    done
+    echo "Use the \`${SINGLE_AGENT}\` subagent for complete implementation."
     echo ""
-    echo "Total agents selected: ${#SELECTED_AGENTS[@]} (max: $MAX_AGENTS for $COMPLEXITY_LEVEL complexity)"
-
-else
-    echo "❌ No implementation context available - reading from complexity assessment"
-    COMPLEXITY_LEVEL=$(cat ".claude/features/${FEATURE_ID}/context/complexity-assessment.json" | jq -r '.level' 2>/dev/null || echo "Unknown")
-    echo "• Complexity Level (from assessment): ${COMPLEXITY_LEVEL}"
-    
-    # Fallback to minimal agent set
-    SELECTED_AGENTS=("golang-api-developer" "react-developer")
-    SELECTION_REASONS=("golang-api-developer: fallback backend agent" "react-developer: fallback frontend agent")
-    echo "🔄 Using fallback agent set: ${SELECTED_AGENTS[@]}"
-fi
-
-# Ensure COMPLEXITY_LEVEL is never empty
-COMPLEXITY_LEVEL=${COMPLEXITY_LEVEL:-"Unknown"}
-```
-
-**Sub-Phase 8.1.5: Thinking Budget Optimization for Implementation Phase**
-
-Optimize thinking budget allocation for implementation agents:
-
-```bash
-source .claude/features/current_feature.env
-IMPL_CONTEXT=".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json"
-IMPL_THINKING_ALLOCATION=".claude/features/${FEATURE_ID}/implementation/thinking-allocation.json"
-
-echo "=== Implementation Phase Thinking Budget Optimization ==="
-echo "Implementation context: ${IMPL_CONTEXT}"
-echo "Thinking allocation output: ${IMPL_THINKING_ALLOCATION}"
-```
-
-Use the `thinking-budget-allocator` subagent to optimize thinking budget allocation for implementation phase agents.
-
-Instruct the thinking-budget-allocator:
-"ultrathink. Optimize thinking budget allocation for implementation phase agents.
-
-Context:
-
-- Complexity assessment: .claude/features/${FEATURE_ID}/context/complexity-assessment.json
-- Implementation context: ${IMPL_CONTEXT}
-- Planned agents: Read recommended_agents from implementation context
-- User preference: balanced (detect from --thinking= flags if provided)
-
-Output allocation plan to: ${IMPL_THINKING_ALLOCATION}
-
-Focus on:
-
-- Implementation agent thinking levels based on complexity and domains
-- Testing agent thinking levels based on risk assessment
-- Cost optimization for development phase efficiency
-- User transparency with cost estimates and alternative strategies
-
-Analyze planned agents from implementation context and provide thinking level recommendations."
-
-```bash
-# Validate implementation thinking allocation
-if [ -f "${IMPL_THINKING_ALLOCATION}" ]; then
-    echo "✓ Implementation thinking allocation completed"
-    cat "${IMPL_THINKING_ALLOCATION}" | jq -r '.cost_estimate // "Cost estimate not available"'
-else
-    echo "✗ Implementation thinking allocation failed - using defaults"
+    echo "Instruct the ${SINGLE_AGENT}:"
+    echo "\"Implement the complete feature as specified in the implementation plan."
+    echo ""
+    echo "**Core Context:**"
+    echo "- Implementation Plan: ${IMPLEMENTATION_PLAN}"
+    echo "- Implementation Context: ${IMPL_CONTEXT_FILE}"
+    echo ""
+    echo "**Your workspace:**"
+    echo "- Code changes: ${IMPL_DIR}/code-changes/"
+    echo "- Progress tracking: ${IMPL_DIR}/agent-outputs/${SINGLE_AGENT}/"
+    echo ""
+    echo "**Instructions:**"
+    echo "1. Read the complete implementation plan"
+    echo "2. Implement all assigned features following established patterns"
+    echo "3. Create necessary files and handle all aspects of the feature"
+    echo "4. Follow success criteria and testing requirements from the plan"
+    echo "5. Track progress and document your implementation approach\""
 fi
 ```
 
-**Dynamic Agent Spawning:**
-
-Spawn selected agents with capability-aware context and optimized thinking levels:
-
-**Dynamically Spawn Selected Agents:**
-
-For each selected agent, spawn with appropriate context, architecture files, and thinking optimization:
-
-**Golang API Developer** (spawn if selected):
+### Implementation Completion
 
 ```bash
-# Check if golang-api-developer was selected
-if [[ " ${SELECTED_AGENTS[@]} " =~ " golang-api-developer " ]]; then
-    echo "🚀 Spawning golang-api-developer..."
-
-    # Read thinking allocation for this agent
-    IMPL_THINKING=$(cat ${IMPL_THINKING_ALLOCATION} | jq -r '.thinking_allocations."golang-api-developer"' 2>/dev/null || echo "think")
-```
-
-    # Use the golang-api-developer subagent to implement backend API components
-    
-    cat << EOF
-Use the \`golang-api-developer\` subagent to implement backend API components with architecture context.
-
-Instruct the golang-api-developer:
-"${IMPL_THINKING}. Implement backend API components with architecture context.
-
-**Core Context:**
-
-- Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
-- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Agent assignments: .claude/features/${FEATURE_ID}/implementation/progress/agent-assignments.json
-- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
-
-**Architecture Context** (read if available):
-$([ -f .claude/features/${FEATURE_ID}/architecture/backend-architecture.md ] && echo "- Backend Architecture: .claude/features/${FEATURE_ID}/architecture/backend-architecture.md" || echo "- No backend architecture file found")
-$([ -f .claude/features/${FEATURE_ID}/architecture/api-architecture.md ] && echo "- API Architecture: .claude/features/${FEATURE_ID}/architecture/api-architecture.md" || echo "- No API architecture file found")
-$([ -f .claude/features/${FEATURE_ID}/architecture/database-architecture.md ] && echo "- Database Architecture: .claude/features/${FEATURE_ID}/architecture/database-architecture.md" || echo "- No database architecture file found")
-
-**Your workspace:**
-
-- Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/backend/
-- Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/golang-api-developer/tracking-report.md
-- Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
-
-**Coordination Context:**
-
-- Shared API contracts: .claude/features/${FEATURE_ID}/implementation/coordination/api-contracts/
-- Inter-agent communication: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
-
-**Instructions:**
-
-1. Read implementation context to understand complexity and requirements
-2. If architecture files are available, apply architectural decisions to your implementation
-3. Focus on domains specified in affected_domains from implementation-context.json
-4. Implement your assigned tasks and maintain detailed progress tracking
-5. Coordinate with other agents through shared workspace and communication files
-6. Update API contracts in coordination directory for frontend integration"
-EOF
-
-```bash
-else
-    echo "⏭️  golang-api-developer not selected for this feature"
-fi
-```
-
-**React Developer** (spawn if selected):
-
-```bash
-# Check if react-developer was selected
-if [[ " ${SELECTED_AGENTS[@]} " =~ " react-developer " ]]; then
-    echo "🚀 Spawning react-developer..."
-
-    # Read thinking allocation for this agent
-    IMPL_THINKING=$(cat ${IMPL_THINKING_ALLOCATION} | jq -r '.thinking_allocations."react-developer"' 2>/dev/null || echo "think")
-```
-
-    # Use the react-developer subagent to implement frontend UI components
-    
-    cat << EOF
-Use the \`react-developer\` subagent to implement frontend UI components with architecture context.
-
-Instruct the react-developer:
-"${IMPL_THINKING}. Implement frontend UI components with architecture context.
-
-**Core Context:**
-
-- Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
-- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Agent assignments: .claude/features/${FEATURE_ID}/implementation/progress/agent-assignments.json
-- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
-
-**Architecture Context** (read if available):
-$([ -f .claude/features/${FEATURE_ID}/architecture/frontend-architecture.md ] && echo "- Frontend Architecture: .claude/features/${FEATURE_ID}/architecture/frontend-architecture.md" || echo "- No frontend architecture file found")
-$([ -f .claude/features/${FEATURE_ID}/architecture/ui-architecture.md ] && echo "- UI Architecture: .claude/features/${FEATURE_ID}/architecture/ui-architecture.md" || echo "- No UI architecture file found")
-$([ -f .claude/features/${FEATURE_ID}/architecture/component-architecture.md ] && echo "- Component Architecture: .claude/features/${FEATURE_ID}/architecture/component-architecture.md" || echo "- No component architecture file found")
-
-**Your workspace:**
-
-- Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/frontend/
-- Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/react-developer/tracking-report.md
-- Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
-
-**Coordination Context:**
-
-- Shared API contracts: .claude/features/${FEATURE_ID}/implementation/coordination/api-contracts/
-- Inter-agent communication: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
-
-**Instructions:**
-
-1. Read implementation context to understand UI requirements and complexity
-2. If frontend architecture files exist, follow architectural decisions for component design
-3. Focus on user stories and acceptance criteria from requirements.json
-4. Implement responsive, accessible UI components following established patterns
-5. Coordinate with backend agent for API integration through shared API contracts
-6. Read API contracts from coordination directory for accurate frontend integration"
-EOF
-
-```bash
-else
-    echo "⏭️  react-developer not selected for this feature"
-fi
-```
-
-**Integration Developer** (spawn if selected):
-
-```bash
-# Check if integration-developer was selected
-if [[ " ${SELECTED_AGENTS[@]} " =~ " integration-developer " ]]; then
-    echo "🚀 Spawning integration-developer..."
-```
-
-    # Use the integration-developer subagent to implement service integrations
-    
-    cat << EOF
-Use the \`integration-developer\` subagent to implement service integrations and API connections.
-
-Instruct the integration-developer:
-"Implement service integrations and API connections.
-
-**Core Context:**
-
-- Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
-- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
-
-**Architecture Context** (read if available):
-$([ -f .claude/features/${FEATURE_ID}/architecture/integration-architecture.md ] && echo "- Integration Architecture: .claude/features/${FEATURE_ID}/architecture/integration-architecture.md" || echo "- No integration architecture file found")
-$([ -f .claude/features/${FEATURE_ID}/architecture/api-architecture.md ] && echo "- API Architecture: .claude/features/${FEATURE_ID}/architecture/api-architecture.md" || echo "- No API architecture file found")
-
-**Your workspace:**
-
-- Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/integrations/
-- Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/integration-developer/tracking-report.md
-- Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
-
-**Coordination Context:**
-
-- Integration contracts: .claude/features/${FEATURE_ID}/implementation/coordination/integration-contracts/
-- Service communication: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
-
-**Instructions:**
-
-1. Focus on integration-specific domains from implementation-context.json
-2. Apply integration architecture patterns and authentication flows
-3. Implement webhook handling, API client code, and service orchestration
-4. Document integration contracts and communication patterns
-5. Coordinate with backend agents through shared integration specifications"
-EOF
-
-```bash
-else
-    echo "⏭️  integration-developer not selected for this feature"
-fi
-```
-
-**Python Developer** (spawn if selected):
-
-```bash
-# Check if python-developer was selected
-if [[ " ${SELECTED_AGENTS[@]} " =~ " python-developer " ]]; then
-    echo "🚀 Spawning python-developer..."
-```
-
-    # Use the python-developer subagent to implement Python components
-    
-    cat << EOF
-Use the \`python-developer\` subagent to implement Python components and CLI tooling.
-
-Instruct the python-developer:
-"Implement Python components and CLI tooling.
-
-**Core Context:**
-
-- Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
-- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
-
-**Your workspace:**
-
-- Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/python/
-- Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/python-developer/tracking-report.md
-- Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
-
-**Instructions:**
-
-1. Focus on Python-specific requirements from implementation context
-2. Implement CLI interfaces, data processing pipelines, or Python services
-3. Follow Praetorian CLI patterns and enterprise Python best practices
-4. Coordinate with other agents through shared workspace structures"
-EOF
-
-```bash
-else
-    echo "⏭️  python-developer not selected for this feature"
-fi
-```
-
-**VQL Developer** (spawn if selected):
-
-```bash
-# Check if vql-developer was selected
-if [[ " ${SELECTED_AGENTS[@]} " =~ " vql-developer " ]]; then
-    echo "🚀 Spawning vql-developer..."
-```
-
-    # Use the vql-developer subagent to implement VQL security capabilities
-    
-    cat << EOF
-Use the \`vql-developer\` subagent to implement VQL security capabilities and detection logic.
-
-Instruct the vql-developer:
-"Implement VQL security capabilities and detection logic.
-
-**Core Context:**
-
-- Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
-- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
-
-**Your workspace:**
-
-- Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/vql/
-- Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/vql-developer/tracking-report.md
-- Progress updates: .claude/features/${FEATURE_ID}/implementation/progress/task-tracker.json
-
-**Instructions:**
-
-1. Focus on security-specific domains from implementation context
-2. Develop VQL artifacts, detection rules, and security automation capabilities
-3. Follow Praetorian Aegis platform patterns for threat hunting and incident response
-4. Document security capabilities and coordinate with other security components"
-EOF
-
-```bash
-else
-    echo "⏭️  vql-developer not selected for this feature"
-fi
-```
-
-**Agent Coordination Workspace Setup:**
-
-Create shared workspace structure for inter-agent communication:
-
-```bash
-echo "=== Setting Up Agent Coordination Workspace ==="
-
-# Create coordination directories
-COORDINATION_DIR=".claude/features/${FEATURE_ID}/implementation/coordination"
-mkdir -p "${COORDINATION_DIR}"/{api-contracts,integration-contracts,communication,progress,dependencies}
-
-echo "📁 Coordination workspace created:"
-echo "  • API Contracts: ${COORDINATION_DIR}/api-contracts/"
-echo "  • Integration Contracts: ${COORDINATION_DIR}/integration-contracts/"
-echo "  • Communication: ${COORDINATION_DIR}/communication/"
-echo "  • Progress Tracking: ${COORDINATION_DIR}/progress/"
-echo "  • Dependencies: ${COORDINATION_DIR}/dependencies/"
-
-# Create coordination metadata
-cat > "${COORDINATION_DIR}/coordination-metadata.json" << EOF
-{
-  "coordination_strategy": "file-based",
-  "selected_agents": [],
-  "communication_channels": [
-    "api-contracts: Backend to Frontend API specifications",
-    "integration-contracts: Third-party service integration specs",
-    "communication: Inter-agent status updates and coordination",
-    "progress: Milestone tracking and dependency resolution",
-    "dependencies: Cross-agent dependency mapping"
-  ],
-  "created": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-}
-EOF
-
-# Update coordination metadata with selected agents
-if [ ${#SELECTED_AGENTS[@]} -gt 0 ]; then
-    AGENTS_JSON=$(printf '%s\n' "${SELECTED_AGENTS[@]}" | jq -R . | jq -s .)
-    jq --argjson agents "${AGENTS_JSON}" '.selected_agents = $agents' \
-        "${COORDINATION_DIR}/coordination-metadata.json" > "${COORDINATION_DIR}/coordination-metadata.json.tmp" && \
-        mv "${COORDINATION_DIR}/coordination-metadata.json.tmp" "${COORDINATION_DIR}/coordination-metadata.json"
-fi
-
-echo "✅ Agent coordination workspace prepared for ${#SELECTED_AGENTS[@]} selected agents"
-```
-
-**Integration Testing Agent** (spawn if testing needed):
-
-```bash
-# Check if integration-test-engineer is needed (always for Medium/Complex, optional for Simple)
-SPAWN_TESTING_AGENT=false
-if [ "${COMPLEXITY_LEVEL}" = "Complex" ] || [ "${COMPLEXITY_LEVEL}" = "Medium" ]; then
-    SPAWN_TESTING_AGENT=true
-    echo "🚀 Spawning integration-test-engineer for ${COMPLEXITY_LEVEL} complexity feature..."
-elif echo "${AVAILABLE_DEV_AGENTS}" | grep -q "integration-test-engineer" && [ ${#SELECTED_AGENTS[@]} -lt 3 ]; then
-    SPAWN_TESTING_AGENT=true
-    echo "🚀 Spawning integration-test-engineer for comprehensive testing..."
-else
-    echo "⏭️  integration-test-engineer not needed for Simple complexity feature"
-fi
-
-if [ "${SPAWN_TESTING_AGENT}" = true ]; then
-```
-
-    # Use the integration-test-engineer subagent to create integration tests
-    
-    cat << EOF
-Use the \`integration-test-engineer\` subagent to create integration tests with architecture-aware context.
-
-Instruct the integration-test-engineer:
-"Create integration tests with architecture-aware context.
-
-**Core Context:**
-
-- Implementation plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
-- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Implementation context: .claude/features/${FEATURE_ID}/implementation/context/implementation-context.json
-- Backend code: .claude/features/${FEATURE_ID}/implementation/code-changes/backend/
-- Frontend code: .claude/features/${FEATURE_ID}/implementation/code-changes/frontend/
-
-**Architecture Context** (read if available):
-$([ -f .claude/features/${FEATURE_ID}/architecture/integration-architecture.md ] && echo "- Integration Architecture: .claude/features/${FEATURE_ID}/architecture/integration-architecture.md" || echo "- No integration architecture file found")
-$([ -f .claude/features/${FEATURE_ID}/architecture/testing-architecture.md ] && echo "- Testing Architecture: .claude/features/${FEATURE_ID}/architecture/testing-architecture.md" || echo "- No testing architecture file found")
-
-**Your workspace:**
-
-- Test code: .claude/features/${FEATURE_ID}/implementation/code-changes/tests/
-- Tracking report: .claude/features/${FEATURE_ID}/implementation/agent-outputs/integration-test-engineer/tracking-report.md
-
-**Coordination Context:**
-
-- Test coordination: .claude/features/${FEATURE_ID}/implementation/coordination/communication/
-- Integration results: .claude/features/${FEATURE_ID}/implementation/coordination/progress/
-
-**Instructions:**
-
-1. Read affected_systems from implementation context to understand integration points
-2. Apply testing architecture patterns if available
-3. Create comprehensive integration tests covering API, database, and service interactions
-4. Focus on user stories from requirements for end-to-end test scenarios
-5. Validate implementation against acceptance criteria
-6. Coordinate testing results with other agents through shared progress tracking"
-EOF
-
-```bash
-else
-    echo "⏭️  integration-test-engineer not spawned for this feature complexity"
-fi
-```
-
-**Dynamic Selection Validation:**
-
-Validate the dynamic agent selection system effectiveness:
-
-```bash
-echo "=== Dynamic Agent Selection Validation ==="
-
-# Display final selection summary
-echo "🎯 Final Agent Selection Results:"
-echo "• Feature Complexity: ${COMPLEXITY_LEVEL}"
-echo "• Agents Discovered: $(echo "${AVAILABLE_DEV_AGENTS}" | wc -w)"
-echo "• Agents Selected: ${#SELECTED_AGENTS[@]}"
-echo "• Max Agents for Complexity: ${MAX_AGENTS}"
-
-echo ""
-echo "Selected Agents and Rationale:"
-for i in "${!SELECTED_AGENTS[@]}"; do
-    echo "$(($i + 1)). ${SELECTED_AGENTS[$i]}"
-    if [ -n "${SELECTION_REASONS[$i]:-}" ]; then
-        echo "   └── ${SELECTION_REASONS[$i]}"
-    fi
-done
-
-echo ""
-echo "🚀 Dynamic Selection Benefits Achieved:"
-echo "• ✅ Discovery-Based: Only available agents selected (no hardcoded failures)"
-echo "• ✅ Capability Mapping: Agents matched to specific feature domains"
-echo "• ✅ Complexity-Aware: Agent count scaled to feature complexity (${COMPLEXITY_LEVEL})"
-echo "• ✅ Coordination-Ready: Shared workspace structure established"
-echo "• ✅ Architecture-Integrated: Architecture files distributed to relevant agents"
-
-# Test different complexity scenarios
-echo ""
-echo "🧪 Testing Different Complexity Scenarios:"
-case "${COMPLEXITY_LEVEL}" in
-    "Simple")
-        echo "• Simple Feature: ✅ Limited to ${MAX_AGENTS} agents maximum"
-        echo "• Core domains covered: Backend + Frontend focus"
-        ;;
-    "Medium")
-        echo "• Medium Feature: ✅ Enhanced to ${MAX_AGENTS} agents maximum"
-        echo "• Additional capabilities: Integration + Testing agents"
-        ;;
-    "Complex")
-        echo "• Complex Feature: ✅ Full specialist set (${MAX_AGENTS}+ agents)"
-        echo "• Comprehensive coverage: Backend + Frontend + Integration + Security + Testing"
-        echo "• Coordination mechanisms: Advanced file-based agent communication"
-        ;;
-esac
-
-echo ""
-echo "✅ Dynamic agent selection system successfully implemented and validated!"
-```
-
-**Context Distribution Validation:**
-
-```bash
-# Validate context distribution success
-echo "=== Context Distribution Validation ==="
-
-# Check if context files were created
-CONTEXT_FILES_CREATED=0
-CONTEXT_FILES=("implementation-context.json" "architecture-mapping.json" "agent-assignments.json")
-
-for context_file in "${CONTEXT_FILES[@]}"; do
-    if [ -f ".claude/features/${FEATURE_ID}/implementation/context/${context_file}" ]; then
-        echo "✅ ${context_file} created successfully"
-        ((CONTEXT_FILES_CREATED++))
-    else
-        echo "❌ ${context_file} missing"
-    fi
-done
-
-if [ ${CONTEXT_FILES_CREATED} -eq 3 ]; then
-    echo "✅ All context files created - agents have comprehensive context access"
-    echo "📊 Context Summary:"
-
-    # Display extracted context summary
-    if [ -f ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" ]; then
-        COMPLEXITY=$(cat ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" | jq -r '.complexity_level')
-        DOMAINS=$(cat ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" | jq -r '.affected_domains[]' | tr '\n' ', ' | sed 's/,$//')
-        AGENTS=$(cat ".claude/features/${FEATURE_ID}/implementation/context/implementation-context.json" | jq -r '.recommended_agents[].agent_type' | tr '\n' ', ' | sed 's/,$//')
-
-        echo "   • Complexity: ${COMPLEXITY}"
-        echo "   • Domains: ${DOMAINS}"
-        echo "   • Agents: ${AGENTS}"
-    fi
-
-    # Display architecture file mapping summary
-    if [ -f ".claude/features/${FEATURE_ID}/implementation/context/architecture-mapping.json" ]; then
-        echo "📁 Architecture Files Distribution:"
-        cat ".claude/features/${FEATURE_ID}/implementation/context/architecture-mapping.json" | jq -r '.agent_architecture_files | to_entries[] | "   • \(.key): \(.value | join(", "))"' 2>/dev/null || echo "   • No architecture mappings found"
-    fi
-
-    echo "🎯 Benefits Achieved:"
-    echo "   • ✅ Parallel Implementation: Each agent works independently with targeted context"
-    echo "   • ✅ Context Minimization: Einstein orchestrates, agents consume specific architecture"
-    echo "   • ✅ Architecture Integration: Design phase decisions flow directly to implementation"
-    echo "   • ✅ Domain Expertise: Specialist agents get relevant architecture files only"
-
-else
-    echo "⚠️ Context distribution incomplete - some agents may lack full context"
-fi
-```
-
-**Sub-Phase 8.3: Implementation Progress Gates**
-
-Execute validation gates using internal agents:
-
-Use the `code-pattern-analyzer` subagent to validate foundation implementation at 25% milestone.
-
-Instruct the code-pattern-analyzer:
-"Validate foundation implementation at 25% milestone.
-
-Check implementation workspace: .claude/features/${FEATURE_ID}/implementation/code-changes/
-Validate against requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-
-Save validation report: .claude/features/${FEATURE_ID}/implementation/validation/foundation-gate-report.md
-
-Include code structure analysis, pattern compliance, and issue identification."
-
-Use the `production-validator` subagent to conduct final production readiness validation at 100% milestone.
-
-Instruct the production-validator:
-"Conduct final production readiness validation at 100% milestone.
-
-Review all implementation artifacts in: .claude/features/${FEATURE_ID}/implementation/
-
-Validate:
-
-- Code quality and testing completeness
-- Security implementation
-- Performance requirements
-- Deployment readiness
-
-Save final report: .claude/features/${FEATURE_ID}/implementation/validation/production-ready-gate-report.md"
-
-**Validate implementation completion:**
-
-```bash
-# Update metadata after implementation
-jq '.status = "implementation_completed" | .implementation_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
-   ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-   mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-IMPL_STATUS=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.status')
-if [ "${IMPL_STATUS}" = "implementation_completed" ]; then
-    echo "✅ Implementation Phase Complete" | tee -a "${PIPELINE_LOG}"
-    NEXT_PHASE="quality-review"
-else
-    echo "❌ Implementation Phase Failed: ${IMPL_STATUS}" | tee -a "${PIPELINE_LOG}"
+# Complete implementation phase using generic completion script
+COMPLETION_OUTPUT=$(.claude/scripts/phases/complete-phase.sh "implementation" "quality-review" "${FEATURE_ID}" "agents_spawned=${TOTAL_AGENTS}" "${PIPELINE_LOG}")
+echo "${COMPLETION_OUTPUT}"
+
+# Extract completion results
+NEXT_PHASE=$(echo "${COMPLETION_OUTPUT}" | grep "NEXT_PHASE=" | cut -d'=' -f2)
+COMPLETION_STATUS=$(echo "${COMPLETION_OUTPUT}" | grep "STATUS=" | cut -d'=' -f2)
+
+# Validate completion was successful
+if [ "${COMPLETION_STATUS}" != "implementation_completed" ]; then
+    echo "❌ Implementation phase completion failed"
     exit 1
 fi
+
+echo "🚀 ${TOTAL_AGENTS} development agents spawned based on implementation plan"
+echo "✅ Ready for ${NEXT_PHASE} phase"
 ```
 
 **Phase 9: Quality Review**
@@ -2022,7 +1215,7 @@ source .claude/scripts/gates/security-orchestration-functions.sh
 
 echo "=== Security Orchestration Functions Loaded ===" | tee -a "${PIPELINE_LOG}"
 echo "Available functions:"
-echo "• discover_security_agents - Dynamic security agent discovery"  
+echo "• discover_security_agents - Dynamic security agent discovery"
 echo "• analyze_security_issues - Vulnerability analysis and classification"
 echo "• check_security_status - Security status assessment"
 echo "• execute_security_gate_orchestration - Complete orchestration workflow"
@@ -2044,22 +1237,22 @@ case ${SECURITY_ORCHESTRATION_RESULT} in
     0)  # No security issues detected - proceed to testing
         echo "✅ Security Orchestration: NO ISSUES DETECTED" | tee -a "${PIPELINE_LOG}"
         echo "Mechanical security analysis found no vulnerabilities" | tee -a "${PIPELINE_LOG}"
-        
+
         # Update metadata for clean security status
-        jq '.status = "security_review_completed" | 
+        jq '.status = "security_review_completed" |
             .security_review_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
             .security_issues_found = false |
             .security_orchestration_result = "clean"' \
            ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
            mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-        
+
         NEXT_PHASE="test"
         ;;
-        
+
     1)  # Security issues detected - strategic assessment required
         echo "🔄 Security Orchestration: VULNERABILITIES DETECTED" | tee -a "${PIPELINE_LOG}"
         echo "Launching strategic security orchestration with security-gate-orchestrator..." | tee -a "${PIPELINE_LOG}"
-        
+
         # Update metadata for security refinement status
         jq '.status = "security_refinement_in_progress" |
             .security_refinement_started = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
@@ -2067,28 +1260,28 @@ case ${SECURITY_ORCHESTRATION_RESULT} in
             .security_orchestration_result = "vulnerabilities_detected"' \
            ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
            mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-        
+
         echo "📊 Security Issue Summary:" | tee -a "${PIPELINE_LOG}"
         if [ -f ".claude/features/${FEATURE_ID}/security-gates/issue-analysis.json" ]; then
             cat ".claude/features/${FEATURE_ID}/security-gates/issue-analysis.json" | jq -r '
-            "Critical Issues: " + (.issue_summary.critical_count | tostring) + 
+            "Critical Issues: " + (.issue_summary.critical_count | tostring) +
             ", High Issues: " + (.issue_summary.high_count | tostring) +
             ", Medium Issues: " + (.issue_summary.medium_count | tostring)' | tee -a "${PIPELINE_LOG}"
         fi
-        
+
         echo "🎯 Launching Strategic Security Orchestration..." | tee -a "${PIPELINE_LOG}"
         ;;
-        
+
     *)  # Error in security orchestration
         echo "❌ Security Orchestration: SYSTEM ERROR" | tee -a "${PIPELINE_LOG}"
         echo "Critical error in security orchestration functions" | tee -a "${PIPELINE_LOG}"
-        
+
         jq '.status = "security_review_failed" |
             .security_review_error = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
             .security_orchestration_result = "error"' \
            ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
            mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-        
+
         exit 1
         ;;
 esac
@@ -2101,7 +1294,7 @@ Deploy security-gate-orchestrator agent for advanced security orchestration:
 ```bash
 if [ ${SECURITY_ORCHESTRATION_RESULT} -eq 1 ]; then
     echo "🧠 Deploying Strategic Security Intelligence..." | tee -a "${PIPELINE_LOG}"
-    
+
     # Prepare security refinement plan output path
     SECURITY_REFINEMENT_PLAN=".claude/features/${FEATURE_ID}/security-gates/refinement-plan.json"
     echo "Security refinement plan will be saved to: ${SECURITY_REFINEMENT_PLAN}" | tee -a "${PIPELINE_LOG}"
@@ -2114,6 +1307,7 @@ Instruct the security-gate-orchestrator:
 "ultrathink. Execute security vulnerability orchestration for this feature.
 
 Read mechanical infrastructure results from:
+
 - Security agent discovery: .claude/features/${FEATURE_ID}/security-gates/agent-discovery.json
 - Vulnerability analysis: .claude/features/${FEATURE_ID}/security-gates/issue-analysis.json
 
@@ -2128,31 +1322,31 @@ Process security orchestration results and finalize security phase:
 ```bash
     # Wait for security-gate-orchestrator completion
     echo "⏳ Waiting for strategic security orchestration completion..." | tee -a "${PIPELINE_LOG}"
-    
+
     # Validate security refinement plan was created
     SECURITY_REFINEMENT_PLAN=".claude/features/${FEATURE_ID}/security-gates/refinement-plan.json"
-    
+
     if [ -f "${SECURITY_REFINEMENT_PLAN}" ]; then
         echo "✅ Strategic security refinement plan created" | tee -a "${PIPELINE_LOG}"
-        
+
         REFINEMENT_NEEDED=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r '.security_refinement_needed')
-        
+
         if [ "${REFINEMENT_NEEDED}" = "true" ]; then
             echo "🔄 Security refinement workflow initiated" | tee -a "${PIPELINE_LOG}"
             echo "EXECUTING iterative security vulnerability remediation..." | tee -a "${PIPELINE_LOG}"
-            
+
             # Show refinement summary
             CRITICAL_COUNT=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r '.vulnerability_summary.critical_count')
             HIGH_COUNT=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r '.vulnerability_summary.high_count')
             MAX_ITERATIONS=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r '.escalation_criteria.max_iterations // 2')
-            
+
             echo "🎯 Security Refinement Target: ${CRITICAL_COUNT} critical, ${HIGH_COUNT} high vulnerabilities" | tee -a "${PIPELINE_LOG}"
             echo "📊 Max Security Iterations: ${MAX_ITERATIONS} (conservative for security)" | tee -a "${PIPELINE_LOG}"
-            
+
             # Initialize security refinement execution
             SECURITY_REFINEMENT_DIR=".claude/features/${FEATURE_ID}/security-gates/refinement"
             mkdir -p "${SECURITY_REFINEMENT_DIR}"/{iteration-1,iteration-2,agent-outputs,progress}
-            
+
             # Update metadata with refinement execution start
             jq '.status = "security_refinement_executing" |
                 .security_refinement_started = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
@@ -2160,7 +1354,7 @@ Process security orchestration results and finalize security phase:
                 .security_refinement_current_iteration = 0 |
                 .security_vulnerabilities_to_remediate = {
                   "critical": '${CRITICAL_COUNT}',
-                  "high": '${HIGH_COUNT}' 
+                  "high": '${HIGH_COUNT}'
                 }' \
                ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
                mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
@@ -2174,34 +1368,34 @@ Process security orchestration results and finalize security phase:
                 echo "" | tee -a "${PIPELINE_LOG}"
                 echo "🛡️ Security Refinement Iteration ${ITERATION}/${MAX_ITERATIONS}" | tee -a "${PIPELINE_LOG}"
                 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) - Starting iteration ${ITERATION}" | tee -a "${PIPELINE_LOG}"
-                
+
                 # Update current iteration in metadata
                 jq '.security_refinement_current_iteration = '${ITERATION}' |
                     .security_refinement_iteration_'${ITERATION}'_started = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
                    ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
                    mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-                
+
                 ITERATION_DIR="${SECURITY_REFINEMENT_DIR}/iteration-${ITERATION}"
                 mkdir -p "${ITERATION_DIR}"/{agents,fixes,validation}
-                
+
                 echo "📁 Iteration workspace: ${ITERATION_DIR}" | tee -a "${PIPELINE_LOG}"
-                
+
                 # Get recommended security agents from refinement plan
                 RECOMMENDED_AGENTS=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r '.recommended_security_refinement[].agent_type' | sort | uniq)
                 AGENT_COUNT=$(echo "${RECOMMENDED_AGENTS}" | wc -l)
-                
+
                 echo "🤖 Deploying ${AGENT_COUNT} security-capable agents for vulnerability remediation:" | tee -a "${PIPELINE_LOG}"
                 echo "${RECOMMENDED_AGENTS}" | sed 's/^/  • /' | tee -a "${PIPELINE_LOG}"
-                
+
                 echo "" | tee -a "${PIPELINE_LOG}"
                 echo "🚀 Spawning Security-Capable Agents (Iteration ${ITERATION})..." | tee -a "${PIPELINE_LOG}"
-                
+
                 # Dynamically spawn security agents based on refinement plan
                 while read -r AGENT_TYPE; do
                     if [ -n "${AGENT_TYPE}" ] && [ "${AGENT_TYPE}" != "null" ]; then
                         # Get agent-specific context from refinement plan
                         AGENT_CONTEXT=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r --arg agent "${AGENT_TYPE}" '
-                        .recommended_security_refinement[] | select(.agent_type == $agent) | 
+                        .recommended_security_refinement[] | select(.agent_type == $agent) |
                         {
                             vulnerabilities: .vulnerabilities_to_address,
                             target_files: .target_files,
@@ -2209,23 +1403,23 @@ Process security orchestration results and finalize security phase:
                             priority: .priority,
                             role: .role
                         }')
-                        
+
                         VULNERABILITIES=$(echo "${AGENT_CONTEXT}" | jq -r '.vulnerabilities[]' | tr '\n' '; ' | sed 's/;$//')
                         TARGET_FILES=$(echo "${AGENT_CONTEXT}" | jq -r '.target_files[]' | tr '\n' '; ' | sed 's/;$//')
                         PRIORITY=$(echo "${AGENT_CONTEXT}" | jq -r '.priority')
                         AGENT_ROLE=$(echo "${AGENT_CONTEXT}" | jq -r '.role')
-                        
+
                         echo "🛡️ Deploying ${AGENT_TYPE} (${AGENT_ROLE}, priority: ${PRIORITY})" | tee -a "${PIPELINE_LOG}"
                         echo "   Vulnerabilities: ${VULNERABILITIES}" | tee -a "${PIPELINE_LOG}"
                         echo "   Target Files: ${TARGET_FILES}" | tee -a "${PIPELINE_LOG}"
-                        
+
                         # Spawn security-capable agent with specific vulnerability remediation tasks
                         case "${AGENT_TYPE}" in
                             "golang-api-developer"|"go-security-reviewer"|"golang-developer")
                                 echo "🚀 Task: Spawning ${AGENT_TYPE} for Go security remediation..." | tee -a "${PIPELINE_LOG}"
-                                
+
                                 # Use the agent to remediate Go security vulnerabilities
-                                
+
                                 cat << EOF
 Use the \`${AGENT_TYPE}\` subagent for security vulnerability remediation - Iteration ${ITERATION}/${MAX_ITERATIONS}.
 
@@ -2274,9 +1468,9 @@ EOF
                                 ;;
                             "react-developer"|"react-security-reviewer")
                                 echo "🚀 Task: Spawning ${AGENT_TYPE} for React security remediation..." | tee -a "${PIPELINE_LOG}"
-                                
+
                                 # Use the agent to remediate React security vulnerabilities
-                                
+
                                 cat << EOF
 Use the \`${AGENT_TYPE}\` subagent for frontend security vulnerability remediation - Iteration ${ITERATION}/${MAX_ITERATIONS}.
 
@@ -2324,9 +1518,9 @@ EOF
                                 ;;
                             "security-architect")
                                 echo "🚀 Task: Spawning ${AGENT_TYPE} for architectural security oversight..." | tee -a "${PIPELINE_LOG}"
-                                
+
                                 # Use security-architect for architectural oversight
-                                
+
                                 cat << EOF
 Use the \`security-architect\` subagent for security architecture oversight - Iteration ${ITERATION}/${MAX_ITERATIONS}.
 
@@ -2375,9 +1569,9 @@ EOF
                                 ;;
                             *)
                                 echo "🚀 Task: Spawning ${AGENT_TYPE} for general security remediation..." | tee -a "${PIPELINE_LOG}"
-                                
+
                                 # Use the general agent for security remediation
-                                
+
                                 cat << EOF
 Use the \`${AGENT_TYPE}\` subagent for security vulnerability remediation - Iteration ${ITERATION}/${MAX_ITERATIONS}.
 
@@ -2407,36 +1601,36 @@ EOF
                         esac
                     fi
                 done <<< "${RECOMMENDED_AGENTS}"
-                
+
                 echo "" | tee -a "${PIPELINE_LOG}"
                 echo "⏳ Waiting for security-capable agents to complete remediation..." | tee -a "${PIPELINE_LOG}"
-                
+
                 # Post-iteration security re-analysis using orchestration functions
                 echo "" | tee -a "${PIPELINE_LOG}"
                 echo "🔍 Security Re-Analysis After Iteration ${ITERATION}" | tee -a "${PIPELINE_LOG}"
                 echo "Executing security orchestration to assess vulnerability resolution..." | tee -a "${PIPELINE_LOG}"
-                
+
                 # Re-run security issue analysis to check if vulnerabilities were resolved
                 if ! analyze_security_issues "${FEATURE_ID}"; then
                     echo "❌ Security re-analysis failed - cannot assess vulnerability resolution" | tee -a "${PIPELINE_LOG}"
                     break
                 fi
-                
+
                 # Check current security status after fixes
                 check_security_status "${FEATURE_ID}"
                 REANALYSIS_RESULT=$?
-                
+
                 ITERATION_ANALYSIS=".claude/features/${FEATURE_ID}/security-gates/issue-analysis.json"
                 if [ -f "${ITERATION_ANALYSIS}" ]; then
                     REMAINING_CRITICAL=$(cat "${ITERATION_ANALYSIS}" | jq -r '.issue_summary.critical_count')
                     REMAINING_HIGH=$(cat "${ITERATION_ANALYSIS}" | jq -r '.issue_summary.high_count')
                     REMAINING_MEDIUM=$(cat "${ITERATION_ANALYSIS}" | jq -r '.issue_summary.medium_count')
-                    
+
                     echo "📊 Post-Iteration ${ITERATION} Security Status:" | tee -a "${PIPELINE_LOG}"
                     echo "   Critical: ${REMAINING_CRITICAL} (was: ${CRITICAL_COUNT})" | tee -a "${PIPELINE_LOG}"
                     echo "   High: ${REMAINING_HIGH} (was: ${HIGH_COUNT})" | tee -a "${PIPELINE_LOG}"
                     echo "   Medium: ${REMAINING_MEDIUM}" | tee -a "${PIPELINE_LOG}"
-                    
+
                     # Update iteration results in metadata
                     jq '.security_refinement_iteration_'${ITERATION}'_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
                         .security_refinement_iteration_'${ITERATION}'_results = {
@@ -2446,7 +1640,7 @@ EOF
                         }' \
                        ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
                        mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-                    
+
                     # Check if vulnerabilities are resolved
                     if [ "${REANALYSIS_RESULT}" -eq 0 ]; then
                         echo "✅ Security vulnerabilities resolved after ${ITERATION} iteration(s)!" | tee -a "${PIPELINE_LOG}"
@@ -2455,7 +1649,7 @@ EOF
                     elif [ "${ITERATION}" -eq "${MAX_ITERATIONS}" ]; then
                         echo "⚠️ Maximum security iterations (${MAX_ITERATIONS}) reached" | tee -a "${PIPELINE_LOG}"
                         echo "Remaining vulnerabilities: Critical=${REMAINING_CRITICAL}, High=${REMAINING_HIGH}" | tee -a "${PIPELINE_LOG}"
-                        
+
                         if [ "${REMAINING_CRITICAL}" -gt 0 ] || [ "${REMAINING_HIGH}" -gt 0 ]; then
                             echo "🚨 CRITICAL/HIGH vulnerabilities remain - ESCALATION REQUIRED" | tee -a "${PIPELINE_LOG}"
                             # Note: In production, this would trigger human security review
@@ -2470,7 +1664,7 @@ EOF
                     echo "❌ Security re-analysis results not found - continuing with caution" | tee -a "${PIPELINE_LOG}"
                 fi
             done
-            
+
             # Security refinement loop completed - update final status
             FINAL_STATUS=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.status')
             if [ "${REANALYSIS_RESULT}" -eq 0 ]; then
@@ -2489,30 +1683,30 @@ EOF
                    ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
                    mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
             fi
-            
+
             echo "" | tee -a "${PIPELINE_LOG}"
             echo "🛡️ Security Refinement Execution Complete" | tee -a "${PIPELINE_LOG}"
             echo "Iterations completed: ${ITERATION}/${MAX_ITERATIONS}" | tee -a "${PIPELINE_LOG}"
         else
             echo "✅ Security assessment complete - no refinement needed" | tee -a "${PIPELINE_LOG}"
-            
+
             # Update metadata for completion
             jq '.status = "security_review_completed" |
                 .security_review_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
                 .security_refinement_needed = false' \
                ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
                mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-               
+
             NEXT_PHASE="test"
         fi
     else
         echo "❌ Strategic security orchestration failed - no refinement plan generated" | tee -a "${PIPELINE_LOG}"
-        
+
         jq '.status = "security_orchestration_failed" |
             .security_orchestration_error = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
            ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
            mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-        
+
         exit 1
     fi
 fi
@@ -2533,23 +1727,23 @@ case "${SECURITY_STATUS}" in
     "security_refinement_completed_with_issues")
         echo "⚠️ Dynamic Security Orchestration: COMPLETED WITH REMAINING ISSUES" | tee -a "${PIPELINE_LOG}"
         echo "Security refinement executed but some vulnerabilities remain" | tee -a "${PIPELINE_LOG}"
-        
+
         ITERATIONS_COMPLETED=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.security_refinement_iterations_completed // 0')
         MANUAL_REVIEW_REQUIRED=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.security_manual_review_required // false')
-        
+
         echo "Security refinement iterations completed: ${ITERATIONS_COMPLETED}" | tee -a "${PIPELINE_LOG}"
-        
+
         if [ "${MANUAL_REVIEW_REQUIRED}" = "true" ]; then
             echo "🚨 Manual security review required before production deployment" | tee -a "${PIPELINE_LOG}"
         fi
-        
+
         echo "Proceeding to testing phase with security awareness..." | tee -a "${PIPELINE_LOG}"
         NEXT_PHASE="test"
         ;;
     "security_refinement_executing"|"security_refinement_planned")
         echo "🔄 Dynamic Security Orchestration: REFINEMENT IN PROGRESS" | tee -a "${PIPELINE_LOG}"
         echo "Security refinement execution should have completed - checking status..." | tee -a "${PIPELINE_LOG}"
-        
+
         # This should not happen - refinement execution should have updated status
         echo "⚠️ Security refinement may still be in progress - proceeding with caution" | tee -a "${PIPELINE_LOG}"
         NEXT_PHASE="test"
@@ -2576,7 +1770,7 @@ if [ "${NEXT_PHASE}" = "test" ]; then
     echo "🧪 Phase 11: DYNAMIC TESTING ORCHESTRATION PHASE" | tee -a "${PIPELINE_LOG}"
     source .claude/features/current_feature.env
     INPUT_REQUIREMENTS=".claude/features/${FEATURE_ID}/context/requirements.json"
-    
+
     # Initialize comprehensive testing workspace with orchestration support
     TESTING_WORKSPACE=".claude/features/${FEATURE_ID}/testing"
     mkdir -p "${TESTING_WORKSPACE}"/{unit,integration,e2e,reports,orchestration,refinement}
@@ -2612,8 +1806,8 @@ if [ "${NEXT_PHASE}" = "test" ]; then
     echo "Dynamic testing orchestration started: ${TEST_START}" | tee -a "${PIPELINE_LOG}"
 
     # Update metadata for testing orchestration
-    jq '.status = "testing_orchestration_in_progress" | 
-        .phase = "testing" | 
+    jq '.status = "testing_orchestration_in_progress" |
+        .phase = "testing" |
         .testing_started = "'${TEST_START}'" |
         .testing_orchestration_enabled = true' \
         ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
@@ -2663,6 +1857,7 @@ Instruct the test-coordinator:
 Create comprehensive test orchestration plan: ${TEST_PLAN}
 
 **Required Structure with Refinement Support:**
+
 ```json
 {
   \"testing_orchestration_needed\": true,
@@ -2728,7 +1923,7 @@ Create comprehensive test orchestration plan: ${TEST_PLAN}
   \"testing_domains\": [...],
   \"expected_test_coverage\": {
     \"unit_tests\": \"business_logic_validation\",
-    \"integration_tests\": \"api_and_service_validation\", 
+    \"integration_tests\": \"api_and_service_validation\",
     \"e2e_tests\": \"user_workflow_validation\"
   }
 }
@@ -2756,7 +1951,7 @@ Map testing needs to discovered agents with refinement capabilities:
 **Testing-Specific Discovery Guidelines:**
 
 - ONLY recommend agents discovered from `.claude/agents/testing/` and `.claude/agents/development/`
-- Prioritize agents with execution capabilities over analysis-only agents  
+- Prioritize agents with execution capabilities over analysis-only agents
 - Include development agents with testing expertise for remediation phase
 - Plan for both test creation and test execution in the same orchestration
 
@@ -2778,15 +1973,15 @@ if [ -f "${TEST_PLAN}" ]; then
     TESTING_ORCHESTRATION_NEEDED=$(cat "${TEST_PLAN}" | jq -r '.testing_orchestration_needed // .testing_needed')
     if [ "${TESTING_ORCHESTRATION_NEEDED}" = "true" ]; then
         echo "🎯 Test coordinator recommends comprehensive testing with refinement capabilities" | tee -a "${TEST_EXECUTION_LOG}"
-        
+
         # Extract testing orchestration parameters
         MAX_TEST_ITERATIONS=$(cat "${TEST_PLAN}" | jq -r '.max_test_iterations // 3')
         TESTING_APPROACH=$(cat "${TEST_PLAN}" | jq -r '.testing_approach // "comprehensive_with_refinement"')
-        
+
         echo "📊 Testing Orchestration Configuration:" | tee -a "${TEST_EXECUTION_LOG}"
         echo "   • Max Test Iterations: ${MAX_TEST_ITERATIONS}"
         echo "   • Testing Approach: ${TESTING_APPROACH}"
-        
+
         # Update metadata with testing orchestration parameters
         jq '.testing_orchestration_config = {
             "max_iterations": '${MAX_TEST_ITERATIONS}',
@@ -2795,7 +1990,7 @@ if [ -f "${TEST_PLAN}" ]; then
         }' \
         ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
         mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-        
+
     else
         echo "⚠️ Test coordinator determined testing not needed" | tee -a "${TEST_EXECUTION_LOG}"
         exit 1
@@ -2824,18 +2019,18 @@ for TEST_ITERATION in $(seq 1 ${MAX_TEST_ITERATIONS}); do
     echo "" | tee -a "${TEST_EXECUTION_LOG}"
     echo "🧪 Testing Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}" | tee -a "${TEST_EXECUTION_LOG}"
     echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) - Starting test iteration ${TEST_ITERATION}" | tee -a "${TEST_EXECUTION_LOG}"
-    
+
     # Update current iteration in metadata
     jq '.testing_current_iteration = '${TEST_ITERATION}' |
         .testing_iteration_'${TEST_ITERATION}'_started = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
        ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
        mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-    
+
     ITERATION_DIR="${TEST_REFINEMENT_DIR}/iteration-${TEST_ITERATION}"
     mkdir -p "${ITERATION_DIR}"/{test-creation,test-execution,test-remediation}
-    
+
     echo "📁 Test iteration workspace: ${ITERATION_DIR}" | tee -a "${TEST_EXECUTION_LOG}"
-    
+
     # Phase 1: Test Creation (First iteration) or Test Updates (Subsequent iterations)
     if [ ${TEST_ITERATION} -eq 1 ]; then
         echo "🔨 Phase 1: Initial Test Creation" | tee -a "${TEST_EXECUTION_LOG}"
@@ -2844,23 +2039,23 @@ for TEST_ITERATION in $(seq 1 ${MAX_TEST_ITERATIONS}); do
         echo "🔄 Phase 1: Test Updates Based on Previous Failures" | tee -a "${TEST_EXECUTION_LOG}"
         TEST_CREATION_PHASE="test_update_refinement"
     fi
-    
+
     # Get test creation agents from test plan
     TEST_CREATION_AGENTS=$(cat "${TEST_PLAN}" | jq -r --arg phase "${TEST_CREATION_PHASE}" '
-        .testing_phases[]? | select(.phase == $phase or .phase == "initial_test_creation") | 
+        .testing_phases[]? | select(.phase == $phase or .phase == "initial_test_creation") |
         .agents[]? | .agent' 2>/dev/null || echo "")
-    
+
     if [ -n "${TEST_CREATION_AGENTS}" ]; then
         echo "🤖 Deploying test creation agents:" | tee -a "${TEST_EXECUTION_LOG}"
         echo "${TEST_CREATION_AGENTS}" | sed 's/^/  • /' | tee -a "${TEST_EXECUTION_LOG}"
-        
+
         # Spawn test creation agents dynamically
         while read -r AGENT_TYPE; do
             if [ -n "${AGENT_TYPE}" ] && [ "${AGENT_TYPE}" != "null" ]; then
                 echo "🚀 Spawning ${AGENT_TYPE} for test creation..." | tee -a "${TEST_EXECUTION_LOG}"
-                
+
                 # Use the agent for comprehensive test creation
-                
+
                 cat << 'EOF'
 Use the `${AGENT_TYPE}` subagent for comprehensive test creation - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}.
 
@@ -2888,7 +2083,7 @@ fi)
 
 **Test Creation Requirements:**
 1. **Unit Tests**: Comprehensive business logic validation with mocking
-2. **Integration Tests**: API endpoints, database operations, service interactions  
+2. **Integration Tests**: API endpoints, database operations, service interactions
 3. **E2E Tests**: Complete user workflows and acceptance criteria validation
 4. **Executable Tests**: All tests must be runnable with clear pass/fail results
 5. **Test Documentation**: Clear test descriptions and expected outcomes
@@ -2898,7 +2093,7 @@ $(case "${AGENT_TYPE}" in
     *"unit"*|*"test-engineer"*) echo "- Focus on unit test creation with comprehensive coverage
 - Create isolated tests for business logic components
 - Implement proper mocking for external dependencies" ;;
-    *"integration"*) echo "- Focus on integration test creation for APIs and services  
+    *"integration"*) echo "- Focus on integration test creation for APIs and services
 - Test database operations and external service integrations
 - Validate data flow between system components" ;;
     *"e2e"*|*"playwright"*) echo "- Focus on end-to-end user workflow testing
@@ -2922,26 +2117,26 @@ EOF
 
             fi
         done <<< "${TEST_CREATION_AGENTS}"
-        
+
         echo "⏳ Waiting for test creation agents to complete..." | tee -a "${TEST_EXECUTION_LOG}"
     fi
-    
+
     # Phase 2: Test Execution & Validation
     echo "" | tee -a "${TEST_EXECUTION_LOG}"
     echo "🏃 Phase 2: Test Execution & Failure Analysis" | tee -a "${TEST_EXECUTION_LOG}"
-    
+
     # Get test execution agents
     TEST_EXECUTION_AGENTS=$(cat "${TEST_PLAN}" | jq -r '
-        .testing_phases[]? | select(.phase == "test_execution_validation") | 
+        .testing_phases[]? | select(.phase == "test_execution_validation") |
         .agents[]? | .agent' 2>/dev/null || echo "playwright-explorer")
-    
+
     if [ -n "${TEST_EXECUTION_AGENTS}" ]; then
         while read -r EXEC_AGENT; do
             if [ -n "${EXEC_AGENT}" ] && [ "${EXEC_AGENT}" != "null" ]; then
                 echo "🚀 Spawning ${EXEC_AGENT} for test execution..." | tee -a "${TEST_EXECUTION_LOG}"
-                
+
                 # Use the agent for test execution and failure analysis
-                
+
                 cat << 'EOF'
 Use the `${EXEC_AGENT}` subagent for test execution and failure analysis - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}.
 
@@ -2977,7 +2172,7 @@ fi)
 
 **Output Requirements:**
 - Execution report: ${ITERATION_DIR}/test-execution/test-execution-report.md
-- Failure analysis: ${ITERATION_DIR}/test-execution/failure-analysis.md  
+- Failure analysis: ${ITERATION_DIR}/test-execution/failure-analysis.md
 - Remediation recommendations: ${ITERATION_DIR}/test-execution/remediation-recommendations.md
 
 **Success Criteria Determination:**
@@ -2988,53 +2183,53 @@ EOF
 
             fi
         done <<< "${TEST_EXECUTION_AGENTS}"
-        
+
         echo "⏳ Waiting for test execution analysis..." | tee -a "${TEST_EXECUTION_LOG}"
     fi
-    
+
     # Phase 3: Analyze Iteration Results & Decide Next Steps
     echo "" | tee -a "${TEST_EXECUTION_LOG}"
     echo "📊 Phase 3: Iteration Results Analysis" | tee -a "${TEST_EXECUTION_LOG}"
-    
+
     # Check test execution results
     EXECUTION_REPORT="${ITERATION_DIR}/test-execution/test-execution-report.md"
     FAILURE_ANALYSIS="${ITERATION_DIR}/test-execution/failure-analysis.md"
-    
+
     if [ -f "${EXECUTION_REPORT}" ]; then
         echo "✓ Test execution report found" | tee -a "${TEST_EXECUTION_LOG}"
-        
+
         # Simple pattern matching for test results (in real implementation, this would be more sophisticated)
         if grep -qi "all.*tests.*pass\|success\|✅.*pass" "${EXECUTION_REPORT}" 2>/dev/null; then
             echo "🎉 Test Iteration ${TEST_ITERATION}: ALL TESTS PASSING" | tee -a "${TEST_EXECUTION_LOG}"
-            
+
             # Update metadata with success
             jq '.testing_status = "all_tests_passing" |
                 .testing_completed_iteration = '${TEST_ITERATION}' |
                 .testing_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
                ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
                mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-            
+
             echo "✅ Testing orchestration successful - all tests passing!" | tee -a "${TEST_EXECUTION_LOG}"
             break  # Exit iteration loop - success achieved
-            
+
         elif grep -qi "fail\|error\|❌" "${EXECUTION_REPORT}" 2>/dev/null && [ ${TEST_ITERATION} -lt ${MAX_TEST_ITERATIONS} ]; then
             echo "🔄 Test Iteration ${TEST_ITERATION}: TESTS FAILING - Proceeding to remediation" | tee -a "${TEST_EXECUTION_LOG}"
-            
+
             # Phase 4: Test Remediation (only if not final iteration)
             echo "" | tee -a "${TEST_EXECUTION_LOG}"
             echo "🔧 Phase 4: Test Failure Remediation" | tee -a "${TEST_EXECUTION_LOG}"
-            
+
             # Get remediation agents from test plan or fall back to development agents
             REMEDIATION_AGENTS=$(cat "${TEST_PLAN}" | jq -r '
-                .testing_phases[]? | select(.phase == "failure_remediation") | 
+                .testing_phases[]? | select(.phase == "failure_remediation") |
                 .agents[]? | .agent' 2>/dev/null || echo "golang-api-developer react-developer")
-            
+
             while read -r REMEDIATION_AGENT; do
                 if [ -n "${REMEDIATION_AGENT}" ] && [ "${REMEDIATION_AGENT}" != "null" ]; then
                     echo "🚀 Spawning ${REMEDIATION_AGENT} for test remediation..." | tee -a "${TEST_EXECUTION_LOG}"
-                    
+
                     # Use the agent for test failure remediation
-                    
+
                     cat << 'EOF'
 Use the `${REMEDIATION_AGENT}` subagent for test failure remediation - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}.
 
@@ -3057,7 +2252,7 @@ $(case "${REMEDIATION_AGENT}" in
 - Improve API endpoints, business logic, and database operations
 - Ensure Go code follows best practices and handles edge cases properly" ;;
     *"react"*|*"frontend"*) echo "- Fix React/TypeScript frontend issues causing test failures
-- Improve UI components, event handling, and state management  
+- Improve UI components, event handling, and state management
 - Ensure frontend code handles user interactions and edge cases properly" ;;
     *"integration"*) echo "- Fix integration issues between services and components
 - Improve API contracts, data flow, and service communication
@@ -3080,31 +2275,31 @@ esac)
 
 **Output Requirements:**
 - Code fixes: ${ITERATION_DIR}/test-remediation/${REMEDIATION_AGENT}-code-fixes.md
-- Test improvements: ${ITERATION_DIR}/test-remediation/${REMEDIATION_AGENT}-test-improvements.md  
+- Test improvements: ${ITERATION_DIR}/test-remediation/${REMEDIATION_AGENT}-test-improvements.md
 - Remediation summary: ${ITERATION_DIR}/test-remediation/${REMEDIATION_AGENT}-remediation-summary.md
 
 **Success Criteria:**
 - Root cause of test failures addressed
 - Code improvements implemented
-- Test issues resolved or improved  
+- Test issues resolved or improved
 - Ready for next iteration execution"
 EOF
 
                 fi
             done <<< "${REMEDIATION_AGENTS}"
-            
+
             echo "⏳ Waiting for test remediation completion..." | tee -a "${TEST_EXECUTION_LOG}"
-            
+
             # Update metadata for this iteration
             jq '.testing_iteration_'${TEST_ITERATION}'_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
                 .testing_iteration_'${TEST_ITERATION}'_result = "tests_failed_remediation_attempted"' \
                ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
                mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-            
+
         elif [ ${TEST_ITERATION} -eq ${MAX_TEST_ITERATIONS} ]; then
             echo "⚠️ Test Iteration ${TEST_ITERATION}: FINAL ITERATION - TESTS STILL FAILING" | tee -a "${TEST_EXECUTION_LOG}"
             echo "🚨 Max test iterations reached with failing tests - escalation needed" | tee -a "${TEST_EXECUTION_LOG}"
-            
+
             # Update metadata with final failure state
             jq '.testing_status = "max_iterations_reached_with_failures" |
                 .testing_escalation_needed = true |
@@ -3112,7 +2307,7 @@ EOF
                 .testing_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
                ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
                mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-            
+
             break  # Exit iteration loop - max iterations reached
         fi
     else
@@ -3144,39 +2339,39 @@ case "${FINAL_TESTING_STATUS}" in
     "all_tests_passing")
         echo "✅ TESTING ORCHESTRATION: SUCCESS" | tee -a "${PIPELINE_LOG}"
         echo "All tests passing after ${COMPLETED_ITERATIONS} iterations" | tee -a "${PIPELINE_LOG}"
-        
+
         # Update metadata for successful completion
-        jq '.status = "testing_completed" | 
+        jq '.status = "testing_completed" |
             .testing_success = true |
             .phase = "testing_complete"' \
            ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
            mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-        
+
         NEXT_PHASE="deploy"
         ;;
     "max_iterations_reached_with_failures")
         echo "⚠️ TESTING ORCHESTRATION: PARTIAL SUCCESS" | tee -a "${PIPELINE_LOG}"
         echo "Max iterations (${MAX_TEST_ITERATIONS}) reached with some failing tests" | tee -a "${PIPELINE_LOG}"
         echo "Manual review recommended before deployment" | tee -a "${PIPELINE_LOG}"
-        
+
         # Continue to deployment with warning
-        jq '.status = "testing_completed_with_warnings" | 
+        jq '.status = "testing_completed_with_warnings" |
             .testing_warnings = true |
             .phase = "testing_complete_with_warnings"' \
            ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
            mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-        
+
         NEXT_PHASE="deploy"
         ;;
     *)
         echo "❌ TESTING ORCHESTRATION: FAILED" | tee -a "${PIPELINE_LOG}"
         echo "Testing orchestration failed with status: ${FINAL_TESTING_STATUS}" | tee -a "${PIPELINE_LOG}"
-        
-        jq '.status = "testing_failed" | 
+
+        jq '.status = "testing_failed" |
             .testing_failed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
            ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
            mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-        
+
         exit 1
         ;;
 esac
