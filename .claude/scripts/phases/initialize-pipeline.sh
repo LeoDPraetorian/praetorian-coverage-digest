@@ -1,0 +1,122 @@
+#!/bin/bash
+
+# initialize-pipeline.sh
+# Mechanical pipeline initialization operations
+# Usage: initialize-pipeline.sh <EXECUTION_MODE> <ARGUMENTS>
+
+set -e  # Exit on error
+
+# Validate input
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 <EXECUTION_MODE> <ARGUMENTS>"
+    echo ""
+    echo "EXECUTION_MODE: 'new' or 'resume'"
+    echo "ARGUMENTS: Feature description or feature ID"
+    exit 1
+fi
+
+EXECUTION_MODE="$1"
+ARGUMENTS="$2"
+
+echo "🔧 Initializing Einstein pipeline infrastructure"
+echo "Mode: ${EXECUTION_MODE}, Arguments: ${ARGUMENTS}"
+
+# Initialize pipeline tracking
+PIPELINE_DIR=".claude/pipeline"
+echo "📁 Creating pipeline directory: ${PIPELINE_DIR}"
+if ! mkdir -p "${PIPELINE_DIR}"; then
+    echo "❌ Error: Failed to create pipeline directory: ${PIPELINE_DIR}"
+    exit 1
+fi
+
+# Create timestamped pipeline log
+PIPELINE_LOG="${PIPELINE_DIR}/einstein-pipeline-$(date +%Y%m%d_%H%M%S).log"
+echo "📝 Creating pipeline log: ${PIPELINE_LOG}"
+
+# Initialize pipeline log with metadata
+cat > "${PIPELINE_LOG}" << EOF
+=== Einstein Pipeline Started ===
+Mode: ${EXECUTION_MODE}
+Arguments: ${ARGUMENTS}
+Started: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+===============================
+EOF
+
+if [ ! -f "${PIPELINE_LOG}" ]; then
+    echo "❌ Error: Failed to create pipeline log: ${PIPELINE_LOG}"
+    exit 1
+fi
+
+# Critical tool validation
+echo "🔍 Validating required system tools..."
+
+if ! command -v jq >/dev/null 2>&1; then
+    ERROR_MSG="❌ Error: jq is required but not installed"
+    echo "${ERROR_MSG}"
+    echo "${ERROR_MSG}" >> "${PIPELINE_LOG}"
+    exit 1
+fi
+
+if ! command -v date >/dev/null 2>&1; then
+    ERROR_MSG="❌ Error: date command is required but not available"
+    echo "${ERROR_MSG}"
+    echo "${ERROR_MSG}" >> "${PIPELINE_LOG}"
+    exit 1
+fi
+
+# Additional tool validation for Einstein pipeline
+if ! command -v grep >/dev/null 2>&1; then
+    ERROR_MSG="❌ Error: grep command is required but not available"
+    echo "${ERROR_MSG}"
+    echo "${ERROR_MSG}" >> "${PIPELINE_LOG}"
+    exit 1
+fi
+
+if ! command -v find >/dev/null 2>&1; then
+    ERROR_MSG="❌ Error: find command is required but not available"
+    echo "${ERROR_MSG}"
+    echo "${ERROR_MSG}" >> "${PIPELINE_LOG}"
+    exit 1
+fi
+
+echo "✅ All required tools validated successfully"
+
+# Validate workspace permissions
+echo "🔐 Validating workspace permissions..."
+
+# Test write permissions to .claude directory
+if ! touch ".claude/.test_write_permissions" 2>/dev/null; then
+    ERROR_MSG="❌ Error: No write permissions to .claude directory"
+    echo "${ERROR_MSG}"
+    echo "${ERROR_MSG}" >> "${PIPELINE_LOG}"
+    exit 1
+fi
+rm -f ".claude/.test_write_permissions"
+
+# Test pipeline directory permissions
+if ! touch "${PIPELINE_DIR}/.test_write_permissions" 2>/dev/null; then
+    ERROR_MSG="❌ Error: No write permissions to pipeline directory"
+    echo "${ERROR_MSG}"
+    echo "${ERROR_MSG}" >> "${PIPELINE_LOG}"
+    exit 1
+fi
+rm -f "${PIPELINE_DIR}/.test_write_permissions"
+
+echo "✅ Workspace permissions validated successfully"
+
+# Log initialization success
+INIT_SUCCESS_MSG="✅ Pipeline infrastructure initialized successfully"
+echo "${INIT_SUCCESS_MSG}"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ): ${INIT_SUCCESS_MSG}" >> "${PIPELINE_LOG}"
+
+# Output key paths and status for Einstein to use
+echo ""
+echo "📋 Pipeline Initialization Results:"
+echo "PIPELINE_DIR=${PIPELINE_DIR}"
+echo "PIPELINE_LOG=${PIPELINE_LOG}"
+echo "EXECUTION_MODE=${EXECUTION_MODE}"
+echo "TOOLS_VALIDATED=true"
+echo "PERMISSIONS_VALIDATED=true"
+echo "INITIALIZATION_STATUS=success"
+echo ""
+echo "🎯 Ready for Einstein orchestration"

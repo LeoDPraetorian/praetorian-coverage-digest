@@ -22,55 +22,40 @@ The Einstein system implements a systematic **11-phase feature development pipel
 
 **Quality Gates**: Each phase includes validation checkpoints ensuring systematic quality assurance.
 
-## Pipeline Execution Strategy
+## Pipeline Execution
 
 ### Step 1: Determine Execution Mode
-
 ```bash
-# Detect if this is a new feature or resuming existing work
+# Strategic decision (core orchestration logic)
 if [[ "$ARGUMENTS" =~ ^[a-z0-9-]+_[0-9]{8}_[0-9]{6}$ ]]; then
-    # Feature ID provided - resume from specific point
     FEATURE_ID="$ARGUMENTS"
     EXECUTION_MODE="resume"
     echo "🔄 Resume Mode: ${FEATURE_ID}"
 else
-    # Feature description provided - start new pipeline
     FEATURE_DESCRIPTION="$ARGUMENTS"
     EXECUTION_MODE="new"
     echo "🚀 New Pipeline: ${FEATURE_DESCRIPTION}"
 fi
 
-# Initialize pipeline tracking
-PIPELINE_DIR=".claude/pipeline"
-mkdir -p "${PIPELINE_DIR}"
-PIPELINE_LOG="${PIPELINE_DIR}/einstein-pipeline-$(date +%Y%m%d_%H%M%S).log"
+# Mechanical pipeline initialization (delegated to script)
+INIT_OUTPUT=$(.claude/scripts/phases/initialize-pipeline.sh "${EXECUTION_MODE}" "${ARGUMENTS}")
+echo "${INIT_OUTPUT}"
 
-echo "=== Einstein Pipeline Started ===" | tee "${PIPELINE_LOG}"
-echo "Mode: ${EXECUTION_MODE}" | tee -a "${PIPELINE_LOG}"
-echo "Arguments: $ARGUMENTS" | tee -a "${PIPELINE_LOG}"
-echo "Started: $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee -a "${PIPELINE_LOG}"
-echo "===============================" | tee -a "${PIPELINE_LOG}"
+# Extract initialization results
+PIPELINE_LOG=$(echo "${INIT_OUTPUT}" | grep "PIPELINE_LOG=" | cut -d'=' -f2)
+PIPELINE_DIR=$(echo "${INIT_OUTPUT}" | grep "PIPELINE_DIR=" | cut -d'=' -f2)
+INIT_STATUS=$(echo "${INIT_OUTPUT}" | grep "INITIALIZATION_STATUS=" | cut -d'=' -f2)
 
-# Critical tool validation
-if ! command -v jq >/dev/null 2>&1; then
-    echo "❌ Error: jq is required but not installed" | tee -a "${PIPELINE_LOG}"
+# Validate initialization
+if [ "${INIT_STATUS}" != "success" ] || [ ! -f "${PIPELINE_LOG}" ]; then
+    echo "❌ Pipeline initialization failed"
     exit 1
 fi
 
-if ! command -v date >/dev/null 2>&1; then
-    echo "❌ Error: date command is required but not available" | tee -a "${PIPELINE_LOG}"
-    exit 1
-fi
-
-# Validate pipeline directory creation
-if ! mkdir -p "${PIPELINE_DIR}"; then
-    echo "❌ Error: Failed to create pipeline directory: ${PIPELINE_DIR}" | tee -a "${PIPELINE_LOG}"
-    exit 1
-fi
+echo "✅ Pipeline infrastructure ready - Mode: ${EXECUTION_MODE}"
 ```
 
 ### Step 2: Pipeline State Detection
-
 ```bash
 # Determine current pipeline state
 if [ "${EXECUTION_MODE}" = "resume" ]; then
@@ -121,10 +106,7 @@ else
 fi
 ```
 
-## Phase Execution Pipeline
-
 ### Step 3: Execute Design Phase
-
 ```bash
 if [ "${NEXT_PHASE}" = "design" ] || [ "${EXECUTION_MODE}" = "new" ]; then
     echo "🎯 Phase 1-5: DESIGN PHASE" | tee -a "${PIPELINE_LOG}"
