@@ -370,11 +370,13 @@ echo "Created research directory: ${RESEARCH_DIR}"
 
 **Example of correct parallel spawning:**
 
-```
-[Single Message with Multiple Task Calls]:
-Task("context7-search-specialist", "Research Cloudflare API...", "context7-search-specialist")
-Task("web-research-specialist", "Research security best practices...", "web-research-specialist")
-Task("code-pattern-analyzer", "Analyze existing patterns...", "code-pattern-analyzer")
+```bash
+# Use research agents based on knowledge-synthesizer recommendations
+# Example instruction pattern (not direct Task calls):
+
+# Use the context7-search-specialist subagent for API documentation research
+# Use the web-research-specialist subagent for security best practices
+# Use the code-pattern-analyzer subagent for existing pattern analysis
 ```
 
 After spawning agents, wait for them to complete before continuing.
@@ -1379,7 +1381,13 @@ if [[ " ${SELECTED_AGENTS[@]} " =~ " golang-api-developer " ]]; then
     IMPL_THINKING=$(cat ${IMPL_THINKING_ALLOCATION} | jq -r '.thinking_allocations."golang-api-developer"' 2>/dev/null || echo "think")
 ```
 
-Task("golang-api-developer", "${IMPL_THINKING}. Implement backend API components with architecture context.
+    # Use the golang-api-developer subagent to implement backend API components
+    
+    cat << EOF
+Use the \`golang-api-developer\` subagent to implement backend API components with architecture context.
+
+Instruct the golang-api-developer:
+"${IMPL_THINKING}. Implement backend API components with architecture context.
 
 **Core Context:**
 
@@ -1411,7 +1419,8 @@ $([ -f .claude/features/${FEATURE_ID}/architecture/database-architecture.md ] &&
 3. Focus on domains specified in affected_domains from implementation-context.json
 4. Implement your assigned tasks and maintain detailed progress tracking
 5. Coordinate with other agents through shared workspace and communication files
-6. Update API contracts in coordination directory for frontend integration", "golang-api-developer")
+6. Update API contracts in coordination directory for frontend integration"
+EOF
 
 ```bash
 else
@@ -1430,7 +1439,13 @@ if [[ " ${SELECTED_AGENTS[@]} " =~ " react-developer " ]]; then
     IMPL_THINKING=$(cat ${IMPL_THINKING_ALLOCATION} | jq -r '.thinking_allocations."react-developer"' 2>/dev/null || echo "think")
 ```
 
-Task("react-developer", "${IMPL_THINKING}. Implement frontend UI components with architecture context.
+    # Use the react-developer subagent to implement frontend UI components
+    
+    cat << EOF
+Use the \`react-developer\` subagent to implement frontend UI components with architecture context.
+
+Instruct the react-developer:
+"${IMPL_THINKING}. Implement frontend UI components with architecture context.
 
 **Core Context:**
 
@@ -1462,7 +1477,8 @@ $([ -f .claude/features/${FEATURE_ID}/architecture/component-architecture.md ] &
 3. Focus on user stories and acceptance criteria from requirements.json
 4. Implement responsive, accessible UI components following established patterns
 5. Coordinate with backend agent for API integration through shared API contracts
-6. Read API contracts from coordination directory for accurate frontend integration", "react-developer")
+6. Read API contracts from coordination directory for accurate frontend integration"
+EOF
 
 ```bash
 else
@@ -1478,7 +1494,13 @@ if [[ " ${SELECTED_AGENTS[@]} " =~ " integration-developer " ]]; then
     echo "🚀 Spawning integration-developer..."
 ```
 
-Task("integration-developer", "Implement service integrations and API connections.
+    # Use the integration-developer subagent to implement service integrations
+    
+    cat << EOF
+Use the \`integration-developer\` subagent to implement service integrations and API connections.
+
+Instruct the integration-developer:
+"Implement service integrations and API connections.
 
 **Core Context:**
 
@@ -1507,7 +1529,8 @@ $([ -f .claude/features/${FEATURE_ID}/architecture/api-architecture.md ] && echo
 2. Apply integration architecture patterns and authentication flows
 3. Implement webhook handling, API client code, and service orchestration
 4. Document integration contracts and communication patterns
-5. Coordinate with backend agents through shared integration specifications", "integration-developer")
+5. Coordinate with backend agents through shared integration specifications"
+EOF
 
 ```bash
 else
@@ -1523,7 +1546,13 @@ if [[ " ${SELECTED_AGENTS[@]} " =~ " python-developer " ]]; then
     echo "🚀 Spawning python-developer..."
 ```
 
-Task("python-developer", "Implement Python components and CLI tooling.
+    # Use the python-developer subagent to implement Python components
+    
+    cat << EOF
+Use the \`python-developer\` subagent to implement Python components and CLI tooling.
+
+Instruct the python-developer:
+"Implement Python components and CLI tooling.
 
 **Core Context:**
 
@@ -1542,7 +1571,8 @@ Task("python-developer", "Implement Python components and CLI tooling.
 1. Focus on Python-specific requirements from implementation context
 2. Implement CLI interfaces, data processing pipelines, or Python services
 3. Follow Praetorian CLI patterns and enterprise Python best practices
-4. Coordinate with other agents through shared workspace structures", "python-developer")
+4. Coordinate with other agents through shared workspace structures"
+EOF
 
 ```bash
 else
@@ -1558,7 +1588,13 @@ if [[ " ${SELECTED_AGENTS[@]} " =~ " vql-developer " ]]; then
     echo "🚀 Spawning vql-developer..."
 ```
 
-Task("vql-developer", "Implement VQL security capabilities and detection logic.
+    # Use the vql-developer subagent to implement VQL security capabilities
+    
+    cat << EOF
+Use the \`vql-developer\` subagent to implement VQL security capabilities and detection logic.
+
+Instruct the vql-developer:
+"Implement VQL security capabilities and detection logic.
 
 **Core Context:**
 
@@ -1577,7 +1613,8 @@ Task("vql-developer", "Implement VQL security capabilities and detection logic.
 1. Focus on security-specific domains from implementation context
 2. Develop VQL artifacts, detection rules, and security automation capabilities
 3. Follow Praetorian Aegis platform patterns for threat hunting and incident response
-4. Document security capabilities and coordinate with other security components", "vql-developer")
+4. Document security capabilities and coordinate with other security components"
+EOF
 
 ```bash
 else
@@ -1648,7 +1685,13 @@ fi
 if [ "${SPAWN_TESTING_AGENT}" = true ]; then
 ```
 
-Task("integration-test-engineer", "Create integration tests with architecture-aware context.
+    # Use the integration-test-engineer subagent to create integration tests
+    
+    cat << EOF
+Use the \`integration-test-engineer\` subagent to create integration tests with architecture-aware context.
+
+Instruct the integration-test-engineer:
+"Create integration tests with architecture-aware context.
 
 **Core Context:**
 
@@ -1679,7 +1722,8 @@ $([ -f .claude/features/${FEATURE_ID}/architecture/testing-architecture.md ] && 
 3. Create comprehensive integration tests covering API, database, and service interactions
 4. Focus on user stories from requirements for end-to-end test scenarios
 5. Validate implementation against acceptance criteria
-6. Coordinate testing results with other agents through shared progress tracking", "integration-test-engineer")
+6. Coordinate testing results with other agents through shared progress tracking"
+EOF
 
 ```bash
 else
@@ -1796,16 +1840,22 @@ fi
 
 Execute validation gates using internal agents:
 
-Task("code-pattern-analyzer", "Validate foundation implementation at 25% milestone.
+Use the `code-pattern-analyzer` subagent to validate foundation implementation at 25% milestone.
+
+Instruct the code-pattern-analyzer:
+"Validate foundation implementation at 25% milestone.
 
 Check implementation workspace: .claude/features/${FEATURE_ID}/implementation/code-changes/
 Validate against requirements: .claude/features/${FEATURE_ID}/context/requirements.json
 
 Save validation report: .claude/features/${FEATURE_ID}/implementation/validation/foundation-gate-report.md
 
-Include code structure analysis, pattern compliance, and issue identification.", "code-pattern-analyzer")
+Include code structure analysis, pattern compliance, and issue identification."
 
-Task("production-validator", "Conduct final production readiness validation at 100% milestone.
+Use the `production-validator` subagent to conduct final production readiness validation at 100% milestone.
+
+Instruct the production-validator:
+"Conduct final production readiness validation at 100% milestone.
 
 Review all implementation artifacts in: .claude/features/${FEATURE_ID}/implementation/
 
@@ -1816,7 +1866,7 @@ Validate:
 - Performance requirements
 - Deployment readiness
 
-Save final report: .claude/features/${FEATURE_ID}/implementation/validation/production-ready-gate-report.md", "production-validator")
+Save final report: .claude/features/${FEATURE_ID}/implementation/validation/production-ready-gate-report.md"
 
 **Validate implementation completion:**
 
@@ -1860,7 +1910,10 @@ fi
 
 **Static Code Analysis and Pattern Validation**
 
-Task("code-quality", "Conduct comprehensive code quality analysis.
+Use the `code-quality` subagent to conduct comprehensive code quality analysis.
+
+Instruct the code-quality:
+"Conduct comprehensive code quality analysis.
 
 Context:
 
@@ -1875,9 +1928,12 @@ Focus on:
 - Code quality metrics and standards compliance
 - Architecture pattern adherence
 - Code maintainability and readability
-- Technical debt identification", "code-quality")
+- Technical debt identification"
 
-Task("go-code-reviewer", "Review Go code quality and best practices.
+Use the `go-code-reviewer` subagent to review Go code quality and best practices.
+
+Instruct the go-code-reviewer:
+"Review Go code quality and best practices.
 
 Context:
 
@@ -1891,9 +1947,12 @@ Focus on:
 - Go idioms and best practices
 - Performance optimization opportunities
 - Error handling patterns
-- Code organization and structure", "go-code-reviewer")
+- Code organization and structure"
 
-Task("performance-analyzer", "Analyze performance characteristics and optimization opportunities.
+Use the `performance-analyzer` subagent to analyze performance characteristics and optimization opportunities.
+
+Instruct the performance-analyzer:
+"Analyze performance characteristics and optimization opportunities.
 
 Context:
 
@@ -1907,7 +1966,7 @@ Focus on:
 - Performance bottleneck identification
 - Optimization recommendations
 - Scalability assessment
-- Resource utilization analysis", "performance-analyzer")
+- Resource utilization analysis"
 
 **Validate quality review completion:**
 
@@ -2165,7 +2224,13 @@ Process security orchestration results and finalize security phase:
                             "golang-api-developer"|"go-security-reviewer"|"golang-developer")
                                 echo "🚀 Task: Spawning ${AGENT_TYPE} for Go security remediation..." | tee -a "${PIPELINE_LOG}"
                                 
-Task("${AGENT_TYPE}", "SECURITY VULNERABILITY REMEDIATION - Iteration ${ITERATION}/${MAX_ITERATIONS}
+                                # Use the agent to remediate Go security vulnerabilities
+                                
+                                cat << EOF
+Use the \`${AGENT_TYPE}\` subagent for security vulnerability remediation - Iteration ${ITERATION}/${MAX_ITERATIONS}.
+
+Instruct the ${AGENT_TYPE}:
+"SECURITY VULNERABILITY REMEDIATION - Iteration ${ITERATION}/${MAX_ITERATIONS}
 
 **CRITICAL: This is active security vulnerability remediation, not analysis**
 
@@ -2203,13 +2268,20 @@ Save your security fixes and documentation to: ${ITERATION_DIR}/fixes/${AGENT_TY
 - When in doubt, choose the more secure approach
 - Validate input at all boundaries
 - Use established security libraries, avoid custom crypto
-- Apply defense in depth principles", "${AGENT_TYPE}")
+- Apply defense in depth principles"
+EOF
 
                                 ;;
                             "react-developer"|"react-security-reviewer")
                                 echo "🚀 Task: Spawning ${AGENT_TYPE} for React security remediation..." | tee -a "${PIPELINE_LOG}"
                                 
-Task("${AGENT_TYPE}", "FRONTEND SECURITY VULNERABILITY REMEDIATION - Iteration ${ITERATION}/${MAX_ITERATIONS}
+                                # Use the agent to remediate React security vulnerabilities
+                                
+                                cat << EOF
+Use the \`${AGENT_TYPE}\` subagent for frontend security vulnerability remediation - Iteration ${ITERATION}/${MAX_ITERATIONS}.
+
+Instruct the ${AGENT_TYPE}:
+"FRONTEND SECURITY VULNERABILITY REMEDIATION - Iteration ${ITERATION}/${MAX_ITERATIONS}
 
 **CRITICAL: This is active security vulnerability remediation for React/TypeScript**
 
@@ -2246,13 +2318,20 @@ Save your security fixes to: ${ITERATION_DIR}/fixes/${AGENT_TYPE}-security-fixes
 - Sanitize all user inputs
 - Use Content Security Policy (CSP)
 - Implement secure authentication patterns
-- Apply secure coding practices for React/TypeScript", "${AGENT_TYPE}")
+- Apply secure coding practices for React/TypeScript"
+EOF
 
                                 ;;
                             "security-architect")
                                 echo "🚀 Task: Spawning ${AGENT_TYPE} for architectural security oversight..." | tee -a "${PIPELINE_LOG}"
                                 
-Task("security-architect", "SECURITY ARCHITECTURE OVERSIGHT - Iteration ${ITERATION}/${MAX_ITERATIONS}
+                                # Use security-architect for architectural oversight
+                                
+                                cat << EOF
+Use the \`security-architect\` subagent for security architecture oversight - Iteration ${ITERATION}/${MAX_ITERATIONS}.
+
+Instruct the security-architect:
+"SECURITY ARCHITECTURE OVERSIGHT - Iteration ${ITERATION}/${MAX_ITERATIONS}
 
 **CRITICAL: Mandatory security architect oversight and approval authority**
 
@@ -2290,13 +2369,20 @@ Save your architectural security approval/rejection to: ${ITERATION_DIR}/validat
 - APPROVE: Fixes are adequate and architecturally sound
 - CONDITIONAL APPROVAL: Minor improvements needed
 - REJECT: Major architectural security issues, fixes inadequate
-- ESCALATE: Issues beyond agent remediation capabilities", "security-architect")
+- ESCALATE: Issues beyond agent remediation capabilities"
+EOF
 
                                 ;;
                             *)
                                 echo "🚀 Task: Spawning ${AGENT_TYPE} for general security remediation..." | tee -a "${PIPELINE_LOG}"
                                 
-Task("${AGENT_TYPE}", "SECURITY VULNERABILITY REMEDIATION - Iteration ${ITERATION}/${MAX_ITERATIONS}
+                                # Use the general agent for security remediation
+                                
+                                cat << EOF
+Use the \`${AGENT_TYPE}\` subagent for security vulnerability remediation - Iteration ${ITERATION}/${MAX_ITERATIONS}.
+
+Instruct the ${AGENT_TYPE}:
+"SECURITY VULNERABILITY REMEDIATION - Iteration ${ITERATION}/${MAX_ITERATIONS}
 
 **CRITICAL: Active security vulnerability remediation**
 
@@ -2314,7 +2400,8 @@ Fix the identified vulnerabilities using your specialized capabilities. Apply se
 - Security findings: .claude/features/${FEATURE_ID}/security-review/analysis/
 
 **Output:**
-Save fixes to: ${ITERATION_DIR}/fixes/${AGENT_TYPE}-security-fixes.md", "${AGENT_TYPE}")
+Save fixes to: ${ITERATION_DIR}/fixes/${AGENT_TYPE}-security-fixes.md"
+EOF
 
                                 ;;
                         esac
@@ -2772,7 +2859,13 @@ for TEST_ITERATION in $(seq 1 ${MAX_TEST_ITERATIONS}); do
             if [ -n "${AGENT_TYPE}" ] && [ "${AGENT_TYPE}" != "null" ]; then
                 echo "🚀 Spawning ${AGENT_TYPE} for test creation..." | tee -a "${TEST_EXECUTION_LOG}"
                 
-Task("${AGENT_TYPE}", "COMPREHENSIVE TEST CREATION - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
+                # Use the agent for comprehensive test creation
+                
+                cat << 'EOF'
+Use the `${AGENT_TYPE}` subagent for comprehensive test creation - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}.
+
+Instruct the ${AGENT_TYPE}:
+"COMPREHENSIVE TEST CREATION - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
 
 **CRITICAL: Create executable tests with validation capabilities**
 
@@ -2824,7 +2917,8 @@ esac)
 - Tests created and properly structured
 - Tests are executable with clear pass/fail results
 - Comprehensive coverage of implemented functionality
-- Clear documentation for test execution", "${AGENT_TYPE}")
+- Clear documentation for test execution"
+EOF
 
             fi
         done <<< "${TEST_CREATION_AGENTS}"
@@ -2846,7 +2940,13 @@ esac)
             if [ -n "${EXEC_AGENT}" ] && [ "${EXEC_AGENT}" != "null" ]; then
                 echo "🚀 Spawning ${EXEC_AGENT} for test execution..." | tee -a "${TEST_EXECUTION_LOG}"
                 
-Task("${EXEC_AGENT}", "TEST EXECUTION & FAILURE ANALYSIS - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
+                # Use the agent for test execution and failure analysis
+                
+                cat << 'EOF'
+Use the `${EXEC_AGENT}` subagent for test execution and failure analysis - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}.
+
+Instruct the ${EXEC_AGENT}:
+"TEST EXECUTION & FAILURE ANALYSIS - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
 
 **CRITICAL: Execute tests and provide detailed failure analysis**
 
@@ -2883,7 +2983,8 @@ fi)
 **Success Criteria Determination:**
 - ALL_TESTS_PASSING: All tests executed successfully
 - TESTS_FAILING_WITH_ANALYSIS: Tests failed but failure analysis is complete
-- EXECUTION_ERROR: Tests could not be executed (escalation needed)", "${EXEC_AGENT}")
+- EXECUTION_ERROR: Tests could not be executed (escalation needed)"
+EOF
 
             fi
         done <<< "${TEST_EXECUTION_AGENTS}"
@@ -2932,7 +3033,13 @@ fi)
                 if [ -n "${REMEDIATION_AGENT}" ] && [ "${REMEDIATION_AGENT}" != "null" ]; then
                     echo "🚀 Spawning ${REMEDIATION_AGENT} for test remediation..." | tee -a "${TEST_EXECUTION_LOG}"
                     
-Task("${REMEDIATION_AGENT}", "TEST FAILURE REMEDIATION - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
+                    # Use the agent for test failure remediation
+                    
+                    cat << 'EOF'
+Use the `${REMEDIATION_AGENT}` subagent for test failure remediation - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}.
+
+Instruct the ${REMEDIATION_AGENT}:
+"TEST FAILURE REMEDIATION - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
 
 **CRITICAL: Fix failing tests by improving code or tests**
 
@@ -2980,7 +3087,8 @@ esac)
 - Root cause of test failures addressed
 - Code improvements implemented
 - Test issues resolved or improved  
-- Ready for next iteration execution", "${REMEDIATION_AGENT}")
+- Ready for next iteration execution"
+EOF
 
                 fi
             done <<< "${REMEDIATION_AGENTS}"
@@ -3085,6 +3193,7 @@ echo "✅ Multi-iteration testing with bounded refinement (max ${MAX_TEST_ITERAT
 
 ### Phase 10: Deployment Phase
 
+```bash
 if [ "${NEXT_PHASE}" = "deploy" ]; then
 echo "🚀 Phase 10: DEPLOYMENT PHASE" | tee -a "${PIPELINE_LOG}"
 
@@ -3097,6 +3206,7 @@ echo "🚀 Phase 10: DEPLOYMENT PHASE" | tee -a "${PIPELINE_LOG}"
       echo "Deployment started: ${DEPLOY_START}" | tee -a "${PIPELINE_LOG}"
 
 fi
+```
 
 ```bash
 echo "🚀 Phase 10: LIVE SYSTEM DEPLOYMENT"
@@ -3368,7 +3478,10 @@ Include:
 
 Execute system validation using integration specialists:
 
-Task("integration-test-engineer", "🔧 FEATURE-AWARE INTEGRATION VALIDATION - Verify feature works in production environment.
+Use the `integration-test-engineer` subagent for feature-aware integration validation.
+
+Instruct the integration-test-engineer:
+"🔧 FEATURE-AWARE INTEGRATION VALIDATION - Verify feature works in production environment.
 
 **Your Mission:**
 Validate that the implemented feature works correctly in the live deployed Chariot system.
@@ -3458,13 +3571,16 @@ Include:
 - Performance meets requirements under load ✅
 - Security controls functioning properly ✅
 - Error handling robust and user-friendly ✅
-- Ready for production deployment ✅", "integration-test-engineer")
+- Ready for production deployment ✅"
 
 ### Phase 9.6: Enhanced Unit Testing Validation
 
 Execute enhanced unit testing with build verification:
 
-Task("unit-test-engineer", "🧪 FEATURE-AWARE UNIT TESTING - Create and execute comprehensive unit tests.
+Use the `unit-test-engineer` subagent for feature-aware unit testing.
+
+Instruct the unit-test-engineer:
+"🧪 FEATURE-AWARE UNIT TESTING - Create and execute comprehensive unit tests.
 
 **Your Mission:**
 Create comprehensive unit tests AND execute them against the built code to verify functionality.
@@ -3556,7 +3672,7 @@ Include:
 - All unit tests pass on built code ✅
 - Coverage requirements met for feature type ✅
 - Performance benchmarks achieved ✅
-- No regressions in existing test suite ✅", "unit-test-engineer")
+- No regressions in existing test suite ✅"
 
 ### Validate Live System Testing Completion
 
