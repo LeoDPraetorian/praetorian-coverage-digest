@@ -4,7 +4,7 @@ type: coordinator
 description: Use this agent to coordinate implementation strategy for features requiring development agent orchestration. Analyzes complexity, selects development agents, optimizes thinking budgets, and creates execution plans. Examples: <example>Context: User needs to implement a multi-domain feature affecting frontend, backend, and integrations. user: 'We need to implement real-time asset monitoring with React UI, Go API, and third-party integrations' assistant: 'I'll use the implementation-coordinator agent to analyze complexity and recommend optimal development agent selection and coordination strategy.' <commentary>Since this affects multiple development domains (frontend, backend, integration), use the implementation-coordinator to coordinate comprehensive development planning.</commentary></example> <example>Context: User has a complex feature with unclear agent requirements. user: 'I need to implement a security dashboard but I'm not sure which development agents to use' assistant: 'Let me use the implementation-coordinator agent to analyze the requirements and recommend the optimal development team composition.' <commentary>This requires strategic analysis of development agent capabilities and intelligent selection based on feature requirements.</commentary></example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
 model: opusplan
-color: green
+color: purple
 ---
 
 # Elite Implementation Coordinator

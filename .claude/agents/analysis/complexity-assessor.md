@@ -210,6 +210,7 @@ Map domains based on the systems affected:
 - **Database**: Schema changes, migrations, queries
 - **Infrastructure**: Deployment, configuration, scaling
 - **Security**: Auth, encryption, compliance
+- **Information**: file patterns, directory patterns
 
 ## Error Handling
 

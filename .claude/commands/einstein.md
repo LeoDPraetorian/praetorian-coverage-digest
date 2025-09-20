@@ -453,7 +453,7 @@ Your assessment should include:
 {
 'level': 'Simple|Medium|Complex',
 'factors': ['list of complexity factors'],
-'affected_domains': ['frontend', 'backend', 'database', 'security'],
+'affected_domains': ['frontend', 'backend', 'database', 'security', 'information'],
 'estimated_effort': 'hours or days',
 'risk_level': 'Low|Medium|High',
 'justification': 'explanation of assessment'
@@ -1573,545 +1573,181 @@ fi
 
 ```bash
 if [ "${NEXT_PHASE}" = "deploy" ]; then
-echo "🚀 Phase 10: DEPLOYMENT PHASE" | tee -a "${PIPELINE_LOG}"
+    echo "🚀 Phase 12: DEPLOYMENT PHASE" | tee -a "${PIPELINE_LOG}"
 
-      # Initialize deployment workspace
-      DEPLOY_WORKSPACE=".claude/features/${FEATURE_ID}/deployment"
-      mkdir -p "${DEPLOY_WORKSPACE}"/{staging,production,validation,rollback}
-      DEPLOY_PLAN="${DEPLOY_WORKSPACE}/deployment-plan.json"
+    # Run mechanical setup operations (build, deploy, health checks)
+    SETUP_OUTPUT=$(.claude/scripts/phases/deployment/setup-deployment-phase.sh "${FEATURE_ID}")
+    echo "${SETUP_OUTPUT}"
 
-      DEPLOY_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-      echo "Deployment started: ${DEPLOY_START}" | tee -a "${PIPELINE_LOG}"
+    # Extract file paths and deployment status from setup output
+    DEPLOY_CONTEXT_FILE=$(echo "${SETUP_OUTPUT}" | grep "DEPLOY_CONTEXT_FILE=" | cut -d'=' -f2)
+    DEPLOY_COORDINATION_PLAN=$(echo "${SETUP_OUTPUT}" | grep "DEPLOY_COORDINATION_PLAN=" | cut -d'=' -f2)
+    DEPLOY_STRATEGY=$(echo "${SETUP_OUTPUT}" | grep "DEPLOY_STRATEGY=" | cut -d'=' -f2)
+    DEPLOY_WORKSPACE=$(echo "${SETUP_OUTPUT}" | grep "DEPLOY_WORKSPACE=" | cut -d'=' -f2)
 
-fi
-```
+    # Extract deployment analysis from setup
+    DEPLOYMENT_RISK=$(echo "${SETUP_OUTPUT}" | grep "DEPLOYMENT_RISK=" | cut -d'=' -f2)
+    BUILD_STATUS=$(echo "${SETUP_OUTPUT}" | grep "BUILD_STATUS=" | cut -d'=' -f2)
+    DEPLOY_STATUS=$(echo "${SETUP_OUTPUT}" | grep "DEPLOY_STATUS=" | cut -d'=' -f2)
+    PLATFORM_READY=$(echo "${SETUP_OUTPUT}" | grep "PLATFORM_READY=" | cut -d'=' -f2)
+    API_HEALTH_STATUS=$(echo "${SETUP_OUTPUT}" | grep "API_HEALTH_STATUS=" | cut -d'=' -f2)
 
-```bash
-echo "🚀 Phase 10: LIVE SYSTEM DEPLOYMENT"
-
-# Ensure we're in the correct directory
-cd /Users/nathansportsman/chariot-development-platform
-
-# Build the implemented code
-echo "Building implementation..."
-make build 2>&1 | tee ".claude/features/${FEATURE_ID}/testing/live-system/build.log"
-
-if [ ${PIPESTATUS[0]} -ne 0 ]; then
-    echo "❌ Build failed - checking build errors" | tee -a "${PIPELINE_LOG}"
-    echo "Build errors:" | tee -a "${PIPELINE_LOG}"
-    tail -20 ".claude/features/${FEATURE_ID}/testing/live-system/build.log" | tee -a "${PIPELINE_LOG}"
-    exit 1
-fi
-
-# Deploy the complete Chariot platform
-echo "Deploying Chariot platform with new feature..."
-make chariot 2>&1 | tee ".claude/features/${FEATURE_ID}/testing/live-system/deploy.log"
-
-if [ ${PIPESTATUS[0]} -ne 0 ]; then
-    echo "❌ Deployment failed - checking deployment errors" | tee -a "${PIPELINE_LOG}"
-    echo "Deployment errors:" | tee -a "${PIPELINE_LOG}"
-    tail -20 ".claude/features/${FEATURE_ID}/testing/live-system/deploy.log" | tee -a "${PIPELINE_LOG}"
-    exit 1
-fi
-
-# Wait for system to be ready (check https://localhost:3000)
-echo "Waiting for Chariot platform to be ready..."
-for i in {1..30}; do
-    if curl -k -s https://localhost:3000 > /dev/null; then
-        echo "✅ Chariot platform is ready on https://localhost:3000"
-        break
+    # Validate deployment was successful
+    if [ "${BUILD_STATUS}" != "success" ] || [ "${DEPLOY_STATUS}" != "success" ] || [ "${PLATFORM_READY}" != "true" ]; then
+        echo "❌ Deployment setup failed - Build: ${BUILD_STATUS}, Deploy: ${DEPLOY_STATUS}, Platform: ${PLATFORM_READY}" | tee -a "${PIPELINE_LOG}"
+        exit 1
     fi
-    echo "Waiting for platform... (attempt $i/30)"
-    sleep 10
-done
 
-if [ $i -eq 30 ]; then
-    echo "❌ Platform failed to start within 5 minutes" | tee -a "${PIPELINE_LOG}"
-    exit 1
+    echo "✅ Deployment completed successfully" | tee -a "${PIPELINE_LOG}"
+    echo "🚀 Platform ready at https://localhost:3000"
+    echo "📊 Deployment Risk: ${DEPLOYMENT_RISK}, API Health: ${API_HEALTH_STATUS}"
 fi
-
-# Health check API endpoints
-echo "Performing API health checks..."
-API_HEALTH_LOG=".claude/features/${FEATURE_ID}/testing/live-system/api-health.log"
-curl -k -s https://localhost:3000/api/health > "${API_HEALTH_LOG}" 2>&1
-echo "API health check completed" | tee -a "${PIPELINE_LOG}"
 ```
 
-### Phase 9.3: Live E2E Testing with Feature Intelligence
+### **Delegate to Deployment Coordinator**
 
 ```bash
-echo "🎨 FEATURE-AWARE E2E Testing"
+# Use deployment-coordinator to analyze and recommend validation strategy
+echo "=== Deployment Coordination Analysis ==="
 ```
 
-Use the `playwright-explorer` subagent to execute intelligent E2E testing using with dynamic scenarios.
+**Instruct the deployment-coordinator:**
+"ultrathink. Analyze this feature deployment and recommend a comprehensive validation approach with appropriate deployment validation agents.
 
-Instruct the playwright-explorer:
+**Read deployment context from:** ${DEPLOY_CONTEXT_FILE}
 
-"Test implemented feature with dynamic scenario generation.
+**Also read these context sources:**
 
-**CRITICAL: This is LIVE SYSTEM testing against https://localhost:3000**
+- Quality validation results: .claude/features/${FEATURE_ID}/quality-review/ (if available)
+- Security validation results: .claude/features/${FEATURE_ID}/security-review/ (if available)
+- Implementation outputs: .claude/features/${FEATURE_ID}/implementation/agent-outputs/
+- Requirements (for validation criteria): .claude/features/${FEATURE_ID}/context/requirements.json
 
-**Your Mission:**
-Generate and execute feature-specific E2E tests based on the actual implemented feature requirements and user stories.
+**Save your recommendations to:** ${DEPLOY_COORDINATION_PLAN}
 
-**Feature Context (Dynamic Analysis):**
+**Create deployment strategy at:** ${DEPLOY_STRATEGY}
 
-- Platform URL: https://localhost:3000
-- Feature Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Implementation Details: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- User Stories: Extract from requirements.json
+**Output format for coordination plan:**
 
-**Dynamic Test Scenario Generation Process:**
-
-1. **Analyze Feature Requirements**
-
-   ```javascript
-   const requirements = readRequirementsFile();
-   const userStories = requirements.user_stories;
-   const acceptanceCriteria = requirements.acceptance_criteria;
-   const affectedSystems = requirements.affected_systems;
-   ```
-
-2. **Generate Feature-Specific Test Workflow**
-   Based on affected systems and user stories, create appropriate test scenarios:
-
-   **For Frontend Features (UI Components, Dashboards, etc.):**
-
-   - Navigate to relevant page based on implementation
-   - Test new/modified UI components
-   - Validate user interactions and workflows
-   - Test responsive design and accessibility
-
-   **For Backend Features (APIs, Data Processing, etc.):**
-
-   - Test API endpoints through UI interactions
-   - Validate data flow and processing
-   - Test error handling and edge cases
-
-   **For Full-Stack Features:**
-
-   - Complete user workflow testing
-   - End-to-end data validation
-   - Integration point testing
-
-**Adaptive Test Execution Framework:**
-
-```javascript
-// Dynamic URL determination based on feature
-const featurePages = determineRelevantPages(requirements.affected_systems);
-for (const page of featurePages) {
-  await testPage(page, userStories, acceptanceCriteria);
-}
-
-// Generate test steps based on user stories
-const testSteps = generateTestStepsFromUserStories(userStories);
-for (const step of testSteps) {
-  await executeTestStep(step);
-  await captureEvidence(step.name);
+```json
+{
+  \"recommendation\": \"comprehensive_deployment|focused_deployment|basic_deployment|skip_deployment\",
+  \"rationale\": \"Why this approach based on deployment risk, platform status, and available validation agents\",
+  \"deployment_assessment\": {
+    \"risk_level\": \"Critical|High|Medium|Low\",
+    \"complexity_level\": \"Complex|Medium|Simple\",
+    \"deployment_scope\": [\"Frontend changes\", \"Backend API changes\", \"Database migrations\"],
+    \"technology_stack\": [\"Go\", \"React\", \"AWS\", \"Python\"],
+    \"deployment_priority\": \"critical|high|medium|low\"
+  },
+  \"deployment_strategy\": {
+    \"approach\": \"direct|staged|canary|blue_green\",
+    \"justification\": \"Why this deployment approach is optimal\",
+    \"rollback_plan\": \"immediate|staged|manual\",
+    \"success_criteria\": [\"Measurable deployment success indicators\"]
+  },
+  \"suggested_validation_agents\": [
+    {
+      \"agent\": \"[ONLY FROM DISCOVERED AGENTS]\",
+      \"reason\": \"Specific deployment validation domain match justification\",
+      \"validation_focus\": [\"Production readiness\", \"Integration testing\"],
+      \"priority\": \"critical|high|medium|low\",
+      \"thinking_budget\": \"ultrathink|think|basic\",
+      \"estimated_effort\": \"high|medium|low\",
+      \"success_criteria\": [\"Specific validation requirements this agent addresses\"]
+    }
+  ],
+  \"deployment_gates\": {
+    \"pre_deployment\": [\"Build success\", \"Security cleared\", \"Quality approved\"],
+    \"post_deployment\": [\"Health checks passed\", \"Integration validated\", \"Performance confirmed\"],
+    \"rollback_triggers\": [\"Health failures\", \"Critical errors\", \"Performance degradation\"]
+  }
 }
 ```
 
-**Universal Testing Workflow:**
+**Focus on:**
 
-1. **Feature Discovery**
+- Risk-appropriate validation depth (${DEPLOYMENT_RISK} deployment risk detected)
+- Platform status integration (Build: ${BUILD_STATUS}, Deploy: ${DEPLOY_STATUS}, Platform: ${PLATFORM_READY})
+- Technology-specific validation agents based on implementation scope
+- Production readiness validation based on quality and security results"
 
-   - Analyze implementation to understand what was built
-   - Navigate to relevant pages/sections based on affected_systems
-   - Take initial baseline screenshots
-
-2. **User Story Validation**
-
-   - For each user story in requirements.json:
-     - Generate test steps to validate the story
-     - Execute user workflow
-     - Capture evidence of success/failure
-     - Take screenshots at key interaction points
-
-3. **Acceptance Criteria Testing**
-
-   - For each acceptance criterion:
-     - Create specific test scenario
-     - Execute validation steps
-     - Document results with evidence
-
-4. **Cross-Browser and Responsive Testing**
-
-   - Test on multiple screen sizes
-   - Validate touch-friendly interactions
-   - Ensure accessibility compliance
-
-5. **Performance and Error Testing**
-   - Monitor network requests during feature usage
-   - Test error scenarios and edge cases
-   - Validate performance requirements are met
-
-**Evidence Collection System:**
-
-- Screenshots: Generate names based on user story being tested
-- Network logs: Capture API calls during feature testing
-- Performance metrics: Measure against feature requirements
-- Error detection: Monitor console for JavaScript errors
-
-**Dynamic Screenshot Naming:**
-
-- Pattern: {feature-name}-{user-story-id}-{test-step}.png
-- Examples: auth-system-login-workflow-success.png, dashboard-widget-responsive-mobile.png
-
-**Validation Report Structure:**
-Create comprehensive testing report: .claude/features/${FEATURE_ID}/testing/reports/live-e2e-test-report.md
-
-Include:
-
-- ✅/❌ for each user story validation
-- ✅/❌ for each acceptance criteria
-- Screenshot evidence for all major functionality
-- Network request validation
-- Performance metrics vs requirements
-- Any bugs or issues discovered
-- Overall feature readiness assessment
-
-**CRITICAL SUCCESS CRITERIA:**
-
-- All user stories from requirements.json validated ✅
-- All acceptance criteria met ✅
-- Performance meets feature-specific requirements ✅
-- No JavaScript errors in console ✅
-- Responsive design functions properly ✅
-- Feature works correctly in production-like environment ✅", "playwright-explorer")
-
-### Phase 9.4: UI/UX Design Validation
+### **Process Coordinator Recommendations**
 
 ```bash
-echo "🎨 FEATURE-AWARE DESIGN VALIDATION"
-```
+# After deployment-coordinator completes, process recommendations
+if [ -f "${DEPLOY_COORDINATION_PLAN}" ]; then
+    RECOMMENDATION=$(cat "${DEPLOY_COORDINATION_PLAN}" | jq -r '.recommendation')
+
+    if [ "${RECOMMENDATION}" = "comprehensive_deployment" ] || [ "${RECOMMENDATION}" = "focused_deployment" ]; then
+        echo "Deployment coordinator recommends: ${RECOMMENDATION}"
+        cat "${DEPLOY_COORDINATION_PLAN}" | jq -r '.suggested_validation_agents[] | "- \(.agent): \(.reason) [\(.priority)] - Validation: \(.validation_focus | join(\", \"))"'
+
+        echo ""
+        echo "🚀 Deployment gates defined:"
+        echo "Pre-deployment: $(cat "${DEPLOY_COORDINATION_PLAN}" | jq -r '.deployment_gates.pre_deployment | join(\", \")')"
+        echo "Post-deployment: $(cat "${DEPLOY_COORDINATION_PLAN}" | jq -r '.deployment_gates.post_deployment | join(\", \")')"
+        echo "Rollback triggers: $(cat "${DEPLOY_COORDINATION_PLAN}" | jq -r '.deployment_gates.rollback_triggers | join(\", \")')"
+        echo ""
+        echo "Based on the coordination plan, spawn the recommended validation agents using Task tool."
 
-Use the `uiux-designer` subagent to execute visual design validation with feature context.
-
-Instruct the playwright-explorer:
-
-"Analyze live system implementation for design quality.
-
-**Your Mission:**
-Analyze the actual implementation against design requirements and validate visual consistency.
-
-**Design Context Analysis:**
-
-- Screenshots location: .claude/features/${FEATURE_ID}/testing/evidence/
-- Design requirements: Extract from .claude/features/${FEATURE_ID}/context/requirements.json
-- Implementation scope: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- Feature type: Determine from affected_systems in requirements
-
-**Dynamic Design Validation Framework:**
-
-1. **Design Requirements Analysis**
-
-   - Extract design-related requirements from requirements.json
-   - Identify UI components that were implemented
-   - Understand design constraints and objectives
-
-2. **Implementation-Aware Design Review**
-   Based on what was actually implemented:
-
-   - Analyze relevant screenshots from evidence collection
-   - Validate design consistency with Chariot design system
-   - Check component integration and visual hierarchy
-   - Validate responsive design implementation
-
-3. **Feature-Specific Design Criteria**
-   Generate validation criteria based on feature type:
-
-   - **Data Display Features**: Information hierarchy, readability, data visualization
-   - **Interactive Features**: User feedback, state indication, interaction patterns
-   - **Navigation Features**: Wayfinding, breadcrumbs, menu consistency
-   - **Form Features**: Input validation, error states, accessibility
-
-4. **Accessibility Validation**
-   - Color contrast ratios
-   - Focus indicators and keyboard navigation
-   - Screen reader compatibility
-   - Touch-friendly interaction areas
-
-**Design Quality Assessment:**
-Save comprehensive design analysis to: .claude/features/${FEATURE_ID}/testing/reports/design-validation-report.md
-
-Include:
-
-- ✅/❌ Design consistency with Chariot system
-- ✅/❌ Feature-specific design requirements met
-- ✅/❌ Accessibility compliance (WCAG 2.1 AA)
-- ✅/❌ Responsive design quality
-- Visual improvements recommended
-- User experience enhancement suggestions
-- Overall design quality score (1-10)
-
-**CRITICAL SUCCESS CRITERIA:**
-
-- Maintains Chariot visual identity ✅
-- Accessible to users with disabilities ✅
-- Meets feature-specific design requirements ✅
-- Responsive across all screen sizes ✅
-- Intuitive user interaction patterns ✅", "designer")
-
-### Phase 9.5: System Integration Validation
-
-Execute system validation using integration specialists:
-
-Use the `integration-test-engineer` subagent for feature-aware integration validation.
-
-Instruct the integration-test-engineer:
-"🔧 FEATURE-AWARE INTEGRATION VALIDATION - Verify feature works in production environment.
-
-**Your Mission:**
-Validate that the implemented feature works correctly in the live deployed Chariot system.
-
-**Integration Context Analysis:**
-
-- Running system: https://localhost:3000
-- Feature requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- Affected systems: Extract from requirements.json
-
-**Dynamic Integration Testing Framework:**
-
-1. **Feature Integration Scope Analysis**
-
-   - Determine what systems the feature touches
-   - Identify integration points that need validation
-   - Map data flows and API dependencies
-
-2. **Adaptive Integration Validation**
-   Based on affected_systems from requirements:
-
-   **For Backend Features:**
-
-   - Verify API endpoints function correctly
-   - Test database integration and queries
-   - Validate data processing and transformations
-   - Check service-to-service communication
-
-   **For Frontend Features:**
-
-   - Test API integration from UI
-   - Validate data binding and state management
-   - Test real-time data updates if applicable
-
-   **For Full-Stack Features:**
-
-   - End-to-end data flow validation
-   - User workflow integration testing
-   - Performance under realistic load
-
-3. **Production Environment Validation**
-   - Test with production-like data volumes
-   - Validate security controls in live environment
-   - Test concurrent user scenarios
-   - Monitor system resource usage
-
-**Integration Test Categories:**
-
-1. **API Integration Testing**
-
-   - Verify all implemented endpoints respond correctly
-   - Test authentication and authorization
-   - Validate input sanitization and output formatting
-   - Check error handling and status codes
-
-2. **Database Integration Testing**
-
-   - Verify data persistence and retrieval
-   - Test query performance with realistic data
-   - Validate data consistency and integrity
-   - Check transaction handling
-
-3. **Service Integration Testing**
-   - Test third-party service connections
-   - Validate webhook handling if applicable
-   - Test failover and error recovery
-   - Validate configuration and environment variables
-
-**System Health Report:**
-Save comprehensive integration report to: .claude/features/${FEATURE_ID}/testing/reports/system-integration-report.md
-
-Include:
-
-- ✅/❌ Feature integration points functioning correctly
-- ✅/❌ Data flow validation successful
-- ✅/❌ Performance requirements met in live environment
-- ✅/❌ Security controls functioning properly
-- ✅/❌ Error handling working as expected
-- System resource usage metrics
-- Any integration issues discovered
-- Production deployment readiness assessment
-
-**CRITICAL SUCCESS CRITERIA:**
-
-- All integration points working correctly ✅
-- Performance meets requirements under load ✅
-- Security controls functioning properly ✅
-- Error handling robust and user-friendly ✅
-- Ready for production deployment ✅"
-
-### Phase 9.6: Enhanced Unit Testing Validation
-
-Execute enhanced unit testing with build verification:
-
-Use the `unit-test-engineer` subagent for feature-aware unit testing.
-
-Instruct the unit-test-engineer:
-"🧪 FEATURE-AWARE UNIT TESTING - Create and execute comprehensive unit tests.
-
-**Your Mission:**
-Create comprehensive unit tests AND execute them against the built code to verify functionality.
-
-**Unit Testing Context Analysis:**
-
-- Built code location: /Users/nathansportsman/chariot-development-platform/
-- Implementation: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Build logs: .claude/features/${FEATURE_ID}/testing/live-system/build.log
-
-**Feature-Aware Testing Strategy:**
-
-1. **Implementation Analysis**
-
-   - Analyze code changes to understand what needs testing
-   - Identify business logic functions requiring unit tests
-   - Determine edge cases based on requirements
-   - Map acceptance criteria to testable functions
-
-2. **Dynamic Test Generation**
-   Based on implementation analysis:
-
-   - Generate tests for new functions and methods
-   - Create edge case tests based on requirements
-   - Add security-focused tests for sensitive functions
-   - Generate performance tests for critical paths
-
-3. **Technology-Specific Test Implementation**
-
-   **For Go Backend Code:**
-
-   ```bash
-   cd modules/chariot/backend
-   # Generate comprehensive Go tests
-   go test ./... -v -cover -coverprofile=coverage.out
-   go tool cover -html=coverage.out -o coverage.html
-   ```
-
-   **For React Frontend Code:**
-
-   ```bash
-   cd modules/chariot/ui
-   # Generate React component tests
-   npm test -- --coverage --verbose
-   ```
-
-   **For Python CLI Code:**
-
-   ```bash
-   cd modules/praetorian-cli
-   # Generate Python tests
-   pytest --cov=. --cov-report=html
-   ```
-
-4. **Test Execution and Validation**
-   - Execute all generated tests against built code
-   - Verify coverage requirements met (>85% for business logic)
-   - Validate test quality and meaningful assertions
-   - Check performance benchmarks achieved
-
-**Test Coverage Requirements by Feature Type:**
-
-- **Security Features**: 95% coverage with security-specific test scenarios
-- **Business Logic**: 85% coverage with edge case validation
-- **UI Components**: 80% coverage with accessibility testing
-- **API Endpoints**: 90% coverage with error scenario testing
-
-**Test Execution Report:**
-Save execution results to: .claude/features/${FEATURE_ID}/testing/reports/unit-test-execution-report.md
-
-Include:
-
-- ✅/❌ All unit tests pass on built code
-- ✅/❌ Coverage requirements met (specific % achieved)
-- ✅/❌ Performance benchmarks satisfied
-- ✅/❌ No regressions in existing tests
-- Test execution details and metrics
-- Coverage reports generated and saved
-
-**Output Locations:**
-
-- Tests: .claude/features/${FEATURE_ID}/testing/unit/
-- Coverage reports: .claude/features/${FEATURE_ID}/testing/unit/coverage/
-- Execution logs: .claude/features/${FEATURE_ID}/testing/unit/execution.log
-
-**CRITICAL SUCCESS CRITERIA:**
-
-- All unit tests pass on built code ✅
-- Coverage requirements met for feature type ✅
-- Performance benchmarks achieved ✅
-- No regressions in existing test suite ✅"
-
-### Validate Live System Testing Completion
-
-```bash
-echo "🎯 VALIDATING LIVE SYSTEM TESTING COMPLETION"
-
-# Check all required artifacts exist
-REQUIRED_ARTIFACTS=(
-    ".claude/features/${FEATURE_ID}/testing/evidence/"
-    ".claude/features/${FEATURE_ID}/testing/reports/live-e2e-test-report.md"
-    ".claude/features/${FEATURE_ID}/testing/reports/design-validation-report.md"
-    ".claude/features/${FEATURE_ID}/testing/reports/system-integration-report.md"
-    ".claude/features/${FEATURE_ID}/testing/reports/unit-test-execution-report.md"
-    ".claude/features/${FEATURE_ID}/testing/reports/test-orchestration-log.md"
-)
-
-VALIDATION_PASSED=true
-
-for artifact in "${REQUIRED_ARTIFACTS[@]}"; do
-    if [ -e "${artifact}" ]; then
-        echo "✅ ${artifact} exists"
     else
-        echo "❌ ${artifact} missing"
-        VALIDATION_PASSED=false
+        echo "Deployment coordinator recommends: ${RECOMMENDATION}"
+        echo "Reason: $(cat "${DEPLOY_COORDINATION_PLAN}" | jq -r '.rationale')"
+        if [ "${RECOMMENDATION}" = "skip_deployment" ]; then
+            echo "Guidance: $(cat "${DEPLOY_COORDINATION_PLAN}" | jq -r '.guidance // "Minimal deployment validation required"')"
+        fi
     fi
-done
 
-# Check evidence collection
-EVIDENCE_COUNT=$(find ".claude/features/${FEATURE_ID}/testing/evidence/" -name "*.png" -o -name "*.json" -o -name "*.log" | wc -l)
-if [ "${EVIDENCE_COUNT}" -ge 5 ]; then
-    echo "✅ Adequate evidence collected (${EVIDENCE_COUNT} files)"
 else
-    echo "❌ Insufficient evidence collected (${EVIDENCE_COUNT} < 5)"
-    VALIDATION_PASSED=false
-fi
-
-# Check system is still running
-if curl -k -s https://localhost:3000 > /dev/null; then
-    echo "✅ Chariot platform still running"
-else
-    echo "⚠️ Chariot platform no longer responding"
-fi
-
-# Update metadata with comprehensive testing results
-if [ "${VALIDATION_PASSED}" = true ]; then
-    # Extract actual metrics from reports
-    ACTUAL_COVERAGE=$(grep -o "Coverage: [0-9]\+%" ".claude/features/${FEATURE_ID}/testing/reports/unit-test-execution-report.md" | head -1 | grep -o "[0-9]\+" || echo "90")
-    TOTAL_TESTS=$(find ".claude/features/${FEATURE_ID}/testing/" -name "*test*" -type f | wc -l)
-    USER_STORIES_COUNT=$(jq -r '.user_stories | length' ".claude/features/${FEATURE_ID}/context/requirements.json" 2>/dev/null || echo "1")
-
-    jq '.status = "testing_completed" | .testing_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" | .test_coverage = '${ACTUAL_COVERAGE}' | .tests_passing = '${TOTAL_TESTS}' | .tests_total = '${TOTAL_TESTS}' | .live_system_tested = true | .evidence_collected = '${EVIDENCE_COUNT}' | .platform_deployed = true | .user_stories_validated = '${USER_STORIES_COUNT}'' \
-       ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-       mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-    echo "✅ Live System Testing Phase Complete" | tee -a "${PIPELINE_LOG}"
-    NEXT_PHASE="complete"
-else
-    echo "❌ Live System Testing Phase Failed - Missing required validation artifacts" | tee -a "${PIPELINE_LOG}"
+    echo "❌ Deployment coordination failed - coordination plan not found"
     exit 1
 fi
+```
 
-# Optional: Stop the platform to clean up resources
-# make teardown
+### **Deployment Validation Feedback Loop**
+
+```bash
+# Initialize feedback loop for deployment validation (if comprehensive validation)
+echo ""
+echo "=== Deployment Validation Feedback Loop ==="
+
+RECOMMENDATION=$(cat "${DEPLOY_COORDINATION_PLAN}" | jq -r '.recommendation')
+if [ "${RECOMMENDATION}" = "comprehensive_deployment" ] || [ "${RECOMMENDATION}" = "focused_deployment" ]; then
+
+    echo "🚀 Initiating deployment validation with feedback loop coordination"
+    echo ""
+    echo "After validation agents complete their analysis:"
+    echo "1. Call feedback-loop-coordinator to analyze validation results and create remediation plan"
+    echo "2. If validation issues found, coordinate fixes with implementation agents"
+    echo "3. If validation passes, mark deployment as successful"
+    echo "4. If critical issues found, coordinate rollback procedures"
+
+else
+    echo "ℹ️ Basic deployment validation - minimal feedback loop"
+fi
+```
+
+### **Deployment Completion**
+
+```bash
+# Complete deployment phase using universal completion script
+COMPLETION_OUTPUT=$(.claude/scripts/phases/complete-phase.sh "deployment" "complete" "${FEATURE_ID}" "platform_deployed=true,platform_url=https://localhost:3000" "${PIPELINE_LOG}")
+echo "${COMPLETION_OUTPUT}"
+
+# Extract completion results
+COMPLETION_STATUS=$(echo "${COMPLETION_OUTPUT}" | grep "STATUS=" | cut -d'=' -f2)
+NEXT_PHASE=$(echo "${COMPLETION_OUTPUT}" | grep "NEXT_PHASE=" | cut -d'=' -f2)
+COMPLETION_TIME=$(echo "${COMPLETION_OUTPUT}" | grep "COMPLETION_TIME=" | cut -d'=' -f2)
+
+# Validate completion
+if [ "${COMPLETION_STATUS}" = "deployment_completed" ]; then
+    echo "🚀 Deployment ${COMPLETION_STATUS} at ${COMPLETION_TIME}"
+    echo "✅ Feature successfully deployed to production"
+    echo "🌐 Platform available at: https://localhost:3000"
+    echo "📊 Next phase: ${NEXT_PHASE}"
+else
+    echo "❌ Deployment completion failed: ${COMPLETION_STATUS}" | tee -a "${PIPELINE_LOG}"
+    exit 1
+fi
 ```
