@@ -1182,7 +1182,7 @@ Instruct the quality-review-coordinator:
 - Measurable quality gates with clear pass/fail criteria
 - Intelligent feedback loops for iterative improvement"
 
-### Process Coordinator Recommendations
+### Process Quality Coordinator Recommendations
 
 ```bash
 # After quality-review-coordinator completes, process recommendations
@@ -1234,7 +1234,7 @@ else
 fi
 ```
 
-### Feedback Loop Execution Pattern
+### Quality Feedback Loop Execution Pattern
 
 After quality agents complete, Einstein executes this feedback loop pattern:
 
@@ -1321,1208 +1321,255 @@ echo "🎯 Quality review complete - proceeding to ${NEXT_PHASE}"
 
 ```bash
 if [ "${NEXT_PHASE}" = "security-review" ]; then
-    echo "🛡️ Phase 10: DYNAMIC SECURITY ORCHESTRATION PHASE" | tee -a "${PIPELINE_LOG}"
-
-    # Initialize security review workspace and security gates
-    SECURITY_WORKSPACE=".claude/features/${FEATURE_ID}/security-review"
-    mkdir -p "${SECURITY_WORKSPACE}"/{analysis,findings,context}
-
-    SECURITY_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-    echo "Security orchestration started: ${SECURITY_START}" | tee -a "${PIPELINE_LOG}"
-
-    # Update metadata
-    jq '.security_review_started = "'${SECURITY_START}'" | .security_orchestration_enabled = true' \
-       ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-       mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-    echo "🔧 Loading security orchestration functions..." | tee -a "${PIPELINE_LOG}"
-fi
-```
-
-**Execute Security Orchestration Phase Using Dynamic Intelligence:**
-
-**Sub-Phase 10.1: Security Orchestration Initialization**
-
-Load security orchestration functions and initialize security gates:
-
-```bash
-# Source security orchestration functions for mechanical operations
-source .claude/scripts/gates/security-orchestration-functions.sh
-
-echo "=== Security Orchestration Functions Loaded ===" | tee -a "${PIPELINE_LOG}"
-echo "Available functions:"
-echo "• discover_security_agents - Dynamic security agent discovery"
-echo "• analyze_security_issues - Vulnerability analysis and classification"
-echo "• check_security_status - Security status assessment"
-echo "• execute_security_gate_orchestration - Complete orchestration workflow"
-
-# Execute comprehensive security orchestration
-echo "🚀 Executing Security Gate Orchestration..." | tee -a "${PIPELINE_LOG}"
-execute_security_gate_orchestration "${FEATURE_ID}" 2
-SECURITY_ORCHESTRATION_RESULT=$?
-
-echo "Security orchestration completed with result: ${SECURITY_ORCHESTRATION_RESULT}" | tee -a "${PIPELINE_LOG}"
-```
-
-**Sub-Phase 10.2: Security Orchestration Decision Logic**
-
-Process orchestration results and determine next steps:
-
-```bash
-case ${SECURITY_ORCHESTRATION_RESULT} in
-    0)  # No security issues detected - proceed to testing
-        echo "✅ Security Orchestration: NO ISSUES DETECTED" | tee -a "${PIPELINE_LOG}"
-        echo "Mechanical security analysis found no vulnerabilities" | tee -a "${PIPELINE_LOG}"
-
-        # Update metadata for clean security status
-        jq '.status = "security_review_completed" |
-            .security_review_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
-            .security_issues_found = false |
-            .security_orchestration_result = "clean"' \
-           ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-           mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-        NEXT_PHASE="test"
-        ;;
-
-    1)  # Security issues detected - strategic assessment required
-        echo "🔄 Security Orchestration: VULNERABILITIES DETECTED" | tee -a "${PIPELINE_LOG}"
-        echo "Launching strategic security orchestration with security-gate-orchestrator..." | tee -a "${PIPELINE_LOG}"
-
-        # Update metadata for security refinement status
-        jq '.status = "security_refinement_in_progress" |
-            .security_refinement_started = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
-            .security_issues_found = true |
-            .security_orchestration_result = "vulnerabilities_detected"' \
-           ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-           mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-        echo "📊 Security Issue Summary:" | tee -a "${PIPELINE_LOG}"
-        if [ -f ".claude/features/${FEATURE_ID}/security-gates/issue-analysis.json" ]; then
-            cat ".claude/features/${FEATURE_ID}/security-gates/issue-analysis.json" | jq -r '
-            "Critical Issues: " + (.issue_summary.critical_count | tostring) +
-            ", High Issues: " + (.issue_summary.high_count | tostring) +
-            ", Medium Issues: " + (.issue_summary.medium_count | tostring)' | tee -a "${PIPELINE_LOG}"
-        fi
-
-        echo "🎯 Launching Strategic Security Orchestration..." | tee -a "${PIPELINE_LOG}"
-        ;;
-
-    *)  # Error in security orchestration
-        echo "❌ Security Orchestration: SYSTEM ERROR" | tee -a "${PIPELINE_LOG}"
-        echo "Critical error in security orchestration functions" | tee -a "${PIPELINE_LOG}"
-
-        jq '.status = "security_review_failed" |
-            .security_review_error = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
-            .security_orchestration_result = "error"' \
-           ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-           mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-        exit 1
-        ;;
-esac
-```
-
-**Sub-Phase 10.3: Strategic Security Intelligence (If Vulnerabilities Detected)**
-
-Deploy security-gate-orchestrator agent for advanced security orchestration:
-
-```bash
-if [ ${SECURITY_ORCHESTRATION_RESULT} -eq 1 ]; then
-    echo "🧠 Deploying Strategic Security Intelligence..." | tee -a "${PIPELINE_LOG}"
-
-    # Prepare security refinement plan output path
-    SECURITY_REFINEMENT_PLAN=".claude/features/${FEATURE_ID}/security-gates/refinement-plan.json"
-    echo "Security refinement plan will be saved to: ${SECURITY_REFINEMENT_PLAN}" | tee -a "${PIPELINE_LOG}"
-fi
-```
-
-Use the `security-gate-orchestrator` subagent to execute comprehensive security vulnerability orchestration.
-
-Instruct the security-gate-orchestrator:
-"ultrathink. Execute security vulnerability orchestration for this feature.
-
-Read mechanical infrastructure results from:
-
-- Security agent discovery: .claude/features/${FEATURE_ID}/security-gates/agent-discovery.json
-- Vulnerability analysis: .claude/features/${FEATURE_ID}/security-gates/issue-analysis.json
-
-Create comprehensive security refinement plan and save to: ${SECURITY_REFINEMENT_PLAN}
-
-Use your established security orchestration capabilities to analyze vulnerabilities and recommend security-capable agent selection with iterative refinement strategy (max 2 iterations - conservative for security)."
-
-**Sub-Phase 10.4: Security Orchestration Completion**
-
-Process security orchestration results and finalize security phase:
-
-```bash
-    # Wait for security-gate-orchestrator completion
-    echo "⏳ Waiting for strategic security orchestration completion..." | tee -a "${PIPELINE_LOG}"
-
-    # Validate security refinement plan was created
-    SECURITY_REFINEMENT_PLAN=".claude/features/${FEATURE_ID}/security-gates/refinement-plan.json"
-
-    if [ -f "${SECURITY_REFINEMENT_PLAN}" ]; then
-        echo "✅ Strategic security refinement plan created" | tee -a "${PIPELINE_LOG}"
-
-        REFINEMENT_NEEDED=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r '.security_refinement_needed')
-
-        if [ "${REFINEMENT_NEEDED}" = "true" ]; then
-            echo "🔄 Security refinement workflow initiated" | tee -a "${PIPELINE_LOG}"
-            echo "EXECUTING iterative security vulnerability remediation..." | tee -a "${PIPELINE_LOG}"
-
-            # Show refinement summary
-            CRITICAL_COUNT=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r '.vulnerability_summary.critical_count')
-            HIGH_COUNT=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r '.vulnerability_summary.high_count')
-            MAX_ITERATIONS=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r '.escalation_criteria.max_iterations // 2')
-
-            echo "🎯 Security Refinement Target: ${CRITICAL_COUNT} critical, ${HIGH_COUNT} high vulnerabilities" | tee -a "${PIPELINE_LOG}"
-            echo "📊 Max Security Iterations: ${MAX_ITERATIONS} (conservative for security)" | tee -a "${PIPELINE_LOG}"
-
-            # Initialize security refinement execution
-            SECURITY_REFINEMENT_DIR=".claude/features/${FEATURE_ID}/security-gates/refinement"
-            mkdir -p "${SECURITY_REFINEMENT_DIR}"/{iteration-1,iteration-2,agent-outputs,progress}
-
-            # Update metadata with refinement execution start
-            jq '.status = "security_refinement_executing" |
-                .security_refinement_started = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
-                .security_refinement_max_iterations = '${MAX_ITERATIONS}' |
-                .security_refinement_current_iteration = 0 |
-                .security_vulnerabilities_to_remediate = {
-                  "critical": '${CRITICAL_COUNT}',
-                  "high": '${HIGH_COUNT}'
-                }' \
-               ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-               mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-            echo "" | tee -a "${PIPELINE_LOG}"
-            echo "🔄 SECURITY REFINEMENT EXECUTION LOOP" | tee -a "${PIPELINE_LOG}"
-            echo "=======================================" | tee -a "${PIPELINE_LOG}"
-
-            # Security Refinement Iteration Loop
-            for ITERATION in $(seq 1 ${MAX_ITERATIONS}); do
-                echo "" | tee -a "${PIPELINE_LOG}"
-                echo "🛡️ Security Refinement Iteration ${ITERATION}/${MAX_ITERATIONS}" | tee -a "${PIPELINE_LOG}"
-                echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) - Starting iteration ${ITERATION}" | tee -a "${PIPELINE_LOG}"
-
-                # Update current iteration in metadata
-                jq '.security_refinement_current_iteration = '${ITERATION}' |
-                    .security_refinement_iteration_'${ITERATION}'_started = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
-                   ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-                   mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-                ITERATION_DIR="${SECURITY_REFINEMENT_DIR}/iteration-${ITERATION}"
-                mkdir -p "${ITERATION_DIR}"/{agents,fixes,validation}
-
-                echo "📁 Iteration workspace: ${ITERATION_DIR}" | tee -a "${PIPELINE_LOG}"
-
-                # Get recommended security agents from refinement plan
-                RECOMMENDED_AGENTS=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r '.recommended_security_refinement[].agent_type' | sort | uniq)
-                AGENT_COUNT=$(echo "${RECOMMENDED_AGENTS}" | wc -l)
-
-                echo "🤖 Deploying ${AGENT_COUNT} security-capable agents for vulnerability remediation:" | tee -a "${PIPELINE_LOG}"
-                echo "${RECOMMENDED_AGENTS}" | sed 's/^/  • /' | tee -a "${PIPELINE_LOG}"
-
-                echo "" | tee -a "${PIPELINE_LOG}"
-                echo "🚀 Spawning Security-Capable Agents (Iteration ${ITERATION})..." | tee -a "${PIPELINE_LOG}"
-
-                # Dynamically spawn security agents based on refinement plan
-                while read -r AGENT_TYPE; do
-                    if [ -n "${AGENT_TYPE}" ] && [ "${AGENT_TYPE}" != "null" ]; then
-                        # Get agent-specific context from refinement plan
-                        AGENT_CONTEXT=$(cat "${SECURITY_REFINEMENT_PLAN}" | jq -r --arg agent "${AGENT_TYPE}" '
-                        .recommended_security_refinement[] | select(.agent_type == $agent) |
-                        {
-                            vulnerabilities: .vulnerabilities_to_address,
-                            target_files: .target_files,
-                            security_requirements: .security_requirements,
-                            priority: .priority,
-                            role: .role
-                        }')
-
-                        VULNERABILITIES=$(echo "${AGENT_CONTEXT}" | jq -r '.vulnerabilities[]' | tr '\n' '; ' | sed 's/;$//')
-                        TARGET_FILES=$(echo "${AGENT_CONTEXT}" | jq -r '.target_files[]' | tr '\n' '; ' | sed 's/;$//')
-                        PRIORITY=$(echo "${AGENT_CONTEXT}" | jq -r '.priority')
-                        AGENT_ROLE=$(echo "${AGENT_CONTEXT}" | jq -r '.role')
-
-                        echo "🛡️ Deploying ${AGENT_TYPE} (${AGENT_ROLE}, priority: ${PRIORITY})" | tee -a "${PIPELINE_LOG}"
-                        echo "   Vulnerabilities: ${VULNERABILITIES}" | tee -a "${PIPELINE_LOG}"
-                        echo "   Target Files: ${TARGET_FILES}" | tee -a "${PIPELINE_LOG}"
-
-                        # Spawn security-capable agent with specific vulnerability remediation tasks
-                        case "${AGENT_TYPE}" in
-                            "golang-api-developer"|"go-security-reviewer"|"golang-developer")
-                                echo "🚀 Task: Spawning ${AGENT_TYPE} for Go security remediation..." | tee -a "${PIPELINE_LOG}"
-
-                                # Use the agent to remediate Go security vulnerabilities
-
-                                cat << EOF
-Use the \`${AGENT_TYPE}\` subagent for security vulnerability remediation - Iteration ${ITERATION}/${MAX_ITERATIONS}.
-
-Instruct the ${AGENT_TYPE}:
-"SECURITY VULNERABILITY REMEDIATION - Iteration ${ITERATION}/${MAX_ITERATIONS}
-
-**CRITICAL: This is active security vulnerability remediation, not analysis**
-
-**Vulnerabilities to Fix:**
-${VULNERABILITIES}
-
-**Target Files for Security Fixes:**
-${TARGET_FILES}
-
-**Security Requirements:**
-- Fix CRITICAL and HIGH priority vulnerabilities only
-- Apply security-first principles and secure coding practices
-- Maintain backward compatibility while enhancing security
-- Document security rationale for all changes
-- Follow principle of least privilege
-- Ensure no new attack surfaces are introduced
-
-**Your Mission:**
-1. **Analyze Specific Vulnerabilities**: Review the vulnerabilities listed above
-2. **Implement Security Fixes**: Make targeted code changes to remediate vulnerabilities
-3. **Apply Security Best Practices**: Use secure coding patterns appropriate for Go development
-4. **Validate Changes**: Ensure fixes don't introduce new vulnerabilities or break functionality
-5. **Document Security Decisions**: Explain security rationale for all changes
-
-**Context Available:**
-- Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/backend/
-- Security analysis: .claude/features/${FEATURE_ID}/security-review/analysis/
-- Architecture decisions: .claude/features/${FEATURE_ID}/architecture/
-
-**Output Requirements:**
-Save your security fixes and documentation to: ${ITERATION_DIR}/fixes/${AGENT_TYPE}-security-fixes.md
-
-**Security-First Approach:**
-- Production security takes precedence over feature completeness
-- When in doubt, choose the more secure approach
-- Validate input at all boundaries
-- Use established security libraries, avoid custom crypto
-- Apply defense in depth principles"
-EOF
-
-                                ;;
-                            "react-developer"|"react-security-reviewer")
-                                echo "🚀 Task: Spawning ${AGENT_TYPE} for React security remediation..." | tee -a "${PIPELINE_LOG}"
-
-                                # Use the agent to remediate React security vulnerabilities
-
-                                cat << EOF
-Use the \`${AGENT_TYPE}\` subagent for frontend security vulnerability remediation - Iteration ${ITERATION}/${MAX_ITERATIONS}.
-
-Instruct the ${AGENT_TYPE}:
-"FRONTEND SECURITY VULNERABILITY REMEDIATION - Iteration ${ITERATION}/${MAX_ITERATIONS}
-
-**CRITICAL: This is active security vulnerability remediation for React/TypeScript**
-
-**Vulnerabilities to Fix:**
-${VULNERABILITIES}
-
-**Target Files for Security Fixes:**
-${TARGET_FILES}
-
-**Frontend Security Requirements:**
-- Fix XSS vulnerabilities (especially dangerouslySetInnerHTML)
-- Remediate client-side authentication bypasses
-- Prevent sensitive data exposure in frontend code
-- Secure unsafe DOM manipulation
-- Apply CSRF protection where applicable
-
-**Your Mission:**
-1. **Fix XSS Vulnerabilities**: Sanitize user input, avoid dangerouslySetInnerHTML
-2. **Secure Authentication Flow**: Ensure proper token handling and validation
-3. **Data Protection**: Remove sensitive data from client-side code
-4. **DOM Security**: Use safe DOM manipulation methods
-5. **Input Validation**: Implement client-side validation with server-side verification
-
-**Context Available:**
-- Frontend code: .claude/features/${FEATURE_ID}/implementation/code-changes/frontend/
-- Security analysis: .claude/features/${FEATURE_ID}/security-review/analysis/
-- UI architecture: .claude/features/${FEATURE_ID}/architecture/
-
-**Output Requirements:**
-Save your security fixes to: ${ITERATION_DIR}/fixes/${AGENT_TYPE}-security-fixes.md
-
-**Frontend Security Principles:**
-- Never trust client-side data
-- Sanitize all user inputs
-- Use Content Security Policy (CSP)
-- Implement secure authentication patterns
-- Apply secure coding practices for React/TypeScript"
-EOF
-
-                                ;;
-                            "security-architect")
-                                echo "🚀 Task: Spawning ${AGENT_TYPE} for architectural security oversight..." | tee -a "${PIPELINE_LOG}"
-
-                                # Use security-architect for architectural oversight
-
-                                cat << EOF
-Use the \`security-architect\` subagent for security architecture oversight - Iteration ${ITERATION}/${MAX_ITERATIONS}.
-
-Instruct the security-architect:
-"SECURITY ARCHITECTURE OVERSIGHT - Iteration ${ITERATION}/${MAX_ITERATIONS}
-
-**CRITICAL: Mandatory security architect oversight and approval authority**
-
-**Architectural Security Review Scope:**
-${VULNERABILITIES}
-
-**Security Architecture Requirements:**
-- Review all security fixes for architectural soundness
-- Ensure no new attack surfaces are introduced
-- Validate security boundaries and controls
-- Approve or reject security remediation approaches
-- Provide additional security guidance where needed
-
-**Your Authority:**
-- APPROVAL AUTHORITY: You can approve or reject security fixes
-- ESCALATION AUTHORITY: You can escalate unresolvable security issues
-- GUIDANCE AUTHORITY: You can provide additional security requirements
-
-**Review Focus:**
-1. **Security Fix Adequacy**: Are the fixes sufficient and appropriate?
-2. **Attack Surface Analysis**: Do changes minimize or eliminate attack surfaces?
-3. **Defense in Depth**: Are multiple security layers properly implemented?
-4. **Security Boundaries**: Are trust boundaries properly maintained?
-5. **Architectural Security**: Do changes align with secure architecture principles?
-
-**Context for Review:**
-- All security fixes: ${ITERATION_DIR}/fixes/
-- Original vulnerabilities: .claude/features/${FEATURE_ID}/security-review/analysis/
-- Architecture decisions: .claude/features/${FEATURE_ID}/architecture/
-
-**Output Requirements:**
-Save your architectural security approval/rejection to: ${ITERATION_DIR}/validation/security-architect-approval.md
-
-**Decision Framework:**
-- APPROVE: Fixes are adequate and architecturally sound
-- CONDITIONAL APPROVAL: Minor improvements needed
-- REJECT: Major architectural security issues, fixes inadequate
-- ESCALATE: Issues beyond agent remediation capabilities"
-EOF
-
-                                ;;
-                            *)
-                                echo "🚀 Task: Spawning ${AGENT_TYPE} for general security remediation..." | tee -a "${PIPELINE_LOG}"
-
-                                # Use the general agent for security remediation
-
-                                cat << EOF
-Use the \`${AGENT_TYPE}\` subagent for security vulnerability remediation - Iteration ${ITERATION}/${MAX_ITERATIONS}.
-
-Instruct the ${AGENT_TYPE}:
-"SECURITY VULNERABILITY REMEDIATION - Iteration ${ITERATION}/${MAX_ITERATIONS}
-
-**CRITICAL: Active security vulnerability remediation**
-
-**Vulnerabilities to Address:**
-${VULNERABILITIES}
-
-**Target Areas:**
-${TARGET_FILES}
-
-**Security Mission:**
-Fix the identified vulnerabilities using your specialized capabilities. Apply security-first principles, maintain system integrity, and document all security decisions.
-
-**Context:**
-- Implementation: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- Security findings: .claude/features/${FEATURE_ID}/security-review/analysis/
-
-**Output:**
-Save fixes to: ${ITERATION_DIR}/fixes/${AGENT_TYPE}-security-fixes.md"
-EOF
-
-                                ;;
-                        esac
-                    fi
-                done <<< "${RECOMMENDED_AGENTS}"
-
-                echo "" | tee -a "${PIPELINE_LOG}"
-                echo "⏳ Waiting for security-capable agents to complete remediation..." | tee -a "${PIPELINE_LOG}"
-
-                # Post-iteration security re-analysis using orchestration functions
-                echo "" | tee -a "${PIPELINE_LOG}"
-                echo "🔍 Security Re-Analysis After Iteration ${ITERATION}" | tee -a "${PIPELINE_LOG}"
-                echo "Executing security orchestration to assess vulnerability resolution..." | tee -a "${PIPELINE_LOG}"
-
-                # Re-run security issue analysis to check if vulnerabilities were resolved
-                if ! analyze_security_issues "${FEATURE_ID}"; then
-                    echo "❌ Security re-analysis failed - cannot assess vulnerability resolution" | tee -a "${PIPELINE_LOG}"
-                    break
-                fi
-
-                # Check current security status after fixes
-                check_security_status "${FEATURE_ID}"
-                REANALYSIS_RESULT=$?
-
-                ITERATION_ANALYSIS=".claude/features/${FEATURE_ID}/security-gates/issue-analysis.json"
-                if [ -f "${ITERATION_ANALYSIS}" ]; then
-                    REMAINING_CRITICAL=$(cat "${ITERATION_ANALYSIS}" | jq -r '.issue_summary.critical_count')
-                    REMAINING_HIGH=$(cat "${ITERATION_ANALYSIS}" | jq -r '.issue_summary.high_count')
-                    REMAINING_MEDIUM=$(cat "${ITERATION_ANALYSIS}" | jq -r '.issue_summary.medium_count')
-
-                    echo "📊 Post-Iteration ${ITERATION} Security Status:" | tee -a "${PIPELINE_LOG}"
-                    echo "   Critical: ${REMAINING_CRITICAL} (was: ${CRITICAL_COUNT})" | tee -a "${PIPELINE_LOG}"
-                    echo "   High: ${REMAINING_HIGH} (was: ${HIGH_COUNT})" | tee -a "${PIPELINE_LOG}"
-                    echo "   Medium: ${REMAINING_MEDIUM}" | tee -a "${PIPELINE_LOG}"
-
-                    # Update iteration results in metadata
-                    jq '.security_refinement_iteration_'${ITERATION}'_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
-                        .security_refinement_iteration_'${ITERATION}'_results = {
-                          "critical_remaining": '${REMAINING_CRITICAL}',
-                          "high_remaining": '${REMAINING_HIGH}',
-                          "medium_remaining": '${REMAINING_MEDIUM}'
-                        }' \
-                       ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-                       mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-                    # Check if vulnerabilities are resolved
-                    if [ "${REANALYSIS_RESULT}" -eq 0 ]; then
-                        echo "✅ Security vulnerabilities resolved after ${ITERATION} iteration(s)!" | tee -a "${PIPELINE_LOG}"
-                        echo "Security refinement successful - proceeding to testing phase" | tee -a "${PIPELINE_LOG}"
-                        break  # Exit iteration loop - vulnerabilities resolved
-                    elif [ "${ITERATION}" -eq "${MAX_ITERATIONS}" ]; then
-                        echo "⚠️ Maximum security iterations (${MAX_ITERATIONS}) reached" | tee -a "${PIPELINE_LOG}"
-                        echo "Remaining vulnerabilities: Critical=${REMAINING_CRITICAL}, High=${REMAINING_HIGH}" | tee -a "${PIPELINE_LOG}"
-
-                        if [ "${REMAINING_CRITICAL}" -gt 0 ] || [ "${REMAINING_HIGH}" -gt 0 ]; then
-                            echo "🚨 CRITICAL/HIGH vulnerabilities remain - ESCALATION REQUIRED" | tee -a "${PIPELINE_LOG}"
-                            # Note: In production, this would trigger human security review
-                            echo "⚠️ Manual security review recommended before production deployment" | tee -a "${PIPELINE_LOG}"
-                        fi
-                        break  # Exit iteration loop - max iterations reached
-                    else
-                        echo "🔄 Vulnerabilities remain - continuing to iteration $((ITERATION + 1))" | tee -a "${PIPELINE_LOG}"
-                        # Continue to next iteration
-                    fi
-                else
-                    echo "❌ Security re-analysis results not found - continuing with caution" | tee -a "${PIPELINE_LOG}"
-                fi
-            done
-
-            # Security refinement loop completed - update final status
-            FINAL_STATUS=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.status')
-            if [ "${REANALYSIS_RESULT}" -eq 0 ]; then
-                jq '.status = "security_review_completed" |
-                    .security_review_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
-                    .security_refinement_successful = true |
-                    .security_refinement_iterations_completed = '${ITERATION}'' \
-                   ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-                   mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-            else
-                jq '.status = "security_refinement_completed_with_issues" |
-                    .security_refinement_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
-                    .security_refinement_successful = false |
-                    .security_refinement_iterations_completed = '${ITERATION}' |
-                    .security_manual_review_required = true' \
-                   ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-                   mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-            fi
-
-            echo "" | tee -a "${PIPELINE_LOG}"
-            echo "🛡️ Security Refinement Execution Complete" | tee -a "${PIPELINE_LOG}"
-            echo "Iterations completed: ${ITERATION}/${MAX_ITERATIONS}" | tee -a "${PIPELINE_LOG}"
-        else
-            echo "✅ Security assessment complete - no refinement needed" | tee -a "${PIPELINE_LOG}"
-
-            # Update metadata for completion
-            jq '.status = "security_review_completed" |
-                .security_review_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
-                .security_refinement_needed = false' \
-               ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-               mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-            NEXT_PHASE="test"
-        fi
-    else
-        echo "❌ Strategic security orchestration failed - no refinement plan generated" | tee -a "${PIPELINE_LOG}"
-
-        jq '.status = "security_orchestration_failed" |
-            .security_orchestration_error = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
-           ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-           mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-        exit 1
-    fi
-fi
-```
-
-**Validate Dynamic Security Orchestration Completion:**
-
-```bash
-# Final security phase validation
-SECURITY_STATUS=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.status')
-
-case "${SECURITY_STATUS}" in
-    "security_review_completed")
-        echo "✅ Dynamic Security Orchestration: CLEAN - No vulnerabilities detected" | tee -a "${PIPELINE_LOG}"
-        echo "Proceeding to testing phase..." | tee -a "${PIPELINE_LOG}"
-        NEXT_PHASE="test"
-        ;;
-    "security_refinement_completed_with_issues")
-        echo "⚠️ Dynamic Security Orchestration: COMPLETED WITH REMAINING ISSUES" | tee -a "${PIPELINE_LOG}"
-        echo "Security refinement executed but some vulnerabilities remain" | tee -a "${PIPELINE_LOG}"
-
-        ITERATIONS_COMPLETED=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.security_refinement_iterations_completed // 0')
-        MANUAL_REVIEW_REQUIRED=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.security_manual_review_required // false')
-
-        echo "Security refinement iterations completed: ${ITERATIONS_COMPLETED}" | tee -a "${PIPELINE_LOG}"
-
-        if [ "${MANUAL_REVIEW_REQUIRED}" = "true" ]; then
-            echo "🚨 Manual security review required before production deployment" | tee -a "${PIPELINE_LOG}"
-        fi
-
-        echo "Proceeding to testing phase with security awareness..." | tee -a "${PIPELINE_LOG}"
-        NEXT_PHASE="test"
-        ;;
-    "security_refinement_executing"|"security_refinement_planned")
-        echo "🔄 Dynamic Security Orchestration: REFINEMENT IN PROGRESS" | tee -a "${PIPELINE_LOG}"
-        echo "Security refinement execution should have completed - checking status..." | tee -a "${PIPELINE_LOG}"
-
-        # This should not happen - refinement execution should have updated status
-        echo "⚠️ Security refinement may still be in progress - proceeding with caution" | tee -a "${PIPELINE_LOG}"
-        NEXT_PHASE="test"
-        ;;
-    *)
-        echo "❌ Dynamic Security Orchestration: FAILED" | tee -a "${PIPELINE_LOG}"
-        echo "Security orchestration status: ${SECURITY_STATUS}" | tee -a "${PIPELINE_LOG}"
-        exit 1
-        ;;
-esac
-
-echo "" | tee -a "${PIPELINE_LOG}"
-echo "🛡️ Dynamic Security Orchestration Phase Complete" | tee -a "${PIPELINE_LOG}"
-echo "✅ Enhanced security intelligence with iterative refinement capabilities" | tee -a "${PIPELINE_LOG}"
-echo "✅ Strategic vulnerability assessment with capability-based agent selection" | tee -a "${PIPELINE_LOG}"
-echo "✅ Mandatory security architect oversight integration" | tee -a "${PIPELINE_LOG}"
-echo "✅ Advanced security validation with penetration testing readiness" | tee -a "${PIPELINE_LOG}"
-```
-
-**Phase 11: Dynamic Testing Orchestration with Feedback Loops**
-
-```bash
-if [ "${NEXT_PHASE}" = "test" ]; then
-    echo "🧪 Phase 11: DYNAMIC TESTING ORCHESTRATION PHASE" | tee -a "${PIPELINE_LOG}"
-    source .claude/features/current_feature.env
-    INPUT_REQUIREMENTS=".claude/features/${FEATURE_ID}/context/requirements.json"
-
-    # Initialize comprehensive testing workspace with orchestration support
-    TESTING_WORKSPACE=".claude/features/${FEATURE_ID}/testing"
-    mkdir -p "${TESTING_WORKSPACE}"/{unit,integration,e2e,reports,orchestration,refinement}
-    OUTPUT_TEST="${TESTING_WORKSPACE}/test-base.md"
-    TEST_PLAN="${TESTING_WORKSPACE}/test-plan.json"
-    TEST_EXECUTION_LOG="${TESTING_WORKSPACE}/orchestration/test-execution.log"
-
-    echo "=== Dynamic Testing Orchestration Paths ===" | tee -a "${PIPELINE_LOG}"
-    echo "Requirements: ${INPUT_REQUIREMENTS}"
-    echo "Testing workspace: ${TESTING_WORKSPACE}"
-    echo "Test execution plan: ${TEST_PLAN}"
-    echo "Execution log: ${TEST_EXECUTION_LOG}"
-
-    if [ ! -f "${INPUT_REQUIREMENTS}" ]; then
-        echo "❌ Requirements file not found: ${INPUT_REQUIREMENTS}" | tee -a "${PIPELINE_LOG}"
-        echo "❌ Testing cannot proceed without feature requirements" | tee -a "${PIPELINE_LOG}"
+    echo "🔒 Phase 10: SECURITY REVIEW PHASE" | tee -a "${PIPELINE_LOG}"
+
+    # Run mechanical setup operations
+    SETUP_OUTPUT=$(.claude/scripts/phases/security-review/setup-security-review-phase.sh "${FEATURE_ID}")
+    echo "${SETUP_OUTPUT}"
+
+    # Extract file paths from setup output
+    SECURITY_CONTEXT_FILE=$(echo "${SETUP_OUTPUT}" | grep "SECURITY_CONTEXT_FILE=" | cut -d'=' -f2)
+    SECURITY_COORDINATION_PLAN=$(echo "${SETUP_OUTPUT}" | grep "SECURITY_COORDINATION_PLAN=" | cut -d'=' -f2)
+    SECURITY_STRATEGY=$(echo "${SETUP_OUTPUT}" | grep "SECURITY_STRATEGY=" | cut -d'=' -f2)
+    SECURITY_DIR=$(echo "${SETUP_OUTPUT}" | grep "SECURITY_DIR=" | cut -d'=' -f2)
+
+    # Extract security analysis from setup
+    RISK_LEVEL=$(echo "${SETUP_OUTPUT}" | grep "RISK_LEVEL=" | cut -d'=' -f2)
+    COMPLEXITY_LEVEL=$(echo "${SETUP_OUTPUT}" | grep "COMPLEXITY_LEVEL=" | cut -d'=' -f2)
+    AFFECTED_DOMAINS=$(echo "${SETUP_OUTPUT}" | grep "AFFECTED_DOMAINS=" | cut -d'=' -f2)
+    TECH_STACK=$(echo "${SETUP_OUTPUT}" | grep "TECH_STACK=" | cut -d'=' -f2)
+
+    # Validate setup was successful
+    if [ ! -f "${SECURITY_CONTEXT_FILE}" ]; then
+        echo "❌ Security review setup failed - context file not found" | tee -a "${PIPELINE_LOG}"
         exit 1
     fi
 
-    # Validate requirements content
-    FEATURE_NAME=$(cat "${INPUT_REQUIREMENTS}" | jq -r '.feature_name' 2>/dev/null)
-    if [ -z "${FEATURE_NAME}" ] || [ "${FEATURE_NAME}" = "null" ]; then
-        echo "❌ Requirements file exists but missing feature_name" | tee -a "${PIPELINE_LOG}"
-        echo "❌ Testing cannot proceed without valid requirements" | tee -a "${PIPELINE_LOG}"
-        exit 1
-    fi
-
-    echo "Requirements Summary:" | tee -a "${PIPELINE_LOG}"
-    echo "• Feature: ${FEATURE_NAME}"
-    cat "${INPUT_REQUIREMENTS}" | jq -r '.affected_systems[]' 2>/dev/null | sed 's/^/• Affected System: /' || echo "• No affected systems found"
-
-    TEST_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-    echo "Dynamic testing orchestration started: ${TEST_START}" | tee -a "${PIPELINE_LOG}"
-
-    # Update metadata for testing orchestration
-    jq '.status = "testing_orchestration_in_progress" |
-        .phase = "testing" |
-        .testing_started = "'${TEST_START}'" |
-        .testing_orchestration_enabled = true' \
-        ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-        mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+    echo "✅ Security review workspace ready" | tee -a "${PIPELINE_LOG}"
+    echo "🔒 Risk Level: ${RISK_LEVEL}, Complexity: ${COMPLEXITY_LEVEL}, Domains: ${AFFECTED_DOMAINS}"
 fi
 ```
 
-**Execute Dynamic Testing Orchestration Phase Using Feedback Loops:**
-
-**Sub-Phase 11.1: Testing Strategy & Agent Discovery**
-
-Initialize comprehensive testing orchestration with agent discovery:
+### **Delegate to Security Review Coordinator**
 
 ```bash
-# Initialize execution tracking
-echo "🚀 DYNAMIC TESTING ORCHESTRATION" | tee -a "${TEST_EXECUTION_LOG}"
-echo "Started: $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee -a "${TEST_EXECUTION_LOG}"
-echo "Feature: ${FEATURE_NAME}" | tee -a "${TEST_EXECUTION_LOG}"
-echo "===============================" | tee -a "${TEST_EXECUTION_LOG}"
+# Use security-review-coordinator to analyze and recommend security strategy
+echo "=== Security Review Coordination Analysis ==="
 ```
 
-Use the `test-coordinator` subagent to create comprehensive testing strategy with refinement capabilities.
+**Instruct the security-review-coordinator:**
+"ultrathink. Analyze this feature implementation and recommend a comprehensive security review approach with threat assessment and appropriate security analysis agents.
 
-Instruct the test-coordinator:
-"ultrathink. Orchestrate comprehensive testing with iterative refinement capabilities.
+**Read security context from:** ${SECURITY_CONTEXT_FILE}
 
-**CRITICAL: Enhanced Testing Orchestration with Feedback Loops**
+**Also read these context sources:**
 
-**Dynamic Agent Discovery Requirements:**
+- Implementation outputs: .claude/features/${FEATURE_ID}/implementation/agent-outputs/
+- Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/
+- Requirements (for threat modeling): .claude/features/${FEATURE_ID}/context/requirements.json
+- Architecture context: .claude/features/${FEATURE_ID}/architecture/\*.md
 
-1. Discover all available test agents from `.claude/agents/testing/` directory
-2. Only recommend agents that actually exist in your discovery results
-3. Map testing needs to discovered agent capabilities for both initial testing AND refinement
-4. Plan for iterative test execution with failure remediation
+**Save your recommendations to:** ${SECURITY_COORDINATION_PLAN}
 
-**Comprehensive Context Analysis:**
+**Create security strategy at:** ${SECURITY_STRATEGY}
 
-- Feature ID: ${FEATURE_ID}
-- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Implementation Plan: .claude/features/${FEATURE_ID}/output/implementation-plan.md
-- Implementation Code: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- Security Fixes: .claude/features/${FEATURE_ID}/security-gates/refinement/ (if exists)
-- Complexity Level: Extract from .claude/features/${FEATURE_ID}/context/complexity-assessment.json
-
-**Enhanced Test Planning Output:**
-
-Create comprehensive test orchestration plan: ${TEST_PLAN}
-
-**Required Structure with Refinement Support:**
+**Output format for coordination plan:**
 
 ```json
 {
-  \"testing_orchestration_needed\": true,
-  \"testing_approach\": \"comprehensive_with_refinement\",
-  \"max_test_iterations\": 3,
-  \"rationale\": \"Explanation including why iterative refinement is needed\",
-  \"discovered_test_agents\": [
-    {
-      \"agent_type\": \"DISCOVERED_AGENT_NAME\",
-      \"capabilities\": [...],
-      \"testing_domains\": [...],
-      \"refinement_capable\": true
-    }
-  ],
-  \"testing_phases\": [
-    {
-      \"phase\": \"initial_test_creation\",
-      \"agents\": [
-        {
-          \"agent\": \"DISCOVERED_AGENT_TYPE\",
-          \"focus\": \"Create comprehensive tests\",
-          \"priority\": \"high|medium|low\",
-          \"test_types\": [\"unit\", \"integration\", \"e2e\"],
-          \"output_file\": \"test-creation-results.md\",
-          \"success_criteria\": \"Tests created and executable\"
-        }
-      ]
-    },
-    {
-      \"phase\": \"test_execution_validation\",
-      \"agents\": [
-        {
-          \"agent\": \"EXECUTION_CAPABLE_AGENT\",
-          \"focus\": \"Execute tests and identify failures\",
-          \"priority\": \"high\",
-          \"validation_approach\": \"automated_execution\",
-          \"output_file\": \"test-execution-results.md\",
-          \"success_criteria\": \"All tests passing OR failure analysis complete\"
-        }
-      ]
-    },
-    {
-      \"phase\": \"failure_remediation\",
-      \"condition\": \"if_tests_fail\",
-      \"agents\": [
-        {
-          \"agent\": \"REMEDIATION_CAPABLE_AGENT\",
-          \"focus\": \"Fix failing tests by improving code or tests\",
-          \"priority\": \"high\",
-          \"remediation_approach\": \"code_fixes_and_test_improvements\",
-          \"output_file\": \"test-remediation-results.md\",
-          \"success_criteria\": \"Failing tests remediated\"
-        }
-      ]
-    }
-  ],
-  \"refinement_strategy\": {
-    \"max_iterations\": 3,
-    \"failure_threshold\": \"any_failing_tests\",
-    \"remediation_approach\": \"fix_code_and_improve_tests\",
-    \"escalation_criteria\": \"max_iterations_reached_with_failures\"
+  \"recommendation\": \"comprehensive_security|focused_security|basic_validation|skip_security\",
+  \"rationale\": \"Why this approach based on risk level, attack surface, and available security agents\",
+  \"security_assessment\": {
+    \"risk_level\": \"Critical|High|Medium|Low\",
+    \"attack_surface_changes\": [\"API endpoints\", \"Authentication\", \"Data handling\"],
+    \"threat_vectors\": [\"Authentication\", \"Authorization\", \"Input Validation\"],
+    \"technology_stack\": [\"Go\", \"React\", \"Python\"],
+    \"security_priority\": \"critical|high|medium|low\"
   },
-  \"testing_domains\": [...],
-  \"expected_test_coverage\": {
-    \"unit_tests\": \"business_logic_validation\",
-    \"integration_tests\": \"api_and_service_validation\",
-    \"e2e_tests\": \"user_workflow_validation\"
+  \"suggested_security_agents\": [
+    {
+      \"agent\": \"[ONLY FROM DISCOVERED SECURITY AGENTS]\",
+      \"reason\": \"Specific security domain/threat vector match justification\",
+      \"security_focus\": [\"Authentication review\", \"Threat modeling\"],
+      \"priority\": \"critical|high|medium|low\",
+      \"thinking_budget\": \"ultrathink|think|basic\",
+      \"estimated_effort\": \"high|medium|low\",
+      \"threat_coverage\": [\"Specific threat vectors this agent addresses\"]
+    }
+  ],
+  \"security_analysis_strategy\": {
+    \"approach\": \"parallel|sequential|hybrid\",
+    \"coordination_method\": \"threat-focused|technology-focused|risk-prioritized\",
+    \"analysis_depth\": \"comprehensive|focused|basic\",
+    \"threat_modeling_required\": true
+  },
+  \"security_gates\": {
+    \"critical_blockers\": [\"Authentication bypass\", \"SQL injection\", \"RCE vulnerabilities\"],
+    \"high_priority\": [\"XSS vulnerabilities\", \"Authorization flaws\", \"Data exposure\"],
+    \"medium_priority\": [\"Configuration issues\", \"Information disclosure\", \"Input validation gaps\"]
   }
 }
 ```
 
-**Enhanced Capability-Based Agent Selection:**
+**Focus on:**
 
-Map testing needs to discovered agents with refinement capabilities:
+- Risk-appropriate security depth (${RISK_LEVEL} risk level detected)
+- Technology-specific security agents (${TECH_STACK} stack detected)
+- Threat vector coverage for affected domains (${AFFECTED_DOMAINS})
+- Attack surface analysis based on implementation changes"
 
-- **Unit Test Creation & Refinement** → Agents with isolated testing, mocking, and failure remediation
-- **Integration Test Orchestration** → Agents with API testing, service validation, and integration debugging
-- **E2E Test Development & Execution** → Agents with browser automation, user scenario testing, and workflow debugging
-- **Test Execution & Analysis** → Agents with test running, result analysis, and failure diagnosis
-- **Code & Test Remediation** → Development agents with testing expertise for fixing failing tests
-- **Performance Test Validation** → Agents with load testing and performance debugging capabilities
-
-**Critical Refinement Requirements:**
-
-- Plan for multiple test iterations (max 3 for testing vs 2 for security)
-- Include agents capable of BOTH creating AND executing tests
-- Include development agents capable of fixing failing tests
-- Design feedback loops: Test → Execute → Analyze Failures → Fix → Re-test
-- Define clear success criteria: \"All tests passing\" vs \"Analysis complete\"
-
-**Testing-Specific Discovery Guidelines:**
-
-- ONLY recommend agents discovered from `.claude/agents/testing/` and `.claude/agents/development/`
-- Prioritize agents with execution capabilities over analysis-only agents
-- Include development agents with testing expertise for remediation phase
-- Plan for both test creation and test execution in the same orchestration
-
-Create initial testing foundation synthesis: ${OUTPUT_TEST}"
-
-**Sub-Phase 11.2: Testing Orchestration Decision Logic**
-
-Process test orchestration plan and initialize iterative testing:
+### **Process Coordinator Recommendations**
 
 ```bash
-if [ -f "${TEST_PLAN}" ]; then
-    # Validate JSON structure
-    if ! jq empty "${TEST_PLAN}" 2>/dev/null; then
-        echo "❌ Test orchestration plan contains invalid JSON" | tee -a "${TEST_EXECUTION_LOG}"
-        exit 1
-    fi
-    echo "✓ Test orchestration plan created successfully" | tee -a "${TEST_EXECUTION_LOG}"
+# After security-review-coordinator completes, process recommendations
+if [ -f "${SECURITY_COORDINATION_PLAN}" ]; then
+    RECOMMENDATION=$(cat "${SECURITY_COORDINATION_PLAN}" | jq -r '.recommendation')
 
-    TESTING_ORCHESTRATION_NEEDED=$(cat "${TEST_PLAN}" | jq -r '.testing_orchestration_needed // .testing_needed')
-    if [ "${TESTING_ORCHESTRATION_NEEDED}" = "true" ]; then
-        echo "🎯 Test coordinator recommends comprehensive testing with refinement capabilities" | tee -a "${TEST_EXECUTION_LOG}"
+    if [ "${RECOMMENDATION}" = "comprehensive_security" ] || [ "${RECOMMENDATION}" = "focused_security" ]; then
+        echo "Security coordinator recommends: ${RECOMMENDATION}"
+        cat "${SECURITY_COORDINATION_PLAN}" | jq -r '.suggested_security_agents[] | "- \(.agent): \(.reason) [\(.priority)] - Threat Coverage: \(.threat_coverage | join(\", \"))"'
 
-        # Extract testing orchestration parameters
-        MAX_TEST_ITERATIONS=$(cat "${TEST_PLAN}" | jq -r '.max_test_iterations // 3')
-        TESTING_APPROACH=$(cat "${TEST_PLAN}" | jq -r '.testing_approach // "comprehensive_with_refinement"')
-
-        echo "📊 Testing Orchestration Configuration:" | tee -a "${TEST_EXECUTION_LOG}"
-        echo "   • Max Test Iterations: ${MAX_TEST_ITERATIONS}"
-        echo "   • Testing Approach: ${TESTING_APPROACH}"
-
-        # Update metadata with testing orchestration parameters
-        jq '.testing_orchestration_config = {
-            "max_iterations": '${MAX_TEST_ITERATIONS}',
-            "approach": "'${TESTING_APPROACH}'",
-            "feedback_loops_enabled": true
-        }' \
-        ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-        mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+        echo ""
+        echo "🔒 Security gates defined:"
+        echo "Critical blockers: $(cat "${SECURITY_COORDINATION_PLAN}" | jq -r '.security_gates.critical_blockers | join(\", \")')"
+        echo "High priority: $(cat "${SECURITY_COORDINATION_PLAN}" | jq -r '.security_gates.high_priority | join(\", \")')"
+        echo ""
+        echo "Based on the coordination plan, spawn the recommended security analysis agents using Task tool."
 
     else
-        echo "⚠️ Test coordinator determined testing not needed" | tee -a "${TEST_EXECUTION_LOG}"
-        exit 1
+        echo "Security coordinator recommends: ${RECOMMENDATION}"
+        echo "Reason: $(cat "${SECURITY_COORDINATION_PLAN}" | jq -r '.rationale')"
+        if [ "${RECOMMENDATION}" = "skip_security" ]; then
+            echo "Guidance: $(cat "${SECURITY_COORDINATION_PLAN}" | jq -r '.guidance // "Minimal security validation required"')"
+        fi
     fi
+
 else
-    echo "❌ Test coordinator failed to create test orchestration plan" | tee -a "${TEST_EXECUTION_LOG}"
+    echo "❌ Security coordination failed - coordination plan not found"
     exit 1
 fi
 ```
 
-**Sub-Phase 11.3: Iterative Testing Execution with Feedback Loops**
-
-Execute comprehensive testing orchestration with refinement capabilities:
+### **Security Review Feedback Loop**
 
 ```bash
-echo "" | tee -a "${TEST_EXECUTION_LOG}"
-echo "🔄 ITERATIVE TESTING EXECUTION WITH FEEDBACK LOOPS" | tee -a "${TEST_EXECUTION_LOG}"
-echo "=================================================" | tee -a "${TEST_EXECUTION_LOG}"
+# Initialize feedback loop for iterative security remediation
+echo ""
+echo "=== Security Review Feedback Loop ==="
 
-# Initialize testing refinement workspace
-TEST_REFINEMENT_DIR="${TESTING_WORKSPACE}/refinement"
-mkdir -p "${TEST_REFINEMENT_DIR}"/{iteration-1,iteration-2,iteration-3,execution-results,remediation}
+# Check if comprehensive security review was recommended
+RECOMMENDATION=$(cat "${SECURITY_COORDINATION_PLAN}" | jq -r '.recommendation')
+if [ "${RECOMMENDATION}" = "comprehensive_security" ] || [ "${RECOMMENDATION}" = "focused_security" ]; then
 
-# Testing Iteration Loop (up to 3 iterations for testing vs 2 for security)
-for TEST_ITERATION in $(seq 1 ${MAX_TEST_ITERATIONS}); do
-    echo "" | tee -a "${TEST_EXECUTION_LOG}"
-    echo "🧪 Testing Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}" | tee -a "${TEST_EXECUTION_LOG}"
-    echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) - Starting test iteration ${TEST_ITERATION}" | tee -a "${TEST_EXECUTION_LOG}"
+    echo "🔒 Initiating security feedback loop with universal coordinator"
+    echo ""
+    echo "After security analysis agents complete their analysis:"
+    echo "1. Call feedback-loop-coordinator to analyze security results and create remediation plan"
+    echo "2. If remediation plan recommends 'spawn_remediation_agents', spawn the specified agents"
+    echo "3. If remediation plan recommends 're_run_validation', re-run security analysis agents"
+    echo "4. If remediation plan recommends 'complete', proceed to next phase"
+    echo "5. If remediation plan recommends 'escalate', manual security review required"
 
-    # Update current iteration in metadata
-    jq '.testing_current_iteration = '${TEST_ITERATION}' |
-        .testing_iteration_'${TEST_ITERATION}'_started = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
-       ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-       mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-    ITERATION_DIR="${TEST_REFINEMENT_DIR}/iteration-${TEST_ITERATION}"
-    mkdir -p "${ITERATION_DIR}"/{test-creation,test-execution,test-remediation}
-
-    echo "📁 Test iteration workspace: ${ITERATION_DIR}" | tee -a "${TEST_EXECUTION_LOG}"
-
-    # Phase 1: Test Creation (First iteration) or Test Updates (Subsequent iterations)
-    if [ ${TEST_ITERATION} -eq 1 ]; then
-        echo "🔨 Phase 1: Initial Test Creation" | tee -a "${TEST_EXECUTION_LOG}"
-        TEST_CREATION_PHASE="initial_test_creation"
-    else
-        echo "🔄 Phase 1: Test Updates Based on Previous Failures" | tee -a "${TEST_EXECUTION_LOG}"
-        TEST_CREATION_PHASE="test_update_refinement"
-    fi
-
-    # Get test creation agents from test plan
-    TEST_CREATION_AGENTS=$(cat "${TEST_PLAN}" | jq -r --arg phase "${TEST_CREATION_PHASE}" '
-        .testing_phases[]? | select(.phase == $phase or .phase == "initial_test_creation") |
-        .agents[]? | .agent' 2>/dev/null || echo "")
-
-    if [ -n "${TEST_CREATION_AGENTS}" ]; then
-        echo "🤖 Deploying test creation agents:" | tee -a "${TEST_EXECUTION_LOG}"
-        echo "${TEST_CREATION_AGENTS}" | sed 's/^/  • /' | tee -a "${TEST_EXECUTION_LOG}"
-
-        # Spawn test creation agents dynamically
-        while read -r AGENT_TYPE; do
-            if [ -n "${AGENT_TYPE}" ] && [ "${AGENT_TYPE}" != "null" ]; then
-                echo "🚀 Spawning ${AGENT_TYPE} for test creation..." | tee -a "${TEST_EXECUTION_LOG}"
-
-                # Use the agent for comprehensive test creation
-
-                cat << 'EOF'
-Use the `${AGENT_TYPE}` subagent for comprehensive test creation - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}.
-
-Instruct the ${AGENT_TYPE}:
-"COMPREHENSIVE TEST CREATION - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
-
-**CRITICAL: Create executable tests with validation capabilities**
-
-**Testing Mission for Iteration ${TEST_ITERATION}:**
-$(if [ ${TEST_ITERATION} -eq 1 ]; then
-    echo "Create comprehensive test suite from scratch covering all implemented functionality"
 else
-    echo "Update and improve existing tests based on previous iteration failures"
-    echo "Previous iteration results: ${TEST_REFINEMENT_DIR}/iteration-$((TEST_ITERATION-1))/test-execution/"
-fi)
-
-**Comprehensive Context:**
-- Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- Feature requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-- Security fixes: .claude/features/${FEATURE_ID}/security-gates/refinement/ (if exists)
-- Architecture decisions: .claude/features/${FEATURE_ID}/architecture/
-$(if [ ${TEST_ITERATION} -gt 1 ]; then
-    echo "- Previous test results: ${TEST_REFINEMENT_DIR}/iteration-$((TEST_ITERATION-1))/"
-fi)
-
-**Test Creation Requirements:**
-1. **Unit Tests**: Comprehensive business logic validation with mocking
-2. **Integration Tests**: API endpoints, database operations, service interactions
-3. **E2E Tests**: Complete user workflows and acceptance criteria validation
-4. **Executable Tests**: All tests must be runnable with clear pass/fail results
-5. **Test Documentation**: Clear test descriptions and expected outcomes
-
-**Your Specialized Focus:**
-$(case "${AGENT_TYPE}" in
-    *"unit"*|*"test-engineer"*) echo "- Focus on unit test creation with comprehensive coverage
-- Create isolated tests for business logic components
-- Implement proper mocking for external dependencies" ;;
-    *"integration"*) echo "- Focus on integration test creation for APIs and services
-- Test database operations and external service integrations
-- Validate data flow between system components" ;;
-    *"e2e"*|*"playwright"*) echo "- Focus on end-to-end user workflow testing
-- Create browser automation tests for complete user journeys
-- Validate acceptance criteria through user interface interactions" ;;
-    *) echo "- Create comprehensive tests based on your specialized capabilities
-- Ensure tests cover critical functionality and edge cases" ;;
-esac)
-
-**Output Requirements:**
-- Test files: ${ITERATION_DIR}/test-creation/${AGENT_TYPE}-tests/
-- Test documentation: ${ITERATION_DIR}/test-creation/${AGENT_TYPE}-test-documentation.md
-- Test execution instructions: Include commands to run your tests
-
-**Success Criteria:**
-- Tests created and properly structured
-- Tests are executable with clear pass/fail results
-- Comprehensive coverage of implemented functionality
-- Clear documentation for test execution"
-EOF
-
-            fi
-        done <<< "${TEST_CREATION_AGENTS}"
-
-        echo "⏳ Waiting for test creation agents to complete..." | tee -a "${TEST_EXECUTION_LOG}"
-    fi
-
-    # Phase 2: Test Execution & Validation
-    echo "" | tee -a "${TEST_EXECUTION_LOG}"
-    echo "🏃 Phase 2: Test Execution & Failure Analysis" | tee -a "${TEST_EXECUTION_LOG}"
-
-    # Get test execution agents
-    TEST_EXECUTION_AGENTS=$(cat "${TEST_PLAN}" | jq -r '
-        .testing_phases[]? | select(.phase == "test_execution_validation") |
-        .agents[]? | .agent' 2>/dev/null || echo "playwright-explorer")
-
-    if [ -n "${TEST_EXECUTION_AGENTS}" ]; then
-        while read -r EXEC_AGENT; do
-            if [ -n "${EXEC_AGENT}" ] && [ "${EXEC_AGENT}" != "null" ]; then
-                echo "🚀 Spawning ${EXEC_AGENT} for test execution..." | tee -a "${TEST_EXECUTION_LOG}"
-
-                # Use the agent for test execution and failure analysis
-
-                cat << 'EOF'
-Use the `${EXEC_AGENT}` subagent for test execution and failure analysis - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}.
-
-Instruct the ${EXEC_AGENT}:
-"TEST EXECUTION & FAILURE ANALYSIS - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
-
-**CRITICAL: Execute tests and provide detailed failure analysis**
-
-**Test Execution Mission:**
-1. Execute all tests created in this iteration
-2. Identify and analyze any test failures
-3. Determine if failures are due to code issues or test issues
-4. Provide actionable remediation recommendations
-
-**Test Sources:**
-- Created tests: ${ITERATION_DIR}/test-creation/
-- Test documentation: ${ITERATION_DIR}/test-creation/*-test-documentation.md
-$(if [ ${TEST_ITERATION} -gt 1 ]; then
-    echo "- Previous iteration tests: ${TEST_REFINEMENT_DIR}/iteration-$((TEST_ITERATION-1))/test-creation/"
-fi)
-
-**Execution Context:**
-- Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- Live system: https://localhost:3000 (if available)
-- Test environment setup instructions from test documentation
-
-**Execution & Analysis Requirements:**
-1. **Execute All Tests**: Run unit, integration, and E2E tests systematically
-2. **Document Results**: Record pass/fail status for each test
-3. **Analyze Failures**: Categorize failures as code issues vs test issues
-4. **Provide Remediation Guidance**: Specific recommendations for fixing failures
-5. **Performance Assessment**: Note any performance issues during test execution
-
-**Output Requirements:**
-- Execution report: ${ITERATION_DIR}/test-execution/test-execution-report.md
-- Failure analysis: ${ITERATION_DIR}/test-execution/failure-analysis.md
-- Remediation recommendations: ${ITERATION_DIR}/test-execution/remediation-recommendations.md
-
-**Success Criteria Determination:**
-- ALL_TESTS_PASSING: All tests executed successfully
-- TESTS_FAILING_WITH_ANALYSIS: Tests failed but failure analysis is complete
-- EXECUTION_ERROR: Tests could not be executed (escalation needed)"
-EOF
-
-            fi
-        done <<< "${TEST_EXECUTION_AGENTS}"
-
-        echo "⏳ Waiting for test execution analysis..." | tee -a "${TEST_EXECUTION_LOG}"
-    fi
-
-    # Phase 3: Analyze Iteration Results & Decide Next Steps
-    echo "" | tee -a "${TEST_EXECUTION_LOG}"
-    echo "📊 Phase 3: Iteration Results Analysis" | tee -a "${TEST_EXECUTION_LOG}"
-
-    # Check test execution results
-    EXECUTION_REPORT="${ITERATION_DIR}/test-execution/test-execution-report.md"
-    FAILURE_ANALYSIS="${ITERATION_DIR}/test-execution/failure-analysis.md"
-
-    if [ -f "${EXECUTION_REPORT}" ]; then
-        echo "✓ Test execution report found" | tee -a "${TEST_EXECUTION_LOG}"
-
-        # Simple pattern matching for test results (in real implementation, this would be more sophisticated)
-        if grep -qi "all.*tests.*pass\|success\|✅.*pass" "${EXECUTION_REPORT}" 2>/dev/null; then
-            echo "🎉 Test Iteration ${TEST_ITERATION}: ALL TESTS PASSING" | tee -a "${TEST_EXECUTION_LOG}"
-
-            # Update metadata with success
-            jq '.testing_status = "all_tests_passing" |
-                .testing_completed_iteration = '${TEST_ITERATION}' |
-                .testing_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
-               ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-               mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-            echo "✅ Testing orchestration successful - all tests passing!" | tee -a "${TEST_EXECUTION_LOG}"
-            break  # Exit iteration loop - success achieved
-
-        elif grep -qi "fail\|error\|❌" "${EXECUTION_REPORT}" 2>/dev/null && [ ${TEST_ITERATION} -lt ${MAX_TEST_ITERATIONS} ]; then
-            echo "🔄 Test Iteration ${TEST_ITERATION}: TESTS FAILING - Proceeding to remediation" | tee -a "${TEST_EXECUTION_LOG}"
-
-            # Phase 4: Test Remediation (only if not final iteration)
-            echo "" | tee -a "${TEST_EXECUTION_LOG}"
-            echo "🔧 Phase 4: Test Failure Remediation" | tee -a "${TEST_EXECUTION_LOG}"
-
-            # Get remediation agents from test plan or fall back to development agents
-            REMEDIATION_AGENTS=$(cat "${TEST_PLAN}" | jq -r '
-                .testing_phases[]? | select(.phase == "failure_remediation") |
-                .agents[]? | .agent' 2>/dev/null || echo "golang-api-developer react-developer")
-
-            while read -r REMEDIATION_AGENT; do
-                if [ -n "${REMEDIATION_AGENT}" ] && [ "${REMEDIATION_AGENT}" != "null" ]; then
-                    echo "🚀 Spawning ${REMEDIATION_AGENT} for test remediation..." | tee -a "${TEST_EXECUTION_LOG}"
-
-                    # Use the agent for test failure remediation
-
-                    cat << 'EOF'
-Use the `${REMEDIATION_AGENT}` subagent for test failure remediation - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}.
-
-Instruct the ${REMEDIATION_AGENT}:
-"TEST FAILURE REMEDIATION - Iteration ${TEST_ITERATION}/${MAX_TEST_ITERATIONS}
-
-**CRITICAL: Fix failing tests by improving code or tests**
-
-**Remediation Mission:**
-Fix failing tests identified in this iteration through code improvements and test refinements.
-
-**Failure Analysis Context:**
-- Test execution report: ${EXECUTION_REPORT}
-- Failure analysis: ${FAILURE_ANALYSIS}
-- Remediation recommendations: ${ITERATION_DIR}/test-execution/remediation-recommendations.md
-
-**Your Remediation Focus:**
-$(case "${REMEDIATION_AGENT}" in
-    *"golang"*|*"go"*) echo "- Fix Go backend code issues causing test failures
-- Improve API endpoints, business logic, and database operations
-- Ensure Go code follows best practices and handles edge cases properly" ;;
-    *"react"*|*"frontend"*) echo "- Fix React/TypeScript frontend issues causing test failures
-- Improve UI components, event handling, and state management
-- Ensure frontend code handles user interactions and edge cases properly" ;;
-    *"integration"*) echo "- Fix integration issues between services and components
-- Improve API contracts, data flow, and service communication
-- Ensure proper error handling and fallback mechanisms" ;;
-    *) echo "- Fix code issues in your domain of expertise
-- Apply best practices and improve error handling" ;;
-esac)
-
-**Remediation Approach:**
-1. **Analyze Failures**: Review test failure details and root cause analysis
-2. **Code Fixes**: Make targeted improvements to fix failing functionality
-3. **Test Improvements**: Enhance tests if they are flawed or incomplete
-4. **Validation**: Ensure fixes don't break existing functionality
-5. **Documentation**: Document all remediation changes and rationale
-
-**Context Available:**
-- Implementation code: .claude/features/${FEATURE_ID}/implementation/code-changes/
-- Previous fixes: ${TEST_REFINEMENT_DIR}/iteration-*/test-remediation/
-- Requirements: .claude/features/${FEATURE_ID}/context/requirements.json
-
-**Output Requirements:**
-- Code fixes: ${ITERATION_DIR}/test-remediation/${REMEDIATION_AGENT}-code-fixes.md
-- Test improvements: ${ITERATION_DIR}/test-remediation/${REMEDIATION_AGENT}-test-improvements.md
-- Remediation summary: ${ITERATION_DIR}/test-remediation/${REMEDIATION_AGENT}-remediation-summary.md
-
-**Success Criteria:**
-- Root cause of test failures addressed
-- Code improvements implemented
-- Test issues resolved or improved
-- Ready for next iteration execution"
-EOF
-
-                fi
-            done <<< "${REMEDIATION_AGENTS}"
-
-            echo "⏳ Waiting for test remediation completion..." | tee -a "${TEST_EXECUTION_LOG}"
-
-            # Update metadata for this iteration
-            jq '.testing_iteration_'${TEST_ITERATION}'_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
-                .testing_iteration_'${TEST_ITERATION}'_result = "tests_failed_remediation_attempted"' \
-               ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-               mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-        elif [ ${TEST_ITERATION} -eq ${MAX_TEST_ITERATIONS} ]; then
-            echo "⚠️ Test Iteration ${TEST_ITERATION}: FINAL ITERATION - TESTS STILL FAILING" | tee -a "${TEST_EXECUTION_LOG}"
-            echo "🚨 Max test iterations reached with failing tests - escalation needed" | tee -a "${TEST_EXECUTION_LOG}"
-
-            # Update metadata with final failure state
-            jq '.testing_status = "max_iterations_reached_with_failures" |
-                .testing_escalation_needed = true |
-                .testing_final_iteration = '${TEST_ITERATION}' |
-                .testing_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
-               ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-               mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
-
-            break  # Exit iteration loop - max iterations reached
-        fi
-    else
-        echo "❌ No test execution report found - test execution failed" | tee -a "${TEST_EXECUTION_LOG}"
-        break
-    fi
-done
+    echo "ℹ️ Basic security validation - no feedback loop required"
+fi
 ```
 
-**Sub-Phase 11.4: Testing Orchestration Completion**
+### **Feedback Loop Execution Pattern**
 
-Finalize testing phase with comprehensive results:
+After security agents complete, Einstein executes this feedback loop pattern:
 
 ```bash
-echo "" | tee -a "${TEST_EXECUTION_LOG}"
-echo "🏁 TESTING ORCHESTRATION COMPLETION" | tee -a "${TEST_EXECUTION_LOG}"
-echo "===================================" | tee -a "${TEST_EXECUTION_LOG}"
+# Security Feedback Loop Execution (Einstein orchestrates, main Claude spawns)
+ITERATION_COMPLETE=false
+ITERATION_COUNT=0
+MAX_ITERATIONS=2  # More conservative for security (vs 3 for quality)
 
-# Read final testing status
-FINAL_TESTING_STATUS=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.testing_status // "unknown"')
-COMPLETED_ITERATIONS=$(cat ".claude/features/${FEATURE_ID}/metadata.json" | jq -r '.testing_completed_iteration // .testing_final_iteration // 0')
+while [ "${ITERATION_COMPLETE}" = false ] && [ ${ITERATION_COUNT} -lt ${MAX_ITERATIONS} ]; do
+    ITERATION_COUNT=$((ITERATION_COUNT + 1))
+    echo "🔒 Security Feedback Loop Iteration ${ITERATION_COUNT}/${MAX_ITERATIONS}"
 
-echo "📊 Testing Orchestration Final Results:" | tee -a "${TEST_EXECUTION_LOG}"
-echo "   • Final Status: ${FINAL_TESTING_STATUS}"
-echo "   • Completed Iterations: ${COMPLETED_ITERATIONS}/${MAX_TEST_ITERATIONS}"
-echo "   • Testing Approach: ${TESTING_APPROACH}"
+    # Call feedback-loop-coordinator to analyze security results and create remediation plan
+    echo "Calling feedback-loop-coordinator to analyze security vulnerabilities and create remediation plan..."
 
-case "${FINAL_TESTING_STATUS}" in
-    "all_tests_passing")
-        echo "✅ TESTING ORCHESTRATION: SUCCESS" | tee -a "${PIPELINE_LOG}"
-        echo "All tests passing after ${COMPLETED_ITERATIONS} iterations" | tee -a "${PIPELINE_LOG}"
+    # feedback-loop-coordinator outputs iteration plan for security phase
+    ITERATION_PLAN=".claude/features/${FEATURE_ID}/security-review/feedback-loop/iteration-${ITERATION_COUNT}-plan.json"
 
-        # Update metadata for successful completion
-        jq '.status = "testing_completed" |
-            .testing_success = true |
-            .phase = "testing_complete"' \
-           ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-           mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+    # Process coordinator recommendation
+    if [ -f "${ITERATION_PLAN}" ]; then
+        ACTION=$(cat "${ITERATION_PLAN}" | jq -r '.einstein_instructions.action')
 
-        NEXT_PHASE="deploy"
-        ;;
-    "max_iterations_reached_with_failures")
-        echo "⚠️ TESTING ORCHESTRATION: PARTIAL SUCCESS" | tee -a "${PIPELINE_LOG}"
-        echo "Max iterations (${MAX_TEST_ITERATIONS}) reached with some failing tests" | tee -a "${PIPELINE_LOG}"
-        echo "Manual review recommended before deployment" | tee -a "${PIPELINE_LOG}"
+        case "${ACTION}" in
+            "spawn_remediation_agents")
+                echo "🛠️  Iteration plan recommends: Spawn security remediation agents"
+                cat "${ITERATION_PLAN}" | jq -r '.einstein_instructions.execution_summary'
+                echo ""
+                echo "Based on iteration plan, spawn the following security remediation agents:"
+                cat "${ITERATION_PLAN}" | jq -r '.einstein_instructions.spawning_details[] | "- \(.agent): \(.instruction)"'
+                echo ""
+                echo "After security remediation agents complete, continue feedback loop..."
+                ;;
 
-        # Continue to deployment with warning
-        jq '.status = "testing_completed_with_warnings" |
-            .testing_warnings = true |
-            .phase = "testing_complete_with_warnings"' \
-           ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-           mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+            "re_run_validation")
+                echo "🔍 Iteration plan recommends: Re-run security validation"
+                echo "Re-spawn security analysis agents to verify vulnerabilities were resolved"
+                ;;
 
-        NEXT_PHASE="deploy"
-        ;;
-    *)
-        echo "❌ TESTING ORCHESTRATION: FAILED" | tee -a "${PIPELINE_LOG}"
-        echo "Testing orchestration failed with status: ${FINAL_TESTING_STATUS}" | tee -a "${PIPELINE_LOG}"
+            "complete")
+                echo "✅ Iteration plan recommends: Security validation complete"
+                echo "All critical and high-priority vulnerabilities resolved"
+                ITERATION_COMPLETE=true
+                ;;
 
-        jq '.status = "testing_failed" |
-            .testing_failed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
-           ".claude/features/${FEATURE_ID}/metadata.json" > ".claude/features/${FEATURE_ID}/metadata.json.tmp" && \
-           mv ".claude/features/${FEATURE_ID}/metadata.json.tmp" ".claude/features/${FEATURE_ID}/metadata.json"
+            "escalate")
+                echo "🚨 Iteration plan recommends: Security escalation required"
+                echo "Reason: $(cat "${ITERATION_PLAN}" | jq -r '.iteration_management.escalation_reason')"
+                ITERATION_COMPLETE=true
+                ESCALATION_REQUIRED=true
+                ;;
+        esac
+    else
+        echo "❌ Security iteration plan not found - ending feedback loop"
+        ITERATION_COMPLETE=true
+    fi
+done
 
-        exit 1
-        ;;
-esac
+# Handle security completion or escalation
+if [ "${ESCALATION_REQUIRED}" = true ]; then
+    echo "🚨 Security review requires manual security intervention"
+    NEXT_PHASE="manual-security-review"
+elif [ "${ITERATION_COMPLETE}" = true ]; then
+    echo "✅ Security review feedback loop complete"
+    NEXT_PHASE="quality-review"  # Proceed to quality review
+else
+    echo "⚠️ Maximum security iterations reached - escalating to manual review"
+    NEXT_PHASE="manual-security-review"
+fi
+```
 
-echo "" | tee -a "${PIPELINE_LOG}"
-echo "🧪 Dynamic Testing Orchestration Phase Complete" | tee -a "${PIPELINE_LOG}"
-echo "✅ Comprehensive testing with iterative refinement capabilities" | tee -a "${PIPELINE_LOG}"
-echo "✅ Test creation, execution, and failure remediation coordination" | tee -a "${PIPELINE_LOG}"
-echo "✅ Feedback loops for continuous test improvement" | tee -a "${PIPELINE_LOG}"
-echo "✅ Multi-iteration testing with bounded refinement (max ${MAX_TEST_ITERATIONS} iterations)" | tee -a "${PIPELINE_LOG}"
+### Security Review Completion
+
+```bash
+# Complete security review phase using universal completion script
+COMPLETION_OUTPUT=$(.claude/scripts/phases/complete-phase.sh "security-review" "quality-review" "${FEATURE_ID}" "" "${PIPELINE_LOG}")
+echo "${COMPLETION_OUTPUT}"
+
+# Extract completion results
+COMPLETION_STATUS=$(echo "${COMPLETION_OUTPUT}" | grep "STATUS=" | cut -d'=' -f2)
+NEXT_PHASE=$(echo "${COMPLETION_OUTPUT}" | grep "NEXT_PHASE=" | cut -d'=' -f2)
+  COMPLETION_TIME=$(echo "${COMPLETION_OUTPUT}" | grep "COMPLETION_TIME=" | cut -d'=' -f2)
+
+# Validate completion
+if [ "${COMPLETION_STATUS}" = "security_review_completed" ]; then
+    echo "🔒 Security review ${COMPLETION_STATUS} at ${COMPLETION_TIME}"
+    echo "➡️  Proceeding to ${NEXT_PHASE}"
+else
+    echo "❌ Security review completion failed: ${COMPLETION_STATUS}" | tee -a "${PIPELINE_LOG}"
+    exit 1
+fi
 ```
 
 **Phase 12: Deployment**
-
-### Phase 10: Deployment Phase
 
 ```bash
 if [ "${NEXT_PHASE}" = "deploy" ]; then
