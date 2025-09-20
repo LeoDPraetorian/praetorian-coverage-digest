@@ -2042,9 +2042,17 @@ Deploy security-gate-orchestrator agent for advanced security orchestration:
 ```bash
 if [ ${SECURITY_ORCHESTRATION_RESULT} -eq 1 ]; then
     echo "🧠 Deploying Strategic Security Intelligence..." | tee -a "${PIPELINE_LOG}"
+    
+    # Prepare security refinement plan output path
+    SECURITY_REFINEMENT_PLAN=".claude/features/${FEATURE_ID}/security-gates/refinement-plan.json"
+    echo "Security refinement plan will be saved to: ${SECURITY_REFINEMENT_PLAN}" | tee -a "${PIPELINE_LOG}"
+fi
 ```
 
-Task("security-gate-orchestrator", "ultrathink. Execute comprehensive security vulnerability orchestration using Einstein context.
+Use the `security-gate-orchestrator` subagent to execute comprehensive security vulnerability orchestration.
+
+Instruct the security-gate-orchestrator:
+"ultrathink. Execute comprehensive security vulnerability orchestration using Einstein context.
 
 **CRITICAL: Enhanced Security Orchestration with Refinement Loops**
 
@@ -2080,11 +2088,9 @@ Task("security-gate-orchestrator", "ultrathink. Execute comprehensive security v
    - Establish attack surface minimization requirements
    - Define escalation criteria for unresolvable vulnerabilities
 
-**Output Artifacts:**
+Instead of spawning agents directly, create a comprehensive security refinement plan and save it to: ${SECURITY_REFINEMENT_PLAN}
 
-Save comprehensive security orchestration plan: .claude/features/${FEATURE_ID}/security-gates/refinement-plan.json
-
-**Structure:**
+**Required Structure:**
 ```json
 {
   \"security_refinement_needed\": true,
@@ -2139,7 +2145,7 @@ Save comprehensive security orchestration plan: .claude/features/${FEATURE_ID}/s
 - Enhanced validation including penetration testing
 - Conservative iteration limits (2 max vs 3 for quality)
 - Attack surface minimization requirements
-- Crypto safety enforcement", "security-gate-orchestrator")
+- Crypto safety enforcement"
 
 **Sub-Phase 10.4: Security Orchestration Completion**
 
