@@ -14,17 +14,18 @@ You are orchestrating the **complete Einstein feature development pipeline**. Yo
 The Einstein system implements a systematic **11-phase feature development pipeline** with quality gates:
 
 🎯 **Design Phase** (Phases 1-7): `/design` command  
-⚙️ **Implementation Phase** (Phase 8): `/implement` command  
-📊 **Quality Review Phase** (Phase 9): `/quality-review` command  
-🛡️ **Security Review Phase** (Phase 10): `/security-review` command  
-🧪 **Testing Phase** (Phase 11): `/test` command
-🚀 **DeploymentPhase** (Phase 12): `/deploy` command
+⚙️ **Implementation Phase** (Phase 8-9): `/implement` command  
+📊 **Quality Review Phase** (Phase 10): `/quality-review` command  
+🛡️ **Security Review Phase** (Phase 11): `/security-review` command  
+🧪 **Testing Phase** (Phase 12): `/test` command
+🚀 **DeploymentPhase** (Phase 13): `/deploy` command
 
 **Quality Gates**: Each phase includes validation checkpoints ensuring systematic quality assurance.
 
 ## Pipeline Execution
 
 ### Step 1: Determine Execution Mode
+
 ```bash
 # Strategic decision (core orchestration logic)
 if [[ "$ARGUMENTS" =~ ^[a-z0-9-]+_[0-9]{8}_[0-9]{6}$ ]]; then
@@ -56,6 +57,7 @@ echo "✅ Pipeline infrastructure ready - Mode: ${EXECUTION_MODE}"
 ```
 
 ### Step 2: Pipeline State Detection
+
 ```bash
 # Determine current pipeline state
 if [ "${EXECUTION_MODE}" = "resume" ]; then
@@ -107,6 +109,7 @@ fi
 ```
 
 ### Step 3: Execute Design Phase
+
 ```bash
 if [ "${NEXT_PHASE}" = "design" ] || [ "${EXECUTION_MODE}" = "new" ]; then
     echo "🎯 Phase 1-5: DESIGN PHASE" | tee -a "${PIPELINE_LOG}"
@@ -398,7 +401,104 @@ fi
 
 DO NOT PROCEED TO PHASE 4 until all research agents are spawned and their tasking has completed.
 
-**Phase 4: Complexity Assessment**
+**Phase 4: Architectural Impact Triage**
+
+```bash
+  # Set up triage context
+  TRIAGE_CONTEXT=".claude/features/${FEATURE_ID}/context/impact-triage-context.md"
+  IMPACT_ANALYSIS=".claude/features/${FEATURE_ID}/context/impact-analysis.json"
+
+  # Create consolidated triage context
+  cat > "${TRIAGE_CONTEXT}" << EOF
+  # Architectural Impact Triage Context
+
+  ## Feature Requirements
+  $(cat .claude/features/${FEATURE_ID}/context/requirements.json | jq -r '.user_stories[]')
+
+  ## Research Findings Summary
+  $(grep -A 20 "## Similar Patterns Found" .claude/features/${FEATURE_ID}/context/knowledge-base.md)
+
+  ## Affected Systems (from requirements)
+  $(cat .claude/features/${FEATURE_ID}/context/requirements.json | jq -r '.affected_systems[]')
+```
+
+Use existing general-system-architect in "triage mode"
+
+- Same agent, different instructions
+- 15-minute time-boxed analysis
+- Focus on impact scope, not implementation design
+
+Instruct the general-system-architect:
+"ARCHITECTURAL IMPACT TRIAGE MODE - This is NOT full design, just impact analysis.
+
+Read context from: ${TRIAGE_CONTEXT}
+
+Your triage mission (15-minute time limit):
+
+1. Scan for Similar Implementations
+
+   - Use Grep/Glob tools to find existing similar features
+   - Count files that implement similar patterns
+   - Identify which modules/directories would be affected
+
+2. Estimate File Impact
+
+# Example searches you should run:
+
+# If it's auth-related: grep -r "authentication\|login\|jwt" --include="_.go" --include="_.tsx"
+
+# If it's UI workflow: find modules/chariot/ui/src -name "\*.tsx" | grep -E "(form|modal|workflow)"
+
+# If it's API endpoint: find modules/_/backend -name "_.go" | grep -E "handler|endpoint"
+
+3. Categorize Change Scope
+
+   - Frontend only / Backend only / Full-stack
+   - Existing patterns vs new patterns needed
+   - Database changes required?
+   - New dependencies/integrations?
+
+4. Quantify Impact Metrics
+
+Save analysis to: ${IMPACT_ANALYSIS}"
+
+```json
+  Required output format:
+  {
+    \"triage_summary\": \"Brief 2-sentence impact summary\",
+    \"file_impact_estimate\": {
+      \"frontend_files\": 5,
+      \"backend_files\": 3,
+      \"config_files\": 2,
+      \"total_estimated\": 10
+    },
+    \"code_volume_estimate\": {
+      \"lines_of_code_range\": \"150-300\",
+      \"confidence_level\": \"medium\"
+    },
+    \"architectural_patterns\": {
+      \"existing_patterns_sufficient\": true,
+      \"new_patterns_needed\": [\"Theme context system\"],
+      \"complexity_drivers\": [\"Multiple component coordination\", \"State management changes\"]
+    },
+    \"change_scope\": {
+      \"domains\": [\"frontend\", \"design-system\"],
+      \"breaking_changes\": false,
+      \"database_changes\": false,
+      \"external_integrations\": false
+    },
+    \"similar_implementations_found\": [
+      \"modules/chariot/ui/src/sections/settings/account-settings.tsx\",
+      \"modules/chariot-ui-components/src/theme/ThemeProvider.tsx\"
+    ],
+    \"risk_indicators\": [\"Performance impact from theme switching\"],
+    \"triage_confidence\": \"high\"
+  }
+```
+
+Critical: This is boundary analysis only - do NOT design the implementation.
+
+**Phase 5: Complexity Assessment**
 
 Prepare paths and context:
 
@@ -406,17 +506,29 @@ Prepare paths and context:
 source .claude/features/current_feature.env
 REQUIREMENTS_PATH=".claude/features/${FEATURE_ID}/context/requirements.json"
 KNOWLEDGE_PATH=".claude/features/${FEATURE_ID}/context/knowledge-base.md"
+IMPACT_ANALYSIS=".claude/features/${FEATURE_ID}/context/impact-analysis.json"
 ASSESSMENT_OUTPUT=".claude/features/${FEATURE_ID}/context/complexity-assessment.json"
 
 echo "=== Complexity Assessor Paths ==="
 echo "Requirements: ${REQUIREMENTS_PATH}"
 echo "Knowledge: ${KNOWLEDGE_PATH}"
+echo "Impact Analysis: ${IMPACT_ANALYSIS}"
 echo "Output: ${ASSESSMENT_OUTPUT}"
 echo "================================="
 
 # Show summary of what was found
 echo "Knowledge Summary:"
 grep -A 3 "## Similar Patterns Found" "${KNOWLEDGE_PATH}" 2>/dev/null | head -10 || echo "No knowledge base found"
+
+if [ -f "${IMPACT_ANALYSIS}" ]; then
+    echo "Impact Analysis Summary:"
+    echo "- Estimated files: $(cat "${IMPACT_ANALYSIS}" | jq -r '.file_impact_estimate.total_estimated') files"
+    echo "- Code volume: $(cat "${IMPACT_ANALYSIS}" | jq -r '.code_volume_estimate.lines_of_code_range') LOC"
+    echo "- Domains: $(cat "${IMPACT_ANALYSIS}" | jq -r '.change_scope.domains | join(", ")')"
+    echo "- Confidence: $(cat "${IMPACT_ANALYSIS}" | jq -r '.triage_confidence')"
+else
+    echo "⚠️ No impact analysis found - using heuristic assessment"
+fi
 ```
 
 Use the `complexity-assessor` subagent to evaluate implementation complexity.
@@ -428,6 +540,16 @@ Read context from:
 
 1. The Requirements path shown above (ending with /requirements.json)
 2. The Knowledge path shown above (ending with /knowledge-base.md)
+3. **NEW:** The Impact Analysis path shown above (ending with /impact-analysis.json) - USE THIS FOR QUANTITATIVE METRICS
+
+**CRITICAL: If impact-analysis.json exists, use its quantitative data for scoring:**
+
+- Use file_impact_estimate.total_estimated for File Impact Score
+- Use code_volume_estimate for Code Volume Score
+- Use change_scope and architectural_patterns for Architectural Impact
+- Use risk_indicators for Risk Factors
+
+**If impact-analysis.json is missing, fall back to heuristic assessment from requirements/knowledge.**
 
 Save your assessment to the Output path shown above (ending with /complexity-assessment.json).
 
@@ -438,7 +560,8 @@ Your assessment should include:
 'affected_domains': ['frontend', 'backend', 'database', 'security', 'information'],
 'estimated_effort': 'hours or days',
 'risk_level': 'Low|Medium|High',
-'justification': 'explanation of assessment'
+'justification': 'explanation of assessment',
+'data_source': 'architectural_triage|heuristic_fallback'
 }"
 
 Check the complexity level:
@@ -455,7 +578,7 @@ else
 fi
 ```
 
-**Phase 5 Thinking Budget Optimization**
+**Phase 6 Thinking Budget Optimization**
 
 Optimize thinking budget allocation for architecture specialists:
 
@@ -504,7 +627,7 @@ else
 fi
 ```
 
-**Phase 6: Architecture Planning (If Complex)**
+**Phase 7: Architecture Planning (If Complex)**
 
 Check if architecture planning is needed:
 
@@ -627,7 +750,9 @@ else
 fi
 ```
 
-**Phase 7: Implementation Planning**
+**🚀 Design Phase Successfully Completed - Ready for Implementation!**
+
+**Phase 8: Implementation Planning**
 
 Prepare the final planning context:
 
@@ -845,8 +970,6 @@ $(head -50 "${SOURCE_PLAN}" | grep -A 20 "## Implementation Overview" | head -15
 
 ---
 
-**🚀 Design Phase Successfully Completed - Ready for Implementation!**
-
 EOFS
 
 ```bash
@@ -867,7 +990,7 @@ else
 fi
 ```
 
-**Phase 8 Execute Implementation**
+**Phase 9 Execute Implementation**
 
 ```bash
 if [ "${NEXT_PHASE}" = "implement" ]; then
@@ -1061,7 +1184,7 @@ echo "🚀 ${TOTAL_AGENTS} development agents spawned based on implementation pl
 echo "✅ Ready for ${NEXT_PHASE} phase"
 ```
 
-**Phase 9: Quality Review**
+**Phase 10: Quality Review**
 
 ```bash
 if [ "${NEXT_PHASE}" = "quality-review" ]; then
@@ -1299,7 +1422,7 @@ jq '.status = "quality_review_completed" | .quality_review_completed = "'${QUALI
 echo "🎯 Quality review complete - proceeding to ${NEXT_PHASE}"
 ```
 
-**Phase 10: Security Review**
+**Phase 11: Security Review**
 
 ```bash
 if [ "${NEXT_PHASE}" = "security-review" ]; then
@@ -1551,7 +1674,7 @@ else
 fi
 ```
 
-**Phase 12: Deployment**
+**Phase 13: Deployment**
 
 ```bash
 if [ "${NEXT_PHASE}" = "deploy" ]; then
