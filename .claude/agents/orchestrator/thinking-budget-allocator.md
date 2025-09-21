@@ -30,6 +30,7 @@ When invoked, you will receive:
 4. User preferences for cost/quality trade-offs (if provided)
 
 Look for patterns like:
+
 - "Complexity assessment: [path ending with /complexity-assessment.json]"
 - "Agent context: [path ending with /agent-context.json]"
 - "Output allocation plan to: [path ending with /thinking-allocation.json]"
@@ -44,23 +45,35 @@ Read and analyze the complexity assessment:
 COMPLEXITY_FILE="[PROVIDED_COMPLEXITY_PATH]"
 if [ -f "${COMPLEXITY_FILE}" ]; then
     COMPLEXITY_LEVEL=$(cat "${COMPLEXITY_FILE}" | jq -r '.level')
+    COMPLEXITY_SCORE=$(cat "${COMPLEXITY_FILE}" | jq -r '.score // 50')
     RISK_LEVEL=$(cat "${COMPLEXITY_FILE}" | jq -r '.risk_level')
     AFFECTED_DOMAINS=$(cat "${COMPLEXITY_FILE}" | jq -r '.affected_domains')
     DOMAIN_COUNT=$(cat "${COMPLEXITY_FILE}" | jq -r '.affected_domains | length')
     COMPLEXITY_FACTORS=$(cat "${COMPLEXITY_FILE}" | jq -r '.factors[]')
-    
-    echo "=== Complexity Analysis ==="
-    echo "Level: ${COMPLEXITY_LEVEL}"
+    ESTIMATED_EFFORT=$(cat "${COMPLEXITY_FILE}" | jq -r '.estimated_effort // "medium"')
+
+    # Read detailed breakdown for more precise allocation
+    FILE_IMPACT_SCORE=$(cat "${COMPLEXITY_FILE}" | jq -r '.breakdown.file_impact // 15')
+    CODE_VOLUME_SCORE=$(cat "${COMPLEXITY_FILE}" | jq -r '.breakdown.code_volume // 15')
+    ARCHITECTURAL_IMPACT_SCORE=$(cat "${COMPLEXITY_FILE}" | jq -r '.breakdown.architectural_impact // 10')
+    RISK_FACTOR_SCORE=$(cat "${COMPLEXITY_FILE}" | jq -r '.breakdown.risk_factors // 10')
+
+    echo "=== Enhanced Complexity Analysis ==="
+    echo "Level: ${COMPLEXITY_LEVEL} (Score: ${COMPLEXITY_SCORE}/100)"
     echo "Risk: ${RISK_LEVEL}"
     echo "Domains: ${AFFECTED_DOMAINS}"
     echo "Domain Count: ${DOMAIN_COUNT}"
+    echo "Estimated Effort: ${ESTIMATED_EFFORT}"
+    echo "Breakdown: Files=${FILE_IMPACT_SCORE}, Code=${CODE_VOLUME_SCORE}, Arch=${ARCHITECTURAL_IMPACT_SCORE}, Risk=${RISK_FACTOR_SCORE}"
     echo "Key Factors: ${COMPLEXITY_FACTORS}"
-    echo "=========================="
+    echo "====================================="
 else
     echo "⚠️ Complexity assessment not found - using conservative estimates"
     COMPLEXITY_LEVEL="Unknown"
+    COMPLEXITY_SCORE=50
     RISK_LEVEL="Medium"
     DOMAIN_COUNT=3
+    ESTIMATED_EFFORT="medium"
 fi
 ```
 
@@ -72,7 +85,7 @@ Classify each planned agent by their decision criticality and complexity require
 # Define agent classification rules
 classify_agent_role() {
     local agent_type=$1
-    
+
     case "$agent_type" in
         # Pipeline Coordinators (Always Critical)
         "intent-translator"|"knowledge-synthesizer"|"architecture-coordinator"|"implementation-planner")
@@ -117,16 +130,16 @@ determine_optimal_thinking_level() {
     local risk_level=$4
     local domain_count=$5
     local user_preference=${6:-"balanced"}
-    
+
     echo "Analyzing agent: $agent_type (role: $agent_role)"
-    
+
     case "$agent_role" in
         "pipeline-critical")
             # Coordinators always get maximum thinking budget
             local thinking_level="ultrathink"
             local justification="Pipeline coordination decisions affect entire feature lifecycle - maximum reasoning required"
             ;;
-            
+
         "architecture-specialist")
             # Architecture decisions based on complexity and domain scope
             if [[ "$complexity" == "Complex" || $domain_count -gt 3 ]]; then
@@ -140,7 +153,7 @@ determine_optimal_thinking_level() {
                 local justification="Architecture decisions require comprehensive analysis even for simple features"
             fi
             ;;
-            
+
         "quality-critical")
             # Security and performance based on risk level
             if [[ "$risk_level" == "High" || "$complexity" == "Complex" ]]; then
@@ -151,7 +164,7 @@ determine_optimal_thinking_level() {
                 local justification="Quality-critical analysis requiring systematic evaluation"
             fi
             ;;
-            
+
         "implementation-worker")
             # Developers based on complexity and user preference
             if [[ "$complexity" == "Complex" && $domain_count -gt 2 ]]; then
@@ -165,7 +178,7 @@ determine_optimal_thinking_level() {
                 local justification="Standard implementation following established patterns"
             fi
             ;;
-            
+
         "validation-worker")
             # Testing based on coverage requirements
             if [[ "$complexity" == "Complex" || "$risk_level" == "High" ]]; then
@@ -176,19 +189,19 @@ determine_optimal_thinking_level() {
                 local justification="Standard testing procedures with established patterns"
             fi
             ;;
-            
+
         *)
             # Conservative default
             local thinking_level="think"
             local justification="Default allocation for general tasks"
             ;;
     esac
-    
+
     echo "  → Recommended: $thinking_level"
     echo "  → Justification: $justification"
     echo "  → Token Budget: $(get_token_estimate $thinking_level)"
     echo ""
-    
+
     # Return structured data
     echo "${agent_type}:${thinking_level}:${justification}"
 }
@@ -216,9 +229,9 @@ create_allocation_plan() {
     local output_file=$1
     local feature_complexity=$2
     local user_preference=$3
-    
+
     echo "=== Generating Thinking Allocation Plan ==="
-    
+
     # Initialize plan structure
     cat > "$output_file" << 'EOF'
 {
@@ -244,18 +257,18 @@ create_allocation_plan() {
   }
 }
 EOF
-    
+
     # Update with actual analysis
     jq --arg complexity "$COMPLEXITY_LEVEL" \
        --arg risk "$RISK_LEVEL" \
        --argjson domain_count "$DOMAIN_COUNT" \
        --arg preference "$user_preference" \
-       '.feature_analysis.complexity_level = $complexity | 
+       '.feature_analysis.complexity_level = $complexity |
         .feature_analysis.risk_level = $risk |
         .feature_analysis.domain_count = $domain_count |
         .feature_analysis.user_preference = $preference' \
         "$output_file" > "$output_file.tmp" && mv "$output_file.tmp" "$output_file"
-        
+
     echo "✓ Base allocation plan created"
 }
 ```
@@ -268,23 +281,23 @@ Provide detailed cost analysis and user control options:
 # Calculate comprehensive cost estimates
 calculate_total_costs() {
     local allocation_file=$1
-    
+
     echo "=== Cost Analysis ==="
-    
+
     local total_tokens=0
     local total_time_min=0
     local total_time_max=0
     local high_cost_agents=()
-    
+
     # Read allocations and calculate costs
     if [ -f "$allocation_file" ]; then
         # Extract thinking levels and calculate totals
         local thinking_levels=$(cat "$allocation_file" | jq -r '.thinking_allocations | to_entries[] | "\(.key):\(.value)"')
-        
+
         while IFS=: read -r agent thinking_level; do
             local tokens=$(get_token_estimate "$thinking_level")
             total_tokens=$((total_tokens + tokens))
-            
+
             case "$thinking_level" in
                 "ultrathink")
                     total_time_min=$((total_time_min + 60))  # 1-3 min range
@@ -305,11 +318,11 @@ calculate_total_costs() {
                     ;;
             esac
         done <<< "$thinking_levels"
-        
+
         echo "💰 Total Token Estimate: ${total_tokens}"
         echo "⏱️  Total Time Estimate: ${total_time_min}-${total_time_max} seconds"
         echo "💸 High-Cost Agents: ${high_cost_agents[@]}"
-        
+
         # Update allocation file with cost analysis
         jq --argjson total_tokens "$total_tokens" \
            --arg time_range "${total_time_min}-${total_time_max} seconds" \
@@ -329,36 +342,36 @@ Provide user transparency and control mechanisms:
 generate_user_controls() {
     local allocation_file=$1
     local total_tokens=$2
-    
+
     echo "=== User Control Options ==="
-    
+
     local cost_warnings=()
     local alternatives=()
-    
+
     # Generate cost warnings
     if [ $total_tokens -gt 1000000 ]; then
         cost_warnings+=("High token usage detected (${total_tokens} tokens) - consider reducing complexity or using manual overrides")
     fi
-    
+
     if [ $total_tokens -gt 500000 ]; then
         cost_warnings+=("Significant token investment - ensure feature complexity justifies deep reasoning allocation")
     fi
-    
+
     # Generate alternative strategies
     alternatives+=("--thinking=speed: Use 'think' for all agents (faster, lower cost)")
     alternatives+=("--thinking=balanced: Use dynamic allocation with conservative estimates")
     alternatives+=("--thinking=quality: Use 'think harder' minimum for all specialists")
-    
+
     # Update allocation file with user controls
     local warnings_json=$(printf '%s\n' "${cost_warnings[@]}" | jq -R . | jq -s .)
     local alternatives_json=$(printf '%s\n' "${alternatives[@]}" | jq -R . | jq -s .)
-    
+
     jq --argjson warnings "$warnings_json" \
        --argjson alternatives "$alternatives_json" \
        '.user_controls.cost_warnings = $warnings |
         .user_controls.alternative_strategies = $alternatives' \
         "$allocation_file" > "$allocation_file.tmp" && mv "$allocation_file.tmp" "$allocation_file"
-        
+
     echo "✓ User controls and alternatives generated"
 }
 ```
@@ -400,7 +413,7 @@ Structure your allocation plan as:
   "allocation_strategy": "dynamic-optimization",
   "feature_analysis": {
     "complexity_level": "Complex",
-    "risk_level": "High", 
+    "risk_level": "High",
     "domain_count": 5,
     "user_preference": "balanced"
   },

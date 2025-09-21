@@ -40,23 +40,48 @@ SECURITY_STRATEGY=".claude/features/${FEATURE_ID}/security-review/coordination/s
 
 # Analyze implementation outputs for security context
 IMPL_DIR=".claude/features/${FEATURE_ID}/implementation"
-COMPLEXITY_LEVEL=$(cat ".claude/features/${FEATURE_ID}/context/complexity-assessment.json" | jq -r '.level' 2>/dev/null || echo "Unknown")
-AFFECTED_DOMAINS=$(cat ".claude/features/${FEATURE_ID}/context/complexity-assessment.json" | jq -r '.affected_domains[]?' 2>/dev/null | tr '\n' ',' | sed 's/,$//' || echo "Unknown")
+
+# Enhanced complexity data extraction for security planning
+COMPLEXITY_ASSESSMENT=".claude/features/${FEATURE_ID}/context/complexity-assessment.json"
+COMPLEXITY_LEVEL=$(cat "${COMPLEXITY_ASSESSMENT}" | jq -r '.level' 2>/dev/null || echo "Unknown")
+COMPLEXITY_SCORE=$(cat "${COMPLEXITY_ASSESSMENT}" | jq -r '.score // 50' 2>/dev/null || echo "50")
+ASSESSMENT_RISK_LEVEL=$(cat "${COMPLEXITY_ASSESSMENT}" | jq -r '.risk_level' 2>/dev/null || echo "Medium")
+AFFECTED_DOMAINS=$(cat "${COMPLEXITY_ASSESSMENT}" | jq -r '.affected_domains[]?' 2>/dev/null | tr '\n' ',' | sed 's/,$//' || echo "Unknown")
+ESTIMATED_EFFORT=$(cat "${COMPLEXITY_ASSESSMENT}" | jq -r '.estimated_effort // "medium"' 2>/dev/null || echo "medium")
+
+# Extract detailed risk factors for intelligent security strategy
+RISK_FACTOR_SCORE=$(cat "${COMPLEXITY_ASSESSMENT}" | jq -r '.breakdown.risk_factors // 10' 2>/dev/null || echo "10")
+ARCHITECTURAL_IMPACT=$(cat "${COMPLEXITY_ASSESSMENT}" | jq -r '.breakdown.architectural_impact // 10' 2>/dev/null || echo "10")
+COMPLEXITY_FACTORS=$(cat "${COMPLEXITY_ASSESSMENT}" | jq -r '.factors[]?' 2>/dev/null | grep -i "security\|auth\|data\|external" | wc -l)
+
 TECH_STACK=$(cat ".claude/features/${FEATURE_ID}/context/implementation-context.json" | jq -r '.technology_requirements | to_entries[] | "\(.key): \(.value)"' 2>/dev/null | tr '\n' ',' | sed 's/,$//' || echo "Unknown")
 
-# Determine risk level based on implementation analysis
-RISK_LEVEL="Medium"  # Default
-if echo "${AFFECTED_DOMAINS}" | grep -qi "authentication\|authorization\|security"; then
-    RISK_LEVEL="High"
-elif echo "${AFFECTED_DOMAINS}" | grep -qi "backend\|api\|integration"; then
+# Enhanced risk level determination using quantitative scoring
+SECURITY_STRATEGY="basic"
+if [ ${COMPLEXITY_SCORE} -ge 75 ] || [ ${RISK_FACTOR_SCORE} -ge 15 ] || [ ${COMPLEXITY_FACTORS} -ge 2 ]; then
+    RISK_LEVEL="High" 
+    SECURITY_STRATEGY="comprehensive"
+elif [ ${COMPLEXITY_SCORE} -ge 40 ] || [ ${RISK_FACTOR_SCORE} -ge 10 ] || echo "${AFFECTED_DOMAINS}" | grep -qi "backend\|api\|integration"; then
     RISK_LEVEL="Medium"
-elif [ "${COMPLEXITY_LEVEL}" = "Complex" ]; then
-    RISK_LEVEL="High"
-elif [ "${COMPLEXITY_LEVEL}" = "Simple" ]; then
+    SECURITY_STRATEGY="focused"
+else
     RISK_LEVEL="Low"
+    SECURITY_STRATEGY="basic"
 fi
 
-echo "📊 Security risk assessment: ${RISK_LEVEL} (Complexity: ${COMPLEXITY_LEVEL}, Domains: ${AFFECTED_DOMAINS})"
+# Override based on domain-specific security risks
+if echo "${AFFECTED_DOMAINS}" | grep -qi "security\|authentication\|authorization"; then
+    RISK_LEVEL="High"
+    SECURITY_STRATEGY="comprehensive"
+fi
+
+echo "🔒 Enhanced Security Analysis:"
+echo "  - Risk Level: ${RISK_LEVEL} (Strategy: ${SECURITY_STRATEGY})"
+echo "  - Complexity Score: ${COMPLEXITY_SCORE}/100 (Level: ${COMPLEXITY_LEVEL})"  
+echo "  - Risk Factor Score: ${RISK_FACTOR_SCORE}/30"
+echo "  - Security-Related Factors: ${COMPLEXITY_FACTORS}"
+echo "  - Estimated Effort: ${ESTIMATED_EFFORT}"
+echo "  - Affected Domains: ${AFFECTED_DOMAINS}"
 
 # Generate security context file
 echo "📄 Generating security context: ${SECURITY_CONTEXT_FILE}"

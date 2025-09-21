@@ -1,28 +1,35 @@
 ---
 description: Complete Einstein feature development pipeline - Design, Implement, Security Review, Quality Review, and Testing
 model: claude-opus-4-1-20250805
+tools: Bash, BashOutput, Glob, Grep, KillBash, Read, Write, TodoWrite
 ---
 
-# Einstein Complete Feature Development Pipeline
+**Einstein Pipeline Starting - Manual analysis PROHIBITED**
+**Do NOT use MCP tools directly**
+**ALL work must go through Einstein phases and agents**
 
 You are orchestrating the **complete Einstein feature development pipeline**. Your goal is to take a feature description through systematic design, implementation, security validation, quality assurance, and comprehensive testing to produce production-ready code.
 
 **Feature Request or Feature ID**: $ARGUMENTS
 
-## Pipeline Overview
+# Einstein Complete Feature Development Pipeline
 
-The Einstein system implements a systematic **11-phase feature development pipeline** with quality gates:
+The Einstein system implements a systematic **13-phase feature development pipeline** with quality gates:
 
-🎯 **Design Phase** (Phases 1-7): `/design` command  
-⚙️ **Implementation Phase** (Phase 8-9): `/implement` command  
-📊 **Quality Review Phase** (Phase 10): `/quality-review` command  
-🛡️ **Security Review Phase** (Phase 11): `/security-review` command  
-🧪 **Testing Phase** (Phase 12): `/test` command
-🚀 **DeploymentPhase** (Phase 13): `/deploy` command
+🎯 **Design Phase** (Phases 0-6): `/design` command  
+⚙️ **Implementation Phase** (Phase 7-8): `/implement` command  
+📊 **Quality Review Phase** (Phase 9): `/quality-review` command  
+🛡️ **Security Review Phase** (Phase 10): `/security-review` command  
+🧪 **Testing Phase** (Phase 11): `/test` command
+🚀 **DeploymentPhase** (Phase 12): `/deploy` command
 
 **Quality Gates**: Each phase includes validation checkpoints ensuring systematic quality assurance.
 
 ## Pipeline Execution
+
+**Execute Design Phase**
+
+**Phase 0: Preprocessing**
 
 ### Step 1: Determine Execution Mode
 
@@ -45,6 +52,10 @@ echo "${INIT_OUTPUT}"
 # Extract initialization results
 PIPELINE_LOG=$(echo "${INIT_OUTPUT}" | grep "PIPELINE_LOG=" | cut -d'=' -f2)
 PIPELINE_DIR=$(echo "${INIT_OUTPUT}" | grep "PIPELINE_DIR=" | cut -d'=' -f2)
+FEATURE_ID=$(echo "${INIT_OUTPUT}" | grep "FEATURE_ID=" | cut -d'=' -f2)
+FEATURE_WORKSPACE_PATH=$(echo "${INIT_OUTPUT}" | grep "FEATURE_WORKSPACE_PATH=" | cut -d'=' -f2)
+CONTENT_SOURCE=$(echo "${INIT_OUTPUT}" | grep "CONTENT_SOURCE=" | cut -d'=' -f2)
+JIRA_TARGET_FILE=$(echo "${INIT_OUTPUT}" | grep "JIRA_TARGET_FILE=" | cut -d'=' -f2)
 INIT_STATUS=$(echo "${INIT_OUTPUT}" | grep "INITIALIZATION_STATUS=" | cut -d'=' -f2)
 
 # Validate initialization
@@ -54,7 +65,11 @@ if [ "${INIT_STATUS}" != "success" ] || [ ! -f "${PIPELINE_LOG}" ]; then
 fi
 
 echo "✅ Pipeline infrastructure ready - Mode: ${EXECUTION_MODE}"
+echo "📁 Feature Workspace: ${FEATURE_ID}"
+echo "📝 Content Source: ${CONTENT_SOURCE:-direct}"
 ```
+
+**Wait for initialize-pipeline to complete, before continuing**
 
 ### Step 2: Pipeline State Detection
 
@@ -108,105 +123,100 @@ else
 fi
 ```
 
+### Step 3: Jira Resolution (Phase 0)
+
+```bash
+# Check if Jira resolution is needed based on content source from initialization
+if [[ "${CONTENT_SOURCE}" == file:* ]]; then
+    JIRA_TARGET_FILE=${CONTENT_SOURCE#file:}
+
+    echo "📋 Jira references detected - spawning jira-reader agent" | tee -a "${PIPELINE_LOG}"
+    echo "🎯 Target file: ${JIRA_TARGET_FILE}" | tee -a "${PIPELINE_LOG}"
+    echo "💰 Token costs will be attributed to jira-reader agent" | tee -a "${PIPELINE_LOG}"
+
+    JIRA_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    echo "Jira resolution started: ${JIRA_START}" | tee -a "${PIPELINE_LOG}"
+else
+    echo "📝 No Jira references detected - proceeding with direct arguments" | tee -a "${PIPELINE_LOG}"
+fi
+```
+
+**Execute Jira Resolution (if needed):**
+
+Use the `jira-reader` subagent to resolve Jira ticket references and enrich the feature description.
+
+Instruct the jira-reader (if Jira references detected):
+"Resolve all Jira ticket references in this feature request: ${ARGUMENTS}
+
+Use your preprocessing mode to:
+
+1. Detect all Jira ticket references (CHA-1527, PROJ-123, etc.)
+2. Fetch full ticket details using Atlassian MCP tools
+3. Replace references with structured ticket content
+4. Save the enriched feature description to: ${JIRA_TARGET_FILE}
+
+Format the enriched content as:
+
+```
+# Enhanced Feature Request
+
+## Original Request
+${ARGUMENTS}
+
+## Resolved Jira Tickets
+[For each resolved ticket, include full details]
+
+## Final Enhanced Description
+[Original request with Jira references replaced by full ticket content]
+```
+
+This preserves the pipeline directory structure while properly delegating Jira resolution token costs."
+
+Wait for jira-reader to complete, then validate:
+
+```bash
+# Validate Jira resolution results
+if [[ "${CONTENT_SOURCE}" == file:* ]]; then
+    JIRA_TARGET_FILE=${CONTENT_SOURCE#file:}
+
+    if [ -f "${JIRA_TARGET_FILE}" ] && [ -s "${JIRA_TARGET_FILE}" ]; then
+        echo "✅ Jira resolution completed successfully" | tee -a "${PIPELINE_LOG}"
+        echo "📄 Enhanced content saved to: ${JIRA_TARGET_FILE}" | tee -a "${PIPELINE_LOG}"
+
+        JIRA_END=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+        echo "Jira resolution completed: ${JIRA_END}" | tee -a "${PIPELINE_LOG}"
+    else
+        echo "⚠️ Jira resolution failed - falling back to original arguments" | tee -a "${PIPELINE_LOG}"
+        CONTENT_SOURCE="direct:${ARGUMENTS}"
+    fi
+fi
+
+echo "Content source prepared for design phases: ${CONTENT_SOURCE}" | tee -a "${PIPELINE_LOG}"
+```
+
 ### Step 3: Execute Design Phase
 
 ```bash
 if [ "${NEXT_PHASE}" = "design" ] || [ "${EXECUTION_MODE}" = "new" ]; then
-    echo "🎯 Phase 1-5: DESIGN PHASE" | tee -a "${PIPELINE_LOG}"
+    echo "🎯 Phase 0-6: DESIGN PHASE" | tee -a "${PIPELINE_LOG}"
 
-    # Create feature workspace for new features
-    if [ "${EXECUTION_MODE}" = "new" ]; then
-        FEATURE_NAME=$(echo "$ARGUMENTS" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//' | cut -c1-30)
-        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-        FEATURE_ID="${FEATURE_NAME}_${TIMESTAMP}"
-
-        # Create feature workspace
-        mkdir -p .claude/features/${FEATURE_ID}/{context,research,output,logs,architecture}
-
-        # Save feature metadata
-        cat > .claude/features/${FEATURE_ID}/metadata.json << EOF
-{
-  "id": "${FEATURE_ID}",
-  "description": "$ARGUMENTS",
-  "created": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "status": "design_in_progress",
-  "phase": "design",
-  "pipeline": "einstein"
-}
-EOF
-
-        echo "FEATURE_ID=${FEATURE_ID}" > .claude/features/current_feature.env
-        echo "📁 Feature workspace created: ${FEATURE_ID}" | tee -a "${PIPELINE_LOG}"
-    fi
+    # Use workspace and content source from enhanced initialization
+    echo "📁 Using feature workspace: ${FEATURE_ID}" | tee -a "${PIPELINE_LOG}"
+    echo "📝 Processing content from: ${CONTENT_SOURCE:-direct}" | tee -a "${PIPELINE_LOG}"
 
     DESIGN_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
     echo "Design started: ${DESIGN_START}" | tee -a "${PIPELINE_LOG}"
 fi
 ```
 
-**Execute Design Phase Using Internal Agents:**
+**Phase 1: Intent Analysis**
 
-**Phase 1: JIRA Preprocessing**
+Content source processing was completed in Phase 0. The enhanced content is now ready for intent analysis.
 
-Execute intent analysis to structure the feature request:
-
-#### Jira Reference Preprocessing
-
-First, check if the feature description contains Jira ticket references:
-
-```bash
-# Check for Jira ticket patterns (e.g., CHA-1232, PROJ-123)
-if echo "$ARGUMENTS" | grep -qE '\b[A-Z]{2,10}-[0-9]+\b'; then
-    echo "🎫 Jira references detected in feature description"
-    echo "Resolving ticket details before analysis..."
-
-    # Create preprocessing output file
-    JIRA_RESOLVED_FILE=".claude/features/${FEATURE_ID}/context/jira-resolved.md"
-    echo "Jira resolution output: ${JIRA_RESOLVED_FILE}"
-
-    # Wait for jira-reader completion before proceeding
-    echo "⏳ Waiting for Jira resolution to complete..."
-```
-
-Tell the jira-reader (if Jira references detected):
-"Resolve all Jira ticket references in this feature request: $ARGUMENTS
-
-Use your preprocessing mode to:
-
-1. Detect all Jira ticket references (CHA-1232, PROJ-123, etc.)
-2. Fetch full ticket details using Atlassian MCP tools
-3. Replace references with structured ticket content
-4. Save the enriched feature description to: ${JIRA_RESOLVED_FILE}"
-
-Wait for jira-reader to complete, then validate and prepare content for intent analysis:
-
-```bash
-# Determine which content to use for intent analysis (single validation point)
-if [ -f "${JIRA_RESOLVED_FILE}" ] && [ -s "${JIRA_RESOLVED_FILE}" ]; then
-    echo "✓ Jira references resolved successfully"
-    ENHANCED_ARGUMENTS=$(grep -A 1000 "## Final Enhanced Description" "${JIRA_RESOLVED_FILE}" | tail -n +2)
-
-    if [ -z "${ENHANCED_ARGUMENTS}" ]; then
-        echo "⚠️  Failed to extract enhanced description, using original"
-        ENHANCED_ARGUMENTS="$ARGUMENTS"
-    else
-        echo "Using enhanced content with resolved Jira tickets"
-    fi
-else
-    ENHANCED_ARGUMENTS="$ARGUMENTS"
-    echo "Using original arguments (no Jira resolution or resolution failed)"
-fi
-
-echo "Content prepared for intent analysis"
-echo "Enhanced arguments length: $(echo "${ENHANCED_ARGUMENTS}" | wc -c) characters"
-```
-
-**Phase 2: Intent Analysis**
-
-Use the `intent-translator` subagent to parse and structure the feature request.
+Use the `intent-translator` subagent to parse and structure the feature request using the enhanced content source.
 
 Instruct the intent-translator:
-"Analyze this feature request: ${ENHANCED_ARGUMENTS}
+"Analyze feature request from: ${CONTENT_SOURCE}
 
 Save your analysis as JSON to: .claude/features/${FEATURE_ID}/context/requirements.json
 
@@ -217,7 +227,9 @@ Your output should include:
 - acceptance_criteria: array of criteria
 - affected_systems: list of components
 - constraints: technical constraints
-- clarification_needed: any unclear requirements"
+- clarification_needed: any unclear requirements
+
+The intent-translator will automatically detect whether to read from a file (if CONTENT_SOURCE starts with 'file:') or process direct text (if it starts with 'direct:')."
 
 Wait for the intent-translator to complete, then verify:
 
@@ -231,7 +243,7 @@ else
 fi
 ```
 
-**Phase 3: Knowledge Synthesis**
+**Phase 2: Knowledge Synthesis**
 
 Get the paths for knowledge synthesis:
 
@@ -399,9 +411,9 @@ else
 fi
 ```
 
-DO NOT PROCEED TO PHASE 4 until all research agents are spawned and their tasking has completed.
+DO NOT PROCEED TO PHASE 3 until all research agents are spawned and their tasking has completed.
 
-**Phase 4: Architectural Impact Triage**
+**Phase 3: Architectural Impact Triage**
 
 ```bash
   # Set up triage context
@@ -498,7 +510,7 @@ Save analysis to: ${IMPACT_ANALYSIS}"
 
 Critical: This is boundary analysis only - do NOT design the implementation.
 
-**Phase 5: Complexity Assessment**
+**Phase 4: Complexity Assessment**
 
 Prepare paths and context:
 
@@ -570,15 +582,26 @@ Check the complexity level:
 source .claude/features/current_feature.env
 ASSESSMENT_FILE=".claude/features/${FEATURE_ID}/context/complexity-assessment.json"
 if [ -f "${ASSESSMENT_FILE}" ]; then
+    # Enhanced complexity data extraction
     COMPLEXITY_LEVEL=$(cat "${ASSESSMENT_FILE}" | jq -r '.level')
-    echo "✓ Complexity assessed as: ${COMPLEXITY_LEVEL}"
+    COMPLEXITY_SCORE=$(cat "${ASSESSMENT_FILE}" | jq -r '.score // 50')
+    ESTIMATED_EFFORT=$(cat "${ASSESSMENT_FILE}" | jq -r '.estimated_effort // "medium"')
+    RISK_LEVEL=$(cat "${ASSESSMENT_FILE}" | jq -r '.risk_level // "Medium"')
+
+    echo "✓ Enhanced complexity assessment:"
+    echo "  - Level: ${COMPLEXITY_LEVEL} (Score: ${COMPLEXITY_SCORE}/100)"
+    echo "  - Risk: ${RISK_LEVEL}"
+    echo "  - Estimated Effort: ${ESTIMATED_EFFORT}"
 else
     echo "✗ Complexity assessment failed"
     COMPLEXITY_LEVEL="Unknown"
+    COMPLEXITY_SCORE=50
+    ESTIMATED_EFFORT="medium"
+    RISK_LEVEL="Medium"
 fi
 ```
 
-**Phase 6 Thinking Budget Optimization**
+**Phase 5: Thinking Budget Optimization**
 
 Optimize thinking budget allocation for architecture specialists:
 
@@ -627,17 +650,34 @@ else
 fi
 ```
 
-**Phase 7: Architecture Planning (If Complex)**
+**Phase 6: Architecture Planning (If Complex)**
 
 Check if architecture planning is needed:
 
 ```bash
 source .claude/features/current_feature.env
-ASSESSMENT_FILE=".claude/features/${FEATURE_ID}/context/complexity-assessment.json"
-COMPLEXITY_LEVEL=$(cat "${ASSESSMENT_FILE}" | jq -r '.level' 2>/dev/null || echo "Unknown")
+# Re-use enhanced complexity variables from Phase 4 (if still in scope)
+# Otherwise re-read for architecture decision logic
+if [ -z "${COMPLEXITY_SCORE}" ]; then
+    ASSESSMENT_FILE=".claude/features/${FEATURE_ID}/context/complexity-assessment.json"
+    COMPLEXITY_LEVEL=$(cat "${ASSESSMENT_FILE}" | jq -r '.level' 2>/dev/null || echo "Unknown")
+    COMPLEXITY_SCORE=$(cat "${ASSESSMENT_FILE}" | jq -r '.score // 50' 2>/dev/null || echo "50")
+    RISK_LEVEL=$(cat "${ASSESSMENT_FILE}" | jq -r '.risk_level // "Medium"' 2>/dev/null || echo "Medium")
+fi
 
-if [ "${COMPLEXITY_LEVEL}" = "Complex" ] || [ "${COMPLEXITY_LEVEL}" = "Medium" ]; then
-    echo "=== Architecture Planning Required (${COMPLEXITY_LEVEL} complexity) ==="
+# Enhanced architecture planning decision logic
+if [ ${COMPLEXITY_SCORE} -ge 71 ]; then
+    ARCH_APPROACH="comprehensive-architecture-planning"
+    echo "=== Comprehensive Architecture Planning Required (Score: ${COMPLEXITY_SCORE}/100, Level: ${COMPLEXITY_LEVEL}) ==="
+elif [ ${COMPLEXITY_SCORE} -ge 40 ] || [ "${COMPLEXITY_LEVEL}" = "Medium" ]; then
+    ARCH_APPROACH="focused-architecture-planning"
+    echo "=== Focused Architecture Planning Required (Score: ${COMPLEXITY_SCORE}/100, Level: ${COMPLEXITY_LEVEL}) ==="
+else
+    ARCH_APPROACH="skip-architecture-planning"
+    echo "=== Architecture Planning Skipped (Score: ${COMPLEXITY_SCORE}/100, Level: ${COMPLEXITY_LEVEL}) ==="
+fi
+
+if [ "${ARCH_APPROACH}" != "skip-architecture-planning" ]; then
 
     # Prepare architect context and directory
     CONTEXT_FILE=".claude/features/${FEATURE_ID}/context/architect-context.md"
@@ -677,8 +717,6 @@ EOFA
     # Show affected domains for architect selection
     echo "Affected domains requiring architects:"
     cat "${ASSESSMENT_FILE}" | jq -r '.affected_domains[]' 2>/dev/null
-else
-    echo "=== Architecture Planning Skipped (${COMPLEXITY_LEVEL} complexity) ==="
 fi
 ```
 
@@ -750,7 +788,38 @@ else
 fi
 ```
 
-**Phase 8: Implementation Planning**
+### Design Phase Completion
+
+```bash
+# Complete design phase using universal completion script
+COMPLETION_OUTPUT=$(.claude/scripts/phases/complete-phase.sh "design" "implement" "${FEATURE_ID}" "design_phases_completed=7" "${PIPELINE_LOG}")
+echo "${COMPLETION_OUTPUT}"
+
+# Extract completion results
+COMPLETION_STATUS=$(echo "${COMPLETION_OUTPUT}" | grep "STATUS=" | cut -d'=' -f2)
+NEXT_PHASE=$(echo "${COMPLETION_OUTPUT}" | grep "NEXT_PHASE=" | cut -d'=' -f2)
+
+# Validate completion was successful
+if [ "${COMPLETION_STATUS}" != "design_completed" ]; then
+    echo "❌ Design phase completion failed"
+    exit 1
+fi
+
+echo "🎯 Design phase complete - proceeding to ${NEXT_PHASE} phase"
+```
+
+## ⚙️ IMPLEMENTATION PHASE (Phases 7-8)
+
+```bash
+if [ "${NEXT_PHASE}" = "implement" ] || [ "${EXECUTION_MODE}" = "new" ]; then
+    echo "⚙️ Phase 7-8: IMPLEMENTATION PHASE" | tee -a "${PIPELINE_LOG}"
+
+    IMPL_START=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    echo "Implementation started: ${IMPL_START}" | tee -a "${PIPELINE_LOG}"
+fi
+```
+
+**Phase 7: Implementation Planning**
 
 ```bash
 # Run mechanical context creation script
@@ -929,35 +998,28 @@ if [ -f "${SOURCE_PLAN}" ] && [ -f "${AGENT_ASSIGNMENTS_FILE}" ]; then
     TOTAL_AGENTS=$(cat "${AGENT_ASSIGNMENTS_FILE}" | jq '.assignments | length' 2>/dev/null || echo "0")
     EXECUTION_STRATEGY=$(cat "${AGENT_ASSIGNMENTS_FILE}" | jq -r '.execution_strategy' 2>/dev/null || echo "sequential")
 
-    # Use standard phase completion script
-    COMPLETION_OUTPUT=$(.claude/scripts/phases/complete-phase.sh "design" "implement" "${FEATURE_ID}" "agents_assigned=${TOTAL_AGENTS},execution_strategy=${EXECUTION_STRATEGY}" "${PIPELINE_LOG}")
-    echo "${COMPLETION_OUTPUT}"
+    # Implementation planning completed - proceed to implementation execution
+    echo "✅ Phase 7: Implementation Planning completed"
+    echo "📋 Agent assignments: ${TOTAL_AGENTS} agents"
+    echo "🔄 Execution strategy: ${EXECUTION_STRATEGY}"
 
-    # Extract completion results
-    COMPLETION_STATUS=$(echo "${COMPLETION_OUTPUT}" | grep "STATUS=" | cut -d'=' -f2)
-    NEXT_PHASE=$(echo "${COMPLETION_OUTPUT}" | grep "NEXT_PHASE=" | cut -d'=' -f2)
-
-    # Validate completion was successful
-    if [ "${COMPLETION_STATUS}" != "design_completed" ]; then
-        echo "❌ Design phase completion failed"
-        exit 1
-    fi
-
-    echo "🚀 Ready for ${NEXT_PHASE} phase"
+    # Set up for Phase 8: Implementation Execution
+    NEXT_PHASE="implementation-execution"
+    echo "🚀 Ready for Phase 8: Implementation Execution"
 else
     echo "❌ Implementation planning failed - missing required outputs"
     exit 1
 fi
 ```
 
-**Phase 9 Execute Implementation**
+**Phase 8 Execute Implementation**
 
 # Implementation Execution Phase - Revised
 
-## Phase 9: Execute Implementation (Revised)
+## Phase 8: Execute Implementation (Revised)
 
 ```bash
-if [ "${NEXT_PHASE}" = "implement" ]; then
+if [ "${NEXT_PHASE}" = "implement" ] || [ "${NEXT_PHASE}" = "implementation-execution" ]; then
     echo "⚙️ Phase 8: IMPLEMENTATION EXECUTION" | tee -a "${PIPELINE_LOG}"
 
     # Run mechanical setup operations only
@@ -1191,7 +1253,7 @@ echo "📋 Coordination approach: ${COORDINATION_APPROACH}"
 echo "✅ Ready for ${NEXT_PHASE} phase"
 ```
 
-**Phase 10: Quality Review**
+**Phase 9: Quality Review**
 
 ```bash
 if [ "${NEXT_PHASE}" = "quality-review" ]; then
@@ -1429,7 +1491,7 @@ jq '.status = "quality_review_completed" | .quality_review_completed = "'${QUALI
 echo "🎯 Quality review complete - proceeding to ${NEXT_PHASE}"
 ```
 
-**Phase 11: Security Review**
+**Phase 10: Security Review**
 
 ```bash
 if [ "${NEXT_PHASE}" = "security-review" ]; then
@@ -1681,7 +1743,7 @@ else
 fi
 ```
 
-**Phase 12: Testing Review**
+**Phase 11: Testing Review**
 
 ```bash
 if [ "${NEXT_PHASE}" = "test" ]; then
@@ -1951,7 +2013,7 @@ else
 fi
 ```
 
-**Phase 13: Deployment**
+**Phase 12: Deployment**
 
 ```bash
 if [ "${NEXT_PHASE}" = "deploy" ]; then
