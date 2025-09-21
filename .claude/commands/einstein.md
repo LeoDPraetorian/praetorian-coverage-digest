@@ -754,7 +754,7 @@ fi
 
 ```bash
 # Run mechanical context creation script
-CONTEXT_OUTPUT=$(.claude/scripts/phases/design/create-planning-context.sh "${FEATURE_ID}")
+CONTEXT_OUTPUT=$(.claude/scripts/phases/implementation/setup-implementation-planning.sh "${FEATURE_ID}")
 echo "${CONTEXT_OUTPUT}"
 
 # Extract file paths from script output
@@ -900,7 +900,8 @@ Based on the affected domains from complexity assessment:
 - **Single domain features** → execution_strategy: \"sequential\"
 - **Frontend + Backend** → react-developer depends on golang-api-developer
 - **Complex features** → thinking_budget: \"ultrathink\"
-- **Simple/Medium features** → thinking_budget: \"think\"
+- **Medium features** → thinking_budget: \"think harder\"
+- **Simple features** → thinking_budget: \"think hard\"
 
 **CRITICAL Requirements:**
 
@@ -951,24 +952,34 @@ fi
 
 **Phase 9 Execute Implementation**
 
+# Implementation Execution Phase - Revised
+
+## Phase 9: Execute Implementation (Revised)
+
 ```bash
 if [ "${NEXT_PHASE}" = "implement" ]; then
     echo "⚙️ Phase 8: IMPLEMENTATION EXECUTION" | tee -a "${PIPELINE_LOG}"
 
-    # Run mechanical setup operations
-    SETUP_OUTPUT=$(.claude/scripts/phases/implementation/setup-implementation-phase.sh "${FEATURE_ID}")
+    # Run mechanical setup operations only
+    SETUP_OUTPUT=$(.claude/scripts/phases/implementation/setup-implementation-execution.sh "${FEATURE_ID}")
     echo "${SETUP_OUTPUT}"
 
-    # Extract file paths from setup output
+    # Extract file paths from setup output (mechanical only)
     IMPL_CONTEXT_FILE=$(echo "${SETUP_OUTPUT}" | grep "IMPL_CONTEXT_FILE=" | cut -d'=' -f2)
     IMPL_DIR=$(echo "${SETUP_OUTPUT}" | grep "IMPL_DIR=" | cut -d'=' -f2)
-
-    # Read the implementation plan created by implementation-planner
-    IMPLEMENTATION_PLAN=".claude/features/${FEATURE_ID}/output/implementation-plan.md"
+    COORDINATION_DIR=$(echo "${SETUP_OUTPUT}" | grep "COORDINATION_DIR=" | cut -d'=' -f2)
 
     # Validate required files exist
+    IMPLEMENTATION_PLAN=".claude/features/${FEATURE_ID}/output/implementation-plan.md"
+    AGENT_ASSIGNMENTS=".claude/features/${FEATURE_ID}/output/agent-assignments.json"
+
     if [ ! -f "${IMPLEMENTATION_PLAN}" ]; then
         echo "❌ Implementation plan not found: ${IMPLEMENTATION_PLAN}" | tee -a "${PIPELINE_LOG}"
+        exit 1
+    fi
+
+    if [ ! -f "${AGENT_ASSIGNMENTS}" ]; then
+        echo "❌ Agent assignments not found: ${AGENT_ASSIGNMENTS}" | tee -a "${PIPELINE_LOG}"
         exit 1
     fi
 
@@ -980,153 +991,189 @@ if [ "${NEXT_PHASE}" = "implement" ]; then
     echo "✅ Implementation execution ready" | tee -a "${PIPELINE_LOG}"
     echo "📋 Implementation Plan: ${IMPLEMENTATION_PLAN}"
     echo "📄 Context File: ${IMPL_CONTEXT_FILE}"
+    echo "🤝 Coordination Directory: ${COORDINATION_DIR}"
 fi
 ```
 
-### Extract Agent Assignments from Implementation Plan
+### Direct Agent Coordination Analysis
 
 ```bash
-# Run agent extraction and coordination setup script
-echo "=== Extracting Agent Assignments and Setting Up Coordination ==="
+# Analyze agent assignments directly without additional agent overhead
+echo "=== Direct Agent Coordination Analysis ==="
 
-AGENT_OUTPUT=$(.claude/scripts/phases/implementation/extract-and-setup-agents.sh "${FEATURE_ID}")
-echo "${AGENT_OUTPUT}"
+echo "Agent assignments source: ${AGENT_ASSIGNMENTS}"
 
-# Extract key variables from script output
-TOTAL_AGENTS=$(echo "${AGENT_OUTPUT}" | grep "TOTAL_AGENTS=" | cut -d'=' -f2)
-PARALLEL_EXECUTION=$(echo "${AGENT_OUTPUT}" | grep "PARALLEL_EXECUTION=" | cut -d'=' -f2)
-PRIMARY_AGENTS=$(echo "${AGENT_OUTPUT}" | grep "PRIMARY_AGENTS=" | cut -d'=' -f2)
-SECONDARY_AGENTS=$(echo "${AGENT_OUTPUT}" | grep "SECONDARY_AGENTS=" | cut -d'=' -f2)
-AGENT_ASSIGNMENTS=$(echo "${AGENT_OUTPUT}" | grep "AGENT_ASSIGNMENTS=" | cut -d'=' -f2)
-COORDINATION_DIR=$(echo "${AGENT_OUTPUT}" | grep "COORDINATION_DIR=" | cut -d'=' -f2)
+# Extract coordination approach from agent assignments
+COORDINATION_APPROACH=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.execution_strategy // "parallel"')
+THINKING_BUDGET=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.thinking_budget // "think"')
+TOTAL_AGENTS=$(cat "${AGENT_ASSIGNMENTS}" | jq '.assignments | length')
 
-# Validate extraction was successful
-if [ ! -f "${AGENT_ASSIGNMENTS}" ]; then
-    echo "❌ Agent extraction failed - assignments file not found" | tee -a "${PIPELINE_LOG}"
-    exit 1
-fi
+echo "📋 Total agents: ${TOTAL_AGENTS}"
+echo "📋 Coordination approach: ${COORDINATION_APPROACH}"
+echo "💭 Thinking budget: ${THINKING_BUDGET}"
 
+# Validate we have agents to work with
 if [ "${TOTAL_AGENTS}" -eq 0 ]; then
-    echo "⚠️ No agents extracted from implementation plan" | tee -a "${PIPELINE_LOG}"
-    echo "Implementation plan may need agent assignments added"
+    echo "⚠️ No agents found in assignments" | tee -a "${PIPELINE_LOG}"
+    echo "Review implementation plan and agent assignments"
     exit 1
 fi
 
-echo "✅ Agent extraction and coordination setup complete"
+# Group agents by parallel execution groups
+PRIMARY_AGENTS=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[] | select(.parallel_group == "primary") | .agent' 2>/dev/null)
+SECONDARY_AGENTS=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[] | select(.parallel_group == "secondary") | .agent' 2>/dev/null)
+ALL_AGENTS=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[].agent')
+
+# Determine execution pattern
+if [ -n "${PRIMARY_AGENTS}" ] && [ -n "${SECONDARY_AGENTS}" ]; then
+    EXECUTION_PATTERN="phased"
+    echo "🔄 Execution pattern: Phased (Primary → Secondary)"
+    echo "Primary agents: $(echo "${PRIMARY_AGENTS}" | tr '\n' ' ')"
+    echo "Secondary agents: $(echo "${SECONDARY_AGENTS}" | tr '\n' ' ')"
+elif [ "${COORDINATION_APPROACH}" = "parallel" ] && [ "${TOTAL_AGENTS}" -gt 1 ]; then
+    EXECUTION_PATTERN="parallel"
+    echo "⚡ Execution pattern: Parallel (All agents simultaneously)"
+    echo "All agents: $(echo "${ALL_AGENTS}" | tr '\n' ' ')"
+else
+    EXECUTION_PATTERN="sequential"
+    echo "📍 Execution pattern: Sequential (Single agent or sequential execution)"
+    echo "Agent: $(echo "${ALL_AGENTS}" | head -1)"
+fi
+
+echo "✅ Agent coordination analysis complete"
 ```
 
-### Intelligent Parallel Agent Spawning
+### Agent Spawning Based on Direct Coordination
 
 ```bash
-# Spawn agents based on extracted assignments with intelligent parallelization
 echo ""
-echo "=== Spawning Development Agents ==="
+echo "=== Agent Spawning Instructions ==="
 
-if [ "${PARALLEL_EXECUTION}" = "true" ]; then
-    echo "🚀 Executing parallel agent spawning strategy"
+# Helper function to generate agent spawning instructions
+generate_agent_instructions() {
+    local agent="$1"
+    local phase="${2:-primary}"
+    local phase_context="$3"
 
-    # Get primary group agents (first wave - parallel execution)
-    PRIMARY_AGENTS=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[] | select(.parallel_group == "primary") | .agent')
-    SECONDARY_AGENTS=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[] | select(.parallel_group == "secondary") | .agent')
+    # Extract agent-specific data from assignments
+    local agent_data=$(cat "${AGENT_ASSIGNMENTS}" | jq -r ".assignments[] | select(.agent == \"${agent}\")")
+    local agent_domain=$(echo "${agent_data}" | jq -r '.domain // "implementation"')
+    local agent_tasks=$(echo "${agent_data}" | jq -r '.tasks[]?' 2>/dev/null | tr '\n' '; ')
+    local agent_files=$(echo "${agent_data}" | jq -r '.files[]?' 2>/dev/null | tr '\n' ' ')
+    local agent_effort=$(echo "${agent_data}" | jq -r '.estimated_effort // "medium"')
+    local thinking_level=$(echo "${agent_data}" | jq -r '.thinking_level // "think"')
+    local dependencies=$(echo "${agent_data}" | jq -r '.dependencies[]?' 2>/dev/null | tr '\n' ', ')
 
+    echo "### Spawn ${agent} (${phase^} Phase)"
     echo ""
-    echo "## Phase 1: Primary Agent Spawning (Parallel)"
+    echo "Use the \`${agent}\` subagent for ${agent_domain} implementation."
     echo ""
-    echo "Spawn these agents simultaneously using Claude Code's Task tool:"
-    echo ""
-
-    # Generate parallel spawning instructions for primary agents
-    for agent in ${PRIMARY_AGENTS}; do
-        echo "### Spawn ${agent}"
-        echo ""
-        echo "Use the \`${agent}\` subagent for implementation."
-        echo ""
-        echo "Instruct the ${agent}:"
-        echo "\"Implement your assigned tasks from the implementation plan."
-        echo ""
-        echo "**Core Context:**"
-        echo "- Implementation Plan: ${IMPLEMENTATION_PLAN}"
-        echo "- Implementation Context: ${IMPL_CONTEXT_FILE}"
-        echo "- Your assignments: Read implementation plan for specific tasks assigned to ${agent}"
-        echo ""
-        echo "**Your workspace:**"
-        echo "- Code changes: ${IMPL_DIR}/code-changes/${agent}/"
-        echo "- Progress tracking: ${IMPL_DIR}/agent-outputs/${agent}/"
-        echo ""
-        echo "**Instructions:**"
-        echo "1. Read the implementation plan to find tasks specifically assigned to ${agent}"
-        echo "2. Implement assigned features following established patterns"
-        echo "3. Create necessary files and coordinate with other agents as needed"
-        echo "4. Track progress in your designated workspace"
-        echo "5. Follow success criteria defined in implementation plan\""
-        echo ""
-    done
-
-    # Secondary agents (if any) spawn after primary completion
-    if [ -n "${SECONDARY_AGENTS}" ]; then
-        echo ""
-        echo "## Phase 2: Secondary Agent Spawning (After Primary Completion)"
-        echo ""
-        echo "After primary agents complete their initial tasks, spawn these additional agents:"
-        echo ""
-
-        for agent in ${SECONDARY_AGENTS}; do
-            echo "### Spawn ${agent} (Sequential)"
-            echo ""
-            echo "Use the \`${agent}\` subagent for implementation."
-            echo ""
-            echo "Instruct the ${agent}:"
-            echo "\"Implement your assigned tasks, building on work completed by primary agents."
-            echo ""
-            echo "**Core Context:**"
-            echo "- Implementation Plan: ${IMPLEMENTATION_PLAN}"
-            echo "- Implementation Context: ${IMPL_CONTEXT_FILE}"
-            echo "- Primary Agent Outputs: ${IMPL_DIR}/agent-outputs/"
-            echo "- Your assignments: Read implementation plan for specific tasks assigned to ${agent}"
-            echo ""
-            echo "**Coordination:**"
-            echo "- Review primary agent outputs before starting"
-            echo "- Build upon existing implementations"
-            echo "- Ensure integration with completed work\""
-            echo ""
-        done
-    fi
-
-else
-    # Single agent execution
-    SINGLE_AGENT=$(cat "${AGENT_ASSIGNMENTS}" | jq -r '.assignments[0].agent')
-
-    echo "📍 Single Agent Execution"
-    echo ""
-    echo "## Implementation Agent Spawning"
-    echo ""
-    echo "Use the \`${SINGLE_AGENT}\` subagent for complete implementation."
-    echo ""
-    echo "Instruct the ${SINGLE_AGENT}:"
-    echo "\"Implement the complete feature as specified in the implementation plan."
+    echo "Instruct the ${agent}:"
+    echo "\"Implement your assigned tasks from the implementation plan."
     echo ""
     echo "**Core Context:**"
     echo "- Implementation Plan: ${IMPLEMENTATION_PLAN}"
     echo "- Implementation Context: ${IMPL_CONTEXT_FILE}"
+    echo "- Agent Assignments: Tasks assigned to ${agent} in ${AGENT_ASSIGNMENTS}"
+
+    if [ -n "${phase_context}" ]; then
+        echo "- Phase Context: ${phase_context}"
+    fi
+
     echo ""
-    echo "**Your workspace:**"
-    echo "- Code changes: ${IMPL_DIR}/code-changes/"
-    echo "- Progress tracking: ${IMPL_DIR}/agent-outputs/${SINGLE_AGENT}/"
+    echo "**Your Workspace:**"
+    echo "- Code changes: ${IMPL_DIR}/code-changes/${agent}/"
+    echo "- Progress tracking: ${IMPL_DIR}/agent-outputs/${agent}/"
+    echo "- Coordination: ${COORDINATION_DIR}"
+    echo ""
+    echo "**Your Assignments:**"
+    if [ -n "${agent_tasks}" ]; then
+        echo "- Tasks: ${agent_tasks%??}"  # Remove trailing '; '
+    fi
+    if [ -n "${agent_files}" ]; then
+        echo "- Files/Modules: ${agent_files% }"  # Remove trailing space
+    fi
+    echo "- Estimated effort: ${agent_effort}"
+    echo "- Thinking level: ${thinking_level}"
+
+    if [ -n "${dependencies}" ]; then
+        echo "- Dependencies: Wait for ${dependencies%, } to complete foundational work"
+    fi
+
     echo ""
     echo "**Instructions:**"
-    echo "1. Read the complete implementation plan"
-    echo "2. Implement all assigned features following established patterns"
-    echo "3. Create necessary files and handle all aspects of the feature"
-    echo "4. Follow success criteria and testing requirements from the plan"
-    echo "5. Track progress and document your implementation approach\""
-fi
+    echo "1. Read implementation plan and find tasks specifically assigned to ${agent}"
+    echo "2. Implement assigned features following established patterns from codebase"
+    echo "3. Create necessary files in your designated workspace"
+    echo "4. Follow success criteria defined in implementation plan"
+    if [ -n "${dependencies}" ]; then
+        echo "5. Coordinate with dependencies: ${dependencies%, }"
+    fi
+    echo "6. Track progress and document implementation decisions\""
+    echo ""
+}
+
+# Execute based on determined execution pattern
+case "${EXECUTION_PATTERN}" in
+    "phased")
+        echo "🚀 Multi-Phase Execution Strategy"
+        echo ""
+
+        if [ -n "${PRIMARY_AGENTS}" ]; then
+            echo "## Phase 1: Primary Agent Spawning (Foundation)"
+            echo ""
+            echo "Spawn these agents simultaneously for foundational implementation:"
+            echo ""
+
+            for agent in ${PRIMARY_AGENTS}; do
+                generate_agent_instructions "${agent}" "primary" "No dependencies - foundational work"
+            done
+        fi
+
+        if [ -n "${SECONDARY_AGENTS}" ]; then
+            echo ""
+            echo "## Phase 2: Secondary Agent Spawning (Integration)"
+            echo ""
+            echo "After primary agents complete their foundational work, spawn these agents:"
+            echo ""
+
+            for agent in ${SECONDARY_AGENTS}; do
+                generate_agent_instructions "${agent}" "secondary" "Build upon primary phase outputs in ${IMPL_DIR}/agent-outputs/"
+            done
+        fi
+        ;;
+
+    "parallel")
+        echo "⚡ Parallel Execution Strategy"
+        echo ""
+        echo "## Parallel Agent Spawning"
+        echo ""
+        echo "Spawn these ${TOTAL_AGENTS} agents simultaneously for coordinated parallel implementation:"
+        echo ""
+
+        for agent in ${ALL_AGENTS}; do
+            generate_agent_instructions "${agent}" "parallel" "Coordinate with other agents through shared workspace"
+        done
+        ;;
+
+    "sequential"|*)
+        SINGLE_AGENT=$(echo "${ALL_AGENTS}" | head -1)
+
+        echo "📍 Sequential Execution Strategy"
+        echo ""
+        echo "## Single Agent Implementation"
+        echo ""
+
+        generate_agent_instructions "${SINGLE_AGENT}" "complete" "Handle all implementation aspects for this feature"
+        ;;
+esac
 ```
 
 ### Implementation Completion
 
 ```bash
 # Complete implementation phase using generic completion script
-COMPLETION_OUTPUT=$(.claude/scripts/phases/complete-phase.sh "implementation" "quality-review" "${FEATURE_ID}" "agents_spawned=${TOTAL_AGENTS}" "${PIPELINE_LOG}")
+COMPLETION_OUTPUT=$(.claude/scripts/phases/complete-phase.sh "implementation" "quality-review" "${FEATURE_ID}" "agents_spawned=${TOTAL_AGENTS},coordination_approach=${COORDINATION_APPROACH}" "${PIPELINE_LOG}")
 echo "${COMPLETION_OUTPUT}"
 
 # Extract completion results
@@ -1139,7 +1186,8 @@ if [ "${COMPLETION_STATUS}" != "implementation_completed" ]; then
     exit 1
 fi
 
-echo "🚀 ${TOTAL_AGENTS} development agents spawned based on implementation plan"
+echo "🚀 ${TOTAL_AGENTS} development agents spawned based on strategic coordination"
+echo "📋 Coordination approach: ${COORDINATION_APPROACH}"
 echo "✅ Ready for ${NEXT_PHASE} phase"
 ```
 
