@@ -30,7 +30,6 @@ chariot-development-platform/                  # Super-repo root
 ├── Makefile                                   # Super-repo automation
 ├── docs/TECH-STACK.md                              # Technology stack reference
 ├── docs/DESIGN-PATTERNS.md                         # Architecture patterns and guidelines
-└── docs/CLAUDE-FLOW.md                             # Claude Flow SPARC methodology
 ```
 
 ## Initial Repository Setup (First Time Only)
@@ -259,7 +258,6 @@ Frontend changes automatically trigger E2E test generation:
 
 - @docs/TECH-STACK.md - Complete technology stack with versions and dependencies
 - @docs/DESIGN-PATTERNS.md - Architectural patterns and security guidelines
-- @docs/CLAUDE-FLOW.md - SPARC development methodology with agent orchestration
 
 **Module Documentation:**
 
