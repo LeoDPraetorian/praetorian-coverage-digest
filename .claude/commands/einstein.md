@@ -750,242 +750,201 @@ else
 fi
 ```
 
-**🚀 Design Phase Successfully Completed - Ready for Implementation!**
-
 **Phase 8: Implementation Planning**
 
-Prepare the final planning context:
-
 ```bash
-source .claude/features/current_feature.env
-PLANNING_CONTEXT=".claude/features/${FEATURE_ID}/context/planning-context.md"
-FINAL_PLAN=".claude/features/${FEATURE_ID}/output/implementation-plan.md"
+# Run mechanical context creation script
+CONTEXT_OUTPUT=$(.claude/scripts/phases/design/create-planning-context.sh "${FEATURE_ID}")
+echo "${CONTEXT_OUTPUT}"
 
-# Get all relevant information
-FEATURE_DESC=$(cat .claude/features/${FEATURE_ID}/metadata.json | jq -r '.description')
-COMPLEXITY=$(cat .claude/features/${FEATURE_ID}/context/complexity-assessment.json | jq -r '.level' 2>/dev/null || echo "Unknown")
-EFFORT=$(cat .claude/features/${FEATURE_ID}/context/complexity-assessment.json | jq -r '.estimated_effort' 2>/dev/null || echo "Unknown")
-RISK=$(cat .claude/features/${FEATURE_ID}/context/complexity-assessment.json | jq -r '.risk_level' 2>/dev/null || echo "Unknown")
+# Extract file paths from script output
+PLANNING_CONTEXT=$(echo "${CONTEXT_OUTPUT}" | grep "PLANNING_CONTEXT=" | cut -d'=' -f2)
+FINAL_PLAN=$(echo "${CONTEXT_OUTPUT}" | grep "FINAL_PLAN=" | cut -d'=' -f2)
+AGENT_ASSIGNMENTS=$(echo "${CONTEXT_OUTPUT}" | grep "AGENT_ASSIGNMENTS=" | cut -d'=' -f2)
 
-# Create comprehensive planning context
-cat > "${PLANNING_CONTEXT}" << EOFP
-# Implementation Planning Context
-
-## Feature Information
-- ID: ${FEATURE_ID}
-- Description: ${FEATURE_DESC}
-- Created: $(date -u +%Y-%m-%dT%H:%M:%SZ)
-
-## Requirements
-$(cat .claude/features/${FEATURE_ID}/context/requirements.json | jq -r '.user_stories[]' 2>/dev/null | sed 's/^/- /')
-
-## Technical Context
-$(grep -A 50 "## Similar Patterns Found" .claude/features/${FEATURE_ID}/context/knowledge-base.md 2>/dev/null || echo "No patterns found")
-
-## Complexity Assessment
-- Level: ${COMPLEXITY}
-- Effort: ${EFFORT}
-- Risk: ${RISK}
-
-## Architecture Decisions
-$(if [ -d .claude/features/${FEATURE_ID}/architecture ]; then
-    echo "### Architecture Recommendations Summary"
-    for file in .claude/features/${FEATURE_ID}/architecture/*.md; do
-        if [ -f "$file" ]; then
-            basename_no_ext=$(basename "$file" .md)
-            title=$(echo "$basename_no_ext" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
-            echo "#### $title"
-            head -20 "$file" | grep -v "^#" | grep -v "^$" | head -5
-            echo "... [See full recommendations in architecture/$basename_no_ext.md]"
-            echo ""
-        fi
-    done
-else
-    echo "N/A - Not a complex feature"
-fi)
-EOFP
-
-echo "=== Implementation Planner Paths ==="
-echo "Context: ${PLANNING_CONTEXT}"
-echo "Output: ${FINAL_PLAN}"
-echo "==================================="
+echo "✅ Planning context prepared for implementation-planner"
 ```
 
-Use the `implementation-planner` subagent to create the final plan.
+### Step 2: Einstein Calls Implementation-Planner Agent
+
+Use the `implementation-planner` subagent to create strategic implementation plan with dual-format output.
 
 Instruct the implementation-planner:
-"ultrathink. Create a detailed implementation plan for this feature.
+"ultrathink. Create a comprehensive implementation plan with strategic agent assignments and coordination strategy.
 
-Read the complete context from the Context path shown above (ending with /planning-context.md).
+**Read the complete context from:** [planning-context.md path provided above]
 
-Generate a comprehensive plan and save it to the Output path shown above (ending with /implementation-plan.md).
+**CRITICAL: Generate TWO outputs for reliable agent coordination:**
 
-Your plan must include:
+## Output 1: Human-Readable Plan
 
-1. Phased implementation approach with specific tasks
-2. File references from the knowledge base
-3. Assigned subagents for each task
-4. Testing strategy
-5. Success criteria
-6. Rollback procedures
+**Save to:** [implementation-plan.md path provided above]
+
+Your comprehensive plan must include:
+
+1. **Feature Implementation Overview**
+2. **Phased implementation approach with specific tasks**
+3. **Strategic Agent Assignments Section** (use consistent format):
+
+```markdown
+## Strategic Agent Assignments
+
+### Assigned to: golang-api-developer
+
+- **Domain**: Backend API development
+- **Tasks**:
+  - Implement REST API endpoints for [specific functionality]
+  - Create database integration layer
+  - Handle authentication middleware
+- **Files**: modules/chariot/backend/pkg/handlers/[feature]/
+- **Dependencies**: None (primary group)
+- **Execution Group**: Primary (parallel safe)
+- **Architecture Context**: backend-architecture.md, api-architecture.md
+
+### Assigned to: react-developer
+
+- **Domain**: Frontend UI development
+- **Tasks**:
+  - Create [specific UI components]
+  - Implement state management
+  - Integrate with backend APIs
+- **Files**: modules/chariot/ui/src/sections/[feature]/
+- **Dependencies**: golang-api-developer (API contracts)
+- **Execution Group**: Secondary (depends on primary)
+- **Architecture Context**: frontend-architecture.md, ui-architecture.md
+```
+
+4. **File references from the knowledge base**
+5. **Testing strategy**
+6. **Success criteria**
+7. **Rollback procedures**
+
+## Output 2: Machine-Readable Assignments
+
+**Save to:** [agent-assignments.json path provided above]
+
+Create structured JSON for reliable parsing:
+
+```json
+{
+  \"feature_id\": \"[FEATURE_ID from context]\",
+  \"complexity_level\": \"[Simple|Medium|Complex from context]\",
+  \"execution_strategy\": \"parallel|sequential\",
+  \"thinking_budget\": \"think|ultrathink\",
+  \"assignments\": [
+    {
+      \"agent\": \"golang-api-developer\",
+      \"domain\": \"backend\",
+      \"tasks\": [
+        \"Implement REST API endpoints for [specific functionality]\",
+        \"Create database integration layer\",
+        \"Handle authentication middleware\"
+      ],
+      \"files\": [
+        \"modules/chariot/backend/pkg/handlers/[feature]/\"
+      ],
+      \"parallel_group\": \"primary\",
+      \"dependencies\": [],
+      \"architecture_files\": [
+        \"backend-architecture.md\",
+        \"api-architecture.md\"
+      ],
+      \"estimated_effort\": \"4-6 hours\",
+      \"thinking_level\": \"think\"
+    },
+    {
+      \"agent\": \"react-developer\",
+      \"domain\": \"frontend\",
+      \"tasks\": [
+        \"Create [specific UI components]\",
+        \"Implement state management\",
+        \"Integrate with backend APIs\"
+      ],
+      \"files\": [
+        \"modules/chariot/ui/src/sections/[feature]/\"
+      ],
+      \"parallel_group\": \"secondary\",
+      \"dependencies\": [\"golang-api-developer\"],
+      \"architecture_files\": [
+        \"frontend-architecture.md\",
+        \"ui-architecture.md\"
+      ],
+      \"estimated_effort\": \"3-5 hours\",
+      \"thinking_level\": \"think\"
+    }
+  ],
+  \"coordination_requirements\": {
+    \"api_contracts\": \"golang-api-developer must document API contracts for react-developer\",
+    \"shared_workspaces\": [
+      \"coordination/api-contracts/\",
+      \"coordination/communication/\"
+    ],
+    \"execution_order\": \"primary_then_secondary\"
+  }
+}
+```
+
+**Strategic Agent Selection Logic (analyze from context):**
+
+Based on the affected domains from complexity assessment:
+
+- **If 'backend' in affected_domains** → Assign: golang-api-developer
+- **If 'frontend' in affected_domains** → Assign: react-developer
+- **If 'database' in affected_domains** → Assign: database-neo4j-architect
+- **If 'integration' in affected_domains** → Assign: integration-developer
+- **If 'security' in affected_domains** → Note for security review phase (not implementation)
+
+**Execution Strategy Logic:**
+
+- **Multi-domain features (2+ domains)** → execution_strategy: \"parallel\"
+- **Single domain features** → execution_strategy: \"sequential\"
+- **Frontend + Backend** → react-developer depends on golang-api-developer
+- **Complex features** → thinking_budget: \"ultrathink\"
+- **Simple/Medium features** → thinking_budget: \"think\"
+
+**CRITICAL Requirements:**
+
+1. Agent assignments must use consistent 'Assigned to: {agent-name}' format in markdown
+2. JSON must be valid and parseable for reliable extraction
+3. Include coordination requirements and dependency mapping
+4. Specify execution groups (primary/secondary) for parallel coordination
+5. Reference specific architecture files available per agent domain
 
 Make sure to reference the specific patterns and files identified in the technical context section."
 
-**Validate design completion and create comprehensive summary:**
+### Step 3: Standard Phase Completion (Post-Agent Bash Execution)
 
-````bash
-# Verify implementation plan exists in feature directory
+Wait for implementation-planner to complete, then use standard completion handler:
+
+```bash
+# Validate core outputs exist
 SOURCE_PLAN=".claude/features/${FEATURE_ID}/output/implementation-plan.md"
+AGENT_ASSIGNMENTS_FILE=".claude/features/${FEATURE_ID}/output/agent-assignments.json"
 
-if [ -f "${SOURCE_PLAN}" ]; then
-    echo "✓ Implementation plan created: ${SOURCE_PLAN}"
+if [ -f "${SOURCE_PLAN}" ] && [ -f "${AGENT_ASSIGNMENTS_FILE}" ]; then
+    echo "✓ Implementation planning completed successfully"
+
+    # Read agent assignments for completion metadata
+    TOTAL_AGENTS=$(cat "${AGENT_ASSIGNMENTS_FILE}" | jq '.assignments | length' 2>/dev/null || echo "0")
+    EXECUTION_STRATEGY=$(cat "${AGENT_ASSIGNMENTS_FILE}" | jq -r '.execution_strategy' 2>/dev/null || echo "sequential")
+
+    # Use standard phase completion script
+    COMPLETION_OUTPUT=$(.claude/scripts/phases/complete-phase.sh "design" "implement" "${FEATURE_ID}" "agents_assigned=${TOTAL_AGENTS},execution_strategy=${EXECUTION_STRATEGY}" "${PIPELINE_LOG}")
+    echo "${COMPLETION_OUTPUT}"
+
+    # Extract completion results
+    COMPLETION_STATUS=$(echo "${COMPLETION_OUTPUT}" | grep "STATUS=" | cut -d'=' -f2)
+    NEXT_PHASE=$(echo "${COMPLETION_OUTPUT}" | grep "NEXT_PHASE=" | cut -d'=' -f2)
+
+    # Validate completion was successful
+    if [ "${COMPLETION_STATUS}" != "design_completed" ]; then
+        echo "❌ Design phase completion failed"
+        exit 1
+    fi
+
+    echo "🚀 Ready for ${NEXT_PHASE} phase"
 else
-    echo "✗ Implementation plan not found at ${SOURCE_PLAN}"
-    exit 1
-fi
-
-# Get complexity and effort information for summary
-METADATA_FILE=".claude/features/${FEATURE_ID}/metadata.json"
-FEATURE_DESC=$(cat "${METADATA_FILE}" | jq -r '.description')
-COMPLEXITY=$(cat .claude/features/${FEATURE_ID}/context/complexity-assessment.json | jq -r '.level' 2>/dev/null || echo "Unknown")
-EFFORT=$(cat .claude/features/${FEATURE_ID}/context/complexity-assessment.json | jq -r '.estimated_effort' 2>/dev/null || echo "Unknown")
-
-# Create comprehensive design summary for implementation phase
-DESIGN_SUMMARY=".claude/features/${FEATURE_ID}/output/design-summary.md"
-cat > "${DESIGN_SUMMARY}" << EOFS
-```
-# 🎯 Design Phase Complete - Ready for Implementation
-
-## Feature: ${FEATURE_DESC}
-- **Feature ID**: ${FEATURE_ID}
-- **Complexity**: ${COMPLEXITY}
-- **Estimated Effort**: ${EFFORT}
-- **Status**: Design Complete - Ready for Implementation
-
----
-
-## 📋 Design Artifacts Generated
-
-### ✅ Phase 1: Requirements Analysis
-- **File**: `.claude/features/${FEATURE_ID}/context/requirements.json`
-- **Contents**: Structured user stories, acceptance criteria, affected systems, constraints
-- **Jira Integration**: $([ -f .claude/features/${FEATURE_ID}/context/jira-resolved.md ] && echo "✅ Jira tickets resolved and integrated" || echo "N/A - No Jira references")
-
-### ✅ Phase 2: Knowledge Synthesis & Research
-- **Knowledge Base**: `.claude/features/${FEATURE_ID}/context/knowledge-base.md`
-- **Research Plan**: `.claude/features/${FEATURE_ID}/context/synthesis-plan.json`
-- **Research Outputs**: `.claude/features/${FEATURE_ID}/research/`
-- **Research Files**: $(find .claude/features/${FEATURE_ID}/research/ -name "*.md" -type f 2>/dev/null | wc -l) research documents
-
-### ✅ Phase 3: Complexity Assessment
-- **File**: `.claude/features/${FEATURE_ID}/context/complexity-assessment.json`
-- **Level**: ${COMPLEXITY}
-- **Risk Level**: $(cat .claude/features/${FEATURE_ID}/context/complexity-assessment.json | jq -r '.risk_level' 2>/dev/null || echo "Unknown")
-- **Effort**: ${EFFORT}
-
-### ✅ Phase 4: Architecture Planning
-$(if [ -d .claude/features/${FEATURE_ID}/architecture ]; then
-    echo "- **Status**: Required for Complex feature"
-    echo "- **Coordination Plan**: \`.claude/features/${FEATURE_ID}/architecture/coordination-plan.json\`"
-    echo "- **Architecture Files**: $(find .claude/features/${FEATURE_ID}/architecture/ -name "*.md" -type f 2>/dev/null | wc -l) architecture documents"
-else
-    echo "- **Status**: Skipped (${COMPLEXITY} complexity)"
-fi)
-
-### ✅ Phase 5: Implementation Planning
-- **Implementation Plan**: `.claude/features/${FEATURE_ID}/output/implementation-plan.md`
-- **Planning Context**: `.claude/features/${FEATURE_ID}/context/planning-context.md`
-- **Ready for**: Immediate implementation execution
-
----
-
-## 🚀 Implementation Phase Readiness
-
-### **For Implementation Phase (Phase 6) - All Context Available:**
-
-**Key Context Files for Implementation Agents:**
-```bash
-# Requirements and user stories
-.claude/features/${FEATURE_ID}/context/requirements.json
-
-# Technical patterns and similar implementations found in codebase
-.claude/features/${FEATURE_ID}/context/knowledge-base.md
-
-# Complexity factors and estimated effort
-.claude/features/${FEATURE_ID}/context/complexity-assessment.json
-
-# Detailed implementation plan with agent assignments
-.claude/features/${FEATURE_ID}/output/implementation-plan.md
-
-# Research findings from specialized agents
-.claude/features/${FEATURE_ID}/research/*.md
-
-$(if [ -d .claude/features/${FEATURE_ID}/architecture ]; then
-echo "# Architecture decisions and recommendations"
-echo ".claude/features/${FEATURE_ID}/architecture/*.md"
-fi)
-````
-
-### **Implementation Plan Summary:**
-
-$(head -50 "${SOURCE_PLAN}" | grep -A 20 "## Implementation Overview" | head -15 || echo "See full plan in implementation-plan.md")
-
-### **Critical Implementation Context:**
-
-- **Affected Systems**: $(cat .claude/features/${FEATURE_ID}/context/requirements.json | jq -r '.affected_systems[]' 2>/dev/null | tr '\n' ', ' | sed 's/,$//')
-- **Primary Focus Areas**: $(cat .claude/features/${FEATURE_ID}/context/complexity-assessment.json | jq -r '.affected_domains[]' 2>/dev/null | tr '\n' ', ' | sed 's/,$//')
-- **Key Constraints**: $(cat .claude/features/${FEATURE_ID}/context/requirements.json | jq -r '.constraints[]' 2>/dev/null | head -3 | tr '\n' '; ' | sed 's/;$//')
-
----
-
-## 📊 Design Quality Metrics
-
-- **Requirements Completeness**: ✅ Structured user stories and acceptance criteria
-- **Research Depth**: ✅ $(find .claude/features/${FEATURE_ID}/research/ -name "\*.md" -type f 2>/dev/null | wc -l) specialized research outputs
-- **Technical Context**: ✅ Existing patterns and implementations identified
-- **Architecture Review**: $([ -d .claude/features/${FEATURE_ID}/architecture ] && echo "✅ Complex feature architecture planned" || echo "N/A - Simple/Medium complexity")
-- **Implementation Readiness**: ✅ Detailed plan with specific agent assignments
-
----
-
-## 🎯 Next Phase Continuation
-
-**Ready for Phase 7 - Implementation:**
-
-```bash
-# Continue Einstein pipeline with implementation
-/einstein "${FEATURE_ID}"
-
-# Or run implementation phase directly
-/implement "${FEATURE_ID}"
-```
-
-**Implementation phase will have access to:**
-
-- Complete design context from all 5 design phases
-- Detailed implementation plan with agent assignments
-- Technical patterns and research findings
-- Architecture decisions (if complex feature)
-- Structured requirements and acceptance criteria
-
----
-
-EOFS
-
-```bash
-# Display the design summary
-cat "${DESIGN_SUMMARY}"
-
-# Update metadata with design completion
-jq '.status = "design_completed" | .phase = "design_complete" | .design_completed = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"' \
-   "${METADATA_FILE}" > "${METADATA_FILE}.tmp" && mv "${METADATA_FILE}.tmp" "${METADATA_FILE}"
-
-DESIGN_STATUS=$(cat "${METADATA_FILE}" | jq -r '.status')
-if [ "${DESIGN_STATUS}" = "design_completed" ]; then
-    echo "✅ Design Phase Complete" | tee -a "${PIPELINE_LOG}"
-    NEXT_PHASE="implement"
-else
-    echo "❌ Design Phase Failed: ${DESIGN_STATUS}" | tee -a "${PIPELINE_LOG}"
+    echo "❌ Implementation planning failed - missing required outputs"
     exit 1
 fi
 ```
@@ -1725,7 +1684,7 @@ Instruct the test-coordinator:
 - Implementation outputs: .claude/features/${FEATURE_ID}/implementation/agent-outputs/
 - Code changes: .claude/features/${FEATURE_ID}/implementation/code-changes/
 - Requirements (for test validation): .claude/features/${FEATURE_ID}/context/requirements.json
-- Architecture context: .claude/features/${FEATURE_ID}/architecture/\\*.md
+- Architecture context: .claude/features/${FEATURE_ID}/architecture/\\\*.md
 - Quality review results: .claude/features/${FEATURE_ID}/quality-review/ (if available)
 
 **Save your recommendations to:** ${TESTING_COORDINATION_PLAN}
@@ -1776,7 +1735,7 @@ Instruct the test-coordinator:
         \"reason\": \"Backend unit test failures require Go expertise\"
       },
       {
-        \"test_failure_type\": \"e2e-test-failures\", 
+        \"test_failure_type\": \"e2e-test-failures\",
         \"remediation_agent\": \"react-developer\",
         \"reason\": \"Frontend E2E failures require React expertise\"
       }
@@ -1803,7 +1762,7 @@ if [ -f "${TESTING_COORDINATION_PLAN}" ]; then
     if [ "${RECOMMENDATION}" = "comprehensive_testing" ] || [ "${RECOMMENDATION}" = "focused_testing" ]; then
         echo "Test coordinator recommends: ${RECOMMENDATION}"
         cat "${TESTING_COORDINATION_PLAN}" | jq -r '.suggested_testing_agents[] | \"- \\(.agent): \\(.reason) [\\(.priority)] - Tests: \\(.test_types | join(\", \"))\"'
-        
+
         echo ""
         echo "🧪 Testing gates defined:"
         echo "Critical gates: $(cat "${TESTING_COORDINATION_PLAN}" | jq -r '.testing_gates.critical_gates | join(\", \")')"
