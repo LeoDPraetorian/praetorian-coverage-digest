@@ -1,3 +1,12 @@
+---
+name: preprocessing-orchestration
+type: coordinator
+description: Orchestration patterns for preprocessing user input containing Jira references before routing to appropriate agents. Defines detection-based conditional execution, sequential vs direct workflow patterns, and integration protocols for seamless Jira reference resolution in Claude Code Task workflows.
+tools: Read, Write, Search, List
+model: opusplan
+color: purple
+---
+
 # Jira Preprocessing Orchestration Rules
 
 ## Integration with Claude Code Task Tool
