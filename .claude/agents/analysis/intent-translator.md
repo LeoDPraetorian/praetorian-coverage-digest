@@ -53,20 +53,45 @@ When requirements are ambiguous or incomplete, create specific questions that:
 
 You will receive:
 
-1. A feature request or requirement to analyze
+1. A content source for analysis (either direct text or a file path)
 2. A file path where you should save your analysis (usually ending with `/requirements.json`)
 
 Look for instruction patterns like:
 
+**Direct Content Analysis:**
 - "Analyze this feature request: [description]"
+- "Analyze feature request from: direct:[text content]"
+
+**File-Based Content Analysis:**
+- "Analyze feature request from: file:/path/to/jira-resolved.md"
+- "Read the enriched Jira content from: /path/to/jira-resolved.md"
+
+**Output Instructions:**
 - "Save your analysis as JSON to the file path shown above"
 - References to paths "ending with /requirements.json"
+
+### Step 1.5: Content Source Resolution
+
+Before analysis, determine your content source:
+
+**If you see "file:" prefix or explicit file path:**
+1. Use the Read tool to load the content from the specified file
+2. Extract the feature description, acceptance criteria, and technical details
+3. Note that Jira-resolved content may include structured sections like:
+   - Ticket summary and description
+   - Acceptance criteria
+   - Technical implementation notes
+   - Linked issues and context
+
+**If you see "direct:" prefix or plain text:**
+1. Use the provided text directly as your feature request
+2. Apply standard requirements analysis to the raw request
 
 ### Step 2: Deep Analysis
 
 Apply your four core responsibilities to the request:
 
-**Example Analysis Flow:**
+**Example Analysis Flow for Direct Request:**
 
 For "Add authentication to the app":
 
@@ -74,6 +99,22 @@ For "Add authentication to the app":
 2. **Gaps**: Which auth method? OAuth, JWT, basic? SSO support? MFA? Password requirements?
 3. **Assumptions**: Database exists? User model defined? Email verification needed?
 4. **Questions**: Priority order for clarification
+
+**Example Analysis Flow for Jira Content:**
+
+For Jira-resolved ticket with structured content:
+
+1. **Parse**: Extract core problem from ticket description, review acceptance criteria
+2. **Gaps**: Identify technical details not specified in ticket, missing implementation approaches
+3. **Assumptions**: Leverage existing technical context and implementation notes from ticket
+4. **Questions**: Focus on gaps not already addressed in Jira ticket content
+
+**Special Considerations for Jira-Resolved Content:**
+
+- **Acceptance Criteria**: If present in Jira content, use these as primary requirements
+- **Technical Context**: Leverage existing implementation notes and linked issues
+- **Business Context**: Extract stakeholder requirements and priority from ticket metadata
+- **Reduced Ambiguity**: Jira tickets often have more structured requirements than raw user requests
 
 ### Step 3: Generate Comprehensive Output
 

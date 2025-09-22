@@ -244,33 +244,210 @@ fi
 ```
 
 **Phase 2: Knowledge Synthesis**
-
-Get the paths for knowledge synthesis:
-
 ```bash
 source .claude/features/current_feature.env
 INPUT_REQUIREMENTS=".claude/features/${FEATURE_ID}/context/requirements.json"
 OUTPUT_KNOWLEDGE=".claude/features/${FEATURE_ID}/context/knowledge-base.md"
 SYNTHESIS_PLAN=".claude/features/${FEATURE_ID}/context/synthesis-plan.json"
 
-echo "=== Knowledge Synthesizer Paths ==="
+# NEW: Existing Implementation Discovery paths
+EXISTING_IMPL_DISCOVERY=".claude/features/${FEATURE_ID}/context/existing-implementation-discovery.md"
+IMPLEMENTATION_GAP_ANALYSIS=".claude/features/${FEATURE_ID}/context/implementation-gap-analysis.json"
+
+echo "=== Enhanced Knowledge Synthesizer Paths ==="
 echo "Input: ${INPUT_REQUIREMENTS}"
 echo "Output: ${OUTPUT_KNOWLEDGE}"
 echo "Synthesis Plan: ${SYNTHESIS_PLAN}"
-echo "==================================="
+echo "NEW - Existing Implementation Discovery: ${EXISTING_IMPL_DISCOVERY}"
+echo "NEW - Gap Analysis: ${IMPLEMENTATION_GAP_ANALYSIS}"
+echo "===================================="
 
 # Show requirements summary for context
 echo "Requirements Summary:"
 cat "${INPUT_REQUIREMENTS}" | jq -r '.feature_name, .affected_systems[]' 2>/dev/null || echo "Requirements not found"
 ```
 
-Use the `knowledge-synthesizer` subagent to analyze requirements and recommend research approach.
+### Step 2.1: Mandatory Existing Implementation Discovery
+
+Use the `code-pattern-analyzer` subagent in **"Codebase Discovery Mode"** first.
+
+Instruct the code-pattern-analyzer:
+"ultrathink. MANDATORY EXISTING IMPLEMENTATION DISCOVERY
+
+**CRITICAL FIRST STEP - Before any research recommendations, you MUST discover existing implementations.**
+
+Read the requirements from: ${INPUT_REQUIREMENTS}
+
+**Your PRIMARY MISSION: Find What Already Exists**
+
+1. **Extract Feature Context from Requirements:**
+   - Feature name and core functionality
+   - Key components mentioned in requirements  
+   - Technology stack involved (Go, React, etc.)
+   - Specific patterns or implementations referenced
+
+2. **Execute Comprehensive Codebase Search:**
+   
+   Use Grep and Glob tools extensively to find existing implementations:
+   
+   ```bash
+   # Search for feature-related terms from requirements
+   # Example searches you MUST perform:
+   grep -r \"feature_name_keywords\" --include=\"*.go\" --include=\"*.tsx\" modules/
+   grep -r \"core_functionality_terms\" --include=\"*.go\" --include=\"*.tsx\" modules/
+   
+   # Search for similar patterns in the specific modules mentioned
+   find modules/ -name \"*pattern*\" -o -name \"*similar*\"
+   
+   # Search for API endpoints related to the feature
+   grep -r \"api/feature\" --include=\"*.go\" modules/
+   
+   # Search for React components related to the feature  
+   find modules/*/ui/src -name \"*Feature*.tsx\" -o -name \"*feature*.tsx\"
+   ```
+
+3. **Document Existing Implementation Discovery**
+
+   Save detailed findings to: ${EXISTING_IMPL_DISCOVERY}
+
+   Format:
+   ```markdown
+   # Existing Implementation Discovery Report
+   
+   ## Feature Context from Requirements
+   - Feature Name: [extracted from requirements]
+   - Core Functionality: [what the feature should do]
+   - Mentioned Components: [any specific components referenced]
+   
+   ## Codebase Search Results
+   
+   ### Backend Implementations Found
+   - File: [path/to/file.go]
+   - Implementation: [what exists]
+   - Relevance: [how it relates to requirements]
+   - Completeness: [what percentage of requirements it covers]
+   
+   ### Frontend Implementations Found  
+   - File: [path/to/component.tsx]
+   - Implementation: [what exists]
+   - Relevance: [how it relates to requirements]
+   - Completeness: [what percentage of requirements it covers]
+   
+   ### Related Patterns Found
+   - Pattern: [description]
+   - Location: [file paths]
+   - Reusability: [can this be extended vs needs replacement]
+   
+   ## Implementation Status Summary
+   - Fully Implemented: [list features that exist completely]
+   - Partially Implemented: [list features that exist but need extension]
+   - Missing Implementation: [list features that don't exist]
+   - Similar Patterns Available: [list reusable patterns found]
+   ```
+
+4. **Create Implementation Gap Analysis**
+
+   Save structured analysis to: ${IMPLEMENTATION_GAP_ANALYSIS}
+   
+   Format:
+   ```json
+   {
+     \"discovery_confidence\": \"high|medium|low\",
+     \"existing_implementation_status\": {
+       \"fully_implemented\": [\"list of features that already exist completely\"],
+       \"partially_implemented\": [
+         {
+           \"feature\": \"feature name\",
+           \"existing_capability\": \"what exists now\",
+           \"missing_capability\": \"what needs to be added\",
+           \"extension_effort\": \"low|medium|high\"
+         }
+       ],
+       \"not_implemented\": [\"list of features that don't exist\"],
+       \"similar_patterns_available\": [
+         {
+           \"pattern\": \"pattern description\",
+           \"location\": \"file path\",
+           \"adaptation_effort\": \"low|medium|high\"
+         }
+       ]
+     },
+     \"reuse_opportunities\": {
+       \"high_reuse\": [\"implementations that can be directly used\"],
+       \"medium_reuse\": [\"implementations that need minor modifications\"],
+       \"low_reuse\": [\"implementations that provide patterns but need major changes\"]
+     },
+     \"implementation_recommendation\": \"extend_existing|modify_existing|build_new|hybrid_approach\",
+     \"justification\": \"detailed reasoning for the recommendation\"
+   }
+   ```
+
+**VALIDATION REQUIREMENTS:**
+- You MUST find at least one existing implementation or explicitly state why none exist
+- You MUST provide file paths and code examples for any implementations found
+- You MUST assess reusability of existing patterns
+- You CANNOT proceed to research recommendations until this discovery is complete"
+
+### Step 2.2: Validation Gate - Implementation Discovery Check
+
+```bash
+# Critical validation before proceeding to research phase
+echo "=== Phase 2.1 Validation Gate ==="
+
+# Check that existing implementation discovery was completed
+if [ ! -f "${EXISTING_IMPL_DISCOVERY}" ]; then
+    echo "❌ VALIDATION FAILED: Existing implementation discovery not found"
+    echo "Cannot proceed to Phase 2.2 without completing codebase discovery"
+    exit 1
+fi
+
+if [ ! -f "${IMPLEMENTATION_GAP_ANALYSIS}" ]; then
+    echo "❌ VALIDATION FAILED: Implementation gap analysis not found" 
+    echo "Cannot proceed to Phase 2.2 without gap analysis"
+    exit 1
+fi
+
+# Validate that discovery actually found existing implementations (if any exist)
+DISCOVERY_CONFIDENCE=$(cat "${IMPLEMENTATION_GAP_ANALYSIS}" | jq -r '.discovery_confidence')
+IMPLEMENTATION_RECOMMENDATION=$(cat "${IMPLEMENTATION_GAP_ANALYSIS}" | jq -r '.implementation_recommendation')
+
+if [ "${DISCOVERY_CONFIDENCE}" = "low" ]; then
+    echo "⚠️  WARNING: Low confidence in implementation discovery"
+    echo "Review discovery results before proceeding"
+fi
+
+echo "✅ Implementation Discovery Validation Passed"
+echo "Discovery Confidence: ${DISCOVERY_CONFIDENCE}"
+echo "Implementation Recommendation: ${IMPLEMENTATION_RECOMMENDATION}"
+
+# Show key findings
+echo ""
+echo "=== Key Discovery Findings ==="
+echo "Fully Implemented Features:"
+cat "${IMPLEMENTATION_GAP_ANALYSIS}" | jq -r '.existing_implementation_status.fully_implemented[]' 2>/dev/null || echo "None"
+
+echo ""
+echo "Available Reuse Opportunities:"
+cat "${IMPLEMENTATION_GAP_ANALYSIS}" | jq -r '.reuse_opportunities.high_reuse[]' 2>/dev/null || echo "None"
+
+echo ""
+echo "=== Proceeding to Research Phase ==="
+```
+
+### Step 2.3: Knowledge Researcher
+
+Use the `knowledge-synthesizer` subagent to analyze requirements and recommend research approach **informed by existing implementation discovery**
 
 Instruct the knowledge-synthesizer:
-"ultrathink. Analyze the requirements and determine what research is needed for this feature.
+"ultrathink. Analyze the requirements and determine what research is needed for this feature (Informed by Existing Implementation Discovery)
+
+**Context from Discovery Phase:**
+- Existing Implementation Discovery: ${EXISTING_IMPL_DISCOVERY}  
+- Implementation Gap Analysis: ${IMPLEMENTATION_GAP_ANALYSIS}
+
+**CRITICAL: Base all research recommendations on the gap analysis, not assumptions about missing functionality.**
 
 **CRITICAL: Perform dynamic agent discovery first:**
-
 1. Discover all available research agents from `.claude/agents/research/` directory
 2. Only recommend agents that actually exist in your discovery results
 3. Map research needs to discovered agent capabilities, not hardcoded agent names

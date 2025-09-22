@@ -5,7 +5,7 @@ description: Use this agent when you need to analyze code for patterns, architec
 domains: codebase-analysis, architectural-patterns, code-quality, refactoring-analysis
 capabilities: pattern-detection, anti-pattern-identification, architectural-consistency-analysis, code-structure-analysis, refactoring-recommendations
 specializations: design-patterns, architectural-consistency, code-smells, SOLID-principles, framework-patterns
-tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, WebFetch, WebSearch, Write
+tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
 model: sonnet
 ---
 

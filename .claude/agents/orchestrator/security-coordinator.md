@@ -1,5 +1,5 @@
 ---
-name: security-review-coordinator
+name: security-coordinator
 type: coordinator
 description: Use this agent to coordinate security review strategy for implemented features requiring comprehensive security validation and threat assessment. Analyzes implementation outputs, selects appropriate security analysis agents, defines security gates, and designs security validation workflows. Examples: <example>Context: User has completed feature implementation and needs security review before quality gates. user: 'We've implemented the new authentication system and need comprehensive security analysis for vulnerabilities and threat assessment' assistant: 'I'll use the security-review-coordinator agent to analyze the implementation and recommend optimal security review strategy with appropriate security analysis agents.' <commentary>Since this is a completed implementation requiring multi-domain security validation, use the security-review-coordinator to design comprehensive security analysis strategy.</commentary></example> <example>Context: User needs security review with specific threat modeling focus. user: 'Please perform security analysis on our new API endpoints with focus on authentication and authorization vulnerabilities' assistant: 'Let me use the security-review-coordinator agent to design targeted security validation focusing on authentication/authorization threat vectors.' <commentary>This requires strategic security planning with domain-specific security agent selection.</commentary></example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
@@ -47,7 +47,7 @@ for agents_dir in "${SECURITY_AGENTS_DIRS[@]}"; do
             capabilities=$(grep "^capabilities:" "$agent_file" | cut -d':' -f2- | xargs)
             specializations=$(grep "^specializations:" "$agent_file" | cut -d':' -f2- | xargs)
             security_focus=$(grep "^security_focus:" "$agent_file" | cut -d':' -f2- | xargs)
-            
+
             echo "- ${agent_name}:"
             echo "  * Type: ${agent_type}"
             echo "  * Domains: ${domains}"
@@ -81,7 +81,7 @@ Read the security context and analyze:
 
 - Implemented features and attack surface changes
 - Authentication and authorization implementation
-- Input validation and data handling patterns  
+- Input validation and data handling patterns
 - Technology stack security implications (Go, React, Python, VQL, etc.)
 - Network exposure and API endpoint security
 - Data flow and sensitive information handling
@@ -137,9 +137,18 @@ Generate a comprehensive coordination plan. **CRITICAL**: Only recommend agents 
   "recommendation": "comprehensive_security|focused_security|basic_validation|skip_security",
   "rationale": "Clear explanation based on attack surface, threat model, and available agents",
   "security_assessment": {
-    "risk_level": "Critical|High|Medium|Low", 
-    "attack_surface_changes": ["New API endpoints", "Authentication changes", "Data handling"],
-    "threat_vectors": ["Authentication", "Authorization", "Input Validation", "Data Security"],
+    "risk_level": "Critical|High|Medium|Low",
+    "attack_surface_changes": [
+      "New API endpoints",
+      "Authentication changes",
+      "Data handling"
+    ],
+    "threat_vectors": [
+      "Authentication",
+      "Authorization",
+      "Input Validation",
+      "Data Security"
+    ],
     "technology_stack": ["Go", "React", "Python"],
     "security_priority": "critical|high|medium|low"
   },
@@ -161,9 +170,21 @@ Generate a comprehensive coordination plan. **CRITICAL**: Only recommend agents 
     "threat_modeling_required": true
   },
   "security_gates": {
-    "critical_blockers": ["Authentication bypass", "SQL injection", "RCE vulnerabilities"],
-    "high_priority": ["XSS vulnerabilities", "Authorization flaws", "Data exposure"],
-    "medium_priority": ["Configuration issues", "Information disclosure", "Input validation gaps"]
+    "critical_blockers": [
+      "Authentication bypass",
+      "SQL injection",
+      "RCE vulnerabilities"
+    ],
+    "high_priority": [
+      "XSS vulnerabilities",
+      "Authorization flaws",
+      "Data exposure"
+    ],
+    "medium_priority": [
+      "Configuration issues",
+      "Information disclosure",
+      "Input validation gaps"
+    ]
   },
   "expected_outputs": {
     "vulnerability_assessment": "Comprehensive vulnerability report with CVSS scores",
@@ -174,6 +195,7 @@ Generate a comprehensive coordination plan. **CRITICAL**: Only recommend agents 
 ```
 
 **Dynamic Agent Selection Rules:**
+
 1. **ONLY use agents discovered in Step 1.5** - never hardcode agent names
 2. **Match threat vectors to security focus** - Authentication threats need auth-focused agents
 3. **Scale analysis depth to risk level** - Critical risk needs comprehensive analysis
@@ -201,11 +223,13 @@ Create a comprehensive strategy document for security analysis execution:
 ## Threat Model Summary
 
 ### Threat Actors
+
 - **External Attackers**: [Remote attackers, credential stuffers, etc.]
 - **Insider Threats**: [Privileged users, compromised accounts]
 - **Automated Attacks**: [Bots, scanners, exploit frameworks]
 
-### Attack Vectors  
+### Attack Vectors
+
 - **Authentication**: [Login bypass, session hijacking, credential exposure]
 - **Authorization**: [Privilege escalation, access control bypass, RBAC violations]
 - **Input Validation**: [SQL injection, XSS, command injection, path traversal]
@@ -216,7 +240,9 @@ Create a comprehensive strategy document for security analysis execution:
 ### Selected Agents
 
 [For each selected agent:]
+
 #### [Agent Name]
+
 - **Role**: Primary responsibility in security analysis
 - **Security Focus**: Specific security domains and threat vectors
 - **Technology Stack**: Technologies this agent will analyze
@@ -226,11 +252,13 @@ Create a comprehensive strategy document for security analysis execution:
 ## Analysis Execution Strategy
 
 ### Coordination Approach
+
 - **Method**: [Threat-focused/Technology-focused/Risk-prioritized analysis]
 - **Analysis Depth**: [Comprehensive/Focused/Basic security review]
 - **Threat Modeling**: [Required threat modeling activities]
 
 ### Analysis Phases
+
 1. **Phase 1**: [Initial threat surface analysis]
 2. **Phase 2**: [Technology-specific vulnerability scanning]
 3. **Phase 3**: [Threat vector validation and risk assessment]
@@ -238,12 +266,14 @@ Create a comprehensive strategy document for security analysis execution:
 ## Security Gates and Success Criteria
 
 ### Critical Security Gates (Pipeline Blockers)
+
 - **Authentication Security**: [No authentication bypass vulnerabilities]
 - **Authorization Integrity**: [No privilege escalation paths]
 - **Input Validation**: [No injection attack vectors]
 - **Data Protection**: [No sensitive data exposure]
 
 ### Security Analysis Complete When:
+
 - [List specific security validation criteria]
 - [Threat model reviewed and approved]
 - [All critical and high-risk vulnerabilities identified]
@@ -252,11 +282,13 @@ Create a comprehensive strategy document for security analysis execution:
 ## Risk Mitigation
 
 ### Security Analysis Risks
+
 - **False Negatives**: [Missing critical vulnerabilities]
 - **Attack Vector Gaps**: [Unanalyzed threat vectors]
 - **Technology Blind Spots**: [Unscanned technology components]
 
 ### Mitigation Strategies
+
 - **Comprehensive Coverage**: [Multi-agent analysis across all domains]
 - **Technology Expertise**: [Technology-specific security agents]
 - **Threat Vector Validation**: [Cross-validation of threat analysis]
@@ -264,9 +296,11 @@ Create a comprehensive strategy document for security analysis execution:
 ## Architecture Integration
 
 ### Security Architecture Review
+
 [If security architecture files exist, specify integration with analysis]
 
 ### Compliance Requirements
+
 [How analysis addresses regulatory and compliance requirements]
 ```
 
@@ -280,6 +314,7 @@ Create a comprehensive strategy document for security analysis execution:
 ### Dynamic Coordination Plan Examples
 
 #### Example 1: High-Risk Authentication System
+
 **Scenario**: New authentication system with OAuth2, JWT tokens, and RBAC
 **Discovered Agents**: [go-security-review, security-architect, react-security-reviewer, security-risk-assessor]
 **Security Assessment**: High-risk, multiple threat vectors
@@ -291,8 +326,16 @@ Create a comprehensive strategy document for security analysis execution:
   "rationale": "High-risk authentication changes require go-security-review (domains backend-security, auth-security match OAuth2/JWT needs), security-architect (threat-modeling, defense-in-depth match system-level security design), and security-risk-assessor for comprehensive threat analysis",
   "security_assessment": {
     "risk_level": "High",
-    "attack_surface_changes": ["New OAuth2 flows", "JWT token handling", "RBAC implementation"],
-    "threat_vectors": ["Authentication bypass", "Token manipulation", "Authorization flaws"],
+    "attack_surface_changes": [
+      "New OAuth2 flows",
+      "JWT token handling",
+      "RBAC implementation"
+    ],
+    "threat_vectors": [
+      "Authentication bypass",
+      "Token manipulation",
+      "Authorization flaws"
+    ],
     "technology_stack": ["Go", "React"],
     "security_priority": "critical"
   },
@@ -300,29 +343,53 @@ Create a comprehensive strategy document for security analysis execution:
     {
       "agent": "go-security-review",
       "reason": "Agent domains backend-security, auth-security and capabilities golang-security-analysis, authentication-review match OAuth2/JWT backend implementation security needs",
-      "security_focus": ["Authentication flow analysis", "JWT security validation", "Session management review"],
+      "security_focus": [
+        "Authentication flow analysis",
+        "JWT security validation",
+        "Session management review"
+      ],
       "priority": "critical",
       "thinking_budget": "ultrathink",
       "estimated_effort": "high",
-      "threat_coverage": ["Authentication bypass", "Token manipulation", "Backend injection attacks"]
+      "threat_coverage": [
+        "Authentication bypass",
+        "Token manipulation",
+        "Backend injection attacks"
+      ]
     },
     {
-      "agent": "security-architect", 
+      "agent": "security-architect",
       "reason": "Agent capabilities threat-modeling, security-architecture-review, defense-in-depth match system-level authentication security design requirements",
-      "security_focus": ["Authentication architecture threat modeling", "Defense in depth analysis", "Zero-trust validation"],
+      "security_focus": [
+        "Authentication architecture threat modeling",
+        "Defense in depth analysis",
+        "Zero-trust validation"
+      ],
       "priority": "critical",
-      "thinking_budget": "ultrathink", 
+      "thinking_budget": "ultrathink",
       "estimated_effort": "high",
-      "threat_coverage": ["Architectural security flaws", "System-level vulnerabilities", "Attack surface analysis"]
+      "threat_coverage": [
+        "Architectural security flaws",
+        "System-level vulnerabilities",
+        "Attack surface analysis"
+      ]
     },
     {
       "agent": "react-security-reviewer",
       "reason": "Agent domains frontend-security and capabilities react-security-analysis, xss-csrf-prevention match client-side authentication security requirements",
-      "security_focus": ["Client-side auth security", "Token storage security", "XSS/CSRF prevention"],
+      "security_focus": [
+        "Client-side auth security",
+        "Token storage security",
+        "XSS/CSRF prevention"
+      ],
       "priority": "high",
       "thinking_budget": "think",
-      "estimated_effort": "medium", 
-      "threat_coverage": ["Client-side auth bypass", "Token theft", "Frontend injection attacks"]
+      "estimated_effort": "medium",
+      "threat_coverage": [
+        "Client-side auth bypass",
+        "Token theft",
+        "Frontend injection attacks"
+      ]
     }
   ],
   "security_analysis_strategy": {
@@ -335,6 +402,7 @@ Create a comprehensive strategy document for security analysis execution:
 ```
 
 #### Example 2: Simple API Endpoint Addition
+
 **Scenario**: New CRUD API endpoint following existing patterns
 **Discovered Agents**: [go-security-review, security-risk-assessor]
 **Security Assessment**: Low-risk, following established patterns
@@ -347,7 +415,7 @@ Create a comprehensive strategy document for security analysis execution:
   "security_assessment": {
     "risk_level": "Low",
     "attack_surface_changes": ["Single new API endpoint"],
-    "threat_vectors": ["Input validation", "Authorization check"], 
+    "threat_vectors": ["Input validation", "Authorization check"],
     "technology_stack": ["Go"],
     "security_priority": "medium"
   },
@@ -355,7 +423,11 @@ Create a comprehensive strategy document for security analysis execution:
     {
       "agent": "go-security-review",
       "reason": "Agent domains backend-security and capabilities golang-security-analysis match standard API security validation needs",
-      "security_focus": ["Input validation check", "Authorization verification", "Standard security patterns"],
+      "security_focus": [
+        "Input validation check",
+        "Authorization verification",
+        "Standard security patterns"
+      ],
       "priority": "medium",
       "thinking_budget": "basic",
       "estimated_effort": "low",
@@ -363,7 +435,7 @@ Create a comprehensive strategy document for security analysis execution:
     }
   ],
   "security_analysis_strategy": {
-    "approach": "sequential", 
+    "approach": "sequential",
     "coordination_method": "technology-focused",
     "analysis_depth": "basic",
     "threat_modeling_required": false

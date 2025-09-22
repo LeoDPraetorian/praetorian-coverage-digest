@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # initialize-pipeline.sh
-# Mechanical pipeline initialization operations
+# Enhanced Einstein pipeline initialization with Jira integration
 # Usage: initialize-pipeline.sh <EXECUTION_MODE> <ARGUMENTS>
 
 set -e  # Exit on error
@@ -18,8 +18,26 @@ fi
 EXECUTION_MODE="$1"
 ARGUMENTS="$2"
 
-echo "🔧 Initializing Einstein pipeline infrastructure"
+echo "🚀 Einstein Pipeline Initialization"
 echo "Mode: ${EXECUTION_MODE}, Arguments: ${ARGUMENTS}"
+
+# Function to extract Jira ticket key from arguments
+extract_jira_key() {
+    local input="$1"
+    echo "${input}" | grep -oE '\b[A-Z]{2,10}-[0-9]+\b' | head -1
+}
+
+# Function to generate short name from description
+generate_short_name() {
+    local input="$1"
+    echo "${input}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//' | cut -c1-30
+}
+
+# Function to check if input contains Jira references
+contains_jira_references() {
+    local input="$1"
+    [[ "${input}" =~ [A-Z]{2,10}-[0-9]+ ]]
+}
 
 # Initialize pipeline tracking
 PIPELINE_DIR=".claude/pipeline"
@@ -104,19 +122,36 @@ rm -f "${PIPELINE_DIR}/.test_write_permissions"
 
 echo "✅ Workspace permissions validated successfully"
 
+# Generate timestamp for new features
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
 # Handle feature workspace creation for new features
 if [ "${EXECUTION_MODE}" = "new" ]; then
-    echo "🚀 Creating feature workspace for new feature..."
+    echo "🆕 Creating unified feature workspace for new feature..."
     
-    # Generate feature ID from arguments
-    FEATURE_NAME=$(echo "${ARGUMENTS}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//' | cut -c1-30)
-    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    # Step 1: Extract feature name from input (Jira or description)
+    if contains_jira_references "${ARGUMENTS}"; then
+        JIRA_KEY=$(extract_jira_key "${ARGUMENTS}")
+        # Generate descriptive name from the rest of the content
+        DESCRIPTION_PART=$(echo "${ARGUMENTS}" | sed "s/${JIRA_KEY}//g" | xargs)
+        if [ -n "${DESCRIPTION_PART}" ]; then
+            SHORT_DESC=$(generate_short_name "${DESCRIPTION_PART}")
+            FEATURE_NAME="${JIRA_KEY}-${SHORT_DESC}"
+        else
+            FEATURE_NAME="${JIRA_KEY}"
+        fi
+        echo "📋 Jira ticket detected: ${JIRA_KEY}"
+    else
+        FEATURE_NAME=$(generate_short_name "${ARGUMENTS}")
+        echo "📝 Direct description provided"
+    fi
+    
     FEATURE_ID="${FEATURE_NAME}_${TIMESTAMP}"
-    
     echo "📁 Feature ID: ${FEATURE_ID}"
     
-    # Create feature workspace directory structure
+    # Step 2: Create main directory structure FIRST
     FEATURE_DIR=".claude/features/${FEATURE_ID}"
+    echo "📁 Creating unified directory structure: ${FEATURE_ID}"
     if ! mkdir -p "${FEATURE_DIR}"/{context,research,output,logs,architecture,implementation,quality-review,security-review,testing,deployment}; then
         ERROR_MSG="❌ Error: Failed to create feature workspace: ${FEATURE_DIR}"
         echo "${ERROR_MSG}"
@@ -124,7 +159,7 @@ if [ "${EXECUTION_MODE}" = "new" ]; then
         exit 1
     fi
     
-    # Create feature metadata
+    # Create feature metadata with enhanced information
     cat > "${FEATURE_DIR}/metadata.json" << EOF
 {
   "id": "${FEATURE_ID}",
@@ -132,7 +167,9 @@ if [ "${EXECUTION_MODE}" = "new" ]; then
   "created": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "status": "design_in_progress",
   "phase": "design",
-  "pipeline": "einstein"
+  "pipeline": "einstein",
+  "execution_mode": "new",
+  "has_jira_reference": $(contains_jira_references "${ARGUMENTS}" && echo "true" || echo "false")
 }
 EOF
 
@@ -147,6 +184,16 @@ EOF
     fi
     
     echo "✅ Feature workspace created: ${FEATURE_ID}"
+    
+    # Step 3: Determine content source for downstream phases
+    if contains_jira_references "${ARGUMENTS}"; then
+        JIRA_TARGET_FILE="${FEATURE_DIR}/context/jira-resolved.md"
+        CONTENT_SOURCE="file:${JIRA_TARGET_FILE}"
+        echo "📋 Content source: Jira resolution → ${JIRA_TARGET_FILE}"
+    else
+        CONTENT_SOURCE="direct:${ARGUMENTS}"
+        echo "📝 Content source: Direct arguments"
+    fi
     
     # Log feature creation
     echo "$(date -u +%Y-%m-%dT%H:%M:%SZ): Feature workspace created: ${FEATURE_ID}" >> "${PIPELINE_LOG}"
@@ -179,6 +226,19 @@ elif [ "${EXECUTION_MODE}" = "resume" ]; then
         
         # Update current feature environment
         echo "FEATURE_ID=${FEATURE_ID}" > ".claude/features/current_feature.env"
+        
+        # Determine content source for resumed features
+        POTENTIAL_JIRA_FILE="${FEATURE_DIR}/context/jira-resolved.md"
+        if [ -f "${POTENTIAL_JIRA_FILE}" ]; then
+            JIRA_TARGET_FILE="${POTENTIAL_JIRA_FILE}"
+            CONTENT_SOURCE="file:${JIRA_TARGET_FILE}"
+            echo "📋 Resume content source: Existing Jira resolution"
+        else
+            # Check metadata for original description
+            ORIGINAL_DESC=$(cat "${FEATURE_DIR}/metadata.json" | jq -r '.description // ""')
+            CONTENT_SOURCE="direct:${ORIGINAL_DESC}"
+            echo "📝 Resume content source: Original description from metadata"
+        fi
         
         echo "✅ Existing feature workspace validated: ${FEATURE_ID}"
         
@@ -213,8 +273,10 @@ echo "EXECUTION_MODE=${EXECUTION_MODE}"
 echo "FEATURE_ID=${FEATURE_ID}"
 echo "FEATURE_WORKSPACE_PATH=${FEATURE_WORKSPACE_PATH}"
 echo "FEATURE_WORKSPACE_CREATED=${FEATURE_WORKSPACE_CREATED}"
+echo "CONTENT_SOURCE=${CONTENT_SOURCE:-}"
+echo "JIRA_TARGET_FILE=${JIRA_TARGET_FILE:-}"
 echo "TOOLS_VALIDATED=true"
 echo "PERMISSIONS_VALIDATED=true"
 echo "INITIALIZATION_STATUS=success"
 echo ""
-echo "🎯 Ready for Einstein orchestration"
+echo "🎯 Ready for Einstein orchestration with unified directory structure"
