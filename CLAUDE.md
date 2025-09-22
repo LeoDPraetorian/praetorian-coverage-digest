@@ -252,6 +252,45 @@ Frontend changes automatically trigger E2E test generation:
 - **E2E Tests**: Complete user security workflows
 - **Capability Tests**: Security tool execution and result validation
 
+## Graph Query Requirements
+
+### allowedColumns Field Validation
+
+When making queries to the Chariot graph database (Neo4j), **ALWAYS check the `allowedColumns` field** to verify which fields are available for querying. This field is defined in `./modules/chariot/backend/build/pkg/query/read.go:41-85` and contains the complete list of queryable fields.
+
+**Critical Rule**: All graph queries MUST only use fields that are present in the `allowedColumns` map for filters. Using invalid field names will result in query validation errors.
+
+**Available Graph Query Fields** (as of current implementation):
+```go
+allowedColumns := map[string]bool{
+    "key", "identifier", "group", "dns", "name", "value", "status", 
+    "source", "origin", "created", "registrar", "registrant", "email", 
+    "country", "priority", "class", "type", "title", "visited", "updated", 
+    "vendor", "product", "version", "cpe", "surface", "asname", "asnumber", 
+    "cvss", "epss", "kev", "exploit", "private", "id", "writeupId", 
+    "category", "attackSurface", "capability", "cloudService", "cloudId", 
+    "cloudRoot", "cloudAccount", "plextracid", "beta"
+}
+```
+
+**Graph Query Validation Process**:
+- **Filter Validation**: All filter fields in query nodes are checked against `allowedColumns`
+- **Runtime Validation**: Query builder validates all field references before execution
+
+**Example Valid Graph Query**:
+```json
+{
+  "node": {
+    "labels": ["Asset"],
+    "filters": [
+      {"field": "status", "operator": "=", "value": "A"},
+      {"field": "class", "operator": "=", "value": "ipv4"}
+    ]
+  },
+  "limit": 100
+}
+```
+
 ## Essential Reference Files
 
 **Architecture & Technology:**
