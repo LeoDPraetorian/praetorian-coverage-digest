@@ -547,7 +547,7 @@ ls -la .claude/features/{FEATURE_ID}/
 
 ```bash
 # Set feature context
-FEATURE_ID="auth-system_20250114_142530"
+FEATURE_ID="auth_system_20250114_142530"
 echo "FEATURE_ID=${FEATURE_ID}" > .claude/features/current_feature.env
 
 # Access all context
