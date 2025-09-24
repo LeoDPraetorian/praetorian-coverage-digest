@@ -28,6 +28,7 @@ chariot-development-platform/                  # Super-repo root
 │   ├── praetorian-cli/                        # Python CLI and SDK
 │   └── praetorian-agent-workflows/            # AI agent workflow orchestration
 ├── Makefile                                   # Super-repo automation
+├── docs/CLEAN_CODE.md                         # Summary of 'Clean code' by Robert C. Martin
 ├── docs/TECH-STACK.md                              # Technology stack reference
 ├── docs/DESIGN-PATTERNS.md                         # Architecture patterns and guidelines
 ```
@@ -70,8 +71,9 @@ make checkout branch=main     # Checkout branch across all submodules
 make create branch=feature-x  # Create branch across all submodules
 make create-prs               # Create PRs across all submodules
 
-# Development workflow with Claude Flow
-make feature description="update portscan capability for IPv6"
+# AI Developer Instructions
+Before writing any code, review the summary of [Clean Code by Robert C. Martin](docs/CLEAN_CODE.md).
+Follow its principles to ensure your work is consistent with the cleanliness, readability, and maintainability standards of our existing codebase.
 ```
 
 ### Module-Specific Commands
