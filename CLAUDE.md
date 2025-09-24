@@ -96,14 +96,12 @@ cd modules/tabularium         # Data schema management
 make test                     # Run Go tests across modules
 go test ./...                 # Standard Go testing
 
-# Frontend (React/TypeScript)
-npm run lint                  # ESLint + Prettier + TypeScript checks
+# Frontend (React/TypeScript: modules/chariot/ui)
 npm run build                 # Production build
-npm run test                  # Jest unit tests
 
-# E2E Testing (Playwright)
-npm test                      # Full E2E suite (in e2e directories)
-npm run test:local-uat        # Test against local UAT backend
+# E2E Testing (Playwright: modules/chariot/e2e)
+npx ts-node script/setup-test.ts --env=local-uat
+npx playwright test
 
 # Python CLI
 pytest                        # Run Python test suites (in praetorian-cli)
