@@ -1,5 +1,6 @@
 .idea/
 .env
+.DS_Store
 # Claude Flow generated files
 .claude-flow/
 .root
@@ -29,4 +30,6 @@ hive-mind-prompt-*.txt
 
 # Einstein generated files
 .claude/features/*
+!.claude/features/.gitkeep
 .claude/pipeline/*
+!.claude/pipeline/.gitkeep

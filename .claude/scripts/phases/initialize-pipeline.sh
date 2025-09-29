@@ -39,31 +39,8 @@ contains_jira_references() {
     [[ "${input}" =~ [A-Z]{2,10}-[0-9]+ ]]
 }
 
-# Initialize pipeline tracking
-PIPELINE_DIR=".claude/pipeline"
-echo "📁 Creating pipeline directory: ${PIPELINE_DIR}"
-if ! mkdir -p "${PIPELINE_DIR}"; then
-    echo "❌ Error: Failed to create pipeline directory: ${PIPELINE_DIR}"
-    exit 1
-fi
-
-# Create timestamped pipeline log
-PIPELINE_LOG="${PIPELINE_DIR}/einstein-pipeline-$(date +%Y%m%d_%H%M%S).log"
-echo "📝 Creating pipeline log: ${PIPELINE_LOG}"
-
-# Initialize pipeline log with metadata
-cat > "${PIPELINE_LOG}" << EOF
-=== Einstein Pipeline Started ===
-Mode: ${EXECUTION_MODE}
-Arguments: ${ARGUMENTS}
-Started: $(date -u +%Y-%m-%dT%H:%M:%SZ)
-===============================
-EOF
-
-if [ ! -f "${PIPELINE_LOG}" ]; then
-    echo "❌ Error: Failed to create pipeline log: ${PIPELINE_LOG}"
-    exit 1
-fi
+# Initialize pipeline tracking will be done after feature directory creation
+# Pipeline directory will be created inside the feature directory for better organization
 
 # Critical tool validation
 echo "🔍 Validating required system tools..."
@@ -111,14 +88,7 @@ if ! touch ".claude/.test_write_permissions" 2>/dev/null; then
 fi
 rm -f ".claude/.test_write_permissions"
 
-# Test pipeline directory permissions
-if ! touch "${PIPELINE_DIR}/.test_write_permissions" 2>/dev/null; then
-    ERROR_MSG="❌ Error: No write permissions to pipeline directory"
-    echo "${ERROR_MSG}"
-    echo "${ERROR_MSG}" >> "${PIPELINE_LOG}"
-    exit 1
-fi
-rm -f "${PIPELINE_DIR}/.test_write_permissions"
+# Pipeline directory permissions will be validated when feature directory is created
 
 echo "✅ Workspace permissions validated successfully"
 
@@ -149,13 +119,33 @@ if [ "${EXECUTION_MODE}" = "new" ]; then
     FEATURE_ID="${FEATURE_NAME}_${TIMESTAMP}"
     echo "📁 Feature ID: ${FEATURE_ID}"
     
-    # Step 2: Create main directory structure FIRST
+    # Step 2: Create main directory structure with pipeline subdirectory
     FEATURE_DIR=".claude/features/${FEATURE_ID}"
     echo "📁 Creating unified directory structure: ${FEATURE_ID}"
-    if ! mkdir -p "${FEATURE_DIR}"/{context,research,output,logs,architecture,implementation,quality-review,security-review,testing,deployment}; then
+    if ! mkdir -p "${FEATURE_DIR}"/{pipeline,context,research,output,logs,architecture,implementation,quality-review,security-review,testing,deployment}; then
         ERROR_MSG="❌ Error: Failed to create feature workspace: ${FEATURE_DIR}"
         echo "${ERROR_MSG}"
-        echo "${ERROR_MSG}" >> "${PIPELINE_LOG}"
+        # Cannot log to PIPELINE_LOG yet as it doesn't exist
+        exit 1
+    fi
+    
+    # Step 3: Create pipeline directory and log inside feature directory
+    PIPELINE_DIR="${FEATURE_DIR}/pipeline"
+    PIPELINE_LOG="${PIPELINE_DIR}/einstein-pipeline-$(date +%Y%m%d_%H%M%S).log"
+    echo "📝 Creating pipeline log: ${PIPELINE_LOG}"
+    
+    # Initialize pipeline log with metadata
+    cat > "${PIPELINE_LOG}" << EOF
+=== Einstein Pipeline Started ===
+Mode: ${EXECUTION_MODE}
+Arguments: ${ARGUMENTS}
+Feature ID: ${FEATURE_ID}
+Started: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+===============================
+EOF
+
+    if [ ! -f "${PIPELINE_LOG}" ]; then
+        echo "❌ Error: Failed to create pipeline log: ${PIPELINE_LOG}"
         exit 1
     fi
     
@@ -173,8 +163,80 @@ if [ "${EXECUTION_MODE}" = "new" ]; then
 }
 EOF
 
-    # Create current feature environment file
-    echo "FEATURE_ID=${FEATURE_ID}" > ".claude/features/current_feature.env"
+    # Create current feature environment file with ALL required paths
+    cat > ".claude/features/current_feature.env" << EOF
+export FEATURE_ID="${FEATURE_ID}"
+export PIPELINE_DIR="${PIPELINE_DIR}"
+export PIPELINE_LOG="${PIPELINE_LOG}"
+export FEATURE_DIR="${FEATURE_DIR}"
+
+# Phase 2: Intent Analysis
+export REQUIREMENTS_FILE="${FEATURE_DIR}/context/requirements.json"
+
+# Phase 3: Existing Implementation Discovery
+export INPUT_REQUIREMENTS="${FEATURE_DIR}/context/requirements.json"
+export OUTPUT_KNOWLEDGE="${FEATURE_DIR}/context/knowledge-base.md"
+export SYNTHESIS_PLAN="${FEATURE_DIR}/context/synthesis-plan.json"
+export COMPLIANCE_TRACKER="${FEATURE_DIR}/compliance/compliance-tracker.json"
+export EXISTING_IMPL_DISCOVERY="${FEATURE_DIR}/context/existing-implementation-discovery.md"
+export IMPLEMENTATION_GAP_ANALYSIS="${FEATURE_DIR}/context/implementation-gap-analysis.json"
+
+# Phase 4: Research
+export RESEARCH_DIR="${FEATURE_DIR}/research"
+
+# Phase 5: Architectural Impact
+export TRIAGE_CONTEXT="${FEATURE_DIR}/context/impact-triage-context.md"
+export IMPACT_ANALYSIS="${FEATURE_DIR}/context/impact-analysis.json"
+
+# Phase 6: Complexity Assessment
+export ASSESSMENT_OUTPUT="${FEATURE_DIR}/context/complexity-assessment.json"
+
+# Phase 7: Thinking Budget
+export ARCH_THINKING_ALLOCATION="${FEATURE_DIR}/context/architecture-thinking-allocation.json"
+
+# Phase 8: Architecture Planning
+export ARCHITECTURE_DIR="${FEATURE_DIR}/architecture"
+export ARCHITECTURE_CONTEXT_FILE="${ARCHITECTURE_DIR}/architect-context.md"
+export ARCHITECTURE_COORDINATION_PLAN="${ARCHITECTURE_DIR}/coordination-plan.json"
+
+# Phase 9: Implementation Planning
+export PLANNING_CONTEXT="${FEATURE_DIR}/context/planning-context.md"
+export AGENT_ASSIGNMENTS="${FEATURE_DIR}/output/agent-assignments.json"
+export FINAL_PLAN="${FEATURE_DIR}/output/implementation-plan.md"
+
+# Phase 10: Implementation Execution
+export IMPL_DIR="${FEATURE_DIR}/implementation"
+export IMPL_CONTEXT_FILE="${IMPL_DIR}/implementation-context.md"
+export COORDINATION_DIR="${IMPL_DIR}/coordination"
+
+# Phase 11: Quality Review
+export QUALITY_DIR="${FEATURE_DIR}/quality-review"
+export QUALITY_CONTEXT_FILE="${QUALITY_DIR}/quality-context.md"
+export QUALITY_COORDINATION_PLAN="${QUALITY_DIR}/coordination-plan.json"
+export QUALITY_STRATEGY="${QUALITY_DIR}/quality-strategy.md"
+
+# Phase 12: Security Review
+export SECURITY_DIR="${FEATURE_DIR}/security-review"
+export SECURITY_CONTEXT_FILE="${SECURITY_DIR}/security-context.md"
+export SECURITY_COORDINATION_PLAN="${SECURITY_DIR}/coordination-plan.json"
+export SECURITY_STRATEGY="${SECURITY_DIR}/security-strategy.md"
+
+# Phase 13: Testing
+export TESTING_DIR="${FEATURE_DIR}/testing"
+export TESTING_CONTEXT_FILE="${TESTING_DIR}/testing-context.md"
+export TESTING_COORDINATION_PLAN="${TESTING_DIR}/coordination-plan.json"
+export TESTING_STRATEGY="${TESTING_DIR}/testing-strategy.md"
+
+# Phase 14: Deployment
+export DEPLOY_DIR="${FEATURE_DIR}/deployment"
+export DEPLOY_CONTEXT_FILE="${DEPLOY_DIR}/deployment-context.md"
+export DEPLOY_COORDINATION_PLAN="${DEPLOY_DIR}/coordination-plan.json"
+export DEPLOY_STRATEGY="${DEPLOY_DIR}/deployment-strategy.md"
+
+# Feedback Loop Directories
+export FEEDBACK_LOOP_DIR="${FEATURE_DIR}/feedback-loops"
+export FEEDBACK_ITERATION_TRACKER="${FEEDBACK_LOOP_DIR}/iteration-tracker.json"
+EOF
     
     if [ ! -f "${FEATURE_DIR}/metadata.json" ]; then
         ERROR_MSG="❌ Error: Failed to create feature metadata"
@@ -213,19 +275,115 @@ elif [ "${EXECUTION_MODE}" = "resume" ]; then
         if [ ! -d "${FEATURE_DIR}" ]; then
             ERROR_MSG="❌ Error: Feature workspace not found: ${FEATURE_DIR}"
             echo "${ERROR_MSG}"
-            echo "${ERROR_MSG}" >> "${PIPELINE_LOG}"
             exit 1
         fi
         
         if [ ! -f "${FEATURE_DIR}/metadata.json" ]; then
             ERROR_MSG="❌ Error: Feature metadata not found: ${FEATURE_DIR}/metadata.json"
             echo "${ERROR_MSG}"
-            echo "${ERROR_MSG}" >> "${PIPELINE_LOG}"
             exit 1
         fi
         
-        # Update current feature environment
-        echo "FEATURE_ID=${FEATURE_ID}" > ".claude/features/current_feature.env"
+        # Create pipeline directory inside feature directory (if it doesn't exist)
+        PIPELINE_DIR="${FEATURE_DIR}/pipeline"
+        if ! mkdir -p "${PIPELINE_DIR}"; then
+            ERROR_MSG="❌ Error: Failed to create pipeline directory: ${PIPELINE_DIR}"
+            echo "${ERROR_MSG}"
+            exit 1
+        fi
+        
+        # Create new pipeline log for this resume session
+        PIPELINE_LOG="${PIPELINE_DIR}/einstein-pipeline-$(date +%Y%m%d_%H%M%S).log"
+        echo "📝 Creating resume pipeline log: ${PIPELINE_LOG}"
+        
+        # Initialize pipeline log with metadata
+        cat > "${PIPELINE_LOG}" << EOF
+=== Einstein Pipeline Resumed ===
+Mode: ${EXECUTION_MODE}
+Feature ID: ${FEATURE_ID}
+Resumed: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+===============================
+EOF
+
+        if [ ! -f "${PIPELINE_LOG}" ]; then
+            echo "❌ Error: Failed to create pipeline log: ${PIPELINE_LOG}"
+            exit 1
+        fi
+        
+        # Update current feature environment with ALL required paths
+        cat > ".claude/features/current_feature.env" << EOF
+export FEATURE_ID="${FEATURE_ID}"
+export PIPELINE_DIR="${PIPELINE_DIR}"
+export PIPELINE_LOG="${PIPELINE_LOG}"
+export FEATURE_DIR="${FEATURE_DIR}"
+
+# Phase 2: Intent Analysis
+export REQUIREMENTS_FILE="${FEATURE_DIR}/context/requirements.json"
+
+# Phase 3: Existing Implementation Discovery
+export INPUT_REQUIREMENTS="${FEATURE_DIR}/context/requirements.json"
+export OUTPUT_KNOWLEDGE="${FEATURE_DIR}/context/knowledge-base.md"
+export SYNTHESIS_PLAN="${FEATURE_DIR}/context/synthesis-plan.json"
+export COMPLIANCE_TRACKER="${FEATURE_DIR}/compliance/compliance-tracker.json"
+export EXISTING_IMPL_DISCOVERY="${FEATURE_DIR}/context/existing-implementation-discovery.md"
+export IMPLEMENTATION_GAP_ANALYSIS="${FEATURE_DIR}/context/implementation-gap-analysis.json"
+
+# Phase 4: Research
+export RESEARCH_DIR="${FEATURE_DIR}/research"
+
+# Phase 5: Architectural Impact
+export TRIAGE_CONTEXT="${FEATURE_DIR}/context/impact-triage-context.md"
+export IMPACT_ANALYSIS="${FEATURE_DIR}/context/impact-analysis.json"
+
+# Phase 6: Complexity Assessment
+export ASSESSMENT_OUTPUT="${FEATURE_DIR}/context/complexity-assessment.json"
+
+# Phase 7: Thinking Budget
+export ARCH_THINKING_ALLOCATION="${FEATURE_DIR}/context/architecture-thinking-allocation.json"
+
+# Phase 8: Architecture Planning
+export ARCHITECTURE_DIR="${FEATURE_DIR}/architecture"
+export ARCHITECTURE_CONTEXT_FILE="${ARCHITECTURE_DIR}/architect-context.md"
+export ARCHITECTURE_COORDINATION_PLAN="${ARCHITECTURE_DIR}/coordination-plan.json"
+
+# Phase 9: Implementation Planning
+export PLANNING_CONTEXT="${FEATURE_DIR}/context/planning-context.md"
+export AGENT_ASSIGNMENTS="${FEATURE_DIR}/output/agent-assignments.json"
+export FINAL_PLAN="${FEATURE_DIR}/output/implementation-plan.md"
+
+# Phase 10: Implementation Execution
+export IMPL_DIR="${FEATURE_DIR}/implementation"
+export IMPL_CONTEXT_FILE="${IMPL_DIR}/implementation-context.md"
+export COORDINATION_DIR="${IMPL_DIR}/coordination"
+
+# Phase 11: Quality Review
+export QUALITY_DIR="${FEATURE_DIR}/quality-review"
+export QUALITY_CONTEXT_FILE="${QUALITY_DIR}/quality-context.md"
+export QUALITY_COORDINATION_PLAN="${QUALITY_DIR}/coordination-plan.json"
+export QUALITY_STRATEGY="${QUALITY_DIR}/quality-strategy.md"
+
+# Phase 12: Security Review
+export SECURITY_DIR="${FEATURE_DIR}/security-review"
+export SECURITY_CONTEXT_FILE="${SECURITY_DIR}/security-context.md"
+export SECURITY_COORDINATION_PLAN="${SECURITY_DIR}/coordination-plan.json"
+export SECURITY_STRATEGY="${SECURITY_DIR}/security-strategy.md"
+
+# Phase 13: Testing
+export TESTING_DIR="${FEATURE_DIR}/testing"
+export TESTING_CONTEXT_FILE="${TESTING_DIR}/testing-context.md"
+export TESTING_COORDINATION_PLAN="${TESTING_DIR}/coordination-plan.json"
+export TESTING_STRATEGY="${TESTING_DIR}/testing-strategy.md"
+
+# Phase 14: Deployment
+export DEPLOY_DIR="${FEATURE_DIR}/deployment"
+export DEPLOY_CONTEXT_FILE="${DEPLOY_DIR}/deployment-context.md"
+export DEPLOY_COORDINATION_PLAN="${DEPLOY_DIR}/deployment-plan.json"
+export DEPLOY_STRATEGY="${DEPLOY_DIR}/deployment-strategy.md"
+
+# Feedback Loop Directories
+export FEEDBACK_LOOP_DIR="${FEATURE_DIR}/feedback-loops"
+export FEEDBACK_ITERATION_TRACKER="${FEEDBACK_LOOP_DIR}/iteration-tracker.json"
+EOF
         
         # Determine content source for resumed features
         POTENTIAL_JIRA_FILE="${FEATURE_DIR}/context/jira-resolved.md"

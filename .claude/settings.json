@@ -5,20 +5,16 @@
   },
   "permissions": {
     "allow": [
-      "Bash(npm run lint)",
       "Bash(npm run test:*)",
       "Bash(npm test :*)",
       "Bash(git status)",
       "Bash(git diff :*)",
       "Bash(git log :*)",
       "Bash(git add :*)",
-      "Bash(git commit :*)",
-      "Bash(git push)",
       "Bash(git config :*)",
       "Bash(git tag :*)",
       "Bash(git branch :*)",
       "Bash(git checkout :*)",
-      "Bash(git stash :*)",
       "Bash(jq :*)",
       "Bash(node :*)",
       "Bash(which :*)",
@@ -34,6 +30,9 @@
       "Bash(make dev)",
       "Bash(make purge)",
       "Bash(go run */user-purge/*)",
+      "Bash(git commit *)",
+      "Bash(vite *)",
+      "Bash(npm run *)",
       "Bash(git push --tags)"
     ]
   },
@@ -52,11 +51,12 @@
   },
   "includeCoAuthoredBy": false,
   "enabledMcpjsonServers": [
-    "chariot",
-    "praetorian-cli",
-    "nebula",
     "atlassian",
+    "chariot",
+    "chrome-devtools",
+    "context7",
+    "nebula",
     "playwright",
-    "context7"
+    "praetorian-cli"
   ]
 }

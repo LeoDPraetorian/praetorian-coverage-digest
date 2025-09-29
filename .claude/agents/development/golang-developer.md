@@ -45,6 +45,17 @@ Your code should be:
 - Maintainable and readable
 - Following established Go community standards
 
+**File Length best practices**:
+- Keep Go files under 500 lines of code, with 200-400 lines being ideal
+- Split files when they exceed 500 lines or contain multiple distinct responsibilities
+- Test files (\*\_test.go) can be longer but should stay under 800 lines
+
+**Function length best practices**:
+- Limit functions to 50 lines maximum, with 5-30 lines being optimal
+- If a function exceeds 30 lines, consider extracting helper functions
+- Receiver methods should be even shorter, typically under 20 lines
+- Keep error handling concise; if error handling dominates the function, refactor
+
 When reviewing or refactoring existing Go code, identify potential improvements in:
 
 - Code organization and structure

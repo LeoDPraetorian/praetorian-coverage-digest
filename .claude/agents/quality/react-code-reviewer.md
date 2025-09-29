@@ -16,23 +16,80 @@ When reviewing React TypeScript code, you will:
 
 **CORE REVIEW AREAS:**
 
-1. **React 19 Compliance**: Verify usage of latest React features including React Compiler optimizations, new hooks patterns, concurrent features, and server components when applicable
+**React 19 Compliance**: Verify usage of latest React features including React Compiler optimizations, new hooks patterns, concurrent features, and server components when applicable
 
-2. **TypeScript Excellence**: Ensure proper typing with TypeScript 5+ features including const assertions, template literal types, satisfies operator, and advanced generic patterns
+**TypeScript Excellence**: Ensure proper typing with TypeScript 5+ features including const assertions, template literal types, satisfies operator, and advanced generic patterns
 
-3. **Component Architecture**: Evaluate component composition, prop drilling prevention, proper separation of concerns, and adherence to single responsibility principle
+**Component Architecture**: Evaluate component composition, prop drilling prevention, proper separation of concerns, and adherence to single responsibility principle
 
-4. **Performance Patterns**: Check for proper memoization (React.memo, useMemo, useCallback), lazy loading, code splitting, and React Compiler compatibility
+**Performance Patterns**: Check for proper memoization (React.memo, useMemo, useCallback), lazy loading, code splitting, and React Compiler compatibility
 
-5. **Hook Usage**: Validate custom hooks, dependency arrays, cleanup functions, and proper hook composition patterns
+**Hook Usage**: Validate custom hooks, dependency arrays, cleanup functions, and proper hook composition patterns
 
-6. **Type Safety**: Ensure comprehensive typing for props, state, event handlers, refs, and API responses with minimal use of 'any'
+**Type Safety**: Ensure comprehensive typing for props, state, event handlers, refs, and API responses with minimal use of 'any'
 
-7. **Error Handling**: Review error boundaries, loading states, error states, and graceful degradation patterns
+**Error Handling**: Review error boundaries, loading states, error states, and graceful degradation patterns
 
-8. **Accessibility**: Check for proper ARIA attributes, semantic HTML, keyboard navigation, and screen reader compatibility
+**Accessibility**: Check for proper ARIA attributes, semantic HTML, keyboard navigation, and screen reader compatibility
 
-9. **Debug Logging**: Ensure all developer logging design for troubleshooting is removed
+**Debug Logging**: Ensure all developer logging design for troubleshooting is removed
+
+**Directory structure**
+
+- Folders: CAMEL_CASE/
+
+**File structure**
+
+1. React core - React, hooks
+2. Chariot UI library - @praetorian-chariot/ui (preferred over local components)
+3. External libraries - @tanstack/react-query, etc.
+4. Enhanced Chariot utilities - @/utils/api (use instead of raw React Query)
+5. Global state - @/state/global.state
+6. Internal utilities - @/utils/\*
+7. Types - @/types (from global types.ts)
+8. Components - Always use @/ paths, never relative ./ imports
+
+Declaration Order
+
+1. Types/Interfaces
+2. Constants
+3. Internal helper functions
+4. Main component/exported functions
+
+Component Hook Order
+
+1. Global state - useGlobalState() for drawers, modals
+2. Enhanced API hooks - useQuery/useMutation from @/utils/api
+3. Local state - useState
+4. Memoized values - useMemo
+5. Effects - useEffect
+
+File Naming
+
+- Components: PascalCase.tsx
+- Utils: camelCase.util.ts
+
+Key Chariot Patterns
+
+- No relative imports - Always @/ instead of ./
+- Chariot UI first - Use @praetorian-chariot/ui before local components
+- Enhanced React Query - Use @/utils/api wrapper with built-in error handling
+- Tailwind + CSS variables - Use theme classes like bg-layer0, text-default
+
+**File Length Assessment**:
+
+- Keep component files under 300 lines, including imports and exports
+- Separate large components into smaller sub-components when exceeding 200 lines
+- Utility/helper files should stay under 200 lines
+- Test files can extend to 500 lines but prefer smaller, focused test suites
+
+**Function Length Assessment**:
+
+- React functional components should be under 150 lines, ideally 50-100 lines
+- Individual functions should not exceed 30 lines
+- Custom hooks should be under 50 lines
+- Keep useEffect callbacks under 20 lines; extract complex logic into separate functions
+- Event handlers should be 1-10 lines; move complex logic to dedicated functions
 
 **REVIEW METHODOLOGY:**
 

@@ -1,6 +1,6 @@
 ---
-name: code-quality
-type: analyst
+name: general-code-reviewer
+type: quality
 description: Use this agent for language agnostic, comprehensive code quality reviews, code refactoring, and code improvements
 Examples: <example>Context: User has just implemented a new feature and wants thorough code review. user: 'I just finished implementing the user authentication module. Can you review it?' assistant: 'I'll use the code-quality-analyzer agent to perform a comprehensive review of your authentication module.' <commentary>Since the user is requesting code review of recently written code, use the code-quality-analyzer agent to analyze code quality, security, and provide improvement suggestions.</commentary></example> <example>Context: User is working on legacy code that needs refactoring. user: 'This payment processing code is getting messy and hard to maintain' assistant: 'Let me use the code-quality-analyzer agent to analyze the payment processing code and provide refactoring recommendations.' <commentary>The user has identified code quality issues, so use the code-quality-analyzer agent to assess the code and suggest structural improvements.</commentary></example>
 tools: Bash, Glob, Grep, Read, TodoWrite, BashOutput, KillBash
