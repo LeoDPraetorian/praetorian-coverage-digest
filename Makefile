@@ -263,44 +263,40 @@ tree-add:
 ifndef NAME
 	$(error NAME is required. Usage: make tree-add NAME=<branch-name>)
 endif
-	@echo "Creating worktree: chariot-$(NAME) from main"
-	@git worktree add -b chariot-$(NAME) ../chariot-$(NAME) origin/main
+	@echo "Creating worktree: chariot-tree/$(NAME) from main"
+	@git worktree add -b $(NAME) ../chariot-tree/$(NAME) origin/main
 	@echo "Opening worktree in Cursor..."
-	@cursor ../chariot-$(NAME)
-	@echo "Installing UI dependencies..."
-	@cd ../chariot-$(NAME)/ui && npm i
-	@echo "Installing E2E dependencies and Playwright..."
-	@cd ../chariot-$(NAME)/e2e && npm i && npx playwright install
-	@echo "Worktree 'chariot-$(NAME)' setup complete!"
+	@cursor ../chariot-tree/$(NAME)
+	@echo "Worktree 'chariot-tree/$(NAME)' setup complete!"
 
 tree-remove:
 ifdef NAME
 	@echo "Removing worktree: $(NAME)"
-	@git worktree remove ../$(NAME) --force 2>/dev/null || git worktree remove ../$(NAME) 2>/dev/null || true
+	@git worktree remove ../chariot-tree/$(NAME) --force 2>/dev/null || git worktree remove ../chariot-tree/$(NAME) 2>/dev/null || true
 	@echo "Pruning worktree references..."
 	@git worktree prune
-	@echo "Worktree 'chariot-$(NAME)' has been removed!"
+	@echo "Worktree 'chariot-tree/$(NAME)' has been removed!"
 else
-	@echo "Finding and removing all worktrees starting with 'chariot-'..."
-	@git worktree list --porcelain | grep "^worktree" | cut -d' ' -f2 | grep "/chariot-" | while read -r worktree_path; do \
+	@echo "Finding and removing all worktrees starting with 'chariot-tree/'..."
+	@git worktree list --porcelain | grep "^worktree" | cut -d' ' -f2 | grep "/chariot-tree/" | while read -r worktree_path; do \
 		worktree_name=$$(basename "$$worktree_path"); \
 		echo "Removing worktree: $$worktree_name at $$worktree_path"; \
 		git worktree remove "$$worktree_path" --force 2>/dev/null || git worktree remove "$$worktree_path" 2>/dev/null || true; \
 	done
 	@echo "Pruning worktree references..."
 	@git worktree prune
-	@echo "All chariot-* worktrees have been removed!"
+	@echo "All chariot-tree/* worktrees have been removed!"
 endif
 
 tree-list:
-	@echo "Listing all worktrees starting with 'chariot-':"
+	@echo "Listing all worktrees in 'chariot-tree/':"
 	@echo "================================================"
 	@found=0; \
 	git worktree list --porcelain | awk ' \
 		BEGIN { found=0 } \
 		/^worktree/ { \
 			path=$$2; \
-			if (path ~ /\/chariot-/) { \
+			if (path ~ /\/chariot-tree\//) { \
 				found=1; \
 				name=path; \
 				gsub(/.*\//, "", name); \
@@ -329,7 +325,7 @@ tree-list:
 			echo "$$line"; \
 			cat; \
 		else \
-			echo "No worktrees found starting with 'chariot-'"; \
+			echo "No worktrees found starting with 'chariot-tree/'"; \
 		fi \
 	}
 
