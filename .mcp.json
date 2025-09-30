@@ -38,6 +38,14 @@
       "command": "npx",
       "args": ["@playwright/mcp@latest", "--isolated"],
       "env": {}
+    },
+    "currents": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@currents/mcp"],
+      "env": {
+        "CURRENTS_API_KEY": "${CURRENTS_API_KEY}"
+      }
     }
   }
 }
