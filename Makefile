@@ -57,58 +57,6 @@ configure-cli: install-cli
 	echo "Use this command prefix for Praetorian CLI:" && \
 	echo "  praetorian --profile $$UUID"
 
-# Claude Code Security Review Integration
-security-setup: ## Install dependencies for claude-code-security-review tool
-	@echo "🔒 Setting up claude-code-security-review dependencies..."
-	pip install -r claude-code-security-review/claudecode/requirements.txt --no-cache-dir
-	@echo "✅ Security review dependencies installed successfully"
-
-security-test: ## Run full test suite for security review tool (173 tests)
-	@echo "🧪 Running claude-code-security-review test suite..."
-	pytest -v claude-code-security-review/claudecode
-	@echo "✅ Security review tests completed"
-
-security-test-fast: ## Run security review tests without verbose output
-	@echo "🧪 Running security review tests (fast mode)..."
-	pytest claude-code-security-review/claudecode -q
-	@echo "✅ Security review tests completed"
-
-security-review: security-setup ## Run security review on current branch changes
-	@echo "🔍 Running security review on current branch..."
-	@if [ -z "$$GITHUB_TOKEN" ]; then \
-		echo "❌ GITHUB_TOKEN environment variable required"; \
-		echo "   Set it with: export GITHUB_TOKEN=<your-token>"; \
-		exit 1; \
-	fi
-	@if [ -z "$$ANTHROPIC_API_KEY" ]; then \
-		echo "❌ ANTHROPIC_API_KEY environment variable required"; \
-		echo "   Set it with: export ANTHROPIC_API_KEY=<your-key>"; \
-		exit 1; \
-	fi
-	@echo "Note: Requires GITHUB_REPOSITORY and PR_NUMBER for full functionality"
-
-security-review-pr: security-setup ## Run security review on specific PR (Usage: make security-review-pr PR=123)
-ifndef PR
-	$(error PR number is required. Usage: make security-review-pr PR=123)
-endif
-	@echo "🔍 Running security review on PR #$(PR)..."
-	@if [ -z "$$GITHUB_TOKEN" ]; then \
-		echo "❌ GITHUB_TOKEN environment variable required"; \
-		exit 1; \
-	fi
-	@if [ -z "$$ANTHROPIC_API_KEY" ]; then \
-		echo "❌ ANTHROPIC_API_KEY environment variable required"; \
-		exit 1; \
-	fi
-	@export GITHUB_REPOSITORY=praetorian-inc/chariot-development-platform && \
-	export PR_NUMBER=$(PR) && \
-	python3 -m claude-code-security-review.claudecode
-
-security-lint: ## Run linting on security review code
-	@echo "🎯 Linting claude-code-security-review code..."
-	python3 -m py_compile claude-code-security-review/claudecode/*.py
-	@echo "✅ Security review code linting completed"
-
 mcp-manager-uninstall: ## Remove MCP manager and clean up broken symlinks
 	@echo "🧹 Uninstalling MCP manager..."
 	@npm uninstall -g mcp-manager > /dev/null 2>&1 || true
@@ -174,9 +122,8 @@ setup: install-cli
 		echo "GitHub already authenticated with read:packages scope"; \
 	fi
 	@echo "Setting up Docker registry authentication..."
-	$(eval GITHUB_USERNAME := $(shell gh auth status 2>&1 | grep "Logged" | cut -d ' ' -f 9))
+	$(eval GITHUB_USERNAME := $(shell gh api user --jq '.login'))
 	gh auth token | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
-	@make security-setup
 	@make mcp-manager-install
 
 checkout:
