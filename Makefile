@@ -109,6 +109,34 @@ security-lint: ## Run linting on security review code
 	python3 -m py_compile claude-code-security-review/claudecode/*.py
 	@echo "✅ Security review code linting completed"
 
+mcp-manager-uninstall: ## Remove MCP manager and clean up broken symlinks
+	@echo "🧹 Uninstalling MCP manager..."
+	@npm uninstall -g mcp-manager > /dev/null 2>&1 || true
+	@echo "✅ MCP manager uninstalled successfully"
+
+mcp-manager-install: ## Install MCP server manager for toggling Claude Desktop MCP servers
+	@echo "📦 Installing MCP manager..."
+	@cd mcp-manager && npm install > /dev/null 2>&1 && npx tsc > /dev/null 2>&1
+	@cd mcp-manager && npm install -g . > /dev/null 2>&1
+	@SHELL_NAME=$$(basename $$SHELL); \
+	if [ "$$SHELL_NAME" = "zsh" ]; then \
+		PROFILE=~/.zshrc; \
+	elif [ "$$SHELL_NAME" = "bash" ]; then \
+		if [ -f ~/.bash_profile ]; then \
+			PROFILE=~/.bash_profile; \
+		else \
+			PROFILE=~/.bashrc; \
+		fi; \
+	else \
+		PROFILE=~/.profile; \
+	fi; \
+	if ! grep -q 'export PATH="$$HOME/.local/bin:$$PATH"' $$PROFILE 2>/dev/null; then \
+		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> $$PROFILE > /dev/null 2>&1; \
+	fi; \
+	export PATH="$$HOME/.local/bin:$$PATH"; \
+	hash -r 2>/dev/null || true
+	@echo "✅ MCP manager installed successfully"
+
 feature:
 	npx claude-flow@alpha sparc $(description)
 
@@ -149,6 +177,7 @@ setup: install-cli
 	$(eval GITHUB_USERNAME := $(shell gh auth status 2>&1 | grep "Logged" | cut -d ' ' -f 9))
 	gh auth token | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
 	@make security-setup
+	@make mcp-manager-install
 
 checkout:
 	git submodule foreach 'git checkout $(branch) || true'
@@ -345,4 +374,8 @@ setup-ui: ## Install UI dependencies and run setup
 	@echo "Setting up UI dependencies..."
 	cd modules/chariot/ui && npm run setup
 	@echo "UI setup completed successfully"
+
+.PHONY: mcp-manager
+mcp-manager: ## Launch Claude Code with MCP server selection
+	@./scripts/mcp-manager.sh
 

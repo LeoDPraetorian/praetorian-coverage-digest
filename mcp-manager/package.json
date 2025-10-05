@@ -1,0 +1,49 @@
+{
+	"name": "mcp-manager",
+	"version": "1.0.1",
+	"description": "CLI tool to manage Claude MCP servers - toggle between active and disabled states",
+	"type": "module",
+	"main": "dist/index.js",
+	"bin": {
+		"mcp-manager": "dist/index.js"
+	},
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsx src/index.ts",
+		"start": "node dist/index.js",
+		"lint": "biome check .",
+		"lint:fix": "biome check . --fix",
+		"format": "biome format . --write",
+		"typecheck": "tsc --noEmit",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"claude",
+		"mcp",
+		"cli",
+		"ai",
+		"anthropic",
+		"server-management"
+	],
+	"author": "Your Name",
+	"license": "MIT",
+	"homepage": "https://github.com/praetorian-inc/chariot-development-platform/tree/main/mcp-manager",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/praetorian-inc/chariot-development-platform.git"
+	},
+	"bugs": {
+		"url": "https://github.com/praetorian-inc/chariot-development-platform/issues"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.2",
+		"@types/node": "^24.3.0",
+		"tsx": "^4.20.5",
+		"typescript": "^5.9.2"
+	},
+	"dependencies": {
+		"@inquirer/prompts": "^7.8.4",
+		"chalk": "^5.6.0",
+		"commander": "^14.0.0"
+	}
+}

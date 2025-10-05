@@ -1,4 +1,5 @@
 {
+  "model": "opus",
   "env": {
     "BASH_DEFAULT_TIMEOUT_MS": "1800000",
     "BASH_MAX_TIMEOUT_MS": "1800000"
@@ -30,9 +31,6 @@
       "Bash(make dev)",
       "Bash(make purge)",
       "Bash(go run */user-purge/*)",
-      "Bash(git commit *)",
-      "Bash(vite *)",
-      "Bash(npm run *)",
       "Bash(git push --tags)"
     ]
   },
@@ -51,12 +49,7 @@
   },
   "includeCoAuthoredBy": false,
   "enabledMcpjsonServers": [
-    "atlassian",
-    "chariot",
-    "chrome-devtools",
-    "context7",
-    "nebula",
-    "playwright",
-    "praetorian-cli"
-  ]
+    "chariot"
+  ],
+  "enableAllProjectMcpServers": false
 }

@@ -71,6 +71,17 @@ make checkout branch=main     # Checkout branch across all submodules
 make create branch=feature-x  # Create branch across all submodules
 make create-prs               # Create PRs across all submodules
 
+# MCP Server Management (Claude Code)
+make mcp-manager              # Select MCPs, sync to project settings, launch Claude Code (RECOMMENDED)
+make mcp-manager-install      # Install MCP server manager tool
+mcp-manager mcp               # Interactive toggle for Claude Code MCP servers (standalone)
+make mcp-manager-uninstall    # Uninstall MCP manager completely
+
+# 🎯 Why use 'make mcp-manager'?
+# MCP servers consume 10,000-20,000+ tokens EACH at session start
+# Disabling MCPs mid-session does NOT free context window space
+# Select only needed MCPs BEFORE launching to maximize available context
+
 # AI Developer Instructions
 Before writing any code, review the summary of [Clean Code by Robert C. Martin](docs/CLEAN_CODE.md).
 Follow its principles to ensure your work is consistent with the cleanliness, readability, and maintainability standards of our existing codebase.
