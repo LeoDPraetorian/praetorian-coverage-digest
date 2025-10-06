@@ -55,6 +55,11 @@ install-claude: ## Install Claude Code CLI globally
 	@npm install -g @anthropic-ai/claude-code
 	@echo "✅ Claude Code CLI installed"
 
+install-claude-agent-sdk: ## Install Claude Agent SDK for Python
+	@echo "📦 Installing Claude Agent SDK..."
+	@python3 -m pip install --upgrade claude-agent-sdk
+	@echo "✅ Claude Agent SDK installed"
+
 update: ## Update all packages (Go, npm, Python, Claude Code, Homebrew)
 	@echo "🔄 Updating all development packages..."
 	@echo ""
@@ -63,6 +68,9 @@ update: ## Update all packages (Go, npm, Python, Claude Code, Homebrew)
 	@echo ""
 	@echo "📦 Updating Claude Code CLI..."
 	@npm update -g @anthropic-ai/claude-code || npm install -g @anthropic-ai/claude-code
+	@echo ""
+	@echo "📦 Updating Claude Agent SDK..."
+	@python3 -m pip install --upgrade claude-agent-sdk
 	@echo ""
 	@echo "📦 Updating praetorian-cli..."
 	@echo "🔍 Detecting system architecture..."
@@ -141,7 +149,7 @@ add-module:
 add-go-module:
 	go work use $(module)
 
-setup: install-cli install-claude
+setup: install-cli install-claude install-claude-agent-sdk
 	open -ja Docker
 	brew install awscli aws-sam-cli jq docker go npm
 	@if ! grep -q "export GOPRIVATE=github.com/praetorian-inc" ~/.zshrc 2>/dev/null; then \
