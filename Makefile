@@ -34,8 +34,53 @@ user:
 
 install-cli:
 	@if ! command -v praetorian >/dev/null 2>&1; then \
-  		python3 -m pip install --upgrade --no-cache praetorian-cli; \
-  	fi
+		echo "🔍 Detecting system architecture..."; \
+		ARCH=$$(uname -m); \
+		if [ "$$ARCH" = "arm64" ]; then \
+			echo "✅ Running on Apple Silicon ($$ARCH)"; \
+			echo "🔧 Ensuring Python is native and forcing rebuild of native extensions..."; \
+			python3 -m pip uninstall -y praetorian-cli rpds-py 2>/dev/null || true; \
+			python3 -m pip install --upgrade --no-cache-dir --force-reinstall praetorian-cli; \
+		elif [ "$$ARCH" = "x86_64" ]; then \
+			echo "✅ Running on Intel ($$ARCH)"; \
+			python3 -m pip install --upgrade --no-cache-dir praetorian-cli; \
+		else \
+			echo "⚠️  Unknown architecture: $$ARCH"; \
+			python3 -m pip install --upgrade --no-cache-dir praetorian-cli; \
+		fi; \
+	fi
+
+install-claude: ## Install Claude Code CLI globally
+	@echo "📦 Installing Claude Code CLI..."
+	@npm install -g @anthropic-ai/claude-code
+	@echo "✅ Claude Code CLI installed"
+
+update: ## Update all packages (Go, npm, Python, Claude Code, Homebrew)
+	@echo "🔄 Updating all development packages..."
+	@echo ""
+	@echo "📦 Updating Homebrew packages..."
+	@brew update && brew upgrade awscli aws-sam-cli jq docker go npm || true
+	@echo ""
+	@echo "📦 Updating Claude Code CLI..."
+	@npm update -g @anthropic-ai/claude-code || npm install -g @anthropic-ai/claude-code
+	@echo ""
+	@echo "📦 Updating praetorian-cli..."
+	@echo "🔍 Detecting system architecture..."
+	@ARCH=$$(uname -m); \
+	if [ "$$ARCH" = "arm64" ]; then \
+		echo "✅ Running on Apple Silicon ($$ARCH)"; \
+		echo "🔧 Ensuring Python is native and forcing rebuild of native extensions..."; \
+		python3 -m pip uninstall -y praetorian-cli rpds-py 2>/dev/null || true; \
+		python3 -m pip install --upgrade --no-cache-dir --force-reinstall praetorian-cli; \
+	elif [ "$$ARCH" = "x86_64" ]; then \
+		echo "✅ Running on Intel ($$ARCH)"; \
+		python3 -m pip install --upgrade --no-cache-dir praetorian-cli; \
+	else \
+		echo "⚠️  Unknown architecture: $$ARCH"; \
+		python3 -m pip install --upgrade --no-cache-dir praetorian-cli; \
+	fi
+	@echo ""
+	@echo "✅ All packages updated successfully!"
 
 configure-cli: install-cli
 	@UUID=$$(uuidgen | tr '[:upper:]' '[:lower:]') && \
@@ -96,7 +141,7 @@ add-module:
 add-go-module:
 	go work use $(module)
 
-setup: install-cli
+setup: install-cli install-claude
 	open -ja Docker
 	brew install awscli aws-sam-cli jq docker go npm
 	@if ! grep -q "export GOPRIVATE=github.com/praetorian-inc" ~/.zshrc 2>/dev/null; then \
