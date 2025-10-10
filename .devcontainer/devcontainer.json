@@ -1,0 +1,8 @@
+{
+  "name": "Chariot Devpod Container",
+  "image": "ghcr.io/praetorian-inc/chariot-devpod:latest",
+
+  "cursor": {
+    "extensions": ["Anthropic.claude-code", "golang.go"]
+  }
+}
