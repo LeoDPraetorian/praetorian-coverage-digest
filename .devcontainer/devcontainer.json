@@ -3,6 +3,12 @@
   "image": "ghcr.io/praetorian-inc/chariot-devpod:latest",
 
   "cursor": {
-    "extensions": ["Anthropic.claude-code", "golang.go"]
+    "extensions": [
+      "Anthropic.claude-code",
+      "golang.go",
+      "anysphere.cursorpyright",
+      "eamodio.gitlens",
+      "dbaeumer.vscode-eslint"
+    ]
   }
 }
