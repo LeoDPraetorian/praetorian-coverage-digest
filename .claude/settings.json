@@ -1,5 +1,5 @@
 {
-  "model": "opus",
+  "model": "sonnet[1m]",
   "env": {
     "BASH_DEFAULT_TIMEOUT_MS": "1800000",
     "BASH_MAX_TIMEOUT_MS": "1800000"
@@ -48,8 +48,15 @@
     ]
   },
   "includeCoAuthoredBy": false,
-  "enabledMcpjsonServers": [
-    "chariot"
-  ],
-  "enableAllProjectMcpServers": false
+  "enableAllProjectMcpServers": false,
+  "enabledMcpjsonServers": ["chariot", "linear", "praetorian-cli"],
+  "disabledMcpjsonServers": [
+    "atlassian",
+    "chrome-devtools",
+    "context7",
+    "currents",
+    "praetorian-cli",
+    "playwright",
+    "nebula"
+  ]
 }
