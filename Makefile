@@ -1,5 +1,38 @@
+# The following section sets up variables depending on whether we are running in macOS or in
+# the Ubuntu devcontainer.
+OS_KERNEL := $(shell uname -s)
+ARCH := $(shell uname -m)
+
+# Detect the shell and determine the appropriate profile file
+# Use $$SHELL environment variable from the parent shell, not Make's internal SHELL
+SHELL_NAME := $(shell basename "$$SHELL")
+ifeq ($(SHELL_NAME),zsh)
+	PROFILE_FILE := $(HOME)/.zshrc
+else ifeq ($(SHELL_NAME),bash)
+	ifeq ($(shell test -f $(HOME)/.bash_profile && echo yes),yes)
+		PROFILE_FILE := $(HOME)/.bash_profile
+	else
+		PROFILE_FILE := $(HOME)/.bashrc
+	endif
+else
+	PROFILE_FILE := $(HOME)/.profile
+endif
+
+# In the devcontainer, need to use --break-system-packages to force installing
+# the packages globally. The disadvantage of this is that the packages may break
+# packages that the Ubuntu system relies on. The advantage is that we can install
+# use the packagges, such as the Claude Agent SDK, without having to deal with
+# virtualenvs. Testing has shown that the packages are not known to be incompatible
+# with the packages Ubuntu depends on.
+ifeq (Linux,$(OS_KERNEL))
+	PIP_ARG := --break-system-packages
+endif
+
 chariot:
+ifeq (Darwin,$(OS_KERNEL))
+	# No support to run docker inside the devcontainer yet
 	open -ja Docker
+endif
 	@echo "Deploying backend."
 	cd modules/chariot/backend && make dev
 	@echo "Backend deployment complete. Starting local frontend."
@@ -33,61 +66,35 @@ user:
     cd ../../.. && echo "CHARIOT_LOGIN_URL=https://localhost:3000/login-with-keychain?keychain=$$ENCODED_KEYCHAIN" >> .env
 
 install-cli:
-	@if ! command -v praetorian >/dev/null 2>&1; then \
-		echo "🔍 Detecting system architecture..."; \
-		ARCH=$$(uname -m); \
-		if [ "$$ARCH" = "arm64" ]; then \
-			echo "✅ Running on Apple Silicon ($$ARCH)"; \
-			echo "🔧 Ensuring Python is native and forcing rebuild of native extensions..."; \
-			python3 -m pip uninstall -y praetorian-cli rpds-py 2>/dev/null || true; \
-			python3 -m pip install --upgrade --no-cache-dir --force-reinstall praetorian-cli; \
-		elif [ "$$ARCH" = "x86_64" ]; then \
-			echo "✅ Running on Intel ($$ARCH)"; \
-			python3 -m pip install --upgrade --no-cache-dir praetorian-cli; \
-		else \
-			echo "⚠️  Unknown architecture: $$ARCH"; \
-			python3 -m pip install --upgrade --no-cache-dir praetorian-cli; \
-		fi; \
-	fi
+	@echo "📦 Installing the Praetorian CLI..."
+	@python3 -m pip install --no-cache-dir praetorian-cli $(PIP_ARG) > /dev/null
+	@echo "✅ Praetorian CLI installed"
 
 install-claude: ## Install Claude Code CLI globally
 	@echo "📦 Installing Claude Code CLI..."
-	@npm install -g @anthropic-ai/claude-code
+	@npm install -g @anthropic-ai/claude-code > /dev/null
 	@echo "✅ Claude Code CLI installed"
 
 install-claude-agent-sdk: ## Install Claude Agent SDK for Python
-	@echo "📦 Installing Claude Agent SDK..."
-	@python3 -m pip install --upgrade claude-agent-sdk
+	@echo "📦 Installing/Upgrading Claude Agent SDK..."
+	@python3 -m pip install --no-cache-dir claude-agent-sdk $(PIP_ARG) > /dev/null
 	@echo "✅ Claude Agent SDK installed"
 
 update: ## Update all packages (Go, npm, Python, Claude Code, Homebrew)
 	@echo "🔄 Updating all development packages..."
 	@echo ""
+	ifeq (Darwin,$(OS_KERNEL))
 	@echo "📦 Updating Homebrew packages..."
-	@brew update && brew upgrade awscli aws-sam-cli jq docker go npm || true
+	@brew update && brew upgrade awscli aws-sam-cli jq docker go npm python $(PIP_ARG)
 	@echo ""
 	@echo "📦 Updating Claude Code CLI..."
-	@npm update -g @anthropic-ai/claude-code || npm install -g @anthropic-ai/claude-code
+	@npm update -g @anthropic-ai/claude-code > /dev/null
 	@echo ""
 	@echo "📦 Updating Claude Agent SDK..."
-	@python3 -m pip install --upgrade claude-agent-sdk
-	@echo ""
+	@python3 -m pip install --no-cache-dir --upgrade claude-agent-sdk $(PIP_ARG) > /dev/null
+	@echo ""	
 	@echo "📦 Updating praetorian-cli..."
-	@echo "🔍 Detecting system architecture..."
-	@ARCH=$$(uname -m); \
-	if [ "$$ARCH" = "arm64" ]; then \
-		echo "✅ Running on Apple Silicon ($$ARCH)"; \
-		echo "🔧 Ensuring Python is native and forcing rebuild of native extensions..."; \
-		python3 -m pip uninstall -y praetorian-cli rpds-py 2>/dev/null || true; \
-		python3 -m pip install --upgrade --no-cache-dir --force-reinstall praetorian-cli; \
-	elif [ "$$ARCH" = "x86_64" ]; then \
-		echo "✅ Running on Intel ($$ARCH)"; \
-		python3 -m pip install --upgrade --no-cache-dir praetorian-cli; \
-	else \
-		echo "⚠️  Unknown architecture: $$ARCH"; \
-		python3 -m pip install --upgrade --no-cache-dir praetorian-cli; \
-	fi
-	@echo ""
+	@python3 -m pip install --no-cache-dir --upgrade praetorian-cli $(PIP_ARG) > /dev/null
 	@echo "✅ All packages updated successfully!"
 
 configure-cli: install-cli
@@ -110,32 +117,18 @@ configure-cli: install-cli
 	echo "Use this command prefix for Praetorian CLI:" && \
 	echo "  praetorian --profile $$UUID"
 
-mcp-manager-uninstall: ## Remove MCP manager and clean up broken symlinks
+uninstall-mcp-manager: ## Remove MCP manager and clean up broken symlinks
 	@echo "🧹 Uninstalling MCP manager..."
-	@npm uninstall -g mcp-manager > /dev/null 2>&1 || true
+	@npm uninstall -g mcp-manager > /dev/null 2>&1
 	@echo "✅ MCP manager uninstalled successfully"
 
-mcp-manager-install: ## Install MCP server manager for toggling Claude Desktop MCP servers
+install-mcp-manager: ## Install MCP server manager for toggling Claude Desktop MCP servers
 	@echo "📦 Installing MCP manager..."
 	@cd mcp-manager && npm install > /dev/null 2>&1 && npx tsc > /dev/null 2>&1
 	@cd mcp-manager && npm install -g . > /dev/null 2>&1
-	@SHELL_NAME=$$(basename $$SHELL); \
-	if [ "$$SHELL_NAME" = "zsh" ]; then \
-		PROFILE=~/.zshrc; \
-	elif [ "$$SHELL_NAME" = "bash" ]; then \
-		if [ -f ~/.bash_profile ]; then \
-			PROFILE=~/.bash_profile; \
-		else \
-			PROFILE=~/.bashrc; \
-		fi; \
-	else \
-		PROFILE=~/.profile; \
-	fi; \
-	if ! grep -q 'export PATH="$$HOME/.local/bin:$$PATH"' $$PROFILE 2>/dev/null; then \
-		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> $$PROFILE > /dev/null 2>&1; \
-	fi; \
-	export PATH="$$HOME/.local/bin:$$PATH"; \
-	hash -r 2>/dev/null || true
+	@if ! grep -q 'export PATH="$$HOME/.local/bin:$$PATH"' $(PROFILE_FILE) 2>/dev/null; then \
+		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> $(PROFILE_FILE) > /dev/null 2>&1; \
+	fi
 	@echo "✅ MCP manager installed successfully"
 
 feature:
@@ -145,17 +138,57 @@ add-module:
 	git submodule add $(repo) ./modules/$(notdir $(basename $(repo)))
 	git submodule set-branch --branch main -- ./modules/$(notdir $(basename $(repo)))
 
-
 add-go-module:
 	go work use $(module)
 
-setup: install-cli install-claude install-claude-agent-sdk
-	open -ja Docker
-	brew install awscli aws-sam-cli jq docker go npm
-	@if ! grep -q "export GOPRIVATE=github.com/praetorian-inc" ~/.zshrc 2>/dev/null; then \
-		echo "export GOPRIVATE=github.com/praetorian-inc" >> ~/.zshrc; \
-		echo "Added GOPRIVATE to ~/.zshrc"; \
+install-core-mac:
+	brew install awscli aws-sam-cli jq npm python docker go gh
+
+upgrade-core-mac:
+	brew upgrade awscli aws-sam-cli jq npm python docker go gh
+
+install-core-ubuntu:
+	# go, npm, jq, python, gh are installed in the devcontainer
+	@make install-aws-cli-ubuntu
+	@make install-sam-cli-ubuntu
+
+upgrade-core-ubuntu:
+	@apt update
+	@apt -y install python3 pip nodejs jq gh
+	@apt clean
+	@npm update -g npm
+	@npm update -g typescript
+	# upgrade of the AWS CLIs involves downloading the latest and installing again.
+	@make install-aws-cli-ubuntu upgrade_option=--update
+	@make install-sam-cli-ubuntu upgrade_option=--update
+
+install-aws-cli-ubuntu:
+	@cd /tmp && \
+	rm -rf aws && \
+	wget -q https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip && \
+	unzip -q awscli-exe-linux-aarch64.zip && \
+	./aws/install $(upgrade_option) && \
+	rm -rf /tmp/aws /tmp/awscli-exe-linux-aarch64.zip
+	
+install-sam-cli-ubuntu:
+	@cd /tmp && \
+	rm -rf sam-installation && \
+	wget -q https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-arm64.zip && \
+	unzip -q aws-sam-cli-linux-arm64.zip -d sam-installation && \
+	./sam-installation/install  $(upgrade_option) && \
+	rm -rf /tmp/sam-installation /tmp/aws-sam-cli-linux-arm64.zip
+
+setup-common: install-cli install-claude install-claude-agent-sdk
+	@if ! grep -q "export GOPRIVATE=github.com/praetorian-inc" $(PROFILE_FILE) 2>/dev/null; then \
+		echo "export GOPRIVATE=github.com/praetorian-inc" >> $(PROFILE_FILE); \
+		echo "Added GOPRIVATE to $(PROFILE_FILE)"; \
 	fi
+ifeq (Linux,$(OS_KERNEL))
+	@if ! grep -q "/usr/local/go/bin" $(PROFILE_FILE) 2>/dev/null; then \
+		echo "export PATH=\$PATH:/usr/local/go/bin" >> $(PROFILE_FILE); \
+		echo "Added /usr/local/go/bin PATH in $(PROFILE_FILE)"; \
+	fi
+endif
 	@make submodule-init-robust
 	@make setup-ui
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
@@ -177,7 +210,18 @@ setup: install-cli install-claude install-claude-agent-sdk
 	@echo "Setting up Docker registry authentication..."
 	$(eval GITHUB_USERNAME := $(shell gh api user --jq '.login'))
 	gh auth token | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
-	@make mcp-manager-install
+	@make install-mcp-manager
+
+setup: 
+ifeq (Darwin,$(OS_KERNEL))
+	@make install-core-mac
+else ifeq (Linux,$(OS_KERNEL))
+	@make install-core-ubuntu
+else
+	@echo "Unknown OS: $(OS_KERNEL)"
+	exit 1
+endif	
+	@make setup-common
 
 checkout:
 	git submodule foreach 'git checkout $(branch) || true'
@@ -379,3 +423,13 @@ setup-ui: ## Install UI dependencies and run setup
 mcp-manager: ## Launch Claude Code with MCP server selection
 	@./scripts/mcp-manager.sh
 
+
+test:
+	@echo "HOME: $(HOME)" # from the shell
+	@echo "SHELL: $(SHELL)" # from the shell
+	@echo "USER: $(USER)" # from the shell
+	@echo "SHELL_NAME: $(SHELL_NAME)"
+	@echo "PROFILE_FILE: $(PROFILE_FILE)"
+	@echo "OS_KERNEL: $(OS_KERNEL)"
+	@echo "ARCH: $(ARCH)"
+	@echo "PIP_ARG: $(PIP_ARG)"
