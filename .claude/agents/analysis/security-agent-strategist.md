@@ -6,7 +6,7 @@ domains: security-agent-coordination, vulnerability-remediation-strategy, securi
 capabilities: strategic-agent-selection, capability-synergy-analysis, coordination-pattern-design, security-expertise-matching, team-composition-optimization, resource-efficiency-planning, vulnerability-to-agent-mapping
 specializations: security-agent-ecosystems, vulnerability-fix-strategies, multi-agent-security-coordination, security-architect-integration, security-capability-optimization
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
-model: sonnet[1m]
+model: opusplan
 color: purple
 ---
 

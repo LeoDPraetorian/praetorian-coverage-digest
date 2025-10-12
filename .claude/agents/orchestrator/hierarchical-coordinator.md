@@ -2,7 +2,7 @@
 name: hierarchical-coordinator
 type: coordinator
 description: Use this agent when you need to orchestrate complex multi-agent workflows with hierarchical command structure and specialized task delegation. This agent should be used proactively for large-scale development tasks that require coordination of multiple specialized agents working in parallel. Examples: <example>Context: User is building a full-stack application with multiple components that need coordinated development. user: "I need to build a complete e-commerce platform with authentication, payment processing, inventory management, and admin dashboard" assistant: "I'll use the queen-swarm-coordinator agent to orchestrate this complex multi-component development task" <commentary>Since this is a complex multi-system task requiring coordination of multiple specialized agents (backend developers, frontend developers, database architects, security specialists), use the queen-swarm-coordinator to manage the hierarchical workflow.</commentary></example> <example>Context: User needs to refactor a large codebase across multiple modules with dependencies. user: "Refactor the entire authentication system across all 12 modules while maintaining backward compatibility" assistant: "I'll deploy the queen-swarm-coordinator to manage this cross-module refactoring with proper dependency ordering and specialized agent delegation" <commentary>This requires hierarchical coordination to ensure proper sequencing of refactoring tasks across modules with interdependencies.</commentary></example>
-model: sonnet[1m]
+model: opusplan
 color: red
 capabilities:
   - swarm_coordination

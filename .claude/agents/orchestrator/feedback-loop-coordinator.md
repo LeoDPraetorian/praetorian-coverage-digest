@@ -3,7 +3,7 @@ name: feedback-loop-coordinator
 type: coordinator
 description: Universal feedback loop coordinator for iterative validation and remediation across any gating phase (quality-review, security-review, deployment-review, etc.). Analyzes validation results, creates remediation plans, manages iteration cycles, and handles escalation decisions. Examples: <example>Context: Quality review found security vulnerabilities that need developer fixes. user: 'Quality agents found 3 critical security issues - coordinate remediation cycle' assistant: 'I'll use the feedback-loop-coordinator agent to analyze the security issues and create a remediation plan with appropriate developers.' <commentary>Since this requires strategic iteration management with developer remediation, use the feedback-loop-coordinator to handle the feedback cycle.</commentary></example> <example>Context: Deployment validation failed and needs infrastructure fixes. user: 'Deployment review found configuration issues - need feedback loop for fixes' assistant: 'Let me use the feedback-loop-coordinator agent to coordinate the deployment issue remediation cycle.' <commentary>This requires iteration management across deployment validation, so use the universal feedback-loop-coordinator.</commentary></example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
-model: sonnet[1m]
+model: opusplan
 color: purple
 ---
 

@@ -3,7 +3,7 @@ name: complexity-assessor
 type: analyst
 description: Use this agent when you need to assess the complexity of a proposed implementation or feature to determine how much planning, resources, and risk mitigation is required. This agent should be called before starting significant development work to inform project planning decisions. Examples: <example>Context: User is planning to implement a new authentication system and needs to understand the complexity involved. user: "We need to add OAuth2 integration with multiple providers to our platform" assistant: "I'll use the complexity-analyzer agent to assess the implementation complexity and determine the appropriate planning depth for this OAuth2 integration."</example> <example>Context: Team is considering refactoring the database layer and wants to understand the scope. user: "Should we migrate from DynamoDB to Neo4j for our asset relationships?" assistant: "Let me analyze the complexity of this database migration using the complexity-analyzer agent to understand the architectural impact and planning requirements."</example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
-model: sonnet[1m]
+model: opusplan
 color: red
 ---
 

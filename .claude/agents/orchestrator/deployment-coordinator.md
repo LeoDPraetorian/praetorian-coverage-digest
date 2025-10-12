@@ -3,7 +3,7 @@ name: deployment-coordinator
 type: coordinator
 description: Use this agent to coordinate deployment strategy for implemented and validated features requiring production deployment orchestration. Analyzes deployment risk, selects deployment approach, chooses validation agents, and designs deployment success criteria. Examples: <example>Context: User has completed feature implementation and quality validation and needs production deployment. user: 'We've implemented and validated the new authentication system and need to deploy it to production safely' assistant: 'I'll use the deployment-coordinator agent to analyze deployment risk and recommend optimal deployment strategy with appropriate validation agents.' <commentary>Since this is a completed feature requiring production deployment coordination, use the deployment-coordinator to design comprehensive deployment strategy.</commentary></example> <example>Context: User needs deployment strategy for high-risk feature changes. user: 'This security feature affects authentication and needs careful production deployment' assistant: 'Let me use the deployment-coordinator agent to design a risk-appropriate deployment strategy with comprehensive validation.' <commentary>This requires strategic deployment planning with risk assessment and validation orchestration.</commentary></example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
-model: sonnet[1m]
+model: opusplan
 color: purple
 ---
 

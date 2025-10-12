@@ -1,9 +1,9 @@
 ---
 name: performance-analyzer
-type: validator
+type: analyst
 description: Use this agent when you need to identify performance bottlenecks, analyze workflow inefficiencies, or optimize system performance. Examples include: analyzing slow API endpoints, identifying database query bottlenecks, reviewing resource utilization patterns, optimizing build processes, or investigating memory leaks. This agent should be used proactively when performance metrics indicate degradation, or reactively when users report slow response times. For example: user: 'Our API response times have increased by 40% over the past week' -> assistant: 'I'll use the performance-bottleneck-analyzer agent to investigate the performance degradation and identify the root causes' -> Task('Performance Bottleneck Analyzer', 'Analyze API performance metrics, identify bottlenecks causing 40% response time increase, and provide optimization recommendations', 'performance-bottleneck-analyzer')
 model: sonnet[1m]
-color: orange
+color: purple
 
 capabilities:
   - performance_analysis

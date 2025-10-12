@@ -3,7 +3,7 @@ name: preprocessing-orchestration
 type: orchestrator
 description: Use this orchestrator to coordinate preprocessing workflows for user input containing Jira references. Automatically detects Jira ticket references, resolves ticket content, and determines appropriate next agent based on enriched context. Examples: <example>Context: User mentions a Jira ticket in their development request. user: 'Implement the authentication feature from CHA-1232' assistant: 'I'll use the preprocessing-orchestration to resolve CHA-1232 and then process the implementation request with full context.' <commentary>Since the user referenced a Jira ticket, use preprocessing-orchestration to resolve the ticket content before implementation.</commentary></example> <example>Context: User provides a Jira URL for feature development. user: 'Please work on https://company.atlassian.net/browse/PROJ-456' assistant: 'Let me use the preprocessing-orchestration to extract the Jira ticket details and determine the appropriate development approach.' <commentary>This requires Jira reference resolution before determining the implementation strategy.</commentary></example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
-model: sonnet[1m]
+model: opusplan
 color: purple
 ---
 

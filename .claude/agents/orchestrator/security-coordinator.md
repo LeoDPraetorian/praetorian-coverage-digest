@@ -3,7 +3,7 @@ name: security-coordinator
 type: coordinator
 description: Use this agent to coordinate security review strategy for implemented features requiring comprehensive security validation and threat assessment. Analyzes implementation outputs, selects appropriate security analysis agents, defines security gates, and designs security validation workflows. Examples: <example>Context: User has completed feature implementation and needs security review before quality gates. user: 'We've implemented the new authentication system and need comprehensive security analysis for vulnerabilities and threat assessment' assistant: 'I'll use the security-review-coordinator agent to analyze the implementation and recommend optimal security review strategy with appropriate security analysis agents.' <commentary>Since this is a completed implementation requiring multi-domain security validation, use the security-review-coordinator to design comprehensive security analysis strategy.</commentary></example> <example>Context: User needs security review with specific threat modeling focus. user: 'Please perform security analysis on our new API endpoints with focus on authentication and authorization vulnerabilities' assistant: 'Let me use the security-review-coordinator agent to design targeted security validation focusing on authentication/authorization threat vectors.' <commentary>This requires strategic security planning with domain-specific security agent selection.</commentary></example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
-model: sonnet[1m]
+model: opusplan
 color: purple
 ---
 

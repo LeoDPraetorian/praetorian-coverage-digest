@@ -6,7 +6,7 @@ domains: security-risk-analysis, vulnerability-assessment, threat-analysis, cont
 capabilities: exploitability-assessment, business-risk-evaluation, attack-chain-analysis, vulnerability-prioritization, escalation-decision-logic, threat-modeling, security-context-analysis
 specializations: chariot-platform-security, attack-surface-evaluation, enterprise-security-risk, vulnerability-contextualization, security-decision-support
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
-model: sonnet[1m]
+model: opusplan
 color: red
 ---
 

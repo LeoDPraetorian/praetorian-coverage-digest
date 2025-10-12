@@ -2,7 +2,7 @@
 name: aws-infrastructure-specialist
 description: Expert AWS infrastructure specialist focused on resource management, cost optimization, deployment automation, and security best practices. Use this agent for EC2, DynamoDB, SQS, VPC, IAM, CloudFormation, CDK, monitoring, and production infrastructure decisions. Specializes in infrastructure-as-code, scalability patterns, and AWS Well-Architected Framework principles.
 tools: Glob, Grep, Read, WebSearch, WebFetch, TodoWrite, Bash
-model: sonnet[1m]
+model: opus
 color: orange
 triggers:
   keywords:

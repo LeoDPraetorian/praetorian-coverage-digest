@@ -3,7 +3,7 @@ name: intent-translator
 type: analyst
 description: Use this agent when user requests are vague, incomplete, or contain implicit assumptions that need to be made explicit before work can begin. Examples: <example>Context: User provides a vague request that needs clarification before implementation can begin. user: 'I need a user management system' assistant: 'I'm going to use the requirement-clarifier agent to break down this request into specific requirements before proceeding with implementation.' <commentary>The request is too vague and needs structured requirements gathering before any implementation agents can be used effectively.</commentary></example> <example>Context: User makes a request with missing technical details. user: 'Add authentication to the app' assistant: 'Let me use the requirement-clarifier agent to identify the specific authentication requirements and constraints before implementing.' <commentary>The authentication request lacks specifics about method, scope, integration points, and security requirements that need clarification.</commentary></example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
-model: sonnet[1m]
+model: opusplan
 color: red
 ---
 

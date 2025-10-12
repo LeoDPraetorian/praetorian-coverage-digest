@@ -6,7 +6,7 @@ domains: documentation, api-reference, library-integration, technical-troublesho
 capabilities: structured-documentation-search, api-reference-lookup, installation-guides, error-solution-research, library-documentation-retrieval
 specializations: context7-mcp-integration, official-documentation, framework-docs, library-installation, technical-error-resolution
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write, mcp__context7__resolve-library-id, mcp__context7__get-library-docs
-model: sonnet[1m]
+model: sonnet
 color: yellow
 ---
 

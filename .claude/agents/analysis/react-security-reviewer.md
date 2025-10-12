@@ -1,7 +1,7 @@
 ---
 name: react-security-reviewer
 description: Use this agent when you need to review React/TypeScript code for security vulnerabilities, authentication issues, XSS risks, or other frontend security concerns. Examples: <example>Context: The user has just implemented a new React component that handles user authentication and wants to ensure it's secure before deployment. user: "I've just finished implementing the LoginForm component with JWT token handling. Can you review it for security issues?" assistant: "I'll use the react-security-reviewer agent to analyze your authentication component for security vulnerabilities." <commentary>Since the user is asking for security review of React code, use the react-security-reviewer agent to identify potential security issues.</commentary></example> <example>Context: The user has created a React form component that processes user input and wants to check for XSS vulnerabilities. user: "Here's my new UserProfile component that allows users to update their information. Please check for any security issues." assistant: "I'll use the react-security-reviewer agent to examine your form component for XSS vulnerabilities and input validation issues." <commentary>Since the user needs security review of a React component handling user input, use the react-security-reviewer agent to check for XSS and validation issues.</commentary></example>
-model: sonnet[1m]
+model: sonnet
 tools: Bash, Glob, Grep, Read, TodoWrite, BashOutput, KillBash
 model: sonnet[1m]
 color: purple

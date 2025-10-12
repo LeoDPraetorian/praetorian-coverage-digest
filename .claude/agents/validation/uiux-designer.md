@@ -1,6 +1,6 @@
 ---
 name: uiux-designer
-type: validator
+type: designer
 description: Use this agent when you need expert guidance on user interface design, visual design systems, accessibility improvements, or user experience optimization. Examples: <example>Context: User is working on a React component and wants to improve its visual design and accessibility. user: 'I have this button component but it doesn't look quite right and I'm not sure about accessibility' assistant: 'Let me use the ui-design-expert agent to analyze your component and provide design and accessibility recommendations' <commentary>Since the user needs UI design expertise, use the ui-design-expert agent to provide comprehensive design guidance.</commentary></example> <example>Context: User is creating a new dashboard layout and needs design system guidance. user: 'I'm building a new dashboard page and want to make sure it follows good design principles' assistant: 'I'll use the ui-design-expert agent to help you create a well-designed dashboard that follows best practices' <commentary>The user needs expert design guidance for a complex UI, so use the ui-design-expert agent.</commentary></example>
 tools: Read, Write, figma, TodoWrite
 model: sonnet[1m]

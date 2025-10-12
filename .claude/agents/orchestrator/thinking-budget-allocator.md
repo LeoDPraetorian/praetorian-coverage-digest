@@ -6,7 +6,7 @@ domains: cognitive-resource-allocation, cost-optimization, meta-orchestration, p
 capabilities: complexity-analysis, token-usage-prediction, cost-benefit-optimization, adaptive-allocation, risk-assessment
 specializations: claude-code-thinking-levels, agent-coordination-optimization, resource-efficiency, pipeline-optimization
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
-model: sonnet[1m]
+model: opusplan
 color: purple
 ---
 

@@ -75,75 +75,102 @@ When implementing tests, always:
 - Document test scenarios and expected outcomes clearly
 - Provide actionable recommendations for improving integration reliability
 
-## Workflow Integration
+```
+Current State (PROBLEMATIC):
+modules/chariot/backend/pkg/capabilities/
+├── axonius.go           # 3rd party integration
+├── crowdstrike.go       # 3rd party integration
+├── bitbucket.go         # 3rd party integration
+├── amazon.go            # 3rd party integration
+└── xyz/                 # Base capability framework
+    ├── xyz.go           # Shared capability infrastructure
+    └── xyz_test.go      # Base testing framework
 
-### When Called for Integration Testing
-
-When invoked for integration testing tasks, you should ALWAYS start by reading the critical integration documentation to understand the architecture, patterns, and current implementation.
-
-**Critical Files to Read:**
-
-```bash
-REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
-
-CRITICAL_FILES=(
-    "$REPO_ROOT/modules/chariot/backend/pkg/tasks/integrations/CLAUDE.md"
-    "$REPO_ROOT/modules/chariot/backend/pkg/tasks/integrations/INTEGRATIONS-NEEDING-IMPROVEMENT.md"
-)
-
-echo "=== Loading critical integration documentation ==="
-for file in "${CRITICAL_FILES[@]}"; do
-    if [ -f "$file" ]; then
-        echo "=== Reading critical file: $file ==="
-        cat "$file"
-        echo -e "\n---\n"
-    fi
-done
+Issues:
+- Integrations mixed with capabilities in same directory
+- No dedicated integration testing framework
+- Limited separation of concerns
+- Missing comprehensive test coverage for API failures
+- No standardized mocking strategies
 ```
 
-### Workflow Behavior
+#### Recommended Structure
 
-1. **Always read critical files first** - Load integration architecture and patterns before testing
-2. **Understand the Capability interface** - Know what methods integrations must implement
-3. **Follow established test patterns** - Use the testing patterns from CLAUDE.md
-4. **Reference integration examples** - Look at well-tested integrations as models
-5. **Test comprehensively** - Cover ValidateCredentials, Match, Accepts, and Invoke methods
+```
+Future State (IMPROVED):
+modules/chariot/backend/pkg/
+├── capabilities/        # Core capabilities only
+│   └── xyz/            # Base capability framework
+├── integrations/       # 3rd party integrations
+│   ├── axonius/
+│   │   ├── client.go
+│   │   ├── client_test.go
+│   │   └── client_integration_test.go
+│   ├── crowdstrike/
+│   │   ├── client.go
+│   │   ├── client_test.go
+│   │   └── client_integration_test.go
+│   └── shared/         # Common integration patterns
+│       ├── auth/       # OAuth, API key patterns
+│       ├── retry/      # Retry mechanisms
+│       └── testing/    # Shared test utilities
+└── testutils/          # Enhanced test utilities
+    └── integrations/   # Integration-specific test helpers
+```
 
-## Common Issues to Test
+### Current Integration Patterns Analysis
 
-### Based on Platform Analysis
+#### 1. Axonius Integration Pattern
 
-#### Authentication Issues
-- **Missing ValidateCredentials()**: DigitalOcean, NS1, and others directly use credentials without validation
-- **No token refresh mechanisms**: Most integrations lack automatic token renewal
-- **Credential exposure in logs**: Check for secrets in error messages and log output
+```go
+// Strengths:
+- Clear pagination handling with AxoniusPaginator
+- Proper credential validation with API key/secret
+- Asset processing with proper error handling
+- Good use of structured logging
 
-#### Error Handling Gaps
-- **Ignored JSON marshaling errors**: Common in azure.go and others
-- **Infinite retry loops**: No circuit breakers or max retry limits
-- **Generic error messages**: Errors without context about operation or integration
+// Weaknesses:
+- No unit tests for pagination logic
+- Missing retry mechanisms for API failures
+- Hard-coded timeout values
+- No rate limiting protection
+- Mixed responsibilities (API client + capability logic)
+```
 
-#### Performance Problems
-- **No rate limiting**: Most integrations lack throttling mechanisms
-- **Memory leaks in pagination**: Full response buffering instead of streaming
-- **Blocking operations**: Synchronous calls without timeouts
+#### 2. CrowdStrike Integration Pattern
 
-#### Code Quality Issues
-- **Oversized files**: wiz.go (858 lines), amazon.go (564 lines)
-- **Complex functions**: Functions exceeding 50 lines
-- **Code duplication**: Pagination logic repeated across 8+ integrations
+```go
+// Strengths:
+- OAuth2 authentication flow
+- Concurrent processing with errgroup
+- Comprehensive error handling
+- Proper filtering and data validation
+- Good use of atomic counters for metrics
 
-## Test Priority Matrix
+// Weaknesses:
+- No integration tests for OAuth flow
+- Missing mock implementations
+- Complex streaming logic not unit tested
+- Rate limiting handling not tested
+- Vulnerability processing logic mixed with API client
+```
 
-| Test Type | Priority | Integrations Needing Most | Specific Tests |
-|-----------|----------|---------------------------|----------------|
-| ValidateCredentials() | CRITICAL | DigitalOcean, NS1 | Verify auth before operations |
-| Rate Limiting | HIGH | All integrations | 429 response handling |
-| Error Recovery | HIGH | All except Bitbucket | Retry logic, circuit breakers |
-| Pagination | MEDIUM | GitHub, Okta, Wiz, etc. | Token/page/link pagination |
-| Memory Usage | MEDIUM | Wiz, Amazon, Qualys | Stream vs buffer tests |
-| Timeout Handling | HIGH | All integrations | Network timeout scenarios |
-| Credential Masking | HIGH | All integrations | Log sanitization |
+#### 3. Base XYZ Pattern Analysis
+
+```go
+// Strengths:
+- Comprehensive logging with structured output
+- HTTP request/response logging for debugging
+- Lifecycle management with cleanup
+- File output handling for ML data
+- Command execution with proper error handling
+
+// Weaknesses:
+- Tightly coupled to specific use cases
+- Missing interface definitions for testability
+- No standardized error types
+- Limited extensibility for different integration patterns
+```
 
 ## Agent Capabilities
 
@@ -243,44 +270,6 @@ type TestAxoniusClient struct {
     responses map[string]interface{}
     errors    map[string]error
     callCount map[string]int
-}
-
-// Rate Limit Simulator for Testing
-type RateLimitMock struct {
-    requestCount int
-    limit        int
-    resetTime    time.Time
-    window       time.Duration
-}
-
-func NewRateLimitMock(limit int, window time.Duration) *RateLimitMock {
-    return &RateLimitMock{
-        limit:     limit,
-        window:    window,
-        resetTime: time.Now().Add(window),
-    }
-}
-
-func (m *RateLimitMock) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    // Reset counter if window has passed
-    if time.Now().After(m.resetTime) {
-        m.requestCount = 0
-        m.resetTime = time.Now().Add(m.window)
-    }
-    
-    m.requestCount++
-    if m.requestCount > m.limit {
-        w.Header().Set("X-RateLimit-Limit", strconv.Itoa(m.limit))
-        w.Header().Set("X-RateLimit-Remaining", "0")
-        w.Header().Set("X-RateLimit-Reset", strconv.FormatInt(m.resetTime.Unix(), 10))
-        w.WriteHeader(429)
-        w.Write([]byte(`{"error": "rate limit exceeded"}`))
-        return
-    }
-    
-    // Normal response handling
-    w.WriteHeader(200)
-    w.Write([]byte(`{"status": "ok"}`))
 }
 ```
 

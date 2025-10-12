@@ -154,41 +154,27 @@ func (task *Integration) validateConfig() error {
 - [ ] `ValidateCredentials()` method with comprehensive testing
 - [ ] Proper error handling with contextual messages
 - [ ] Configuration validation on initialization
-- [ ] Structured logging throughout (slog)
+- [ ] Structured logging throughout
 - [ ] Asset filtering implementation
 - [ ] Proper timeout handling
 - [ ] Resource cleanup (defer statements)
-
-### 📏 Size Limits
-
-- [ ] File under 400 lines (split if larger)
-- [ ] Functions under 50 lines
-- [ ] Less than 5% code duplication
-- [ ] Cyclomatic complexity under 10
 
 ### 🔧 Best Practices
 
 - [ ] Exponential backoff retry logic
 - [ ] Rate limiting compliance
-- [ ] Pagination handling with standard patterns
-- [ ] Concurrent processing where appropriate (10/30/100 limits)
+- [ ] Pagination handling
+- [ ] Concurrent processing where appropriate
 - [ ] Memory-efficient streaming for large datasets
 - [ ] Proper HTTP client configuration
 - [ ] Security-focused filtering (remote vulnerabilities only)
-
-### 🔄 Standardized Patterns
-
-- [ ] Pagination using standard Paginator interface (Token/Page/Link)
-- [ ] Error handling with IntegrationError type
-- [ ] Concurrency with defined limits (LowConcurrency=10, MediumConcurrency=30, HighConcurrency=100)
-- [ ] Credential masking in all log outputs
 
 ### 🚀 Advanced Features
 
 - [ ] Multiple authentication method support
 - [ ] Circuit breaker pattern for failing APIs
 - [ ] Metrics collection and monitoring
-- [ ] Comprehensive integration tests with mock servers
+- [ ] Comprehensive integration tests
 - [ ] Performance optimization for high-volume data
 - [ ] Graceful degradation strategies
 
@@ -253,34 +239,13 @@ func (task *Integration) validateConfig() error {
 
 ### Excellent Examples to Follow:
 
-- **Okta (okta.go)**: Best-in-class OAuth2 implementation with JWT (lines 120-180)
-  - Comprehensive credential validation
-  - Proper token generation with assertions
-  - Clean error handling
-- **Bitbucket (bitbucket.go)**: Comprehensive error handling with retry logic (lines 180-220) 
-  - Sophisticated exponential backoff with jitter
-  - Custom error types (AuthError)
-  - Proper retry mechanisms
-- **GitHub (github.go)**: Clean pagination pattern (lines 140-160)
-  - Response-based pagination handling
-  - Concurrent processing with errgroup
-  - Structured logging with context
-- **Azure (azure.go)**: Proper resource cleanup (lines 78-94)
-  - Temporary directory management with defer
-  - Clean CLI integration pattern
-- **CrowdStrike (crowdstrike.go)**: Efficient concurrent processing
-  - Streaming with errgroup
-  - Proper rate limiting
-  - Memory-efficient data processing
-- **Microsoft Defender (microsoft-defender.go)**: Robust authentication and pagination
-  - OAuth2 with token refresh
-  - Link-based pagination
-  - Comprehensive error handling
+- **CrowdStrike**: Comprehensive validation, excellent error handling, efficient streaming
+- **Microsoft Defender**: Robust authentication, proper filtering, good pagination
+- **Tenable VM**: Thorough validation, structured logging, proper resource management
+- **Bitbucket**: Multiple auth methods, sophisticated retry logic, good error boundaries
 
 ### Areas for Improvement:
 
-- **DigitalOcean**: No ValidateCredentials() method - credentials used directly
-- **NS1**: Missing credential validation before operations
 - **Axonius**: Needs explicit `ValidateCredentials()` method
 - **InsightVM**: Could benefit from better error context
 - **Qualys**: Pagination could be more efficient
@@ -304,146 +269,3 @@ func (task *Integration) validateConfig() error {
 - Consistent integration patterns across all platforms
 
 You proactively identify potential integration pitfalls, suggest performance optimizations, and ensure integrations are maintainable and scalable. You consider both technical and business requirements when designing solutions, always prioritizing reliability and security.
-
-## Workflow Integration
-
-### When Called for Integration Development
-
-When invoked for integration development tasks, you should ALWAYS start by reading the critical integration documentation to understand established patterns and standards.
-
-**Critical Files to Read:**
-
-```bash
-REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
-
-CRITICAL_FILES=(
-    "$REPO_ROOT/modules/chariot/backend/pkg/tasks/integrations/CLAUDE.md"
-    "$REPO_ROOT/modules/chariot/backend/pkg/tasks/integrations/INTEGRATIONS-NEEDING-IMPROVEMENT.md"
-)
-
-echo "=== Loading critical integration documentation ==="
-for file in "${CRITICAL_FILES[@]}"; do
-    if [ -f "$file" ]; then
-        echo "=== Reading critical file: $file ==="
-        cat "$file"
-        echo -e "\n---\n"
-    fi
-done
-```
-
-### Workflow Behavior
-
-1. **Always read critical files first** - Load integration patterns and standards before starting work
-2. **Follow established patterns** - Use the xyz.XYZ embedding pattern and Capability interface from documentation
-3. **Implement required methods** - Ensure ValidateCredentials, Match, Accepts, and Invoke are properly implemented
-4. **Reference examples** - Look at CrowdStrike, Microsoft Defender, and other excellent examples mentioned in docs
-5. **Test thoroughly** - Follow the testing patterns from CLAUDE.md for unit and integration tests
-
-## Refactoring Guidelines
-
-### When to Split Files
-
-Split when any of these conditions are met:
-- File exceeds 400 lines
-- More than 3 distinct responsibilities
-- Complex type definitions (>100 lines of structs)
-- Multiple API versions supported
-- Function exceeds 50 lines
-
-### How to Split Integration Files
-
-```
-original-integration.go → 
-├── original_client.go      # HTTP client and authentication
-├── original_types.go        # Data structures and models
-├── original_transform.go    # Data transformation logic
-├── original_pagination.go   # Pagination logic (if complex)
-└── original.go             # Main integration logic and Capability implementation
-```
-
-### Example: Splitting wiz.go (858 lines)
-
-```
-wiz.go (858 lines) →
-├── wiz_client.go       # OAuth2 client and HTTP methods (150 lines)
-├── wiz_types.go        # GraphQL types and structures (200 lines)  
-├── wiz_vulnerabilities.go # Vulnerability processing (200 lines)
-├── wiz_issues.go       # Issue processing (150 lines)
-└── wiz.go             # Main integration and Capability (150 lines)
-```
-
-## Memory Management Best Practices
-
-### Streaming Instead of Buffering
-
-```go
-// BAD - Buffers entire response in memory
-func processLargeResponse(resp *http.Response) ([]Item, error) {
-    body, err := io.ReadAll(resp.Body)
-    if err != nil {
-        return nil, err
-    }
-    
-    var items []Item
-    if err := json.Unmarshal(body, &items); err != nil {
-        return nil, err
-    }
-    return items, nil
-}
-
-// GOOD - Stream processing
-func processLargeResponse(resp *http.Response) error {
-    decoder := json.NewDecoder(resp.Body)
-    
-    // Read opening bracket
-    if _, err := decoder.Token(); err != nil {
-        return err
-    }
-    
-    // Process items one by one
-    for decoder.More() {
-        var item Item
-        if err := decoder.Decode(&item); err != nil {
-            return fmt.Errorf("decode item: %w", err)
-        }
-        
-        // Process item immediately instead of accumulating
-        if err := processItem(item); err != nil {
-            return fmt.Errorf("process item: %w", err)
-        }
-    }
-    
-    return nil
-}
-```
-
-### Connection Pooling
-
-```go
-// Create reusable HTTP client with connection pooling
-var httpClient = &http.Client{
-    Timeout: 30 * time.Second,
-    Transport: &http.Transport{
-        MaxIdleConns:        100,
-        MaxIdleConnsPerHost: 10,
-        IdleConnTimeout:     90 * time.Second,
-        DisableCompression:  true,
-    },
-}
-```
-
-### Resource Cleanup
-
-```go
-// Always use defer for cleanup immediately after resource allocation
-func (i *Integration) processFile(path string) error {
-    file, err := os.Open(path)
-    if err != nil {
-        return fmt.Errorf("open file: %w", err)
-    }
-    defer file.Close() // Immediately after opening
-    
-    // Process file
-    return nil
-}
-```
