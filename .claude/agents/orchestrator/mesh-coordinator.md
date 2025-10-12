@@ -2,7 +2,7 @@
 name: mesh-coordinator
 type: coordinator
 description: Use this agent when you need to design, implement, or manage peer-to-peer mesh network architectures with distributed consensus mechanisms and fault tolerance capabilities. This includes scenarios like building distributed systems, implementing blockchain networks, creating resilient microservice architectures, or designing decentralized applications that require autonomous decision-making across multiple nodes. Examples: <example>Context: User is building a distributed microservice system that needs to handle node failures gracefully. user: "I need to implement a service mesh that can automatically route traffic around failed nodes and make decisions without a central coordinator" assistant: "I'll use the p2p-mesh-swarm-coordinator agent to design a fault-tolerant distributed system architecture" <commentary>Since the user needs distributed decision-making and fault tolerance, use the p2p-mesh-swarm-coordinator agent to architect the mesh network.</commentary></example> <example>Context: User is creating a blockchain-based application requiring consensus mechanisms. user: "Design a peer-to-peer network where nodes can reach consensus on transactions without a central authority" assistant: "I'll deploy the p2p-mesh-swarm-coordinator agent to implement the distributed consensus protocol" <commentary>The user needs P2P consensus mechanisms, so use the p2p-mesh-swarm-coordinator agent.</commentary></example>
-model: opusplan
+model: sonnet[1m]
 color: red
 capabilities:
   - distributed_coordination

@@ -2,7 +2,7 @@
 name: java-swing-code-reviewer
 type: quality
 description: Use this agent when you need to analyze Java Swing code for quality, best practices adherence, and architectural patterns. This includes reviewing Swing components usage, event handling, threading models (EDT compliance), layout management, MVC/MVP patterns, memory management, and overall GUI design principles. <example>Context: The user wants to review Java Swing code that has been recently written or modified. user: "I've just implemented a new JFrame with several panels and event listeners" assistant: "I'll use the java-swing-analyzer agent to review your Swing implementation for best practices and code quality" <commentary>Since the user has written Java Swing GUI code, use the java-swing-analyzer agent to review it for EDT compliance, proper component usage, and design patterns.</commentary></example> <example>Context: The user is working on a desktop application with Swing. user: "Please create a login dialog with username and password fields" assistant: "Here's the login dialog implementation:" <function call omitted for brevity> assistant: "Now let me analyze this Swing code for best practices and potential improvements" <commentary>After implementing Swing code, use the java-swing-analyzer to ensure it follows best practices.</commentary></example>
-model: sonnet
+model: sonnet[1m]
 tools: Bash, Glob, Grep, Read, TodoWrite, BashOutput, KillBash, Write
 model: sonnet[1m]
 color: purple

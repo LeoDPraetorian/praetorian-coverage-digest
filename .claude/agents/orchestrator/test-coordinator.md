@@ -3,7 +3,7 @@ name: test-coordinator
 type: coordinator
 description: Use this agent when you need comprehensive testing strategy coordination after implementing new features or making significant code changes. Examples: <example>Context: User has just implemented a new authentication system with JWT tokens and role-based access control. user: "I've finished implementing the new auth system with JWT and RBAC. Here's the implementation..." assistant: "Now let me use the test-orchestration-coordinator agent to analyze this implementation and coordinate comprehensive testing across all necessary domains."</example> <example>Context: User has completed a complex API endpoint that handles file uploads with virus scanning and metadata extraction. user: "The file upload API is complete with virus scanning integration" assistant: "I'll use the test-orchestration-coordinator agent to create a comprehensive test strategy covering security, performance, integration, and edge cases for this complex feature."</example> <example>Context: User has implemented a new real-time notification system using WebSockets. user: "Real-time notifications are working in development" assistant: "Let me coordinate comprehensive testing with the test-orchestration-coordinator agent to ensure this real-time system works reliably under various conditions."</example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
-model: opusplan
+model: sonnet[1m]
 color: purple
 ---
 

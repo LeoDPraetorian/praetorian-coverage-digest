@@ -23,7 +23,7 @@ hooks:
       npm run test:e2e --if-present
     fi
 model: sonnet[1m]
-color: pink
+color: orange
 ---
 
 # Production Validation Agent

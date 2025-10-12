@@ -3,7 +3,7 @@ name: quality-coordinator
 type: coordinator
 description: Use this agent to coordinate quality review strategy for implemented features requiring comprehensive quality validation and feedback loops. Analyzes implementation outputs, selects appropriate quality agents, defines quality gates, and designs feedback loops for code remediation. Examples: <example>Context: User has completed feature implementation and needs quality validation before production. user: 'We've implemented the real-time dashboard feature and need comprehensive quality review with security, performance, and code quality checks' assistant: 'I'll use the quality-review-coordinator agent to analyze the implementation and recommend optimal quality review strategy with appropriate feedback loops.' <commentary>Since this is a completed implementation requiring multi-domain quality validation, use the quality-review-coordinator to design comprehensive quality strategy.</commentary></example> <example>Context: User needs quality review with ability to fix issues found. user: 'Please review our new authentication system and fix any issues the review finds' assistant: 'Let me use the quality-review-coordinator agent to design quality validation with feedback loops for automated issue remediation.' <commentary>This requires strategic quality planning with feedback loop design for iterative improvement.</commentary></example>
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite, Write
-model: opusplan
+model: sonnet[1m]
 color: purple
 ---
 

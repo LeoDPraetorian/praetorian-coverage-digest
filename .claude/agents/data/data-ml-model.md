@@ -2,6 +2,7 @@
 name: "ml-developer"
 color: "purple"
 type: "data"
+model: sonnet[1m]
 version: "1.0.0"
 created: "2025-07-25"
 author: "Claude Code"
