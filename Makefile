@@ -72,7 +72,7 @@ install-cli:
 
 install-claude: ## Install Claude Code CLI globally
 	@echo "📦 Installing Claude Code CLI..."
-	@npm install -g @anthropic-ai/claude-code > /dev/null
+	@sudo npm install -g @anthropic-ai/claude-code > /dev/null
 	@echo "✅ Claude Code CLI installed"
 
 install-claude-agent-sdk: ## Install Claude Agent SDK for Python
@@ -83,16 +83,21 @@ install-claude-agent-sdk: ## Install Claude Agent SDK for Python
 update: ## Update all packages (Go, npm, Python, Claude Code, Homebrew)
 	@echo "🔄 Updating all development packages..."
 	@echo ""
-	ifeq (Darwin,$(OS_KERNEL))
+ifeq (Darwin,$(OS_KERNEL))
 	@echo "📦 Updating Homebrew packages..."
-	@brew update && brew upgrade awscli aws-sam-cli jq docker go npm python $(PIP_ARG)
+	@brew update && brew upgrade awscli aws-sam-cli jq docker go npm python
 	@echo ""
 	@echo "📦 Updating Claude Code CLI..."
 	@npm update -g @anthropic-ai/claude-code > /dev/null
 	@echo ""
+else ifeq (Linux,$(OS_KERNEL))
+	@echo "📦 Updating Claude Code CLI..."
+	@sudo npm update -g @anthropic-ai/claude-code > /dev/null
+	@echo ""
+endif
 	@echo "📦 Updating Claude Agent SDK..."
 	@python3 -m pip install --no-cache-dir --upgrade claude-agent-sdk $(PIP_ARG) > /dev/null
-	@echo ""	
+	@echo ""
 	@echo "📦 Updating praetorian-cli..."
 	@python3 -m pip install --no-cache-dir --upgrade praetorian-cli $(PIP_ARG) > /dev/null
 	@echo "✅ All packages updated successfully!"
@@ -119,13 +124,13 @@ configure-cli: install-cli
 
 uninstall-mcp-manager: ## Remove MCP manager and clean up broken symlinks
 	@echo "🧹 Uninstalling MCP manager..."
-	@npm uninstall -g mcp-manager > /dev/null 2>&1
+	@sudo npm uninstall -g mcp-manager > /dev/null 2>&1
 	@echo "✅ MCP manager uninstalled successfully"
 
 install-mcp-manager: ## Install MCP server manager for toggling Claude Desktop MCP servers
 	@echo "📦 Installing MCP manager..."
 	@cd mcp-manager && npm install > /dev/null 2>&1 && npx tsc > /dev/null 2>&1
-	@cd mcp-manager && npm install -g . > /dev/null 2>&1
+	@cd mcp-manager && sudo npm install -g . > /dev/null 2>&1
 	@if ! grep -q 'export PATH="$$HOME/.local/bin:$$PATH"' $(PROFILE_FILE) 2>/dev/null; then \
 		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> $(PROFILE_FILE) > /dev/null 2>&1; \
 	fi
@@ -149,8 +154,8 @@ upgrade-core-mac:
 
 install-core-ubuntu:
 	# go, npm, jq, python, gh are installed in the devcontainer
-	@make install-aws-cli-ubuntu
-	@make install-sam-cli-ubuntu
+	#@make install-aws-cli-ubuntu
+	#@make install-sam-cli-ubuntu
 
 upgrade-core-ubuntu:
 	@apt update
@@ -167,15 +172,15 @@ install-aws-cli-ubuntu:
 	rm -rf aws && \
 	wget -q https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip && \
 	unzip -q awscli-exe-linux-aarch64.zip && \
-	./aws/install $(upgrade_option) && \
+	sudo ./aws/install $(upgrade_option) && \
 	rm -rf /tmp/aws /tmp/awscli-exe-linux-aarch64.zip
-	
+
 install-sam-cli-ubuntu:
 	@cd /tmp && \
 	rm -rf sam-installation && \
 	wget -q https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-arm64.zip && \
 	unzip -q aws-sam-cli-linux-arm64.zip -d sam-installation && \
-	./sam-installation/install  $(upgrade_option) && \
+	sudo ./sam-installation/install  $(upgrade_option) && \
 	rm -rf /tmp/sam-installation /tmp/aws-sam-cli-linux-arm64.zip
 
 setup-common: install-cli install-claude install-claude-agent-sdk
@@ -207,9 +212,12 @@ endif
 	else \
 		echo "GitHub already authenticated with read:packages scope"; \
 	fi
+ifeq (Darwin,$(OS_KERNEL))
+	# Running docker inside devcontainer isn't supported yet
 	@echo "Setting up Docker registry authentication..."
 	$(eval GITHUB_USERNAME := $(shell gh api user --jq '.login'))
 	gh auth token | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
+endif
 	@make install-mcp-manager
 
 setup: 
