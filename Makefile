@@ -1,3 +1,5 @@
+MAKEFLAGS += --no-print-directory
+
 # The following section sets up variables depending on whether we are running in macOS or in
 # the Ubuntu devcontainer.
 OS_KERNEL := $(shell uname -s)
@@ -18,19 +20,9 @@ else
 	PROFILE_FILE := $(HOME)/.profile
 endif
 
-# In the devcontainer, need to use --break-system-packages to force installing
-# the packages globally. The disadvantage of this is that the packages may break
-# packages that the Ubuntu system relies on. The advantage is that we can install
-# use the packagges, such as the Claude Agent SDK, without having to deal with
-# virtualenvs. Testing has shown that the packages are not known to be incompatible
-# with the packages Ubuntu depends on.
-ifeq (Linux,$(OS_KERNEL))
-	PIP_ARG := --break-system-packages
-endif
-
 chariot:
 ifeq (Darwin,$(OS_KERNEL))
-	# No support to run docker inside the devcontainer yet
+# running docker inside the devcontainer isn't supported yet
 	open -ja Docker
 endif
 	@echo "Deploying backend."
@@ -65,77 +57,6 @@ user:
     echo "https://localhost:3000/login-with-keychain?keychain=$$ENCODED_KEYCHAIN" && \
     cd ../../.. && echo "CHARIOT_LOGIN_URL=https://localhost:3000/login-with-keychain?keychain=$$ENCODED_KEYCHAIN" >> .env
 
-install-cli:
-	@echo "📦 Installing the Praetorian CLI..."
-	@python3 -m pip install --no-cache-dir praetorian-cli $(PIP_ARG) > /dev/null
-	@echo "✅ Praetorian CLI installed"
-
-install-claude: ## Install Claude Code CLI globally
-	@echo "📦 Installing Claude Code CLI..."
-	@sudo npm install -g @anthropic-ai/claude-code > /dev/null
-	@echo "✅ Claude Code CLI installed"
-
-install-claude-agent-sdk: ## Install Claude Agent SDK for Python
-	@echo "📦 Installing/Upgrading Claude Agent SDK..."
-	@python3 -m pip install --no-cache-dir claude-agent-sdk $(PIP_ARG) > /dev/null
-	@echo "✅ Claude Agent SDK installed"
-
-update: ## Update all packages (Go, npm, Python, Claude Code, Homebrew)
-	@echo "🔄 Updating all development packages..."
-	@echo ""
-ifeq (Darwin,$(OS_KERNEL))
-	@echo "📦 Updating Homebrew packages..."
-	@brew update && brew upgrade awscli aws-sam-cli jq docker go npm python
-	@echo ""
-	@echo "📦 Updating Claude Code CLI..."
-	@npm update -g @anthropic-ai/claude-code > /dev/null
-	@echo ""
-else ifeq (Linux,$(OS_KERNEL))
-	@echo "📦 Updating Claude Code CLI..."
-	@sudo npm update -g @anthropic-ai/claude-code > /dev/null
-	@echo ""
-endif
-	@echo "📦 Updating Claude Agent SDK..."
-	@python3 -m pip install --no-cache-dir --upgrade claude-agent-sdk $(PIP_ARG) > /dev/null
-	@echo ""
-	@echo "📦 Updating praetorian-cli..."
-	@python3 -m pip install --no-cache-dir --upgrade praetorian-cli $(PIP_ARG) > /dev/null
-	@echo "✅ All packages updated successfully!"
-
-configure-cli: install-cli
-	@UUID=$$(uuidgen | tr '[:upper:]' '[:lower:]') && \
-	echo "Setting up Praetorian CLI configuration..." && \
-	echo "Generated profile UUID: $$UUID" && \
-	echo "" && \
-	read -p "Enter username: " USERNAME && \
-	read -s -p "Enter password: " PASSWORD && \
-	echo "" && \
-	echo "" && \
-	echo "Creating keychain file..." && \
-	echo "[$$UUID]" > keychain.ini && \
-	echo "username = $$USERNAME" >> keychain.ini && \
-	echo "password = $$PASSWORD" >> keychain.ini && \
-	echo "Moving keychain file to ~/.keychain.ini..." && \
-	mv keychain.ini ~/.keychain.ini && \
-	echo "Configuration complete!" && \
-	echo "" && \
-	echo "Use this command prefix for Praetorian CLI:" && \
-	echo "  praetorian --profile $$UUID"
-
-uninstall-mcp-manager: ## Remove MCP manager and clean up broken symlinks
-	@echo "🧹 Uninstalling MCP manager..."
-	@sudo npm uninstall -g mcp-manager > /dev/null 2>&1
-	@echo "✅ MCP manager uninstalled successfully"
-
-install-mcp-manager: ## Install MCP server manager for toggling Claude Desktop MCP servers
-	@echo "📦 Installing MCP manager..."
-	@cd mcp-manager && npm install > /dev/null 2>&1 && npx tsc > /dev/null 2>&1
-	@cd mcp-manager && sudo npm install -g . > /dev/null 2>&1
-	@if ! grep -q 'export PATH="$$HOME/.local/bin:$$PATH"' $(PROFILE_FILE) 2>/dev/null; then \
-		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> $(PROFILE_FILE) > /dev/null 2>&1; \
-	fi
-	@echo "✅ MCP manager installed successfully"
-
 feature:
 	npx claude-flow@alpha sparc $(description)
 
@@ -145,91 +66,6 @@ add-module:
 
 add-go-module:
 	go work use $(module)
-
-install-core-mac:
-	brew install awscli aws-sam-cli jq npm python docker go gh
-
-upgrade-core-mac:
-	brew upgrade awscli aws-sam-cli jq npm python docker go gh
-
-install-core-ubuntu:
-	# go, npm, jq, python, gh are installed in the devcontainer
-	#@make install-aws-cli-ubuntu
-	#@make install-sam-cli-ubuntu
-
-upgrade-core-ubuntu:
-	@apt update
-	@apt -y install python3 pip nodejs jq gh
-	@apt clean
-	@npm update -g npm
-	@npm update -g typescript
-	# upgrade of the AWS CLIs involves downloading the latest and installing again.
-	@make install-aws-cli-ubuntu upgrade_option=--update
-	@make install-sam-cli-ubuntu upgrade_option=--update
-
-install-aws-cli-ubuntu:
-	@cd /tmp && \
-	rm -rf aws && \
-	wget -q https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip && \
-	unzip -q awscli-exe-linux-aarch64.zip && \
-	sudo ./aws/install $(upgrade_option) && \
-	rm -rf /tmp/aws /tmp/awscli-exe-linux-aarch64.zip
-
-install-sam-cli-ubuntu:
-	@cd /tmp && \
-	rm -rf sam-installation && \
-	wget -q https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-arm64.zip && \
-	unzip -q aws-sam-cli-linux-arm64.zip -d sam-installation && \
-	sudo ./sam-installation/install  $(upgrade_option) && \
-	rm -rf /tmp/sam-installation /tmp/aws-sam-cli-linux-arm64.zip
-
-setup-common: install-cli install-claude install-claude-agent-sdk
-	@if ! grep -q "export GOPRIVATE=github.com/praetorian-inc" $(PROFILE_FILE) 2>/dev/null; then \
-		echo "export GOPRIVATE=github.com/praetorian-inc" >> $(PROFILE_FILE); \
-		echo "Added GOPRIVATE to $(PROFILE_FILE)"; \
-	fi
-ifeq (Linux,$(OS_KERNEL))
-	@if ! grep -q "/usr/local/go/bin" $(PROFILE_FILE) 2>/dev/null; then \
-		echo "export PATH=\$PATH:/usr/local/go/bin" >> $(PROFILE_FILE); \
-		echo "Added /usr/local/go/bin PATH in $(PROFILE_FILE)"; \
-	fi
-endif
-	@make submodule-init-robust
-	@make setup-ui
-	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
-		echo "AWS credentials not found, running aws configure..."; \
-		aws configure; \
-	else \
-		echo "AWS credentials already configured, skipping aws configure"; \
-	fi
-	@echo "Checking GitHub authentication status..."
-	@if ! gh auth status >/dev/null 2>&1; then \
-		echo "GitHub not logged in. Logging in with read:packages scope..."; \
-		gh auth login --scopes read:packages; \
-	elif ! gh auth status 2>&1 | grep -q "read:packages"; then \
-		echo "GitHub logged in but missing read:packages scope. Refreshing authentication..."; \
-		gh auth refresh --scopes read:packages; \
-	else \
-		echo "GitHub already authenticated with read:packages scope"; \
-	fi
-ifeq (Darwin,$(OS_KERNEL))
-	# Running docker inside devcontainer isn't supported yet
-	@echo "Setting up Docker registry authentication..."
-	$(eval GITHUB_USERNAME := $(shell gh api user --jq '.login'))
-	gh auth token | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
-endif
-	@make install-mcp-manager
-
-setup: 
-ifeq (Darwin,$(OS_KERNEL))
-	@make install-core-mac
-else ifeq (Linux,$(OS_KERNEL))
-	@make install-core-ubuntu
-else
-	@echo "Unknown OS: $(OS_KERNEL)"
-	exit 1
-endif	
-	@make setup-common
 
 checkout:
 	git submodule foreach 'git checkout $(branch) || true'
@@ -431,8 +267,7 @@ setup-ui: ## Install UI dependencies and run setup
 mcp-manager: ## Launch Claude Code with MCP server selection
 	@./scripts/mcp-manager.sh
 
-
-test:
+info:
 	@echo "HOME: $(HOME)" # from the shell
 	@echo "SHELL: $(SHELL)" # from the shell
 	@echo "USER: $(USER)" # from the shell
@@ -440,4 +275,175 @@ test:
 	@echo "PROFILE_FILE: $(PROFILE_FILE)"
 	@echo "OS_KERNEL: $(OS_KERNEL)"
 	@echo "ARCH: $(ARCH)"
-	@echo "PIP_ARG: $(PIP_ARG)"
+
+setup: 
+ifeq (Darwin,$(OS_KERNEL))
+	@make install-mac
+else ifeq (Linux,$(OS_KERNEL))
+	@make install-ubuntu
+else
+	@echo "Unknown OS: $(OS_KERNEL)"
+	exit 1
+endif	
+	@if ! grep -q "export GOPRIVATE=github.com/praetorian-inc" $(PROFILE_FILE) 2>/dev/null; then \
+		echo "export GOPRIVATE=github.com/praetorian-inc" >> $(PROFILE_FILE); \
+		echo "Added GOPRIVATE to $(PROFILE_FILE)"; \
+	fi
+	@make submodule-init-robust
+	@make setup-ui
+	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
+		echo "AWS credentials not found, running aws configure..."; \
+		aws configure; \
+	else \
+		echo "AWS credentials already configured, skipping aws configure"; \
+	fi
+	@echo "Checking GitHub authentication status..."
+	@if ! gh auth status >/dev/null 2>&1; then \
+		echo "GitHub not logged in. Logging in with read:packages scope..."; \
+		gh auth login --scopes read:packages; \
+	elif ! gh auth status 2>&1 | grep -q "read:packages"; then \
+		echo "GitHub logged in but missing read:packages scope. Refreshing authentication..."; \
+		gh auth refresh --scopes read:packages; \
+	else \
+		echo "GitHub already authenticated with read:packages scope"; \
+	fi
+ifeq (Darwin,$(OS_KERNEL))
+	@echo "Setting up Docker registry authentication..."
+	$(eval GITHUB_USERNAME := $(shell gh api user --jq '.login'))
+	gh auth token | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
+else
+	@echo "ℹ️Running docker inside devcontainer isn't supported yet. Skipping Docker registry authentication."
+endif
+	@echo "✅ Setup completed successfully"
+
+update: ## Update all packages (Go, npm, Python, Claude Code, Praetorian CLI, Homebrew)
+	@echo "🔄 Updating all development packages..."
+	@echo "📦 Updating core packages..."
+ifeq (Darwin,$(OS_KERNEL))
+	@make update-mac
+else
+	@make update-ubuntu
+endif
+	@echo "✅ All packages updated successfully!"
+
+install-mac:
+	@echo "Installing core packages on macOS..."
+	@brew install awscli aws-sam-cli jq node python docker go gh
+	@echo "Installing Praetorian CLI..."
+	@python3 -m pip install --no-cache-dir praetorian-cli > /dev/null
+	@echo "Installing Claude Code..."
+	@npm install -g @anthropic-ai/claude-code > /dev/null
+	@echo "Installing Claude Agent SDK..."
+	@python3 -m pip install --no-cache-dir claude-agent-sdk > /dev/null
+	@make mcp-manager-install
+
+update-mac:
+	@echo "Upgrading core packages on macOS..."
+	@brew upgrade awscli aws-sam-cli jq node python docker go gh
+	@echo "Installing Praetorian CLI..."
+	@python3 -m pip install --no-cache-dir --upgrade praetorian-cli > /dev/null
+	@echo "Installing Claude Code..."
+	@npm update -g @anthropic-ai/claude-code > /dev/null
+	@echo "Installing Claude Agent SDK..."
+	@python3 -m pip install --no-cache-dir --upgrade claude-agent-sdk > /dev/null
+	
+install-ubuntu:
+# go, npm, jq, python, gh are installed in the devcontainer, upgrade them manually in devcontainer
+	@echo "Core packages in Ubuntu comes pre-installed in the devcontainer. Installing additional packages..."
+	@test -d /usr/local/aws-cli/v2/current || make install-aws-cli-ubuntu
+	@test -d /usr/local/aws-sam-cli/current || make install-sam-cli-ubuntu
+	@echo "Installing Praetorian CLI..."
+	@sudo python3 -m pip install --no-cache-dir praetorian-cli --break-system-packages > /dev/null
+	@echo "Installing Claude Code..."
+	@sudo npm install -g @anthropic-ai/claude-code > /dev/null
+	@echo "Installing Claude Agent SDK..."
+	@sudo python3 -m pip install --no-cache-dir claude-agent-sdk --break-system-packages > /dev/null
+# Put go in the PATH
+	@if ! grep -q "/usr/local/go/bin" $(PROFILE_FILE) 2>/dev/null; then \
+		echo "export PATH=\$$PATH:/usr/local/go/bin" >> $(PROFILE_FILE); \
+		echo "Added /usr/local/go/bin PATH in $(PROFILE_FILE)"; \
+	fi
+# TODO (Peter): determine whether we need to install mcp-manager in Ubuntu.
+
+
+update-ubuntu:
+	@echo "Upgrading core packages on Ubuntu..."
+	@sudo apt update
+	@sudo apt -y install python3 pip nodejs jq gh
+	@sudo apt clean
+	@sudo npm update -g npm
+	@sudo npm update -g typescript
+	@make install-aws-cli-ubuntu upgrade_option=--update
+	@make install-sam-cli-ubuntu upgrade_option=--update
+	@echo "Updating Praetorian CLI..."
+	@sudo python3 -m pip install --no-cache-dir --upgrade praetorian-cli --break-system-packages > /dev/null
+	@echo "Updating Claude Code..."
+	@sudo npm update -g @anthropic-ai/claude-code > /dev/null
+	@echo "Updating Claude Agent SDK..."
+	@sudo python3 -m pip install --no-cache-dir --upgrade claude-agent-sdk --break-system-packages > /dev/null
+
+install-aws-cli-ubuntu:
+	@echo "Installing/updating AWS CLI..."
+	@cd /tmp && \
+	rm -rf aws && \
+	wget -q https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip && \
+	unzip -q awscli-exe-linux-aarch64.zip && \
+	sudo ./aws/install $(upgrade_option) && \
+	rm -rf /tmp/aws /tmp/awscli-exe-linux-aarch64.zip
+
+install-sam-cli-ubuntu:
+	@echo "Installing/updating AWS SAM CLI..."
+	@cd /tmp && \
+	rm -rf sam-installation && \
+	wget -q https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-arm64.zip && \
+	unzip -q aws-sam-cli-linux-arm64.zip -d sam-installation && \
+	sudo ./sam-installation/install  $(upgrade_option) && \
+	rm -rf /tmp/sam-installation /tmp/aws-sam-cli-linux-arm64.zip
+
+configure-cli:
+	@UUID=$$(uuidgen | tr '[:upper:]' '[:lower:]') && \
+	echo "Setting up Praetorian CLI configuration..." && \
+	echo "Generated profile UUID: $$UUID" && \
+	echo "" && \
+	read -p "Enter username: " USERNAME && \
+	read -s -p "Enter password: " PASSWORD && \
+	echo "" && \
+	echo "" && \
+	echo "Creating keychain file..." && \
+	echo "[$$UUID]" > keychain.ini && \
+	echo "username = $$USERNAME" >> keychain.ini && \
+	echo "password = $$PASSWORD" >> keychain.ini && \
+	echo "Moving keychain file to ~/.keychain.ini..." && \
+	mv keychain.ini ~/.keychain.ini && \
+	echo "Configuration complete!" && \
+	echo "" && \
+	echo "Use this command prefix for Praetorian CLI:" && \
+	echo "  praetorian --profile $$UUID"
+
+mcp-manager-uninstall: ## Remove MCP manager and clean up broken symlinks
+	@echo "🧹 Uninstalling MCP manager..."
+	@npm uninstall -g mcp-manager > /dev/null 2>&1 || true
+	@echo "✅ MCP manager uninstalled successfully"
+
+mcp-manager-install: ## Install MCP server manager for toggling Claude Desktop MCP servers
+	@echo "📦 Installing MCP manager..."
+	@cd mcp-manager && npm install > /dev/null 2>&1 && npx tsc > /dev/null 2>&1
+	@cd mcp-manager && npm install -g . > /dev/null 2>&1
+	@SHELL_NAME=$$(basename $$SHELL); \
+	if [ "$$SHELL_NAME" = "zsh" ]; then \
+		PROFILE=~/.zshrc; \
+	elif [ "$$SHELL_NAME" = "bash" ]; then \
+		if [ -f ~/.bash_profile ]; then \
+			PROFILE=~/.bash_profile; \
+		else \
+			PROFILE=~/.bashrc; \
+		fi; \
+	else \
+		PROFILE=~/.profile; \
+	fi; \
+	if ! grep -q 'export PATH="$$HOME/.local/bin:$$PATH"' $$PROFILE 2>/dev/null; then \
+		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> $$PROFILE > /dev/null 2>&1; \
+	fi; \
+	export PATH="$$HOME/.local/bin:$$PATH"; \
+	hash -r 2>/dev/null || true
+	@echo "✅ MCP manager installed successfully"
