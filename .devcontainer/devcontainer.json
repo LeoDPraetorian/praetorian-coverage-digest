@@ -1,17 +1,4 @@
 {
   "name": "Chariot Devpod Container",
-  "image": "ghcr.io/praetorian-inc/chariot-devpod:latest",
-
-  "customizations": {
-    "postCreateCommand": "echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc",
-    "cursor": {
-      "extensions": [
-        "Anthropic.claude-code",
-        "golang.go",
-        "anysphere.cursorpyright",
-        "eamodio.gitlens",
-        "dbaeumer.vscode-eslint"
-      ]
-    }
-  }
+  "image": "ghcr.io/praetorian-inc/chariot-devpod:latest"
 }
