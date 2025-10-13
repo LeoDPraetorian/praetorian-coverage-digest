@@ -27,8 +27,7 @@
       "Bash(curl)",
       "Bash(wget)",
       "Bash(eval :*)",
-      "Bash(make play)",
-      "Bash(make dev)",
+      "Bash(make deploy:*)",
       "Bash(make purge)",
       "Bash(go run */user-purge/*)",
       "Bash(git push --tags)"

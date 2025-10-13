@@ -93,9 +93,9 @@ Navigate to specific modules for targeted development:
 
 ```bash
 cd modules/chariot            # Main platform development
-cd modules/chariot/backend && make dev    # Deploy backend only
-cd modules/chariot/ui && npm start       # Frontend development server
-cd modules/chariot/e2e && npm test       # Run E2E test suite
+cd modules/chariot/backend && make deploy    # Deploy backend only
+cd modules/chariot/ui && npm start           # Frontend development server
+cd modules/chariot/e2e && npm test           # Run E2E test suite
 
 cd modules/nebula             # Multi-cloud security scanning
 cd modules/janus              # Security tool orchestration

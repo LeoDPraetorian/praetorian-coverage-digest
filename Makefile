@@ -26,7 +26,7 @@ ifeq (Darwin,$(OS_KERNEL))
 	open -ja Docker
 endif
 	@echo "Deploying backend."
-	cd modules/chariot/backend && make dev
+	cd modules/chariot/backend && make deploy ENV=dev-autoscale
 	@echo "Backend deployment complete. Starting local frontend."
 	cd modules/chariot/backend && make populate-env
 	@make restart-ui
