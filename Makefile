@@ -358,6 +358,7 @@ install-ubuntu:
 	@sudo npm install -g @anthropic-ai/claude-code > /dev/null
 	@echo "Installing Claude Agent SDK..."
 	@sudo python3 -m pip install --no-cache-dir claude-agent-sdk --break-system-packages > /dev/null
+	@sudo make mcp-manager-install
 # Put go in the PATH
 	@if ! grep -q "/usr/local/go/bin" $(PROFILE_FILE) 2>/dev/null; then \
 		echo "export PATH=\$$PATH:/usr/local/go/bin" >> $(PROFILE_FILE); \
