@@ -1,4 +1,8 @@
 {
   "name": "Chariot Devpod Container",
-  "image": "ghcr.io/praetorian-inc/chariot-devpod:latest"
+  "image": "ghcr.io/praetorian-inc/chariot-devpod:latest",
+  "features": {
+    "ghcr.io/devcontainers/features/desktop-lite:1": {}
+  },
+  "runArgs": ["--shm-size=2gb"]
 }

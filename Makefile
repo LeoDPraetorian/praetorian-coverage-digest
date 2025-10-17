@@ -386,19 +386,19 @@ install-aws-cli-ubuntu:
 	@echo "Installing/updating AWS CLI..."
 	@cd /tmp && \
 	rm -rf aws && \
-	wget -q https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip && \
-	unzip -q awscli-exe-linux-aarch64.zip && \
+	wget -q https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -O aws-cli-installer.zip && \
+	unzip -q aws-cli-installer.zip && \
 	sudo ./aws/install $(upgrade_option) && \
-	rm -rf /tmp/aws /tmp/awscli-exe-linux-aarch64.zip
+	rm -rf /tmp/aws /tmp/aws-cli-installer.zip
 
 install-sam-cli-ubuntu:
 	@echo "Installing/updating AWS SAM CLI..."
 	@cd /tmp && \
 	rm -rf sam-installation && \
-	wget -q https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-arm64.zip && \
-	unzip -q aws-sam-cli-linux-arm64.zip -d sam-installation && \
+	wget -q https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip -O aws-sam-installer.zip && \
+	unzip -q aws-sam-installer.zip -d sam-installation && \
 	sudo ./sam-installation/install  $(upgrade_option) && \
-	rm -rf /tmp/sam-installation /tmp/aws-sam-cli-linux-arm64.zip
+	rm -rf /tmp/sam-installation /tmp/aws-sam-installer.zip
 
 configure-cli:
 	@UUID=$$(uuidgen | tr '[:upper:]' '[:lower:]') && \
