@@ -1,16 +1,16 @@
 # Remote Development
 
 This document walks through how to set up **DevPod** for remote development. DevPod implements the [`devcontainer`](https://containers.dev/)
-standard. It is an open-source alternative to GitHub Codespaces, without tight coupling to VS Code. The way devcontainer works is
-ingenious. Learn more on how it works [here](https://code.visualstudio.com/docs/devcontainers/containers).
+standard. It is an open-source alternative to GitHub Codespaces, without tight coupling to VS Code. The way devcontainer
+works is ingenious. Learn more on how it works [here](https://code.visualstudio.com/docs/devcontainers/containers).
 
 
 ## Install DevPod
 - Install the CLI: 
   ```
-  curl -L -o devpod "https://github.com/loft-sh/devpod/releases/latest/download/devpod-darwin-arm64"
-  sudo install -c -m 0755 devpod /usr/local/bin
-  rm -f devpod
+  curl -L -o /tmp/devpod "https://github.com/loft-sh/devpod/releases/latest/download/devpod-darwin-arm64"
+  sudo install -c -m 0755 /tmp/devpod /usr/local/bin
+  rm -f /tmp/devpod
   ```
 - Install the Desktop App: 
   
@@ -53,77 +53,112 @@ In DevPod, a **provider** is the entity that provides the compute for the devcon
 ### Create a workspace
 - A **DevPod Workspace** is the container that runs the development environment.
 
-- Create a workspace off of the `chariot-development-platform` repo. Give it a name that has meaning to you, such as "ui-refactor":
+- Create a workspace off of the `chariot-development-platform` repo. Give it a name that has meaning to you, such a
+  "ui-refactor":
 
-  `devpod up --provider aws-provider github.com/praetorian-inc/chariot-development-platform --ide cursor --id {{YOUR_WORKSPACE_NAME}}`
+  - **Cursor:** 
+    - `devpod up --provider aws-provider github.com/praetorian-inc/chariot-development-platform --ide cursor --id {{YOUR_WORKSPACE_NAME}}`
+    - Once it is done initializing the container, a new IDE window will appear with the name of the workspace and an indication
+      that it operates over an SSH tunnel. This IDE should show the repo tree in the file explorer. It is the tree
+      in the container.
+
+  - **GoLand:**
+    - `devpod up --provider aws-provider github.com/praetorian-inc/chariot-development-platform --ide goland --id {{YOUR_WORKSPACE_NAME}}`
+    - Once it is done initializing the container, it will bring up a **Connect to SSH** dialog window with default
+      filled in. Click **Check Connection and Continue**. It will initialize the GoLand project, dropping you in the
+      Readme file of the repo.
+
+- _All the communications between your laptop and the container are mediated by the IDE._
   
-  *(Note: I am still working out Goland...)*
-
-- It will print tons of log messages as it installs the container and additional software needed for the
-  workspace. At the end of this, a new Cursor window will appear with the name of the workspace and an indication
-  that it operates over an SSH tunnel. This Cursor window should show the repo tree in the file explorer.
-
-- _All the communications between your laptop and the container are mediated by Cursor. So, you need to get terminals and brower from Cursor._
-
-- Workaround a DevPod bug where the state of the container will not be preserved across the _first_ stop/up cycle:
+- Don't do any work in the container yet. You need to workaround a DevPod bug before doing so ([Issue #1925](https://github.com/loft-sh/devpod/issues/1925)).
   - Run `scripts/cycle-devpod.sh {{YOUR_WORKSPACE_NAME}}`
-  - Subsequent stop/up cycle will preserve the container.
+  - Subsequent restart cycles will preserve the container.
 
 ### Set up the environment in the container
 
 This section is about cloning the repos, authenticating to various services, and viewing the
 desktop of the container.
 
-- Open up a terminal in Cursor. You will be dropped into the directory where the `chariot-development-platform` lives.
+- Open up a terminal in the IDE. You will be dropped into the directory where the `chariot-development-platform` lives.
   DevPod puts it at `/workspaces/{{YOUR_WORKSPACE_NAME}}`.
 
-- Run `make setup && make start-ui`. During this, the Chrome running on your laptop will pop up for authentication. This 
-  command take about 5 minutes because it clones the modules and install NPM packages for the UI.
+- Run `make setup`. During this, the Chrome running on your laptop will pop up for authentication to GitHub.
 
 
-### View the desktop
+### View the Fluxbox desktop and running Chrome
 
-- Run `xrandr -s 1600x1200` 
+- The devcontainer is pre-installed with a lightweight Fluxbox desktop environment. This allows us to run Chrome 
+  visually and login to Chariot with drag-and-drop keychain files.
 
-- Press `CMD+SHIFT+P` and type "ports view ↵". This will drop you in a **Ports** tab in the bottom pane.
+- Forward the VNC port to your laptop:
+  - **Cursor:**
+    - Press `CMD+SHIFT+P` and type "ports view ↵". This will drop you in a **Ports** tab in the bottom pane.
+    - Click the **Forward a Port** button. Enter `6080`.
+    - This creates a new entry for port 6080. In the localhost:NNNNN column, click the **Preview in Editor** icon to open
+      the Cursor browser to view the noVNC webpage. Click **Connect**.
+    - Reference: https://code.visualstudio.com/docs/debugtest/port-forwarding
+    
+  - **GoLand:** 
+    - Open the **Backend Control Center** by clicking the DevPod workspace name on the top chrome of GoLand window.
+    - Click the **Ports** tab.
+    - Click Add for **Forward Remote -> Local**. 
+    - Enter `6080` for remote and a random open port on local, say, `60123`
+    - In your local browser, point it to **http://localhost:60123**. It will open up a noVNC page. Click **Connect**.
+    - Reference: https://www.jetbrains.com/help/idea/security-model.html#manage_ports
 
-- Click the **Forward a Port** button. Enter `6080`.
+- You now see the Fluxbox desktop. You can run the file manager and terminal via the application menu in the lower
+  left corner.
 
-- This creates a new entry for port 6080. In the localhost:6080 column, click the **Preview in Editor** icon to open the Cursor browser to view the noVNC webpage. Click `Connect` in the webpage. You now see a lightweight FluxBox desktop.
+- Back in the IDE terminal, run `scripts/launch-chrome.sh https://chariot.praetorian.com`. Chrome should show up.
+  We use a script to launch Chrome with options that support interaction with the chrome-devtools MCP server and graphics
+  acceleration.
 
-- Back in the Cursor terminal, run `scripts/launch-chrome.sh https://localhost:3000`. Chrome should show up in
-  noVNC with the Chariot login page.
+### Running the frontend
 
-### Add your favorite Cursor extension
-- Go to the **Extension** view. You will see your list of extensions with "Install in SSH:{{WORKSPACE_NAME}}" buttons. 
-  Click that button to install in the container. If you will need to repeat this step for all containers you launch.
+- Run `make start-ui`
+- Run `scripts/launch-chrome.sh https://localhost:3000`
+- Login to any stack, including Prod, using keychain file drag-and-drop. I recommend putting individual keychain files
+  in `/home/vscode`. Then use the File Manager of Fluxbox to drag-and-drop.
 
-### Deploy the backend
-- `make setup` would have set the STACK_NAME variable in `.bashrc`. Please verify that it is your stack.
-- Support only for deploying the SAM stack. No support yet for creating the docker image for the compute
-  server.
-- run `make build` in `modules/chariot/backend`. The first build takes between 5 to 10 minutes, with the `go mod download`
+### Deploying the backend
+- The `whoami` username is `vscode`. So, you need to update the config env files to point to your stack. 
+- Support only for deploying the SAM stack. No support yet for creating the docker image for the compute server. So, work
+  that requires iterating on the compute server code need to be done on your laptop.
+- Run `make build` in `modules/chariot/backend`. The first build takes between 5 to 10 minutes, with the `go mod download`
   step looks like it is hanging for a couple of minute.
+- There is an open question to solve -- how to deploy only the SAM stack without updating the docker image?
+
+### Add your IDE extensions/plugins:
+- **Cursor:**
+    - Go to the **Extension** view. You will see your list of extensions with "Install in SSH:{{WORKSPACE_NAME}}" buttons.
+      Click that button to install in the container. If you will need to repeat this step for all containers you launch.
+
+- **GoLand:**
+    - In Settings, you will see two Plugins menu entries: Host and Client. Install the plugins on **Host**.
+    - Reference: https://youtrack.jetbrains.com/articles/SUPPORT-A-696/Where-should-the-plugin-be-installed-in-the-client-or-on-the-host-for-remote-development
 
 ## Variations
 - If you want to launch a DevPod workspace with a specific commit of the repo, add the version slug to it, such as
 `devpod up --provider aws-provider github.com/praetorian-inc/chariot-development-platform@peter/vnc --id workspace-at-a-branch`
-`devpod up github.com/praetorian-inc/chariot-development-platform@sha256:3f8179ae8deb7d2021406625c9444134b65952c4 --id workspace-at-a-hash`
+`devpod up --provider aws-provider github.com/praetorian-inc/chariot-development-platform@sha256:3f8179ae8deb7d2021406625c9444134b65952c4 --id workspace-at-a-hash`
+
+- You can change the size of the VNC display with the `xrandr` command, such as `xrandr -s 1600x1200`.
 
 # Build and publish the devcontainer
 - The devcontainer is pre-built in [Praetorian's ghcr.io](https://github.com/praetorian-inc/chariot-development-platform/pkgs/container/chariot-devpod).
-- To update it:
-  - Login to Docker with a PAT that can write ghcr packages.
+- To update it on MacBook:
+  - Login to Docker with a PAT that can write ghcr.io packages.
   - Run `make publish` in `.devcontainer/`.
 
 # Set up notes:
 - Workaround DevPod v0.6.15 bug ([Issue #49](https://github.com/loft-sh/devpod-provider-aws/issues/49)) by making copies of
   the Jammy Jellyfish Ubuntu AMI into our AWS Playground account with the description prefix that the code looks for.
-
-- Running Google Chrome
-  - Google Chrome official packages are only available for x86_64 on Linux. So we moved to an Intel EC2.
-  - Desktop environment is providede by the [desktop-lite](https://github.com/devcontainers/features/tree/main/src/desktop-lite). 
-    It contains TigerVNC and Fluxbox, just enough for us Chrome to function.
+- Workaround DevPod persistence by running `scripts/cycle-devpod.sh`
+- Running Google Chrome with chrome-devtools-mcp
+  - Google Chrome official packages are only available for x86_64 on Linux. So we moved to an Intel instance type.
+  - Desktop environment is provided by the [desktop-lite](https://github.com/devcontainers/features/tree/main/src/desktop-lite). 
+    It contains TigerVNC and Fluxbox, just enough for us use Chrome visually and login using keychain files.
   - Chrome needs a more memory in /dev/shm. Expanded that to 2GB from the 64MB default.
   - Our sigma.js in the UI needs several specific packages and launch time options to run correctly.
     See those in Dockerfile and launch-chrome.sh
+  - In order to the debug port 9222 to work, Chrome needs to be launched with `--user-data-dir`.
