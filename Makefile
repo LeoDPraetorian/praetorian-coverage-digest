@@ -278,9 +278,9 @@ info:
 
 setup: 
 ifeq (Darwin,$(OS_KERNEL))
-	@make install-mac
+	@make setup-mac
 else ifeq (Linux,$(OS_KERNEL))
-	@make install-ubuntu
+	@make setup-ubuntu
 else
 	@echo "Unknown OS: $(OS_KERNEL)"
 	exit 1
@@ -312,9 +312,10 @@ ifeq (Darwin,$(OS_KERNEL))
 	$(eval GITHUB_USERNAME := $(shell gh api user --jq '.login'))
 	gh auth token | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
 else
-	@echo "ℹ️Running docker inside devcontainer isn't supported yet. Skipping Docker registry authentication."
+	@echo "ℹ️ Running docker inside devcontainer isn't supported yet. Skipping Docker registry authentication."
 endif
-	@echo "✅ Setup completed successfully"
+	@echo "✅ Setup completed successfully."
+	@echo "ℹ️ Please run 'source $(PROFILE_FILE)' to apply the changes now."
 
 update: ## Update all packages (Go, npm, Python, Claude Code, Praetorian CLI, Homebrew)
 	@echo "🔄 Updating all development packages..."
@@ -326,7 +327,7 @@ else
 endif
 	@echo "✅ All packages updated successfully!"
 
-install-mac:
+setup-mac:
 	@echo "Installing core packages on macOS..."
 	@brew install awscli aws-sam-cli jq node python docker go gh
 	@echo "Installing Praetorian CLI..."
@@ -347,9 +348,9 @@ update-mac:
 	@echo "Installing Claude Agent SDK..."
 	@python3 -m pip install --no-cache-dir --upgrade claude-agent-sdk > /dev/null
 	
-install-ubuntu:
+setup-ubuntu:
+	@echo "Installing additional core packages in devcontainer..."
 # go, npm, jq, python, gh are installed in the devcontainer, upgrade them manually in devcontainer
-	@echo "Core packages in Ubuntu comes pre-installed in the devcontainer. Installing additional packages..."
 	@test -d /usr/local/aws-cli/v2/current || make install-aws-cli-ubuntu
 	@test -d /usr/local/aws-sam-cli/current || make install-sam-cli-ubuntu
 	@echo "Installing Praetorian CLI..."
@@ -359,13 +360,13 @@ install-ubuntu:
 	@echo "Installing Claude Agent SDK..."
 	@sudo python3 -m pip install --no-cache-dir claude-agent-sdk --break-system-packages > /dev/null
 	@sudo make mcp-manager-install
-# Put go in the PATH
+# devcontainer specific for go path
 	@if ! grep -q "/usr/local/go/bin" $(PROFILE_FILE) 2>/dev/null; then \
 		echo "export PATH=\$$PATH:/usr/local/go/bin" >> $(PROFILE_FILE); \
-		echo "Added /usr/local/go/bin PATH in $(PROFILE_FILE)"; \
 	fi
-# TODO (Peter): determine whether we need to install mcp-manager in Ubuntu.
-
+	@if [ "$$(whoami)" = "vscode" ]; then \
+		echo "⚠️ You are in devcontainer running as vscode. You need to update the STACK_NAME in backend/config/dev.env to make sure you deploy to the right SAM stack,"; \
+	fi
 
 update-ubuntu:
 	@echo "Upgrading core packages on Ubuntu..."

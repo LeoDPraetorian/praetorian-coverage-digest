@@ -48,10 +48,11 @@
   },
   "includeCoAuthoredBy": false,
   "enableAllProjectMcpServers": false,
-  "enabledMcpjsonServers": ["chariot", "linear", "praetorian-cli"],
+  "enabledMcpjsonServers": [
+    "chrome-devtools", "linear"
+  ],
   "disabledMcpjsonServers": [
     "atlassian",
-    "chrome-devtools",
     "context7",
     "currents",
     "praetorian-cli",

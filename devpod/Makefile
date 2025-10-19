@@ -14,3 +14,5 @@ tag:
 	git tag -a $(GIT_TRACKING_TAG) -m "Published by $(shell whoami)"
 	git push origin $(GIT_TRACKING_TAG)
 
+run:
+	docker run -it ghcr.io/praetorian-inc/chariot-devpod:latest

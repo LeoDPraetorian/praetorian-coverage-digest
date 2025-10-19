@@ -13,7 +13,7 @@
     "chrome-devtools": {
       "type": "stdio",
       "command": "npx",
-      "args": ["chrome-devtools-mcp@latest"]
+      "args": ["chrome-devtools-mcp@latest", "--browserUrl", "http://localhost:9222"]
     },
     "context7": {
       "type": "stdio",

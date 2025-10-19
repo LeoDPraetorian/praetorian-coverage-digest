@@ -11,7 +11,7 @@ RUN touch /etc/apt/apt.conf.d/99fixbadproxy && \
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 
 # install development software
-RUN apt update && apt -y install python3 pip nodejs jq gh && apt install -y --no-install-recommends emacs-nox && apt clean && npm i -g npm && npm i -g typescript
+RUN apt update && apt -y install python3 pip nodejs jq gh uuid-runtime && apt install -y --no-install-recommends emacs-nox && apt clean && npm i -g npm && npm i -g typescript
 
 # Update Go version regularly using the latest tarball file name from https://go.dev/dl/
 ARG GO_TARBALL=go1.25.3.linux-amd64.tar.gz

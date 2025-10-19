@@ -4,5 +4,9 @@
   "features": {
     "ghcr.io/devcontainers/features/desktop-lite:1": {}
   },
-  "runArgs": ["--shm-size=2gb"]
+  "containerEnv": {
+    "VNC_RESOLUTION": "1600x1200x16"
+  },
+  "runArgs": ["--shm-size=2gb"],
+  "postCreateCommand": "sudo chsh -s $(which zsh) $(whoami)"
 }
