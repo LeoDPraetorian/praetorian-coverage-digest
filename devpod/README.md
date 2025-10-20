@@ -15,7 +15,6 @@ works is ingenious. Learn more on how it works [here](https://code.visualstudio.
 - Install the Desktop App: 
   
   Click the **Download DevPod** button on this page: https://devpod.sh/
-  
 
 ## Get Your DevPod Configured
 
@@ -71,7 +70,7 @@ In DevPod, a **provider** is the entity that provides the compute for the devcon
 - _All the communications between your laptop and the container are mediated by the IDE._
   
 - Don't do any work in the container yet. You need to workaround a DevPod bug before doing so ([Issue #1925](https://github.com/loft-sh/devpod/issues/1925)).
-  - Run `scripts/cycle-devpod.sh {{YOUR_WORKSPACE_NAME}}`
+  - On your laptop, run `scripts/cycle-devpod.sh {{YOUR_WORKSPACE_NAME}}`
   - Subsequent restart cycles will preserve the container.
 
 ### Set up the environment in the container
@@ -82,11 +81,12 @@ desktop of the container.
 - Open up a terminal in the IDE. You will be dropped into the directory where the `chariot-development-platform` lives.
   DevPod puts it at `/workspaces/{{YOUR_WORKSPACE_NAME}}`.
 
-- Run `make setup`. During this, the Chrome running on your laptop will pop up for authentication to GitHub.
-
+- Run `make setup`. During this, your local Chrome will pop up for authentication to GitHub.
+  - UI certificate set up: Answer "Y".
+  - AWS CLI configuration: Use the API credentials from your local `~/.aws/credentials`. Use `us-east-2` for default region and `json` for default format.
+  - GitHub SSH key: Answer "↵"; probably don't want to use a passphrase for the SSH key.
 
 ### View the Fluxbox desktop and running Chrome
-
 - The devcontainer is pre-installed with a lightweight Fluxbox desktop environment. This allows us to run Chrome 
   visually and login to Chariot with drag-and-drop keychain files.
 
@@ -109,12 +109,11 @@ desktop of the container.
 - You now see the Fluxbox desktop. You can run the file manager and terminal via the application menu in the lower
   left corner.
 
-- Back in the IDE terminal, run `scripts/launch-chrome.sh https://chariot.praetorian.com`. Chrome should show up.
+- Back in the remote IDE terminal, run `scripts/launch-chrome.sh https://chariot.praetorian.com`. Chrome should show up.
   We use a script to launch Chrome with options that support interaction with the chrome-devtools MCP server and graphics
   acceleration.
 
 ### Running the frontend
-
 - Run `make start-ui`
 - Run `scripts/launch-chrome.sh https://localhost:3000`
 - Login to any stack, including Prod, using keychain file drag-and-drop. I recommend putting individual keychain files
@@ -128,9 +127,18 @@ desktop of the container.
   step looks like it is hanging for a couple of minute.
 - There is an open question to solve -- how to deploy only the SAM stack without updating the docker image?
 
+### Using Claude Code
+- Type `claude` in the remote terminal to get authenticated. Use the Anthropic Console Login option. You local Chrome will 
+  pop up for authentication.
+- Add the Claude Code extenion to your IDE.
+
+### Quirks on running `chrome-devtools`
+- It appears that chrome-devtools-mcp establishes a long-live connection to port 9222. If the Chrome session was
+  interrupted, such as restarting Chrome, the tools will stop working. When that happens, **restart Claude Code**.
+
 ### Add your IDE extensions/plugins:
 - **Cursor:**
-    - Go to the **Extension** view. You will see your list of extensions with "Install in SSH:{{WORKSPACE_NAME}}" buttons.
+    - Go to the **Extension** view. You will see your list of extensions with "Install in SSH: {{WORKSPACE_NAME}}" buttons.
       Click that button to install in the container. If you will need to repeat this step for all containers you launch.
 
 - **GoLand:**
