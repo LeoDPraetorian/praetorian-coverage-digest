@@ -290,6 +290,7 @@ endif
 		echo "Added GOPRIVATE to $(PROFILE_FILE)"; \
 	fi
 	@make submodule-init-robust
+	@make submodule-pull
 	@make setup-ui
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
 		echo "AWS credentials not found, running aws configure..."; \
