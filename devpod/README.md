@@ -30,23 +30,23 @@ In DevPod, a **provider** is the entity that provides the compute for the devcon
 - Run the corresponding command below for your region to create the provider. The commands have different AMIs and VPCs.
   - **Virginia (us-east-1):**
 
-    `devpod provider add aws -o AWS_REGION=us-east-1 -o AWS_AMI=ami-0360c520857e3138f -o AWS_INSTANCE_TYPE=c7i.2xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-05295a3b3e9c56627 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
+    `devpod provider add aws -o AWS_REGION=us-east-1 -o AWS_AMI=ami-0360c520857e3138f -o AWS_INSTANCE_TYPE=c7i.4xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-05295a3b3e9c56627 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
 
   - **Ohio (us-east-2):**
 
-    `devpod provider add aws -o AWS_REGION=us-east-2 -o AWS_AMI=ami-0cfde0ea8edd312d4 -o AWS_INSTANCE_TYPE=c7i.2xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-04ded0246f0e1cbb9 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
+    `devpod provider add aws -o AWS_REGION=us-east-2 -o AWS_AMI=ami-0cfde0ea8edd312d4 -o AWS_INSTANCE_TYPE=c7i.4xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-04ded0246f0e1cbb9 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
 
   - **Spain (eu-south-2):**
 
-    `devpod provider add aws -o AWS_REGION=eu-south-2 -o AWS_AMI=ami-0fd47a5cb59868dde -o AWS_INSTANCE_TYPE=c7i.2xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-0a680aa940edf918b -o INACTIVITY_TIMEOUT=1h --name aws-provider`
+    `devpod provider add aws -o AWS_REGION=eu-south-2 -o AWS_AMI=ami-0fd47a5cb59868dde -o AWS_INSTANCE_TYPE=c7i.4xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-0a680aa940edf918b -o INACTIVITY_TIMEOUT=1h --name aws-provider`
 
   - **California (us-west-1):**
 
-    `devpod provider add aws -o AWS_REGION=us-west-1 -o AWS_AMI=ami-00271c85bf8a52b84 -o AWS_INSTANCE_TYPE=c7i.2xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-060e44ce21af50236 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
+    `devpod provider add aws -o AWS_REGION=us-west-1 -o AWS_AMI=ami-00271c85bf8a52b84 -o AWS_INSTANCE_TYPE=c7i.4xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-060e44ce21af50236 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
 
   - **Oregon (us-west-2):**
 
-    `devpod provider add aws -o AWS_REGION=us-west-2 -o AWS_AMI=ami-03aa99ddf5498ceb9 -o AWS_INSTANCE_TYPE=c7i.2xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-0092000be10e2c104 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
+    `devpod provider add aws -o AWS_REGION=us-west-2 -o AWS_AMI=ami-03aa99ddf5498ceb9 -o AWS_INSTANCE_TYPE=c7i.4xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-0092000be10e2c104 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
     
 
 ### Create a workspace
@@ -84,13 +84,13 @@ desktop of the container.
 - Run `make setup`. During this, your local Chrome will pop up for authentication to GitHub.
   - UI certificate set up: Answer "Y".
   - AWS CLI configuration: Use the API credentials from your local `~/.aws/credentials`. Use `us-east-2` for default region and `json` for default format.
-  - GitHub SSH key: Answer "↵"; probably don't want to use a passphrase for the SSH key.
+  - GitHub: Answer "SSH" for protocol and you probably don't want to use a passphrase for the SSH key.
 
 ### View the Fluxbox desktop and running Chrome
 - The devcontainer is pre-installed with a lightweight Fluxbox desktop environment. This allows us to run Chrome 
   visually and login to Chariot with drag-and-drop keychain files.
 
-- Forward the VNC port to your laptop:
+- Forward the VNC _web_ port to your laptop:
   - **Cursor:**
     - Press `CMD+SHIFT+P` and type "ports view ↵". This will drop you in a **Ports** tab in the bottom pane.
     - Click the **Forward a Port** button. Enter `6080`.
@@ -113,6 +113,17 @@ desktop of the container.
   We use a script to launch Chrome with options that support interaction with the chrome-devtools MCP server and graphics
   acceleration.
 
+### Alternative to the web noVNC
+
+The above method use `noVNC`. It does not require any local software installation but it has clunky copy-and-paste between
+the local and remote desktops. An alternative is to use the TigerVNC viewer and get it to connect to port 5901, which talks
+the VNC protocol. To do that, install [TigerVNC](https://sourceforge.net/projects/tigervnc/files/stable/1.15.0/). Forward
+port 5901 from the container to your laptop using the same method above for port 6080.
+
+### Recommendation for keychain files
+- Put your keychain files in /home/vscode/*.ini. For example, I have `prod-peter.ini` there.
+- Use Fluxbox's file explorer in **Home** to drag-and-drop the keychain files to the Chariot login screen.
+
 ### Running the frontend
 - Run `make start-ui`
 - Run `scripts/launch-chrome.sh https://localhost:3000`
@@ -132,10 +143,6 @@ desktop of the container.
   pop up for authentication.
 - Add the Claude Code extenion to your IDE.
 
-### Quirks on running `chrome-devtools`
-- It appears that chrome-devtools-mcp establishes a long-live connection to port 9222. If the Chrome session was
-  interrupted, such as restarting Chrome, the tools will stop working. When that happens, **restart Claude Code**.
-
 ### Add your IDE extensions/plugins:
 - **Cursor:**
     - Go to the **Extension** view. You will see your list of extensions with "Install in SSH: {{WORKSPACE_NAME}}" buttons.
@@ -145,6 +152,28 @@ desktop of the container.
     - In Settings, you will see two Plugins menu entries: Host and Client. Install the plugins on **Host**.
     - Reference: https://youtrack.jetbrains.com/articles/SUPPORT-A-696/Where-should-the-plugin-be-installed-in-the-client-or-on-the-host-for-remote-development
 
+### Quirks
+- **chrome-devtools**
+  - It appears that chrome-devtools-mcp establishes a long-live connection to port 9222. If the Chrome session was
+    interrupted, such as restarting Chrome, the tools will stop working. When that happens, **restart Claude Code**.
+
+- **The Go Extension in Cursor**
+  - It runs the Go Language Server (gopls). It is a memory and CPU intensive process. It is known to cause a 16GB EC2 instance
+    to lose the SSH tunnel due to 100% CPU for extended period of time.
+  - You can limit the extent to which gopls indexes things by adding the following to your Cursor settings.json at
+    `~/Library/Application Support/Cursor/User/settings.json`:
+    ```
+    "gopls": {
+  
+      "directoryFilters": [
+        "-/",
+        "+modules/chariot",
+        "+modules/tabularium",
+        "+modules/janus-framework"
+      ]
+    }
+    ```
+
 ## Variations
 - If you want to launch a DevPod workspace with a specific commit of the repo, add the version slug to it, such as
 `devpod up --provider aws-provider github.com/praetorian-inc/chariot-development-platform@peter/vnc --id workspace-at-a-branch`
@@ -152,7 +181,7 @@ desktop of the container.
 
 - You can change the size of the VNC display with the `xrandr` command, such as `xrandr -s 1600x1200`.
 
-# Build and publish the devcontainer
+# Building and publishing the devcontainer
 - The devcontainer is pre-built in [Praetorian's ghcr.io](https://github.com/praetorian-inc/chariot-development-platform/pkgs/container/chariot-devpod).
 - To update it on MacBook:
   - Login to Docker with a PAT that can write ghcr.io packages.
