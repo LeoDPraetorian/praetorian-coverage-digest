@@ -70,7 +70,7 @@ In DevPod, a **provider** is the entity that provides the compute for the devcon
 - _All the communications between your laptop and the container are mediated by the IDE._
   
 - Don't do any work in the container yet. You need to workaround a DevPod bug before doing so ([Issue #1925](https://github.com/loft-sh/devpod/issues/1925)).
-  - On your laptop, run `scripts/cycle-devpod.sh {{YOUR_WORKSPACE_NAME}}`
+  - On your laptop, in the `chariot-development-platform` repo, run `./scripts/cycle-devpod.sh {{YOUR_WORKSPACE_NAME}}`
   - Subsequent restart cycles will preserve the container.
 
 ### Set up the environment in the container
@@ -81,7 +81,8 @@ desktop of the container.
 - Open up a terminal in the IDE. You will be dropped into the directory where the `chariot-development-platform` lives.
   DevPod puts it at `/workspaces/{{YOUR_WORKSPACE_NAME}}`.
 
-- Run `make setup`. During this, your local Chrome will pop up for authentication to GitHub.
+- In DevPod, in the `chariot-development-platform` repo, run `make setup`. During this, your local Chrome will pop up for
+  authentication to GitHub.
   - UI certificate set up: Answer "Y".
   - AWS CLI configuration: Use the API credentials from your local `~/.aws/credentials`. Use `us-east-2` for default region and `json` for default format.
   - GitHub: Answer "SSH" for protocol and you probably don't want to use a passphrase for the SSH key.
@@ -109,9 +110,9 @@ desktop of the container.
 - You now see the Fluxbox desktop. You can run the file manager and terminal via the application menu in the lower
   left corner.
 
-- Back in the remote IDE terminal, run `scripts/launch-chrome.sh https://chariot.praetorian.com`. Chrome should show up.
-  We use a script to launch Chrome with options that support interaction with the chrome-devtools MCP server and graphics
-  acceleration.
+- In DevPod, in the `chariot-development-platform` repo, run `./scripts/launch-chrome.sh https://chariot.praetorian.com`.
+  Chrome should show up. We use a script to launch Chrome with options that support interaction with the chrome-devtools
+  MCP server and graphics acceleration.
 
 ### Alternative to the web noVNC
 
@@ -121,20 +122,20 @@ the VNC protocol. To do that, install [TigerVNC](https://sourceforge.net/project
 port 5901 from the container to your laptop using the same method above for port 6080.
 
 ### Recommendation for keychain files
-- Put your keychain files in /home/vscode/*.ini. For example, I have `prod-peter.ini` there.
-- Use Fluxbox's file explorer in **Home** to drag-and-drop the keychain files to the Chariot login screen.
+- Put your keychain files in home directory in DevPod, `/home/vscode/*.ini`. For example, I have `prod-peter.ini` there.
+- Use Fluxbox's file manager in **Home** to drag-and-drop the keychain files to the Chariot login screen.
 
 ### Running the frontend
+- In DevPod, in the `chariot-development-platform` repo.
 - Run `make start-ui`
-- Run `scripts/launch-chrome.sh https://localhost:3000`
-- Login to any stack, including Prod, using keychain file drag-and-drop. I recommend putting individual keychain files
-  in `/home/vscode`. Then use the File Manager of Fluxbox to drag-and-drop.
+- Run `./scripts/launch-chrome.sh https://localhost:3000`
+- Login to any stack, including Prod, using keychain file drag-and-drop.
 
 ### Deploying the backend
 - The `whoami` username is `vscode`. So, you need to update the config env files to point to your stack. 
-- Support only for deploying the SAM stack. No support yet for creating the docker image for the compute server. So, work
+- Support only for deploying the SAM stack. No support for creating the docker image for the compute server. So, work
   that requires iterating on the compute server code need to be done on your laptop.
-- Run `make build` in `modules/chariot/backend`. The first build takes between 5 to 10 minutes, with the `go mod download`
+- In `modules/chariot/backend`, run `make build`. The first build takes between 5 to 10 minutes, with the `go mod download`
   step looks like it is hanging for a couple of minute.
 - There is an open question to solve -- how to deploy only the SAM stack without updating the docker image?
 
@@ -160,8 +161,8 @@ port 5901 from the container to your laptop using the same method above for port
 - **The Go Extension in Cursor**
   - It runs the Go Language Server (gopls). It is a memory and CPU intensive process. It is known to cause a 16GB EC2 instance
     to lose the SSH tunnel due to 100% CPU for extended period of time.
-  - You can limit the extent to which gopls indexes things by adding the following to your Cursor settings.json at
-    `~/Library/Application Support/Cursor/User/settings.json`:
+  - You can limit the extent to which gopls indexes the submodules by adding the following to your Cursor settings.json on your
+    laptop at `~/Library/Application Support/Cursor/User/settings.json`:
     ```
     "gopls": {
   
