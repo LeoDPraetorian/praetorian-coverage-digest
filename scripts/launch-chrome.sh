@@ -6,13 +6,9 @@ if [ "$DEVPOD" != "true" ]; then
     exit 1
 fi
 
-# In order to chrome to launch with the debug port 9222, AI suggests to
-# create point chrome to a profile directory. I admit I don't understand it.
-# But this is the minimal change that did make it work. This is the incremental
-# change that enable chrome to open 9222 and respond to inspections by the
-# chrome-devtools-mcp server.
-# Aapparently some humans made the original observation here:
-# https://stackoverflow.com/questions/51563287/how-to-make-chrome-always-launch-with-remote-debugging-port-flag
+# In order to chrome to launch with the debug port 9222, it requires --user-data-dir to be set.
+# The error message when run without it is this:
+# "DevTools remote debugging requires a non-default data directory. Specify this using --user-data-dir."
 CHROME_PROFILE="/tmp/chrome-profile"
 mkdir -p $CHROME_PROFILE
 rm -rf $CHROME_PROFILE/*
