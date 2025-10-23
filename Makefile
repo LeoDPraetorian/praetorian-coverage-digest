@@ -248,7 +248,7 @@ tree-list:
 
 start-ui: ## Start the UI in the background
 	@echo "Starting UI as a background task on https://localhost:3000..."
-	cd modules/chariot/ui && npm i && npm run link && (npm run start &)
+	cd modules/chariot/ui && npm i && (npm run start &)
 
 stop-ui: ## Stop the UI background task
 	@echo "Stopping the UI background task..."
