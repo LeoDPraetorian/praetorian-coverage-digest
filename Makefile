@@ -450,3 +450,195 @@ mcp-manager-install: ## Install MCP server manager for toggling Claude Desktop M
 	export PATH="$$HOME/.local/bin:$$PATH"; \
 	hash -r 2>/dev/null || true
 	@echo "✅ MCP manager installed successfully"
+
+# ============================================================
+# DevPod Management
+# ============================================================
+
+.PHONY: devpod-install
+devpod-install: ## Install DevPod CLI and Desktop App (VNC-free setup)
+	@echo "📦 Installing DevPod CLI..."
+ifeq (Darwin,$(OS_KERNEL))
+ifeq ($(ARCH),arm64)
+	curl -L -o /tmp/devpod "https://github.com/loft-sh/devpod/releases/latest/download/devpod-darwin-arm64"
+else
+	curl -L -o /tmp/devpod "https://github.com/loft-sh/devpod/releases/latest/download/devpod-darwin-amd64"
+endif
+	sudo install -c -m 0755 /tmp/devpod /usr/local/bin
+	rm -f /tmp/devpod
+	@echo "✅ DevPod CLI installed"
+	@echo ""
+	@echo "📱 Opening DevPod Desktop download page..."
+	@open https://devpod.sh/
+	@echo ""
+	@echo "✅ Installation complete!"
+	@echo ""
+	@echo "📝 Next steps:"
+	@echo "   1. Download and install DevPod Desktop from the opened browser"
+	@echo "   2. Run 'make devpod-setup-provider' to configure AWS providers"
+	@echo ""
+	@echo "💡 Modern approach:"
+	@echo "   - No VNC required! Uses SSH + X11 forwarding for GUI apps"
+	@echo "   - Headless Chrome for automated testing"
+	@echo "   - Automatic port forwarding for web apps"
+else
+	@echo "❌ DevPod installation currently only supports macOS"
+	@echo "   Please install manually: https://devpod.sh/"
+endif
+
+.PHONY: devpod-setup-provider
+devpod-setup-provider: ## Automated AWS provider setup for all regions with latency testing
+	@echo "🚀 Running automated DevPod setup..."
+	@./scripts/devpod/setup-devpod.sh
+
+.PHONY: devpod-select-region
+devpod-select-region: ## Switch DevPod region based on latency testing
+	@./scripts/devpod/select-region.sh
+
+.PHONY: devpod-create
+devpod-create: ## Create new DevPod workspace with prebuilds (Usage: make devpod-create WORKSPACE=my-workspace IDE=cursor)
+ifndef WORKSPACE
+	$(error WORKSPACE is required. Usage: make devpod-create WORKSPACE=my-workspace IDE=cursor)
+endif
+ifndef IDE
+	$(eval IDE := cursor)
+endif
+	@echo "🚀 Creating DevPod workspace: $(WORKSPACE) with IDE: $(IDE)"
+	@echo "ℹ️  Using prebuild for faster startup (if available)"
+	@devpod up --provider aws-provider \
+		github.com/praetorian-inc/chariot-development-platform \
+		--ide $(IDE) \
+		--id $(WORKSPACE)
+	@echo "⚠️  Running cycle-devpod workaround for DevPod persistence bug..."
+	@./scripts/cycle-devpod.sh $(WORKSPACE)
+	@echo "✅ Workspace '$(WORKSPACE)' created and ready!"
+
+.PHONY: devpod-start
+devpod-start: ## Start existing DevPod workspace (Usage: make devpod-start WORKSPACE=my-workspace)
+ifndef WORKSPACE
+	$(error WORKSPACE is required. Usage: make devpod-start WORKSPACE=my-workspace)
+endif
+	@echo "▶️  Starting DevPod workspace: $(WORKSPACE)"
+	@devpod up $(WORKSPACE)
+	@echo "✅ Workspace '$(WORKSPACE)' started"
+
+.PHONY: devpod-stop
+devpod-stop: ## Stop DevPod workspace (Usage: make devpod-stop WORKSPACE=my-workspace)
+ifndef WORKSPACE
+	$(error WORKSPACE is required. Usage: make devpod-stop WORKSPACE=my-workspace)
+endif
+	@echo "⏸️  Stopping DevPod workspace: $(WORKSPACE)"
+	@devpod stop $(WORKSPACE)
+	@echo "✅ Workspace '$(WORKSPACE)' stopped"
+
+.PHONY: devpod-delete
+devpod-delete: ## Delete DevPod workspace (Usage: make devpod-delete WORKSPACE=my-workspace)
+ifndef WORKSPACE
+	$(error WORKSPACE is required. Usage: make devpod-delete WORKSPACE=my-workspace)
+endif
+	@echo "🗑️  Deleting DevPod workspace: $(WORKSPACE)"
+	@read -p "Are you sure you want to delete workspace '$(WORKSPACE)'? (y/N): " confirm; \
+	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
+		devpod delete $(WORKSPACE); \
+		echo "✅ Workspace '$(WORKSPACE)' deleted"; \
+	else \
+		echo "❌ Deletion cancelled"; \
+	fi
+
+.PHONY: devpod-list
+devpod-list: ## List all DevPod workspaces
+	@echo "📋 DevPod workspaces:"
+	@devpod list
+
+.PHONY: devpod-ssh
+devpod-ssh: ## SSH into DevPod workspace (Usage: make devpod-ssh WORKSPACE=my-workspace)
+ifndef WORKSPACE
+	$(error WORKSPACE is required. Usage: make devpod-ssh WORKSPACE=my-workspace)
+endif
+	@echo "🔌 Connecting to workspace: $(WORKSPACE)"
+	@devpod ssh $(WORKSPACE)
+
+.PHONY: devpod-setup-remote
+devpod-setup-remote: ## Run setup inside DevPod workspace (run this from inside DevPod)
+	@if [ "$$DEVPOD" != "true" ]; then \
+		echo "❌ This command must be run inside a DevPod workspace"; \
+		echo "   Use: make devpod-ssh WORKSPACE=your-workspace"; \
+		exit 1; \
+	fi
+	@echo "🔧 Setting up DevPod environment..."
+	@make setup
+	@echo "✅ DevPod environment setup complete!"
+	@echo ""
+	@echo "📝 Next steps:"
+	@echo "   1. Run 'make chariot' to deploy the backend and start the UI"
+	@echo "   2. Access UI at https://localhost:3000 (auto-forwarded)"
+	@echo "   3. Or launch Chrome: make devpod-chrome"
+	@echo ""
+	@echo "💡 No VNC needed! Ports forward automatically via DevPod"
+
+.PHONY: devpod-chrome
+devpod-chrome: ## Launch Chrome in DevPod (Usage: make devpod-chrome URL=https://localhost:3000 MODE=headless)
+	@if [ "$$DEVPOD" != "true" ]; then \
+		echo "❌ This command must be run inside a DevPod workspace"; \
+		exit 1; \
+	fi
+ifndef URL
+	$(eval URL := https://localhost:3000)
+endif
+ifdef MODE
+	@./scripts/launch-chrome.sh $(URL) --$(MODE)
+else
+	@./scripts/launch-chrome.sh $(URL)
+endif
+
+.PHONY: devpod-help
+devpod-help: ## Show DevPod quick reference guide
+	@echo "╔══════════════════════════════════════════════════════════════╗"
+	@echo "║              DevPod Quick Reference Guide                    ║"
+	@echo "╚══════════════════════════════════════════════════════════════╝"
+	@echo ""
+	@echo "🚀 Initial Setup (run on your laptop):"
+	@echo "   make devpod-install              # Install DevPod CLI + Desktop"
+	@echo "   make devpod-setup-provider       # Auto-configure all 6 AWS regions + latency test"
+	@echo "   make devpod-select-region        # Switch regions anytime based on latency"
+	@echo ""
+	@echo "📦 Workspace Management (run on your laptop):"
+	@echo "   make devpod-create WORKSPACE=my-workspace IDE=cursor"
+	@echo "   make devpod-start WORKSPACE=my-workspace"
+	@echo "   make devpod-stop WORKSPACE=my-workspace"
+	@echo "   make devpod-delete WORKSPACE=my-workspace"
+	@echo "   make devpod-list"
+	@echo "   make devpod-ssh WORKSPACE=my-workspace"
+	@echo ""
+	@echo "🔧 Inside DevPod (run inside workspace):"
+	@echo "   make devpod-setup-remote         # Run full setup"
+	@echo "   make chariot                     # Deploy backend + start UI"
+	@echo "   make devpod-chrome               # Launch Chrome (auto-detects headless/X11)"
+	@echo "   make devpod-chrome MODE=headless # Force headless mode"
+	@echo "   make devpod-chrome MODE=x11      # Force X11 forwarding mode"
+	@echo ""
+	@echo "🖥️  GUI Access (No VNC Needed!):"
+	@echo "   Modern approach - Choose based on your needs:"
+	@echo ""
+	@echo "   Option 1 - Headless Chrome (for automated testing):"
+	@echo "     • Chrome runs without GUI"
+	@echo "     • DevTools Protocol on port 9222 (auto-forwarded)"
+	@echo "     • Perfect for Playwright/Puppeteer tests"
+	@echo ""
+	@echo "   Option 2 - X11 Forwarding (for manual debugging):"
+	@echo "     • Forward DISPLAY from your Mac to container"
+	@echo "     • Chrome GUI appears on your local screen"
+	@echo "     • Requires XQuartz on macOS: brew install --cask xquartz"
+	@echo ""
+	@echo "   Option 3 - Web UI Only:"
+	@echo "     • Port 3000 auto-forwards (Chariot UI)"
+	@echo "     • No Chrome GUI needed at all"
+	@echo "     • Use your local browser"
+	@echo ""
+	@echo "💡 Tips:"
+	@echo "   - Default IDE is 'cursor', also supports 'goland'"
+	@echo "   - Workspaces auto-stop after 1h inactivity"
+	@echo "   - Ports 3000, 8080, 9222 forward automatically"
+	@echo "   - VNC eliminated - simpler, faster, more secure!"
+	@echo ""
+	@echo "📚 Full documentation: devpod/README.md"
