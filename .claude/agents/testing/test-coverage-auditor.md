@@ -110,7 +110,7 @@ fi
 ```bash
 # Direct analysis when gate scripts fail
 # Use Go coverage tools directly: go test -coverprofile -covermode=atomic
-# Use npm/jest coverage tools directly: npm test -- --coverage
+# Use Vitest coverage tools directly: npm test -- --coverage
 # Use basic Playwright test analysis
 # Generate simplified coverage analysis
 ```

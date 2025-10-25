@@ -59,7 +59,7 @@ When evaluating test quality, you will:
 **Framework-Specific Evaluation:**
 
 - For Go tests: Evaluate testify usage, table-driven tests, and benchmark tests
-- For React/TypeScript: Review React Testing Library patterns, Jest configuration, and component testing strategies
+- For React/TypeScript: Review React Testing Library patterns, Vitest configuration, and component testing strategies
 - For Playwright E2E: Assess page object patterns, fixture usage, and parallel execution strategies
 - For Python tests: Evaluate pytest patterns, fixture usage, and mock strategies
 

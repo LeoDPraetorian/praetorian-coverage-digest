@@ -36,7 +36,7 @@ Your core responsibilities:
 
 **Test Implementation Strategy:**
 
-- Write automated integration tests using appropriate frameworks (Jest, Playwright, Postman/Newman, etc.)
+- Write automated integration tests using appropriate frameworks (Vitest, Playwright, Postman/Newman, etc.)
 - Implement contract testing to ensure API compatibility
 - Create mock services for testing in isolation
 - Design test data sets that cover various scenarios and edge cases

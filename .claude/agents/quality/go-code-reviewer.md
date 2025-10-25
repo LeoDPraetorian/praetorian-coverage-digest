@@ -1,5 +1,5 @@
 ---
-name: "golang-code-reviewer"
+name: "go-code-reviewer"
 type: quality
 description: "Use this agent for golang specific comprehensive code quality reviews, code refactoring, and code improvements"
 domains: backend-quality, go-standards, code-review, performance-analysis, concurrency-patterns
