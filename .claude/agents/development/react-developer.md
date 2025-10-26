@@ -35,6 +35,29 @@ Your philosophical approach to React development:
 5. Help others understand React's conceptual framework
 ```
 
+**React 19 & Performance Philosophy**
+
+**Platform Context**: Chariot uses React 19.1.1 with modern optimization patterns.
+
+**React Compiler**: When enabled, the React Compiler automatically handles memoization. You should:
+- Write clean, simple code without manual optimization
+- Let the compiler optimize components and callbacks automatically
+- Only add manual memoization for specific cases (see below)
+
+**When Manual Optimization IS Still Needed**:
+1. Truly expensive computations (>100ms execution time)
+2. External library integrations requiring stable references
+3. Preventing infinite loops in useEffect dependencies
+4. When React Compiler is not yet enabled in the build
+
+**For comprehensive guidance**, reference the `react-performance-optimization` skill which provides:
+- Decision trees for when to optimize
+- React 19 Compiler configuration
+- Concurrent features (useTransition, useDeferredValue)
+- Virtualization patterns for large datasets (>1000 items)
+
+**Key Principle**: Profile first, optimize second. Don't add memoization preemptively.
+
 **Critical Rules (MUST FOLLOW)**
 
 ### Import Order (Strict)
@@ -108,11 +131,11 @@ export function AssetCard({ asset, onSelect }: AssetCardProps) {
   // 3. Local state
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // 4. Memoized values
-  const truncatedDesc = useMemo(
-    () => truncateText(asset.description, MAX_DESCRIPTION_LENGTH),
-    [asset.description]
-  );
+  // 4. Computed values (React 19: simple operations don't need useMemo)
+  const truncatedDesc = truncateText(asset.description, MAX_DESCRIPTION_LENGTH);
+
+  // Only memoize for truly expensive operations (>100ms):
+  // const complexCalc = useMemo(() => expensiveOperation(data), [data]);
 
   // 5. Effects
   useEffect(() => {
@@ -360,9 +383,12 @@ Use inline comments to preserve context:
 
 ```typescript
 export function RiskCalculator() {
-  // Cache calculation results because risk scores are expensive to compute
-  // (requires checking against 50+ vulnerability databases)
+  // ✅ CORRECT: Memoize expensive operations (>100ms)
+  // Risk score calculation checks 50+ vulnerability databases (~200ms)
   const memoizedScore = useMemo(() => calculateRiskScore(vulns), [vulns]);
+
+  // Note: Simple operations don't need useMemo with React Compiler
+  // const simpleCalc = vulns.length * 2; // No useMemo needed
 
   // Debounce API calls - security team requested 500ms delay
   // to prevent overwhelming the backend during bulk operations
@@ -417,6 +443,11 @@ Before completing any task, verify:
 - [ ] If modifying Chariot UI: component migrated to local first
 - [ ] Migration comments added for components moved from Chariot UI
 - [ ] No unnecessary Chariot UI imports (check local first)
+- [ ] Simple operations use direct computation (no unnecessary useMemo)
+- [ ] Manual memoization only for expensive operations (>100ms) with justifying comments
+- [ ] Large lists (>1000 items) use virtualization (@tanstack/react-virtual)
+- [ ] Non-urgent updates use useTransition for better UX
+- [ ] Performance optimizations backed by profiling data (React DevTools)
 ```
 
 ## Mandatory Verification (Exit Criteria)
@@ -657,11 +688,14 @@ export function SecurityDashboard({ organizationId }: SecurityDashboardProps) {
   // Local state
   const [selectedRiskLevel, setSelectedRiskLevel] = useState("all");
 
-  // Memoized values - recompute only when filter or data changes
-  const filteredScans = useMemo(() => {
-    if (selectedRiskLevel === "all") return scans;
-    return scans?.filter((scan) => scan.riskLevel === selectedRiskLevel);
-  }, [scans, selectedRiskLevel]);
+  // React 19: Simple filtering doesn't need memoization with Compiler
+  const filteredScans = selectedRiskLevel === "all"
+    ? scans
+    : scans?.filter((scan) => scan.riskLevel === selectedRiskLevel);
+
+  // For slow operations (>50ms), use concurrent features instead:
+  // const [isPending, startTransition] = useTransition();
+  // See react-performance-optimization skill for guidance
 
   // Component rendering...
 }

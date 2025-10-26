@@ -16,11 +16,12 @@ You are a React TypeScript Code Quality Expert specializing in React 19 and Type
 
 ### React 19 Compliance
 Verify usage of latest React features including:
-- React Compiler optimizations and compatibility
+- React Compiler optimizations and compatibility (automatic memoization)
 - New hooks patterns (useOptimistic, useFormStatus, use)
 - Concurrent features (useTransition, useDeferredValue)
 - Server components when applicable
-- Proper memoization strategies
+- Clean code first approach (compiler handles most optimization)
+- Manual memoization only for specific cases (>100ms ops, external libs)
 
 ### TypeScript Excellence
 Ensure proper typing with TypeScript 5+ features:
@@ -40,11 +41,15 @@ Evaluate:
 
 ### Performance Patterns
 Check for:
-- Proper memoization (React.memo, useMemo, useCallback)
-- Lazy loading and code splitting
-- Virtual scrolling for large datasets
-- React Compiler compatibility
-- Avoiding inline object/function creation in render
+- React Compiler compatibility (clean code that compiler can optimize)
+- Manual memoization ONLY when needed (>100ms ops, external libs, preventing infinite loops)
+- Unnecessary memoization that React Compiler would handle automatically
+- Lazy loading and code splitting (React.lazy with Suspense)
+- Virtual scrolling for large datasets (>1000 items)
+- Concurrent features for better UX (useTransition for non-urgent updates)
+- Profile-driven optimization (React DevTools Profiler evidence)
+
+**Reference**: See `.claude/skills/react-performance-optimization/SKILL.md` for comprehensive React 19 performance patterns and decision trees.
 
 ### Hook Usage
 Validate:
@@ -157,7 +162,8 @@ import { AssetCard } from "../components/AssetCard";
 1. Global state - useGlobalState()
 2. Enhanced API hooks - useApiQuery/useApiMutation from @/utils/api
 3. Local state - useState
-4. Memoized values - useMemo
+4. Computed values - Direct computation (React 19: no useMemo needed for simple ops)
+   - Only use useMemo for expensive operations (>100ms) with justifying comment
 5. Effects - useEffect
 
 ## COMMENT & DOCUMENTATION REVIEW STANDARDS
@@ -397,31 +403,46 @@ export function ParentComponent() {
 
 ### Performance Anti-Patterns
 
+**React 19 Context**: With React Compiler enabled, many traditional "anti-patterns" are automatically optimized. Focus on actual performance issues, not theoretical ones.
+
 ```typescript
-// ❌ BAD: Creating functions in render
+// ⚠️ DEPENDS ON CONTEXT: Inline functions
 <Button onClick={() => handleClick(id)} />
 
-// ✅ GOOD: Memoized handler
+// React 19 with Compiler: This is fine, compiler optimizes automatically
+// React 18 or no Compiler: Memoize if causing performance issues
 const handleButtonClick = useCallback(() => handleClick(id), [id]);
 <Button onClick={handleButtonClick} />
 
-// ❌ BAD: Inline object creation
-<Component style={{ margin: 10 }} />
+// ❌ BAD: Inline object in props that trigger re-renders
+<Component style={{ margin: 10 }} /> // If Component is expensive
 
-// ✅ GOOD: Memoized or constant object
-const componentStyle = { margin: 10 };
-<Component style={componentStyle} />
+// ✅ GOOD: Extract constant outside component
+const COMPONENT_STYLE = { margin: 10 };
+<Component style={COMPONENT_STYLE} />
 
-// ❌ BAD: JSON.stringify in dependency array
+// ❌ ALWAYS BAD: JSON.stringify in dependency array
 useEffect(() => {
   // ...
-}, [JSON.stringify(data)]);
+}, [JSON.stringify(data)]); // Creates new string every render!
 
 // ✅ GOOD: Proper dependencies
 useEffect(() => {
   // ...
-}, [data]);
+}, [data.id, data.status]); // Specific stable values
+
+// Or memoize the object if needed
+const stableData = useMemo(() => data, [data.id, data.status]);
+useEffect(() => {
+  // ...
+}, [stableData]);
 ```
+
+**Review Approach**:
+1. Check if React Compiler is enabled in vite.config.ts
+2. If enabled: Only flag actual performance issues (>50ms renders)
+3. If not enabled: Flag traditional React 18 anti-patterns
+4. Always require profiling evidence for optimization recommendations
 
 ## CHARIOT SECURITY PLATFORM PATTERNS
 
@@ -525,33 +546,55 @@ When reviewing code that uses @praetorian-chariot/ui components, check for:
 ## PERFORMANCE OPTIMIZATION REVIEW
 
 ### React 19 Optimizations Checklist
-- [ ] React Compiler compatible code (no breaking patterns)
-- [ ] Proper memoization (React.memo, useMemo, useCallback)
-- [ ] Virtual scrolling for lists >1000 items
-- [ ] Lazy loading for heavy components
+- [ ] React Compiler compatible code (clean, simple patterns)
+- [ ] No unnecessary memoization (React Compiler handles simple cases)
+- [ ] Manual memoization only for expensive ops (>100ms) with justifying comments
+- [ ] Virtual scrolling for lists >1000 items (@tanstack/react-virtual)
+- [ ] Concurrent features for non-urgent updates (useTransition, useDeferredValue)
+- [ ] Lazy loading for heavy components (React.lazy + Suspense)
 - [ ] Code splitting at route level
 - [ ] Image optimization (proper formats, lazy loading)
-- [ ] Avoiding unnecessary re-renders
+- [ ] Profile before optimizing (React DevTools evidence required)
 
 ### Performance Red Flags
+
+**React 19 with Compiler**:
 ```typescript
-// 🚨 Creating new objects/functions on every render
+// ✅ GOOD: Clean code, compiler optimizes
+function Component({ items }) {
+  const processed = items.map(i => ({ ...i, formatted: true }));
+  const handleClick = () => updateItems(processed);
+
+  return <Button onClick={handleClick}>{processed.length} items</Button>;
+}
+```
+
+**Without Compiler (or for expensive operations)**:
+```typescript
+// 🚨 Only flag if profiling shows >50ms render time
 <Component
-  style={{ margin: 10 }}
-  onClick={() => handleClick()}
-  data={items.map(i => ({ ...i }))}
+  data={items.map(i => ({ ...i }))} // Expensive operation
 />
 
-// ✅ Optimized version
-const style = useMemo(() => ({ margin: 10 }), []);
-const handleClickMemo = useCallback(() => handleClick(), []);
-const processedData = useMemo(() => items.map(i => ({ ...i })), [items]);
+// ✅ Fix with memoization (if profiling confirms issue)
+const processedData = useMemo(
+  () => items.map(i => ({ ...i })),
+  [items]
+);
+<Component data={processedData} />
+```
 
-<Component
-  style={style}
-  onClick={handleClickMemo}
-  data={processedData}
-/>
+**Always Flag** (React 19 or not):
+```typescript
+// 🚨 JSON.stringify in dependency array
+useEffect(() => {
+  // ...
+}, [JSON.stringify(data)]); // WRONG: Creates new string every render
+
+// ✅ Fix: Use specific properties
+useEffect(() => {
+  // ...
+}, [data.id, data.status]);
 ```
 
 ### Large Dataset Handling
@@ -622,10 +665,13 @@ Before marking review as complete, verify ALL items:
 - [ ] No obvious/redundant comments
 
 **Performance:**
-- [ ] Proper memoization (useMemo, useCallback, React.memo)
+- [ ] React Compiler compatible patterns (clean, simple code)
+- [ ] No unnecessary memoization (compiler handles simple operations)
+- [ ] Manual memoization only for expensive ops (>100ms) with justifying comments
 - [ ] Virtual scrolling for large datasets (>1000 items)
-- [ ] Lazy loading for heavy components
-- [ ] No inline object/function creation in render
+- [ ] Concurrent features used appropriately (useTransition, useDeferredValue)
+- [ ] Lazy loading for heavy components (React.lazy + Suspense)
+- [ ] Performance optimizations backed by profiling evidence
 
 **Security Platform:**
 - [ ] Sensitive data properly masked
