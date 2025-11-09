@@ -1,16 +1,6 @@
 ---
 name: react-performance-optimization
 description: Expert performance optimization patterns for React 19 applications in the Chariot security platform. Use when dealing with slow rendering, performance bottlenecks, large datasets, expensive calculations, or when optimizing React components. Covers React 19 Compiler features, automatic memoization, useTransition and useDeferredValue for concurrent rendering, virtualization with @tanstack/react-virtual, code splitting strategies, and modern performance patterns that replace obsolete React 18 techniques. Includes decision trees for when to apply each optimization technique.
-license: MIT
-allowed-tools: [Read, Write, Edit, Grep, Bash]
-metadata:
-  version: 1.0.0
-  platform: chariot
-  domains: frontend, react, performance, optimization
-  react-version: 19.1.1
-  last-updated: 2025-10-26
-  author: Chariot Platform Team
-  related-skills: [chariot-component-library, react-security-dashboards]
 ---
 
 # React Performance Optimization (React 19)
