@@ -594,6 +594,283 @@ describe('tagValidation', () => {
 });
 ```
 
+## MSW (Mock Service Worker) for HTTP Mocking
+
+### When to Use MSW vs vi.mock()
+
+**Use MSW when:**
+- ✅ Testing components that make real HTTP calls (fetch, axios)
+- ✅ Need realistic HTTP semantics (status codes, headers, delays)
+- ✅ Want reusable mock handlers across tests
+- ✅ Testing TanStack Query caching behavior (stale-while-revalidate)
+- ✅ Testing retry logic and error handling
+- ✅ Testing multiple components sharing same API
+
+**Use vi.mock() when:**
+- ✅ Mocking modules that don't involve HTTP (utilities, hooks, components)
+- ✅ Simple unit tests with controlled return values
+- ✅ Testing pure logic without network layer
+- ✅ Mocking non-HTTP dependencies (localStorage, timers)
+
+### MSW Setup Pattern
+
+**Installation:**
+```bash
+npm install -D msw@latest
+```
+
+**Step 1: Create Request Handlers**
+```typescript
+// src/__tests__/mocks/handlers.ts
+import { http, HttpResponse } from 'msw';
+
+export const handlers = [
+  // Mock GET endpoint
+  http.get('/api/assets', () => {
+    return HttpResponse.json({
+      assets: [
+        { id: '1', name: 'Asset 1', status: 'A' },
+        { id: '2', name: 'Asset 2', status: 'A' },
+      ],
+    });
+  }),
+
+  // Mock POST endpoint
+  http.post('/api/assets', async ({ request }) => {
+    const body = await request.json();
+    return HttpResponse.json(
+      { id: '3', ...body },
+      { status: 201 }
+    );
+  }),
+
+  // Mock error response
+  http.get('/api/vulnerabilities', () => {
+    return HttpResponse.json(
+      { error: 'Not found' },
+      { status: 404 }
+    );
+  }),
+];
+
+// Error handlers for testing error states
+export const errorHandlers = [
+  http.get('/api/*', () => {
+    return HttpResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }),
+];
+
+// Delayed handlers for testing loading states
+export const delayedHandlers = [
+  http.get('/api/*', async () => {
+    await delay(2000); // 2 second delay
+    return HttpResponse.json({ data: [] });
+  }),
+];
+```
+
+**Step 2: Create MSW Server**
+```typescript
+// src/__tests__/mocks/server.ts
+import { setupServer } from 'msw/node';
+import { handlers } from './handlers';
+
+export const server = setupServer(...handlers);
+```
+
+**Step 3: Set Up in Test Configuration**
+```typescript
+// src/__tests__/setup.ts (or section-specific setup)
+import { afterAll, afterEach, beforeAll } from 'vitest';
+import { server } from './mocks/server';
+
+// Start MSW server before all tests
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' });
+});
+
+// Reset handlers after each test (prevent test pollution)
+afterEach(() => {
+  server.resetHandlers();
+});
+
+// Clean up after all tests
+afterAll(() => {
+  server.close();
+});
+```
+
+**Step 4: Update Vitest Config**
+```typescript
+// vitest.config.ts
+export default defineConfig({
+  test: {
+    setupFiles: ['./src/__tests__/setup.ts'], // Include MSW setup
+    // ... rest of config
+  },
+});
+```
+
+### Testing with MSW
+
+**Basic API Test:**
+```typescript
+import { render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+
+describe('AssetTable', () => {
+  it('should load and display assets from API', async () => {
+    render(<AssetTable />);
+
+    // MSW intercepts the HTTP call and returns mock data
+    await waitFor(() => {
+      expect(screen.getByText('Asset 1')).toBeInTheDocument();
+      expect(screen.getByText('Asset 2')).toBeInTheDocument();
+    });
+  });
+});
+```
+
+**Override Handler Per Test:**
+```typescript
+import { server } from './mocks/server';
+import { http, HttpResponse } from 'msw';
+
+it('should handle 500 error gracefully', async () => {
+  // Override default handler for this test only
+  server.use(
+    http.get('/api/assets', () => {
+      return HttpResponse.json(
+        { error: 'Server error' },
+        { status: 500 }
+      );
+    })
+  );
+
+  render(<AssetTable />);
+
+  await waitFor(() => {
+    expect(screen.getByText('Failed to load assets')).toBeInTheDocument();
+  });
+});
+```
+
+**Test Loading States with Delay:**
+```typescript
+it('should show loading spinner during API call', async () => {
+  server.use(
+    http.get('/api/assets', async () => {
+      await delay(1000); // Delay response
+      return HttpResponse.json({ assets: [] });
+    })
+  );
+
+  render(<AssetTable />);
+
+  // Spinner should be visible during delay
+  expect(screen.getByTestId('loader')).toBeInTheDocument();
+
+  // Wait for data to load
+  await waitFor(() => {
+    expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
+  });
+});
+```
+
+**Test TanStack Query Caching:**
+```typescript
+it('should use cached data on second render', async () => {
+  const { rerender } = render(<AssetTable />);
+
+  // First render - API call happens
+  await waitFor(() => {
+    expect(screen.getByText('Asset 1')).toBeInTheDocument();
+  });
+
+  // Unmount and remount
+  rerender(<></>);
+  rerender(<AssetTable />);
+
+  // Second render - should use cache (no loading state)
+  expect(screen.getByText('Asset 1')).toBeInTheDocument();
+  expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
+});
+```
+
+### MSW Best Practices
+
+1. **Use wildcards for flexible matching:**
+```typescript
+http.get('*/chariot/my', ({ request }) => {
+  const url = new URL(request.url);
+  const label = url.searchParams.get('label');
+
+  if (label === 'asset') {
+    return HttpResponse.json({ assets: mockAssets });
+  }
+  return HttpResponse.json({ data: [] });
+})
+```
+
+2. **Reset handlers between tests:**
+```typescript
+afterEach(() => {
+  server.resetHandlers(); // Critical to prevent test pollution
+});
+```
+
+3. **Handle query parameters:**
+```typescript
+http.get('/api/search', ({ request }) => {
+  const url = new URL(request.url);
+  const query = url.searchParams.get('q');
+
+  if (query === 'status:critical') {
+    return HttpResponse.json({ results: criticalItems });
+  }
+  return HttpResponse.json({ results: [] });
+})
+```
+
+4. **Test realistic error scenarios:**
+```typescript
+// 404 Not Found
+server.use(
+  http.get('/api/asset/:id', () =>
+    HttpResponse.json({ error: 'Asset not found' }, { status: 404 })
+  )
+);
+
+// 401 Unauthorized
+server.use(
+  http.get('/api/*', () =>
+    HttpResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  )
+);
+
+// Network timeout
+server.use(
+  http.get('/api/*', async () => {
+    await delay('infinite'); // Never resolves
+  })
+);
+```
+
+### When NOT to Use MSW
+
+❌ **Don't use MSW for:**
+- Testing pure utility functions (no HTTP)
+- Testing React hooks that don't make HTTP calls
+- Simple component rendering (no API dependency)
+- Mock expensive computations (use vi.mock())
+
+✅ **Do use vi.mock() for these instead.**
+
+---
+
 ## Mocking Patterns
 
 ### Pattern 1: Vitest Module Mocking
