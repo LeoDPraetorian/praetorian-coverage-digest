@@ -399,11 +399,486 @@ type DiscoveryEngine interface {
 - **Bundle optimization** with code splitting
 - **Image optimization** with proper formats
 
+## React 19 Patterns
+
+### Optimistic Updates with useOptimistic
+
+**When to Use**: Provide immediate UI feedback for async mutations (toggles, status changes, tag additions)
+
+**Pattern**:
+```typescript
+import { useOptimistic } from 'react';
+
+// Server state (single source of truth from API)
+const serverFlags = useMemo(
+  () => (apiData || [])
+    .map(item => item.name)
+    .filter(name => ValidFlags.includes(name)),
+  [apiData]
+);
+
+// Optimistic state with automatic rollback on error
+const [optimisticFlags, setOptimisticFlags] = useOptimistic(
+  serverFlags,
+  (_currentState, optimisticValue: string[]) => optimisticValue
+);
+
+// Usage in mutation handler
+const handleToggle = async (newValue: string) => {
+  try {
+    // 1. Optimistic update (immediate UI feedback)
+    setOptimisticFlags([...optimisticFlags, newValue]);
+
+    // 2. API call
+    await mutation({ value: newValue });
+
+    // 3. Success feedback
+    toast.success('Updated successfully');
+  } catch (error) {
+    // 4. Automatic rollback by useOptimistic
+    toast.error('Update failed');
+  }
+};
+```
+
+**Benefits**:
+- Automatic rollback on errors (no manual state management)
+- Type-safe with TypeScript
+- Minimal code (2-line hook vs 40+ line manual pattern)
+- React Compiler compatible
+- Battle-tested React 19 API
+
+**Use Cases in Chariot**:
+- Feature flag toggles (Settings page)
+- Asset tag additions (Query Builder)
+- Status updates (Asset management)
+- Comment updates (Vulnerability tracking)
+
+**Implementation Examples**:
+- `ui/src/sections/settings/components/ChariotModules.tsx`
+- `ui/src/sections/insights/queryBuilder/hooks/useEntityActions/useAssetActions.ts`
+
+### Suspense Boundaries for Data Loading
+
+**When to Use**: Declarative loading states for async data fetching
+
+**Pattern**:
+```typescript
+import { Suspense } from 'react';
+
+// Static component structure (no conditional rendering)
+function Settings() {
+  return (
+    <Tabs tabs={STATIC_TABS} />
+
+    {selectedTab === 'subscription' && (
+      <ErrorBoundary fallback={<ErrorUI />}>
+        <Suspense fallback={<LoadingSkeleton />}>
+          <SubscriptionTab />
+        </Suspense>
+      </ErrorBoundary>
+    )}
+  );
+}
+```
+
+**Benefits**:
+- Prevents layout shift (stable component structure)
+- Declarative loading states
+- Automatic error boundaries integration
+- Code splitting support
+- React 19 concurrent rendering optimization
+
+**Use Cases in Chariot**:
+- Tab content loading (Settings page)
+- Heavy component lazy loading
+- Data-dependent components
+- Modal content loading
+
+**Implementation Examples**:
+- `ui/src/sections/settings/index.tsx` (Subscription tab)
+- `ui/src/sections/settings/monitoring/index.tsx`
+
+### Concurrent Features for Non-Urgent Updates
+
+**When to Use**: Non-blocking updates that shouldn't interrupt user interactions
+
+**Pattern**:
+```typescript
+import { useTransition } from 'react';
+
+const [isPending, startTransition] = useTransition();
+
+// Expensive or non-urgent update
+const handleLayoutChange = (newLayout) => {
+  startTransition(() => {
+    setLayout(newLayout); // Non-urgent, can be deferred
+  });
+};
+
+// Show subtle loading indicator
+{isPending && <LoadingIndicator />}
+```
+
+**Benefits**:
+- Keeps UI responsive during expensive updates
+- User input remains snappy
+- Automatic prioritization by React
+- Better perceived performance
+
+**Use Cases in Chariot**:
+- Dashboard layout changes (Metrics)
+- Filter applications (large datasets)
+- Graph rendering updates
+- Search debouncing
+
+**Implementation Examples**:
+- `ui/src/sections/insights/metrics/index.tsx` (Drag-and-drop layout)
+
+### React Compiler Optimization
+
+**Configuration**:
+```typescript
+// vite.config.ts
+react({
+  babel: {
+    plugins: [['babel-plugin-react-compiler', {}]],
+  },
+})
+```
+
+**Philosophy**: Write simple, clean code. Let React Compiler handle optimization.
+
+**What Compiler Optimizes**:
+- Automatic component memoization
+- Stable callback references
+- Dependency tracking for hooks
+- Prevents unnecessary re-renders
+
+**When Manual Optimization IS Still Needed**:
+1. **Expensive computations** (>100ms): Use `useMemo`
+2. **Large lists** (>1000 items): Use virtualization
+3. **External library integration**: Use `useMemo/useCallback` for stable refs
+4. **Blocking user input**: Use `useTransition`
+
+**What to AVOID with React Compiler**:
+- ❌ Unnecessary `React.memo` wrapping
+- ❌ `useMemo` for simple operations
+- ❌ `useCallback` for every function
+- ❌ Over-optimization without profiling
+
+**References**:
+- `.claude/skills/react-performance-optimization/SKILL.md`
+- `.claude/skills/react-modernization/SKILL.md`
+
 ### Testing Optimization
 - **Parallel test execution** for faster feedback
 - **Test data management** with fixtures
 - **Mock optimization** to reduce external dependencies
 - **Coverage-based testing** focusing on critical paths
+
+## Frontend UI Patterns
+
+### Linear-Inspired Settings Pattern
+
+**When to Use**: Settings pages, configuration interfaces, preference screens
+
+**Pattern**: Unified cards with dividers showing current state + edit actions
+
+```typescript
+// Consolidated card with automatic dividers
+<SettingContentCard className="divide-y divide-chariot-stroke">
+  <SettingRow>
+    <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-1">
+        <h3 className="font-semibold">Setting Name</h3>
+        <p className="text-sm text-chariot-text-secondary">Description</p>
+      </div>
+      <Button onClick={openEditModal} label="Edit" />
+    </div>
+  </SettingRow>
+
+  {/* Automatic divider between rows */}
+  <SettingRow>
+    <div className="flex items-center justify-between">
+      <h3 className="font-semibold">Another Setting</h3>
+      <Button onClick={openEditModal} label="Edit" />
+    </div>
+  </SettingRow>
+</SettingContentCard>
+```
+
+**Benefits**:
+- Visual consistency across all settings
+- Scannable single-card layout
+- Automatic dividers with Tailwind divide-y
+- Display + Edit modal pattern matches Linear/modern SaaS
+- Reduced visual fragmentation vs multiple cards
+
+**Key Components**:
+- `SettingRow`: Wrapper with py-6 padding, first:pt-0
+- `SettingContentCard`: Card container with optional divide-y
+- `SettingSectionHeader`: Section title (text-lg font-bold)
+
+**Use Cases in Chariot**:
+- Settings tabs (Scan Settings, Notifications, User Settings)
+- Configuration pages
+- Preference screens
+
+**Implementation Example**:
+- `ui/src/sections/settings/tabs/ScanSettingsTab.tsx`
+- `ui/src/sections/settings/components/SettingRow.tsx`
+- `ui/src/sections/settings/components/ScanSettingCard.tsx`
+
+### Copy Functionality with Visual Feedback
+
+**When to Use**: Displaying copyable values (API keys, webhook URLs, identifiers)
+
+**Pattern**: Clickable value with green flash feedback on copy
+
+```typescript
+const [copied, setCopied] = useState(false);
+
+const handleCopy = async () => {
+  try {
+    await navigator.clipboard.writeText(value);
+    toast.success('Copied to clipboard');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  } catch (error) {
+    toast.error('Failed to copy');
+  }
+};
+
+<button
+  onClick={handleCopy}
+  className={cn(
+    'rounded-md px-3 py-1.5 transition-colors',
+    copied
+      ? 'bg-green-500/10 text-green-600 ring-1 ring-green-500/20'
+      : 'bg-chariot-background-secondary text-chariot-text-primary hover:bg-chariot-background-tertiary'
+  )}
+>
+  {value}
+</button>
+```
+
+**Visual States**:
+- Default: Gray background
+- Hover: Lighter background (shows interactivity)
+- Copied: Green flash (1.5 seconds)
+- Error: Red toast notification
+
+**Benefits**:
+- Immediate visual feedback (no waiting for toast)
+- Consistent copy UX across application
+- Accessible (proper button with aria-label)
+- Error handling for clipboard failures
+
+**Use Cases in Chariot**:
+- Webhook URLs (notification integrations)
+- API keys
+- Scan headers (MD5 identifiers)
+- Asset identifiers
+
+**Implementation Examples**:
+- `ui/src/sections/settings/components/ScanSettingsCards.tsx` (scan header copy)
+- `ui/src/sections/settings/tabs/NotificationsTab.tsx` (webhook URL copy)
+
+### Component Extraction from Monolithic Files
+
+**When to Use**: Single file exceeds 300 lines, multiple logical sections, tab-based UI
+
+**Pattern**: Progressive extraction maintaining functionality
+
+**Step 1: Identify Extraction Candidates**
+```typescript
+// Criteria for extraction:
+// - File > 300 lines
+// - Clear logical sections (tabs, features)
+// - Self-contained functionality
+// - Reusable across contexts
+```
+
+**Step 2: Extract to Dedicated Files**
+```typescript
+// Before: 791-line settings/index.tsx with all tabs inline
+
+// After: Modular structure
+settings/
+├── index.tsx (250 lines - orchestration only)
+├── tabs/
+│   ├── ScanSettingsTab.tsx (60 lines)
+│   ├── NotificationsTab.tsx (320 lines)
+│   ├── UserSettingsTab.tsx (121 lines)
+│   └── OrganizationTab.tsx (122 lines)
+```
+
+**Step 3: Maintain Shared State**
+```typescript
+// Keep shared state in parent (index.tsx)
+const [selectedTab, setSelectedTab] = useState('scanSettings');
+
+// Pass via props or context to extracted tabs
+{selectedTab === 'scanSettings' && <ScanSettingsTab />}
+```
+
+**Benefits**:
+- Smaller files easier to review and maintain
+- Isolated testing of individual tabs
+- Reduced merge conflicts
+- Clear ownership of code
+- Better code splitting opportunities
+
+**Migration Strategy**:
+1. Extract one tab at a time (prove pattern)
+2. Validate functionality preserved
+3. Apply to remaining tabs
+4. Reduce main file to orchestration only
+
+**Target**: Main orchestration file < 300 lines
+
+**Implementation Example**:
+- Settings section reduced from 791 → 250 lines through tab extraction
+
+### TanStack Query Caching Strategy
+
+**When to Use**: Data fetching with TanStack Query, impersonation support, settings data
+
+**Pattern**: Standard cache configuration with impersonation safety
+
+```typescript
+// Standard cache configuration
+const { data } = useQuery({
+  queryKey: ['resource', userId], // Include userId for isolation
+  queryFn: fetchData,
+  staleTime: 30000,  // 30 seconds - appropriate for settings/config data
+  gcTime: 300000,    // 5 minutes - keep during navigation
+});
+```
+
+**Cache Configuration Guidelines**:
+
+| Data Type | staleTime | gcTime | Rationale |
+|-----------|-----------|--------|-----------|
+| User settings | 30s | 5min | Changes infrequently, 30s acceptable |
+| Real-time data | 5s | 1min | Needs freshness, short cache |
+| Static config | 5min | 30min | Rarely changes, long cache OK |
+| Search results | 1min | 5min | Balance freshness and performance |
+
+**Impersonation Safety**:
+```typescript
+// Include email in query key for cache isolation
+const { data } = useMy(
+  { resource: 'setting' },
+  {
+    email: impersonatedUserEmail,  // Differentiates cache entries
+    staleTime: 30000,
+    gcTime: 300000,
+  }
+);
+
+// Query key becomes: ['my', 'setting', 'user@example.com']
+// Different users get different cache entries
+```
+
+**When to Disable Cache** (rare):
+- Never use `staleTime: 0, gcTime: 0` for performance
+- If fresh data required, use `refetchOnMount` or manual refetch
+- Global cache clearing on impersonation (`queryClient.clear()`) handles user switching
+
+**Anti-Pattern**:
+```typescript
+// ❌ WRONG: Aggressive cache disabling
+{
+  staleTime: 0,
+  gcTime: 0,
+  refetchOnMount: 'always',
+}
+
+// ✅ CORRECT: Standard caching
+{
+  staleTime: 30000,
+  gcTime: 300000,
+}
+```
+
+**Benefits**:
+- 80-90% reduction in API calls
+- Faster perceived performance
+- Better user experience (instant navigation)
+- Lower backend load
+
+**Implementation Examples**:
+- `ui/src/sections/settings/components/ScanSettingsCards.tsx`
+- `ui/src/hooks/useSubscription.ts`
+
+### Settings Section Component Composition
+
+**When to Use**: Building settings interfaces, configuration pages
+
+**Pattern**: Hierarchical composition with semantic components
+
+```typescript
+// Section structure
+<SettingSection
+  title="Section Title"          // text-lg heading
+  description="Section description"
+  action={<Button />}             // Optional action button
+>
+  <SettingContentCard>
+    {/* Card content */}
+  </SettingContentCard>
+</SettingSection>
+```
+
+**Component Hierarchy**:
+```
+SettingSection (provides h2 heading, description, optional action)
+└── SettingContentCard (provides background, border, padding)
+    └── SettingRow (provides vertical spacing, divider support)
+        └── Content (settings display, forms, etc.)
+```
+
+**Typography Scale**:
+- Section title: `text-lg font-bold` (h2)
+- Subsection title: `text-base font-semibold` (h3)
+- Description: `text-sm text-chariot-text-secondary`
+- Helper text: `text-xs text-chariot-text-tertiary`
+
+**Spacing Scale**:
+- Between sections: `gap-14` (56px)
+- Section to card: `gap-6` (24px) - handled by SettingSection
+- Between rows: `py-6` (24px) - handled by SettingRow
+- Within content: `gap-4` (16px) or `gap-2` (8px)
+
+**Divider Pattern**:
+```typescript
+// Automatic dividers between rows
+<SettingContentCard className="divide-y divide-chariot-stroke">
+  <SettingRow>Row 1</SettingRow>
+  <SettingRow>Row 2</SettingRow>
+  <SettingRow>Row 3</SettingRow>
+</SettingContentCard>
+```
+
+**Benefits**:
+- Consistent visual hierarchy
+- Semantic HTML structure
+- Predictable spacing
+- Automatic divider management
+- Accessibility (proper heading levels)
+
+**Use Cases**:
+- All settings tabs
+- Configuration pages
+- User preferences
+- Admin panels
+
+**Implementation Examples**:
+- `ui/src/sections/settings/components/SettingSection.tsx`
+- `ui/src/sections/settings/components/SettingRow.tsx`
+- All settings tabs use this composition pattern
 
 ## Documentation Standards
 
