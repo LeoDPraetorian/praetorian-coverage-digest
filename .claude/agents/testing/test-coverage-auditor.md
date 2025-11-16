@@ -18,6 +18,24 @@ Your primary responsibilities:
 - Distinguish between shallow coverage and deep behavioral validation
 - Evaluate test isolation and independence
 - Assess the robustness of test data and scenarios
+- Verify accessibility test coverage (jest-axe for interactive components)
+- Ensure keyboard navigation is tested (dropdowns, modals, forms, menus)
+- Validate component UI interaction coverage (userEvent, not fireEvent)
+
+**Accessibility Coverage Requirements:**
+- All interactive components (buttons, dropdowns, modals) must have accessibility tests
+- Keyboard navigation tested for all user-interactive widgets
+- ARIA roles, labels, and screen reader compatibility validated
+- WCAG AA compliance verified (color contrast, text sizing)
+
+**REQUIRED SKILL:** Use `react-testing` skill for React testing patterns including accessibility and keyboard navigation
+
+**Agent Recommendations for Coverage Gaps:**
+- Component accessibility gaps → Recommend `frontend-component-test-engineer`
+- Keyboard navigation gaps → Recommend `frontend-component-test-engineer`
+- Hook testing gaps → Recommend `frontend-integration-test-engineer`
+- E2E workflow gaps → Recommend `frontend-browser-test-engineer`
+- Util function gaps → Recommend `frontend-unit-test-engineer`
 
 **Critical Path Identification:**
 

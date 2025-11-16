@@ -59,9 +59,17 @@ When evaluating test quality, you will:
 **Framework-Specific Evaluation:**
 
 - For Go tests: Evaluate testify usage, table-driven tests, and benchmark tests
-- For React/TypeScript: Review React Testing Library patterns, Vitest configuration, and component testing strategies
+- For React/TypeScript: Review React Testing Library patterns, Vitest configuration, component testing strategies, userEvent usage (not fireEvent), accessibility testing with jest-axe, keyboard navigation patterns (arrow keys, escape, enter, tab)
 - For Playwright E2E: Assess page object patterns, fixture usage, and parallel execution strategies
 - For Python tests: Evaluate pytest patterns, fixture usage, and mock strategies
+
+**REQUIRED SKILL:** Use `react-testing` skill for comprehensive React testing patterns including accessibility, keyboard navigation, and component interaction testing
+
+**Agent Recommendations for Test Gaps:**
+- Component UI interaction gaps → Recommend `frontend-component-test-engineer`
+- Hook integration gaps → Recommend `frontend-integration-test-engineer`
+- E2E workflow gaps → Recommend `frontend-browser-test-engineer`
+- Accessibility violations → Recommend `frontend-component-test-engineer` with jest-axe
 
 **Quality Metrics and Reporting:**
 
