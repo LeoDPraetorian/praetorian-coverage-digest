@@ -1,0 +1,1589 @@
+---
+name: chariot-react-testing-patterns
+description: Use when writing unit tests, integration tests, or component tests for Chariot React UI - provides comprehensive testing strategies using Vitest, React Testing Library, and Testing Library User Event following Chariot's established patterns for hooks, components, and user interactions
+---
+
+# Chariot React Testing Patterns
+
+Testing guide for the Chariot security platform's React/TypeScript codebase using modern testing frameworks and best practices specific to our architecture.
+
+## When to Use This Skill
+
+- Writing unit tests for React components in Chariot UI
+- Creating integration tests for features like Seeds, Vulnerabilities, Assets
+- Testing custom hooks with complex state management
+- Setting up test infrastructure for new features
+- Testing user interactions with @testing-library/user-event
+- Implementing test-driven development (TDD) workflows
+- Testing security-critical UI components
+
+## Testing Stack
+
+### Core Testing Framework: Vitest
+
+**Configuration** (`vitest.config.ts`):
+```typescript
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react-swc';
+import tsconfigPaths from 'vite-tsconfig-paths';
+
+export default defineConfig({
+  plugins: [react(), tsconfigPaths()],
+  test: {
+    globals: true,
+    environment: 'happy-dom', // Lightweight DOM environment
+    setupFiles: ['./src/test/setup.ts'],
+    include: ['**/*.{test,spec}.{ts,tsx}'],
+    exclude: ['node_modules', 'build', 'dist'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        '**/*.d.ts',
+        '**/*.config.*',
+        '**/mockData',
+        '**/*.{test,spec}.{ts,tsx}',
+      ],
+    },
+  },
+});
+```
+
+### Test Setup File (`src/test/setup.ts`)
+
+```typescript
+import '@testing-library/jest-dom/vitest'; // IMPORTANT: /vitest suffix
+
+import { cleanup } from '@testing-library/react';
+import { afterEach, vi } from 'vitest';
+
+// Cleanup after each test
+afterEach(() => {
+  cleanup();
+});
+
+// Mock window.matchMedia (required for responsive components)
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
+// Mock IntersectionObserver (required for virtualized lists)
+global.IntersectionObserver = class IntersectionObserver {
+  constructor() {}
+  disconnect() {}
+  observe() {}
+  takeRecords() {
+    return [];
+  }
+  unobserve() {}
+} as any;
+```
+
+## Component Testing Patterns
+
+### Pattern 1: Table Cell Component Tests
+
+```typescript
+/**
+ * CVSSCell Component Tests
+ */
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+
+import type { RiskWithVulnerability } from '@/hooks/useRisks';
+
+import { CVSSCell } from './CVSSCell';
+
+describe('CVSSCell', () => {
+  it('should render CVSS score when available', () => {
+    const risk: Partial<RiskWithVulnerability> = {
+      cvss: 9.8,
+      name: 'Test Vulnerability',
+    };
+
+    render(<CVSSCell risk={risk as RiskWithVulnerability} />);
+
+    expect(screen.getByText('9.8')).toBeInTheDocument();
+  });
+
+  it('should render dash when CVSS is undefined', () => {
+    const risk: Partial<RiskWithVulnerability> = {
+      name: 'Test Vulnerability',
+    };
+
+    const { container } = render(
+      <CVSSCell risk={risk as RiskWithVulnerability} />
+    );
+
+    expect(container.textContent).toBe('-');
+  });
+
+  it('should render dash when CVSS is null', () => {
+    const risk: Partial<RiskWithVulnerability> = {
+      cvss: null as unknown as number,
+      name: 'Test Vulnerability',
+    };
+
+    const { container } = render(
+      <CVSSCell risk={risk as RiskWithVulnerability} />
+    );
+
+    expect(container.textContent).toBe('-');
+  });
+
+  it('should render CVSS score of 0', () => {
+    const risk: Partial<RiskWithVulnerability> = {
+      cvss: 0,
+      name: 'Test Vulnerability',
+    };
+
+    render(<CVSSCell risk={risk as RiskWithVulnerability} />);
+
+    expect(screen.getByText('0')).toBeInTheDocument();
+  });
+
+  it('should use value prop over risk.cvss when provided', () => {
+    const risk: Partial<RiskWithVulnerability> = {
+      cvss: 5.0,
+      name: 'Test Vulnerability',
+    };
+
+    render(<CVSSCell risk={risk as RiskWithVulnerability} value={8.5} />);
+
+    expect(screen.getByText('8.5')).toBeInTheDocument();
+    expect(screen.queryByText('5.0')).not.toBeInTheDocument();
+  });
+});
+```
+
+### Pattern 2: Integration Tests with User Interactions
+
+```typescript
+/**
+ * SeedsHeader Integration Tests
+ *
+ * These are integration tests that verify actual preseed tab rendering
+ * and behavior for all user types, NOT just that components render without crashing.
+ *
+ * Related: CHARIOT-1566 - Preseed tab visibility for all users
+ */
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { SeedsHeader } from './SeedsHeader';
+
+// Mock only necessary components to simplify DOM verification
+interface MockTabsProps {
+  tabs: Array<{ value: string; label: React.ReactNode; loading?: boolean }>;
+  selected?: { value: string };
+  onSelect: (tab: { value: string }) => void;
+}
+
+vi.mock('@/components/Tabs', () => ({
+  default: ({ tabs, selected, onSelect }: MockTabsProps) => (
+    <div data-testid="tabs-component">
+      {tabs.map(tab => (
+        <button
+          key={tab.value}
+          data-testid={`tab-${tab.value}`}
+          data-selected={selected?.value === tab.value}
+          onClick={() => onSelect(tab)}
+          disabled={tab.loading}
+        >
+          <div data-testid={`tab-${tab.value}-label`}>{tab.label}</div>
+        </button>
+      ))}
+    </div>
+  ),
+}));
+
+describe('SeedsHeader - Preseed Tab Integration Tests', () => {
+  const mockOnTabChange = vi.fn();
+
+  const mockCounts = {
+    tld: 5,
+    domain: 10,
+    cidr: 3,
+    ipv4: 20,
+    ipv6: 7,
+    webapplication: 15,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('Preseed Tab Rendering', () => {
+    it('should render preseed tab in actual DOM', () => {
+      render(
+        <SeedsHeader
+          activeTab="domain"
+          onTabChange={mockOnTabChange}
+          counts={mockCounts}
+          preseedCount={42}
+          countsLoading={false}
+          preseedCountLoading={false}
+        />
+      );
+
+      // ✅ Verify actual preseed tab button exists in DOM
+      const preseedTab = screen.getByTestId('tab-preseed');
+      expect(preseedTab).toBeInTheDocument();
+      expect(preseedTab).not.toBeDisabled();
+    });
+
+    it('should display preseed count in actual tab label', () => {
+      const preseedCount = 123;
+
+      render(
+        <SeedsHeader
+          activeTab="domain"
+          onTabChange={mockOnTabChange}
+          counts={mockCounts}
+          preseedCount={preseedCount}
+          countsLoading={false}
+          preseedCountLoading={false}
+        />
+      );
+
+      const preseedTabLabel = screen.getByTestId('tab-preseed-label');
+      expect(preseedTabLabel).toHaveTextContent('123');
+    });
+  });
+
+  describe('Preseed Tab Interactions', () => {
+    it('should allow clicking preseed tab', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <SeedsHeader
+          activeTab="domain"
+          onTabChange={mockOnTabChange}
+          counts={mockCounts}
+          preseedCount={42}
+          countsLoading={false}
+          preseedCountLoading={false}
+        />
+      );
+
+      const preseedTab = screen.getByTestId('tab-preseed');
+      await user.click(preseedTab);
+
+      expect(mockOnTabChange).toHaveBeenCalledWith('preseed');
+      expect(mockOnTabChange).toHaveBeenCalledTimes(1);
+    });
+
+    it('should show preseed tab as selected when active', () => {
+      render(
+        <SeedsHeader
+          activeTab="preseed"
+          onTabChange={mockOnTabChange}
+          counts={mockCounts}
+          preseedCount={42}
+          countsLoading={false}
+          preseedCountLoading={false}
+        />
+      );
+
+      const preseedTab = screen.getByTestId('tab-preseed');
+      expect(preseedTab).toHaveAttribute('data-selected', 'true');
+    });
+  });
+
+  describe('Preseed Tab Loading States', () => {
+    it('should show loading state on preseed tab', () => {
+      render(
+        <SeedsHeader
+          activeTab="domain"
+          onTabChange={mockOnTabChange}
+          counts={mockCounts}
+          preseedCount={0}
+          countsLoading={false}
+          preseedCountLoading={true}
+        />
+      );
+
+      const preseedTab = screen.getByTestId('tab-preseed');
+      expect(preseedTab).toBeDisabled();
+    });
+  });
+});
+```
+
+## Hook Testing Patterns
+
+### Pattern 1: Custom Hook with Mocked Dependencies
+
+```typescript
+import { renderHook } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { Column } from '@/components/table/types';
+
+import { useSmartColumnPositioning } from './useSmartColumnPositioning';
+
+// Mock dependencies
+vi.mock('./useSortableColumn', () => ({
+  useSortableColumn: vi.fn(),
+}));
+
+import { useSortableColumn } from './useSortableColumn';
+
+describe('useSmartColumnPositioning', () => {
+  let mockSetActiveColumns: ReturnType<typeof vi.fn>;
+  let mockActiveColumns: string[] | undefined;
+
+  beforeEach(() => {
+    mockSetActiveColumns = vi.fn();
+    mockActiveColumns = ['identifier', 'name'];
+
+    (useSortableColumn as ReturnType<typeof vi.fn>).mockReturnValue({
+      activeColumns: mockActiveColumns,
+      setActiveColumns: mockSetActiveColumns,
+      columns: mockColumns,
+    });
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('initialization', () => {
+    it('should return columns and activeColumns from useSortableColumn', () => {
+      const { result } = renderHook(() =>
+        useSmartColumnPositioning({
+          key: 'test',
+          defaultColumns,
+          defaultConfig,
+          positioningRules: {},
+        })
+      );
+
+      expect(result.current.columns).toBe(mockColumns);
+      expect(result.current.activeColumns).toBe(mockActiveColumns);
+      expect(typeof result.current.setActiveColumns).toBe('function');
+    });
+  });
+
+  describe('drag operations', () => {
+    it('should pass through unchanged for drag operations', () => {
+      const { result } = renderHook(() =>
+        useSmartColumnPositioning({
+          key: 'test',
+          defaultColumns,
+          defaultConfig,
+          positioningRules: {
+            firstColumns: ['status'],
+          },
+        })
+      );
+
+      const newColumns = ['name', 'identifier'];
+      result.current.setActiveColumns(newColumns);
+
+      expect(mockSetActiveColumns).toHaveBeenCalledWith(newColumns);
+    });
+  });
+});
+```
+
+### Pattern 2: Hook with React Query Integration
+
+```typescript
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { renderHook, waitFor } from '@testing-library/react';
+import React from 'react';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+
+import { useStatisticsBatch } from '@/hooks/useStatisticsBatch';
+
+// Mock dependencies
+vi.mock('@/hooks/useAxios');
+vi.mock('@/hooks/useQueryKeys');
+
+import { useAxios } from '@/hooks/useAxios';
+import { useGetUserKey } from '@/hooks/useQueryKeys';
+
+describe('useStatisticsBatch', () => {
+  let queryClient: QueryClient;
+  let mockAxiosGet: Mock;
+
+  beforeEach(() => {
+    // Create fresh QueryClient for each test
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          refetchOnWindowFocus: false,
+          refetchOnMount: false,
+          refetchOnReconnect: false,
+        },
+      },
+    });
+
+    mockAxiosGet = vi.fn();
+    (useAxios as Mock).mockReturnValue({
+      get: mockAxiosGet,
+    });
+
+    (useGetUserKey as Mock).mockImplementation((keys: string[]) => [
+      'user123',
+      ...keys,
+    ]);
+  });
+
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+
+  it('should fetch batch statistics successfully', async () => {
+    mockAxiosGet.mockResolvedValueOnce({
+      data: [
+        { statistics: [mockStatistic1] },
+        { statistics: [mockStatistic2] },
+      ],
+    });
+
+    const { result } = renderHook(
+      () =>
+        useStatisticsBatch({
+          statisticKeys: ['asset#origin', 'asset#status'],
+          enabled: true,
+        }),
+      { wrapper }
+    );
+
+    // Initially pending
+    expect(result.current.status).toBe('pending');
+    expect(result.current.isLoading).toBe(true);
+
+    // Wait for success
+    await waitFor(() => {
+      expect(result.current.status).toBe('success');
+    });
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.data).toBeDefined();
+  });
+
+  it('should not fetch when enabled is false', async () => {
+    const { result } = renderHook(
+      () =>
+        useStatisticsBatch({
+          statisticKeys: ['asset#origin'],
+          enabled: false,
+        }),
+      { wrapper }
+    );
+
+    expect(result.current.status).toBe('pending');
+    expect(mockAxiosGet).not.toHaveBeenCalled();
+  });
+});
+```
+
+## Utility Function Testing
+
+### Pattern: Comprehensive Utility Tests
+
+```typescript
+/**
+ * Tests for tag validation utilities
+ *
+ * These tests verify validation rules are correctly implemented
+ * and error messages are user-friendly and actionable.
+ */
+import { describe, expect, it } from 'vitest';
+
+import {
+  getTagValidationError,
+  isValidTag,
+  sanitizeTag,
+  validateTagInput,
+} from './tagValidation';
+
+describe('tagValidation', () => {
+  describe('validateTagInput', () => {
+    describe('valid tags', () => {
+      it('should accept simple alphanumeric tags', () => {
+        const result = validateTagInput('production');
+        expect(result.isValid).toBe(true);
+        expect(result.sanitized).toBe('production');
+        expect(result.error).toBeUndefined();
+      });
+
+      it('should accept tags with hyphens', () => {
+        const result = validateTagInput('api-gateway');
+        expect(result.isValid).toBe(true);
+        expect(result.sanitized).toBe('api-gateway');
+      });
+
+      it('should accept maximum length tags (50 chars)', () => {
+        const tag = 'a'.repeat(50);
+        const result = validateTagInput(tag);
+        expect(result.isValid).toBe(true);
+        expect(result.sanitized).toBe(tag);
+      });
+    });
+
+    describe('whitespace handling', () => {
+      it('should trim leading whitespace', () => {
+        const result = validateTagInput('  production');
+        expect(result.isValid).toBe(true);
+        expect(result.sanitized).toBe('production');
+      });
+
+      it('should reject tags that are only whitespace', () => {
+        const result = validateTagInput('   ');
+        expect(result.isValid).toBe(false);
+        expect(result.error).toBe('Tag cannot be empty');
+      });
+    });
+
+    describe('invalid tags', () => {
+      it('should reject empty strings', () => {
+        const result = validateTagInput('');
+        expect(result.isValid).toBe(false);
+        expect(result.error).toBe('Tag cannot be empty');
+      });
+
+      it('should reject tags exceeding 50 characters', () => {
+        const tag = 'a'.repeat(51);
+        const result = validateTagInput(tag);
+        expect(result.isValid).toBe(false);
+        expect(result.error).toBe('Tag cannot exceed 50 characters');
+      });
+
+      it('should reject tags with special characters', () => {
+        const specialChars = ['@', '#', '$', '%', '^', '&', '*'];
+        specialChars.forEach(char => {
+          const result = validateTagInput(`tag${char}special`);
+          expect(result.isValid).toBe(false);
+          expect(result.error).toContain('invalid characters');
+        });
+      });
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle consecutive special allowed characters', () => {
+      const result = validateTagInput('tag--name');
+      expect(result.isValid).toBe(true);
+    });
+
+    it('should handle exact boundary lengths', () => {
+      expect(isValidTag('a')).toBe(true);
+      expect(isValidTag('a'.repeat(50))).toBe(true);
+      expect(isValidTag('a'.repeat(51))).toBe(false);
+    });
+  });
+});
+```
+
+## MSW (Mock Service Worker) for HTTP Mocking
+
+### When to Use MSW vs vi.mock()
+
+**Use MSW when:**
+- ✅ Testing components that make real HTTP calls (fetch, axios)
+- ✅ Need realistic HTTP semantics (status codes, headers, delays)
+- ✅ Want reusable mock handlers across tests
+- ✅ Testing TanStack Query caching behavior (stale-while-revalidate)
+- ✅ Testing retry logic and error handling
+- ✅ Testing multiple components sharing same API
+
+**Use vi.mock() when:**
+- ✅ Mocking modules that don't involve HTTP (utilities, hooks, components)
+- ✅ Simple unit tests with controlled return values
+- ✅ Testing pure logic without network layer
+- ✅ Mocking non-HTTP dependencies (localStorage, timers)
+
+### MSW Setup Pattern
+
+**Installation:**
+```bash
+npm install -D msw@latest
+```
+
+**Step 1: Create Request Handlers**
+```typescript
+// src/__tests__/mocks/handlers.ts
+import { http, HttpResponse } from 'msw';
+
+export const handlers = [
+  // Mock GET endpoint
+  http.get('/api/assets', () => {
+    return HttpResponse.json({
+      assets: [
+        { id: '1', name: 'Asset 1', status: 'A' },
+        { id: '2', name: 'Asset 2', status: 'A' },
+      ],
+    });
+  }),
+
+  // Mock POST endpoint
+  http.post('/api/assets', async ({ request }) => {
+    const body = await request.json();
+    return HttpResponse.json(
+      { id: '3', ...body },
+      { status: 201 }
+    );
+  }),
+
+  // Mock error response
+  http.get('/api/vulnerabilities', () => {
+    return HttpResponse.json(
+      { error: 'Not found' },
+      { status: 404 }
+    );
+  }),
+];
+
+// Error handlers for testing error states
+export const errorHandlers = [
+  http.get('/api/*', () => {
+    return HttpResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }),
+];
+
+// Delayed handlers for testing loading states
+export const delayedHandlers = [
+  http.get('/api/*', async () => {
+    await delay(2000); // 2 second delay
+    return HttpResponse.json({ data: [] });
+  }),
+];
+```
+
+**Step 2: Create MSW Server**
+```typescript
+// src/__tests__/mocks/server.ts
+import { setupServer } from 'msw/node';
+import { handlers } from './handlers';
+
+export const server = setupServer(...handlers);
+```
+
+**Step 3: Set Up in Test Configuration**
+```typescript
+// src/__tests__/setup.ts (or section-specific setup)
+import { afterAll, afterEach, beforeAll } from 'vitest';
+import { server } from './mocks/server';
+
+// Start MSW server before all tests
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' });
+});
+
+// Reset handlers after each test (prevent test pollution)
+afterEach(() => {
+  server.resetHandlers();
+});
+
+// Clean up after all tests
+afterAll(() => {
+  server.close();
+});
+```
+
+**Step 4: Update Vitest Config**
+```typescript
+// vitest.config.ts
+export default defineConfig({
+  test: {
+    setupFiles: ['./src/__tests__/setup.ts'], // Include MSW setup
+    // ... rest of config
+  },
+});
+```
+
+### Testing with MSW
+
+**Basic API Test:**
+```typescript
+import { render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+
+describe('AssetTable', () => {
+  it('should load and display assets from API', async () => {
+    render(<AssetTable />);
+
+    // MSW intercepts the HTTP call and returns mock data
+    await waitFor(() => {
+      expect(screen.getByText('Asset 1')).toBeInTheDocument();
+      expect(screen.getByText('Asset 2')).toBeInTheDocument();
+    });
+  });
+});
+```
+
+**Override Handler Per Test:**
+```typescript
+import { server } from './mocks/server';
+import { http, HttpResponse } from 'msw';
+
+it('should handle 500 error gracefully', async () => {
+  // Override default handler for this test only
+  server.use(
+    http.get('/api/assets', () => {
+      return HttpResponse.json(
+        { error: 'Server error' },
+        { status: 500 }
+      );
+    })
+  );
+
+  render(<AssetTable />);
+
+  await waitFor(() => {
+    expect(screen.getByText('Failed to load assets')).toBeInTheDocument();
+  });
+});
+```
+
+**Test Loading States with Delay:**
+```typescript
+it('should show loading spinner during API call', async () => {
+  server.use(
+    http.get('/api/assets', async () => {
+      await delay(1000); // Delay response
+      return HttpResponse.json({ assets: [] });
+    })
+  );
+
+  render(<AssetTable />);
+
+  // Spinner should be visible during delay
+  expect(screen.getByTestId('loader')).toBeInTheDocument();
+
+  // Wait for data to load
+  await waitFor(() => {
+    expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
+  });
+});
+```
+
+**Test TanStack Query Caching:**
+```typescript
+it('should use cached data on second render', async () => {
+  const { rerender } = render(<AssetTable />);
+
+  // First render - API call happens
+  await waitFor(() => {
+    expect(screen.getByText('Asset 1')).toBeInTheDocument();
+  });
+
+  // Unmount and remount
+  rerender(<></>);
+  rerender(<AssetTable />);
+
+  // Second render - should use cache (no loading state)
+  expect(screen.getByText('Asset 1')).toBeInTheDocument();
+  expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
+});
+```
+
+### MSW Best Practices
+
+1. **Use wildcards for flexible matching:**
+```typescript
+http.get('*/chariot/my', ({ request }) => {
+  const url = new URL(request.url);
+  const label = url.searchParams.get('label');
+
+  if (label === 'asset') {
+    return HttpResponse.json({ assets: mockAssets });
+  }
+  return HttpResponse.json({ data: [] });
+})
+```
+
+2. **Reset handlers between tests:**
+```typescript
+afterEach(() => {
+  server.resetHandlers(); // Critical to prevent test pollution
+});
+```
+
+3. **Handle query parameters:**
+```typescript
+http.get('/api/search', ({ request }) => {
+  const url = new URL(request.url);
+  const query = url.searchParams.get('q');
+
+  if (query === 'status:critical') {
+    return HttpResponse.json({ results: criticalItems });
+  }
+  return HttpResponse.json({ results: [] });
+})
+```
+
+4. **Test realistic error scenarios:**
+```typescript
+// 404 Not Found
+server.use(
+  http.get('/api/asset/:id', () =>
+    HttpResponse.json({ error: 'Asset not found' }, { status: 404 })
+  )
+);
+
+// 401 Unauthorized
+server.use(
+  http.get('/api/*', () =>
+    HttpResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  )
+);
+
+// Network timeout
+server.use(
+  http.get('/api/*', async () => {
+    await delay('infinite'); // Never resolves
+  })
+);
+```
+
+### When NOT to Use MSW
+
+❌ **Don't use MSW for:**
+- Testing pure utility functions (no HTTP)
+- Testing React hooks that don't make HTTP calls
+- Simple component rendering (no API dependency)
+- Mock expensive computations (use vi.mock())
+
+✅ **Do use vi.mock() for these instead.**
+
+---
+
+## Mocking Patterns
+
+### Pattern 1: Vitest Module Mocking
+
+```typescript
+// Mock module BEFORE importing it
+vi.mock('@/hooks/useAxios');
+vi.mock('@/hooks/useQueryKeys');
+
+// Import mocked modules to access their implementations
+import { useAxios } from '@/hooks/useAxios';
+import { useGetUserKey } from '@/hooks/useQueryKeys';
+
+// Set mock implementation
+(useAxios as Mock).mockReturnValue({
+  get: mockAxiosGet,
+  post: mockAxiosPost,
+});
+
+// Mock specific function calls
+mockAxiosGet.mockResolvedValueOnce({ data: mockData });
+mockAxiosGet.mockRejectedValueOnce(new Error('API error'));
+```
+
+### Pattern 2: Component Mocking for Integration Tests
+
+```typescript
+// Mock only the component you need to simplify testing
+vi.mock('@/components/Tabs', () => ({
+  default: ({ tabs, selected, onSelect }: TabsProps) => (
+    <div data-testid="tabs-component">
+      {tabs.map(tab => (
+        <button
+          key={tab.value}
+          data-testid={`tab-${tab.value}`}
+          onClick={() => onSelect(tab)}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  ),
+}));
+```
+
+## Test Organization
+
+### File Naming Conventions
+
+- Tests live **alongside source files** (not in separate `__tests__` directory)
+- Component tests: `ComponentName.test.tsx`
+- Hook tests: `useHookName.test.ts`
+- Utility tests: `utilityName.test.ts`
+- Integration tests: `FeatureName.integration.test.tsx`
+
+### Test Structure
+
+```typescript
+describe('FeatureName', () => {
+  // Setup and teardown
+  beforeEach(() => {
+    // Initialize mocks and state
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('Feature Group 1', () => {
+    it('should do something specific', () => {
+      // Arrange
+      const input = setupTestData();
+
+      // Act
+      const result = performAction(input);
+
+      // Assert
+      expect(result).toBe(expected);
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle boundary conditions', () => {
+      // Test edge cases
+    });
+  });
+});
+```
+
+## Best Practices for Chariot Platform
+
+### 1. Use Partial<Type> for Mock Data
+
+```typescript
+// ✅ GOOD: Use Partial for mock data
+const mockRisk: Partial<RiskWithVulnerability> = {
+  cvss: 9.8,
+  name: 'Test Vulnerability',
+};
+
+render(<CVSSCell risk={mockRisk as RiskWithVulnerability} />);
+
+// ❌ BAD: Creating full objects with all required fields
+const mockRisk: RiskWithVulnerability = {
+  cvss: 9.8,
+  name: 'Test Vulnerability',
+  // ... 50 more required fields
+};
+```
+
+### 2. Use data-testid for E2E Integration
+
+```typescript
+// Component
+<button data-testid="preseed-tab">Preseed</button>
+
+// Test
+const preseedTab = screen.getByTestId('preseed-tab');
+expect(preseedTab).toBeInTheDocument();
+```
+
+### 3. Test User Interactions with @testing-library/user-event
+
+```typescript
+import userEvent from '@testing-library/user-event';
+
+it('should handle user interactions', async () => {
+  const user = userEvent.setup();
+
+  render(<Component />);
+
+  await user.click(screen.getByRole('button'));
+  await user.type(screen.getByRole('textbox'), 'test input');
+});
+```
+
+### 4. Include JSDoc Comments
+
+```typescript
+/**
+ * Component Name - Integration Tests
+ *
+ * These tests verify actual component rendering and behavior,
+ * NOT just that components render without crashing.
+ *
+ * Related: CHARIOT-1566 - Feature description
+ */
+```
+
+### 5. Test Actual DOM, Not Component Instantiation
+
+```typescript
+// ✅ GOOD: Verify actual DOM content
+const preseedTab = screen.getByTestId('tab-preseed');
+expect(preseedTab).toBeInTheDocument();
+expect(preseedTab).not.toBeDisabled();
+
+// ❌ BAD: Just checking render doesn't throw
+render(<SeedsHeader />);
+// No assertions - doesn't verify behavior!
+```
+
+### 6. Descriptive Test Names
+
+```typescript
+// ✅ GOOD: Clear, behavior-focused names
+it('should render preseed tab in actual DOM for non-Praetorian users', () => {});
+it('should display preseed count with thousands separator', () => {});
+
+// ❌ BAD: Vague test names
+it('works', () => {});
+it('test preseed', () => {});
+```
+
+### 7. Group Related Tests
+
+```typescript
+describe('Component', () => {
+  describe('rendering', () => {
+    // Tests for rendering behavior
+  });
+
+  describe('user interactions', () => {
+    // Tests for click/type/etc
+  });
+
+  describe('loading states', () => {
+    // Tests for loading/error states
+  });
+
+  describe('edge cases', () => {
+    // Tests for boundary conditions
+  });
+});
+```
+
+## Running Tests
+
+### Commands
+
+```bash
+# Run all tests in watch mode
+npm test
+
+# Run tests once
+npm run test:run
+
+# Run with coverage
+npm run test:coverage
+
+# Run with UI dashboard
+npm run test:ui
+
+# Run specific test file
+npm test -- path/to/file.test.tsx
+
+# Run tests matching pattern
+npm test -- --grep "preseed"
+```
+
+### Coverage Requirements
+
+- **Configuration**: 100% coverage for config files
+- **Hooks**: 80%+ coverage for custom hooks
+- **Components**: Focus on integration tests
+- **Utilities**: Comprehensive unit tests with edge cases
+
+## Common Patterns
+
+### Testing Async Operations
+
+```typescript
+it('should fetch data successfully', async () => {
+  mockAxiosGet.mockResolvedValueOnce({ data: mockData });
+
+  const { result } = renderHook(() => useCustomHook(), { wrapper });
+
+  // Wait for async operation
+  await waitFor(() => {
+    expect(result.current.status).toBe('success');
+  });
+
+  expect(result.current.data).toEqual(mockData);
+});
+```
+
+### Testing Error States
+
+```typescript
+it('should handle API errors gracefully', async () => {
+  const mockError = {
+    response: {
+      status: 500,
+      data: 'Internal server error',
+    },
+    message: 'Network error',
+  };
+
+  mockAxiosGet.mockRejectedValueOnce(mockError);
+
+  const { result } = renderHook(() => useCustomHook(), { wrapper });
+
+  await waitFor(() => {
+    expect(result.current.status).toBe('error');
+  });
+
+  expect(result.current.error).toBeDefined();
+});
+```
+
+### Testing Loading States
+
+```typescript
+it('should show loading state initially', () => {
+  const { result } = renderHook(() => useCustomHook());
+
+  expect(result.current.status).toBe('pending');
+  expect(result.current.isLoading).toBe(true);
+});
+```
+
+## Key Dependencies
+
+```json
+{
+  "vitest": "^3.2.4",
+  "@testing-library/react": "latest",
+  "@testing-library/user-event": "latest",
+  "@testing-library/jest-dom": "latest",
+  "@tanstack/react-query": "^5.90.1",
+  "happy-dom": "latest"
+}
+```
+
+## Resources
+
+- **Vitest Documentation**: https://vitest.dev/
+- **React Testing Library**: https://testing-library.com/react
+- **Testing Library User Event**: https://testing-library.com/docs/user-event/intro
+- **TanStack Query Testing**: https://tanstack.com/query/latest/docs/framework/react/guides/testing
+
+## Chariot-Specific Considerations
+
+### Security-Critical Components
+
+When testing security-critical UI components:
+
+- Test all user input validation
+- Verify XSS prevention
+- Test authentication flows
+- Verify authorization checks
+- Test error handling and error messages
+
+### Data Attributes for E2E Tests
+
+Always add `data-testid` attributes for E2E test integration:
+
+```typescript
+<button data-testid="approve-seed-button">
+  Approve
+</button>
+```
+
+### Testing with Global State
+
+```typescript
+// Mock global state when needed
+vi.mock('@/state/global.state', () => ({
+  useGlobalState: () => ({
+    drawerState: mockDrawerState,
+    setDrawerState: mockSetDrawerState,
+  }),
+}));
+```
+
+### Testing with Authentication
+
+```typescript
+// Mock auth context
+vi.mock('@/state/auth', () => ({
+  useAuth: () => ({
+    user: mockUser,
+    isPraetorianUser: true,
+    logout: vi.fn(),
+  }),
+}));
+```
+
+## Troubleshooting
+
+### Issue: Tests Fail with "IntersectionObserver is not defined"
+
+**Solution**: Ensure `src/test/setup.ts` includes IntersectionObserver mock
+
+### Issue: Tests Fail with "matchMedia is not defined"
+
+**Solution**: Ensure `src/test/setup.ts` includes matchMedia mock
+
+### Issue: Async Tests Timing Out
+
+**Solution**: Increase timeout or use `waitFor` with proper conditions:
+
+```typescript
+await waitFor(
+  () => {
+    expect(result.current.status).toBe('success');
+  },
+  { timeout: 5000 }
+);
+```
+
+### Issue: Mock Not Working
+
+**Solution**: Ensure mock is defined BEFORE import:
+
+```typescript
+// ✅ GOOD: Mock before import
+vi.mock('@/hooks/useAxios');
+import { useAxios } from '@/hooks/useAxios';
+
+// ❌ BAD: Import before mock
+import { useAxios } from '@/hooks/useAxios';
+vi.mock('@/hooks/useAxios'); // Too late!
+```
+
+## Accessibility Testing
+
+### When to Use
+
+Test accessibility for:
+- Interactive components (buttons, dropdowns, modals)
+- Form components (inputs, selects, checkboxes)
+- Navigation components (menus, tabs)
+- Data tables
+- Any user-facing UI
+
+### Setup
+
+```bash
+npm install --save-dev jest-axe @axe-core/react
+```
+
+### Pattern: Component Accessibility Tests
+
+```typescript
+import { axe, toHaveNoViolations } from 'jest-axe';
+import { render } from '@testing-library/react';
+
+expect.extend(toHaveNoViolations);
+
+describe('FilterDropdown accessibility', () => {
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <FilterDropdown
+        id="status"
+        label="Status"
+        options={statusOptions}
+        selectedValues={[]}
+        onApply={vi.fn()}
+        onClear={vi.fn()}
+      />
+    );
+
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has accessible labels for icon-only buttons', async () => {
+    const { container } = render(
+      <Button aria-label="Close dialog">
+        <XMarkIcon />
+      </Button>
+    );
+
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has proper ARIA roles for interactive elements', async () => {
+    const { container } = render(<AssetTable />);
+
+    // Check for required roles
+    expect(container.querySelector('[role="button"]')).toBeInTheDocument();
+    expect(container.querySelector('[role="table"]')).toBeInTheDocument();
+
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+```
+
+### Common Accessibility Issues to Test
+
+**1. Missing ARIA Labels:**
+```typescript
+// Icon-only buttons need aria-label
+<Button aria-label="Export data">
+  <DownloadIcon />
+</Button>
+```
+
+**2. Keyboard Navigation:**
+```typescript
+// Interactive elements must be keyboard accessible
+// Test with Tab, Enter, Space, Arrow keys
+```
+
+**3. Focus Management:**
+```typescript
+// Modals should trap focus
+// Dropdowns should return focus on close
+```
+
+**4. Color Contrast:**
+```typescript
+// axe-core checks color contrast automatically
+// Ensure text meets WCAG AA standards
+```
+
+## Keyboard Navigation Testing
+
+### When to Use
+
+Test keyboard navigation for:
+- Dropdowns and menus
+- Modals and dialogs
+- Tab components
+- Form navigation
+- Table navigation
+- Custom interactive widgets
+
+### Pattern: Dropdown Keyboard Navigation
+
+```typescript
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+describe('FilterDropdown keyboard navigation', () => {
+  it('opens dropdown with Enter key', async () => {
+    const user = userEvent.setup();
+
+    render(<FilterDropdown ... />);
+
+    // Tab to focus the trigger
+    await user.tab();
+    expect(screen.getByText('Status')).toHaveFocus();
+
+    // Press Enter to open
+    await user.keyboard('{Enter}');
+
+    // Dropdown should be open
+    await expect(screen.findByRole('listbox')).toBeInTheDocument();
+  });
+
+  it('navigates options with arrow keys', async () => {
+    const user = userEvent.setup();
+
+    render(<FilterDropdown options={statusOptions} ... />);
+
+    await user.tab();
+    await user.keyboard('{Enter}'); // Open dropdown
+
+    const options = screen.getAllByRole('option');
+
+    // Arrow down to navigate
+    await user.keyboard('{ArrowDown}');
+    expect(options[0]).toHaveFocus();
+
+    await user.keyboard('{ArrowDown}');
+    expect(options[1]).toHaveFocus();
+
+    // Arrow up to go back
+    await user.keyboard('{ArrowUp}');
+    expect(options[0]).toHaveFocus();
+  });
+
+  it('selects option with Space key', async () => {
+    const mockApply = vi.fn();
+    const user = userEvent.setup();
+
+    render(<FilterDropdown onApply={mockApply} ... />);
+
+    await user.tab();
+    await user.keyboard('{Enter}'); // Open
+    await user.keyboard('{ArrowDown}'); // Navigate to first option
+    await user.keyboard('{Space}'); // Select with Space
+
+    // Verify selection
+    expect(screen.getByRole('checkbox')).toBeChecked();
+  });
+
+  it('closes dropdown with Escape key', async () => {
+    const user = userEvent.setup();
+
+    render(<FilterDropdown ... />);
+
+    await user.tab();
+    await user.keyboard('{Enter}'); // Open
+
+    await expect(screen.findByRole('listbox')).toBeInTheDocument();
+
+    await user.keyboard('{Escape}'); // Close
+
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
+
+  it('applies selection with Enter key on Apply button', async () => {
+    const mockApply = vi.fn();
+    const user = userEvent.setup();
+
+    render(<FilterDropdown onApply={mockApply} ... />);
+
+    await user.tab(); // Focus trigger
+    await user.keyboard('{Enter}'); // Open
+    await user.keyboard('{ArrowDown}'); // Navigate to option
+    await user.keyboard('{Space}'); // Select
+    await user.tab(); // Tab to Apply button
+    await user.keyboard('{Enter}'); // Apply
+
+    expect(mockApply).toHaveBeenCalledWith([
+      expect.objectContaining({ value: 'status:JR' })
+    ]);
+  });
+});
+```
+
+### Common Keyboard Shortcuts to Test
+
+| Key | Action | Use Case |
+|-----|--------|----------|
+| `Tab` | Focus next element | Navigation |
+| `Shift+Tab` | Focus previous element | Reverse navigation |
+| `Enter` | Activate/Submit | Buttons, forms, dropdowns |
+| `Space` | Toggle/Select | Checkboxes, options |
+| `Escape` | Close/Cancel | Modals, dropdowns, overlays |
+| `ArrowUp/Down` | Navigate list | Dropdowns, menus |
+| `ArrowLeft/Right` | Navigate horizontal | Tabs, sliders |
+| `Home/End` | Jump to start/end | Lists, inputs |
+
+## Coverage Analysis and Thresholds
+
+### Configuring Coverage Thresholds
+
+Add to `vitest.config.ts`:
+
+```typescript
+export default defineConfig({
+  test: {
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        '**/*.d.ts',
+        '**/*.config.*',
+        '**/mockData',
+        '**/*.{test,spec}.{ts,tsx}',
+      ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
+    },
+  },
+});
+```
+
+### Running Coverage
+
+```bash
+# Generate coverage report
+npm run test:coverage
+
+# View HTML report
+open coverage/index.html
+
+# Check specific file coverage
+npm test -- --coverage Button.test.tsx
+```
+
+### Interpreting Coverage Reports
+
+**Coverage Types:**
+
+| Type | What It Measures | Target |
+|------|------------------|--------|
+| **Lines** | % of code lines executed | 80%+ |
+| **Functions** | % of functions called | 80%+ |
+| **Branches** | % of if/else paths taken | 80%+ |
+| **Statements** | % of statements executed | 80%+ |
+
+**Coverage ≠ Quality:**
+- 100% coverage doesn't mean bug-free
+- Focus on critical paths
+- Test behavior, not just coverage numbers
+
+**Prioritize Testing:**
+1. Critical user workflows (90%+ coverage)
+2. Business logic (80%+ coverage)
+3. Error handling (80%+ coverage)
+4. Edge cases (70%+ coverage)
+5. UI components (60%+ coverage - E2E handles rest)
+
+### What to Exclude from Coverage
+
+```typescript
+exclude: [
+  'node_modules/',           // Third-party code
+  'src/test/',               // Test utilities
+  '**/*.d.ts',               // Type definitions
+  '**/*.config.*',           // Configuration files
+  '**/mockData',             // Mock data
+  '**/*.{test,spec}.{ts,tsx}', // Test files themselves
+  'src/types.ts',            // Pure type definitions
+  'src/constants.ts',        // Static constants
+],
+```
+
+### Improving Low Coverage
+
+**When coverage is low:**
+
+1. **Identify untested code:**
+   ```bash
+   npm run test:coverage
+   # Check HTML report - red lines are untested
+   ```
+
+2. **Prioritize by risk:**
+   - Business logic > UI rendering
+   - Error paths > happy paths
+   - Complex functions > simple getters
+
+3. **Write targeted tests:**
+   ```typescript
+   // Cover untested branch
+   it('handles error when API fails', async () => {
+     server.use(
+       http.get('*/my', () => HttpResponse.json({}, { status: 500 }))
+     );
+
+     const { result } = renderHook(() => useJobsCoordinator(filters));
+
+     await waitFor(() => {
+       expect(result.current.status).toBe('error');
+     });
+   });
+   ```
+
+4. **Don't chase 100%:**
+   - Some code is hard to test (defensive checks)
+   - Some code is covered by E2E tests
+   - Focus on meaningful coverage

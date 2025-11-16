@@ -1,5 +1,5 @@
 ---
-name: brand-guidelines
+name: chariot-brand-guidelines
 description: Applies Chariot's official brand colors and typography for light and dark modes to any sort of artifact. Use it when brand colors or style guidelines, visual formatting, or company design standards apply.
 ---
 

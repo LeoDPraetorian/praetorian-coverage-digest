@@ -1,5 +1,5 @@
 ---
-name: third-party-integrations
+name: chariot-third-party-integrations
 description: Use when creating Chariot integrations with external APIs - provides step-by-step workflow for researching APIs with Context7 MCP, writing frontend integration cards, implementing backend stubs with credential validation, writing integration tests, and mapping external API types to tabularium data models
 ---
 
