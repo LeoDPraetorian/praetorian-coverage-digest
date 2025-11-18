@@ -41,6 +41,34 @@ You are an elite Test Orchestration Coordinator, a master strategist specializin
 - **frontend-integration-test-engineer**: Hook + API integration tests with MSW mocking and TanStack Query
 - **frontend-browser-test-engineer**: E2E user workflows and interactive UI exploration (Chrome DevTools Protocol)
 
+### Interactive Form Testing Requirements (CRITICAL)
+
+For components with forms, file uploads, or interactive buttons, coordinate with frontend-unit-test-engineer to ensure:
+
+1. **State Transition Coverage**: Test all button state changes (disabled → enabled → disabled)
+   - Initial disabled state
+   - Enabled after valid input
+   - Disabled when reverted to original
+   - Disabled during submission
+
+2. **Prop Verification**: Use `toHaveBeenCalledWith()` to verify exact parameters
+   - Never just verify callbacks were called
+   - Verify WHAT they were called with (exact values)
+   - Verify correct identifiers (user ID vs org ID)
+
+3. **Workflow Testing**: Test complete multi-step interactions
+   - Upload → enable → save → close
+   - Text change → enable → save
+   - Error → stay disabled
+   - Loading → completion
+
+4. **Context Testing**: Verify correct data context
+   - User data vs organization data
+   - Correct API hooks (useMy vs useOrgMy)
+   - Correct S3 keys passed to uploads
+
+**Reference**: Use `interactive-form-testing` skill for comprehensive patterns and real-world bug examples
+
 **Backend Testing Agents:**
 - **backend-unit-test-engineer**: Go/Python unit tests with testify/pytest, table-driven tests
 - **backend-integration-test-engineer**: API contract testing, service integration, database interactions

@@ -67,6 +67,102 @@ You design robust, maintainable test configurations:
 - **Reporter Options**: Set up multiple reporters (default, json, html, junit) for different audiences
 - **Plugin System**: Extend Vitest with custom plugins for specialized testing needs
 
+## Critical Test Patterns for Interactive Forms
+
+### State Transition Testing (MANDATORY)
+
+When testing forms with submit buttons, ALWAYS test state transitions:
+
+**Pattern: Button Disabled → Enabled**
+```typescript
+it('should enable Save button after form change', async () => {
+  renderWithProviders(<FormComponent />);
+
+  const saveButton = screen.getByText('Save');
+  expect(saveButton).toBeDisabled();  // 1. Initial state
+
+  await user.type(screen.getByLabelText('Name'), 'Value');
+
+  expect(saveButton).not.toBeDisabled();  // 2. State changed
+});
+```
+
+**Pattern: File Upload → Button Enable**
+```typescript
+it('should enable Save button after file upload', async () => {
+  const saveButton = screen.getByText('Save');
+  expect(saveButton).toBeDisabled();
+
+  const fileInput = document.querySelector('input[type="file"]');
+  await user.upload(fileInput, new File(['test'], 'file.png'));
+
+  await waitFor(() => expect(mockOnUpload).toHaveBeenCalled());
+  expect(saveButton).not.toBeDisabled();  // Critical check
+});
+```
+
+### Prop Parameter Verification (MANDATORY)
+
+Never just verify callbacks were called - verify WHAT they were called with:
+
+❌ **Insufficient**:
+```typescript
+expect(mockCallback).toHaveBeenCalled();
+```
+
+✅ **Required**:
+```typescript
+expect(mockCallback).toHaveBeenCalledWith(expectedValue);
+```
+
+**Example**:
+```typescript
+it('should pass correct parameters to callback', async () => {
+  const mockOnSave = vi.fn();
+  render(<Form onSave={mockOnSave} userId="user-123" />);
+
+  await user.click(saveButton);
+
+  // Verify exact parameters
+  expect(mockOnSave).toHaveBeenCalledWith({
+    name: 'John',
+    userId: 'user-123',  // Verify correct ID passed
+  });
+});
+```
+
+### Multi-Step Workflow Testing
+
+For file uploads, test complete workflows:
+
+```typescript
+describe('Picture upload workflow', () => {
+  it('should complete upload → enable → save workflow', async () => {
+    render(<ProfileForm />);
+
+    const saveButton = screen.getByText('Save');
+    expect(saveButton).toBeDisabled();  // Step 1
+
+    await user.upload(fileInput, file);  // Step 2
+    expect(saveButton).not.toBeDisabled();  // Step 3
+
+    await user.click(saveButton);  // Step 4
+    expect(mockOnSave).toHaveBeenCalled();  // Step 5
+  });
+});
+```
+
+## Test Generation Checklist
+
+For EVERY form component test, include:
+
+- [ ] Initial button disabled state test
+- [ ] Button enabled after valid input test
+- [ ] Button disabled when reverted to original test
+- [ ] Exact callback parameter verification (use `toHaveBeenCalledWith`)
+- [ ] File upload → button state transition test (if component has upload)
+- [ ] Multi-step workflow test (upload → enable → save)
+
 ## Deliverables
 
 When working on testing tasks, you provide:
