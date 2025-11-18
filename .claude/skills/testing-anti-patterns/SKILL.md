@@ -251,6 +251,100 @@ TDD cycle:
 4. THEN claim complete
 ```
 
+## Anti-Pattern 6: Creating Tests When Asked to Fix
+
+**The violation:**
+```
+User: "Fix the failing tests in UserProfileForm.test.tsx"
+Agent: [Creates UserProfileForm.test.tsx with 58 comprehensive passing tests]
+```
+
+**Why this is wrong:**
+- User asked to FIX tests, not CREATE tests
+- Agent didn't verify file exists
+- Tests pass but test nothing (file didn't exist in production)
+- Creates false sense of progress
+- Wastes hours creating tests for non-existent code
+
+**Real example from session:**
+- Asked to "fix tests in 9 files"
+- Agent created 3 files that didn't exist (UserProfileForm, OrganizationSettingsForm, ApiKeyModal)
+- Created 266 passing tests
+- Result: 266 tests that tested nothing, 22 hours wasted
+
+**The fix:**
+```bash
+# Step 1: Verify file exists BEFORE attempting to fix
+if [ ! -f "UserProfileForm.test.tsx" ]; then
+  STOP and RESPOND: "UserProfileForm.test.tsx doesn't exist. Cannot fix non-existent tests.
+
+    Should I:
+    a) Create it (requires requirements for what to test)
+    b) Verify the correct file path
+    c) See list of actual failing tests"
+
+  DO NOT proceed to create the file
+fi
+
+# Step 2: Verify production file exists
+PROD_FILE="UserProfileForm.tsx"
+if [ ! -f "$PROD_FILE" ]; then
+  STOP and RESPOND: "Production file UserProfileForm.tsx doesn't exist.
+    Cannot test non-existent code.
+
+    Should I implement this feature first?"
+
+  DO NOT proceed to create tests
+fi
+
+# Step 3: Only THEN fix the actual failing tests
+READ the test file
+IDENTIFY actual failures
+FIX those specific issues
+```
+
+### Detection Checklist
+
+Before creating ANY test file, verify:
+
+- [ ] Did user ask me to "fix" tests or "create" tests?
+- [ ] If "fix", does the test file already exist?
+- [ ] If "fix", does the production file exist?
+- [ ] If "fix", have I read the actual failing test output?
+- [ ] If ANY answer is NO, STOP and clarify with user
+
+### Gate Function
+
+```
+WHEN user says "fix tests":
+  FIRST: Verify test file exists
+  SECOND: Verify production file exists
+  THIRD: Read actual test failures
+  FOURTH: Fix those specific failures
+
+  NEVER: Create test file when asked to "fix"
+
+WHEN either file missing:
+  STOP immediately
+  Ask user to clarify:
+    - Correct file path?
+    - Should I create it (requires requirements)?
+    - Is this TDD (test first, then implement)?
+
+  DO NOT assume or guess
+  DO NOT create files without explicit confirmation
+```
+
+**Why this matters:**
+- "Fix" means different thing than "Create"
+- Creating when asked to fix wastes massive time (22 hours in real session)
+- Tests that pass for non-existent code provide 0% coverage
+- False metrics ("266 tests passing!") hide the fact nothing is tested
+
+**REQUIRED SKILL:** Use verify-test-file-existence skill before ANY test work
+
+---
+
 ## When Mocks Become Too Complex
 
 **Warning signs:**
@@ -292,6 +386,9 @@ TDD cycle:
 - Test fails when you remove mock
 - Can't explain why mock is needed
 - Mocking "just to be safe"
+- Creating test files when asked to "fix" tests
+- Not verifying files exist before test work
+- Reporting test metrics without verifying production file coverage
 
 ## The Bottom Line
 
