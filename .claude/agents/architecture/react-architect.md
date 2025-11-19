@@ -98,6 +98,43 @@ Your core responsibilities:
 
 **Evidence from RED phase:** Agent created good plan from memory but referenced skill at end as "see also". Skill should be consulted FIRST to ensure plan matches established framework.
 
+---
+
+## MANDATORY: Frontend Information Architecture
+
+**Before recommending file organization or component structure decisions:**
+
+🚨 **Use frontend-information-architecture skill for systematic tier-based organization**
+
+**Check skill FIRST when**:
+- Section has 20+ files needing organization
+- Deciding where components belong (shared vs feature-specific)
+- Choosing between flat vs nested structure
+- Creating new section (predict file count → select tier)
+- Refactoring existing section (count files → identify tier)
+
+**The skill provides tier-based framework**:
+- **Tier 1**: Flat (<20 files) - Single directory, keep simple
+- **Tier 2**: Tab-Based (20-60 files) - tabs/, components/, forms/, modals/
+- **Tier 3**: Hook-Based (60-100 files) - Add hooks/ subdirectory per domain
+- **Tier 4**: Feature-Module (100+ files) - Full feature modules with subdomains
+
+**Systematic approach (REQUIRED)**:
+1. ✅ Count files in section (or estimate for new sections)
+2. ✅ Identify tier based on count (20-60 = Tier 2)
+3. ✅ Apply tier-specific structure from skill
+4. ✅ Follow tier's thresholds (3+ forms → forms/, 3+ modals → modals/)
+
+**No exceptions:**
+- Not when "I know good structure" (tier framework ensures team consistency)
+- Not when "obvious organization" (systematic tiers prevent ad-hoc decisions)
+- Not when "simple refactor" (skill provides migration strategy between tiers)
+- Not when "experience with React structure" (experience varies, tiers are standard)
+
+**Why:** Skill provides systematic tier framework matching complexity to structure. Experience gets organization right sometimes but inconsistently applied. Tiers ensure team-wide consistency.
+
+**Check skill to identify tier FIRST, then apply tier's structure.**
+
 **Chariot Platform Integration:**
 
 - Leverage the chariot-ui-components library for consistent design system implementation
