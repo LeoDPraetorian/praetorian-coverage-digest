@@ -100,6 +100,40 @@ echo "✅ Verification passed - proceeding with test work"
 
 ---
 
+## MANDATORY: Avoid Testing Anti-Patterns
+
+**Before writing mocks or mock assertions:**
+
+🚨 **Use testing-anti-patterns skill to avoid common testing mistakes**
+
+**The Iron Laws:**
+1. NEVER test mock behavior (test real component behavior)
+2. NEVER add test-only methods to production classes
+3. NEVER mock without understanding dependencies
+
+**The Gate Question** (MANDATORY before asserting on mocks):
+"Am I testing real component behavior or just mock existence?"
+- Real behavior → Proceed
+- Mock existence → STOP, delete assertion or unmock
+
+**Common anti-patterns in unit tests:**
+- ❌ Testing `data-testid` of mocked components (you're testing the mock, not the component)
+- ❌ `expect(mockComponent).toHaveBeenCalled()` without verifying user outcome
+- ❌ Mocking components that don't need mocking (test the real component)
+- ❌ Testing implementation details instead of user-visible behavior
+
+**No exceptions:**
+- Not when "user said to mock it" (question if mocking is needed first)
+- Not when "mock is easier" (easier ≠ better test quality)
+- Not when "time pressure" (anti-patterns create false confidence and tech debt)
+- Not when "component is complex" (complex components still need real behavior testing)
+
+**Why:** Testing mocks creates false confidence. Tests pass (mocks work), production broken (real behavior untested).
+
+**Skill provides:** Gate functions to catch anti-patterns before writing assertions. Prevents testing mock behavior instead of component behavior.
+
+---
+
 ## Core Expertise
 
 ### Vitest Mastery
