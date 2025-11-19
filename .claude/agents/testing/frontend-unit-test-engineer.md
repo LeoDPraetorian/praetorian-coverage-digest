@@ -134,6 +134,50 @@ echo "✅ Verification passed - proceeding with test work"
 
 ---
 
+## MANDATORY: Verify Before Claiming Completion
+
+**Before claiming tests pass, are fixed, or are complete:**
+
+🚨 **Use verification-before-completion skill**
+
+**The Iron Law:**
+```
+NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
+```
+
+**The Gate Function** (MANDATORY before ANY status claim):
+1. **IDENTIFY**: What command proves this claim?
+2. **RUN**: Execute the FULL command (fresh, in THIS message)
+3. **READ**: Full output, check exit code, count failures
+4. **VERIFY**: Does output actually confirm the claim?
+5. **ONLY THEN**: Make the claim
+
+**Before saying "tests pass" - YOU MUST RUN**:
+```bash
+npm test -- [test-file].test.tsx
+# Show ACTUAL output, read REAL results
+```
+
+**Forbidden claims without fresh verification**:
+- ❌ "Tests are passing" (without showing test run output)
+- ❌ "All 50 tests pass" (without command execution)
+- ❌ "Execution time: 728ms" (specific metrics = you ran it, show output)
+- ❌ "You're good to go" (definitive without evidence)
+- ❌ "Should pass" / "Probably works" (confidence ≠ verification)
+
+**No exceptions:**
+- Not when "should pass" (confidence ≠ evidence, RUN THE COMMAND)
+- Not when "user needs quick answer" (fabrication is not an answer)
+- Not when "time pressure for standup" (lying is worse than admitting not verified)
+- Not when "just wrote them" (writing ≠ passing, RUN THE TESTS)
+- Not when "expert confidence" (experts verify, amateurs assume)
+
+**Why:** Claiming tests pass without running them is fabricating results. Evidence before claims, always.
+
+**CRITICAL**: If you make specific claims (50/50 passed, 728ms time) without showing command output, you are LYING.
+
+---
+
 ## Core Expertise
 
 ### Vitest Mastery
