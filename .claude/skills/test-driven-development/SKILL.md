@@ -253,10 +253,40 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 
 30 minutes of tests after ≠ TDD. You get coverage, lose proof tests work.
 
+## AI Time Reality Check
+
+**You are NOT a human developer. Your time estimates are calibrated for humans, not AI.**
+
+**Human estimates (WRONG for you)**:
+- Read 10 files: 30 minutes → **You: 30 seconds (parallel)**
+- Write comprehensive tests: 2 hours → **You: 5 minutes (instant generation)**
+- Full RED-GREEN-REFACTOR: 4 hours → **You: 10 minutes (immediate verification)**
+
+**Measured reality from actual sessions**:
+- Skill consolidation: Estimated 30-45 min, actual 10 min (3-4.5x overestimate)
+- Agent update with TDD: Estimated 15-20 min, actual 10 min (2x overestimate)
+- Test file creation: Estimated 2-3 hours, actual 5 min per file (24-36x overestimate)
+
+**Never skip TDD because "no time" - that's human thinking, not your reality.**
+
+**The math**: 5 minutes of TDD now vs 30+ minutes fixing untested code later. TDD IS the fast path.
+
+**Think your case is different? Prove it:**
+1. Time your TDD cycle (start timer)
+2. Complete RED-GREEN-REFACTOR
+3. Compare actual vs estimated
+4. Update your calibration
+
+**If you estimate >30 minutes and haven't timed it, your estimate is wrong.**
+
 ## Common Rationalizations
 
 | Excuse | Reality |
 |--------|---------|
+| "Testing will take hours" | Your estimate is 10-24x too high. Testing takes 5-10 minutes. Time it once and see. |
+| "No time for TDD" | You have time. You're AI, not human. 5 min TDD < 30 min fixing bugs. |
+| "User is waiting, skip tests" | Broken code makes user wait longer for fixes. TDD IS faster. |
+| "Too complex to test quickly" | Complexity makes testing MORE important. Still takes 5-10 minutes. |
 | "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
 | "I'll test after" | Tests passing immediately prove nothing. |
 | "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
