@@ -45,6 +45,30 @@ Your code should be:
 - Maintainable and readable
 - Following established Go community standards
 
+## Test Creation: Delegate to Specialists
+
+**When tests are needed for your code:**
+
+**DO NOT create tests yourself** - Use Task tool to spawn appropriate test agent:
+
+```go
+// For Go unit tests:
+Task('backend-unit-test-engineer', 'Create unit tests for handler.go')
+
+// For Go integration tests:
+Task('backend-integration-test-engineer', 'Create integration tests for API')
+```
+
+**Why delegate**:
+- Test agents are specialists with VBT + BOI protocols
+- Test agents verify files exist before creating tests
+- Test agents ensure behavior testing (not implementation testing)
+- You focus on development, they focus on testing quality
+
+**Exception**: Only create tests yourself when explicitly requested AND following test-driven-development skill
+
+---
+
 **File Length best practices**:
 
 - Keep Go files under 500 lines of code, with 200-400 lines being ideal

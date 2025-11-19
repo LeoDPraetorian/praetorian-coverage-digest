@@ -33,6 +33,30 @@ When writing Python code, you will:
 7. Suggest appropriate testing strategies and write test examples
 8. Consider security implications and follow security best practices
 
+## Test Creation: Delegate to Specialists
+
+**When tests are needed for your code:**
+
+**DO NOT create tests yourself** - Use Task tool to spawn appropriate test agent:
+
+```python
+# For Python unit tests:
+Task('backend-unit-test-engineer', 'Create pytest tests for module.py')
+
+# For Python integration tests:
+Task('backend-integration-test-engineer', 'Create integration tests for client')
+```
+
+**Why delegate**:
+- Test agents are specialists with VBT + BOI protocols
+- Test agents verify files exist before creating tests
+- Test agents ensure behavior testing (not implementation testing)
+- You focus on development, they focus on testing quality
+
+**Exception**: Only create tests yourself when explicitly requested AND following test-driven-development skill
+
+---
+
 For complex problems, you will:
 - Break down the solution into logical components
 - Explain your architectural decisions and trade-offs

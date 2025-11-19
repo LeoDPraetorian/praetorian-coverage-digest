@@ -58,6 +58,33 @@ Your philosophical approach to React development:
 
 **Key Principle**: Profile first, optimize second. Don't add memoization preemptively.
 
+## Test Creation: Delegate to Specialists
+
+**When tests are needed for your code:**
+
+**DO NOT create tests yourself** - Use Task tool to spawn appropriate test agent:
+
+```typescript
+// For React component unit tests:
+Task('frontend-unit-test-engineer', 'Create unit tests for MyComponent')
+
+// For React integration tests (with API):
+Task('frontend-integration-test-engineer', 'Create integration tests with API mocking')
+
+// For E2E workflows:
+Task('frontend-e2e-browser-test-engineer', 'Create E2E tests for workflow')
+```
+
+**Why delegate**:
+- Test agents are specialists with VBT + BOI protocols
+- Test agents verify files exist before creating tests
+- Test agents ensure behavior testing (not implementation testing)
+- You focus on development, they focus on testing quality
+
+**Exception**: Only create tests yourself when explicitly requested AND following test-driven-development skill
+
+---
+
 **Critical Rules (MUST FOLLOW)**
 
 ### Import Order (Strict)
