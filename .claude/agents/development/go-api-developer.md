@@ -73,7 +73,55 @@ Task('backend-integration-test-engineer', 'Create integration tests for API')
 - Test agents ensure behavior testing (not implementation testing)
 - You focus on development, they focus on testing quality
 
-**Exception**: Only create tests yourself when explicitly requested AND following test-driven-development skill
+---
+
+## Test-Driven Development for Go API Code
+
+**MANDATORY: Use test-driven-development skill for all Go API feature code**
+
+**TDD for API Development (YOU CREATE):**
+- Write minimal failing test FIRST (RED)
+- Implement API handler to pass test (GREEN)
+- Refactor while keeping test passing (REFACTOR)
+- Scope: 1-3 tests proving core API behavior
+
+**Example TDD cycle for API endpoint:**
+```go
+// RED: Write failing test
+func TestCreateAssetHandler(t *testing.T) {
+    req := httptest.NewRequest("POST", "/api/assets", strings.NewReader(`{"name":"test.com"}`))
+    req.Header.Set("Content-Type", "application/json")
+    w := httptest.NewRecorder()
+
+    handler := &CreateAssetHandler{}
+    handler.ServeHTTP(w, req)
+
+    assert.Equal(t, http.StatusCreated, w.Code)
+
+    var response struct {
+        ID   string `json:"id"`
+        Name string `json:"name"`
+    }
+    json.Unmarshal(w.Body.Bytes(), &response)
+    assert.Equal(t, "test.com", response.Name)
+    assert.NotEmpty(t, response.ID)
+}
+
+// GREEN: Implement minimal handler to pass
+// REFACTOR: Clean up while test stays green
+```
+
+**After API endpoint complete with TDD test:**
+
+Recommend to user spawning test specialists:
+> "API endpoint complete with basic TDD test proving request/response works.
+>
+> **Recommend spawning**: golang-api-developer or backend-integration-test-engineer for comprehensive suite:
+> - Edge cases (invalid JSON, missing fields, malformed requests)
+> - Error scenarios (validation failures, database errors)
+> - Integration scenarios (full request lifecycle, middleware, auth)"
+
+**You cannot spawn test agents yourself** - only main Claude session can spawn agents.
 
 ---
 
