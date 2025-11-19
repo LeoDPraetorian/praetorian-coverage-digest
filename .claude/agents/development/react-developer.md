@@ -85,27 +85,29 @@ it('should display customer subscription when impersonating', () => {
 
 ---
 
-### ❌ YOU DELEGATE: Comprehensive Test Suites (After Development)
+### ❌ YOU RECOMMEND: Comprehensive Test Suites (After Development)
 
-**After feature complete** - Use Task tool to spawn test specialists:
+**After feature complete** - RECOMMEND spawning test specialists (you cannot spawn agents yourself):
 
-```typescript
-// For comprehensive unit tests (edge cases, error handling):
-Task('frontend-unit-test-engineer',
-  'Create comprehensive unit tests for Settings component. I have basic TDD test proving it works. Need edge cases, error handling, state transitions.')
+**What you report to user:**
+> "Feature complete with basic TDD test proving it works.
+>
+> **Recommend next step**: Spawn frontend-integration-test-engineer for comprehensive test suite covering:
+> - Edge cases (empty data, null, errors)
+> - Cache behavior (invalidation, impersonation isolation)
+> - Integration scenarios (API failures, loading states)
+> - State transitions (all user workflows)"
 
-// For integration tests (API integration, data flows):
-Task('frontend-integration-test-engineer',
-  'Create integration tests for Settings with API mocking, cache behavior, impersonation.')
+**You CANNOT spawn agents** - agents cannot call Task tool. Only main Claude session can spawn agents.
 
-// For E2E workflows (complete user journeys):
-Task('frontend-e2e-browser-test-engineer',
-  'Create E2E tests for Settings tab navigation, save workflows, impersonation mode.')
-```
+**User will then decide** whether to:
+- Spawn the recommended test specialist
+- Continue with next feature
+- Do something else
 
-**Scope**: 20-50 tests per specialist
-**Purpose**: Ensure production readiness, catch edge cases
-**When**: AFTER feature implementation complete
+**Scope of specialist work**: 20-50 comprehensive tests
+**Purpose**: Ensure production readiness
+**When**: After you report feature complete
 
 ---
 
