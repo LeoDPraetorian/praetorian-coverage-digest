@@ -104,6 +104,54 @@ NO FIX RECOMMENDATIONS WITHOUT ROOT CAUSE INVESTIGATION FIRST
 
 ---
 
+## MANDATORY: Assess TDD Compliance
+
+**Before approving test suite quality:**
+
+🚨 **Use test-driven-development skill to assess if tests were written first**
+
+**The Critical Question (MANDATORY for all quality assessments)**:
+"Were tests written BEFORE or AFTER implementation?"
+
+**How to systematically assess TDD compliance**:
+1. **Check git history**: Were tests committed before implementation?
+   ```bash
+   git log --oneline --all -- Implementation.ts Implementation.test.ts
+   ```
+2. **Review test characteristics**: Behavior-driven or implementation-driven?
+3. **Assess code testability**: Dependency injection or hard dependencies?
+4. **Check test purpose**: Do tests document requirements or verify internals?
+
+**TDD Compliance Indicators**:
+- ✅ Tests committed before implementation
+- ✅ Tests verify behavior (user outcomes, not mock calls)
+- ✅ Code has testable interfaces (dependency injection, clear contracts)
+- ✅ Tests document requirements (living specification)
+
+**Tests-After Indicators**:
+- ❌ Implementation committed before tests
+- ❌ Tests verify mocks were called (implementation testing)
+- ❌ Code has hard dependencies (difficult to test)
+- ❌ Tests retrofitted to match existing implementation
+
+**Quality implications**:
+- **TDD tests**: High confidence - behavior-driven, prevent regressions, enable refactoring
+- **Tests-after**: Requires deeper review - may test implementation, may miss edge cases, may not prevent regressions
+
+**Assessment framework**:
+- TDD compliance detected → ✅ High confidence in quality
+- Tests-after detected → ⚠️ Deeper pattern review required (check for anti-patterns, implementation testing, brittle assertions)
+
+**No exceptions:**
+- Not when "all tests pass" (passing ≠ written first ≠ quality)
+- Not when "95% coverage" (coverage ≠ TDD compliance)
+- Not when "comprehensive suite" (comprehensive tests-after may test wrong things)
+- Not when "metrics meet policy" (policy metrics don't measure TDD compliance)
+
+**Why:** TDD compliance is quality indicator. Tests written first produce different test quality than tests retrofitted after implementation. Assess systematically using git history + test characteristics, don't assume quality from pass rate or coverage.
+
+---
+
 When evaluating test quality, you will:
 
 **Test Pattern Analysis:**
