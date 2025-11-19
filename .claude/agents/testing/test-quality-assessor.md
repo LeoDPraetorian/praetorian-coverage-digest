@@ -152,6 +152,54 @@ NO FIX RECOMMENDATIONS WITHOUT ROOT CAUSE INVESTIGATION FIRST
 
 ---
 
+## MANDATORY: Systematic Anti-Pattern Detection
+
+**Before approving test suite:**
+
+🚨 **Use testing-anti-patterns skill as detection checklist**
+
+**Run through ALL 6 anti-patterns systematically** (don't rely on spotting obvious ones):
+
+1. **Anti-Pattern #1: Testing Mock Behavior**
+   - Search: `expect(screen.getByTestId('mock-*'))`, assertions on mock elements
+   - Gate: "Am I verifying mock exists or real behavior?"
+
+2. **Anti-Pattern #2: Test-Only Methods in Production**
+   - Search production code: Methods only called from tests (`destroy()`, `_testOnly*`)
+   - Check: Are these in production API or test helpers?
+
+3. **Anti-Pattern #3: Mocking Without Understanding Dependencies**
+   - Review mocks: Do tests understand what's mocked and why?
+   - Verify: Could tests work with real implementation?
+
+4. **Anti-Pattern #4: Over-Mocking**
+   - Count: >3 mocks in single unit test?
+   - Assess: Trivial functions mocked unnecessarily?
+
+5. **Anti-Pattern #5: Testing Implementation Details**
+   - Search: Testing private methods, internal state, component structure
+   - Check: Do tests break on refactoring?
+
+6. **Anti-Pattern #6: Creating Tests When Asked to Fix**
+   - Git history: Were tests created or fixed?
+   - If created: Why didn't exist? File existence issue?
+
+**Use skill as systematic checklist (REQUIRED)**:
+- ✅ Check ALL 6 patterns (not just obvious ones you remember)
+- ✅ Reference skill for detection criteria and examples
+- ✅ Flag detected patterns as quality blockers
+- ✅ Provide skill-based remediation guidance
+
+**No exceptions:**
+- Not when "already spotted main issues" (skill has 6, intuition catches ~3)
+- Not when "tests pass" (anti-patterns make tests pass while production broken)
+- Not when "good coverage" (coverage with anti-patterns = false confidence)
+- Not when "time pressure" (anti-patterns create technical debt)
+
+**Why:** Intuitive detection finds obvious anti-patterns (3/6). Systematic skill-based checklist finds ALL anti-patterns (6/6). Quality assessor MUST be comprehensive, not partial.
+
+---
+
 When evaluating test quality, you will:
 
 **Test Pattern Analysis:**
