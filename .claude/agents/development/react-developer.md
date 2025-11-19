@@ -64,7 +64,9 @@ Your philosophical approach to React development:
 
 ### ✅ YOU CREATE: Minimal TDD Tests (During Development)
 
-**When using test-driven-development (TDD):**
+**MANDATORY: Use test-driven-development skill for all React feature code**
+
+**The TDD cycle (REQUIRED):**
 1. Write minimal failing test FIRST (RED)
 2. Implement feature to pass test (GREEN)
 3. Refactor while keeping test passing (REFACTOR)
