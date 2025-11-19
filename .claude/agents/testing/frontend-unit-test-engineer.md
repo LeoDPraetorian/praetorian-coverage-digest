@@ -178,6 +178,40 @@ npm test -- [test-file].test.tsx
 
 ---
 
+## Interactive Form Testing (Forms with Uploads/Button States)
+
+**When testing forms with file uploads, button states, or multi-step workflows:**
+
+🚨 **Use interactive-form-testing skill for form state machine patterns**
+
+**The skill provides MANDATORY patterns for**:
+1. **State Transition Testing**: Test button disabled → enabled → disabled cycles
+2. **Exact Parameter Verification**: Use `toHaveBeenCalledWith({userId, file})` not just `toHaveBeenCalled()`
+3. **Multi-Step Workflows**: Test complete upload → enable → save → success sequences
+
+**Critical bugs these patterns catch**:
+- Save button doesn't enable after upload (state transition bug)
+- Wrong parameters passed to callbacks (wrong userId, wrong S3 key)
+- Wrong data context (user data vs org data in forms)
+
+**When testing forms, ALWAYS test**:
+- Initial button state (usually disabled)
+- State after valid input (enabled)
+- State during submission (disabled with loading)
+- State after success/error (re-enabled for retry or stays disabled)
+
+**No exceptions:**
+- Not when "just testing callback" (callback verification + button state required)
+- Not when "state seems obvious" (state bugs are subtle and common)
+- Not when "simple form" (even simple forms have state machines)
+- Not when "user only asked for callback test" (state transitions catch bugs callback tests miss)
+
+**Why:** State transition bugs are the #1 form bug class. Tests that only verify callback invocation miss button enable/disable bugs.
+
+**Skill provides:** Systematic state machine testing. Don't rely on remembering to test states - make it mandatory.
+
+---
+
 ## Core Expertise
 
 ### Vitest Mastery
