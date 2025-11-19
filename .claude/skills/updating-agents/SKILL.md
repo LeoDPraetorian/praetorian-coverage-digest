@@ -520,6 +520,69 @@ cp .claude/agents/testing/integration-test-engineer.md \
 - ✅ **Update** to reference react-testing skill
 - ❌ **Don't** copy all react-testing content into agent
 
+## Critical: Agent Architecture Limitations
+
+**Before writing delegation sections in agents:**
+
+### Agents CANNOT Spawn Other Agents
+
+**Architectural reality** (confirmed via web research):
+- Only main Claude session can spawn agents (via Task tool)
+- Task tool intentionally excluded from sub-agent toolsets
+- Flat delegation model (no hierarchical nesting)
+- Maximum one level of agent spawning
+
+**Common mistake when updating agents**:
+```markdown
+❌ WRONG (implies agent can spawn):
+Task('frontend-unit-test-engineer', 'Create tests for MyComponent')
+
+✅ CORRECT (agent recommends to user):
+"Feature complete with TDD test.
+
+Recommend next step: Spawn frontend-integration-test-engineer for comprehensive test suite covering edge cases and integration scenarios."
+```
+
+### Correct Delegation Pattern
+
+**What agents CAN do**:
+- ✅ Report completion with recommendations
+- ✅ Suggest which specialist agent to spawn next
+- ✅ Explain what comprehensive testing is needed
+
+**What agents CANNOT do**:
+- ❌ Call Task tool to spawn other agents
+- ❌ Coordinate multiple agents
+- ❌ Create hierarchical workflows
+
+**Correct agent instruction template**:
+```markdown
+## Test Creation Delegation
+
+**After feature complete, recommend to user:**
+> "Feature complete with basic TDD test proving functionality.
+>
+> **Recommend spawning**: [specialist-agent-name] for comprehensive testing:
+> - [Specific testing needs]
+> - [Coverage requirements]
+> - [Quality standards]"
+
+**You cannot spawn agents yourself** - only main Claude session can spawn.
+```
+
+### Evidence from Session
+
+**RED phase**: All developer agents had `Task()` examples in delegation sections
+- Implied agents could spawn other agents
+- Required web research to clarify architecture
+- Had to fix react-developer, 7 other agents still incorrect
+
+**Source**: GitHub issues #4182 (Task tool excluded), #4993 (agent-to-agent communication feature request proves it doesn't exist)
+
+**Fix pattern**: Replace Task() examples with recommendation templates
+
+---
+
 ## Integration with Other Skills
 
 **Required prerequisites:**
