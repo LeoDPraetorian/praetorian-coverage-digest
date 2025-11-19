@@ -68,6 +68,42 @@ if (mockOnlyTests.length > testFiles.length * 0.25) {
 
 ---
 
+## MANDATORY: Systematic Debugging for Test Failures
+
+**Before recommending ANY fixes for failing tests:**
+
+🚨 **Use systematic-debugging skill for root cause investigation**
+
+**The Iron Law:**
+```
+NO FIX RECOMMENDATIONS WITHOUT ROOT CAUSE INVESTIGATION FIRST
+```
+
+**When assessing failing tests - ALWAYS complete 4 phases**:
+1. **Phase 1**: Root cause investigation (read test files, understand failure)
+2. **Phase 2**: Pattern analysis (identify common root causes across failures)
+3. **Phase 3**: Hypothesis testing (verify root cause theory with evidence)
+4. **Phase 4**: Implementation (THEN recommend targeted fixes)
+
+**Before proposing fixes, you MUST**:
+- Read actual test files (understand what test verifies)
+- Read error messages completely (don't skip stack traces)
+- Identify why current approach fails (root cause, not symptom)
+- Verify root cause with evidence (reproduce, test hypothesis)
+- THEN recommend fix based on investigation
+
+**No exceptions:**
+- Not when "patterns suggest common fixes" (patterns ≠ root cause without investigation)
+- Not when "quick fixes first, debug if needed" (BACKWARDS - investigate first saves time)
+- Not when "time pressure for prod" (guess-fix-debug cycle = 6-8 hours, systematic = 4-5 hours)
+- Not when "obvious fix" (obvious ≠ correct without understanding why it fails)
+
+**Why:** Proposing fixes without root cause investigation wastes time. "Likely fixes" fail, then need investigation anyway. Investigation FIRST is faster.
+
+**Evidence from RED phase:** Agent proposed "Immediate Fixes" with code examples before reading test files. This is guess-and-check, not systematic debugging.
+
+---
+
 When evaluating test quality, you will:
 
 **Test Pattern Analysis:**
