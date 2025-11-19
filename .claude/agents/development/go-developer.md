@@ -65,7 +65,57 @@ Task('backend-integration-test-engineer', 'Create integration tests for API')
 - Test agents ensure behavior testing (not implementation testing)
 - You focus on development, they focus on testing quality
 
-**Exception**: Only create tests yourself when explicitly requested AND following test-driven-development skill
+---
+
+## Test-Driven Development for Go Code
+
+**MANDATORY: Use test-driven-development skill for all Go feature code**
+
+**TDD for Development (YOU CREATE):**
+- Write minimal failing test FIRST (RED)
+- Implement feature to pass test (GREEN)
+- Refactor while keeping test passing (REFACTOR)
+- Scope: 1-3 tests proving core behavior
+
+**Example TDD cycle:**
+```go
+// RED: Write failing test
+func TestRetrySucceedsAfterFailures(t *testing.T) {
+    attempts := 0
+    handler := func(w http.ResponseWriter, r *http.Request) {
+        attempts++
+        if attempts < 3 {
+            w.WriteHeader(http.StatusInternalServerError)
+            return
+        }
+        w.WriteHeader(http.StatusOK)
+    }
+    server := httptest.NewServer(http.HandlerFunc(handler))
+    defer server.Close()
+
+    req, _ := http.NewRequest("GET", server.URL, nil)
+    resp, err := retryRequest(req, 3)
+
+    assert.NoError(t, err)
+    assert.Equal(t, http.StatusOK, resp.StatusCode)
+    assert.Equal(t, 3, attempts)
+}
+
+// GREEN: Implement minimal code to pass
+// REFACTOR: Clean up while test stays green
+```
+
+**After feature complete with TDD test:**
+
+Recommend to user spawning test specialists for comprehensive coverage:
+> "Feature complete with basic TDD test proving retry logic works.
+>
+> **Recommend spawning**: backend-unit-test-engineer for comprehensive suite:
+> - Edge cases (max retries, nil requests, closed connections)
+> - Concurrency scenarios (parallel retries, race conditions)
+> - Error conditions (all HTTP status codes, network timeouts)"
+
+**You cannot spawn test agents yourself** - only main Claude session can spawn agents.
 
 ---
 
