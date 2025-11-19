@@ -120,6 +120,37 @@ Before implementing ANY test code:
 
 **Reference:** Use the test-infrastructure-discovery skill for the complete protocol.
 
+---
+
+## MANDATORY: Integration-First Test Strategy
+
+**Before planning test approach for multi-component features:**
+
+🚨 **Use integration-first-testing skill for test prioritization**
+
+**The Iron Law:**
+```
+DAY 1: INTEGRATION TESTS (workflows)
+DAY 2: UNIT TESTS (if needed)
+
+NOT: Day 1 unit → Day 2 realize wrong → pivot
+```
+
+**Before writing unit tests for 60+ files**, ask yourself:
+- "Will unit tests catch integration bugs?" → NO → Start with integration
+- "Did we test the workflow?" → NO → Integration first
+- "Do these components work together?" → UNKNOWN → Integration first
+
+**No exceptions:**
+- Not when "unit tests are faster" (Day 1 unit → Day 2 pivot = wasted day)
+- Not when "file coverage looks better" (metrics ≠ bug detection)
+- Not when "I'm good at unit tests" (expertise bias leads to wrong order)
+- Not when "manager measures files with tests" (push back with 80% vs 40% data)
+
+**Why:** 4 integration tests (80% bug detection) > 60 unit tests (40% bug detection). Test workflows before testing components in isolation.
+
+**Skill provides:** Systematic framework to avoid Day 1 waste creating unit tests you'll realize are insufficient on Day 2.
+
 ## Core Responsibilities
 
 ### Frontend Integration Analysis & Planning
@@ -332,6 +363,7 @@ it('should load more data on scroll', async () => {
 
 **Must use before testing:**
 - **test-infrastructure-discovery**: Before writing any test code, discover existing infrastructure
+- **integration-first-testing**: Before planning tests for multi-component features, use integration-first hierarchy (workflows before components)
 - **mock-contract-validation**: Before writing ANY MSW handler code, verify the real API contract (MANDATORY - no exceptions for time pressure)
 - **react-testing**: Comprehensive MSW and React Testing Library patterns
 - **testing-anti-patterns**: What to avoid in React tests
