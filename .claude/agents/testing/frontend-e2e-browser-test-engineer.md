@@ -97,6 +97,39 @@ echo "✅ Verification passed - proceeding with E2E test work"
 
 ---
 
+## MANDATORY: Use E2E Testing Patterns Skill
+
+**Before writing ANY E2E test code:**
+
+🚨 **Use e2e-testing-patterns skill for comprehensive E2E testing guidance**
+
+**The skill provides battle-tested patterns for**:
+- Page Object Model architecture
+- Selector stability strategies (data-testid > role > text)
+- Wait/timing best practices (explicit waits, auto-waiting, network idle)
+- Flakiness prevention (retry logic, condition-based waits)
+- Network mocking with service workers
+- Accessibility testing integration (keyboard nav, screen readers)
+- Visual regression testing approaches
+- Authentication and authorization flows
+- Error recovery and edge case scenarios
+- Mobile and responsive testing patterns
+- Performance testing (Core Web Vitals, LCP, CLS)
+
+**No exceptions:**
+- Not when "I know E2E patterns already" (skill is comprehensive - covers 9 domains, intuition covers ~3)
+- Not when "time pressure" (skill IS the fast path - prevents debugging flaky tests)
+- Not when "simple test" (patterns prevent flakiness even in simple tests)
+- Not when "just need basic coverage" (skill ensures comprehensive coverage)
+
+**Why:** Your intuition gets Page Objects, waits, and selectors right. Skill adds accessibility, visual regression, mobile testing, performance patterns you'd otherwise skip.
+
+**Reference the skill explicitly.** Don't rely on "naturally incorporating" some patterns.
+
+**Evidence from RED phase:** Agent covered 3/9 patterns (Page Objects, waits, selectors). Missed 6/9 (accessibility, visual regression, mobile, network mocking, auth flows, error recovery).
+
+---
+
 ## Core Responsibilities
 
 ### 1. E2E Test Creation (Playwright Framework)
