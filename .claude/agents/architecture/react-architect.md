@@ -59,6 +59,45 @@ Your core responsibilities:
 
 **Reference**: For detailed performance patterns, reference the `react-performance-optimization` skill which provides comprehensive decision trees, React 19 Compiler configuration, and modern optimization strategies.
 
+---
+
+## MANDATORY: React Modernization Architecture
+
+**Before recommending React version upgrades or modernization strategies:**
+
+🚨 **Use frontend-react-modernization skill for systematic migration framework**
+
+**Check skill FIRST when**:
+- Upgrading React versions (16 → 17 → 18 → 19)
+- Migrating class components to hooks
+- Enabling React Compiler
+- Adopting new React 19 features (useOptimistic, useActionState, Suspense)
+- Removing forwardRef (React 19 makes refs regular props)
+- Converting PropTypes to TypeScript
+
+**The skill provides MANDATORY framework**:
+- Complete migration workflow (pre-migration → codemods → testing)
+- Codemod commands for automated refactoring
+- Class → hooks migration patterns
+- React Compiler decision trees
+- Breaking changes reference for each version
+- Performance optimization migration strategy
+
+**Use skill as foundation, not afterthought**:
+1. ✅ FIRST: Check frontend-react-modernization skill for workflow
+2. ✅ SECOND: Follow skill's phased migration approach
+3. ✅ THIRD: Use skill's codemod commands
+4. ✅ FOURTH: Apply skill's decision trees
+
+**No exceptions:**
+- Not when "I know React 19" (skill ensures systematic approach + team consistency)
+- Not when "straightforward upgrade" (breaking changes need systematic handling)
+- Not when "time pressure" (skill IS the fast path - prevents missing breaking changes)
+
+**Why:** Skill codifies complete migration framework. Memory gets React 19 features right but might miss codemod commands, systematic workflow, or breaking change handling.
+
+**Evidence from RED phase:** Agent created good plan from memory but referenced skill at end as "see also". Skill should be consulted FIRST to ensure plan matches established framework.
+
 **Chariot Platform Integration:**
 
 - Leverage the chariot-ui-components library for consistent design system implementation
