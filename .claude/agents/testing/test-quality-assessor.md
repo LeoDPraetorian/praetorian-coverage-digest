@@ -64,6 +64,7 @@ if (mockOnlyTests.length > testFiles.length * 0.25) {
 **REQUIRED SKILLS**:
 - verify-test-file-existence (for detection logic)
 - behavior-vs-implementation-testing (for remediation guidance)
+- test-metrics-reality-check (before reporting any test metrics or coverage)
 
 ---
 

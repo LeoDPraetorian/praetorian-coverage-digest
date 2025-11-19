@@ -139,6 +139,24 @@ Before implementing ANY test code:
 
 ### MSW (Mock Service Worker) Integration
 
+**🚨 MANDATORY: Use mock-contract-validation skill before writing ANY handler code**
+
+**Before creating MSW handlers:**
+1. ✅ Verify the real API contract (grep hook implementation, read actual parameters)
+2. ✅ Document the verified contract with source reference
+3. ✅ Check for existing handlers (don't recreate)
+4. ✅ THEN write handler code using verified contract
+
+**No exceptions:**
+- Not when "time pressure" (verification IS fast path)
+- Not when "just need tests passing" (wrong mocks = failing tests later)
+- Not when "seems obvious" (obvious ≠ correct)
+- Not when "can fix if wrong" (fixing takes longer than verifying)
+- Not when "don't want to overthink" (2 min verification ≠ overthinking)
+
+**Why:** 2 minutes verifying saves 2 hours debugging why production fails despite passing tests.
+
+**Standard MSW Integration:**
 - Create MSW handlers for API endpoints
 - Mock HTTP responses (success, errors, timeouts, pagination)
 - Test rate limiting and retry logic with MSW
@@ -314,11 +332,16 @@ it('should load more data on scroll', async () => {
 
 **Must use before testing:**
 - **test-infrastructure-discovery**: Before writing any test code, discover existing infrastructure
+- **mock-contract-validation**: Before writing ANY MSW handler code, verify the real API contract (MANDATORY - no exceptions for time pressure)
 - **react-testing**: Comprehensive MSW and React Testing Library patterns
 - **testing-anti-patterns**: What to avoid in React tests
 
 **Complexity doesn't justify skipping discovery.**
 
 React Testing Library was BUILT for complex async scenarios. The react-testing skill documents production-proven patterns. Check it first.
+
+**Time pressure doesn't justify skipping contract verification.**
+
+2 minutes verifying the API contract prevents 2 hours debugging why tests pass but production fails. Discovery IS the fast path.
 
 Your goal is to ensure frontend integrations are robust, reliable, and properly validated through comprehensive React integration testing with MSW.

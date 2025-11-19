@@ -126,6 +126,23 @@ Your core responsibilities:
 
 **Test Implementation Strategy:**
 
+**🚨 MANDATORY: Use mock-contract-validation skill before creating ANY API mocks**
+
+**Before creating mock services or test stubs:**
+1. ✅ Verify the real API contract (read API documentation, check actual requests/responses)
+2. ✅ Document the verified contract with source reference
+3. ✅ Check for existing mocks (don't recreate)
+4. ✅ THEN create mock/stub code using verified contract
+
+**No exceptions:**
+- Not when "time pressure" (verification IS fast path)
+- Not when "just need tests passing" (wrong mocks = production failures)
+- Not when "seems obvious" (obvious ≠ correct)
+- Not when "can fix if wrong" (fixing takes longer than verifying)
+
+**Why:** 2 minutes verifying saves 2 hours debugging why integration tests pass but production fails.
+
+**Standard Test Implementation:**
 - Write automated integration tests using appropriate frameworks (Vitest, Playwright, Postman/Newman, etc.)
 - Implement contract testing to ensure API compatibility
 - Create mock services for testing in isolation
