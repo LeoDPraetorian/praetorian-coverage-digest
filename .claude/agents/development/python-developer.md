@@ -53,7 +53,50 @@ Task('backend-integration-test-engineer', 'Create integration tests for client')
 - Test agents ensure behavior testing (not implementation testing)
 - You focus on development, they focus on testing quality
 
-**Exception**: Only create tests yourself when explicitly requested AND following test-driven-development skill
+---
+
+## Test-Driven Development for Python Code
+
+**MANDATORY: Use test-driven-development skill for all Python feature code**
+
+**TDD for Development (YOU CREATE):**
+- Write minimal failing test FIRST (RED)
+- Implement feature to pass test (GREEN)
+- Refactor while keeping test passing (REFACTOR)
+- Scope: 1-3 tests proving core behavior
+
+**Example TDD cycle:**
+```python
+# RED: Write failing test
+def test_retry_succeeds_after_failures():
+    attempts = []
+
+    def flaky_operation():
+        attempts.append(1)
+        if len(attempts) < 3:
+            raise ConnectionError("Network failure")
+        return "success"
+
+    result = retry_operation(flaky_operation, max_retries=3)
+
+    assert result == "success"
+    assert len(attempts) == 3
+
+# GREEN: Implement minimal code to pass
+# REFACTOR: Clean up while test stays green
+```
+
+**After feature complete with TDD test:**
+
+Recommend to user spawning test specialists for comprehensive coverage:
+> "Feature complete with basic TDD test proving retry logic works.
+>
+> **Recommend spawning**: backend-unit-test-engineer for comprehensive suite:
+> - Edge cases (max retries exceeded, immediate success, None handling)
+> - Error scenarios (different exception types, timeout)
+> - Type safety (mypy validation, type hints coverage)"
+
+**You cannot spawn test agents yourself** - only main Claude session can spawn agents.
 
 ---
 
