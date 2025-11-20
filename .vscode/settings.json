@@ -29,5 +29,11 @@
     "javascriptreact",
     "typescript", 
     "typescriptreact"
-  ]
+  ],
+  "search.exclude": {
+    "**/modules/chariot/backend/build": true
+  },
+  "files.exclude": {
+    "**/modules/chariot/backend/build": true
+  }
 }
