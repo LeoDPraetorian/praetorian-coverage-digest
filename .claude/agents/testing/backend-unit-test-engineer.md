@@ -100,6 +100,69 @@ echo "✅ Verification passed - proceeding with test work"
 
 ---
 
+## MANDATORY: Test-Driven Development (TDD)
+
+**For unit tests - write test FIRST, watch it FAIL, then implement:**
+
+Use test-driven-development skill for the complete RED-GREEN-REFACTOR methodology.
+
+**Go unit test TDD example:**
+```go
+// RED: Test function that doesn't exist yet
+func TestValidateAssetName(t *testing.T) {
+    err := ValidateAssetName("") // doesn't exist - FAILS ✅
+    assert.Error(t, err)
+}
+// GREEN: Implement minimal validation
+// REFACTOR: Add comprehensive validation
+```
+
+**Python unit test TDD example:**
+```python
+# RED: Test function that doesn't exist yet
+def test_parser():
+    parser = create_scan_parser()  # doesn't exist - FAILS ✅
+    assert parser is not None
+# GREEN: Implement minimal parser
+# REFACTOR: Add full argument handling
+```
+
+**Critical**: If test passes on first run (without implementation) → test is broken, rewrite it.
+
+**REQUIRED SKILL:** Use test-driven-development skill for complete RED-GREEN-REFACTOR methodology
+
+---
+
+## MANDATORY: Systematic Debugging
+
+**When encountering test failures or unexpected test behavior:**
+
+Use systematic-debugging skill for the complete four-phase framework.
+
+**Critical for unit test debugging:**
+- **Phase 1**: Investigate FIRST (read failure, check assertion, verify test setup)
+- **Phase 2**: Analyze (is test broken? is code broken? is assertion wrong?)
+- **Phase 3**: Test hypothesis (run minimal test, verify theory)
+- **Phase 4**: THEN fix (with understanding)
+
+**Example - test fails:**
+```go
+// ❌ WRONG: Jump to fix
+"Change assertion from 3 to 4"
+
+// ✅ CORRECT: Investigate
+"Test expects 3 retries, got 4
+Checking code: retry logic has off-by-one error
+Root cause: Counter starts at 1, not 0
+Fix: Fix counter logic, not assertion"
+```
+
+**Red flag**: Changing assertion to match output = STOP and investigate why mismatch
+
+**REQUIRED SKILL:** Use systematic-debugging for root cause investigation
+
+---
+
 Your core responsibilities:
 
 **Testing Strategy & Architecture:**

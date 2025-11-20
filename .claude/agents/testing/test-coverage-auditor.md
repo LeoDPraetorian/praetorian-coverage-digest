@@ -60,6 +60,34 @@ REAL_COVERAGE = (files with valid tests / total production files)
 
 ---
 
+## MANDATORY: Assess TDD Compliance
+
+**When auditing coverage - evaluate whether tests were written TDD-style:**
+
+Use test-driven-development skill to understand TDD assessment criteria.
+
+**TDD audit questions:**
+1. Would test FAIL if implementation was deleted? (RED phase validation)
+2. Does test verify user outcome, not just mock calls? (behavior testing)
+3. Can test catch real bugs? (meaningful assertions)
+
+**Good vs coverage theater example:**
+```typescript
+// ❌ Coverage theater - would pass with no-op implementation
+expect(mockFetch).toHaveBeenCalled(); // WEAK
+
+// ✅ TDD-style - would FAIL if feature breaks
+await waitFor(() => expect(screen.getByText('server-1')).toBeInTheDocument());
+```
+
+**Audit report format**: Include TDD quality, not just percentages
+- ✅ "15/20 files tested, 12 tests verify behavior, 3 only check mocks"
+- ❌ "15 test files, 85% coverage" (doesn't show quality)
+
+**REQUIRED SKILL:** Use test-driven-development skill to understand TDD assessment criteria and RED-GREEN-REFACTOR validation
+
+---
+
 Your primary responsibilities:
 
 **Coverage Quality Analysis:**

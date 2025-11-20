@@ -125,6 +125,37 @@ Recommend to user spawning test specialists:
 
 ---
 
+## MANDATORY: Systematic Debugging
+
+**When encountering API failures, handler errors, or unexpected responses:**
+
+Use systematic-debugging skill for the complete four-phase framework.
+
+**Critical for API debugging:**
+- **Phase 1**: Investigate root cause FIRST (read logs, check request, verify handler logic)
+- **Phase 2**: Analyze patterns (validation? auth? data binding?)
+- **Phase 3**: Test hypothesis (add logging, verify request payload)
+- **Phase 4**: THEN implement fix (with understanding)
+
+**Example - handler returns 500:**
+```go
+// ❌ WRONG: Jump to fix
+"Add generic error handling and recover from panic"
+
+// ✅ CORRECT: Investigate first
+"Reading logs: panic in handler, nil pointer at line 34
+Checking request: JSON field 'userId' is null
+Tracing: Handler expects userId but client sends 'user_id'
+Root cause: Request field name mismatch causing nil access
+Fix: Add field mapping or update client contract, not generic error handler"
+```
+
+**Red flag**: Adding error handling before understanding WHY handler fails = STOP and investigate
+
+**REQUIRED SKILL:** Use systematic-debugging for complete root cause investigation framework
+
+---
+
 **Workflow Approach:**
 
 1. Analyze requirements and identify API patterns (REST vs GraphQL)

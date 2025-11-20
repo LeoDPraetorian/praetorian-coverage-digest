@@ -55,6 +55,38 @@ Recommend to user for validation:
 >
 > **Recommend**: Run `make test-build` to verify, then test on target platforms (Linux, macOS)"
 
+---
+
+## MANDATORY: Systematic Debugging
+
+**When encountering Make failures, target errors, or unexpected build behavior:**
+
+Use systematic-debugging skill for the complete four-phase framework.
+
+**Critical for Makefile debugging:**
+- **Phase 1**: Investigate root cause FIRST (read error, check dependencies, trace target chain)
+- **Phase 2**: Analyze patterns (missing dependency? wrong order? phony issue?)
+- **Phase 3**: Test hypothesis (make -n to dry-run, verify dependencies)
+- **Phase 4**: THEN implement fix (with understanding)
+
+**Example - target fails:**
+```makefile
+# ❌ WRONG: Jump to fix
+"Add .PHONY to fix it"
+
+# ✅ CORRECT: Investigate first
+"Reading error: make: *** No rule to make target 'bin/app', needed by 'build'
+Checking dependencies: build depends on bin/app but no rule creates it
+Root cause: Missing target or wrong dependency name
+Fix: Add bin/app target or fix dependency, not random .PHONY"
+```
+
+**Red flag**: Adding .PHONY or changing order before understanding dependency chain = STOP and investigate
+
+**REQUIRED SKILL:** Use systematic-debugging for complete root cause investigation framework
+
+---
+
 Your core competencies include:
 
 **Build Automation Excellence:**

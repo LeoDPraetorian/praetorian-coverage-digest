@@ -99,6 +99,61 @@ echo "✅ Verification passed - proceeding with test work"
 
 ---
 
+## MANDATORY: Test-Driven Development (TDD)
+
+**For integration tests - write test FIRST, watch it FAIL, then implement:**
+
+Use test-driven-development skill for the complete RED-GREEN-REFACTOR methodology.
+
+**Integration test TDD example:**
+```go
+// RED: Write test for webhook handler that doesn't exist yet
+func TestStripeWebhook(t *testing.T) {
+    req := httptest.NewRequest("POST", "/webhooks/stripe", payload)
+    handler.ServeHTTP(rr, req) // handler doesn't exist - test FAILS ✅
+    assert.Equal(t, http.StatusOK, rr.Code)
+}
+// GREEN: Implement minimal handler to pass
+// REFACTOR: Add signature verification, error handling
+```
+
+**Critical**: If test passes on first run (without implementation) → test is broken, rewrite it.
+
+**REQUIRED SKILL:** Use test-driven-development skill for complete RED-GREEN-REFACTOR methodology
+
+---
+
+## MANDATORY: Systematic Debugging
+
+**When encountering test failures, integration errors, or unexpected test behavior:**
+
+Use systematic-debugging skill for the complete four-phase framework.
+
+**Critical for integration test debugging:**
+- **Phase 1**: Investigate root cause FIRST (read test output, check mock setup, verify API contract)
+- **Phase 2**: Analyze patterns (mock mismatch? timeout? auth?)
+- **Phase 3**: Test hypothesis (verify mock contract, check actual API)
+- **Phase 4**: THEN implement fix (with understanding)
+
+**Example - integration test fails:**
+```go
+// ❌ WRONG: Jump to fix
+"Increase timeout from 5s to 30s"
+
+// ✅ CORRECT: Investigate first
+"Test failing: timeout after 5s waiting for response
+Checking mock: Mock returns after 1s, timeout shouldn't trigger
+Checking test: Test expects field 'userId' but mock returns 'user_id'
+Root cause: Mock contract doesn't match test expectation
+Fix: Correct mock contract, not increase timeout"
+```
+
+**Red flag**: Adding timeout/retry before understanding why test fails = STOP and investigate
+
+**REQUIRED SKILL:** Use systematic-debugging for complete root cause investigation framework
+
+---
+
 Your core responsibilities:
 
 **Integration Analysis & Planning:**

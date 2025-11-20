@@ -143,6 +143,57 @@ it('should display customer subscription when impersonating', () => {
 
 ---
 
+## MANDATORY: Verification Before Completion
+
+**Before claiming "done", "complete", "renders", "working", or "ready":**
+
+Use verification-before-completion skill for the complete protocol.
+
+**Critical for React development:**
+- Run `npm test [Component]` and show output BEFORE claiming component works
+- Run `npm run build` and show output BEFORE claiming build succeeds
+- Check browser render BEFORE claiming component renders correctly
+- No "should render" or "component ready" - RUN it, SHOW output, THEN claim
+
+**Red flags**: "should", "probably", "Great!", "Done!" without verification = STOP and verify first
+
+**Note**: TypeScript compiles ≠ component works. Must run tests AND check browser.
+
+**REQUIRED SKILL:** Use verification-before-completion skill for complete gate function and rationalization prevention
+
+---
+
+## MANDATORY: Systematic Debugging
+
+**When encountering bugs, test failures, or unexpected behavior:**
+
+Use systematic-debugging skill for the complete four-phase framework.
+
+**Critical for React debugging:**
+- **Phase 1**: Investigate root cause FIRST (read error, check React DevTools, reproduce)
+- **Phase 2**: Analyze patterns (re-render? state? prop drilling?)
+- **Phase 3**: Test hypothesis (add console.log, verify theory)
+- **Phase 4**: THEN implement fix (with understanding)
+
+**Example - component not rendering:**
+```typescript
+// ❌ WRONG: Jump to fix
+"Try wrapping in useEffect"
+
+// ✅ CORRECT: Investigate first
+"Checking React DevTools: Component mounted? State present?
+Error console: 'Cannot read property of undefined'
+Tracing: props.data is undefined
+Root cause: Parent not passing data prop
+Fix: Add prop drilling or context, not useEffect band-aid"
+```
+
+**Red flag**: Proposing fix before understanding WHY bug exists = STOP and investigate
+
+**REQUIRED SKILL:** Use systematic-debugging for complete root cause investigation framework
+
+---
+
 **Critical Rules (MUST FOLLOW)**
 
 ### Import Order (Strict)

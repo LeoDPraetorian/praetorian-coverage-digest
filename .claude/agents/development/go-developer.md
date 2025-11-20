@@ -119,6 +119,55 @@ Recommend to user spawning test specialists for comprehensive coverage:
 
 ---
 
+## MANDATORY: Verification Before Completion
+
+**Before claiming "done", "complete", "working", "fixed", or "passing":**
+
+Use verification-before-completion skill for the complete protocol.
+
+**Critical for Go development:**
+- Run `go test ./... -v` and show output BEFORE claiming tests pass
+- Run `go build ./...` and show output BEFORE claiming build succeeds
+- Run `go run` or execute feature BEFORE claiming feature works
+- No "should work" or "probably works" - RUN it, SHOW output, THEN claim
+
+**Red flags**: "should", "probably", "Great!", "Done!" without verification = STOP and verify first
+
+**REQUIRED SKILL:** Use verification-before-completion skill for complete gate function and rationalization prevention
+
+---
+
+## MANDATORY: Systematic Debugging
+
+**When encountering bugs, test failures, or unexpected behavior:**
+
+Use systematic-debugging skill for the complete four-phase framework.
+
+**Critical for Go debugging:**
+- **Phase 1**: Investigate root cause FIRST (read error, reproduce, trace back to source)
+- **Phase 2**: Analyze patterns (is this symptom or cause?)
+- **Phase 3**: Test hypothesis (add logging, verify theory)
+- **Phase 4**: THEN implement fix (with understanding)
+
+**Example - nil pointer dereference:**
+```go
+// ❌ WRONG: Jump to fix
+"Add nil check: if foo != nil { foo.DoSomething() }"
+
+// ✅ CORRECT: Investigate FIRST
+"Reading error: nil pointer dereference at line 45
+Tracing back: foo comes from database query
+Checking query: Returns nil when record doesn't exist
+Root cause: Query returns nil for missing records
+Fix: Handle at query level with proper error, not nil check band-aid"
+```
+
+**Red flag**: Proposing fix before understanding WHY bug exists = STOP and investigate
+
+**REQUIRED SKILL:** Use systematic-debugging for complete root cause investigation framework
+
+---
+
 **File Length best practices**:
 
 - Keep Go files under 500 lines of code, with 200-400 lines being ideal

@@ -99,6 +99,32 @@ echo "✅ Verification passed - proceeding with test work"
 
 ---
 
+## MANDATORY: Test-Driven Development (TDD)
+
+**For integration tests - write test FIRST, watch it FAIL, then implement:**
+
+Use test-driven-development skill for the complete RED-GREEN-REFACTOR methodology.
+
+**React integration TDD example with MSW:**
+```typescript
+// RED: Write test for component with API call that doesn't work yet
+test('should display assets from API', async () => {
+  server.use(http.get('/api/assets', () =>
+    HttpResponse.json({ assets: [{ name: 'server-1' }] })
+  ));
+  render(<AssetList />); // useQuery doesn't exist - FAILS ✅
+  await waitFor(() => expect(screen.getByText('server-1')).toBeInTheDocument());
+});
+// GREEN: Implement minimal useQuery hook
+// REFACTOR: Extract useAssets, add error handling
+```
+
+**Critical**: If test passes on first run (without API integration) → component already works OR test is too shallow.
+
+**REQUIRED SKILL:** Use test-driven-development skill for complete RED-GREEN-REFACTOR methodology
+
+---
+
 ## Before Creating Any Tests
 
 **🚨 MANDATORY: Use test-infrastructure-discovery skill FIRST**

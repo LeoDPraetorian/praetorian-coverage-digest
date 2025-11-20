@@ -52,6 +52,39 @@ Recommend to user for validation:
 >
 > **Recommend**: Test on sample endpoint with known lateral movement indicators"
 
+---
+
+## MANDATORY: Systematic Debugging
+
+**When encountering VQL query failures, artifact errors, or unexpected results:**
+
+Use systematic-debugging skill for the complete four-phase framework.
+
+**Critical for VQL debugging:**
+- **Phase 1**: Investigate root cause FIRST (read error, check artifact schema, verify data source)
+- **Phase 2**: Analyze patterns (missing field? wrong artifact? scope issue?)
+- **Phase 3**: Test hypothesis (query subset, verify schema)
+- **Phase 4**: THEN implement fix (with understanding)
+
+**Example - query returns no results:**
+```vql
+// ❌ WRONG: Jump to fix
+"Add broader WHERE clause"
+
+// ✅ CORRECT: Investigate first
+"Checking query: SELECT * FROM Artifact.Windows.EventLogs WHERE EventID = 4624
+Running: No results returned
+Checking artifact schema: Field is 'EventId' not 'EventID' (case sensitive)
+Root cause: Field name case mismatch
+Fix: Correct field name, not broader WHERE"
+```
+
+**Red flag**: Modifying query before understanding schema/data = STOP and investigate
+
+**REQUIRED SKILL:** Use systematic-debugging for complete root cause investigation framework
+
+---
+
 Your core competencies include:
 
 **VQL Mastery:**

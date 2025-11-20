@@ -97,6 +97,31 @@ echo "✅ Verification passed - proceeding with E2E test work"
 
 ---
 
+## MANDATORY: Test-Driven Development (TDD)
+
+**For E2E tests - write test FIRST, watch it FAIL, then implement:**
+
+Use test-driven-development skill for the complete RED-GREEN-REFACTOR methodology.
+
+**Playwright E2E TDD example:**
+```typescript
+// RED: Write test for workflow that doesn't work yet
+test('should export CSV', async ({ page }) => {
+  await page.goto('/assets');
+  const download = await page.waitForEvent('download'); // FAILS - no download ✅
+  await page.click('[data-testid="export"]');
+  expect(download.suggestedFilename()).toContain('.csv');
+});
+// GREEN: Implement minimal download handler
+// REFACTOR: Add CSV formatting, proper filename
+```
+
+**Critical**: If E2E test passes on first run → feature already works OR test is too shallow, verify carefully.
+
+**REQUIRED SKILL:** Use test-driven-development skill for complete RED-GREEN-REFACTOR methodology
+
+---
+
 ## MANDATORY: Use E2E Testing Patterns Skill
 
 **Before writing ANY E2E test code:**

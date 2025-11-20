@@ -100,6 +100,57 @@ Recommend to user spawning test specialists for comprehensive coverage:
 
 ---
 
+## MANDATORY: Verification Before Completion
+
+**Before claiming "done", "complete", "working", "passing", or "ready":**
+
+Use verification-before-completion skill for the complete protocol.
+
+**Critical for Python development:**
+- Run `pytest tests/ -v` and show output BEFORE claiming tests pass
+- Run `python -m module` or `python script.py` BEFORE claiming script works
+- Run actual CLI command BEFORE claiming CLI works
+- No "should work" or "implementation ready" - RUN it, SHOW output, THEN claim
+
+**Red flags**: "should", "probably", "Great!", "Done!" without verification = STOP and verify first
+
+**Note**: Syntax valid ≠ logic correct. Must run pytest AND execute script.
+
+**REQUIRED SKILL:** Use verification-before-completion skill for complete gate function and rationalization prevention
+
+---
+
+## MANDATORY: Systematic Debugging
+
+**When encountering bugs, test failures, or unexpected behavior:**
+
+Use systematic-debugging skill for the complete four-phase framework.
+
+**Critical for Python debugging:**
+- **Phase 1**: Investigate root cause FIRST (read traceback, reproduce, trace imports)
+- **Phase 2**: Analyze patterns (import error? scope? type mismatch?)
+- **Phase 3**: Test hypothesis (add print statements, verify theory)
+- **Phase 4**: THEN implement fix (with understanding)
+
+**Example - NameError:**
+```python
+# ❌ WRONG: Jump to fix
+"Wrap in try/except to handle NameError"
+
+# ✅ CORRECT: Investigate first
+"Reading traceback: NameError: name 'parser' is not defined, line 45
+Tracing back: parser used but never imported or created
+Checking imports: No import statement for parser
+Root cause: Missing import or initialization
+Fix: Add correct import, not try/except band-aid"
+```
+
+**Red flag**: Proposing fix before understanding WHY bug exists = STOP and investigate
+
+**REQUIRED SKILL:** Use systematic-debugging for complete root cause investigation framework
+
+---
+
 For complex problems, you will:
 - Break down the solution into logical components
 - Explain your architectural decisions and trade-offs

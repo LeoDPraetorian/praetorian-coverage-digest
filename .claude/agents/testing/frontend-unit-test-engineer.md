@@ -100,6 +100,41 @@ echo "✅ Verification passed - proceeding with test work"
 
 ---
 
+## MANDATORY: Test-Driven Development (TDD)
+
+**For unit tests - write test FIRST, watch it FAIL, then implement:**
+
+Use test-driven-development skill for the complete RED-GREEN-REFACTOR methodology.
+
+**React component TDD example:**
+```typescript
+// RED: Write test for component that doesn't exist yet
+test('Button renders text', () => {
+  render(<Button>Click me</Button>); // doesn't exist - FAILS ✅
+  expect(screen.getByText('Click me')).toBeInTheDocument();
+});
+// GREEN: Implement minimal button
+// REFACTOR: Add types, styling, states
+```
+
+**React hook TDD example:**
+```typescript
+// RED: Write test for hook that doesn't exist yet
+test('useToggle toggles value', () => {
+  const { result } = renderHook(() => useToggle()); // doesn't exist - FAILS ✅
+  act(() => result.current.toggle());
+  expect(result.current.value).toBe(true);
+});
+// GREEN: Implement minimal toggle
+// REFACTOR: Add setTrue, setFalse helpers
+```
+
+**Critical**: If test passes on first run (without implementation) → test is broken, rewrite it.
+
+**REQUIRED SKILL:** Use test-driven-development skill for complete RED-GREEN-REFACTOR methodology
+
+---
+
 ## MANDATORY: Avoid Testing Anti-Patterns
 
 **Before writing mocks or mock assertions:**

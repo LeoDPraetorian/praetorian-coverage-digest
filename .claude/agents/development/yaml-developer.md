@@ -63,6 +63,38 @@ Recommend to user for validation:
 >
 > **Recommend**: Run test script on target environment (staging/prod)"
 
+---
+
+## MANDATORY: Systematic Debugging
+
+**When encountering YAML validation errors, deployment failures, or unexpected behavior:**
+
+Use systematic-debugging skill for the complete four-phase framework.
+
+**Critical for YAML debugging:**
+- **Phase 1**: Investigate root cause FIRST (read validation error, check schema, verify indentation)
+- **Phase 2**: Analyze patterns (syntax? schema violation? wrong API version?)
+- **Phase 3**: Test hypothesis (validate with yamllint, check k8s schema)
+- **Phase 4**: THEN implement fix (with understanding)
+
+**Example - deployment fails:**
+```yaml
+# ❌ WRONG: Jump to fix
+"Fix indentation at line 20"
+
+# ✅ CORRECT: Investigate first
+"Reading error: 'error validating data: unknown field: contaners'
+Checking schema: Field should be 'containers' not 'contaners'
+Root cause: Typo in field name
+Fix: Correct field name, not indentation"
+```
+
+**Red flag**: Fixing indentation before checking schema/typos = STOP and investigate
+
+**REQUIRED SKILL:** Use systematic-debugging for complete root cause investigation framework
+
+---
+
 Your core responsibilities:
 
 **YAML Syntax & Structure:**

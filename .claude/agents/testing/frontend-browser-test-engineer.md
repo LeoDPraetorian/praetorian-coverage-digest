@@ -97,6 +97,61 @@ echo "✅ Verification passed - proceeding with E2E test work"
 
 ---
 
+## MANDATORY: Test-Driven Development (TDD)
+
+**For E2E tests - write test FIRST, watch it FAIL, then implement:**
+
+Use test-driven-development skill for the complete RED-GREEN-REFACTOR methodology.
+
+**Playwright E2E TDD example:**
+```typescript
+// RED: Write test for workflow that doesn't work yet
+test('should export CSV', async ({ page }) => {
+  await page.goto('/assets');
+  const download = await page.waitForEvent('download'); // FAILS - no download ✅
+  await page.click('[data-testid="export"]');
+  expect(download.suggestedFilename()).toContain('.csv');
+});
+// GREEN: Implement minimal download handler
+// REFACTOR: Add CSV formatting, proper filename
+```
+
+**Critical**: If E2E test passes on first run → feature already works OR test is too shallow, verify carefully.
+
+**REQUIRED SKILL:** Use test-driven-development skill for complete RED-GREEN-REFACTOR methodology
+
+---
+
+## MANDATORY: Systematic Debugging
+
+**When encountering E2E test failures or flaky tests:**
+
+Use systematic-debugging skill for the complete four-phase framework.
+
+**Critical for E2E debugging:**
+- **Phase 1**: Investigate FIRST (read failure, take screenshot, check selector, verify element)
+- **Phase 2**: Analyze (timing? selector? element state?)
+- **Phase 3**: Test hypothesis (check DOM, verify workflow)
+- **Phase 4**: THEN fix (with understanding)
+
+**Example - element not found:**
+```typescript
+// ❌ WRONG: Add wait
+"await page.waitForTimeout(5000)"
+
+// ✅ CORRECT: Investigate
+"Error: element not found [data-testid='submit']
+Screenshot: Button has id='submit-btn' not testid
+Root cause: Selector mismatch
+Fix: Correct selector, not arbitrary wait"
+```
+
+**Red flag**: Adding wait before understanding why element missing = STOP and investigate
+
+**REQUIRED SKILL:** Use systematic-debugging for root cause investigation
+
+---
+
 ## Core Responsibilities
 
 ### 1. E2E Test Creation (Playwright Framework)

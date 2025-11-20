@@ -78,6 +78,38 @@ Recommend to user spawning test specialists for comprehensive coverage:
 
 **You cannot spawn test agents yourself** - only main Claude session can spawn agents.
 
+---
+
+## MANDATORY: Systematic Debugging
+
+**When encountering integration failures, API errors, or unexpected behavior:**
+
+Use systematic-debugging skill for the complete four-phase framework.
+
+**Critical for integration debugging:**
+- **Phase 1**: Investigate root cause FIRST (read API error, check logs, verify contract)
+- **Phase 2**: Analyze patterns (authentication? rate limit? data format?)
+- **Phase 3**: Test hypothesis (add request logging, verify API contract)
+- **Phase 4**: THEN implement fix (with understanding)
+
+**Example - API integration fails:**
+```go
+// ❌ WRONG: Jump to fix
+"Add retry logic with exponential backoff"
+
+// ✅ CORRECT: Investigate first
+"Reading error: 400 Bad Request, 'invalid field: user_id'
+Checking API docs: Field is 'userId' (camelCase), not 'user_id'
+Root cause: Request field name mismatch
+Fix: Correct field name in request struct, not retry band-aid"
+```
+
+**Red flag**: Proposing timeout/retry fix before understanding API contract = STOP and investigate
+
+**REQUIRED SKILL:** Use systematic-debugging for complete root cause investigation framework
+
+---
+
 ## 📋 Critical File References
 
 **IMPORTANT**: Before providing integration guidance, ALWAYS read the following critical files to ensure recommendations align with current platform patterns:
