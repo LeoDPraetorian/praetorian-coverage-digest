@@ -1,0 +1,384 @@
+{
+  "$schema": "./deprecation-registry.schema.json",
+  "version": "1.0.0",
+  "lastUpdated": "2025-11-29",
+  "description": "Central registry of deprecated commands, skills, agents, and patterns. Used by audit-references and fix-references skills to detect and remediate outdated references.",
+
+  "commands": {
+    "/write-agent": {
+      "replacedBy": "/agent-manager",
+      "deprecatedDate": "2024-11-01",
+      "reason": "Consolidated into unified agent-manager command",
+      "migrationNotes": "Use /agent-manager new, /agent-manager update, etc."
+    },
+    "/audit-agent": {
+      "replacedBy": "/agent-manager audit",
+      "deprecatedDate": "2024-11-01",
+      "reason": "Consolidated into unified agent-manager command"
+    },
+    "/fix-agent": {
+      "replacedBy": "/agent-manager fix",
+      "deprecatedDate": "2024-11-01",
+      "reason": "Consolidated into unified agent-manager command"
+    }
+  },
+
+  "skills": {
+    "claude-write-command": {
+      "replacedBy": "claude-command-write",
+      "deprecatedDate": "2024-11-28",
+      "reason": "Naming convention: verb-last pattern (noun-verb)",
+      "migrationNotes": "All claude-* skills follow pattern: claude-{noun}-{verb}"
+    },
+    "claude-agent-audit-skills": {
+      "replacedBy": null,
+      "deprecatedDate": "2024-11-27",
+      "reason": "Functionality merged into claude-agent-audit orchestrator",
+      "status": "removed"
+    },
+    "claude-agent-audit-report": {
+      "replacedBy": "claude-agent-audit",
+      "deprecatedDate": "2024-11-27",
+      "reason": "Renamed to match orchestrator pattern"
+    },
+    "zustand-state-management": {
+      "replacedBy": "frontend-zustand-state-management",
+      "deprecatedDate": "2024-11-28",
+      "reason": "Naming convention: frontend-* prefix for frontend-specific skills",
+      "migrationNotes": "All frontend framework skills follow pattern: frontend-{framework}-{feature}"
+    },
+    "mcp-code-create": {
+      "replacedBy": "mcp-code-write",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated with mcp-code-2-skill into unified mcp-code-write skill (78.4% token reduction)",
+      "migrationNotes": "Use mcp-code-write Mode 1 for creating wrappers. See MIGRATION.md for detailed guide."
+    },
+    "mcp-code-2-skill": {
+      "replacedBy": "mcp-code-write",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated with mcp-code-create into unified mcp-code-write skill (78.4% token reduction)",
+      "migrationNotes": "Use mcp-code-write Mode 3 for generating service-specific skills. See MIGRATION.md for detailed guide."
+    },
+    "claude-skill-audit": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated with claude-skill-fix into unified claude-skill-compliance skill",
+      "migrationNotes": "Use claude-skill-compliance with audit mode for validation. Supports --phase filtering."
+    },
+    "claude-skill-audit-commands": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 11)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance audit -- SKILL_PATH --phase 11"
+    },
+    "claude-skill-audit-frontmatter": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 1)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance audit -- SKILL_PATH --phase 1"
+    },
+    "claude-skill-audit-links": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 4)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance audit -- SKILL_PATH --phase 4"
+    },
+    "claude-skill-audit-references": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 10)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance audit -- SKILL_PATH --phase 10"
+    },
+    "claude-skill-audit-report": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Reporting functionality integrated into claude-skill-compliance output",
+      "migrationNotes": "Use claude-skill-compliance audit mode - returns pre-formatted markdown report"
+    },
+    "claude-skill-audit-script-paths": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 6)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance audit -- SKILL_PATH --phase 6"
+    },
+    "claude-skill-audit-scripts": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 8)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance audit -- SKILL_PATH --phase 8"
+    },
+    "claude-skill-audit-structure": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 5)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance audit -- SKILL_PATH --phase 5"
+    },
+    "claude-skill-fix": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated with claude-skill-audit into unified claude-skill-compliance skill",
+      "migrationNotes": "Use claude-skill-compliance with fix mode for auto-remediation. Supports --phase filtering and --dry-run."
+    },
+    "claude-skill-fix-cli-errors": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 12)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance fix -- SKILL_PATH --phase 12"
+    },
+    "claude-skill-fix-commands": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 11)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance fix -- SKILL_PATH --phase 11"
+    },
+    "claude-skill-fix-frontmatter": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 2)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance fix -- SKILL_PATH --phase 2"
+    },
+    "claude-skill-fix-links": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 4)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance fix -- SKILL_PATH --phase 4"
+    },
+    "claude-skill-fix-references": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 10)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance fix -- SKILL_PATH --phase 10"
+    },
+    "claude-skill-fix-script-paths": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 6)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance fix -- SKILL_PATH --phase 6"
+    },
+    "claude-skill-fix-scripts": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 7)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance fix -- SKILL_PATH --phase 7"
+    },
+    "claude-skill-fix-structure": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 5)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance fix -- SKILL_PATH --phase 5"
+    },
+    "claude-skill-fix-typescript-structure": {
+      "replacedBy": "claude-skill-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Phase-specific skill consolidated into claude-skill-compliance (Phase 8)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-compliance fix -- SKILL_PATH --phase 8"
+    },
+    "claude-skill-detect-opportunity": {
+      "replacedBy": "claude-skill-write",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Pattern detection functionality integrated into claude-skill-write workflow",
+      "migrationNotes": "Use claude-skill-write to create skills based on detected patterns"
+    },
+    "claude-skill-rename": {
+      "replacedBy": null,
+      "deprecatedDate": "2025-11-29",
+      "reason": "Skill renaming functionality integrated into /skill-manager rename command",
+      "migrationNotes": "Use: /skill-manager rename OLD_NAME NEW_NAME",
+      "status": "removed"
+    },
+    "claude-mcp-audit-references": {
+      "replacedBy": "mcp-code-compliance",
+      "deprecatedDate": "2025-11-29",
+      "reason": "MCP reference audit consolidated into mcp-code-compliance (Phase 5)",
+      "migrationNotes": "Use mcp-code-compliance audit mode with Phase 5 for reference validation"
+    },
+    "mcp-chrome-devtools-guide": {
+      "replacedBy": "mcp-tools-chrome-devtools",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Renamed to follow mcp-tools-{service} naming convention",
+      "migrationNotes": "Use: skill 'mcp-tools-chrome-devtools'"
+    },
+    "mcp-code-chrome-devtools-guide": {
+      "replacedBy": "mcp-tools-chrome-devtools",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into mcp-tools-chrome-devtools with service-specific tools pattern",
+      "migrationNotes": "Use: skill 'mcp-tools-chrome-devtools'"
+    },
+    "mcp-code-guide": {
+      "replacedBy": null,
+      "deprecatedDate": "2025-11-29",
+      "reason": "General MCP code execution guidance integrated into mcp-code-write references",
+      "migrationNotes": "Refer to mcp-code-write for MCP wrapper implementation patterns",
+      "status": "removed"
+    },
+    "mcp-code-write": {
+      "replacedBy": "mcp-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified mcp-manager skill with TDD enforcement",
+      "migrationNotes": "Use: npm run -w @claude/mcp-manager create -- <service> <tool>"
+    },
+    "mcp-code-compliance": {
+      "replacedBy": "mcp-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified mcp-manager skill (audit operation)",
+      "migrationNotes": "Use: npm run -w @claude/mcp-manager audit -- <name> [--phase N]"
+    },
+    "mcp-code-audit": {
+      "replacedBy": "mcp-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified mcp-manager skill (audit operation)",
+      "migrationNotes": "Use: npm run -w @claude/mcp-manager audit -- <name>"
+    },
+    "mcp-code-fix": {
+      "replacedBy": "mcp-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified mcp-manager skill (fix operation)",
+      "migrationNotes": "Use: npm run -w @claude/mcp-manager fix -- <name> [--dry-run]"
+    },
+    "mcp-code-test": {
+      "replacedBy": "mcp-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified mcp-manager skill (test operation)",
+      "migrationNotes": "Use: npm run -w @claude/mcp-manager test -- <name> [--unit] [--coverage]"
+    },
+    "claude-agent-write": {
+      "replacedBy": "agent-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified agent-manager skill with TDD enforcement and 8 operations",
+      "migrationNotes": "Use: npm run -w @chariot/agent-manager create -- <name> <desc> OR npm run -w @chariot/agent-manager update -- <name> <changes>"
+    },
+    "claude-agent-compliance": {
+      "replacedBy": "agent-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified agent-manager skill (audit/fix operations)",
+      "migrationNotes": "Use: npm run -w @chariot/agent-manager audit -- <name> [--all] [--phase N] OR npm run -w @chariot/agent-manager fix -- <name> [--dry-run]"
+    },
+    "claude-agent-search": {
+      "replacedBy": "agent-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified agent-manager skill (search operation)",
+      "migrationNotes": "Use: npm run -w @chariot/agent-manager search -- <query>"
+    },
+    "claude-agent-rename": {
+      "replacedBy": "agent-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified agent-manager skill (rename operation)",
+      "migrationNotes": "Use: npm run -w @chariot/agent-manager rename -- <old-name> <new-name>"
+    },
+    "claude-agent-skill-discovery": {
+      "replacedBy": "agent-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Skill discovery integrated into agent-manager create/update workflows",
+      "migrationNotes": "Skill discovery runs automatically after agent creation/update"
+    },
+    "claude-skill-write": {
+      "replacedBy": "skill-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified skill-manager skill (create/update operations)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-manager create -- <name> \"<desc>\" OR npm run -w @chariot/skill-manager update -- <name> \"<changes>\""
+    },
+    "claude-skill-compliance": {
+      "replacedBy": "skill-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified skill-manager skill (audit/fix operations)",
+      "migrationNotes": "Use: npm run -w @chariot/skill-manager audit -- [name] [--phase N] OR npm run -w @chariot/skill-manager fix -- <name> [--dry-run]"
+    },
+    "claude-skill-search": {
+      "replacedBy": "skill-manager",
+      "deprecatedDate": "2025-11-29",
+      "reason": "Consolidated into unified skill-manager skill with enhanced dual-location search",
+      "migrationNotes": "Use: npm run -w @chariot/skill-manager search -- \"<query>\" (NOW searches both core and library locations)"
+    }
+  },
+
+  "agents": {
+    "skill-auditor": {
+      "replacedBy": null,
+      "deprecatedDate": "2024-11-27",
+      "reason": "Removed - use /skill-manager audit instead",
+      "status": "removed"
+    },
+    "agent-auditor": {
+      "replacedBy": null,
+      "deprecatedDate": "2024-11-27",
+      "reason": "Removed - use /agent-manager audit instead",
+      "status": "removed"
+    },
+    "agent-creator": {
+      "replacedBy": null,
+      "deprecatedDate": "2024-11-27",
+      "reason": "Removed - use /agent-manager new instead",
+      "status": "removed"
+    },
+    "bash-typescript-migration": {
+      "replacedBy": null,
+      "deprecatedDate": "2024-11-27",
+      "reason": "Removed - migrations handled by skill-manager",
+      "status": "removed"
+    }
+  },
+
+  "mcpTools": {
+    "mcp-chariot-tools": {
+      "replacedBy": "mcp-tools-chariot",
+      "deprecatedDate": "2024-11-27",
+      "reason": "Naming convention: mcp-tools-{service} pattern"
+    },
+    "mcp-chrome-devtools-tools": {
+      "replacedBy": "mcp-tools-chrome-devtools",
+      "deprecatedDate": "2024-11-27",
+      "reason": "Naming convention: mcp-tools-{service} pattern"
+    },
+    "mcp-currents-tools": {
+      "replacedBy": "mcp-tools-currents",
+      "deprecatedDate": "2024-11-27",
+      "reason": "Naming convention: mcp-tools-{service} pattern"
+    },
+    "mcp-praetorian-cli-tools": {
+      "replacedBy": "mcp-tools-praetorian-cli",
+      "deprecatedDate": "2024-11-27",
+      "reason": "Naming convention: mcp-tools-{service} pattern"
+    }
+  },
+
+  "patterns": {
+    "description: >": {
+      "replacedBy": "description: |",
+      "context": "When description contains <example> blocks",
+      "reason": "Folded scalar (>) collapses blank lines needed in examples",
+      "migrationNotes": "Use literal scalar (|) to preserve blank lines in <example> blocks"
+    },
+    "BashOutput": {
+      "replacedBy": null,
+      "context": "In agent tools field",
+      "reason": "Not a valid tool - removed from valid tools list",
+      "status": "invalid"
+    },
+    "KillBash": {
+      "replacedBy": null,
+      "context": "In agent tools field",
+      "reason": "Not a valid tool - removed from valid tools list",
+      "status": "invalid"
+    }
+  },
+
+  "_metadata": {
+    "maintainers": ["claude-skill-write", "agent-manager"],
+    "consumers": [
+      "claude-skill-compliance",
+      "agent-manager",
+      "mcp-manager"
+    ],
+    "updateProtocol": "When renaming via /skill-manager rename or /agent-manager rename, the skill should automatically add an entry here (NOT YET IMPLEMENTED - manual for now)",
+    "legacyConsumers": [
+      "claude-skill-audit-references (deprecated)",
+      "claude-skill-fix-references (deprecated)",
+      "claude-agent-audit-references (deprecated)",
+      "claude-agent-fix-references (deprecated)",
+      "claude-command-audit-references (deprecated)",
+      "claude-command-fix-references (deprecated)",
+      "claude-mcp-audit-references (deprecated)",
+      "mcp-code-compliance (deprecated)"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Test files
+test-*.ts
+*.test.ts
+
+# Build outputs
+dist/
+build/
+*.js
+*.d.ts
+!*.config.js
+
+# Environment
+.env
+.env.local

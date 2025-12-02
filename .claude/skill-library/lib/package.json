@@ -1,0 +1,9 @@
+{
+  "name": "@chariot/skills-lib",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Shared utilities for Claude Code skills",
+  "exports": {
+    "./find-project-root.js": "./find-project-root.ts"
+  }
+}

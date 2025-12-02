@@ -1,0 +1,19 @@
+{
+  "name": "@chariot/lib",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Shared utilities for ALL Claude Code infrastructure (skills, tools, hooks, commands)",
+  "exports": {
+    "./find-project-root.js": "./find-project-root.ts",
+    "./find-project-root": "./find-project-root.ts"
+  },
+  "main": "find-project-root.ts",
+  "keywords": [
+    "claude",
+    "utilities",
+    "path-resolution",
+    "project-root"
+  ],
+  "author": "Chariot Development Platform",
+  "license": "MIT"
+}

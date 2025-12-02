@@ -1,0 +1,20 @@
+{
+  "name": "chariot-development-platform",
+  "description": "Development marketplace for Chariot platform skills, agents, and workflows",
+  "owner": {
+    "name": "Chariot Development Team",
+    "email": "nathan.sportsman@praetorian.com"
+  },
+  "plugins": [
+    {
+      "name": "chariot-development-platform",
+      "description": "Comprehensive skills library for Chariot platform development: agent creation, TDD workflows, React patterns, Go development, testing strategies, and systematic debugging",
+      "version": "1.1.0",
+      "source": "./",
+      "author": {
+        "name": "Chariot Development Team",
+        "email": "nathan.sportsman@praetorian.com"
+      }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "test-driven-development": {
+    "type": "renamed",
+    "replacedBy": "developing-with-tdd",
+    "deprecatedOn": "2025-11-30"
+  },
+  "systematic-debugging": {
+    "type": "renamed",
+    "replacedBy": "debugging-systematically",
+    "deprecatedOn": "2025-11-30"
+  },
+  "verification-before-completion": {
+    "type": "renamed",
+    "replacedBy": "verifying-before-completion",
+    "deprecatedOn": "2025-11-30"
+  },
+  "root-cause-tracing": {
+    "type": "renamed",
+    "replacedBy": "tracing-root-causes",
+    "deprecatedOn": "2025-11-30"
+  },
+  "subagent-driven-development": {
+    "type": "renamed",
+    "replacedBy": "developing-with-subagents",
+    "deprecatedOn": "2025-11-30"
+  },
+  "task-domain-detection": {
+    "type": "renamed",
+    "replacedBy": "detecting-task-domains",
+    "deprecatedOn": "2025-11-30"
+  },
+  "test-skills-with-subagents": {
+    "type": "renamed",
+    "replacedBy": "testing-skills-with-subagents",
+    "deprecatedOn": "2025-11-30"
+  },
+  "time-calibration": {
+    "type": "renamed",
+    "replacedBy": "calibrating-time-estimates",
+    "deprecatedOn": "2025-11-30"
+  },
+  "prompt-engineering-patterns": {
+    "type": "renamed",
+    "replacedBy": "engineering-prompts",
+    "deprecatedOn": "2025-11-30"
+  },
+  "verify-test-file-existence": {
+    "type": "renamed",
+    "replacedBy": "verifying-test-file-existence",
+    "deprecatedOn": "2025-11-30"
+  }
+}

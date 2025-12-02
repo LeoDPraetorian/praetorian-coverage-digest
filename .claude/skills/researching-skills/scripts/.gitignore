@@ -1,0 +1,14 @@
+# Build output
+dist/
+
+# Runtime artifacts
+*.log
+*.tmp
+.cache/
+
+# Dependencies (committed for reproducibility)
+# node_modules/
+
+# IDE
+.idea/
+*.swp

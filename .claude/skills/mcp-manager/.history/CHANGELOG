@@ -1,0 +1,28 @@
+# Changelog
+
+All notable changes to this skill.
+
+- **2025-12-01**: Fix phase count maintenance issue - adding a new audit phase requires updating 12+ places manually.
+
+## Problem
+When Phase 11 was added, these weren't updated:
+- SKILL.md frontmatter description (10 phases → 11)
+- SKILL.md body references
+- references/new-workflow.md (2 places)
+- references/update-workflow.md (2 places)
+- docs/MCP-TOOLS-ARCHITECTURE.md (6 places)
+- cli.ts validation (hardcoded 1-10)
+
+## Solution
+1. **Make CLI dynamic**: Export PHASES.length from audit.ts, use in cli.ts validation
+2. **Update all '10 phases' → '11 phases'** in documentation listed above
+3. **Add 'Adding New Phases' section** to references/audit-workflow.md with checklist:
+   - Create phases/phase{N}-{name}.ts
+   - Register in audit.ts PHASES array
+   - Register in fix.ts FIXERS array
+   - Update SKILL.md table and description
+   - Update references/*.md
+   - Update docs/MCP-TOOLS-ARCHITECTURE.md
+   - CLI validation auto-updates (if made dynamic)
+
+4. **Consider**: Add script to find all 'N phase' references for future audits

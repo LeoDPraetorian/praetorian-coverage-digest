@@ -1,0 +1,34 @@
+{
+  "name": "@claude/mcp-manager",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MCP wrapper lifecycle manager with TDD enforcement",
+  "scripts": {
+    "create": "tsx src/cli.ts create",
+    "verify-red": "tsx src/cli.ts verify-red",
+    "generate-wrapper": "tsx src/cli.ts generate-wrapper",
+    "verify-green": "tsx src/cli.ts verify-green",
+    "update": "tsx src/cli.ts update",
+    "audit": "tsx src/cli.ts audit",
+    "fix": "tsx src/cli.ts fix",
+    "test": "tsx src/cli.ts test",
+    "generate-skill": "tsx src/cli.ts generate-skill",
+    "test:unit": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:all": "vitest run && vitest run --config vitest.integration.config.ts",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run typecheck && npm run test:unit"
+  },
+  "dependencies": {
+    "@claude/testing": "*",
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  }
+}

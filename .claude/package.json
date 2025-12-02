@@ -1,0 +1,41 @@
+{
+  "name": "@chariot/claude-infrastructure",
+  "version": "1.0.0",
+  "description": "Claude Code infrastructure - skills, tools, agents, hooks",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "lib",
+    "lib/testing",
+    "tools/*",
+    "skills/*/scripts",
+    "skill-library/lib",
+    "skill-library/claude/skills/*/scripts",
+    "!skill-library/claude/skills/claude-skill-search/scripts",
+    "skill-library/claude/agents/*/scripts",
+    "skill-library/claude/mcp-code/*/scripts"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@vitest/coverage-v8": "^1.6.1",
+    "@vitest/ui": "^1.6.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.3.3",
+    "vitest": "^1.6.1"
+  },
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:unit": "vitest run **/*.unit.test.ts",
+    "test:integration": "vitest run **/*.integration.test.ts",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "build:skills": "npm run build --workspaces --if-present -- --filter='skills/*'",
+    "clean:all": "rm -rf node_modules tools/*/node_modules skills/*/scripts/node_modules lib/testing/node_modules",
+    "audit": "npm run -w @chariot/skill-manager audit --",
+    "fix": "npm run -w @chariot/skill-manager fix --",
+    "validate": "npm run -w @chariot/skill-manager audit --",
+    "agent:audit": "npm run -w @chariot/agent-manager audit --",
+    "agent:fix": "npm run -w @chariot/agent-manager fix --"
+  }
+}

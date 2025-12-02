@@ -1,0 +1,244 @@
+// Template for wrapping MCP tool with Zod validation and filtering
+// Copy this file and customize for your specific MCP tool
+
+import { z } from 'zod';
+import { callMCPTool } from '../config/lib/mcp-client.js';
+import {
+  validateNoPathTraversal,
+  validateNoCommandInjection,
+  validateNoControlChars,
+  createSecureStringValidator,
+  validators,
+} from '../config/lib/sanitize.js';
+
+// ============================================================================
+// STEP 1: Define Input Schema with Zod + Security Validation
+// ============================================================================
+
+/**
+ * Input validation schema
+ * - Validates all inputs before calling MCP tool
+ * - Prevents injection attacks via sanitization helpers
+ * - Provides TypeScript types
+ *
+ * SECURITY: Always use security refinements for user-provided strings!
+ */
+const InputSchema = z.object({
+  // SECURITY PATTERNS - Use these for user input:
+
+  // Pattern 1: Secure string with all checks (recommended)
+  id: z.string()
+    .min(1, 'ID is required')
+    .max(256, 'ID too long')
+    .superRefine(createSecureStringValidator('id', { maxLength: 256 })),
+
+  // Pattern 2: Pre-built validators for common types
+  libraryId: z.string().refine(validators.libraryId, 'Invalid library ID format'),
+  issueId: z.string().refine(validators.issueId, 'Invalid issue ID format'),
+  searchQuery: z.string().refine(validators.searchQuery, 'Invalid search query'),
+
+  // Pattern 3: Individual security checks
+  name: z.string()
+    .regex(/^[a-zA-Z0-9_\-]+$/, 'Only alphanumeric, dash, underscore allowed')
+    .refine(validateNoControlChars, 'Control characters not allowed'),
+
+  path: z.string()
+    .refine(validateNoPathTraversal, 'Path traversal not allowed')
+    .refine(validateNoCommandInjection, 'Invalid characters'),
+
+  // NON-STRING FIELDS (no sanitization needed):
+  count: z.number().int().min(1).max(1000),          // Integer with range limits
+  enabled: z.boolean().default(true),                 // Boolean flag
+  enum: z.enum(['option1', 'option2', 'option3']),   // Enum/choice field
+
+  // OPTIONAL FIELDS:
+  optional: z.string()
+    .refine(validateNoControlChars, 'Control characters not allowed')
+    .optional(),
+  withDefault: z.number().default(10),
+});
+
+// ============================================================================
+// STEP 2: Define Output Schema
+// ============================================================================
+
+/**
+ * Output validation schema
+ * - Validates MCP tool response
+ * - Ensures contract is maintained
+ * - Catches unexpected response formats
+ */
+const OutputSchema = z.object({
+  // Define expected output structure
+  // Examples:
+  id: z.string(),
+  result: z.any(),                                    // Use 'any' for dynamic content
+  data: z.array(z.object({                            // Array of objects
+    field1: z.string(),
+    field2: z.number()
+  })),
+  metadata: z.object({                                // Nested metadata
+    count: z.number(),
+    timestamp: z.string()
+  }).optional()
+});
+
+// ============================================================================
+// STEP 3: Define Tool Wrapper
+// ============================================================================
+
+/**
+ * MCP Tool Wrapper
+ *
+ * Usage:
+ *   import { toolName } from '.claude/tools/{mcp-name}/tool-name';
+ *   const result = await toolName.execute({ input: 'value' });
+ */
+export const toolName = {
+  // Tool identifier (used for discovery)
+  name: '{mcp-name}.{tool-name}',
+
+  // Schemas for validation
+  inputSchema: InputSchema,
+  outputSchema: OutputSchema,
+
+  /**
+   * Execute MCP tool with validation and filtering
+   */
+  async execute(input: z.infer<typeof InputSchema>): Promise<z.infer<typeof OutputSchema>> {
+    // STEP 3a: Validate input (automatic via Zod)
+    const validated = InputSchema.parse(input);
+
+    // STEP 3b: Call MCP tool
+    // Replace with actual MCP client call
+    const rawResult = await callMCPTool('{mcp-server-name}', '{tool-name}', validated);
+
+    // STEP 3c: Filter result (IMPORTANT: Reduce token usage)
+    // Return summary/subset instead of full data
+    const filtered = filterResult(rawResult);
+
+    // STEP 3d: Validate output
+    return OutputSchema.parse(filtered);
+  }
+};
+
+// ============================================================================
+// STEP 4: Helper Functions
+// ============================================================================
+
+// NOTE: callMCPTool is imported from '../config/lib/mcp-client.js'
+// It handles:
+// - MCP server connection with 30-second timeout
+// - Authentication via credentials.json
+// - Error handling and resource cleanup
+
+/**
+ * Filter result to reduce token usage
+ *
+ * IMPORTANT: This is where token savings happen!
+ * - Return summary instead of full data
+ * - Limit array sizes
+ * - Remove verbose fields
+ * - Extract key information only
+ */
+function filterResult(rawResult: any): any {
+  // ============================================================================
+  // STEP 1: Handle TEXT responses (like Context7)
+  // ============================================================================
+  // Some MCPs return plain text instead of JSON. Check type first!
+
+  if (typeof rawResult === 'string') {
+    // TEXT RESPONSE - needs parsing!
+    // See .claude/tools/context7/resolve-library-id.ts for example
+
+    // Option A: Return text directly with token estimate
+    return {
+      content: rawResult,
+      estimatedTokens: Math.ceil(rawResult.length / 4)
+    };
+
+    // Option B: Parse text into structured data (recommended)
+    // return parseTextResponse(rawResult);
+    // See templates/text-parser-example.ts for parser template
+  }
+
+  // ============================================================================
+  // STEP 2: Handle JSON responses (standard case)
+  // ============================================================================
+
+  // Example filtering strategies:
+
+  // 1. Return summary only
+  if (Array.isArray(rawResult)) {
+    return {
+      count: rawResult.length,
+      items: rawResult.slice(0, 10),  // Top 10 only
+      estimatedTokens: 200  // vs 5000 for full dataset
+    };
+  }
+
+  // 2. Extract key fields only
+  if (rawResult.fullDocumentation) {
+    return {
+      summary: rawResult.summary,
+      tableOfContents: extractTOC(rawResult.fullDocumentation),
+      keyPoints: rawResult.keyPoints?.slice(0, 5)
+    };
+  }
+
+  // 3. Remove verbose fields
+  const { verboseField, debugInfo, rawData, ...essential } = rawResult;
+  return essential;
+
+  // 4. Default: return as-is (no filtering)
+  return rawResult;
+}
+
+/**
+ * Extract table of contents from nested structure
+ */
+function extractTOC(doc: any): string[] {
+  if (!doc.sections) return [];
+  return doc.sections.map((s: any) => s.title);
+}
+
+// ============================================================================
+// STEP 5: Type Exports
+// ============================================================================
+
+/**
+ * Export types for TypeScript consumers
+ */
+export type ToolInput = z.infer<typeof InputSchema>;
+export type ToolOutput = z.infer<typeof OutputSchema>;
+
+// ============================================================================
+// USAGE EXAMPLES
+// ============================================================================
+
+/*
+// Example 1: Basic usage
+const result = await toolName.execute({
+  id: 'example-id',
+  name: 'example',
+  count: 5
+});
+console.log(result);
+
+// Example 2: Error handling
+try {
+  const result = await toolName.execute({ invalidInput: true });
+} catch (error) {
+  if (error instanceof z.ZodError) {
+    console.error('Validation failed:', error.errors);
+  }
+}
+
+// Example 3: Type-safe usage with TypeScript
+const input: ToolInput = {
+  id: 'typed-id',
+  name: 'typed-example',
+  count: 10
+};
+const output: ToolOutput = await toolName.execute(input);
+*/

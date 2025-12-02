@@ -1,0 +1,51 @@
+;; Seatbelt sandbox profile for MCP code execution (macOS)
+;; Usage: sandbox-exec -f .claude/security/seatbelt.sb node script.js
+
+(version 1)
+
+;; Default deny all
+(deny default)
+
+;; Allow reading system files
+(allow file-read*
+  (subpath "/System")
+  (subpath "/Library")
+  (subpath "/usr/lib")
+  (subpath "/usr/share")
+  (subpath "/usr/local/lib/node_modules")
+  (subpath "/usr/local/bin"))
+
+;; Allow Node.js execution
+(allow file-read*
+  (literal "/usr/local/bin/node")
+  (literal "/usr/bin/node"))
+
+;; Allow workspace access
+(allow file-read*
+  (subpath (param "WORKSPACE")))
+
+;; Allow temporary writes
+(allow file-read* file-write*
+  (subpath "/tmp")
+  (subpath "/private/tmp"))
+
+;; Block sensitive paths
+(deny file-read* file-write*
+  (regex #"^/Users/[^/]+/\.ssh")
+  (regex #"^/Users/[^/]+/\.aws")
+  (regex #"^/Users/[^/]+/\.config")
+  (literal "/etc/passwd")
+  (literal "/etc/shadow"))
+
+;; Block network
+(deny network*)
+
+;; Allow process execution (Node.js only)
+(allow process-exec
+  (literal "/usr/local/bin/node")
+  (literal "/usr/bin/node"))
+
+;; Allow required mach services
+(allow mach-lookup
+  (global-name "com.apple.system.logger")
+  (global-name "com.apple.system.notification_center"))

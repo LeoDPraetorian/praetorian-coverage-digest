@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": [
+    "assets-get.ts",
+    "assets-list.ts",
+    "attributes-get.ts",
+    "attributes-list.ts",
+    "aegis-list.ts",
+    "capabilities-list.ts",
+    "index.ts",
+    "integrations-list.ts",
+    "jobs-get.ts",
+    "jobs-list.ts",
+    "keys-list.ts",
+    "preseeds-list.ts",
+    "risks-get.ts",
+    "risks-list.ts",
+    "search-by-query.ts",
+    "seeds-list.ts",
+    "validate.ts",
+    "../config/config-loader.ts",
+    "../config/lib/mcp-client.ts",
+    "../config/lib/sanitize.ts",
+    "../../lib/find-project-root.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

@@ -45,6 +45,7 @@ git clone --recurse-submodules https://github.com/praetorian-inc/chariot-develop
 make setup                    # Install dependencies and configure environment
 make chariot                  # Deploy complete Chariot stack (CloudFormation + React UI)
 make user                     # Generate test user with UUID credentials
+make claude-setup             # Display Claude Code plugin installation commands
 
 # Credentials are automatically stored in .env:
 # PRAETORIAN_CLI_USERNAME={uuid}@praetorian.com
@@ -52,6 +53,67 @@ make user                     # Generate test user with UUID credentials
 
 # UI will be available at https://localhost:3000 with generated credentials
 ```
+
+## Claude Code Setup (AI Development Assistant)
+
+**First-time setup for Claude Code users:**
+
+```bash
+# Display plugin installation commands
+make claude-setup
+
+# Then run the displayed commands in Claude Code:
+/plugin marketplace add obra/superpowers
+/plugin install superpowers
+/plugin marketplace add ./
+/plugin install chariot-development-platform
+
+# Restart Claude Code to load plugins
+```
+
+**What this provides:**
+- **Superpowers** (20 foundation skills): TDD, systematic debugging, verification protocols
+- **Chariot Skills** (63 platform skills): Agent creation, React patterns, architecture standards
+- **SessionStart Hook**: Automatic skill activation (80%+ vs 20% baseline)
+- **MANDATORY FIRST RESPONSE PROTOCOL**: Enforces skill usage before all tasks
+
+**Full documentation:** `docs/CLAUDE_CODE_SETUP.md`
+
+**Verification:** After restart, ask Claude "What skills are available?" - should see 80+ skills.
+
+## Skills Discovery & Usage
+
+This repository uses a **hybrid skill architecture** with 80+ skills organized in two tiers:
+
+### Finding Skills
+
+```bash
+# Search for skills across both core and library
+cd .claude && npm run -w @chariot/skill-search search -- "query"
+
+# Examples
+npm run -w @chariot/skill-search search -- "react testing"
+npm run -w @chariot/skill-search search -- "debugging"
+npm run -w @chariot/skill-search search -- ""  # List all skills
+```
+
+**Output shows access method:**
+- `[CORE]` skills → Use with Skill tool: `skill: "skill-name"`
+- `[LIB]` skills → Use with Read tool: Read the path shown
+
+### Skill Architecture
+
+- **Core Skills** (~15): High-frequency skills in `.claude/skills/` - auto-discovered
+- **Gateway Skills** (6): Domain entry points that route to library skills
+  - `gateway-frontend` - React, State, UI, Testing patterns
+  - `gateway-backend` - Go, AWS, Infrastructure, Integration
+  - `gateway-testing` - API, E2E, Mocking, Performance
+  - `gateway-mcp-tools` - External APIs (Linear, CLI, Context7)
+  - `gateway-security` - Auth, Secrets, Cryptography, Defense
+  - `gateway-integrations` - API research, Chariot patterns
+- **Library Skills** (~120): Specialized skills in `.claude/skill-library/` - load on-demand
+
+**Full architecture details:** `docs/SKILLS-ARCHITECTURE.md`
 
 ## Essential Development Commands
 
@@ -120,6 +182,32 @@ npx playwright test
 pytest                        # Run Python test suites (in praetorian-cli)
 ```
 
+### MCP Tools (Model Context Protocol)
+
+This repository uses **TypeScript wrappers** for MCP tools to achieve **0 tokens at session start** (vs 71.8k tokens with native MCPs).
+
+**Available MCP Services:**
+- `praetorian-cli` - Chariot API access (17 tools)
+- `linear` - Issue tracking (23 tools)
+- `context7` - Documentation lookup (2 tools)
+
+**Access via Gateway:**
+```bash
+# Agents access via gateway-mcp-tools skill
+# Executes wrappers with: npx tsx .claude/tools/{service}/{tool}.ts
+```
+
+**Create New Wrapper:**
+```bash
+cd .claude/skills/mcp-manager/scripts
+npm run create -- <service> <tool>           # TDD workflow
+npm run verify-red -- <service>/<tool>
+npm run generate-wrapper -- <service>/<tool>
+npm run verify-green -- <service>/<tool>
+```
+
+**Full architecture details:** `docs/MCP-TOOLS-ARCHITECTURE.md`
+
 ## Technology Stack & Patterns
 
 ### Backend Architecture
@@ -131,7 +219,7 @@ pytest                        # Run Python test suites (in praetorian-cli)
 
 ### Frontend Architecture
 
-- **React 18 + TypeScript**: Main UI framework
+- **React 19 + TypeScript**: Main UI framework
 - **Tailwind CSS**: Styling with custom design system
 - **Vite**: Build system and development server
 - **TanStack Query**: Data fetching and caching
@@ -145,6 +233,56 @@ pytest                        # Run Python test suites (in praetorian-cli)
 - **Claude Flow**: SPARC methodology for AI-assisted development
 
 ## Development Workflows
+
+### Submodule Commit Prevention
+
+🚨 **CRITICAL: Never commit submodule changes in the super-repo**
+
+Submodule changes should ONLY be committed in their respective submodule repositories, not in the super-repo.
+
+**Git Hook Protection (Automatic):**
+
+```bash
+# Git hooks are automatically installed during setup
+make setup                    # Installs pre-commit hook automatically
+
+# Manual installation if needed
+make install-git-hooks       # Install git hooks manually
+```
+
+The pre-commit hook will **block any commits** that include changes to `modules/*`, preventing accidental submodule commits.
+
+**Working with Submodules:**
+
+```bash
+# ✅ CORRECT: Work in submodule directory
+cd modules/chariot
+git checkout -b feature/my-feature
+# Make changes, commit, push
+git commit -m "feat: add new feature"
+git push origin feature/my-feature
+# Create PR in chariot repository
+
+# ❌ WRONG: Committing submodule pointer in super-repo
+git add modules/chariot
+git commit -m "update chariot"  # This will be BLOCKED by pre-commit hook
+```
+
+**If You Accidentally Committed Submodule Changes:**
+
+```bash
+# Unstage submodule changes
+git restore --staged modules/*
+
+# If already committed, use filter-branch to remove from history
+# (Contact team lead for assistance with this)
+```
+
+**Why This Matters:**
+- Submodule pointer changes clutter the super-repo history
+- They create merge conflicts across team members
+- They make PRs harder to review
+- Each submodule has its own independent workflow and PR process
 
 ### Branch Safety Protocol
 
@@ -192,18 +330,32 @@ npx claude-flow sparc batch <modes> "<task>"   # Parallel execution
 # Task("Test Engineer", "Write E2E tests...", "e2e-test-writer-fixer")
 ```
 
-### Available Specialized Agents (54 total)
+### Agent Architecture
 
-Key agents for Chariot development:
+55 specialized agents organized across 8 categories:
 
+| Category | Count | Examples |
+|----------|-------|----------|
+| `architecture` | 7 | go-architect, react-architect, security-architect |
+| `development` | 16 | react-developer, go-developer, typescript-developer |
+| `testing` | 8 | frontend-browser-test-engineer, backend-unit-test-engineer |
+| `quality` | 5 | go-code-reviewer, react-code-reviewer |
+| `analysis` | 6 | security-risk-assessor, complexity-assessor |
+| `research` | 3 | web-research-specialist, code-pattern-analyzer |
+| `orchestrator` | 8 | universal-coordinator, hierarchical-coordinator |
+| `mcp-tools` | 2 | praetorian-cli-expert, chromatic-test-engineer |
+
+**Key Agents for Chariot Development:**
 - `security-architect` - Security platform design and threat modeling
-- `go-api-optimizer` - Go backend performance and concurrency patterns
-- `frontend-developer` - React/TypeScript with automatic E2E test generation
-- `neo4j-schema-architect` - Graph database schema design for attack surface data
-- `e2e-test-writer-fixer` - Comprehensive Playwright test automation
-- `unit-test-engineer` - Go and Python test suites with security focus
+- `react-developer` - React/TypeScript with automatic E2E test generation
+- `go-developer` - Go backend development with concurrency patterns
+- `frontend-browser-test-engineer` - Comprehensive Playwright test automation
+- `backend-unit-test-engineer` - Go and Python test suites with security focus
 - `vql-developer` - Velociraptor security capability development
-- `code-review-swarm` - Multi-agent code review for security platforms
+
+**Agent Design Principle**: Lean prompts (<300 lines) that delegate detailed patterns to skills
+
+**Full architecture details:** `docs/AGENT-ARCHITECTURE.md`
 
 ## Security Platform Context
 
@@ -308,6 +460,9 @@ allowedColumns := map[string]bool{
 
 - @docs/TECH-STACK.md - Complete technology stack with versions and dependencies
 - @docs/DESIGN-PATTERNS.md - Architectural patterns and security guidelines
+- @docs/SKILLS-ARCHITECTURE.md - Hybrid skill system: Core, Gateway, Library tiers
+- @docs/AGENT-ARCHITECTURE.md - Lean agent pattern with skill delegation
+- @docs/MCP-TOOLS-ARCHITECTURE.md - TypeScript MCP wrappers for progressive loading
 
 **Module Documentation:**
 
@@ -345,5 +500,7 @@ make tree-remove NAME=feature-branch # Clean worktree removal
 4. **Testing**: Frontend changes automatically generate E2E tests with Playwright
 5. **Security Focus**: All development must consider attack surface implications and security best practices
 6. **Concurrency**: Use Claude Code's Task tool for parallel agent execution, batch all operations in single messages
+7. **Skills & Architecture**: Use skill-search CLI to discover capabilities before implementing
+8. **Context Engineering**: Architecture optimized for token efficiency - use gateways for progressive loading
 
 This super-repository enables unified development of comprehensive security platforms with AI-assisted workflows and automated testing.

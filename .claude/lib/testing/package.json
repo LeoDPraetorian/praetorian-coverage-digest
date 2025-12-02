@@ -1,0 +1,29 @@
+{
+  "name": "@claude/testing",
+  "version": "1.0.0",
+  "description": "Shared testing infrastructure for all MCP wrappers using Vitest",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./mocks": "./src/mocks/mcp-client-mock.ts",
+    "./fixtures": "./src/fixtures/security-scenarios.ts",
+    "./assertions": "./src/assertions/schema-assertions.ts"
+  },
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
+  },
+  "keywords": [
+    "testing",
+    "mcp",
+    "mocking",
+    "unit-tests",
+    "vitest"
+  ],
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
+}

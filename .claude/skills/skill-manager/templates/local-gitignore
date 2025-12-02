@@ -1,0 +1,26 @@
+# .local/.gitignore
+# Excludes runtime artifacts but keeps persistent metadata
+
+# Exclude everything by default
+*
+
+# EXCEPTIONS: Keep these files in git
+!CHANGELOG.md
+!.gitignore
+!.gitkeep
+
+# Common runtime artifacts (explicitly excluded for clarity)
+# These patterns are already excluded by * above
+audit-*.md
+audit-*.txt
+audit-*.json
+report-*.md
+report-*.txt
+test-results-*
+results-*.md
+run-*.log
+output-*
+generated-*
+*.tmp
+temp/
+logs/

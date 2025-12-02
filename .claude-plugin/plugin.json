@@ -1,0 +1,34 @@
+{
+  "name": "chariot-development-platform",
+  "description": "Chariot platform-specific skills: agent structure standards, React patterns (TanStack Query, Zustand, React Hook Form), Go development, architecture patterns, and security platform workflows. Includes 87 integrated skills (67 Chariot + 20 foundation skills), SessionStart hook for MANDATORY FIRST RESPONSE PROTOCOL, and progressive disclosure patterns.",
+  "version": "2.0.0",
+  "author": {
+    "name": "Chariot Development Team",
+    "email": "nathan.sportsman@praetorian.com"
+  },
+  "homepage": "https://github.com/praetorian-inc/chariot-development-platform",
+  "repository": "https://github.com/praetorian-inc/chariot-development-platform",
+  "license": "MIT",
+  "keywords": [
+    "chariot",
+    "react",
+    "testing",
+    "claude-code",
+    "tanstack-query",
+    "zustand",
+    "playwright",
+    "mcp",
+    "aws-cloud",
+    "security",
+    "debugging",
+    "tdd",
+    "hooks",
+    "agents",
+    "golang",
+    "python",
+    "shadcn-ui",
+    "document-processing",
+    "automation",
+    "architecture"
+  ]
+}

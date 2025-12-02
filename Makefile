@@ -96,6 +96,13 @@ logs:
 purge:
 	go run modules/chariot-devops/chariot-utils/user-purge/main.go -stack $(stack) -u $(user) -neo4j-mode delete -keep-user
 
+.PHONY: install-git-hooks
+install-git-hooks: ## Install git hooks to prevent submodule commits in super-repo
+	@echo "Installing git hooks..."
+	@ln -sf ../../.githooks/pre-commit .git/hooks/pre-commit
+	@echo "✅ Git hooks installed successfully"
+	@echo "The pre-commit hook will now prevent accidental submodule commits"
+
 .PHONY: submodule-init
 submodule-init: ## Initialize all submodules
 	@echo "Initializing all submodules..."
@@ -291,7 +298,9 @@ endif
 	fi
 	@make submodule-init-robust
 	@make submodule-pull
+	@make install-git-hooks
 	@make setup-ui
+	@make mcp-tools-setup
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
 		echo "AWS credentials not found, running aws configure..."; \
 		aws configure; \
@@ -450,6 +459,19 @@ mcp-manager-install: ## Install MCP server manager for toggling Claude Desktop M
 	export PATH="$$HOME/.local/bin:$$PATH"; \
 	hash -r 2>/dev/null || true
 	@echo "✅ MCP manager installed successfully"
+
+.PHONY: mcp-tools-setup
+mcp-tools-setup: ## Install dependencies for all MCP custom tools (chrome-devtools, currents, context7, linear)
+	@echo "📦 Installing MCP tool dependencies..."
+	@echo "  → chrome-devtools..."
+	@cd .claude/tools/chrome-devtools && npm install > /dev/null 2>&1
+	@echo "  → currents..."
+	@cd .claude/tools/currents && npm install > /dev/null 2>&1
+	@echo "  → context7..."
+	@cd .claude/tools/context7 && npm install > /dev/null 2>&1
+	@echo "  → linear..."
+	@cd .claude/tools/linear && npm install > /dev/null 2>&1
+	@echo "✅ All MCP tool dependencies installed"
 
 # ============================================================
 # DevPod Management
@@ -642,3 +664,106 @@ devpod-help: ## Show DevPod quick reference guide
 	@echo "   - VNC eliminated - simpler, faster, more secure!"
 	@echo ""
 	@echo "📚 Full documentation: devpod/README.md"
+
+.PHONY: claude-setup
+claude-setup:
+	@echo ""
+	@echo "🤖 Setting up Claude Code plugins for Chariot Development..."
+	@echo ""
+	@echo "This will install:"
+	@echo "  • Superpowers (20 foundation skills)"
+	@echo "  • Chariot Development Platform (63 platform skills)"
+	@echo ""
+	@echo "Run these commands in Claude Code:"
+	@echo ""
+	@echo "  /plugin marketplace add obra/superpowers"
+	@echo "  /plugin install superpowers"
+	@echo ""
+	@echo "  /plugin marketplace add ./"
+	@echo "  /plugin install chariot-development-platform"
+	@echo ""
+	@echo "  Then restart Claude Code"
+	@echo ""
+	@echo "📚 Full documentation: docs/CLAUDE_CODE_SETUP.md"
+	@echo ""
+
+.PHONY: claude-reload
+claude-reload:
+	@echo ""
+	@echo "🔄 Reloading Claude Code plugins..."
+	@echo ""
+	@echo "Run these commands in Claude Code to pick up skill changes:"
+	@echo ""
+	@echo "  /plugin uninstall chariot-development-platform"
+	@echo "  /plugin install chariot-development-platform"
+	@echo ""
+	@echo "  Then restart Claude Code"
+	@echo ""
+	@echo "Use this after:"
+	@echo "  • Renaming skills"
+	@echo "  • Modifying skill frontmatter"
+	@echo "  • Adding/removing skills"
+	@echo ""
+
+# ============================================================
+# Release Management
+# ============================================================
+
+.PHONY: test-release-prerequisites
+test-release-prerequisites: ## Test that release prerequisites are available (TDD verification)
+	@echo "Testing release prerequisites..."
+	@command -v gh >/dev/null 2>&1 || (echo "FAIL: 'gh' CLI not found. Install with: brew install gh" && exit 1)
+	@command -v git >/dev/null 2>&1 || (echo "FAIL: 'git' not found" && exit 1)
+	@gh auth status >/dev/null 2>&1 || (echo "FAIL: GitHub authentication required. Run: gh auth login" && exit 1)
+	@[ -n "$$(git describe --tags 2>/dev/null || echo '')" ] || (echo "FAIL: No git tags found. Create a tag first: git tag v1.0.0" && exit 1)
+	@echo "PASS: All release prerequisites available"
+
+.PHONY: test-release-artifacts
+test-release-artifacts: ## Test that release artifacts can be packaged (TDD verification)
+	@echo "Testing release artifact discovery..."
+	@ARTIFACTS=$$(find . -maxdepth 2 -type f \( -name "*.zip" -o -name "*.tar.gz" -o -name "*.tgz" \) 2>/dev/null | head -5); \
+	if [ -z "$$ARTIFACTS" ]; then \
+		echo "Note: No pre-built artifacts found. Release will be created without artifacts."; \
+	else \
+		echo "PASS: Found release artifacts: $$ARTIFACTS"; \
+	fi
+
+.PHONY: release
+release: ## Create GitHub release with optional artifacts (Usage: make release TAG=v1.0.0)
+ifndef TAG
+	$(error TAG is required. Usage: make release TAG=v1.0.0)
+endif
+	@echo "🚀 Creating GitHub release: $(TAG)"
+	@echo "Validating prerequisites..."
+	@$(MAKE) test-release-prerequisites > /dev/null
+	@echo "Discovering artifacts..."
+	@$(MAKE) test-release-artifacts > /dev/null
+	@echo "Creating release on GitHub..."
+	@GIT_ORIGIN=$$(git config --get remote.origin.url | sed 's|.*github.com[:/]||' | sed 's|\.git||'); \
+	REPO_OWNER=$$(echo $$GIT_ORIGIN | cut -d/ -f1); \
+	REPO_NAME=$$(echo $$GIT_ORIGIN | cut -d/ -f2); \
+	COMMIT_MSG=$$(git log -1 --pretty=%B); \
+	gh release create $(TAG) \
+		--repo $$REPO_OWNER/$$REPO_NAME \
+		--title "Release $(TAG)" \
+		--notes "$$COMMIT_MSG" \
+		|| (echo "FAIL: Release creation failed. Tag may already exist." && exit 1)
+	@echo "✅ Release $(TAG) created successfully"
+	@ARTIFACTS=$$(find . -maxdepth 2 -type f \( -name "*.zip" -o -name "*.tar.gz" -o -name "*.tgz" \) 2>/dev/null | head -5); \
+	if [ -n "$$ARTIFACTS" ]; then \
+		echo "📦 Uploading artifacts..."; \
+		echo "$$ARTIFACTS" | while read -r artifact; do \
+			if [ -f "$$artifact" ]; then \
+				echo "  Uploading: $$artifact"; \
+				GIT_ORIGIN=$$(git config --get remote.origin.url | sed 's|.*github.com[:/]||' | sed 's|\.git||'); \
+				REPO_OWNER=$$(echo $$GIT_ORIGIN | cut -d/ -f1); \
+				REPO_NAME=$$(echo $$GIT_ORIGIN | cut -d/ -f2); \
+				gh release upload $(TAG) "$$artifact" --repo $$REPO_OWNER/$$REPO_NAME || echo "  Warning: Failed to upload $$artifact"; \
+			fi; \
+		done; \
+		echo "✅ Artifacts uploaded"; \
+	fi
+	@echo ""
+	@echo "Release complete! View at:"
+	@GIT_ORIGIN=$$(git config --get remote.origin.url | sed 's|.*github.com[:/]||' | sed 's|\.git||'); \
+	echo "https://github.com/$$GIT_ORIGIN/releases/tag/$(TAG)"

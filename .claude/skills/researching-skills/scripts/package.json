@@ -1,0 +1,29 @@
+{
+  "name": "@chariot/researching-skills",
+  "version": "1.0.0",
+  "description": "Skill research and generation CLI - brainstorming, codebase analysis, Context7, web research",
+  "type": "module",
+  "scripts": {
+    "research": "tsx src/research.ts",
+    "generate": "tsx src/generate.ts",
+    "orchestrate": "tsx src/orchestrator.ts",
+    "build": "tsc",
+    "test": "vitest run --config ../../../vitest.config.ts",
+    "test:unit": "vitest run --config ../../../vitest.config.ts",
+    "test:watch": "vitest --config ../../../vitest.config.ts"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^11.1.0",
+    "gray-matter": "^4.0.3",
+    "ora": "^8.0.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  }
+}

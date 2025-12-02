@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": [
+    "access-key-to-account-id.ts",
+    "apollo.ts",
+    "parse-response.ts",
+    "public-resources.ts",
+    "summary.ts",
+    "whoami.ts",
+    "../config/config-loader.ts",
+    "../config/lib/mcp-client.ts",
+    "../config/lib/sanitize.ts",
+    "../../lib/find-project-root.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

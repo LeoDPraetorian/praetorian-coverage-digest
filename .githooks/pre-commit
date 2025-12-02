@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# Pre-commit hook to prevent submodule commits in super-repo branches
+#
+# Installation:
+#   make install-git-hooks
+# or manually:
+#   ln -sf ../../.githooks/pre-commit .git/hooks/pre-commit
+#
+
+# Check if any submodule changes are staged
+if git diff --cached --name-only | grep -q "^modules/"; then
+    echo "❌ ERROR: Submodule changes detected in commit!"
+    echo ""
+    echo "You are attempting to commit changes to submodules in modules/*"
+    echo "This is not allowed in the chariot-development-platform super-repo."
+    echo ""
+    echo "To work on submodule code:"
+    echo "  1. cd modules/<submodule-name>"
+    echo "  2. Create a branch and commit there"
+    echo "  3. Create a PR in that submodule's repository"
+    echo ""
+    echo "To unstage these changes:"
+    echo "  git restore --staged modules/*"
+    echo ""
+    exit 1
+fi
+
+exit 0

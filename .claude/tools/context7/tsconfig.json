@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": [
+    "resolve-library-id.ts",
+    "get-library-docs.ts",
+    "index.ts",
+    "client.ts",
+    "formatters.ts",
+    "../config/config-loader.ts",
+    "../config/lib/mcp-client.ts",
+    "../config/lib/sanitize.ts",
+    "../../lib/find-project-root.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

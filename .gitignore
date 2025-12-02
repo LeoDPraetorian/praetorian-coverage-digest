@@ -33,3 +33,19 @@ hive-mind-prompt-*.txt
 !.claude/features/.gitkeep
 .claude/pipeline/*
 !.claude/pipeline/.gitkeep
+__pycache__/
+.claude/config/credentials.json
+.claude/node_modules/
+
+# Temporary and generated files
+.tmp/
+**/.tmp/
+
+# Node modules (never commit)
+**/node_modules/
+
+# Local development files
+**/.local/
+
+# Working plans (not for version control)
+docs/plans/

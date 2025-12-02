@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Deprecation Registry",
+  "description": "Schema for tracking deprecated commands, skills, agents, MCP tools, and patterns",
+  "type": "object",
+  "required": ["version", "lastUpdated", "commands", "skills", "agents", "mcpTools", "patterns"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date"
+    },
+    "description": {
+      "type": "string"
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/deprecationEntry"
+      }
+    },
+    "skills": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/deprecationEntry"
+      }
+    },
+    "agents": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/deprecationEntry"
+      }
+    },
+    "mcpTools": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/deprecationEntry"
+      }
+    },
+    "patterns": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/patternEntry"
+      }
+    },
+    "_metadata": {
+      "type": "object",
+      "properties": {
+        "maintainers": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "consumers": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "updateProtocol": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "deprecationEntry": {
+      "type": "object",
+      "required": ["deprecatedDate", "reason"],
+      "properties": {
+        "replacedBy": {
+          "type": ["string", "null"],
+          "description": "The new name/command to use, or null if removed entirely"
+        },
+        "deprecatedDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "migrationNotes": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["deprecated", "removed", "renamed"],
+          "default": "deprecated"
+        }
+      }
+    },
+    "patternEntry": {
+      "type": "object",
+      "required": ["reason"],
+      "properties": {
+        "replacedBy": {
+          "type": ["string", "null"]
+        },
+        "context": {
+          "type": "string",
+          "description": "Where this pattern applies"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "migrationNotes": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["deprecated", "invalid", "anti-pattern"]
+        }
+      }
+    }
+  }
+}

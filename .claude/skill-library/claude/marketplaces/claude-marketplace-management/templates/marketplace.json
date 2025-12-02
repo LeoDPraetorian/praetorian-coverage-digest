@@ -1,0 +1,28 @@
+{
+  "name": "my-marketplace",
+  "owner": {
+    "name": "Your Name or Team Name",
+    "email": "your-email@example.com"
+  },
+  "description": "Brief description of your marketplace and its purpose",
+  "version": "1.0.0",
+  "homepage": "https://github.com/your-org/your-marketplace",
+  "repository": "https://github.com/your-org/your-marketplace",
+  "license": "MIT",
+  "plugins": [
+    {
+      "name": "example-plugin",
+      "source": {
+        "source": "directory",
+        "path": "./plugins/example-plugin"
+      },
+      "description": "Example plugin demonstrating the structure",
+      "version": "1.0.0",
+      "author": {
+        "name": "Plugin Author",
+        "email": "plugin-author@example.com"
+      },
+      "license": "MIT"
+    }
+  ]
+}

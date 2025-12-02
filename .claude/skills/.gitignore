@@ -1,0 +1,18 @@
+# Shared dependencies (hoisted from workspaces)
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Lock file (package-lock.json committed for reproducibility)
+# Uncomment if you want to ignore it:
+# package-lock.json

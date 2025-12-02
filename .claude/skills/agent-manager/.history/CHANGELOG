@@ -1,0 +1,338 @@
+- **2025-12-01**: Implement JSON-based interactive fix workflow (like skill-manager create)
+
+CHANGES NEEDED:
+
+1. audit.ts:
+   - REMOVE lines 121-137 (the execSync call to fix --suggest)
+   - Audit should just report results and exit, letting Claude handle the flow
+
+2. fix.ts --suggest:
+   - Change from plain text output to structured JSON output
+   - Follow skill-manager create.ts pattern with:
+     - status: 'NEEDS_INPUT' | 'READY' | 'ERROR'
+     - questions: array with id, question, type, options (for AskUserQuestion)
+     - collectedAnswers: track which fixes user has selected
+     - applyCommand: final command to run selected fixes
+   - Group fixes by category: auto-fixable vs manual
+   - Allow multi-select for batch applying fixes
+
+3. types.ts:
+   - Add FixSuggestionOutput type (like CreateSuggestionWithCreate7)
+   - Add FixQuestion type for structured questions
+
+4. Documentation:
+   - Update SKILL.md workflow section
+   - Update references/fix-workflow.md with JSON format and Claude interception pattern
+
+PATTERN TO FOLLOW:
+- See .claude/skills/skill-manager/scripts/src/create.ts lines 237-313 (handleSuggestMode)
+- JSON output enables Claude to intercept, use AskUserQuestion, then run apply command
+
+EXPECTED FLOW:
+1. User runs: /agent-manager audit my-agent
+2. Audit reports failures, exits
+3. Claude sees failures, runs: npm run fix -- my-agent --suggest
+4. fix.ts returns JSON with questions
+5. Claude uses AskUserQuestion to present fix options
+6. User selects fixes
+7. Claude runs: npm run fix -- my-agent --apply fix-id-1,fix-id-2
+- **2025-12-01**: after audit completes and issues are found and it reports its results to where the user can see them, id like it to then run npm run fix -- {agent} --suggest
+- **2025-12-01**: Update agent-manager to implement intelligent gateway-to-library-skill resolution. Currently, agent-manager recommends gateways but doesn't populate the "Skill References" table with actual library skills from those gateways. This creates a gap where agents have placeholders instead of real skill paths.
+
+## Problem Statement
+
+1. **Gateway selection works** but only suggests ONE gateway, not considering agents that need multiple (e.g., `frontend-unit-test-engineer` needs both `gateway-frontend` AND `gateway-testing`)
+
+2. **"Skill References" table uses placeholders** - When creating agents or fixing Phase 4, the suggested table contains:
+   | [Task 1] | .claude/skill-library/path/to/SKILL.md |
+Instead of actual skills from the gateway like:
+   | React state patterns | .claude/skill-library/development/frontend/state/frontend-react-state-management/SKILL.md |
+
+3. **No validation** that referenced skills in body actually exist in the gateway's routing table
+
+## Required Changes
+
+### 1. Create `lib/gateway-parser.ts`
+
+Parse gateway skill files to extract their routing tables:
+
+```typescript
+interface GatewayRoute {
+  task: string;           // e.g., "React state patterns"
+  skillPath: string;      // e.g., ".claude/skill-library/.../SKILL.md"
+  keywords: string[];     // Extracted keywords for matching
+}
+
+interface GatewayInfo {
+  name: string;           // e.g., "gateway-frontend"
+  routes: GatewayRoute[];
+  domains: string[];      // e.g., ["react", "typescript", "ui"]
+}
+
+export function parseGatewaySkill(gatewayName: string): GatewayInfo | null;
+export function getAllGateways(): GatewayInfo[];
+export function findRoutesForKeywords(gateway: GatewayInfo, keywords: string[]): GatewayRoute[];
+```
+
+Implementation should:
+- Read gateway skill files from .claude/skills/gateway-*/SKILL.md
+- Parse markdown tables using regex: /\|\s*([^|]+)\s*\|\s*([^]+)/gm`
+- Extract keywords from task descriptions and skill paths
+- Cache parsed gateways to avoid repeated filesystem reads
+
+### 2. Create `lib/skill-references-generator.ts`
+
+Generate "Skill References" table content based on agent context:
+
+```typescript
+interface SkillReference {
+  task: string;
+  skillPath: string;
+  relevanceScore: number;  // 1-10
+  source: 'gateway-match' | 'keyword-match' | 'type-default';
+}
+
+export function generateSkillReferences(agent: AgentInfo): SkillReference[];
+export function formatSkillReferencesTable(refs: SkillReference[]): string;
+```
+
+Algorithm:
+1. Get agent's gateways (from frontmatter.skills)
+2. Extract keywords from agent name, type, and body (responsibilities section)
+3. For each gateway:
+   a. Parse gateway with parseGatewaySkill()
+   b. Find matching routes with findRoutesForKeywords()
+   c. Score matches (exact keyword = 10, partial = 6, type-default = 4)
+4. Deduplicate and sort by relevance
+5. Return top 5-8 most relevant skill references
+
+### 3. Update `phases/phase4-skill-integration.ts`
+
+3a. Add multi-gateway recommendation (lines 231-269)
+
+Replace single gateway suggestion with multi-gateway logic:
+
+```typescript
+// Determine primary and secondary gateways
+const gateways = recommendGateways(agent);  // New function
+
+for (const { gateway, isPrimary, reason } of gateways) {
+  if (!existingSkills.includes(gateway)) {
+    issues.push({
+      severity: isPrimary ? 'warning' : 'info',
+      message: isPrimary
+        ? `Missing primary gateway skill: "${gateway}"`
+        : `Consider adding secondary gateway: "${gateway}"`,
+      details: reason,
+    });
+    // ... suggestion
+  }
+}
+```
+
+3b. Replace placeholder table with actual content (lines 295-314)
+
+When "Skill References" section is missing:
+
+```typescript
+if (!hasSkillReferencesSection(agent.body)) {
+  // Generate actual skill references from gateway(s)
+  const refs = generateSkillReferences(agent);
+  const tableContent = formatSkillReferencesTable(refs);
+
+  suggestions.push({
+    id: 'phase4-references-section',
+    phase: 4,
+    description: 'Add Skill References section with gateway skills',
+    autoFixable: true,  // NOW auto-fixable with real content
+    suggestedValue: tableContent,
+  });
+}
+```
+
+3c. Add new check: Validate existing skill references
+
+```typescript
+// Check existing Skill References table entries resolve to real files
+const existingRefs = parseSkillReferencesFromBody(agent.body);
+for (const ref of existingRefs) {
+  if (!fs.existsSync(path.join(repoRoot, ref.skillPath))) {
+    issues.push({
+      severity: 'error',
+      message: `Broken skill reference: "${ref.skillPath}"`,
+      details: 'Path does not exist in skill library',
+    });
+  }
+}
+```
+
+### 4. Update `create.ts` template generation (lines 84-91)
+
+Replace placeholder table with generated content:
+
+```typescript
+// In generateLeanTemplate(), after determining gateway:
+const gatewayInfo = parseGatewaySkill(gateway);
+const relevantRoutes = findRoutesForKeywords(gatewayInfo, [name, category]);
+const skillRefsTable = formatSkillReferencesForTemplate(relevantRoutes.slice(0, 5));
+
+return `...
+## Skill References (Load On-Demand via Gateway)
+
+**IMPORTANT**: Before implementing, consult the \`${gateway}\` skill.
+
+${skillRefsTable}
+...`;
+```
+
+### 5. Update `lib/skill-recommender.ts`
+
+Add function to recommend multiple gateways:
+
+```typescript
+export function recommendGateways(agent: AgentInfo): Array<{
+  gateway: string;
+  isPrimary: boolean;
+  reason: string;
+  relevanceScore: number;
+}> {
+  const recommendations = [];
+
+  // Primary gateway by type
+  const primaryGateway = getPrimaryGatewayForType(agent.frontmatter.type);
+  recommendations.push({
+    gateway: primaryGateway,
+    isPrimary: true,
+    reason: `Required for ${agent.frontmatter.type} agents`,
+    relevanceScore: 10,
+  });
+
+  // Secondary gateways by keywords
+  const keywords = extractKeywords(agent);
+  for (const [keyword, gateway] of KEYWORD_TO_GATEWAY_MAP) {
+    if (keywords.includes(keyword) && gateway !== primaryGateway) {
+      recommendations.push({
+        gateway,
+        isPrimary: false,
+        reason: `Keyword "${keyword}" found in agent`,
+        relevanceScore: 7,
+      });
+    }
+  }
+
+  return recommendations;
+}
+```
+
+### 6. Update `lib/types.ts`
+
+Add gateway-to-domain mapping:
+
+```typescript
+export const GATEWAY_DOMAINS: Record<string, string[]> = {
+  'gateway-frontend': ['react', 'typescript', 'ui', 'component', 'hook', 'state', 'tanstack', 'zustand'],
+  'gateway-backend': ['go', 'golang', 'api', 'aws', 'lambda', 'dynamodb', 'handler'],
+  'gateway-testing': ['test', 'vitest', 'playwright', 'e2e', 'unit', 'integration', 'mock'],
+  'gateway-security': ['auth', 'security', 'vulnerability', 'owasp', 'encryption'],
+  'gateway-mcp-tools': ['mcp', 'linear', 'context7', 'praetorian'],
+  'gateway-integrations': ['integration', 'webhook', 'api', 'oauth'],
+};
+
+export const TYPE_TO_PRIMARY_GATEWAY: Record<AgentCategory, string> = {
+  development: 'gateway-frontend',  // Refined by name
+  testing: 'gateway-testing',
+  architecture: 'gateway-backend',
+  quality: 'gateway-testing',
+  analysis: 'gateway-security',
+  research: 'gateway-backend',
+  orchestrator: 'gateway-mcp-tools',
+  'mcp-tools': 'gateway-mcp-tools',
+};
+
+export const TYPE_TO_SECONDARY_GATEWAYS: Record<AgentCategory, string[]> = {
+  development: [],  // Determined by keywords
+  testing: ['gateway-frontend', 'gateway-backend'],  // Test agents often need domain skills
+  architecture: ['gateway-frontend', 'gateway-security'],
+  quality: ['gateway-frontend', 'gateway-backend'],
+  analysis: ['gateway-backend'],
+  research: [],
+  orchestrator: [],
+  'mcp-tools': [],
+};
+```
+
+## Test Scenarios
+
+After implementation, verify:
+
+1. **Create new frontend testing agent:**
+   ```bash
+   npm run create -- react-test-specialist "Use when testing React components" --type testing
+   ```
+   Expected: Skill References table populated with actual paths from gateway-testing AND gateway-frontend
+
+2. **Audit existing agent missing skill references:**
+   ```bash
+   npm run audit -- frontend-unit-test-engineer
+   ```
+   Expected: Phase 4 suggests actual skill paths, not placeholders
+
+3. **Fix agent with missing references:**
+   ```bash
+   npm run fix -- frontend-unit-test-engineer
+   ```
+   Expected: Auto-populates Skill References table with relevant skills from gateway-testing and gateway-frontend
+
+4. **Audit agent with broken skill reference:**
+   Create agent with non-existent path in Skill References table
+   Expected: Phase 4 reports error for broken path
+
+## Files to Create/Modify
+
+| File                               | Action | Purpose                                    |
+|------------------------------------|--------|--------------------------------------------|
+| lib/gateway-parser.ts              | CREATE | Parse gateway skill routing tables         |
+| lib/skill-references-generator.ts  | CREATE | Generate Skill References content          |
+| lib/skill-recommender.ts           | UPDATE | Add recommendGateways() function           |
+| lib/types.ts                       | UPDATE | Add gateway domain mappings                |
+| phases/phase4-skill-integration.ts | UPDATE | Multi-gateway + real skill references      |
+| create.ts                          | UPDATE | Use generated skill references in template |
+
+## Acceptance Criteria
+
+1. ✅ npm run create generates agents with REAL skill paths in Skill References table
+2. ✅ Phase 4 audit recommends MULTIPLE gateways when appropriate (primary + secondary)
+3. ✅ Phase 4 fix auto-populates Skill References with actual gateway skills
+4. ✅ Broken skill reference paths are detected as errors
+5. ✅ All existing tests pass
+6. ✅ New unit tests cover gateway parsing and skill reference generation
+- **2025-12-01**: Update Phase 4 (Skill Integration) to enforce that ONLY core skills from .claude/skills/ are allowed in the frontmatter skills field. Library skills from .claude/skill-library/ must be referenced in the body "Skill References" section, not in frontmatter.
+
+Changes needed:
+
+1. Add function to discover core skill names from .claude/skills/ directory (excluding gateway skills which are already handled)
+
+2. Add Check 9 in phase4-skill-integration.ts: "Library skill names in frontmatter"
+   - Parse frontmatter skills field
+   - For each skill name, check if it exists in .claude/skill-library/ (not .claude/skills/)
+   - If found in library → ERROR: "Library skill X should not be in frontmatter - move to body Skill References section"
+   - Auto-fixable: YES (remove from frontmatter)
+
+3. Update types.ts:
+   - Add CORE_SKILLS constant (discovered from .claude/skills/ directory names)
+   - Or add helper function getCoreSkillNames()
+
+4. Validation logic:
+   - Valid in frontmatter: gateway-* skills + core skills from .claude/skills/
+   - Invalid in frontmatter: any skill name that exists in .claude/skill-library/
+
+5. Fix suggestion should:
+   - Remove library skill from frontmatter
+   - Suggest adding to body "Skill References" section with full path
+
+The goal: Enforce the architectural rule that frontmatter skills = gateway skills + core skills ONLY. Library skills go in body.
+# Changelog
+
+All notable changes to this skill.
+
+- **2025-12-01**: Phase 8 should ERROR (not warn) on missing mandatory gateway skills. Gateway skills are determined by agent type (quality→gateway-testing, development→gateway-frontend/backend, etc). Current bug: all missing high-relevance skills marked as warnings. Fix: check if recommendation has source='category' and relevanceScore=9 (the mandatory gateway), mark as ERROR. Optional gateway recommendations (score 7-8) remain warnings. This ensures agents have the appropriate gateway for their domain.

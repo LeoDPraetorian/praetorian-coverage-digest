@@ -1,0 +1,32 @@
+- **2025-12-01**: Phase 8 test scoping fix - single-skill audits now run only that skill's tests (e.g., 23 tests for skill-manager) instead of all workspace tests (102+ files). Prevents false negatives from unrelated test failures. All-skills audits still run workspace-wide tests.
+- **2025-12-01**: Automatic gateway synchronization - create/migrate operations now auto-update gateway skills. New `sync-gateways` command validates and repairs gateway consistency with `--fix` flag.
+- **2025-12-01**: Fix phase count maintenance issue - adding a new audit phase requires updating multiple places manually.
+
+## Problem
+When adding Phase 13 (state-externalization), these needed manual updates:
+- SKILL.md frontmatter description (phase count)
+- SKILL.md body table and references
+- references/audit-phases.md
+- cli.ts validation (if hardcoded)
+
+## Solution
+1. **Make CLI dynamic**: Export PHASES array from audit.ts, use PHASES.length in cli.ts validation
+2. **Add 'Adding New Phases' section** to references/audit-phases.md with checklist:
+   - Create phases/phase{N}-{name}.ts
+   - Register in audit.ts PHASES array  
+   - Register in fix.ts FIXERS array (if auto-fixable)
+   - Update SKILL.md table and description count
+   - Update references/audit-phases.md
+   - CLI validation auto-updates (dynamic)
+3. **Consider**: Script to grep 'N phase' references for audit
+- **2025-11-30**: Documentation sync - Updated fix.ts Phase 8 guidance, SKILL.md phase list, and fixed 'Phase 7' typo in phase8-typescript-structure.ts comment
+- **2025-11-30**: Phase 8 now validates: (1) TypeScript compilation via tsc --noEmit, (2) tsconfig.json has vitest/globals types, (3) Unit tests 100% pass required. CRITICAL failure if any check fails.
+- **2025-11-30**: Test changelog functionality with new .history/CHANGELOG path
+# Changelog
+
+All notable changes to this skill.
+
+- **2025-11-30**: Changed changelog storage from .local/changelog (gitignored) to .history/CHANGELOG (version controlled) to enable tracking skill evolution in repository
+- **2025-11-30**: Suggest mode now outputs ALL fixes (deterministic + semantic) as suggestions. Nothing is auto-applied - Claude presents each one for Accept/Skip, user controls what gets applied. Deterministic fixes (phases 2,4,5,6,7,10,12) are detected via dry-run and presented as suggestions with applyCommand.
+- **2025-11-30**: Add context7 integration for library/framework skills - skill type selection, --context7-data flag, --refresh-context7 for updates, auto-generated API references and patterns
+- **2025-11-30**: Documentation audit - fixed phase names, backup path docs, Phase 11 classification, list output docs, and removed references to non-existent skills

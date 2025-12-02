@@ -1,0 +1,107 @@
+# Skill Frontmatter Template
+
+# Standard format (all fields)
+---
+name: skill-name-in-kebab-case
+description: Use when [specific triggers, symptoms, or situations] - [what the skill does and how it helps, written in third person]
+allowed-tools: Read, Write, Bash, Grep, Glob
+---
+
+# Minimal format (if allowed-tools truly unrestricted)
+---
+name: skill-name-in-kebab-case
+description: Use when [specific triggers, symptoms, or situations] - [what the skill does and how it helps, written in third person]
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task, Skill
+---
+
+# Field Specifications
+
+## name (required)
+- Lowercase letters, numbers, hyphens only
+- No spaces, underscores, dots, or special characters
+- Max 64 characters
+- Use verb-first gerunds for processes (creating-, testing-, debugging-)
+- Examples: my-skill, data-processing, react-testing-patterns
+
+## description (required)
+- Max 1,024 characters total
+- Target: 300-500 characters (concise but complete)
+- Must include BOTH triggers AND functionality
+- Written in third person
+- Start with "Use when..." to focus on triggering conditions
+- Include specific keywords for discovery
+
+### Description Structure
+Use when [trigger 1], [trigger 2], or [trigger 3] - [what it does in one sentence]. [Optional: Additional context or technology specificity]
+
+### Description Examples
+
+# Technique skill
+description: Use when tests have race conditions, timing dependencies, or pass/fail inconsistently - replaces arbitrary timeouts with condition polling for reliable async tests
+
+# Technology-specific skill
+description: Use when using React Router and handling authentication redirects - provides patterns for protected routes and auth state management with TypeScript
+
+# Reference skill
+description: Use when working with PDF files, extracting text, filling forms, or merging documents - comprehensive guide to pdf-lib API with TypeScript examples
+
+# Pattern skill
+description: Use when reducing code complexity, eliminating duplication, or refactoring tangled logic - provides systematic approach to simplifying complex code while preserving behavior
+
+## allowed-tools (REQUIRED)
+- Comma-separated list of tools
+- Documents which tools the skill uses
+- Improves transparency and discoverability
+- Common tools: Read, Write, Edit, Bash, Grep, Glob, Task, Skill
+
+### How to Determine allowed-tools
+
+**Analyze your skill:**
+- Does it read files? → Read
+- Does it create/modify files? → Write, Edit
+- Does it search code? → Grep, Glob
+- Does it run commands? → Bash
+- Does it spawn subagents? → Task
+- Does it invoke other skills? → Skill
+
+**Common patterns:**
+- Read-only analysis: `Read, Grep, Glob`
+- File creation: `Read, Write, Bash, Grep`
+- Full development: `Read, Write, Edit, Bash, Grep, Glob`
+- Orchestration: `Read, Write, Task, Skill`
+
+### allowed-tools Examples
+
+# Read-only skill
+allowed-tools: Read, Grep, Glob
+
+# Write-capable skill
+allowed-tools: Read, Write, Edit, Grep, Glob
+
+# Full development skill
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Task, Skill
+
+# Script execution skill
+allowed-tools: Read, Bash
+
+## Validation
+
+Before deployment, verify:
+- ✅ All required fields present: name, description, allowed-tools
+- ✅ Name uses valid characters only (lowercase, hyphens)
+- ✅ Description under 1,024 characters
+- ✅ Description MUST start with "Use when..."
+- ✅ Description in third person (no "you/your")
+- ✅ allowed-tools field specifies permitted tools
+- ✅ YAML syntax valid (opening ---, closing ---)
+- ✅ No extra fields (only name, description, allowed-tools supported)
+
+## Common Mistakes
+
+❌ name: "My Skill" (spaces, capitals)
+❌ name: skill_name (underscores)
+❌ description: I can help... (first person)
+❌ description: For working with data (vague, no triggers)
+❌ allowed-tools: all (not a valid value - omit field instead)
+❌ Missing opening or closing --- in YAML
+❌ Indentation with tabs (use spaces)

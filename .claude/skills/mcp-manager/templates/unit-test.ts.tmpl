@@ -1,0 +1,244 @@
+/**
+ * Unit tests for {{TOOL_NAME}}
+ * Generated with mandatory test categories
+ */
+
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import {
+  createMCPMock,
+  getAllSecurityScenarios,
+  testSecurityScenarios,
+  MCPErrors,
+  EdgeCaseData,
+} from '@claude/testing';
+
+// Factory mock pattern (REQUIRED to prevent module loading errors)
+vi.mock('../config/lib/mcp-client', () => ({
+  callMCPTool: vi.fn(),
+}));
+
+import { {{TOOL_NAME_CAMEL}} } from './{{TOOL_NAME}}';
+import * as mcpClient from '../config/lib/mcp-client';
+
+describe('{{TOOL_NAME}} - Unit Tests', () => {
+  let mcpMock: ReturnType<typeof createMCPMock>;
+
+  beforeEach(() => {
+    mcpMock = createMCPMock();
+    vi.mocked(mcpClient.callMCPTool).mockImplementation(mcpMock);
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // MANDATORY CATEGORY 1: Schema validation
+  describe('Schema validation', () => {
+    it('should accept valid input', async () => {
+      mcpMock.mockResolvedValue({ id: 'test-123', data: 'test' });
+      const result = await {{TOOL_NAME_CAMEL}}.execute({ /* valid input */ });
+      expect(result).toBeDefined();
+      expect(result.id).toBe('test-123');
+    });
+
+    it('should reject invalid input', async () => {
+      await expect(
+        {{TOOL_NAME_CAMEL}}.execute({ /* invalid input */ })
+      ).rejects.toThrow(/required|invalid/i);
+    });
+
+    it('should handle multiple valid formats', async () => {
+      const validInputs = [
+        // TODO: Add 3+ valid input formats
+      ];
+
+      for (const input of validInputs) {
+        mcpMock.mockResolvedValue({ id: 'test' });
+        const result = await {{TOOL_NAME_CAMEL}}.execute(input);
+        expect(result.id).toBeDefined();
+      }
+    });
+  });
+
+  // MANDATORY CATEGORY 2: Security testing
+  // CRITICAL: Security test failures should block deployment
+  describe('Security testing', () => {
+    it('should block all security attack vectors', async () => {
+      const results = await testSecurityScenarios(
+        getAllSecurityScenarios(),
+        (input) => {{TOOL_NAME_CAMEL}}.execute({ field: input })
+      );
+
+      // Log results for visibility
+      console.log(`Security tests: ${results.passed}/${results.total} passed`);
+
+      // CRITICAL: All attacks must be blocked
+      expect(results.failed).toBe(0);
+      expect(results.passed).toBe(results.total);
+    });
+
+    it('should block path traversal in all string fields', async () => {
+      const pathTraversalInputs = [
+        '../../../etc/passwd',
+        '..\\..\\windows\\system32',
+        'valid/../../../secret',
+      ];
+
+      for (const malicious of pathTraversalInputs) {
+        await expect(
+          {{TOOL_NAME_CAMEL}}.execute({ field: malicious })
+        ).rejects.toThrow();
+      }
+    });
+
+    it('should block command injection in all string fields', async () => {
+      const commandInjectionInputs = [
+        '; rm -rf /',
+        '| cat /etc/passwd',
+        '$(whoami)',
+        '`id`',
+      ];
+
+      for (const malicious of commandInjectionInputs) {
+        await expect(
+          {{TOOL_NAME_CAMEL}}.execute({ field: malicious })
+        ).rejects.toThrow();
+      }
+    });
+
+    it('should block control characters', async () => {
+      const controlCharInputs = [
+        'test\x00null',
+        'test\x01start',
+        'test\x7Fdelete',
+      ];
+
+      for (const malicious of controlCharInputs) {
+        await expect(
+          {{TOOL_NAME_CAMEL}}.execute({ field: malicious })
+        ).rejects.toThrow(/control/i);
+      }
+    });
+  });
+
+  // MANDATORY CATEGORY 3: Response format
+  describe('Response format', () => {
+    it('should handle direct array format', async () => {
+      mcpMock.mockResolvedValue([{ key: '1' }, { key: '2' }]);
+      const result = await {{TOOL_NAME_CAMEL}}.execute({ input: 'test' });
+
+      expect(Array.isArray(result.items)).toBe(true);
+      expect(result.items).toHaveLength(2);
+    });
+
+    it('should handle tuple format', async () => {
+      mcpMock.mockResolvedValue([[{ key: '1' }], 'offset-123']);
+      const result = await {{TOOL_NAME_CAMEL}}.execute({ input: 'test' });
+
+      expect(result.items).toHaveLength(1);
+      expect(result.next_offset).toBe('offset-123');
+    });
+
+    it('should handle object format', async () => {
+      mcpMock.mockResolvedValue({ data: [{ key: '1' }] });
+      const result = await {{TOOL_NAME_CAMEL}}.execute({ input: 'test' });
+
+      expect(result.items).toHaveLength(1);
+    });
+
+    it('should support array operations on extracted data', async () => {
+      const formats = [
+        [{ key: '1' }],
+        [[{ key: '1' }], 'offset'],
+        { data: [{ key: '1' }] }
+      ];
+
+      for (const mockResponse of formats) {
+        mcpMock.mockResolvedValue(mockResponse);
+        const result = await {{TOOL_NAME_CAMEL}}.execute({ input: 'test' });
+
+        expect(() => result.items.forEach(item => item.key)).not.toThrow();
+        expect(() => result.items.map(item => item.key)).not.toThrow();
+      }
+    });
+  });
+
+  // MANDATORY CATEGORY 4: Token reduction
+  describe('Token reduction', () => {
+    it('should achieve ≥80% reduction', async () => {
+      const verboseResponse = {
+        // TODO: Add verbose mock response
+      };
+      mcpMock.mockResolvedValue(verboseResponse);
+
+      const result = await {{TOOL_NAME_CAMEL}}.execute({ input: 'test' });
+
+      const inputSize = JSON.stringify(verboseResponse).length;
+      const outputSize = JSON.stringify(result).length;
+      const reduction = ((inputSize - outputSize) / inputSize) * 100;
+
+      expect(reduction).toBeGreaterThanOrEqual(80);
+    });
+
+    it('should preserve essential fields', async () => {
+      mcpMock.mockResolvedValue({
+        // TODO: Add mock response with essential + verbose fields
+      });
+
+      const result = await {{TOOL_NAME_CAMEL}}.execute({ input: 'test' });
+
+      // TODO: Verify essential fields present
+      // TODO: Verify verbose fields removed
+    });
+  });
+
+  // MANDATORY CATEGORY 5: Error handling
+  describe('Error handling', () => {
+    it('should handle rate limit errors', async () => {
+      mcpMock.mockRejectedValue(MCPErrors.rateLimit());
+      await expect({{TOOL_NAME_CAMEL}}.execute({ input: 'test' })).rejects.toThrow(/rate limit/i);
+    });
+
+    it('should handle timeout errors', async () => {
+      mcpMock.mockRejectedValue(MCPErrors.timeout());
+      await expect({{TOOL_NAME_CAMEL}}.execute({ input: 'test' })).rejects.toThrow(/ETIMEDOUT/);
+    });
+
+    it('should handle malformed responses', async () => {
+      mcpMock.mockResolvedValue({ invalid: 'structure' });
+
+      try {
+        const result = await {{TOOL_NAME_CAMEL}}.execute({ input: 'test' });
+        expect(result).toBeDefined();
+      } catch (error) {
+        expect(error).toBeDefined();
+      }
+    });
+  });
+
+  // RECOMMENDED: Edge cases
+  describe('Edge cases', () => {
+    it('should handle edge case data', async () => {
+      mcpMock.mockResolvedValue(EdgeCaseData.large.deepObject);
+      const result = await {{TOOL_NAME_CAMEL}}.execute({ input: 'test' });
+      expect(result).toBeDefined();
+    });
+  });
+
+  // RECOMMENDED: Performance
+  describe('Performance', () => {
+    it('should have minimal wrapper overhead', async () => {
+      mcpMock.mockResolvedValue({ data: 'test' });
+
+      const start = Date.now();
+      const iterations = 100;
+
+      for (let i = 0; i < iterations; i++) {
+        await {{TOOL_NAME_CAMEL}}.execute({ input: 'test' });
+      }
+
+      const avgTime = (Date.now() - start) / iterations;
+      expect(avgTime).toBeLessThan(10); // <10ms per call
+    });
+  });
+});
