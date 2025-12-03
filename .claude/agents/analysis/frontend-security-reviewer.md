@@ -1,6 +1,6 @@
 ---
 name: frontend-security-reviewer
-description: Use when reviewing React/TypeScript code for security vulnerabilities - authentication issues, XSS risks, authorization flaws, or other frontend security concerns.\n\n<example>\nContext: Developer implemented new authentication flow\nuser: "Review the new login component for security issues"\nassistant: "I'll use the react-security-reviewer agent to assess authentication security and identify vulnerabilities."\n</example>\n\n<example>\nContext: User input handling added to form component\nuser: "Check if our search form is vulnerable to XSS"\nassistant: "I'll use the react-security-reviewer agent to analyze input validation and XSS prevention."\n</example>
+description: Use when reviewing React/TypeScript code for security vulnerabilities - authentication issues, XSS risks, authorization flaws, or other frontend security concerns.\n\n<example>\nContext: Developer implemented new authentication flow\nuser: "Review the new login component for security issues"\nassistant: "I'll use the frontend-security-reviewer agent to assess authentication security and identify vulnerabilities."\n</example>\n\n<example>\nContext: User input handling added to form component\nuser: "Check if our search form is vulnerable to XSS"\nassistant: "I'll use the frontend-security-reviewer agent to analyze input validation and XSS prevention."\n</example>
 type: analysis
 permissionMode: plan
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite
@@ -112,7 +112,7 @@ Return results as structured JSON:
     ]
   },
   "handoff": {
-    "recommended_agent": "react-developer|security-architect",
+    "recommended_agent": "frontend-developer|security-architect",
     "context": "what the next agent should know/do"
   }
 }
@@ -122,11 +122,10 @@ Return results as structured JSON:
 
 **Stop and escalate if**:
 - Architecture-level security decisions needed → Recommend `security-architect`
-- Implementation of fixes required → Recommend `react-developer`
-- Backend security vulnerabilities identified → Recommend `go-security-reviewer`
+- Implementation of fixes required → Recommend `frontend-developer`
+- Backend security vulnerabilities identified → Recommend `backend-security-reviewer`
 - Complex authentication patterns needed → Recommend `security-architect`
 - Blocked by unclear requirements → Use AskUserQuestion tool
-- Third-party library security assessment needed → Recommend `web-research-specialist`
 
 ## Quality Assurance
 

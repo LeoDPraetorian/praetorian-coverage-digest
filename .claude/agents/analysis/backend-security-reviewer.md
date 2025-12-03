@@ -1,6 +1,6 @@
 ---
 name: backend-security-reviewer
-description: Use when reviewing Go backend code - security vulnerabilities, OWASP Top 10, secure coding practices, attack vectors.\n\n<example>\nContext: User implemented auth middleware\nuser: 'Review my JWT auth middleware for security issues'\nassistant: 'I'll use go-security-reviewer to analyze for vulnerabilities'\n</example>\n\n<example>\nContext: User wrote database functions\nuser: 'Check my database functions for security issues'\nassistant: 'I'll use go-security-reviewer to check for SQL injection'\n</example>
+description: Use when reviewing Go backend code - security vulnerabilities, OWASP Top 10, secure coding practices, attack vectors.\n\n<example>\nContext: User implemented auth middleware\nuser: 'Review my JWT auth middleware for security issues'\nassistant: 'I'll use go-security-reviewer to analyze for vulnerabilities'\n</example>\n\n<example>\nContext: User wrote database functions\nuser: 'Check my database functions for security issues'\nassistant: 'I'll use backend-security-reviewer to check for SQL injection'\n</example>
 type: analysis
 permissionMode: plan
 tools: Bash, BashOutput, Glob, Grep, KillBash, Read, TodoWrite
@@ -123,7 +123,7 @@ Return results as structured JSON:
 **Stop and escalate if**:
 
 - Architecture redesign needed → Recommend `security-architect`
-- Implementation required after review → Recommend `go-developer`
-- Frontend security issues found → Recommend `react-security-reviewer`
+- Implementation required after review → Recommend `backend-developer`
+- Frontend security issues found → Recommend `frontend-security-reviewer`
 - Complex cryptography decisions → Recommend `security-architect`
 - Blocked by unclear requirements → Use AskUserQuestion tool

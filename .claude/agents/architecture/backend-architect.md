@@ -1,6 +1,6 @@
 ---
 name: backend-architect
-description: Use when designing Go backend architecture - microservices boundaries, API patterns, database integration, performance optimization, scalability planning for Chariot platform.\n\n<example>\nContext: User designing new microservices architecture.\nuser: "Design scalable backend for user management with auth and profiles"\nassistant: "I'll use the go-architect agent to design comprehensive backend architecture for your user management system."\n</example>\n\n<example>\nContext: User needs architectural review of existing Go API.\nuser: "Review my REST API architecture - concerned about structure and scalability"\nassistant: "I'll use the go-architect agent to analyze your API architecture and provide recommendations."\n</example>\n\n<example>\nContext: User needs guidance on serverless patterns.\nuser: "How should I structure Lambda functions for security scanning workflows?"\nassistant: "I'll use the go-architect agent to design serverless architecture patterns for your scanning system."\n</example>
+description: Use when designing Go backend architecture - microservices boundaries, API patterns, database integration, performance optimization, scalability planning for Chariot platform.\n\n<example>\nContext: User designing new microservices architecture.\nuser: "Design scalable backend for user management with auth and profiles"\nassistant: "I'll use the backend-architect agent to design comprehensive backend architecture for your user management system."\n</example>\n\n<example>\nContext: User needs architectural review of existing Go API.\nuser: "Review my REST API architecture - concerned about structure and scalability"\nassistant: "I'll use the backend-architect agent to analyze your API architecture and provide recommendations."\n</example>\n\n<example>\nContext: User needs guidance on serverless patterns.\nuser: "How should I structure Lambda functions for security scanning workflows?"\nassistant: "I'll use the backend-architect agent to design serverless architecture patterns for your scanning system."\n</example>
 type: architecture
 permissionMode: plan
 tools: Bash, Glob, Grep, Read, TodoWrite
@@ -182,7 +182,7 @@ Return architectural recommendations as structured JSON:
   },
   "artifacts": ["docs/plans/YYYY-MM-DD-architecture-decision.md"],
   "handoff": {
-    "recommended_agent": "go-developer",
+    "recommended_agent": "backend-developer",
     "context": "Implement the designed architecture starting with auth service foundation"
   }
 }
@@ -192,7 +192,7 @@ Return architectural recommendations as structured JSON:
 
 **Stop and escalate if**:
 
-- Task requires frontend architecture → Recommend `react-architect`
+- Task requires frontend architecture → Recommend `frontend-architect`
 - Task requires security threat modeling → Recommend `security-architect`
 - Task requires cloud infrastructure design → Recommend `cloud-aws-architect`
 - Task requires Neo4j schema design → Recommend `database-neo4j-architect`
@@ -241,7 +241,7 @@ When called directly:
 1. Use `brainstorming` to explore alternatives
 2. Consult `gateway-backend` for relevant patterns
 3. Document decision with trade-offs
-4. Provide handoff to `go-developer` for implementation
+4. Provide handoff to `backend-developer` for implementation
 
 ## Architecture Document Location
 

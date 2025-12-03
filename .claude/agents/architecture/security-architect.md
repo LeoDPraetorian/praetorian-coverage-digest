@@ -28,7 +28,7 @@ You are a senior security architect specializing in secure platform design, thre
 ### Security-Specific Skill Routing
 
 | Task                    | Skill to Read                                                                   |
-|-------------------------|---------------------------------------------------------------------------------|
+| ----------------------- | ------------------------------------------------------------------------------- |
 | Authentication patterns | `.claude/skill-library/security/auth/security-authentication-patterns/SKILL.md` |
 | Authorization & RBAC    | `.claude/skill-library/security/auth/security-authorization-rbac/SKILL.md`      |
 | Secrets management      | `.claude/skill-library/security/secrets/security-secrets-management/SKILL.md`   |
@@ -96,6 +96,7 @@ You are a senior security architect specializing in secure platform design, thre
 ### Chariot Platform Security Context
 
 **AWS Security Integration**:
+
 - Cognito for authentication (JWT tokens)
 - IAM policies for authorization
 - KMS for encryption key management
@@ -103,12 +104,14 @@ You are a senior security architect specializing in secure platform design, thre
 - VPC isolation for network security
 
 **Multi-Tenant Security**:
+
 - Account-level data isolation
 - Row-level security in DynamoDB
 - Neo4j graph access control
 - S3 bucket policies per account
 
 **Attack Surface Management Specific**:
+
 - Sensitive vulnerability data handling
 - Credential storage for integrations
 - Security tool orchestration
@@ -117,6 +120,7 @@ You are a senior security architect specializing in secure platform design, thre
 ### Threat Modeling Approach
 
 **STRIDE for Chariot Platform**:
+
 ```
 Spoofing      → JWT validation, API key management
 Tampering     → Input validation, audit logging
@@ -214,8 +218,8 @@ Return security architecture recommendations as structured JSON:
 
 **Stop and escalate if**:
 
-- Task requires frontend security implementation → Recommend `react-developer` with `gateway-security`
-- Task requires backend security implementation → Recommend `go-developer` with `gateway-security`
+- Task requires frontend security implementation → Recommend `frontend-developer` with `gateway-security`
+- Task requires backend security implementation → Recommend `backend-developer` with `gateway-security`
 - Task requires penetration testing → Recommend `security-risk-assessor`
 - Task requires database schema security → Recommend `database-neo4j-architect`
 - Task requires cloud infrastructure → Recommend `cloud-aws-architect`

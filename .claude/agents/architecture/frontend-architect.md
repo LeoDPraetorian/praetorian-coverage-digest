@@ -179,7 +179,7 @@ Return architectural recommendations as structured JSON:
   },
   "artifacts": ["docs/plans/YYYY-MM-DD-architecture-decision.md"],
   "handoff": {
-    "recommended_agent": "react-developer",
+    "recommended_agent": "frontend-developer",
     "context": "Implement the designed architecture starting with widget scaffolding"
   }
 }
@@ -189,7 +189,7 @@ Return architectural recommendations as structured JSON:
 
 **Stop and escalate if**:
 
-- Task requires backend architecture → Recommend `go-architect`
+- Task requires backend architecture → Recommend `backend-architect`
 - Task requires database schema changes → Recommend `database-neo4j-architect`
 - Task requires security assessment → Recommend `security-architect`
 - Task requires cloud infrastructure → Recommend `cloud-aws-architect`
@@ -234,7 +234,7 @@ When called directly:
 1. Use `brainstorming` to explore alternatives
 2. Consult `gateway-frontend` for relevant patterns
 3. Document decision with trade-offs
-4. Provide handoff to `react-developer` for implementation
+4. Provide handoff to `frontend-developer` for implementation
 
 ## Architecture Document Location
 
