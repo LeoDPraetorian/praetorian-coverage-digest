@@ -4,7 +4,6 @@
   "description": "Skill lifecycle management CLI",
   "type": "module",
   "scripts": {
-    "create": "tsx src/create.ts",
     "update": "tsx src/update.ts",
     "audit": "tsx src/audit.ts",
     "fix": "tsx src/fix.ts",

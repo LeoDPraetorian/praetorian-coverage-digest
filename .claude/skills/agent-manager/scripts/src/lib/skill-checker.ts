@@ -20,6 +20,15 @@ const SKILL_REFERENCE_PATTERNS = [
 ];
 
 /**
+ * Patterns to detect file path references to skill library
+ */
+const SKILL_PATH_PATTERNS = [
+  /`(\.claude\/skill-library\/[^`]+\/SKILL\.md)`/g, // `path/to/SKILL.md`
+  /Read:\s*(\.claude\/skill-library\/[^\s]+\/SKILL\.md)/g, // Read: path/to/SKILL.md
+  /\|\s*`?(\.claude\/skill-library\/[^`|\s]+\/SKILL\.md)`?\s*\|/g, // | path/to/SKILL.md | (in tables)
+];
+
+/**
  * Cache for skill existence checks
  */
 let skillCache: Set<string> | null = null;
@@ -281,4 +290,66 @@ export function findDeprecatedSkillReferences(
   }
 
   return deprecated;
+}
+
+/**
+ * Find all skill library file paths referenced in agent body
+ *
+ * Extracts paths like `.claude/skill-library/security/auth-patterns/SKILL.md`
+ * from markdown tables, inline code, and Read: directives.
+ *
+ * @param body - Agent body content
+ * @returns Array of referenced file paths
+ */
+export function findSkillPathsInBody(body: string): string[] {
+  const paths: Set<string> = new Set();
+
+  for (const pattern of SKILL_PATH_PATTERNS) {
+    // Reset regex lastIndex for global patterns
+    pattern.lastIndex = 0;
+
+    let match;
+    while ((match = pattern.exec(body)) !== null) {
+      const filePath = match[1];
+      if (filePath && filePath.includes('skill-library')) {
+        paths.add(filePath);
+      }
+    }
+  }
+
+  return [...paths];
+}
+
+/**
+ * Find broken skill library paths (paths that don't exist on filesystem)
+ *
+ * @param body - Agent body content
+ * @param basePath - Base path to search from (defaults to cwd, walks up to find .claude)
+ * @returns Array of { path, exists } for broken paths only
+ */
+export function findBrokenSkillPaths(
+  body: string,
+  basePath?: string
+): Array<{ path: string; exists: boolean }> {
+  const referencedPaths = findSkillPathsInBody(body);
+  const broken: Array<{ path: string; exists: boolean }> = [];
+
+  // Find repo root
+  let base = basePath || process.cwd();
+  const repoRoot = findRepoRoot(base);
+  if (repoRoot) {
+    base = repoRoot;
+  }
+
+  for (const refPath of referencedPaths) {
+    // Resolve the path relative to repo root
+    const fullPath = path.join(base, refPath);
+    const exists = fs.existsSync(fullPath);
+
+    if (!exists) {
+      broken.push({ path: refPath, exists: false });
+    }
+  }
+
+  return broken;
 }

@@ -25,7 +25,7 @@ This skill covers Janus framework chain development for orchestrating security t
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      Janus Chain                             │
+│                      Janus Chain                            │
 │  Orchestrates Links, manages state, handles errors          │
 └─────────────────────────────────────────────────────────────┘
          │                    │                    │
@@ -37,7 +37,7 @@ This skill covers Janus framework chain development for orchestrating security t
          │                    │                    │
          ▼                    ▼                    ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    State/Context                             │
+│                    State/Context                            │
 │  Shared data passed between Links via channels              │
 └─────────────────────────────────────────────────────────────┘
 ```

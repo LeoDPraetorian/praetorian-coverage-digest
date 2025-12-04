@@ -45,6 +45,7 @@ import {
   detectGatewayForCategory,
   addSkillToGateway,
 } from './lib/gateway-updater.js';
+// Research mode removed - use the simplified 'researching-skills' skill instead
 
 const PROJECT_ROOT = findProjectRoot();
 
@@ -113,7 +114,7 @@ program
 
       // Step 3: Suggest mode - multi-stage workflow
       if (options?.suggest) {
-        const output = handleSuggestMode(name, description, options);
+        const output = await handleSuggestMode(name, description, options);
         console.log(JSON.stringify(output, null, 2));
         return;
       }
@@ -231,20 +232,17 @@ program
 
       // Step 9: Next steps
       console.log(chalk.green('\n✅ Skill created successfully!\n'));
-      console.log(chalk.blue('Next steps (TDD workflow):'));
-      console.log(chalk.blue('1. RED: Document the gap this skill addresses'));
-      console.log(chalk.blue('2. GREEN: Fill in SKILL.md with minimal content'));
-      console.log(chalk.blue('3. REFACTOR: Test with subagents and close loopholes'));
-      console.log(chalk.blue(`4. Add detailed docs to ${skillDir}/references/`));
-      console.log(chalk.blue(`5. Add examples to ${skillDir}/examples/`));
-      console.log(chalk.blue(`6. Run: npm run audit -- ${name}\n`));
+      console.log(chalk.blue('Next steps:'));
+      console.log(chalk.blue('1. Use the "researching-skills" skill to research and populate content'));
+      console.log(chalk.blue('2. Fill in SKILL.md following the skill structure guidelines'));
+      console.log(chalk.blue(`3. Add detailed docs to ${skillDir}/references/`));
+      console.log(chalk.blue(`4. Add examples to ${skillDir}/examples/`));
+      console.log(chalk.blue(`5. Run: npm run audit -- ${name}\n`));
 
-      if (skillType === 'library' && !options.context7Data) {
-        console.log(chalk.yellow('\n💡 Tip: For library skills, you can use context7 to populate documentation:'));
-        console.log(chalk.yellow('   1. Query context7 for the library documentation'));
-        console.log(chalk.yellow('   2. Save to a JSON file'));
-        console.log(chalk.yellow(`   3. Re-run: npm run create -- ${name} "${description}" --location ${location} --category ${category} --skill-type library --context7-data /path/to/data.json\n`));
-      }
+      console.log(chalk.yellow('💡 Tip: The "researching-skills" skill guides you through:'));
+      console.log(chalk.yellow('   - Codebase research (find similar skills, patterns)'));
+      console.log(chalk.yellow('   - Context7 research (library documentation)'));
+      console.log(chalk.yellow('   - Web research (supplemental sources)\n'));
 
     } catch (error) {
       console.error(chalk.red('\n⚠️  Tool Error - This is a tool failure, not a skill creation failure.'));
@@ -255,8 +253,15 @@ program
 
 /**
  * Handle suggest mode with multi-stage workflow
+ *
+ * Stage flow (simplified - research mode removed):
+ * 1. Location (core vs library)
+ * 2. Category (if library)
+ * 3. Skill type (process, library, integration, tool-wrapper)
+ * 4. Context7 (if library/integration type)
+ * 5. Ready
  */
-function handleSuggestMode(
+async function handleSuggestMode(
   name: string,
   description: string | undefined,
   options: {
@@ -266,7 +271,7 @@ function handleSuggestMode(
     queryContext7?: string;
     context7Data?: string;
   }
-): CreateSuggestionWithContext7 {
+): Promise<CreateSuggestionWithContext7> {
   // Build collected answers from provided options
   const collectedAnswers: CreateSuggestionWithContext7['collectedAnswers'] = {};
 
@@ -331,11 +336,19 @@ function handleSuggestMode(
     stagesRemaining: 0,
     collectedAnswers,
     createCommand: buildFinalCreateCommand(name, description, collectedAnswers),
+    nextStep: "Use the 'researching-skills' skill to research and populate content",
   };
 }
 
 /**
  * Determine current stage based on collected answers
+ *
+ * Stage flow (simplified - research mode removed):
+ * 1. Location (core vs library)
+ * 2. Category (if library)
+ * 3. Skill type (process, library, integration, tool-wrapper)
+ * 4. Context7 (if library/integration type)
+ * 5. Ready
  */
 function determineStage(
   answers: CreateSuggestionWithContext7['collectedAnswers']
@@ -355,7 +368,7 @@ function determineStage(
     return { stage: 3, stagesRemaining: 2 };
   }
 
-  // Stage 4: Need context7 decision (only for library/integration types)
+  // Stage 4: Need context7 decision (for library/integration types)
   if (
     (answers.skillType === 'library' || answers.skillType === 'integration') &&
     answers.queryContext7 === undefined
@@ -424,6 +437,7 @@ function generateStageQuestion(
       };
 
     case 4:
+      // Context7 decision (for library/integration types)
       return {
         id: 'queryContext7',
         question: 'Would you like to query context7 for official documentation?',
@@ -437,7 +451,7 @@ function generateStageQuestion(
           {
             value: 'no',
             label: 'No',
-            description: "Skip - I'll write documentation manually",
+            description: "Skip - I'll use the 'researching-skills' skill to research manually",
           },
         ],
         required: true,

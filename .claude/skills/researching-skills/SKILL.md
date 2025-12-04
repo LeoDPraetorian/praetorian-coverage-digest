@@ -1,324 +1,472 @@
 ---
 name: researching-skills
-description: Use when creating any skill - orchestrates brainstorming, codebase research, Context7 docs, web research, generates complete skill structure
+description: Use when creating any skill - guides research through codebase, Context7, and web sources
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, WebFetch, WebSearch, AskUserQuestion
 ---
 
 # Researching Skills
 
-**Automated research and generation workflow for creating gold-standard skills.**
-
-## Quick Reference
-
-| Command | Description | Time |
-|---------|-------------|------|
-| `npm run research -- "<topic>"` | Full workflow (brainstorm + codebase + Context7 + web) | 15-30 min |
-| `npm run research -- "<topic>" --context7-only` | Context7 only (library skills) | 5-10 min |
-| `npm run research -- "<topic>" --no-context7` | Skip Context7 (process skills) | 10-20 min |
-| `npm run generate -- --from-research <path>` | Generate skill from research data | 5-10 min |
+**Interactive research workflow for creating comprehensive skills.**
 
 ## When to Use
 
 Use this skill when:
 - Creating ANY new skill (process, library, integration, tool-wrapper)
-- You want automated codebase analysis to find similar skills and patterns
-- You want Context7 documentation search (for library/integration skills)
-- You want optional web research (GitHub, official docs, articles)
-- You need to generate complete skill structure matching quality standards
+- You need to research existing patterns before writing a skill
+- You want to use Context7 for library documentation
+- You want to find similar skills as structural templates
 
-**You MUST use TodoWrite before starting** to track all workflow steps.
+**You MUST use TodoWrite** to track progress through all phases.
 
-## Overview
+## Quick Reference
 
-This skill automates the research-to-generation workflow for creating comprehensive skills. It replaces 2-4 hours of manual research with a 30-minute interactive workflow that produces consistent, high-quality output.
+| Phase | Purpose | Tools Used |
+|-------|---------|------------|
+| 1. Requirements | Gather skill details | AskUserQuestion |
+| 2. Codebase Research | Find similar skills/patterns | Grep, Glob, Read |
+| 3. Context7 Research | Library documentation | MCP tools |
+| 4. Web Research | Supplemental sources | WebSearch, WebFetch |
+| 5. Generation | Create skill structure | Write |
 
-### The Problem It Solves
+## Phase 1: Requirements Gathering
 
-Creating skills requires:
-1. Understanding existing patterns (what similar skills exist?)
-2. Gathering documentation (Context7, official docs, articles)
-3. Extracting code patterns from the codebase
-4. Synthesizing into a well-structured skill
+Ask the user these questions (one at a time via AskUserQuestion):
 
-### What This Skill Provides
-
-1. **Brainstorming** - Extract detailed requirements through Q&A
-2. **Codebase Research** - Find similar skills, patterns, conventions
-3. **Context7 Search** - Official library documentation (conditional)
-4. **Web Research** - GitHub/docs/articles (optional)
-5. **Skill Generation** - Complete structure matching quality standards
-
-## Workflow Phases
-
-### Phase 0: Brainstorming
-
-Extracts requirements through guided Q&A (one question at a time):
-
+### Question 1: Skill Type
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  🎯 Understanding Your Skill                                 │
-│                                                             │
-│  ? What type of skill is this?                              │
-│    ○ Process (methodology, workflow)                        │
-│    ● Library (npm package, API)                             │
-│    ○ Integration (connecting tools)                         │
-│    ○ Tool Wrapper (CLI, MCP)                                │
-│                                                             │
-│  ? Where should this skill live?                            │
-│    ○ Core Skills (high-frequency)                           │
-│    ● Skill Library (specialized)                            │
-│                                                             │
-│  ? Which category? [if library]                             │
-│    ○ development/frontend/patterns                          │
-│    ● development/frontend/state                             │
-│    ○ development/backend/api                                │
-└─────────────────────────────────────────────────────────────┘
+What type of skill is this?
+- Process: Methodology or workflow (TDD, debugging, brainstorming)
+- Library: npm package or framework (TanStack Query, Zustand)
+- Integration: Connecting services (GitHub + Linear)
+- Tool Wrapper: CLI or MCP tool wrapper
 ```
 
-**Questions asked:**
-1. Skill type (process, library, integration, tool-wrapper)
-2. Location (core vs library)
-3. Category (if library - dynamic from filesystem)
-4. Purpose/scope (open-ended)
-5. Key workflows to cover (multi-select)
-6. Target audience (beginner, intermediate, expert)
-7. Library name (if library/integration type)
-
-### Phase 1: Codebase Research
-
-Analyzes existing patterns and conventions:
-
+### Question 2: Location
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  🔍 Analyzing Codebase...                                    │
-│                                                             │
-│  ✓ Found 3 similar skills                                   │
-│    - frontend-tanstack (similarity: 78%)                    │
-│    - frontend-zustand (similarity: 72%)                     │
-│    - frontend-react-hook-form-zod (similarity: 65%)         │
-│                                                             │
-│  ✓ Searched 2 relevant modules                              │
-│    - chariot/ui (47 pattern matches)                        │
-│    - chariot-ui-components (12 pattern matches)             │
-│                                                             │
-│  ✓ Extracted project conventions                            │
-└─────────────────────────────────────────────────────────────┘
+Where should this skill live?
+- Core: High-frequency, always loaded (.claude/skills/)
+- Library: Specialized, on-demand (.claude/skill-library/)
 ```
 
-**What it analyzes:**
-- Similar existing skills (by keyword/type similarity)
-- Relevant submodules (dynamically discovered)
-- Code patterns (grep for related implementations)
-- Project conventions (from CLAUDE.md, DESIGN-PATTERNS.md)
-
-### Phase 2: Context7 Search (Conditional)
-
-Runs only for `library` or `integration` skill types:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  📦 Fetching Library Documentation...                        │
-│                                                             │
-│  Found 3 packages:                                          │
-│  [1] ✅ @tanstack/react-query (v5.67.0) - 127 pages        │
-│  [2] ⚠️  @tanstack/query-core (v5.67.0) - 45 pages         │
-│  [3] ❌ react-query (v3.39.0) - DEPRECATED                  │
-│                                                             │
-│  Select packages (comma-separated): 1,2                     │
-└─────────────────────────────────────────────────────────────┘
+### Question 3: Category (if Library)
+If library location selected, discover available categories:
+```bash
+ls -d .claude/skill-library/*/ .claude/skill-library/*/*/ 2>/dev/null | sed 's|.claude/skill-library/||' | sort -u
 ```
 
-### Phase 3: Web Research (Optional)
+Then ask which category.
 
-User-controlled additional research:
-
+### Question 4: Scope
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  ? Include web research? [Y/n]                              │
-│                                                             │
-│  Found 12 high-quality sources:                             │
-│                                                             │
-│  GitHub:                                                    │
-│  [1] ✅ TanStack/query (47.2k ⭐) - Score: 98              │
-│  [2] ✅ TanStack/query/examples - Score: 95                │
-│                                                             │
-│  Official Docs:                                             │
-│  [3] ✅ tanstack.com/query/v5 - Score: 100                 │
-│                                                             │
-│  Expert Articles:                                           │
-│  [4] ⭐ tkdodo.eu/practical-react-query - Score: 92        │
-│                                                             │
-│  Select sources (comma-separated, or 'all'): 1,3,4         │
-└─────────────────────────────────────────────────────────────┘
+What specific workflows or patterns should this skill cover?
+(Open-ended, let user describe)
 ```
 
-**Source Quality Scoring:**
-
-| Source Type | Base Score | Modifiers |
-|-------------|------------|-----------|
-| Official docs | 100 | +10 versioned, -20 outdated |
-| GitHub official | 95 | +5 per 10k stars |
-| Context7 | 88 | +15 complete API docs |
-| Maintainer blogs | 85 | -5 per year old |
-| Quality blogs | 70 | -10 per year old |
-
-### Phase 4: Skill Generation
-
-Combines all research into complete skill:
-
+### Question 5: Library Name (if Library/Integration type)
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  🔨 Generating Skill Structure...                            │
-│                                                             │
-│  ✓ SKILL.md (412 lines)                                    │
-│  ✓ references/                                              │
-│    ├── api-configuration.md                                 │
-│    ├── best-practices.md                                    │
-│    └── common-patterns.md                                   │
-│  ✓ templates/                                               │
-│    ├── basic-usage.tsx                                      │
-│    └── advanced-patterns.tsx                                │
-│                                                             │
-│  ✅ Skill created: .claude/skill-library/.../my-skill/     │
-└─────────────────────────────────────────────────────────────┘
+What is the main library or package name?
+(e.g., "@tanstack/react-query", "zustand", "zod")
 ```
 
-**Uses similar skills as structural templates** - if `frontend-tanstack` is the most similar, uses that structure.
+## Phase 2: Codebase Research
 
-## CLI Reference
+### 2.1 Find Similar Skills
 
-All commands run from the scripts directory:
+Search for skills with similar keywords:
 
 ```bash
-# From anywhere in the repo
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude/skills/researching-skills/scripts"
+# Search skill descriptions
+grep -r "description:.*[keyword]" .claude/skills/ .claude/skill-library/ --include="SKILL.md"
 ```
 
-### Research Command
+Read the top 2-3 most similar skills to use as structural templates.
+
+### 2.2 Find Codebase Usage
+
+Search for how the library/pattern is used in the codebase:
 
 ```bash
-# Full workflow (all phases)
-npm run research -- "tanstack query"
-
-# Context7 only (faster, library docs only)
-npm run research -- "zustand" --context7-only
-
-# Skip Context7 (process skills)
-npm run research -- "debugging react" --no-context7
-
-# Include web research automatically
-npm run research -- "react hook form" --include-web
-
-# Output research data to specific location
-npm run research -- "jotai" --output /tmp/jotai-research.json
+# Search modules for imports/usage
+grep -r "[library-name]" modules/ --include="*.ts" --include="*.tsx" -l | head -10
 ```
 
-### Generate Command
+Read 3-5 files to understand real usage patterns.
 
+### 2.3 Check Conventions
+
+Read project conventions:
+- `CLAUDE.md` - Project-wide conventions
+- `docs/DESIGN-PATTERNS.md` - Architecture patterns
+- `docs/TECH-STACK.md` - Technology decisions
+
+## Phase 3: Context7 Research (Library/Integration types only)
+
+**This phase is INTERACTIVE - ask the user at each step.**
+
+> **Tool Reference:** Read `.claude/skill-library/claude/mcp-tools/mcp-tools-context7/SKILL.md` for detailed type definitions, parameters, and return values.
+
+### 3.1 Ask: Use Context7?
+
+Ask via AskUserQuestion:
+```
+Would you like to search Context7 for official documentation?
+
+Options:
+- Yes, search Context7
+- No, skip to web research
+- No, skip all research (use template only)
+```
+
+**If user skips, go to Phase 4 or Phase 5.**
+
+### 3.2 Ask: Search Query
+
+Ask via AskUserQuestion:
+```
+What should I search for in Context7?
+
+Default: {library-name from Phase 1}
+Examples: "jira", "@atlassian/jira", "jira-cloud-api"
+
+(You can refine this if the default doesn't find good results)
+```
+
+### 3.3 Execute Search & Show Results
+
+Execute the search:
 ```bash
-# Generate skill from research data
-npm run generate -- --from-research /tmp/tanstack-research.json
-
-# Generate to specific location
-npm run generate -- --from-research /tmp/research.json --location library:frontend/state
-
-# Dry run (preview without creating)
-npm run generate -- --from-research /tmp/research.json --dry-run
+npx tsx -e "(async () => {
+  const { resolveLibraryId } = await import('./.claude/tools/context7/resolve-library-id.ts');
+  const result = await resolveLibraryId.execute({ libraryName: '{USER_QUERY}' });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
 ```
 
-## Integration with skill-manager
+**Show the results to the user** with quality indicators:
+- ✅ **Recommended**: Main package, stable version, not deprecated
+- ⚠️ **Caution**: Internal packages (`-core`), pre-release (alpha/beta/rc)
+- ❌ **Deprecated**: Contains "deprecated" in name/description
 
-This skill integrates with skill-manager's create workflow:
+### 3.4 Ask: Select Package or Retry
 
+Ask via AskUserQuestion:
+```
+Here are the Context7 results for "{query}":
+
+1. {package-name-1} - {description}
+2. {package-name-2} - {description}
+3. {package-name-3} - {description}
+
+Options:
+- Select package 1
+- Select package 2
+- Select package 3
+- Search again with different query
+- Skip Context7 research
+```
+
+**If "Search again"**: Go back to 3.2 with new query
+**If "Skip"**: Go to Phase 4
+
+### 3.5 Fetch Documentation
+
+For the selected package:
 ```bash
-# skill-manager create automatically triggers research
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude/skills/skill-manager/scripts"
-npm run create -- my-skill "Use when doing X"
-
-# Skip research with --no-research flag
-npm run create -- my-skill "Use when doing X" --no-research
+npx tsx -e "(async () => {
+  const { getLibraryDocs } = await import('./.claude/tools/context7/get-library-docs.ts');
+  const result = await getLibraryDocs.execute({ context7CompatibleLibraryID: '{SELECTED_LIBRARY_ID}' });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
 ```
 
-When create runs (without `--no-research`):
-1. skill-manager delegates to researching-skills
-2. This skill runs the interactive research workflow
-3. Generated files are returned to skill-manager
-4. skill-manager writes files and runs audit
+### 3.6 Ask: Documentation Quality Check
 
-## Success Criteria
+Show a summary of what was found and ask:
+```
+Found documentation for {package-name}:
+- {X} API functions documented
+- {Y} code examples
+- Topics: {list of main sections}
 
-A successful run produces:
+Options:
+- Looks good, continue
+- Try a different package
+- Skip Context7 and use web research instead
+```
 
-- [ ] SKILL.md with 300-600 lines of real content (not stubs)
-- [ ] At least 3 reference documents in references/
-- [ ] At least 2 code templates in templates/ (if applicable)
-- [ ] All research sources documented in .local/research-sources.json
-- [ ] Passes skill-manager 13-phase audit
-- [ ] No `TODO:` placeholders in generated content
+### 3.7 Extract Key Information
 
-## Example Output
+From the documentation, extract:
+- Core API functions and their signatures
+- Common usage patterns with code examples
+- Configuration options
+- Best practices and anti-patterns
+- Migration guides (if relevant)
 
-See `frontend-tanstack` for the gold-standard this skill produces:
+**Save extracted info for Phase 5 generation.**
+
+## Phase 4: Web Research (Optional)
+
+**This phase is INTERACTIVE - ask the user at each step.**
+
+### 4.1 Ask: Use Web Research?
+
+Ask via AskUserQuestion:
+```
+Would you like to search the web for additional documentation?
+
+This can find:
+- Official documentation sites
+- GitHub repositories with examples
+- Blog posts from library maintainers
+- Best practices guides
+
+Options:
+- Yes, search the web
+- No, skip to skill generation
+```
+
+**If user skips, go to Phase 5.**
+
+### 4.2 Ask: Search Query
+
+Ask via AskUserQuestion:
+```
+What should I search for?
+
+Suggested queries:
+- "{library-name} documentation"
+- "{library-name} best practices 2025"
+- "{library-name} API reference"
+- "{library-name} examples github"
+
+Enter your search query or select a suggestion:
+```
+
+### 4.3 Execute Search & Show Results
+
+Execute WebSearch and show results with quality indicators:
+
+| Source Type | Quality | Examples |
+|-------------|---------|----------|
+| Official docs | ✅ High | tanstack.com, react.dev |
+| GitHub repos | ✅ High | Source code, examples |
+| Maintainer blogs | ✅ High | tkdodo.eu (TanStack Query) |
+| Expert blogs | ⭐ Medium | kentcdodds.com, joshwcomeau.com |
+| Tutorials | ⚠️ Lower | General articles |
+
+### 4.4 Ask: Select Sources
+
+Ask via AskUserQuestion:
+```
+Here are the search results:
+
+1. ✅ {title} - {url} (Official docs)
+2. ✅ {title} - {url} (GitHub)
+3. ⭐ {title} - {url} (Expert blog)
+4. ⚠️ {title} - {url} (Tutorial)
+
+Which sources should I fetch? (Select multiple)
+- Source 1
+- Source 2
+- Source 3
+- Source 4
+- Search again with different query
+- Skip web research
+```
+
+### 4.5 Fetch Selected Sources
+
+Use WebFetch for each selected source and summarize key findings.
+
+### 4.6 Ask: Sufficient Information?
+
+Ask via AskUserQuestion:
+```
+I found the following information:
+- {summary of source 1}
+- {summary of source 2}
+- {summary of source 3}
+
+Options:
+- Looks good, continue to generation
+- Search for more sources
+- Skip remaining research
+```
+
+## Phase 5: Skill Generation
+
+### 5.1 Directory Structure
+
+Create the skill with this structure:
 
 ```
-.claude/skill-library/development/frontend/state/frontend-tanstack/
-├── SKILL.md                    # 724 lines
-├── references/                 # 21 files
-│   ├── integration-patterns.md
-│   ├── query-api-configuration.md
-│   └── ...
-├── templates/                  # 14 files
-│   ├── server-paginated-table.tsx
-│   └── ...
+skill-name/
+├── SKILL.md                 # 300-600 lines (main entry point)
+├── references/              # Detailed documentation
+│   ├── api-reference.md     # Full API docs
+│   ├── patterns.md          # Common patterns
+│   └── troubleshooting.md   # Common issues
+├── templates/               # Code templates (if applicable)
+│   └── typescript/
+│       ├── README.md        # Template index
+│       └── 01-basic.ts      # Example templates
 └── .local/
-    └── CHANGELOG.md
+    └── metadata.json        # Generation metadata
 ```
 
-## Directory Structure
+### 5.2 SKILL.md Structure
 
+Follow this structure for SKILL.md:
+
+```markdown
+---
+name: skill-name
+description: Use when [trigger] - [key capabilities]
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+---
+
+# Skill Title
+
+**Brief description of what this skill provides.**
+
+## When to Use
+
+- Bullet points of when to use this skill
+- Specific triggers and scenarios
+
+## Quick Reference
+
+| Pattern/API | Description | Example |
+|-------------|-------------|---------|
+| key_function | What it does | `code()` |
+
+## Core Concepts
+
+### Concept 1
+Explanation with code example.
+
+### Concept 2
+Explanation with code example.
+
+## Common Patterns
+
+### Pattern 1: Name
+```typescript
+// Code example
 ```
-.claude/skills/researching-skills/
-├── SKILL.md                        # This file
-├── scripts/
-│   ├── src/
-│   │   ├── cli.ts                  # Main CLI entry point
-│   │   ├── orchestrator.ts         # Phase coordination
-│   │   ├── phases/
-│   │   │   ├── brainstorm.ts       # Phase 0: Requirements extraction
-│   │   │   ├── codebase.ts         # Phase 1: Codebase analysis
-│   │   │   ├── context7.ts         # Phase 2: Context7 docs
-│   │   │   └── web.ts              # Phase 3: Web research
-│   │   ├── generators/
-│   │   │   ├── skill-md.ts         # SKILL.md generation
-│   │   │   ├── references.ts       # references/ generation
-│   │   │   └── templates.ts        # templates/ generation
-│   │   └── lib/
-│   │       ├── types.ts            # Type definitions
-│   │       ├── submodule-discovery.ts
-│   │       ├── similar-skills.ts
-│   │       └── codebase-search.ts
-│   ├── package.json
-│   └── tsconfig.json
-├── references/
-│   ├── workflow-phases.md
-│   ├── source-quality.md
-│   ├── skill-structure.md
-│   └── context7-integration.md
-├── .output/                        # Research data outputs (gitignored)
-└── .local/                         # Temp data (gitignored)
+
+### Pattern 2: Name
+```typescript
+// Code example
 ```
+
+## Anti-Patterns
+
+### ❌ Don't Do This
+Why it's wrong and what to do instead.
 
 ## References
 
-- [Workflow Phases](references/workflow-phases.md)
-- [Source Quality Criteria](references/source-quality.md)
-- [Skill Structure Spec](references/skill-structure.md)
-- [Context7 Integration](references/context7-integration.md)
+- [API Reference](references/api-reference.md)
+- [Patterns](references/patterns.md)
+- [Troubleshooting](references/troubleshooting.md)
 
 ## Related Skills
 
-- `skill-manager` - Lifecycle management (create, audit, fix)
-- `gateway-mcp-tools` - MCP tool access (Context7 wrappers)
-- `frontend-tanstack` - Gold-standard output example
+- `related-skill-name` - Why it's related
+```
+
+### 5.3 Content Guidelines
+
+**Line Count Targets:**
+| Skill Type | Target | Maximum |
+|------------|--------|---------|
+| Library | 400-600 | 800 |
+| Process | 200-400 | 600 |
+| Integration | 300-500 | 700 |
+
+**Quality Requirements:**
+- [ ] Description starts with "Use when"
+- [ ] Quick reference table present
+- [ ] 3-5 core concepts with code
+- [ ] Real code examples from codebase research
+- [ ] Links to references/
+- [ ] No TODO placeholders
+
+### 5.4 Reference Files
+
+Create reference files for detailed content:
+
+**api-reference.md**: Full API documentation
+- Function signatures
+- Parameter descriptions
+- Return types
+- Usage examples
+
+**patterns.md**: Common usage patterns
+- Real-world examples
+- Integration with other libraries
+- Performance considerations
+
+**troubleshooting.md**: Common issues
+- Error messages and solutions
+- Edge cases
+- Migration issues
+
+### 5.5 Template Files (if applicable)
+
+For library skills, create code templates:
+
+```typescript
+// templates/typescript/01-basic-usage.ts
+// Source: [Section from Context7 docs]
+// Context: Basic setup and usage
+
+import { useQuery } from '@tanstack/react-query';
+
+export function BasicExample() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['example'],
+    queryFn: fetchExample,
+  });
+  // ...
+}
+```
+
+## Success Criteria
+
+Before completing, verify:
+
+- [ ] SKILL.md is 300-600 lines (not stubs)
+- [ ] At least 2 reference documents in references/
+- [ ] At least 3 code templates (for library skills)
+- [ ] All code examples are real (from research, not made up)
+- [ ] Description starts with "Use when"
+- [ ] No TODO placeholders in content
+- [ ] Similar skill structure matches gold-standard examples
+
+## Gold Standard Examples
+
+Reference these skills for quality benchmarks:
+
+**Library Skills:**
+- `.claude/skill-library/development/frontend/state/frontend-tanstack/` - TanStack Query patterns
+- `.claude/skill-library/development/frontend/state/frontend-zustand/` - Zustand state management
+
+**Process Skills:**
+- `.claude/skills/developing-with-tdd/` - TDD methodology
+- `.claude/skills/debugging-systematically/` - Debugging process
+
+## References
+
+- [Skill Structure Specification](references/skill-structure.md)
+- [Context7 Integration](references/context7-integration.md)
+- [Source Quality Criteria](references/source-quality.md)
+
+## Related Skills
+
+- `creating-skills` - Skill creation workflow (uses this skill for research)
+- `skill-manager` - Lifecycle management (audit, fix, rename)
+- `mcp-tools-context7` - Context7 tool definitions (types, parameters, examples)
+- `gateway-mcp-tools` - MCP tool access routing

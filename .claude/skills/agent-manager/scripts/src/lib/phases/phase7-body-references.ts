@@ -18,6 +18,8 @@ import {
   findSkillReferencesInBody,
   findPhantomSkills,
   findDeprecatedSkillReferences,
+  findBrokenSkillPaths,
+  findSkillPathsInBody,
 } from '../skill-checker.js';
 
 export const PHASE_NUMBER = 7;
@@ -66,6 +68,36 @@ export function runPhase7(agent: AgentInfo): AuditPhaseResult {
       autoFixable: false,
       currentValue: skill,
       suggestedValue: replacement,
+    });
+  }
+
+  // Check 3: Broken skill library paths (file paths that don't exist)
+  const brokenPaths = findBrokenSkillPaths(agent.body);
+  for (const { path } of brokenPaths) {
+    issues.push({
+      severity: 'error',
+      message: `Broken skill library path: "${path}"`,
+      details: 'This file path is referenced but does not exist on the filesystem',
+    });
+
+    suggestions.push({
+      id: `phase7-broken-path-${path.replace(/[^a-z0-9-]/gi, '-')}`,
+      phase: 7,
+      description: `Fix or remove broken path "${path}"`,
+      autoFixable: false,
+      currentValue: path,
+      suggestedValue: '(verify the correct path in .claude/skill-library/)',
+    });
+  }
+
+  // Info: Show all skill library paths found
+  const allPaths = findSkillPathsInBody(agent.body);
+  if (allPaths.length > 0) {
+    const validCount = allPaths.length - brokenPaths.length;
+    issues.push({
+      severity: 'info',
+      message: `Found ${allPaths.length} skill library paths (${validCount} valid, ${brokenPaths.length} broken)`,
+      details: `Paths: ${allPaths.join(', ')}`,
     });
   }
 

@@ -2,7 +2,6 @@
 name: gateway-capabilities
 description: Use when developing offensive security capabilities - VQL, Nuclei templates, scanner integration, Janus chains
 allowed-tools: Read, Bash
-skill-type: gateway
 ---
 
 # Gateway: Capabilities Development

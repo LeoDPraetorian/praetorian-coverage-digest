@@ -64,11 +64,8 @@ Each skill is organized by domain for easy discovery.
 **Integration Chariot Patterns**: `.claude/skill-library/development/integrations/integration-chariot-patterns/SKILL.md`
 - Chariot-specific API patterns and platform integration
 
-**Integration First Testing**: `.claude/skill-library/development/integrations/integration-first-testing/SKILL.md`
+**Integration First Testing**: `.claude/skill-library/testing/integration-first-testing/SKILL.md`
 - Testing external API integrations, contract testing
-
-**Integration Research**: `.claude/skill-library/development/integrations/integration-research/SKILL.md`
-- Researching and documenting third-party APIs
 
 **Integration Step Validator**: `.claude/skill-library/development/integrations/integration-step-validator/SKILL.md`
 - Validating integration workflows and multi-step processes

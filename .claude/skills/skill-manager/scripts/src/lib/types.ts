@@ -341,7 +341,7 @@ export interface Context7Instructions {
 }
 
 /**
- * Multi-stage workflow stages for skill creation
+ * Multi-stage workflow stages for skill creation (simplified - research mode removed)
  */
 export type CreateStage =
   | 1  // Location: core vs library
@@ -352,6 +352,7 @@ export type CreateStage =
 
 /**
  * Extended create suggestion with context7 support and multi-stage workflow
+ * (Simplified - research mode removed, use 'researching-skills' skill instead)
  */
 export interface CreateSuggestionWithContext7 {
   skill: string;
@@ -379,13 +380,16 @@ export interface CreateSuggestionWithContext7 {
   questions?: {
     id: string;
     question: string;
-    type: 'select' | 'input';
-    options?: { value: string; label: string; description: string }[];
+    type: 'select' | 'input' | 'multiselect';
+    options?: { value: string; label: string; description?: string }[];
     placeholder?: string;
     required: boolean;
   }[];
   context7Instructions?: Context7Instructions;
   createCommand?: string;
+
+  /** Instructions for next step in workflow */
+  nextStep?: string;
 }
 
 /**
@@ -421,3 +425,13 @@ export interface Context7DiffResult {
   updatedExamples: number;
   summary: string;
 }
+
+// ============================================
+// Research Integration (Simplified)
+// ============================================
+// Research mode removed from skill-manager workflow
+// Use the 'researching-skills' skill instead for research workflows
+// The instruction-only skill guides Claude through research using native tools:
+// - Grep/Glob for codebase research
+// - MCP tools for Context7 documentation
+// - WebSearch/WebFetch for web research

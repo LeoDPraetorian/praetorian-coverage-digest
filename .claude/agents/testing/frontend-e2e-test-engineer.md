@@ -1,5 +1,5 @@
 ---
-name: frontend-browser-test-engineer
+name: frontend-e2e-test-engineer
 description: Use when testing frontend through browser - Playwright E2E test creation, interactive UI exploration, network request analysis, performance testing, accessibility validation.\n\n<example>\nContext: User implemented new feature\nuser: "Create E2E tests for asset filtering"\nassistant: "I'll use frontend-browser-test-engineer to create Playwright tests"\n</example>\n\n<example>\nContext: User debugging UI issue\nuser: "What API calls happen when I click Export?"\nassistant: "I'll use frontend-browser-test-engineer to capture network requests"\n</example>
 type: testing
 permissionMode: default
@@ -190,6 +190,7 @@ Use Chrome DevTools Performance API: `performance_start_trace()` → actions →
 ## Chrome DevTools MCP vs Playwright MCP
 
 **Chrome DevTools wins for Chariot** (Chrome-only testing):
+
 - Direct CDP connection (faster, lower latency)
 - Token-efficient (concise responses)
 - Performance tracing, memory profiling, CPU/network throttling
@@ -268,7 +269,7 @@ test("filters jobs by status", async ({ page }) => {
 **IMPORTANT**: Before implementing, consult the relevant gateway skill for domain-specific patterns.
 
 | Task                        | Gateway Skill          | Specific Patterns                                        |
-|-----------------------------|------------------------|----------------------------------------------------------|
+| --------------------------- | ---------------------- | -------------------------------------------------------- |
 | Chrome DevTools / MCP tools | `gateway-mcp-tools`    | Tool usage, navigation, interaction, debugging           |
 | E2E test patterns           | `gateway-testing`      | Playwright patterns, test best practices, user workflows |
 | React/frontend patterns     | `gateway-frontend`     | Component testing, state management, UI patterns         |
@@ -355,9 +356,7 @@ Return results as structured JSON for multi-agent coordination:
 {
   "status": "complete|blocked|needs_review",
   "summary": "1-2 sentence description of what was accomplished",
-  "files_modified": [
-    "e2e/src/tests/assets/filtering.spec.ts"
-  ],
+  "files_modified": ["e2e/src/tests/assets/filtering.spec.ts"],
   "verification": {
     "tests_passed": true,
     "test_count": 8,
@@ -372,6 +371,7 @@ Return results as structured JSON for multi-agent coordination:
 ```
 
 **Status values:**
+
 - `complete` - Tests created/exploration finished, all passing
 - `blocked` - Cannot proceed (app not running, auth failed, element not found)
 - `needs_review` - Tests implemented but require manual validation
@@ -388,6 +388,7 @@ Return results as structured JSON for multi-agent coordination:
 - **Unclear requirements** → Use `AskUserQuestion` tool to clarify with user
 
 **When to continue:**
+
 - Adding new E2E test cases
 - Interactive UI exploration and debugging
 - Network request analysis

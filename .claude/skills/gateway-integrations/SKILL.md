@@ -16,11 +16,6 @@ This skill serves as a master directory for all integration development skills i
 
 Each skill is organized by workflow stage for easy discovery.
 
-## Research & Discovery
-
-**Integration Research**: `.claude/skill-library/development/integrations/integration-research/SKILL.md`
-- Researching third-party APIs, documenting endpoints, understanding rate limits
-
 ## Implementation Patterns
 
 **Integration Chariot Patterns**: `.claude/skill-library/development/integrations/integration-chariot-patterns/SKILL.md`
@@ -28,7 +23,7 @@ Each skill is organized by workflow stage for easy discovery.
 
 ## Testing & Validation
 
-**Integration First Testing**: `.claude/skill-library/development/integrations/integration-first-testing/SKILL.md`
+**Integration First Testing**: `.claude/skill-library/testing/integration-first-testing/SKILL.md`
 - Testing external API integrations, contract testing, mock strategies
 
 **Integration Step Validator**: `.claude/skill-library/development/integrations/integration-step-validator/SKILL.md`
@@ -38,17 +33,17 @@ Each skill is organized by workflow stage for easy discovery.
 
 | Need | Read This Skill |
 |------|----------------|
-| Research new API | integration-research |
 | Chariot conventions | integration-chariot-patterns |
 | Test integrations | integration-first-testing |
 | Validate workflows | integration-step-validator |
+| Jira Cloud integration | jira-integration |
+| Microsoft Defender integration | ms-defender-integration |
 
 ## When to Use This Gateway
 
 Use this gateway skill when:
 - Building a new third-party integration
 - Maintaining existing integrations
-- Researching external API capabilities
 - Testing integration reliability
 - Validating multi-step workflows
 
@@ -58,10 +53,9 @@ For specific implementations, always load the individual skill rather than worki
 
 When building integrations, follow this sequence:
 
-1. **Research**: Use `integration-research` to understand the external API
-2. **Design**: Apply `integration-chariot-patterns` for Chariot conventions
-3. **Test**: Use `integration-first-testing` for reliable test coverage
-4. **Validate**: Apply `integration-step-validator` for complex workflows
+1. **Design**: Apply `integration-chariot-patterns` for Chariot conventions
+2. **Test**: Use `integration-first-testing` for reliable test coverage
+3. **Validate**: Apply `integration-step-validator` for complex workflows
 
 ## Related Gateways
 
@@ -71,8 +65,9 @@ When building integrations, follow this sequence:
 
 ## Third-Party Integrations
 
-**Fastly Integration**: `.claude/skill-library/development/integrations/fastly-integration/SKILL.md`
-- Use when integrating with Fastly CDN, edge compute, and API services - service creation, domain management, DDoS protection
+**Jira Cloud Integration**: `.claude/skill-library/development/integrations/jira-integration/SKILL.md`
+- Integrate Jira Cloud with Chariot platform for issue tracking and security findings sync
 
-
+**Microsoft Defender Integration**: `.claude/skill-library/development/integrations/ms-defender-integration/SKILL.md`
+- Integrate Microsoft Defender for Endpoint with Chariot platform for threat detection, vulnerability management, and device inventory sync
 

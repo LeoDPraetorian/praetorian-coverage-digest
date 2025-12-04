@@ -10,10 +10,10 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, Skill, AskU
 
 ## Quick Reference
 
-| Operation     | Command                                                                                             | Time      | Purpose                            |
+| Operation     | Method                                                                                              | Time      | Purpose                            |
 | ------------- | --------------------------------------------------------------------------------------------------- | --------- | ---------------------------------- |
-| Create        | `npm run create -- <name> "<desc>" --location <loc> [--skill-type <type>] [--context7-data <path>]` | 15-30 min | TDD-driven skill creation          |
-| Update        | `npm run update -- <name> "<changes>" [--refresh-context7 --context7-data <path>]`                  | 10-20 min | Minimal updates with TDD           |
+| **Create**    | Use `creating-skills` skill                                                                         | 15-30 min | Instruction-driven skill creation  |
+| Update        | `npm run update -- <name> "<changes>"`                                                              | 10-20 min | Minimal updates with TDD           |
 | Audit         | `npm run audit -- [name]`                                                                           | 2-5 min   | 13-phase compliance check          |
 | Fix           | `npm run fix -- <name> [--dry-run\|--suggest]`                                                      | 5-15 min  | Auto-remediation (3 modes)         |
 | Rename        | `npm run rename -- <old> <new>`                                                                     | 5-10 min  | Safe renaming with updates         |
@@ -24,26 +24,25 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, Skill, AskU
 
 ## For Claude Code (Programmatic Invocation)
 
-**IMPORTANT: Do NOT use the bash REPO_ROOT pattern below. Use the simple TypeScript invocation.**
-
-```bash
-# ✅ CORRECT: Simple invocation from anywhere in the repo
-npx tsx .claude/skills/skill-manager/scripts/src/create.ts <args>
-
-# ✅ CORRECT: Navigate once, then use npm run
-cd "$REPO_ROOT/.claude/skills/skill-manager/scripts" && npm run create -- <args>
-
-# ❌ WRONG: Unnecessary REPO_ROOT pattern (only for human CLI setup)
-# REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-# REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-# cd "$REPO_ROOT/.claude/skills/skill-manager/scripts"
+**Create uses the `creating-skills` skill (instruction-based, not TypeScript):**
+```
+skill: "creating-skills"
 ```
 
-**Why:**
+**All other operations use TypeScript CLI:**
+```bash
+# ✅ CORRECT: Simple invocation from anywhere in the repo
+npx tsx .claude/skills/skill-manager/scripts/src/audit.ts <args>
 
-- `findProjectRoot()` handles path detection internally (checks `CLAUDE_PROJECT_DIR` env var, git, filesystem)
-- Verbose bash patterns duplicate work that TypeScript already does
-- Simple pattern works from anywhere in the repo
+# ✅ CORRECT: Navigate once, then use npm run
+cd .claude/skills/skill-manager/scripts && npm run audit -- <args>
+```
+
+**Available scripts:** `audit`, `fix`, `update`, `rename`, `migrate`, `search`, `list`, `sync-gateways`
+
+**Why simple patterns work:**
+- `findProjectRoot()` handles path detection internally
+- Works from anywhere in the repo
 
 ## Prerequisites (Human CLI Setup - One-Time Only)
 
@@ -83,88 +82,31 @@ npm install
 
 ## Operations
 
-### Create (TDD-First Skill Creation)
+### Create (Delegated to creating-skills)
 
-**Three modes: suggest (Claude-mediated), direct (with all inputs), or context7-enhanced (with library documentation).**
+**Skill creation is now instruction-driven via the `creating-skills` skill.**
 
-```bash
-# Claude-mediated mode (outputs JSON for location/description prompts)
-npm run create -- my-skill --suggest
-
-# Direct mode with all inputs
-npm run create -- my-skill "Use when developing features" --location core
-npm run create -- my-skill "Use when testing APIs" --location library:testing
-
-# With skill type (process, library, integration, tool-wrapper)
-npm run create -- my-skill "Use when working with TanStack Query" --location library:frontend --skill-type library
-
-# With context7 documentation data
-npm run create -- tanstack-query-skill "Use when implementing data fetching" --location library:frontend --skill-type library --context7-data /tmp/tanstack-query-docs.json
+```
+skill: "creating-skills"
 ```
 
-**Location options:**
+The `creating-skills` skill guides you through:
+1. **Validation** - Name format, check existence
+2. **Location** - Core vs Library selection
+3. **Category** - Which library folder (if library)
+4. **Skill Type** - Process/Library/Integration/Tool-wrapper
+5. **Generation** - Create directory and SKILL.md from templates
+6. **Research** - Populate content via `researching-skills` skill
 
-- `core` - `.claude/skills/` - High-frequency, always-loaded (~25 skills)
-- `library:<category>` - `.claude/skill-library/<category>/` - Specialized, on-demand (~120 skills)
+**Why instruction-driven?**
+- Claude uses native tools (AskUserQuestion, Write, Grep)
+- No TypeScript state machine complexity
+- Templates as readable markdown code blocks
+- Same outcome, simpler implementation
 
-**Skill type options:**
-
-- `process` - Methodology, workflow, or best practice (TDD, debugging, brainstorming)
-- `library` - Documentation for npm package, API, or framework (TanStack Query, Zustand)
-- `integration` - Connecting two or more tools/services together
-- `tool-wrapper` - Wraps CLI tool or MCP server
-
-**Workflow:**
-
-1. **RED Phase** - Document gap (why is this skill needed?)
-2. **Generate Skill** - Create from template with modern structure
-3. **GREEN Phase** - Test skill teaches expected behavior
-4. **Progressive Disclosure** - Organize into SKILL.md + references/
-5. **Audit** - Automatic 13-phase compliance check
-6. **REFACTOR** - Pressure test and close loopholes
-
-**See:** [references/create-workflow.md](references/create-workflow.md)
-
-### Creating Library/Framework Skills with Context7
-
-For library/framework skills, you can use context7 to auto-populate documentation:
-
-**Step 1: Query context7 for the library**
-
+**After creation, run audit:**
 ```bash
-# Use context7 MCP tools to fetch documentation
-# 1. Resolve library ID
-# 2. Get library docs
-# 3. Save to JSON file
-```
-
-**Step 2: Create skill with context7 data**
-
-```bash
-npm run create -- tanstack-query "Use when implementing data fetching with TanStack Query" \
-  --location library:frontend \
-  --skill-type library \
-  --context7-data /tmp/tanstack-query-docs.json
-```
-
-**What gets generated:**
-
-- `SKILL.md` - Main skill with API quick reference table
-- `references/api-reference.md` - Full API documentation
-- `references/patterns.md` - Common usage patterns
-- `examples/basic-usage.md` - Code examples organized by complexity
-- `.local/context7-source.json` - Metadata for future updates
-
-**Sample context7 JSON structure:**
-
-```json
-{
-  "libraryName": "tanstack-query",
-  "libraryId": "/npm/@tanstack/react-query",
-  "fetchedAt": "2024-01-15T10:30:00.000Z",
-  "version": "5.0.0",
-  "content": "... raw documentation text ..."
-}
+npm run audit -- my-new-skill
 ```
 
 ### Update (Test-Guarded Changes)
@@ -438,7 +380,7 @@ npm run sync-gateways -- --fix
 
 This skill consolidates:
 
-- `claude-skill-write` → use `npm run create` or `npm run update`
+- `claude-skill-write` → use `creating-skills` skill or `npm run update`
 - `claude-skill-compliance` → use `npm run audit` or `npm run fix`
 - `claude-skill-search` → use `npm run search` (NOW includes library)
 
@@ -450,13 +392,15 @@ This skill consolidates:
 2. **13-Phase Compliance** - All skills validated before deployment
 3. **Progressive Disclosure** - Lean SKILL.md + detailed references/
 4. **Router Pattern** - `/skill-manager` command delegates here
-5. **Behavioral Parity** - All old functionality preserved
+5. **Instruction-Driven Creation** - Create via `creating-skills` skill (no TypeScript CLI)
 6. **Dual-Location Search** - Searches both core and library
 7. **TodoWrite Tracking** - You MUST use TodoWrite before starting to track all workflow steps
-8. **Context7 Integration** - Library skills can auto-populate from official documentation
+8. **Research Delegation** - Use `researching-skills` for content population
 
 ## Related Skills
 
+- **creating-skills** - Instruction-driven skill creation workflow (location, type, templates)
+- **researching-skills** - Interactive research orchestrator for skill creation (source selection, Context7, web research)
 - **testing-skills-with-subagents** - For meta-testing skills with pressure scenarios
 - **using-skills** - Navigator/librarian for skill discovery
 - **developing-with-tdd** - TDD methodology and best practices
