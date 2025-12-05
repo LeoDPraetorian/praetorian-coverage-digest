@@ -4,17 +4,9 @@
   "description": "Agent lifecycle management CLI",
   "type": "module",
   "scripts": {
-    "create": "tsx src/create.ts",
-    "update": "tsx src/update.ts",
-    "audit": "tsx src/audit.ts",
-    "fix": "tsx src/fix.ts",
-    "rename": "tsx src/rename.ts",
-    "test": "tsx src/test.ts",
+    "audit-critical": "tsx src/audit-critical.ts",
     "search": "tsx src/search.ts",
-    "list": "tsx src/list.ts",
-    "build": "tsc",
-    "test:unit": "vitest run",
-    "test:watch": "vitest"
+    "test": "tsx src/test.ts"
   },
   "dependencies": {
     "zod": "^3.22.4",

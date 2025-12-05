@@ -48,5 +48,10 @@
     "type": "renamed",
     "replacedBy": "verifying-test-file-existence",
     "deprecatedOn": "2025-11-30"
+  },
+  "library-freshservice-itsm-integration-chariot-platform": {
+    "type": "renamed",
+    "replacedBy": "freshservice-integration",
+    "deprecatedOn": "2025-12-04"
   }
 }
