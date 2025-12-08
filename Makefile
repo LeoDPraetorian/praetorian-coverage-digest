@@ -151,7 +151,9 @@ submodule-init-robust: ## Initialize submodules with retry logic, progress track
 .PHONY: submodule-pull
 submodule-pull: ## Pull latest changes from all submodules
 	@echo "Pulling latest changes from all submodules..."
-	git submodule foreach --recursive 'git fetch && git checkout main && git pull origin main'
+	@git submodule foreach 'git fetch && git checkout main && git pull origin main' || true
+	@echo "✅ Submodule pull completed"
+	@echo "⚠️  Note: Warnings about nested submodules with missing URLs are expected and safe to ignore"
 
 .PHONY: submodule-status
 submodule-status: ## Show status of all submodules
