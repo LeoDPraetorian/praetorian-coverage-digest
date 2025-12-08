@@ -2,9 +2,9 @@
 name: frontend-developer
 description: "Use when developing React frontend - components, UI bugs, performance, API integration, TypeScript/React codebases.\n\n<example>\nContext: New dashboard component.\nuser: 'Create dashboard with real-time security scan results'\nassistant: 'I will use frontend-developer'\n</example>\n\n<example>\nContext: UI bug in assets page.\nuser: 'Assets page search not filtering correctly'\nassistant: 'I will use frontend-developer to debug search'\n</example>\n\n<example>\nContext: Performance issue.\nuser: 'Vulnerabilities table laggy with 5000 items'\nassistant: 'I will use frontend-developer to optimize with virtualization'\n</example>"
 type: development
-permissionMode: default
+permissionMode: acceptEdits
 tools: Bash, Edit, Glob, Grep, MultiEdit, Read, TodoWrite, Write
-skills: calibrating-time-estimates, debugging-systematically, developing-with-tdd, gateway-frontend, verifying-before-completion
+skills: calibrating-time-estimates, debugging-systematically, developing-with-tdd, gateway-frontend, using-eslint, verifying-before-completion
 model: opus
 color: green
 ---

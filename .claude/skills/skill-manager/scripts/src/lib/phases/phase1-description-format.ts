@@ -134,6 +134,15 @@ export class Phase1DescriptionFormat {
       });
     }
 
+    // Check for first person voice (I, me, my)
+    if (/\b(I|me|my|I'll|I'm|I've)\b/.test(description)) {
+      issues.push({
+        severity: 'WARNING',
+        message: 'Description uses first person voice (should be third person)',
+        autoFixable: false,
+      });
+    }
+
     // Check for second person voice (you, your)
     if (/\b(you|your|you're|you'll)\b/i.test(description)) {
       issues.push({

@@ -138,16 +138,76 @@ rm -rf ~/.mcp-auth/mcp-remote-*/*linear*
 - **Token cost:** ~unknown tokens
 
 
-## Quick Examples
+## Common Operations with Parameters
+
+### Create Issue
+```bash
+npx tsx -e "(async () => {
+  const { createIssue } = await import('./.claude/tools/linear/create-issue.ts');
+  const result = await createIssue.execute({
+    title: 'Issue title here',
+    description: 'Optional description in Markdown',
+    team: 'Chariot'  // Team name OR team ID works
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+**Key parameters:**
+- `title` (required) - Issue title string
+- `description` (optional) - Markdown description
+- `team` (required) - **Team name like "Chariot"** OR team UUID
+- `assignee` (optional) - User ID, name, email, or "me"
+- `priority` (optional) - 0=No priority, 1=Urgent, 2=High, 3=Normal, 4=Low
+- `state` (optional) - State name or ID
+- `labels` (optional) - Array of label names or IDs
+
+### Get Issue
+```bash
+npx tsx -e "(async () => {
+  const { getIssue } = await import('./.claude/tools/linear/get-issue.ts');
+  const result = await getIssue.execute({
+    id: 'CHARIOT-1234'  // Issue identifier
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### List Issues
+```bash
+npx tsx -e "(async () => {
+  const { listIssues } = await import('./.claude/tools/linear/list-issues.ts');
+  const result = await listIssues.execute({
+    limit: 20  // Optional, defaults to 20
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### Update Issue
+```bash
+npx tsx -e "(async () => {
+  const { updateIssue } = await import('./.claude/tools/linear/update-issue.ts');
+  const result = await updateIssue.execute({
+    id: 'CHARIOT-1234',
+    title: 'Updated title',  // Optional
+    state: 'In Progress',    // Optional
+    priority: 1              // Optional
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+## Quick Reference
 
 See mcp-tools-registry for complete Bash + tsx execution patterns.
 
-**Inline execution:**
+**Generic inline execution:**
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
 npx tsx -e "(async () => {
-  const { createBug } = await import('./.claude/tools/linear/create-bug.ts');
-  const result = await createBug.execute({ /* params */ });
+  const { toolName } = await import('./.claude/tools/linear/tool-name.ts');
+  const result = await toolName.execute({ /* params */ });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
 ```

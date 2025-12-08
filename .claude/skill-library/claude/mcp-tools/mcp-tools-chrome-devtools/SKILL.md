@@ -19,6 +19,46 @@ Enable granular agent access control for chrome-devtools operations.
 **Include this skill when:** Agent needs chrome-devtools access
 **Exclude this skill when:** Agent should NOT access chrome-devtools
 
+## 🚨 SETUP REQUIRED
+
+**Chrome must be running with remote debugging BEFORE using these tools.**
+
+The chrome-devtools MCP **connects to** an already-running Chrome instance at `localhost:9222`. It does NOT launch Chrome for you.
+
+### Start Chrome with Remote Debugging:
+
+**macOS:**
+```bash
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+  --remote-debugging-port=9222 \
+  --user-data-dir=/tmp/chrome-debug &
+```
+
+**Linux:**
+```bash
+google-chrome --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-debug &
+```
+
+**Windows:**
+```bash
+"C:\Program Files\Google\Chrome\Application\chrome.exe" ^
+  --remote-debugging-port=9222 ^
+  --user-data-dir=%TEMP%\chrome-debug
+```
+
+### Verify Chrome is Running:
+```bash
+curl http://localhost:9222/json/version
+# Should return Chrome version info JSON
+```
+
+### Common Error Without Setup:
+```
+Error: Failed to fetch browser webSocket URL from http://localhost:9222/json/version: fetch failed
+```
+
+**Solution**: Start Chrome with the command above, then retry the MCP tool.
+
 ## Available Tools (Auto-discovered: 26 wrappers)
 
 ### click
@@ -367,16 +407,99 @@ interface WaitForInput {
 ```
 
 
-## Quick Examples
+## Common Operations with Parameters
+
+### List Network Requests
+```bash
+npx tsx -e "(async () => {
+  const { listNetworkRequests } = await import('./.claude/tools/chrome-devtools/list-network-requests.ts');
+  const result = await listNetworkRequests.execute({
+    resourceTypes: ['fetch', 'xhr'],  // Optional: filter by type
+    pageSize: 30,                      // Optional: default 20
+    includePreservedRequests: false    // Optional: include preserved
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+**Key parameters:**
+- `resourceTypes` - Array: ['fetch', 'xhr', 'script', 'stylesheet', 'image', 'document']
+- `pageSize` - Number: How many requests to return (default 20)
+- `pageIdx` - Number: Page number for pagination
+- `includePreservedRequests` - Boolean: Include preserved requests
+
+### New Page
+```bash
+npx tsx -e "(async () => {
+  const { newPage } = await import('./.claude/tools/chrome-devtools/new-page.ts');
+  const result = await newPage.execute({
+    url: 'https://example.com',  // URL to load in new page
+    timeout: 30000               // Optional: wait timeout in ms
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### Take Screenshot
+```bash
+npx tsx -e "(async () => {
+  const { takeScreenshot } = await import('./.claude/tools/chrome-devtools/take-screenshot.ts');
+  const result = await takeScreenshot.execute({
+    filePath: '/tmp/screenshot.png',  // Optional: where to save
+    format: 'png',                    // Optional: png, jpeg, webp
+    fullPage: true,                   // Optional: capture full page
+    quality: 80                       // Optional: 0-100 for jpeg/webp
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### List Console Messages
+```bash
+npx tsx -e "(async () => {
+  const { listConsoleMessages } = await import('./.claude/tools/chrome-devtools/list-console-messages.ts');
+  const result = await listConsoleMessages.execute({
+    pageSize: 50,                     // Optional: default 20
+    includePreservedMessages: false   // Optional: include preserved
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### Navigate Page
+```bash
+npx tsx -e "(async () => {
+  const { navigatePage } = await import('./.claude/tools/chrome-devtools/navigate-page.ts');
+  const result = await navigatePage.execute({
+    url: 'https://example.com',  // URL to navigate to
+    type: 'load',                // Optional: 'load' or 'reload'
+    timeout: 30000               // Optional: wait timeout in ms
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### Execute JavaScript
+```bash
+npx tsx -e "(async () => {
+  const { evaluateScript } = await import('./.claude/tools/chrome-devtools/evaluate-script.ts');
+  const result = await evaluateScript.execute({
+    function: 'document.querySelector(\"h1\").textContent'
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+## Quick Reference
 
 See mcp-tools-registry for complete Bash + tsx execution patterns.
 
-**Inline execution:**
+**Generic inline execution:**
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
 npx tsx -e "(async () => {
-  const { click } = await import('./.claude/tools/chrome-devtools/click.ts');
-  const result = await click.execute({ /* params */ });
+  const { toolName } = await import('./.claude/tools/chrome-devtools/tool-name.ts');
+  const result = await toolName.execute({ /* params */ });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
 ```

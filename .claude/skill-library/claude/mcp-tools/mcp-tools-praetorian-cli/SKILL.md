@@ -190,16 +190,113 @@ interface SeedsListInput {
 ```
 
 
-## Quick Examples
+## Common Operations with Parameters
+
+### List Assets
+```bash
+npx tsx -e "(async () => {
+  const { assetsList } = await import('./.claude/tools/praetorian-cli/assets-list.ts');
+  const result = await assetsList.execute({
+    key_prefix: 'example.com',  // Optional: filter by key prefix
+    asset_type: 'domain',        // Optional: filter by type (domain, ipv4, etc.)
+    pages: 1                     // Optional: pagination (default 1)
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+**Key parameters:**
+- `key_prefix` (optional) - Filter assets starting with this prefix
+- `asset_type` (optional) - Filter by type: domain, ipv4, ipv6, etc.
+- `pages` (optional) - Number of pages to retrieve (default 1)
+
+**Returns:** Summary with total count, asset types breakdown, statuses, sample assets
+
+### Get Asset
+```bash
+npx tsx -e "(async () => {
+  const { assetsGet } = await import('./.claude/tools/praetorian-cli/assets-get.ts');
+  const result = await assetsGet.execute({
+    key: 'example.com'  // Asset key (required)
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### List Risks
+```bash
+npx tsx -e "(async () => {
+  const { risksList } = await import('./.claude/tools/praetorian-cli/risks-list.ts');
+  const result = await risksList.execute({
+    pages: 1  // Optional: pagination (default 1)
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+**Returns:** Summary with total risks, severity breakdown, sample high-priority risks
+
+### Get Risk
+```bash
+npx tsx -e "(async () => {
+  const { risksGet } = await import('./.claude/tools/praetorian-cli/risks-get.ts');
+  const result = await risksGet.execute({
+    key: 'RISK-123'  // Risk key (required)
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### List Jobs
+```bash
+npx tsx -e "(async () => {
+  const { jobsList } = await import('./.claude/tools/praetorian-cli/jobs-list.ts');
+  const result = await jobsList.execute({
+    pages: 1  // Optional: pagination (default 1)
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### Get Job
+```bash
+npx tsx -e "(async () => {
+  const { jobsGet } = await import('./.claude/tools/praetorian-cli/jobs-get.ts');
+  const result = await jobsGet.execute({
+    key: 'JOB-456'  // Job key (required)
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### Search by Query
+```bash
+npx tsx -e "(async () => {
+  const { searchByQuery } = await import('./.claude/tools/praetorian-cli/search-by-query.ts');
+  const result = await searchByQuery.execute({
+    query: 'status:active',  // Search query string
+    limit: 20                 // Optional: result limit (default 20)
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+**Query syntax examples:**
+- `status:active` - Assets with active status
+- `type:domain` - Domain assets
+- `class:ipv4` - IPv4 assets
+- `name:production` - Assets with "production" in name
+
+## Quick Reference
 
 See mcp-tools-registry for complete Bash + tsx execution patterns.
 
-**Inline execution:**
+**Generic inline execution:**
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
 npx tsx -e "(async () => {
-  const { aegisList } = await import('./.claude/tools/praetorian-cli/aegis-list.ts');
-  const result = await aegisList.execute({ /* params */ });
+  const { toolName } = await import('./.claude/tools/praetorian-cli/tool-name.ts');
+  const result = await toolName.execute({ /* params */ });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
 ```

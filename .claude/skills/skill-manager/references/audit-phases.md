@@ -4,18 +4,23 @@ Complete reference for all compliance validation phases.
 
 ## Overview
 
-The audit validates skills against structural, semantic, and operational requirements across multiple phases (currently 13). Some phases are auto-fixable, others require manual intervention. See [Adding New Phases](#adding-new-phases) for the checklist when extending.
+The audit validates skills against structural, semantic, and operational requirements across multiple phases (currently 16, with 14-15 reserved). Some phases are auto-fixable, others require manual intervention. See [Adding New Phases](#adding-new-phases) for the checklist when extending.
+
+**After structural audit completes, Claude performs semantic review.** See [Post-Audit Semantic Review](#post-audit-semantic-review).
 
 ## Phase Categories
 
 ### Auto-Fixable (Deterministic)
-Phases 2, 4, 5, 6, 7, 10, 12 - can be automatically fixed
+Phases 2, 4, 5, 6, 7, 10, 12, 16 - can be automatically fixed
 
 ### Semantic (Deferred)
 Phases 1, 3, 9, 13 - require human judgment
 
 ### Specialized CLI
 Phases 8, 11 - use dedicated validation tools
+
+### Reserved
+Phases 14-15 - reserved for future structural validation
 
 ## Phase Reference
 
@@ -260,6 +265,35 @@ Phases 8, 11 - use dedicated validation tools
 
 ---
 
+### Phases 14-15: Reserved
+
+Reserved for future structural validation phases. Skipped in current implementation.
+
+---
+
+### Phase 16: Windows Path Detection ✅ Auto-fixable
+
+**Validates:** No Windows-style backslash paths in skills
+
+**Requirements:**
+- All paths use forward slashes (POSIX-style)
+- No `C:\path\to\file` patterns
+- No `.\relative\path` patterns
+- Cross-platform path compatibility
+
+**Auto-fix:**
+- Converts backslashes to forward slashes
+- Preserves path semantics
+
+**Why this matters:**
+- Skills may be authored on Windows but run on macOS/Linux
+- Backslash paths break on non-Windows systems
+- Forward slashes work universally
+
+**See:** [phase-16-windows-paths.md](phase-16-windows-paths.md)
+
+---
+
 ## Running Audits
 
 ### Audit Single Skill
@@ -381,8 +415,125 @@ When you add Phase 14, update `PHASE_COUNT = 14` and all CLI validation automati
 
 Never renumber existing phases - this breaks historical audit references and documentation.
 
+---
+
+## Post-Audit Semantic Review
+
+**After the structural audit (Phases 1-16) completes, Claude MUST perform semantic review.**
+
+The structural audit catches what code can detect. But code cannot reason about:
+- Whether a skill is categorized correctly (frontend vs backend vs testing)
+- Whether gateway membership is correct
+- Whether the description effectively helps discovery
+- Whether tools are appropriate for the skill's actual purpose
+
+### Semantic Review Checklist
+
+After reviewing structural audit output, Claude performs these checks:
+
+#### 1. Description Quality (CSO - Claude Search Optimization)
+
+**Ask yourself:**
+- Does the description include key trigger terms users would mention?
+- Is the complexity level appropriate for this skill?
+- Are there important keywords missing that would improve discovery?
+- Is it specific enough to differentiate from similar skills?
+- Does it explain both WHAT and WHEN clearly?
+
+**Example issue:** Skill about "ESLint configuration" with description "Use when linting code" is too generic. Should mention "ESLint", "TypeScript", "JavaScript", specific patterns.
+
+#### 2. Skill Categorization
+
+**Ask yourself:**
+- Is this a frontend skill? (React, TypeScript, CSS, UI, components)
+- Is this a backend skill? (Go, AWS, API, Lambda, DynamoDB)
+- Is this a testing skill? (unit tests, e2e tests, Playwright, Vitest)
+- Is this a security skill? (auth, credentials, vulnerabilities)
+- Is this a tooling skill? (MCP, CLI, automation)
+
+**Example issue:** Skill named `eslint-smart` that lints TypeScript/React code is clearly a **frontend** skill but may not be categorized as such.
+
+#### 3. Gateway Membership
+
+**Based on categorization, check gateway membership:**
+
+| Category | Gateway | Check Path |
+|----------|---------|------------|
+| Frontend | `gateway-frontend` | `.claude/skills/gateway-frontend/SKILL.md` |
+| Backend | `gateway-backend` | `.claude/skills/gateway-backend/SKILL.md` |
+| Testing | `gateway-testing` | `.claude/skills/gateway-testing/SKILL.md` |
+| Security | `gateway-security` | `.claude/skills/gateway-security/SKILL.md` |
+| MCP Tools | `gateway-mcp-tools` | `.claude/skills/gateway-mcp-tools/SKILL.md` |
+| Integrations | `gateway-integrations` | `.claude/skills/gateway-integrations/SKILL.md` |
+
+**Ask yourself:**
+- Should this skill be listed in a gateway?
+- Is it listed in the CORRECT gateway(s)?
+- Is it missing from a gateway it should be in?
+
+**Example issue:** `eslint-smart` is a frontend linting skill but not listed in `gateway-frontend`. Agent using `gateway-frontend` would never discover it.
+
+#### 4. Tool Appropriateness
+
+**Ask yourself:**
+- Given the skill's PURPOSE, are the allowed-tools appropriate?
+- Should read-only analysis skills have Write/Edit tools?
+- Should Bash be scoped more narrowly? (e.g., `Bash(git:*)` instead of `Bash`)
+- Are there tools enabling operations the skill shouldn't perform?
+
+**Example issue:** Skill for "code review" has `Write, Edit` in allowed-tools but should be read-only analysis.
+
+#### 5. Content Density Assessment
+
+**For skills with word count warnings (>500 lines):**
+- Is the length justified by essential content density?
+- What sections could be extracted to references/?
+- Are there redundant examples or repetitive explanations?
+- Is progressive disclosure being used appropriately?
+
+### Reporting Semantic Issues
+
+After semantic review, report findings in this format:
+
+```markdown
+## Semantic Review Findings
+
+### Skill Categorization
+- **Current:** Not categorized
+- **Should be:** Frontend (lints TypeScript/React code)
+- **Action:** Add to gateway-frontend routing table
+
+### Gateway Membership
+- **Missing from:** gateway-frontend
+- **Action:** Add skill path to gateway-frontend SKILL.md
+
+### Description Quality
+- **Issue:** Missing key term "ESLint" in description
+- **Current:** "Use when linting code - smart file detection"
+- **Suggested:** "Use when linting TypeScript/JavaScript with ESLint - smart file detection, only lints modified files"
+
+### Tool Appropriateness
+- ✅ Tools appropriate for skill purpose
+```
+
+### When to Skip Semantic Review
+
+Skip semantic review if:
+- Running `--phase N` for a specific structural phase
+- All structural phases passed with zero warnings
+- Skill is a simple tool-wrapper with minimal content
+
+### Integration with Fix Command
+
+Semantic issues cannot be auto-fixed. After identifying issues:
+
+1. **Gateway membership:** Manually update gateway SKILL.md
+2. **Description quality:** Use `npm run fix -- skill-name --apply phase1-description --value "new description"`
+3. **Categorization:** Update skill location or gateway references
+
 ## Related
 
 - [Fix Workflow](fix-workflow.md)
 - [Create Workflow](create-workflow.md)
 - [Update Workflow](update-workflow.md)
+- [Semantic Review Reference](semantic-review.md)

@@ -47,19 +47,15 @@ Agent prompts directly enter the sub-agent's context window when spawned. Excess
 - 50-60% reduction in per-spawn context cost
 - More room for actual work
 
-### Problem 3: Orchestrator Sprawl
+### Problem 3: Orchestrator Sprawl (RESOLVED)
 
-8 orchestrator agents create selection confusion:
-- `hierarchical-coordinator`
-- `universal-coordinator`
-- `mesh-coordinator`
-- `test-coordinator`
-- `architecture-coordinator`
-- `implementation-planner`
-- `feedback-loop-coordinator`
-- `thinking-budget-allocator`
+**Previous state**: 8 orchestrator agents created selection confusion.
 
-**Impact**: Claude struggles to choose the right coordinator. Users get inconsistent behavior.
+**Current state**: Consolidated to 2 domain-specific orchestrators:
+- `backend-orchestrator` - Go, AWS, infrastructure coordination
+- `frontend-orchestrator` - React, TypeScript, UI coordination
+
+**Resolution**: Domain-based orchestration eliminates selection ambiguity. Agents know exactly which orchestrator to use based on task domain.
 
 ---
 
@@ -158,10 +154,9 @@ We implemented a **thin orchestrator architecture** that keeps agent prompts lea
 │   ├── web-research-specialist.md
 │   ├── code-pattern-analyzer.md
 │   └── ...
-├── orchestrator/     # 8 agents - coordination, planning, workflows
-│   ├── universal-coordinator.md
-│   ├── hierarchical-coordinator.md
-│   └── ...
+├── orchestrator/     # 2 agents - domain-specific coordination
+│   ├── backend-orchestrator.md
+│   └── frontend-orchestrator.md
 └── mcp-tools/        # 2 agents - specialized MCP tool access
     ├── praetorian-cli-expert.md
     └── chromatic-test-engineer.md
@@ -177,10 +172,10 @@ We implemented a **thin orchestrator architecture** that keeps agent prompts lea
 | `quality` | 5 | Code review, auditing | `default` |
 | `analysis` | 6 | Security, complexity assessment | `plan` |
 | `research` | 3 | Web search, documentation | `plan` |
-| `orchestrator` | 8 | Coordination, workflows | `default` |
+| `orchestrator` | 2 | Domain-specific coordination | `default` |
 | `mcp-tools` | 2 | Specialized MCP access | `default` |
 
-**Total**: 55 agents across 8 categories
+**Total**: 49 agents across 8 categories (6 orchestrators consolidated to 2)
 
 ---
 
@@ -319,14 +314,17 @@ Before completing, verify:
 
 ```bash
 # Check agent description syntax (must not be | or >)
-cd .claude/skills/agent-manager/scripts
-npm run audit -- react-developer
+# Use via command:
+/agent-manager audit react-developer
 
-# Batch audit all agents
-npm run audit -- --all
+# Or directly invoke skill:
+skill: "auditing-agents"
 
-# Fix auto-fixable issues
-npm run fix -- react-developer
+# Audit all agents
+/agent-manager audit --all
+
+# Fix issues
+/agent-manager fix react-developer
 ```
 
 ### Line Count Targets
@@ -863,14 +861,14 @@ Every agent has:
 - [x] **Description syntax documented**: Block scalar issue identified and fixed
 - [x] **Lean agent template**: Standardized structure defined
 - [x] **Agent-manager skill**: Audit/fix commands available
+- [x] **Consolidate orchestrators**: 8 → 2 domain-specific orchestrators (backend, frontend)
 
 ### In Progress
 
 - [ ] **Fix broken descriptions**: Convert all `|` and `>` to single-line
-- [ ] **Consolidate orchestrators**: 8 → 2-3 agents
 - [ ] **Consolidate Go agents**: `go-developer` + `go-api-developer`
 - [ ] **Consolidate security agents**: 5 → 1-2 with domain parameter
-- [ ] **Trim verbose agents**: `universal-coordinator`, `go-architect`
+- [ ] **Trim verbose agents**: `go-architect` (if >400 lines)
 
 ### To Do
 

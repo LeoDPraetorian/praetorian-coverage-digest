@@ -39,6 +39,27 @@ make install-git-hooks
 
 This creates a symbolic link from `.git/hooks/pre-commit` to `.githooks/pre-commit`.
 
+### Verification
+
+To verify the hooks are installed correctly:
+
+```bash
+.githooks/verify-hooks.sh
+```
+
+If the hook is missing, you'll see a warning with installation instructions.
+
+#### Optional: Automatic Verification on Shell Startup
+
+Add this to your `~/.zshrc` or `~/.bashrc` to automatically check for hooks when you enter the repo:
+
+```bash
+# Auto-verify git hooks for chariot-development-platform
+if [ -f ".githooks/verify-hooks.sh" ]; then
+    .githooks/verify-hooks.sh
+fi
+```
+
 ## Usage
 
 Once installed, the hooks run automatically when you attempt to commit changes.

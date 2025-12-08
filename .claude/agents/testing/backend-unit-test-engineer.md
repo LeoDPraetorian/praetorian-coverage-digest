@@ -5,7 +5,7 @@ type: validation
 permissionMode: default
 tools: Bash, Glob, Grep, Read, TodoWrite, Write
 skills: api-testing-patterns, behavior-vs-implementation-testing, cli-testing-patterns, integration-first-testing, debugging-systematically, developing-with-tdd, calibrating-time-estimates, verifying-test-file-existence
-model: opus
+model: sonnet
 color: pink
 ---
 

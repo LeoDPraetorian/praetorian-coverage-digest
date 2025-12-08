@@ -18,18 +18,12 @@ skills: agent-manager
 
 **Critical Rules:**
 
-1. **INTERCEPT SUGGESTIONS:** If `agent-manager` returns JSON configuration output (`--suggest` mode), you **MUST NOT** proceed automatically.
-2. **USE INTERACTION:** Present configuration options to user via `AskUserQuestion` tool.
-3. **DELEGATE COMPLETELY:** For non-interactive commands, display output verbatim.
-4. **DO NOT SEARCH:** Do not attempt to find agent files yourself.
-5. **Output:** Display the CLI output verbatim.
+1. **DELEGATE COMPLETELY:** The agent-manager skill routes to operation-specific skills. Let it handle the routing.
+2. **USE INTERACTION:** Skills may use `AskUserQuestion` for user choices (e.g., fixing-agents, creating-agents).
+3. **DISPLAY OUTPUT:** Display the skill output verbatim.
+4. **DO NOT BYPASS:** Do not attempt to execute operations yourself or call CLI scripts directly.
 
-**Workflow for Creation (`create`):**
-
-1. Call `agent-manager` with `--suggest` to generate configuration options.
-2. Parse the returned JSON.
-3. **STOP** and use `AskUserQuestion` to present options (category, description).
-4. Run final creation command with chosen parameters.
+**Note:** The `agent-manager` skill delegates to operation-specific skills that handle all workflow complexity, including TDD cycles, interactive user prompts, and validation.
 
 ---
 
@@ -44,6 +38,6 @@ skills: agent-manager
 | `/agent-manager fix <name> [--dry-run]`          | Fix issues                |
 | `/agent-manager fix <name> --suggest`            | Show fix suggestions      |
 | `/agent-manager rename <old> <new>`              | Rename agent              |
-| `/agent-manager test <agent> [skill]`            | Test agent discovery      |
+| `/agent-manager test <agent> [skill]`            | Test agent behavioral validation |
 | `/agent-manager search "<keyword>"`              | Search agents             |
 | `/agent-manager list [--type <category>]`        | List agents               |

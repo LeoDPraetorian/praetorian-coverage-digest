@@ -1,6 +1,23 @@
 # Agent Fix Workflow
 
-## Overview
+> **⚠️ DEPRECATION NOTICE (December 2024)**
+>
+> **This workflow documents ARCHIVED CLI commands.**
+>
+> **For agent fixing, use the instruction-based skill instead:**
+> ```
+> skill: "fixing-agents"
+> ```
+>
+> **Why the change?** Pure Router Pattern migration completed December 7, 2024. All agent operations now use instruction-based skills for consistency, context efficiency, and better user experience.
+>
+> **See:** `.claude/skills/fixing-agents/SKILL.md` for the current workflow
+>
+> ---
+>
+> **The content below is kept for historical reference only.**
+
+## Overview (ARCHIVED)
 
 The fix command applies compliance remediation to agents with JSON-based interactive selection.
 

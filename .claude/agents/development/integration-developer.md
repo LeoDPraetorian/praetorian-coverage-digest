@@ -2,10 +2,10 @@
 name: integration-developer
 description: Use when integrating third-party APIs, external services - API design, auth flows, webhooks, rate limiting, Chariot backend patterns.\n\n<example>\nContext: Payment integration needed\nuser: "Add Stripe to checkout"\nassistant: "I'll use integration-developer"\n</example>\n\n<example>\nContext: API rate limiting issues\nuser: "Salesforce API failing with 429s"\nassistant: "I'll use integration-developer"\n</example>\n\n<example>\nContext: Webhook handler setup\nuser: "Process GitHub webhooks"\nassistant: "I'll use integration-developer"\n</example>
 type: development
-permissionMode: default
+permissionMode: acceptEdits
 tools: Bash, BashOutput, Edit, Glob, Grep, KillBash, MultiEdit, Read, TodoWrite, Write
 skills: calibrating-time-estimates, debugging-systematically, developing-with-tdd, gateway-backend, gateway-frontend, gateway-integrations, gateway-security, gateway-testing, verifying-before-completion
-model: opus
+model: sonnet
 color: green
 ---
 
@@ -20,7 +20,7 @@ Build secure, reliable, and maintainable integrations with third-party security 
 **IMPORTANT**: Before implementing, consult the `gateway-integrations` skill for access to detailed integration patterns.
 
 | Task                         | Skill to Read                                                                          |
-|------------------------------|----------------------------------------------------------------------------------------|
+| ---------------------------- | -------------------------------------------------------------------------------------- |
 | Chariot-specific patterns    | `.claude/skill-library/development/integrations/integration-chariot-patterns/SKILL.md` |
 | Step-by-step validation      | `.claude/skill-library/development/integrations/integration-step-validator/SKILL.md`   |
 | Authentication patterns      | `.claude/skill-library/security/auth-implementation-patterns/SKILL.md`                 |
@@ -35,14 +35,15 @@ Build secure, reliable, and maintainable integrations with third-party security 
 
 These skills are in your frontmatter and **MUST** be used:
 
-| Skill | When to Use | Red Flag |
-|-------|-------------|----------|
-| `calibrating-time-estimates` | Before ANY time estimate | Saying "days" without measurement |
-| `developing-with-tdd` | Before writing ANY code | Writing code without failing test |
-| `debugging-systematically` | When ANY error occurs | Proposing fix before understanding cause |
-| `verifying-before-completion` | Before claiming "done" | No verification checklist |
+| Skill                         | When to Use              | Red Flag                                 |
+| ----------------------------- | ------------------------ | ---------------------------------------- |
+| `calibrating-time-estimates`  | Before ANY time estimate | Saying "days" without measurement        |
+| `developing-with-tdd`         | Before writing ANY code  | Writing code without failing test        |
+| `debugging-systematically`    | When ANY error occurs    | Proposing fix before understanding cause |
+| `verifying-before-completion` | Before claiming "done"   | No verification checklist                |
 
 **Integration-specific checklist before completion:**
+
 - [ ] ValidateCredentials() implemented and tested
 - [ ] xyz.XYZ embedded, Integration() returns true
 - [ ] File size < 400 lines (split if needed)

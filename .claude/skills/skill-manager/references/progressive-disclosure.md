@@ -133,6 +133,80 @@ Basic structure:
 
 **Benefit:** Doesn't load 2,000-word schema unless needed.
 
+## Critical Rules for Reference Links
+
+### 🚨 Keep References One Level Deep
+
+**CRITICAL:** Claude may partially read files referenced from other referenced files. When encountering nested references, Claude might use `head -100` to preview rather than reading complete files, resulting in incomplete information.
+
+**❌ BAD: Too deep (nested references)**
+```markdown
+# SKILL.md
+See [advanced.md](advanced.md) for advanced patterns...
+
+# advanced.md
+See [details.md](details.md) for implementation details...
+
+# details.md
+Here's the actual information...  ← Claude may only see first 100 lines
+```
+
+**✅ GOOD: One level deep**
+```markdown
+# SKILL.md
+
+**Basic usage**: [instructions in SKILL.md]
+**Advanced features**: See [advanced.md](references/advanced.md)
+**API reference**: See [reference.md](references/reference.md)
+**Implementation details**: See [details.md](references/details.md)
+
+# All reference files link directly from SKILL.md
+# Claude reads complete files when needed
+```
+
+**Why this matters:**
+- **Partial reads**: Nested references trigger preview behavior (`head -100`)
+- **Incomplete context**: Claude may miss critical information at end of files
+- **Unpredictable**: Can't guarantee full file will be read
+
+**Solution:** All supporting files should link **directly from SKILL.md**. Cross-references between reference files are fine for navigation, but ensure primary access is always from the main skill file.
+
+### Structure Long Reference Files with Table of Contents
+
+**For reference files >100 lines, include table of contents at top.**
+
+This ensures Claude can see the full scope even when previewing with partial reads.
+
+**Example:**
+```markdown
+# API Reference
+
+## Table of Contents
+
+- [Authentication and Setup](#authentication-and-setup)
+- [Core Methods](#core-methods)
+  - Create, Read, Update, Delete
+- [Advanced Features](#advanced-features)
+  - Batch operations
+  - Webhooks
+  - Real-time updates
+- [Error Handling Patterns](#error-handling-patterns)
+- [Code Examples](#code-examples)
+
+## Authentication and Setup
+
+[Detailed content...]
+
+## Core Methods
+
+[Detailed content...]
+```
+
+**Benefits:**
+- Claude sees full outline even with `head -100` preview
+- Can navigate directly to relevant sections
+- Provides complete context map upfront
+
 ## Organizing Content by Type
 
 ### references/ Directory

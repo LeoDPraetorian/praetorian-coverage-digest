@@ -1,6 +1,10 @@
 ---
-name: frontend-smart-eslint
-description: Use when linting TypeScript/JavaScript code after making changes, before committing - runs ESLint only on modified files instead of entire codebase to prevent hanging, slow performance, and wasted CPU. Detects changed files via git diff and lints them in seconds rather than minutes.
+name: using-eslint
+description: >-
+  Use when linting TypeScript/JavaScript code after making changes, before
+  committing - runs ESLint only on modified files instead of entire codebase to
+  prevent hanging, slow performance, and wasted CPU. Detects changed files via
+  git diff and lints them in seconds rather than minutes.
 allowed-tools: 'Read, Write, Edit, Bash, Grep'
 ---
 

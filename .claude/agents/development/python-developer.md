@@ -2,10 +2,10 @@
 name: python-developer
 description: Use when developing Python applications - CLI tools, data processing, asyncio systems, Lambda functions, testing frameworks.\n\n<example>\nContext: User needs data processing pipeline.\nuser: "Build asyncio pipeline for processing millions of records"\nassistant: "I'll use python-developer agent"\n</example>\n\n<example>\nContext: User needs memory leak fix.\nuser: "Python app consuming too much memory"\nassistant: "I'll use python-developer agent"\n</example>\n\n<example>\nContext: User needs CLI tool.\nuser: "Create CLI with Click for managing assets"\nassistant: "I'll use python-developer agent"\n</example>
 type: development
-permissionMode: default
+permissionMode: acceptEdits
 tools: Bash, BashOutput, Edit, Glob, Grep, KillBash, MultiEdit, Read, TodoWrite, Write
 skills: calibrating-time-estimates, debugging-systematically, developing-with-tdd, gateway-backend, gateway-security, gateway-testing, verifying-before-completion
-model: opus
+model: sonnet
 color: green
 ---
 

@@ -38,6 +38,7 @@ Each skill is organized by workflow stage for easy discovery.
 | Validate workflows | integration-step-validator |
 | Jira Cloud integration | jira-integration |
 | Microsoft Defender integration | ms-defender-integration |
+| HackerOne integration | hackerone-integration |
 
 ## When to Use This Gateway
 
@@ -70,4 +71,7 @@ When building integrations, follow this sequence:
 
 **Microsoft Defender Integration**: `.claude/skill-library/development/integrations/ms-defender-integration/SKILL.md`
 - Integrate Microsoft Defender for Endpoint with Chariot platform for threat detection, vulnerability management, and device inventory sync
+
+**HackerOne Integration**: `.claude/skill-library/development/integrations/hackerone-integration/SKILL.md`
+- Integrate HackerOne bug bounty platform with Chariot for vulnerability report ingestion, researcher collaboration, and bounty management
 

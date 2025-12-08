@@ -1,6 +1,27 @@
 # Agent Update Workflow
 
-## Overview
+> **⚠️ DEPRECATION NOTICE (December 2024)**
+>
+> **This workflow documents ARCHIVED CLI commands (`npm run update`).**
+>
+> **For agent updates, use the instruction-based skill instead:**
+> ```
+> skill: "updating-agents"
+> ```
+>
+> **Why the change?** Analysis showed Edit tool + instructions achieve the same result as TypeScript code with more flexibility. The instruction-based workflow provides:
+> - Simplified 6-phase TDD (RED-GREEN with optional REFACTOR)
+> - Minimal diff approach using Edit tool
+> - Conditional pressure testing for major changes
+> - Fast iteration (~20 min for minor updates)
+>
+> **See:** `.claude/skills/updating-agents/SKILL.md` for the current workflow
+>
+> ---
+>
+> **The content below is kept for historical reference only.**
+
+## Overview (ARCHIVED)
 
 Updating an agent follows a TDD workflow to ensure changes don't break existing functionality:
 1. **RED**: Document current state and desired changes

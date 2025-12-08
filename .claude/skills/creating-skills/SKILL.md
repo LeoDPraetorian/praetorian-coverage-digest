@@ -26,8 +26,8 @@ Use this skill when:
 | 3. Location | Core vs Library | AskUserQuestion |
 | 4. Category | Which library folder | AskUserQuestion, Bash |
 | 5. Skill Type | Process/Library/Integration/Tool-wrapper | AskUserQuestion |
-| 6. Generation | Create directory and SKILL.md | Write |
-| 7. Research | Populate content | `researching-skills` skill |
+| 6. Generation | Create directory, SKILL.md (<500 lines), references/ | Write |
+| 7. Research | Populate content with progressive disclosure | `researching-skills` skill |
 | 8. 🟢 GREEN | Verify skill works, test passes | manual test |
 | 9. 🔵 REFACTOR | Pressure test, close loopholes | Task (spawn subagents) |
 
@@ -64,7 +64,9 @@ Chariot patterns and creates inconsistent code."
 
 ### 1.3 Capture Failure Behavior
 
-**CRITICAL**: Actually test the scenario and capture the failure:
+**CRITICAL**: Actually test the scenario and capture the failure.
+
+**Option A: Conversational Testing (Recommended for Most Skills)**
 
 1. Ask Claude to perform the task (without using any skill)
 2. Document exactly what goes wrong:
@@ -74,6 +76,40 @@ Chariot patterns and creates inconsistent code."
    - Takes too long?
 
 **Record verbatim** what Claude does wrong. This proves the skill is needed.
+
+**Option B: Structured Evaluations (Advanced - For Heavily Reused Skills)**
+
+For skills that will be used frequently or need regression testing, create evaluation JSON files:
+
+**Create `evaluations/test-case-1.json`:**
+```json
+{
+  "skills": ["skill-name"],
+  "query": "Specific user request that should trigger this skill",
+  "files": ["test-data/input-file.pdf"],
+  "expected_behavior": [
+    "Behavior 1 - what Claude should do",
+    "Behavior 2 - what Claude should do",
+    "Behavior 3 - what Claude should do"
+  ]
+}
+```
+
+**Benefits of structured evaluations:**
+- ✅ **Regression testing**: Re-run after changes to ensure no breakage
+- ✅ **Quantitative metrics**: Measure pass rate (e.g., "3/3 tests passed")
+- ✅ **Team collaboration**: Share test cases, not just anecdotes
+- ✅ **Baseline comparison**: Measure improvement over time
+
+**When to use:**
+- Skills used across multiple projects
+- Critical workflows requiring high reliability
+- Skills with complex validation requirements
+- Team-shared skills needing objective quality measures
+
+**Note**: Anthropic doesn't provide built-in evaluation tooling. You'll need to build your own test runner or use conversational testing (Option A).
+
+**For most skills, conversational testing (Option A) is sufficient.** Use structured evaluations when you need automated regression testing.
 
 ### 1.4 Confirm RED State
 
@@ -208,7 +244,9 @@ mkdir -p .claude/skill-library/{category}/{skill-name}/references
 mkdir -p .claude/skill-library/{category}/{skill-name}/examples
 ```
 
-### 5.2 Generate SKILL.md
+### 5.2 Generate SKILL.md with Progressive Disclosure
+
+**🚨 CRITICAL: Design for progressive disclosure from the start.**
 
 Use the appropriate template from [references/skill-templates.md](references/skill-templates.md):
 
@@ -219,21 +257,244 @@ Use the appropriate template from [references/skill-templates.md](references/ski
 | Integration | Service connection templates |
 | Tool Wrapper | CLI/MCP wrapper templates |
 
-### 5.3 Create Placeholder References
+**SKILL.md Structure (Target: <500 lines):**
 
-Create placeholder files for the references/ directory:
-
-**references/detailed-guide.md** (or api-reference.md for libraries):
 ```markdown
-# {Skill Name} - Detailed Guide
+---
+name: skill-name
+description: Use when [trigger] - [capabilities]  # MUST be third-person
+allowed-tools: Read, Write, Bash  # Optional: restrict tool access (see below)
+---
 
-This document will be populated with detailed documentation.
+# Skill Name
 
-## TODO
+## When to Use This Skill
 
-- [ ] Add comprehensive documentation
-- [ ] Include code examples
-- [ ] Document edge cases
+[Symptoms, triggers, use cases]
+
+## Quick Start
+
+[1-2 basic examples showing core usage]
+
+## Table of Contents
+
+This skill is organized into detailed reference documents. Read them as needed:
+
+### Core Concepts
+- **[Topic 1](references/topic-1.md)** - Brief description
+- **[Topic 2](references/topic-2.md)** - Brief description
+
+### Advanced Patterns
+- **[Pattern 1](references/pattern-1.md)** - Brief description
+
+## Core Workflow
+
+[High-level steps with links to detailed references]
+
+1. **Step 1** - Brief description
+2. **Step 2** - Brief description
+
+See [Detailed Workflow](references/workflow.md) for step-by-step instructions.
+
+## Best Practices
+
+[Summary bullets only]
+- ✅ Do this
+- ❌ Don't do that
+
+## Critical Rules
+
+[Non-negotiable constraints]
+
+## Troubleshooting
+
+[Common issues with quick solutions]
+
+## Related Skills
+
+[Links to related skills]
+```
+
+**Description Requirements (CRITICAL for Discovery):**
+
+**🚨 MUST be third-person** - Description is injected into system prompt, inconsistent point-of-view breaks discovery.
+
+```yaml
+# ✅ CORRECT: Third-person
+description: Processes Excel files and generates reports. Use when analyzing spreadsheets or .xlsx files.
+
+# ❌ WRONG: First-person
+description: I can help you process Excel files and generate reports.
+
+# ❌ WRONG: Second-person
+description: You can use this to process Excel files and generate reports.
+```
+
+**Why this matters:** The description appears in Claude's system prompt. Using "I" or "You" creates point-of-view confusion that degrades skill selection accuracy.
+
+**Pattern:** `[Action verb]s [object]` - "Processes files", "Analyzes data", "Generates reports"
+
+---
+
+**Tool Access Control (Optional but Recommended):**
+
+Use `allowed-tools` to restrict which tools Claude can use when executing this skill. This improves security and prevents unintended side effects.
+
+**Granular scoping patterns:**
+
+```yaml
+# Read-only file access (safe for analysis skills)
+allowed-tools: Read, Grep, Glob
+
+# Git operations only
+allowed-tools: Bash(git:*), Read, Write
+
+# NPM/Node operations only
+allowed-tools: Bash(npm:*), Bash(node:*), Read, Write
+
+# Python operations only
+allowed-tools: Bash(python:*), Bash(pip:*), Read, Write
+
+# Full access (no restrictions)
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+```
+
+**Common patterns:**
+
+| Skill Type | Recommended Tools | Rationale |
+|------------|------------------|-----------|
+| Read-only analysis | `Read, Grep, Glob` | No file modifications |
+| Code generation | `Read, Write, Bash(npm:*), Bash(node:*)` | Limited to specific commands |
+| Git workflows | `Bash(git:*), Read, Write` | Git operations only |
+| Testing | `Bash(npm test:*), Read, Write` | Test execution only |
+| Documentation | `Read, Write` | Simple file operations |
+
+**Why use scoping:**
+- ✅ Prevents accidental destructive operations
+- ✅ Makes skill intent explicit
+- ✅ Easier to audit what skill can do
+- ✅ Security isolation for sensitive operations
+
+**When to use full access:**
+- Complex workflows requiring multiple tools
+- Development skills needing flexibility
+- Orchestration skills coordinating multiple operations
+
+---
+
+**What to put in SKILL.md vs references/:**
+
+| Content Type | Location | Why |
+|--------------|----------|-----|
+| Overview, when-to-use | SKILL.md | Helps Claude decide if skill applies |
+| Quick examples (<10 lines) | SKILL.md | Shows basic usage immediately |
+| Core workflow (high-level) | SKILL.md | Provides roadmap |
+| Best practices (summary) | SKILL.md | Quick reference |
+| Critical rules | SKILL.md | Must-know constraints |
+| Detailed explanations | references/ | Load only when implementing |
+| API references | references/ | Reference material |
+| Advanced patterns | references/ | Specialized techniques |
+| Edge cases | references/ | Troubleshooting details |
+| Complete examples | examples/ | Full case studies |
+
+### 5.3 Create Reference File Structure
+
+Create placeholder files that will be populated during research:
+
+**references/workflow.md** (for process skills):
+```markdown
+# {Skill Name} - Detailed Workflow
+
+Step-by-step implementation guide with validation loops.
+
+## Table of Contents
+
+- [Step 1: Setup](#step-1-setup)
+- [Step 2: Implementation](#step-2-implementation)
+- [Step 3: Validation](#step-3-validation)
+
+## Step 1: Setup
+
+[Detailed instructions]
+
+## Step 2: Implementation
+
+[Detailed instructions with code examples]
+
+## Step 3: Validation (Feedback Loop)
+
+**Pattern: Run validator → fix errors → repeat**
+
+1. Run validation check:
+   ```bash
+   python scripts/validate.py output/
+   ```
+
+2. If validation fails:
+   - Review error messages carefully
+   - Fix the identified issues
+   - **Run validation again** (don't skip)
+
+3. **Only proceed when validation passes**
+
+4. Continue to next step
+
+**Why this matters:** Validation loops catch errors early and improve output quality.
+
+## Related References
+
+- [Advanced Patterns](advanced-patterns.md)
+```
+
+**references/api-reference.md** (for library skills):
+```markdown
+# {Library Name} - API Reference
+
+Comprehensive API documentation.
+
+## Core APIs
+
+### Function 1
+
+**Signature:** `function1(param: Type): ReturnType`
+
+**Description:** [What it does]
+
+**Parameters:**
+- `param`: [Description]
+
+**Returns:** [Description]
+
+**Example:**
+\`\`\`typescript
+const result = function1(value);
+\`\`\`
+
+## Related References
+
+- [Common Patterns](patterns.md)
+```
+
+**references/patterns.md** (for pattern collections):
+```markdown
+# {Skill Name} - Common Patterns
+
+Reusable patterns and techniques.
+
+## Pattern 1: [Name]
+
+**When to use:** [Situation]
+
+**Implementation:**
+\`\`\`typescript
+// Code example
+\`\`\`
+
+**Why it works:** [Explanation]
+
+## Pattern 2: [Name]
+
+[Similar structure]
 ```
 
 ## Phase 6: Research & Populate Content
@@ -374,11 +635,68 @@ Don't just fill templates with placeholder text. Use `researching-skills` to fin
 
 Empty skills with TODO placeholders are useless. Always populate with real content.
 
-### ❌ Don't Exceed Line Limits
+### ❌ Don't Exceed Line Limits (MANDATORY)
 
-- SKILL.md should be <500 lines
-- Use references/ for detailed documentation
-- Use progressive disclosure pattern
+**🚨 CRITICAL: SKILL.md MUST be <500 lines**
+
+- **Target**: 300-500 lines for SKILL.md
+- **Always use references/** for detailed documentation (no line limit)
+- **Always use progressive disclosure pattern** from the start
+- **Plan content distribution** during Phase 5 (Generation), not after
+
+**If you create a skill >500 lines:**
+1. You violated the creation workflow
+2. You must immediately restructure with progressive disclosure
+3. See `.claude/skills/skill-manager/references/progressive-disclosure.md`
+
+**Real example**: `frontend-architecture` skill has 293-line SKILL.md + 7 reference files (16KB total content). This is the standard.
+
+### ❌ Don't Include Time-Sensitive Information
+
+Avoid information that will become outdated. Use "Old Patterns" section for deprecated content.
+
+**❌ BAD: Time-sensitive (will become wrong)**
+```markdown
+If you're doing this before August 2025, use the old API.
+After August 2025, use the new API.
+```
+
+**✅ GOOD: Use "Old Patterns" section**
+```markdown
+## Current Method
+
+Use the v2 API endpoint: `api.example.com/v2/messages`
+
+```typescript
+const response = await fetch('https://api.example.com/v2/messages', {
+  method: 'POST',
+  body: JSON.stringify({ text: 'Hello' }),
+});
+```
+
+## Old Patterns
+
+<details>
+<summary>Legacy v1 API (deprecated 2025-08)</summary>
+
+The v1 API used: `api.example.com/v1/messages`
+
+This endpoint is no longer supported. Migrate to v2 API above.
+</details>
+```
+
+**Benefits:**
+- ✅ Current method is prominent and up-to-date
+- ✅ Historical context preserved for existing code
+- ✅ `<details>` tag keeps deprecated content collapsed
+- ✅ No maintenance burden removing old content
+- ✅ Helps developers migrating legacy code
+
+**When to use:**
+- API version changes
+- Deprecated library methods
+- Replaced patterns or practices
+- Tools no longer recommended
 
 ## Related Skills
 

@@ -39,6 +39,8 @@ These are auto-discovered and accessible via the normal Skill tool. They consume
 - `verification-before-completion`
 - `writing-plans`
 - `using-skills` (the navigator/librarian)
+- `orchestrating-multi-agent-workflows` (multi-agent coordination)
+- `persisting-progress-across-sessions` (cross-session state)
 
 ### Tier 2: Gateway Skills (Domain Entry Points)
 
@@ -859,7 +861,7 @@ This isn't just a workaround for a token limit—it's better context engineering
 - [x] **Gerund naming migration** — rename agent-discoverable skills to gerund form
 - [x] Create the `.claude/skill-library/` directory structure
 - [x] Move extended skills to library (preserving functionality)
-- [x] **Write gateway skills for each domain** (7 gateways complete):
+- [x] **Write gateway skills for each domain** (8 gateways complete):
   - `gateway-frontend` (20 skills)
   - `gateway-backend` (16 skills)
   - `gateway-testing` (14 skills)
@@ -867,6 +869,7 @@ This isn't just a workaround for a token limit—it's better context engineering
   - `gateway-capabilities` (9 skills)
   - `gateway-security` (6 skills)
   - `gateway-integrations` (5 skills)
+  - `gateway-claude` (8 skills - agent management) ✨ NEW Dec 2024
 - [x] **Optimize all gateway frontmatter to "Use when [action] - [keywords]" pattern (< 120 chars)**
 - [x] **Consolidate overlapping skills** — skill-manager, agent-manager, mcp-manager, command-manager
 - [x] Update agents to reference gateways — 19/24 agents (79%) have gateway references
@@ -877,6 +880,17 @@ This isn't just a workaround for a token limit—it's better context engineering
 
 ### To Do
 
-- [ ] Add gateway validation to CI pipeline (CLI exists, not yet in CI)
+- [x] **agent-manager Pure Router Pattern migration** (completed Dec 7, 2024)
+  - Created 5 new instruction-based skills (auditing, fixing, renaming, searching, listing)
+  - Migrated all 8 operations to skill delegation
+  - Created gateway-claude and moved agent-management skills to library
+  - Reduced Core from 39 → 32 skills (18% reduction)
+  - See: `.claude/skills/agent-manager/AGENT-MANAGER-MIGRATION.md`
+- [ ] **skill-manager Router Pattern evaluation**
+  - Current: Hybrid pattern (1 skill creation skill + 8 CLI scripts exposed)
+  - Decision needed: Migrate to Pure Router Pattern vs document hybrid approach
+  - Estimated effort: 28-37 hours if migrating (more complex than agent-manager)
+  - Complexity: 16-phase audit, context7 integration, progressive disclosure enforcement
+- [ ] Add gateway validation to CI pipeline (sync-gateways CLI exists, not yet in CI)
 - [ ] Audit skill bodies > 500 lines and split into skill + docs pattern (many exceed limit)
 - [ ] Update remaining 5 agents to reference gateways

@@ -1,20 +1,20 @@
 ---
 name: skill-manager
-description: Use when creating, updating, auditing, fixing, renaming, migrating, searching, or listing skills - unified lifecycle management with TDD enforcement, 13-phase compliance validation, and progressive disclosure. Searches both core (.claude/skills) and library (.claude/skill-library) locations.
+description: Use when creating, updating, auditing, fixing, renaming, migrating, searching, or listing skills - unified lifecycle management with TDD enforcement, 16-phase compliance validation, and progressive disclosure. Searches both core (.claude/skills) and library (.claude/skill-library) locations.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, Skill, AskUserQuestion
 ---
 
 # Skill Lifecycle Manager
 
-**Complete skill lifecycle with TDD enforcement, 13-phase compliance validation, and dual-location search.**
+**Complete skill lifecycle with TDD enforcement, 16-phase structural audit + semantic review, and dual-location search.**
 
 ## Quick Reference
 
 | Operation     | Method                                                                                              | Time      | Purpose                            |
 | ------------- | --------------------------------------------------------------------------------------------------- | --------- | ---------------------------------- |
 | **Create**    | Use `creating-skills` skill                                                                         | 15-30 min | Instruction-driven skill creation  |
-| Update        | `npm run update -- <name> "<changes>"`                                                              | 10-20 min | Minimal updates with TDD           |
-| Audit         | `npm run audit -- [name]`                                                                           | 2-5 min   | 13-phase compliance check          |
+| Update        | `npm run update -- <name> "<changes>"` + progressive disclosure if >500 lines                       | 10-20 min | Minimal updates with TDD           |
+| Audit         | `npm run audit -- [name]`                                                                           | 2-5 min   | 16-phase + semantic review         |
 | Fix           | `npm run fix -- <name> [--dry-run\|--suggest]`                                                      | 5-15 min  | Auto-remediation (3 modes)         |
 | Rename        | `npm run rename -- <old> <new>`                                                                     | 5-10 min  | Safe renaming with updates         |
 | Migrate       | `npm run migrate -- <name> <target>`                                                                | 5-10 min  | Move core ↔ library                |
@@ -139,13 +139,16 @@ npm run update -- tanstack-query-skill --refresh-context7 --context7-data /tmp/n
 3. **Update Skill** - Apply minimal change
 4. **GREEN Phase** - Verify gap closes
 5. **Audit** - Re-validate compliance
-6. **REFACTOR** - Test under pressure
+6. **Progressive Disclosure** - ⚠️ MANDATORY if SKILL.md >500 lines (split into references/)
+7. **REFACTOR** - Test under pressure
+
+**🚨 CRITICAL:** If audit shows word count warning (>500 lines), you MUST restructure with progressive disclosure before continuing. See Step 7 in update-workflow.md.
 
 **See:** [references/update-workflow.md](references/update-workflow.md)
 
-### Audit (13-Phase Compliance)
+### Audit (16-Phase Structural + Semantic Review)
 
-**Validates skill against 13 compliance phases.**
+**Validates skill against 16 structural phases, then Claude performs semantic review.**
 
 ```bash
 # Audit single skill (auto-detects location)
@@ -158,9 +161,9 @@ npm run audit
 npm run audit -- frontend-patterns --phase 1
 ```
 
-**13 Phases:**
+**16 Structural Phases:**
 
-1. Description Format
+1. Description Format (first/second person, "Use when" trigger)
 2. Allowed-Tools Field
 3. Word Count
 4. Broken Links
@@ -173,10 +176,24 @@ npm run audit -- frontend-patterns --phase 1
 11. Command Example Audit
 12. CLI Error Handling
 13. State Externalization
+14-15. Reserved
+16. Windows Path Detection
 
-**Output:** Pre-formatted markdown report (display verbatim)
+**Post-Audit Semantic Review (Claude performs after structural audit):**
 
-**See:** [references/audit-phases.md](references/audit-phases.md)
+After structural audit output, Claude MUST perform semantic review:
+
+1. **Description Quality (CSO)** - Does description include key trigger terms? Specific enough for discovery?
+2. **Skill Categorization** - Is this frontend/backend/testing/security/tooling?
+3. **Gateway Membership** - Should this be in gateway-frontend? gateway-testing? Is it missing from appropriate gateway?
+4. **Tool Appropriateness** - Are allowed-tools appropriate for skill's actual purpose?
+5. **Content Density** - If >500 lines warning, is length justified?
+
+**Example semantic issue:** `eslint-smart` skill lints TypeScript/React but isn't listed in `gateway-frontend`. Agents using frontend gateway would never discover it.
+
+**Output:** Pre-formatted markdown report (display verbatim), then semantic review findings
+
+**See:** [references/audit-phases.md](references/audit-phases.md) (includes semantic review checklist)
 
 ### Fix (Compliance Remediation)
 
@@ -365,14 +382,14 @@ npm run sync-gateways -- --fix
 
 - Full TDD cycle with pressure testing
 - Progressive disclosure organization
-- Compliance validation (all 13 phases)
+- Compliance validation (all 16 structural phases + semantic review)
 - Reference updates and migration
 
 **Deep Dives (references/):**
 
 - [TDD methodology](references/tdd-methodology.md)
 - [Progressive disclosure](references/progressive-disclosure.md)
-- [13 audit phases](references/audit-phases.md)
+- [Audit phases + semantic review](references/audit-phases.md)
 - [Rename protocol](references/rename-protocol.md)
 - [Migration workflow](references/migrate-workflow.md)
 
@@ -389,7 +406,7 @@ This skill consolidates:
 ## Key Principles
 
 1. **TDD Always** - Cannot create/update without failing test first
-2. **13-Phase Compliance** - All skills validated before deployment
+2. **Hybrid Audit** - 16-phase structural audit + Claude semantic review
 3. **Progressive Disclosure** - Lean SKILL.md + detailed references/
 4. **Router Pattern** - `/skill-manager` command delegates here
 5. **Instruction-Driven Creation** - Create via `creating-skills` skill (no TypeScript CLI)

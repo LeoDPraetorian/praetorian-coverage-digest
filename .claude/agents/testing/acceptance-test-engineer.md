@@ -5,7 +5,7 @@ type: testing
 permissionMode: default
 tools: Bash, Edit, Glob, Grep, Read, TodoWrite, Write
 skills: calibrating-time-estimates, debugging-systematically, gateway-backend, gateway-integrations, gateway-security, gateway-testing, verifying-before-completion
-model: opus
+model: sonnet
 color: pink
 ---
 
@@ -61,12 +61,12 @@ acceptance/
 
 **IMPORTANT**: Before implementing tests, consult the relevant gateway skill for domain-specific patterns.
 
-| Task | Gateway Skill | Specific Patterns |
-|------|---------------|-------------------|
-| Backend testing patterns | `gateway-backend` | Go testing patterns, AWS mocking, table-driven tests |
-| API testing patterns | `gateway-testing` | HTTP testing, request validation, response assertions |
-| Integration patterns | `gateway-integrations` | Third-party service testing, API contract validation |
-| Security testing | `gateway-security` | Auth testing, credential validation, secrets management |
+| Task                     | Gateway Skill          | Specific Patterns                                       |
+| ------------------------ | ---------------------- | ------------------------------------------------------- |
+| Backend testing patterns | `gateway-backend`      | Go testing patterns, AWS mocking, table-driven tests    |
+| API testing patterns     | `gateway-testing`      | HTTP testing, request validation, response assertions   |
+| Integration patterns     | `gateway-integrations` | Third-party service testing, API contract validation    |
+| Security testing         | `gateway-security`     | Auth testing, credential validation, secrets management |
 
 The gateway skills will route you to detailed testing patterns in the skill library. Load these on-demand as needed.
 
@@ -80,6 +80,7 @@ The acceptance framework has 4 key components:
 4. **Assertors** (`pkg/assertors/`) - Multi-layer validation (DynamoDB, S3, Secrets Manager, user management)
 
 **Basic test pattern:**
+
 ```go
 helper, _ := ops.NewTestHelper(t)  // Auto-setup
 asset, _ := helper.AddAsset(helper.GenerateDomainAssetData())  // Create via API
@@ -88,18 +89,21 @@ helper.AssertJobsQueuedForTarget(t, asset)  // Verify queue jobs
 ```
 
 For detailed architecture, assertor internals, and data generators, see:
+
 - Code documentation in `modules/chariot/acceptance/pkg/`
 - Gateway skills: `gateway-backend` (Go patterns), `gateway-testing` (test patterns)
 
 ## Extending the Framework
 
 **When adding new tests:**
+
 1. Add operation method to `TestHelper` (`pkg/ops/`)
 2. Add data generator to `ModelDataFactory` (`pkg/data/`)
 3. Add validation method (if needed)
 4. Create test file in `tests/api/{domain}/`
 
 **When adding new assertors:**
+
 1. Create assertor package in `pkg/assertors/{name}/`
 2. Integrate into `TestHelper` struct
 3. Add to `NewPassiveTestHelper()` constructor
@@ -249,6 +253,7 @@ Return results as structured JSON for multi-agent coordination:
 ```
 
 **Status values:**
+
 - `complete` - Tests created/fixed, all passing, work finished
 - `blocked` - Cannot proceed (missing credentials, stack not deployed, dependency issues)
 - `needs_review` - Tests implemented but require manual validation or architecture decision
@@ -264,6 +269,7 @@ Return results as structured JSON for multi-agent coordination:
 - **Backend implementation bugs found** → Recommend `go-developer` to fix underlying backend code, not just tests
 
 **When to continue:**
+
 - Adding new test cases to existing test files
 - Extending existing assertors with new methods
 - Debugging test failures caused by test code (not backend bugs)

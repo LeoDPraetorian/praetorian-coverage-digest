@@ -100,7 +100,221 @@ npm run audit -- skill-name
 - File organization maintained
 - All 13 phases still pass
 
-### Step 7: REFACTOR Phase - Pressure Test Update
+**If audit shows word count warning (>500 lines), proceed to Step 7.**
+
+### Step 7: Apply Progressive Disclosure (MANDATORY if >500 lines)
+
+**🚨 CRITICAL: If SKILL.md > 500 lines, you MUST restructure with progressive disclosure.**
+
+#### Why This Matters
+
+- **Performance**: Claude's attention degrades beyond ~500 lines
+- **Token efficiency**: Load details only when needed
+- **Maintainability**: Easier to update specific topics
+- **Best practice**: Official Claude Code recommendation
+
+#### Detection
+
+**Audit will show word count warning:**
+```
+Phase 3: Word Count
+  WARNING: SKILL.md exceeds 500 lines (1880 lines)
+```
+
+**Manual check:**
+```bash
+wc -l SKILL.md  # Should be < 500 lines
+```
+
+#### Restructuring Workflow
+
+**Step 7.1: Read Progressive Disclosure Guide**
+
+```
+Read: .claude/skills/skill-manager/references/progressive-disclosure.md
+```
+
+This reference explains:
+- What to keep in SKILL.md (overview, quick reference, core workflow)
+- What to move to references/ (detailed explanations, advanced patterns)
+- What to move to examples/ (case studies, before/after)
+- How to structure links for on-demand loading
+
+**Step 7.2: Create Directory Structure**
+
+```bash
+cd <skill-directory>
+mkdir -p references examples
+```
+
+**Step 7.3: Split Content**
+
+**Keep in SKILL.md (~300-500 lines):**
+- Frontmatter (name, description, tags)
+- When to Use This Skill (symptoms, triggers)
+- Tech Stack Context (if applicable)
+- Quick Start (basic examples)
+- Table of Contents (with links to references)
+- Core Concepts (high-level overview only)
+- Common Workflows (main steps, link to details)
+- Best Practices (summary bullets)
+- Critical Rules (non-negotiable constraints)
+- Troubleshooting (common issues with solutions)
+- Related Skills
+
+**Move to references/ directory:**
+- Detailed explanations (>200 words per topic)
+- API references and schemas
+- Advanced patterns and techniques
+- Architecture deep-dives
+- Edge cases and troubleshooting details
+- Performance optimization strategies
+- Security considerations
+
+**Move to examples/ directory:**
+- Complete case studies
+- Good vs bad code comparisons
+- Real-world scenarios
+- Before/after demonstrations
+- Common mistakes with fixes
+
+**Step 7.4: Create Reference Files**
+
+**Naming convention:** `<topic>.md` (e.g., `react-19-patterns.md`, `state-management.md`)
+
+**Structure for each reference:**
+```markdown
+# Topic Name
+
+Brief introduction (1-2 paragraphs)
+
+## Table of Contents
+
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+
+## Section 1
+
+Detailed content...
+
+## Section 2
+
+Detailed content...
+
+## Related References
+
+- [Other Reference](other-reference.md)
+- [Another Reference](another-reference.md)
+```
+
+**Step 7.5: Update SKILL.md with Links**
+
+**Add Table of Contents section:**
+```markdown
+## Table of Contents
+
+This skill is organized into detailed reference documents. Read them as needed:
+
+### Core Concepts
+
+- **[Topic 1](references/topic-1.md)** - Brief description
+- **[Topic 2](references/topic-2.md)** - Brief description
+
+### Advanced Patterns
+
+- **[Pattern 1](references/pattern-1.md)** - Brief description
+- **[Pattern 2](references/pattern-2.md)** - Brief description
+```
+
+**Link from workflows:**
+```markdown
+### Creating a New Feature
+
+1. **Design component hierarchy** - Identify containers and presentational components
+2. **Set up state management** - Choose TanStack Query for server data
+
+See [React 19 Patterns](references/react-19-patterns.md) for detailed component design.
+```
+
+**Step 7.6: Verify Structure**
+
+**Check file organization:**
+```bash
+tree -L 2 <skill-directory>
+# Should show:
+# skill-name/
+# ├── SKILL.md
+# ├── references/
+# │   ├── topic-1.md
+# │   ├── topic-2.md
+# │   └── topic-3.md
+# └── examples/
+#     └── example-1.md
+```
+
+**Check line count:**
+```bash
+wc -l SKILL.md        # Should be < 500 lines
+wc -l references/*.md # Can be any length
+```
+
+**Step 7.7: Re-Run Audit**
+
+```bash
+npm run audit -- skill-name
+```
+
+**Should now pass Phase 3 (Word Count) without warnings.**
+
+#### Real-World Example
+
+**Case Study: frontend-architecture skill**
+
+**Before restructuring:**
+- Single file: 1,880 lines
+- Audit warning: Word count exceeded
+- All content in one file (slow to load)
+
+**After restructuring:**
+- SKILL.md: 293 lines (84% reduction)
+- 7 reference files:
+  - `react-19-patterns.md` (16KB)
+  - `state-management.md` (16KB)
+  - `build-tools.md` (1.9KB)
+  - `design-patterns.md` (4.7KB)
+  - `performance.md` (4.1KB)
+  - `module-systems.md` (1.3KB)
+  - `scalability.md` (1.3KB)
+- Audit: ✅ PASSED WITH WARNINGS (no critical issues)
+
+**Location:** `.claude/skill-library/development/frontend/frontend-architecture/`
+
+**Structure:**
+```markdown
+## Table of Contents
+
+### Core Architecture Patterns
+
+- **[React 19 Patterns](references/react-19-patterns.md)** - Component design principles
+- **[Design Patterns](references/design-patterns.md)** - MVC, MVVM, Flux patterns
+- **[State Management](references/state-management.md)** - TanStack Query v5 and Zustand 4.x
+
+### Build & Performance
+
+- **[Build Tools](references/build-tools.md)** - Vite 7 configuration
+- **[Performance Optimization](references/performance.md)** - React Compiler usage
+```
+
+#### When Progressive Disclosure is NOT Needed
+
+✅ **Skip if SKILL.md < 500 lines** - File is already appropriately sized
+
+Common cases where skills stay small:
+- Simple tool wrappers (100-200 lines)
+- Focused process skills (200-300 lines)
+- Integration guides (150-250 lines)
+
+### Step 8: REFACTOR Phase - Pressure Test Update
 
 **Test under pressure:**
 
@@ -211,6 +425,11 @@ Use progressive disclosure.
 ✅ GREEN phase: Test passes with updated skill
 ✅ No regressions in existing tests
 ✅ Compliance audit still passes
+✅ **Progressive disclosure applied (if SKILL.md was >500 lines)**
+  - SKILL.md reduced to <500 lines
+  - Detailed content moved to references/
+  - Table of contents added with links
+  - Re-audit passes without word count warnings
 ✅ REFACTOR phase: Update holds under pressure
 
 ## Related

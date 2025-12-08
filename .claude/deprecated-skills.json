@@ -53,5 +53,15 @@
     "type": "renamed",
     "replacedBy": "freshservice-integration",
     "deprecatedOn": "2025-12-04"
+  },
+  "frontend-smart-eslint": {
+    "type": "renamed",
+    "replacedBy": "using-eslint",
+    "deprecatedOn": "2025-12-08"
+  },
+  "frontend-using-eslint": {
+    "type": "renamed",
+    "replacedBy": "using-eslint",
+    "deprecatedOn": "2025-12-08"
   }
 }

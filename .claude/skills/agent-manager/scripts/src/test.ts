@@ -2,7 +2,15 @@
 /**
  * test.ts - Agent Discovery Testing CLI
  *
- * Usage:
+ * ⚠️ INTERNAL UTILITY - Not invoked by agent-manager skill
+ *
+ * This CLI is for maintainers debugging agent discovery issues.
+ * It performs basic structural tests (file exists, parses correctly, description visible).
+ *
+ * Users should invoke: skill: "testing-agent-skills"
+ * That skill performs full behavioral validation by spawning agents.
+ *
+ * Usage (for maintainers only):
  *   npm run test -- <name>
  *   npm run test -- <name> <skill-name>
  */
@@ -215,6 +223,21 @@ program
             details: `skills field: ${agent.frontmatter.skills || '(empty)'}`,
           });
         }
+
+        // Router: Skill Integration Testing (instruction-based)
+        console.log(chalk.cyan('\n═══ Skill Integration Testing ═══\n'));
+        console.log('The test above checks if the skill is in frontmatter.');
+        console.log(chalk.bold('To test if the agent actually USES the skill correctly:\n'));
+        console.log(chalk.white('  skill: "testing-agent-skills"\n'));
+        console.log('Then provide:');
+        console.log(chalk.gray(`  - Agent: ${name}`));
+        console.log(chalk.gray(`  - Skill: ${skill}\n`));
+        console.log('The skill will guide you through:');
+        console.log(chalk.gray('  1. Verify skill file exists'));
+        console.log(chalk.gray('  2. Design trigger scenario'));
+        console.log(chalk.gray('  3. Spawn agent with Task tool'));
+        console.log(chalk.gray('  4. Evaluate if agent invoked and followed skill'));
+        console.log(chalk.gray('  5. Report PASS/FAIL/PARTIAL with reasoning'));
       }
 
       // Show results

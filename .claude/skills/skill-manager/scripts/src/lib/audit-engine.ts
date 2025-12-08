@@ -16,6 +16,7 @@ import { Phase10ReferenceAudit } from './phases/phase10-reference-audit.js';
 import { Phase11CommandAudit } from './phases/phase11-command-audit.js';
 import { Phase12CliErrorHandling } from './phases/phase12-cli-error-handling.js';
 import { Phase13StateExternalization } from './phases/phase13-state-externalization.js';
+import { Phase16WindowsPaths } from './phases/phase16-windows-paths.js';
 import { SkillParser } from './utils/skill-parser.js';
 import type { FixOptions, ValidatorResult } from './types.js';
 import chalk from 'chalk';
@@ -23,8 +24,9 @@ import chalk from 'chalk';
 /**
  * Total number of audit phases - used for CLI validation and documentation
  * When adding a new phase, update this constant and the phaseRunners in runSinglePhaseForSkill()
+ * Note: Phases 14-15 are reserved for future reference validation features
  */
-export const PHASE_COUNT = 13;
+export const PHASE_COUNT = 16;
 
 export class SkillAuditor {
   constructor(private skillsDir: string) {}
@@ -72,7 +74,10 @@ export class SkillAuditor {
     console.log(chalk.gray('Running Phase 13: State Externalization...'));
     const phase13 = await Phase13StateExternalization.run(this.skillsDir);
 
-    const phases = [phase1, phase2, phase3, phase4, phase5, phase6, phase7, phase8, phase9, phase10, phase11, phase12, phase13];
+    console.log(chalk.gray('Running Phase 16: Windows Path Detection...'));
+    const phase16 = await Phase16WindowsPaths.run(this.skillsDir);
+
+    const phases = [phase1, phase2, phase3, phase4, phase5, phase6, phase7, phase8, phase9, phase10, phase11, phase12, phase13, phase16];
 
     const criticalCount = phases.reduce(
       (sum, p) => sum + p.details.filter(d => d.includes('[CRITICAL]')).length,
@@ -157,6 +162,9 @@ export class SkillAuditor {
     console.log(chalk.gray('Running Phase 13: State Externalization...'));
     const phase13Issues = Phase13StateExternalization.validate(skill);
 
+    console.log(chalk.gray('Running Phase 16: Windows Path Detection...'));
+    const phase16Issues = Phase16WindowsPaths.validate(skill);
+
     // Format results as phase results for consistency
     const formatPhaseResult = (phaseName: string, issues: any[]) => {
       const issueCount = issues?.length || 0;
@@ -185,6 +193,7 @@ export class SkillAuditor {
       formatPhaseResult('Phase 11: Command Example Audit', phase11Issues),
       formatPhaseResult('Phase 12: CLI Error Handling', phase12Issues),
       formatPhaseResult('Phase 13: State Externalization', phase13Issues),
+      formatPhaseResult('Phase 16: Windows Path Detection', phase16Issues),
     ];
 
     const criticalCount = phases.reduce(

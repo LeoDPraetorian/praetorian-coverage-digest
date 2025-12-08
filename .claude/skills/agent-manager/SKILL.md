@@ -12,26 +12,92 @@ allowed-tools: 'Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, Skill, Ask
 
 ## Quick Reference
 
-| Operation | Command | Time | Purpose |
-|-----------|---------|------|---------|
-| Create | `npm run --silent create -- <name> "<desc>" --type <category>` | 15-30 min | TDD-driven agent creation |
-| Update | `npm run --silent update -- <name> "<changes>"` | 10-20 min | Minimal updates with TDD |
-| Audit | `npm run --silent audit -- [name] [--all]` | 2-5 min | 8-phase compliance check |
-| Fix | `npm run --silent fix -- <name> [--dry-run\|--suggest]` | 5-15 min | Auto-remediation |
-| Rename | `npm run --silent rename -- <old> <new>` | 5-10 min | Safe renaming with updates |
-| Test | `npm run --silent test -- <name> [skill-name]` | 5-10 min | Test agent with skill invocation |
-| Search | `npm run --silent search -- "<query>"` | 1-2 min | Keyword discovery |
-| List | `npm run --silent list -- [--type <category>]` | 1 min | List all agents |
+| Operation | Skill | Time | Purpose |
+|-----------|-------|------|---------|
+| **Create** | `creating-agents` | 60-90 min | Full TDD workflow with pressure testing |
+| **Update** | `updating-agents` | 20-40 min | Simplified TDD with conditional pressure testing |
+| **Test** | `testing-agent-skills` | 10-25 min | Behavioral validation - spawns agents, tests skill invocation |
+| **Audit** | `auditing-agents` | 30-60 sec | Critical validation - block scalars, name mismatches |
+| **Fix** | `fixing-agents` | 2-5 min | Interactive remediation - auto-fixes and manual guidance |
+| **Rename** | `renaming-agents` | 2-5 min | Safe renaming - validates, updates all references, verifies integrity |
+| **Search** | `searching-agents` | 30-60 sec | Keyword discovery - relevance scoring, filtering, result interpretation |
+| **List** | `listing-agents` | 30-60 sec | Display all agents - grouped by category, alphabetically sorted |
+
+---
+
+## 🚨 CRITICAL: Pure Router Pattern
+
+**This skill ONLY routes to operation-specific skills in the library. It contains ZERO business logic.**
+
+### How Routing Works
+
+When user invokes `/agent-manager <operation>`:
+
+1. **Parse operation** from arguments ($1)
+2. **Route to appropriate library skill:**
+
+   | Operation | Routes To |
+   |-----------|-----------|
+   | `create` | `.claude/skill-library/claude/agent-management/creating-agents/SKILL.md` |
+   | `update` | `.claude/skill-library/claude/agent-management/updating-agents/SKILL.md` |
+   | `test` | `.claude/skill-library/claude/agent-management/testing-agent-skills/SKILL.md` |
+   | `audit` | `.claude/skill-library/claude/agent-management/auditing-agents/SKILL.md` |
+   | `fix` | `.claude/skill-library/claude/agent-management/fixing-agents/SKILL.md` |
+   | `rename` | `.claude/skill-library/claude/agent-management/renaming-agents/SKILL.md` |
+   | `search` | `.claude/skill-library/claude/agent-management/searching-agents/SKILL.md` |
+   | `list` | `.claude/skill-library/claude/agent-management/listing-agents/SKILL.md` |
+
+3. **Read the library skill** using the Read tool
+4. **Follow the skill's instructions**
+5. **Display output** from skill execution
+
+### What This Means
+
+✅ **DO:**
+- Invoke the appropriate skill based on operation
+- Pass user arguments to the skill
+- Display skill output verbatim
+
+❌ **DO NOT:**
+- Execute CLI commands directly (npm run audit, npm run fix, etc.)
+- Implement business logic in this skill
+- Skip skill delegation and do operations manually
+
+### Why This Matters
+
+**From Architecture Documentation:**
+> "Commands follow the Router Pattern: they parse arguments and delegate to skills, containing zero business logic."
+
+**Benefits:**
+- **Skills load on-demand** - Only when actually used (context efficiency)
+- **Commands stay lightweight** - Loaded into context on every invocation
+- **Skills are reusable** - Can be invoked directly or via commands
+- **Maintainability** - Business logic lives in one place (skills)
+
+### Internal Implementation Details
+
+**CLI scripts exist** but are wrapped by skills:
+- `audit-critical.ts` → Wrapped by `auditing-agents` skill
+- `search.ts` → Wrapped by `searching-agents` skill
+- `test.ts` → Used internally by `testing-agent-skills` skill
+
+**Users should NEVER invoke CLI scripts directly.** Always use skills.
+
+---
 
 ## Prerequisites
 
-**Workspace setup:**
+**For users:** None. All operations use skills that handle setup internally.
+
+**For maintainers** (if modifying CLI scripts):
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
 cd "$REPO_ROOT/.claude/skills/agent-manager/scripts"
 npm install
 ```
+
+**Note:** Skills wrap CLI scripts automatically. Users never need to run npm commands directly.
 
 ## Critical Problem: Block Scalar Descriptions
 
@@ -88,17 +154,46 @@ description: Use when developing React applications - components, UI bugs, perfo
 
 ## Operations
 
-### Create (TDD-First Agent Creation)
+### Understanding Audit vs Test
 
-```bash
-# Standard creation with category
-npm run --silent create -- my-agent "Use when [trigger] - [capabilities]" --type development
+**Critical distinction** between structural and behavioral validation:
 
-# With suggest mode (outputs JSON for Claude)
-npm run --silent create -- my-agent --suggest
+| Aspect | Audit (Structural) | Test (Behavioral) |
+|--------|-------------------|-------------------|
+| **Purpose** | Lint check - format, syntax, compliance | Behavioral validation - does agent work correctly? |
+| **Method** | Static analysis of agent file | Spawns agent instances with Task tool |
+| **What it checks** | YAML syntax, description format, line count, file structure | Skill invocation, methodology compliance, workflow correctness |
+| **Speed** | Fast (2-5 min) | Slower (10-25 min per skill) |
+| **When to use** | Before committing, after editing agent file | After major changes, before deployment, when debugging behavior |
+| **Tool** | Instruction skill (`auditing-agents`) | Instruction skill (`testing-agent-skills`) |
+| **Output** | 8-phase compliance report | PASS/FAIL/PARTIAL per skill with reasoning |
+
+**Analogy:**
+- **Audit** = TypeScript compiler (syntax, types, structure)
+- **Test** = Jest/Vitest (runtime behavior, correctness)
+
+**Use both:** Audit catches format issues quickly. Test catches behavior issues that only appear when agents execute.
+
+---
+
+### Create Agent (Instruction-Based Workflow)
+
+**⚠️ IMPORTANT: Agent creation is now instruction-based (as of December 2024).**
+
+**Read the creating-agents skill:**
+```
+Read: .claude/skill-library/claude/agent-management/creating-agents/SKILL.md
 ```
 
-**Type options:**
+The `creating-agents` skill provides:
+- **Full 10-phase TDD workflow** with RED-GREEN-REFACTOR
+- **Phase 8: Skill Verification** - Tests each mandatory skill individually
+- **Phase 10: Pressure Testing** - Subagent-based rationalization testing
+- **Interactive guidance** via AskUserQuestion for decisions
+
+**Why instruction-based?** December 2024 analysis showed 97% of TypeScript code duplicated Claude's native capabilities. Instructions provide more flexibility for interactive workflows, pressure testing, and skill verification.
+
+**Type options** (selected in Phase 3):
 - `architecture` - System design, patterns, decisions
 - `development` - Implementation, coding, features
 - `testing` - Unit, integration, e2e testing
@@ -108,151 +203,189 @@ npm run --silent create -- my-agent --suggest
 - `orchestrator` - Coordination, workflows
 - `mcp-tools` - Specialized MCP access
 
+**Documentation:** `.claude/skill-library/claude/agent-management/creating-agents/SKILL.md`
+
+### Update Agent (Instruction-Based Workflow)
+
+**⚠️ IMPORTANT: Agent updates are now instruction-based (as of December 2024).**
+
+**Read the updating-agents skill:**
+```
+Read: .claude/skill-library/claude/agent-management/updating-agents/SKILL.md
+```
+
+The `updating-agents` skill provides:
+- **Simplified 6-phase TDD workflow** (RED-GREEN with optional REFACTOR)
+- **Minimal diff approach** using Edit tool
+- **Conditional pressure testing** for major changes (Phase 6)
+- **Fast iteration** for minor updates (~20 min vs ~40 min for major)
+
+**When to pressure test:**
+- Changed Critical Rules (rules might not resist pressure)
+- Added/removed capabilities (behavior changes)
+- Modified mandatory skills (workflow changes)
+- Major refactoring (>50 lines changed)
+
+**Documentation:** `.claude/skill-library/claude/agent-management/updating-agents/SKILL.md`
+
+### Audit (Critical Validation)
+
+**⚠️ IMPORTANT: Agent auditing is now instruction-based (as of December 2024).**
+
+**Read the auditing-agents skill:**
+```
+Read: .claude/skill-library/claude/agent-management/auditing-agents/SKILL.md
+```
+
+The `auditing-agents` skill provides:
+- **Block scalar detection** - Catches `|` and `>` that make agents invisible
+- **Name consistency** - Validates frontmatter name matches filename
+- **Description validation** - Ensures description field exists and has content
+- **Fast execution** - 30-60 seconds per agent
+
+**What it checks:**
+
+| Check | Impact | Fix |
+|-------|--------|-----|
+| Block scalar (`\|` or `>`) | CRITICAL - Agent invisible to Claude | Convert to single-line |
+| Name mismatch | CRITICAL - Discovery fails | Update frontmatter or filename |
+| Missing description | CRITICAL - No discovery metadata | Add description field |
+| Empty description | CRITICAL - No discovery content | Write description |
+
+**Why instruction-based?** Auditing requires:
+- Portable repo root resolution (super-repo + normal repo)
+- CLI wrapper for complex regex detection
+- Result interpretation and fix guidance
+
+**See:** `.claude/skill-library/claude/agent-management/auditing-agents/SKILL.md` - Complete audit workflow
+
+### Fix (Interactive Remediation)
+
+**⚠️ IMPORTANT: Agent fixing is now instruction-based (as of December 2024).**
+
+**Read the fixing-agents skill:**
+```
+Read: .claude/skill-library/claude/agent-management/fixing-agents/SKILL.md
+```
+
+The `fixing-agents` skill provides:
+- **Auto-fixes** - Deterministic fixes applied with Edit tool (block scalars, name mismatches)
+- **Manual guidance** - Step-by-step help for issues needing user input (missing/empty descriptions)
+- **Interactive** - User chooses which fixes to apply via AskUserQuestion
+- **Verified** - Re-audits after fixes to confirm success
+
+**What it fixes:**
+
+| Issue | Type | Example |
+|-------|------|---------|
+| Block scalar (`\|` or `>`) | AUTO | Convert to single-line with `\n` escapes |
+| Name mismatch | AUTO | Update frontmatter name to match filename |
+| Missing description | MANUAL | Ask user for description content |
+| Empty description | MANUAL | Ask user for description content |
+
 **Workflow:**
-1. **RED Phase** - Document gap (why is this agent needed?)
-2. **Generate Agent** - Create from lean template
-3. **GREEN Phase** - Test agent solves the gap
-4. **Audit** - Automatic 8-phase compliance check
-5. **Discovery Test** - Verify description visible in new session
+1. Audit agent (via `auditing-agents`) → get issues
+2. Categorize: auto-fixable vs needs user input
+3. Present options via AskUserQuestion
+4. Apply selected fixes with Edit tool
+5. Re-audit to verify fixes worked
+6. Report results
 
-**See:** [references/create-workflow.md](references/create-workflow.md)
+**Why instruction-based?** Fixing requires:
+- Reading agent files to understand context
+- Categorizing fix types dynamically
+- Interactive user selection (AskUserQuestion)
+- Applying edits with verification
+- Feedback loop (audit → fix → re-audit)
 
-### Update (Test-Guarded Changes)
-
-```bash
-npm run --silent update -- react-developer "Add Chariot API integration patterns"
-npm run --silent update -- react-developer --suggest
-```
-
-**Workflow:**
-1. **Identify Gap** - What instruction is missing?
-2. **RED Phase** - Document current failure behavior
-3. **Update Agent** - Apply minimal change
-4. **GREEN Phase** - Verify gap closes
-5. **Audit** - Re-validate compliance (esp. line count)
-
-**See:** [references/update-workflow.md](references/update-workflow.md)
-
-### Audit (8-Phase Compliance)
-
-```bash
-npm run --silent audit -- react-developer           # Single agent
-npm run --silent audit -- --all                     # All agents
-npm run --silent audit -- react-developer --phase 1 # Specific phase
-```
-
-**8 Phases:**
-
-| Phase | Name | Auto-Fix | Description |
-|-------|------|----------|-------------|
-| 1 | Frontmatter Syntax | ✅ | Description not block scalar, name matches filename, color, permissionMode, field order, alphabetical sorting |
-| 2 | Description Quality | ❌ | "Use when" trigger, includes examples, <1024 chars |
-| 3 | Prompt Efficiency | ❌ | <300 lines, delegates to skills, no duplication |
-| 4 | Skill Integration | ✅ | Uses gateway skills, tool appropriateness by type |
-| 5 | Output Standardization | ❌ | Returns structured JSON with handoff |
-| 6 | Escalation Protocol | ❌ | Clear stopping conditions, agent recommendations |
-| 7 | Body References | ✅ | Phantom skill detection (referenced but non-existent) |
-| 8 | Skill Coverage | ❌ | Recommended skills based on type and keywords |
-
-**Output:** Pre-formatted markdown report (display verbatim)
-
-**See:** [references/audit-phases.md](references/audit-phases.md)
-
-### Fix (Interactive Compliance Remediation)
-
-**🎯 New JSON Workflow (November 2024):**
-The fix command now outputs structured JSON for Claude to intercept and present interactive fix selection via `AskUserQuestion`.
-
-**Flow:**
-1. User runs: `/agent-manager audit my-agent`
-2. Audit reports failures, exits
-3. Claude sees failures, runs: `npm run fix -- my-agent --suggest`
-4. `fix.ts` returns JSON with questions
-5. Claude uses `AskUserQuestion` to present fix options
-6. User selects fixes (multi-select supported)
-7. Claude runs: `npm run fix -- my-agent --apply fix-id-1,fix-id-2`
-
-**Commands:**
-```bash
-# Interactive mode (outputs JSON for Claude)
-npm run --silent fix -- react-developer --suggest
-
-# Apply selected fixes (comma-separated)
-npm run --silent fix -- react-developer --apply phase1-description,phase1-skills-sort
-
-# Apply all auto-fixable
-npm run --silent fix -- react-developer --all-auto
-
-# Preview changes
-npm run --silent fix -- react-developer --dry-run
-```
-
-**Fix Categories:**
-- **[AUTO] Deterministic fixes:** Phases 1 (syntax), 4 (skill paths), 7 (phantom skills)
-- **[MANUAL] Semantic fixes:** Phases 2, 3, 5, 6, 8 (require Claude or manual review)
-
-**Semantic Fix IDs:**
-| ID | Phase | Description |
-|----|-------|-------------|
-| `phase1-description` | 1 | Convert block scalar to single-line |
-| `phase1-color-missing` | 1 | Add color field |
-| `phase1-color-mismatch` | 1 | Fix incorrect color |
-| `phase1-permission-mode` | 1 | Fix permissionMode value |
-| `phase1-ordering` | 1 | Reorder frontmatter fields |
-| `phase1-tools-sort` | 1 | Sort tools alphabetically |
-| `phase1-skills-sort` | 1 | Sort skills alphabetically |
-| `phase2-trigger` | 2 | Add "Use when" trigger |
-| `phase2-examples` | 2 | Add example blocks |
-| `phase3-trim` | 3 | Extract patterns to skills |
-| `phase4-gateway` | 4 | Replace library paths with gateway |
-| `phase4-add-tool-{name}` | 4 | Add required/recommended tool |
-| `phase4-remove-tool-{name}` | 4 | Remove forbidden tool |
-| `phase5-output` | 5 | Add standardized JSON output |
-| `phase6-escalation` | 6 | Add escalation protocol |
-| `phase7-remove-phantom-{name}` | 7 | Remove phantom skill reference |
-| `phase8-add-skill-{name}` | 8 | Add recommended skill |
-
-**See:** [references/fix-workflow.md](references/fix-workflow.md)
+**See:** `.claude/skill-library/claude/agent-management/fixing-agents/SKILL.md` - Complete fix patterns and examples
 
 ### Rename (Safe Agent Renaming)
 
-```bash
-npm run --silent rename -- old-agent-name new-agent-name
+**⚠️ IMPORTANT: Agent renaming is now instruction-based (as of December 2024).**
+
+**Read the renaming-agents skill:**
+```
+Read: .claude/skill-library/claude/agent-management/renaming-agents/SKILL.md
 ```
 
-**7-Step Protocol:**
-1. Validate old name exists
-2. Validate new name available
-3. Update frontmatter `name` field
-4. Rename agent file
-5. Update Task tool references in code
-6. Update agent references in other agents
-7. Move old to .archived/ if consolidating
+The `renaming-agents` skill provides:
+- **7-step safe rename** - Validates source/target, updates all references
+- **Reference tracking** - Finds ALL references across commands, skills, agents
+- **Integrity verification** - Confirms no broken references remain
+- **Conflict detection** - Prevents overwriting existing agents
+- **Atomic operation** - All updates succeed or all rollback
 
-**See:** [references/rename-protocol.md](references/rename-protocol.md)
+**What it updates:**
+1. Frontmatter name field
+2. Agent filename
+3. All references in commands (examples, usage)
+4. All references in skills (workflows, integration points)
+5. All references in other agents (delegation, recommendations)
 
-### Test (Agent Discovery Testing)
+**Why instruction-based?** Renaming requires:
+- Comprehensive reference search across codebase
+- Multiple file updates with Edit tool
+- Validation before and after operation
+- User confirmation for safety
+- Integrity verification to prevent broken references
 
-```bash
-npm run --silent test -- react-developer              # Test description discovery
-npm run --silent test -- react-developer gateway-frontend  # Test with skill
+**See:** `.claude/skill-library/claude/agent-management/renaming-agents/SKILL.md` - Complete rename workflow
+
+### Test (Behavioral Validation - Skill Integration)
+
+**⚠️ IMPORTANT: Agent testing is now instruction-based (as of December 2024).**
+
+**Read the testing-agent-skills skill:**
+```
+Read: .claude/skill-library/claude/agent-management/testing-agent-skills/SKILL.md
 ```
 
-**What it tests:**
-1. Description is NOT `|` or `>`
-2. Description parses correctly
-3. Agent spawns without error
-4. (Optional) Skill auto-loads
+The `testing-agent-skills` skill provides:
+- **Behavioral validation** - Spawns agents with trigger scenarios
+- **Skill invocation testing** - Verifies agent invokes mandatory skills
+- **Methodology compliance** - Checks if agent follows skill workflows
+- **PASS/FAIL/PARTIAL** - Reports with detailed reasoning
 
-**See:** [references/test-workflow.md](references/test-workflow.md)
+**Inputs:**
+- Agent name (required): `frontend-developer`
+- Skill name (optional): `developing-with-tdd` (if omitted, tests ALL mandatory skills)
+
+**Example:**
+```
+User: "Test if react-developer uses developing-with-tdd correctly"
+Agent: Read .claude/skill-library/claude/agent-management/testing-agent-skills/SKILL.md
+       Provide agent=react-developer, skill=developing-with-tdd
+```
+
+**Why instruction-based?** Testing requires:
+- Spawning agents with Task tool
+- Evaluating complex behavior patterns
+- Multi-step workflows with TodoWrite tracking
+- Scenario design based on skill descriptions
+
+**For structural validation** (syntax, format, line count), use `audit` instead:
+```
+Read: .claude/skill-library/claude/agent-management/auditing-agents/SKILL.md
+```
+
+**See:** `.claude/skill-library/claude/agent-management/testing-agent-skills/SKILL.md` - Complete testing workflow
 
 ### Search (Agent Discovery)
 
-```bash
-npm run --silent search -- "react"
-npm run --silent search -- "security" --type analysis
-npm run --silent search -- "coordinator" --limit 5
+**⚠️ IMPORTANT: Agent searching is now instruction-based (as of December 2024).**
+
+**Read the searching-agents skill:**
 ```
+Read: .claude/skill-library/claude/agent-management/searching-agents/SKILL.md
+```
+
+The `searching-agents` skill provides:
+- **Keyword search** - Searches across names, descriptions, types, skills
+- **Relevance scoring** - Ranks results by match quality (0-100+ points)
+- **Category filtering** - Optionally filter by agent type
+- **Result limiting** - Show top N matches
+- **Score interpretation** - Explains what scores mean
 
 **Scoring algorithm:**
 - Name exact match: 100 points
@@ -260,20 +393,51 @@ npm run --silent search -- "coordinator" --limit 5
 - Description match: 30 points
 - Type match: 20 points
 - Skills match: 10 points
+- Valid description bonus: 5 points
 
-**See:** [references/search-workflow.md](references/search-workflow.md)
+**Why instruction-based?** Searching requires:
+- Portable repo root resolution
+- CLI wrapper for scoring algorithm
+- Result interpretation and recommendations
+- Integration with Task tool workflow (search → select → use)
+
+**See:** `.claude/skill-library/claude/agent-management/searching-agents/SKILL.md` - Complete search patterns and examples
 
 ### List (Show All Agents)
 
-```bash
-npm run --silent list                           # All agents
-npm run --silent list -- --type development     # Filter by type
-npm run --silent list -- --status broken        # Show broken descriptions
+**⚠️ IMPORTANT: Agent listing is now instruction-based (as of December 2024).**
+
+**Read the listing-agents skill:**
+```
+Read: .claude/skill-library/claude/agent-management/listing-agents/SKILL.md
 ```
 
-**Output columns:** Name, Type, Lines, Description Status, Skill Integration
+The `listing-agents` skill provides:
+- **Category grouping** - All agents organized by 8 categories
+- **Alphabetical sorting** - Within each category
+- **Descriptions shown** - First 80 chars of each agent's purpose
+- **Counts provided** - Per category and total
+- **Browsing-optimized** - For discovering available agents
 
-**See:** [references/list-workflow.md](references/list-workflow.md)
+**Categories:**
+- Architecture (3) - Design decisions, patterns
+- Development (5) - Implementation, coding
+- Testing (8) - Unit, integration, E2E
+- Quality (3) - Code review, auditing
+- Analysis (2) - Security, complexity
+- Research (1) - Web search, documentation
+- Orchestrator (2) - Coordination, workflows
+- MCP Tools (2) - Specialized MCP access
+
+**Total:** 26 agents (as of December 2024)
+
+**Why instruction-based?** Listing requires:
+- Discovery via Glob across all categories
+- Reading frontmatter from each agent
+- Grouping and formatting output
+- Simple but comprehensive presentation
+
+**See:** `.claude/skill-library/claude/agent-management/listing-agents/SKILL.md` - Complete listing patterns and formats
 
 ## Lean Agent Pattern
 
@@ -388,9 +552,10 @@ User: What is the description for the [agent-name] agent? Quote it exactly.
 
 ## Changelog
 
-- **2024-12-01**: Enhanced audit workflow automation
-  - Audit automatically runs `npm run fix -- {agent} --suggest` when issues are found
-  - Provides immediate fix suggestions without manual intervention
+- **2024-12-07**: Migrated to Pure Router Pattern
+  - All operations now use instruction-based skills (create, update, test, audit, fix, rename, search, list)
+  - Audit workflow integrated with fixing-agents skill for automatic remediation
+  - CLI scripts wrapped by skills (audit-critical, search, test)
 - **2024-11-30**: Expanded to 8-phase audit system
   - Phase 1: Added color field, permissionMode alignment, field ordering, alphabetical sorting
   - Phase 4: Added tool appropriateness checks (required/forbidden/recommended by type)

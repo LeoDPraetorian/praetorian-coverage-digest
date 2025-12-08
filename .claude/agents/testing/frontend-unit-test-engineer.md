@@ -5,7 +5,7 @@ type: testing
 permissionMode: default
 tools: Bash, Glob, Grep, Read, TodoWrite, Write
 skills: calibrating-time-estimates, debugging-systematically, developing-with-tdd, gateway-frontend, gateway-testing, verifying-before-completion
-model: opus
+model: sonnet
 color: pink
 ---
 

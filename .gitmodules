@@ -46,3 +46,24 @@
 	path = modules/chariot-devops
 	url = https://github.com/praetorian-inc/chariot-devops
 	branch = main
+[submodule "modules/noseyparker"]
+	path = modules/noseyparker
+	url = https://github.com/praetorian-inc/noseyparker
+[submodule "modules/noseyparkerplusplus"]
+	path = modules/noseyparkerplusplus
+	url = https://github.com/praetorian-inc/noseyparkerplusplus
+[submodule "modules/noseyparker-explorer"]
+	path = modules/noseyparker-explorer
+	url = https://github.com/praetorian-inc/noseyparker-explorer
+[submodule "modules/ai-research"]
+	path = modules/ai-research
+	url = https://github.com/praetorian-inc/ai-research
+[submodule "modules/redteam-attack-infrastructure"]
+	path = modules/redteam-attack-infrastructure
+	url = https://github.com/praetorian-inc/redteam-attack-infrastructure
+[submodule "modules/nexus"]
+	path = modules/nexus
+	url = https://github.com/praetorian-inc/nexus
+[submodule "modules/msp-definitions"]
+	path = modules/msp-definitions
+	url = https://github.com/praetorian-inc/msp-definitions

@@ -1,6 +1,23 @@
 # Agent Rename Protocol
 
-## Overview
+> **⚠️ DEPRECATION NOTICE (December 2024)**
+>
+> **This protocol documents ARCHIVED CLI commands.**
+>
+> **For agent renaming, use the instruction-based skill instead:**
+> ```
+> skill: "renaming-agents"
+> ```
+>
+> **Why the change?** Pure Router Pattern migration completed December 7, 2024. All agent operations now use instruction-based skills.
+>
+> **See:** `.claude/skills/renaming-agents/SKILL.md` for the current 7-step safe rename workflow
+>
+> ---
+>
+> **The content below is kept for historical reference only.**
+
+## Overview (ARCHIVED)
 
 Renaming an agent involves a 7-step protocol to ensure all references are updated correctly.
 

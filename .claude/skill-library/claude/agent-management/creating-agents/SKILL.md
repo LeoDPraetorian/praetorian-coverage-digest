@@ -244,49 +244,53 @@ Ask: "Does agent solve the problem?"
 
 **Test each mandatory skill individually to verify integration.**
 
-### 8.1 Identify Mandatory Skills
+### 8.1 Invoke Skill Testing Workflow
 
-From agent's "Mandatory Skills" section (created in Phase 6), extract list.
-
-Example: developing-with-tdd, debugging-systematically, verifying-before-completion
-
-### 8.2 For EACH Mandatory Skill
-
-**a. Verify Exists**:
-```bash
-# Check if skill file exists
-ls .claude/skills/{skill-name}/SKILL.md || find .claude/skill-library -name "{skill-name}"
+```
+skill: "testing-agent-skills"
 ```
 
-**If NOT found**: STOP - cannot proceed with missing mandatory skill.
+**Provide**:
+- Agent name: `{agent-name}` (from Phase 2)
+- Skill: (omit to test all mandatory skills)
 
-**b. Design Trigger Scenario**:
-Create scenario that requires this specific skill invocation.
+**The skill will guide you through**:
+1. Extract mandatory skills from agent
+2. For each skill:
+   - Verify skill file exists
+   - Design trigger scenario
+   - Spawn agent with Task tool
+   - Evaluate PASS/FAIL/PARTIAL
+3. Report aggregate results
 
-**c. Spawn Agent**:
+### 8.2 Evaluate Results
+
+**Example output**:
 ```
-Task({
-  subagent_type: "{agent-name}",
-  prompt: "{Skill-trigger scenario}"
-})
+Agent: python-developer
+Skills Tested: 3
+
+Results:
+✅ developing-with-tdd: PASS
+✅ debugging-systematically: PASS
+❌ verifying-before-completion: FAIL - didn't invoke
+
+Overall: 2/3 PASS (67%)
 ```
-
-**d. Evaluate**:
-- **PASS**: Agent invoked skill, followed methodology, output shows application
-- **FAIL**: Agent didn't invoke or didn't follow
-- **PARTIAL**: Agent followed implicitly but didn't explicitly invoke
-
-**e. Record**: "{skill-name}: PASS/FAIL/PARTIAL"
 
 ### 8.3 Confirm All PASS
 
-Ask: "All {N} mandatory skills verified?"
-- Yes → Phase 9
-- No → Fix agent, re-test failed skills
+**If ALL PASS** ✅:
+- Proceed to Phase 9
+
+**If ANY FAIL** ❌:
+- Fix agent (update Mandatory Skills section, add emphasis)
+- Re-test failed skills: `skill: "testing-agent-skills"` with specific skill
+- Repeat until all PASS
 
 **Cannot proceed without all PASS** ✅
 
-**Detailed methodology**: Read `references/skill-verification.md`
+**See:** `.claude/skills/testing-agent-skills/SKILL.md` for complete workflow
 
 ---
 

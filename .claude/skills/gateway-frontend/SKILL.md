@@ -73,7 +73,7 @@ Each skill is organized by domain for easy discovery.
 
 ## Development Tools
 
-**Frontend Smart ESLint**: `.claude/skill-library/development/frontend/frontend-smart-eslint/SKILL.md`
+**Frontend Smart ESLint**: `.claude/skill-library/development/frontend/using-eslint/SKILL.md`
 - ESLint configuration and linting strategies for TypeScript/React
 
 ## Shared Standards & Architecture
@@ -114,7 +114,7 @@ These foundational skills apply across all frontend development:
 | Performance issues | frontend-performance-optimization |
 | UI animations | frontend-animation-designer |
 | Shadcn components | frontend-shadcn-ui |
-| Code quality | frontend-smart-eslint |
+| Code quality | using-eslint |
 
 ## When to Use This Gateway
 

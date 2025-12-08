@@ -1,6 +1,27 @@
 # Agent Creation Workflow
 
-## Overview
+> **⚠️ DEPRECATION NOTICE (December 2024)**
+>
+> **This workflow documents ARCHIVED CLI commands (`npm run create`).**
+>
+> **For agent creation, use the instruction-based skill instead:**
+> ```
+> skill: "creating-agents"
+> ```
+>
+> **Why the change?** Analysis showed 97% of TypeScript code duplicated Claude's native capabilities. The instruction-based workflow provides:
+> - Full 10-phase TDD with pressure testing (Phase 10)
+> - Skill verification phase (Phase 8)
+> - Interactive AskUserQuestion guidance
+> - More flexibility than TypeScript code
+>
+> **See:** `.claude/skills/creating-agents/SKILL.md` for the current workflow
+>
+> ---
+>
+> **The content below is kept for historical reference only.**
+
+## Overview (ARCHIVED)
 
 Creating a new agent follows a TDD workflow:
 1. **RED**: Document the gap this agent fills

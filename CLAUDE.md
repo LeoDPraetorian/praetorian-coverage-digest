@@ -10,11 +10,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Super-Repository Structure
 
-This is a **super-repository** containing 12 submodules organized under `/modules/`:
+This is a **super-repository** containing 16 submodules organized under `/modules/`:
 
 ```
 chariot-development-platform/                  # Super-repo root
-├── modules/                                   # All submodules (12 total)
+├── modules/                                   # All submodules (16 total)
 │   ├── chariot/                               # Core platform (backend API + React UI)
 │   ├── chariot-ui-components/                 # Shared React component library
 │   ├── tabularium/                            # Universal data schema and models
@@ -26,7 +26,11 @@ chariot-development-platform/                  # Super-repo root
 │   ├── chariot-devops/                        # DevOps and infrastructure automation
 │   ├── nuclei-templates/                      # Security vulnerability templates
 │   ├── praetorian-cli/                        # Python CLI and SDK
-│   └── praetorian-agent-workflows/            # AI agent workflow orchestration
+│   ├── praetorian-agent-workflows/            # AI agent workflow orchestration
+│   ├── noseyparker/                           # Secret scanning engine (Rust)
+│   ├── noseyparkerplusplus/                   # Enhanced secret scanner (Rust)
+│   ├── noseyparker-explorer/                  # Web UI for secret scan results
+│   └── ai-research/                           # AI security research and experiments
 ├── Makefile                                   # Super-repo automation
 ├── docs/CLEAN_CODE.md                         # Summary of 'Clean code' by Robert C. Martin
 ├── docs/TECH-STACK.md                              # Technology stack reference
@@ -38,7 +42,7 @@ chariot-development-platform/                  # Super-repo root
 **Critical**: This super-repository requires recursive submodule cloning:
 
 ```bash
-# Initial clone with all 12 submodules
+# Initial clone with all 16 submodules
 git clone --recurse-submodules https://github.com/praetorian-inc/chariot-development-platform.git
 
 # Complete setup sequence
@@ -52,6 +56,20 @@ make claude-setup             # Display Claude Code plugin installation commands
 # PRAETORIAN_CLI_PASSWORD={uuid-no-dashes}Aa1!
 
 # UI will be available at https://localhost:3000 with generated credentials
+```
+
+**⚠️ IMPORTANT: Verify Git Hooks Are Installed**
+
+After running `make setup`, verify the pre-commit hook is active:
+
+```bash
+.githooks/verify-hooks.sh
+```
+
+This hook **prevents accidental submodule commits** that cause PR conflicts. If you see a warning, run:
+
+```bash
+make install-git-hooks
 ```
 
 ## Claude Code Setup (AI Development Assistant)
