@@ -114,9 +114,26 @@ Use this gateway when:
 
 For specific implementations, load the individual service skill.
 
+## Creating MCP Wrappers
+
+**When**: Creating new MCP wrappers
+
+**Skill**: [creating-mcp-wrappers](../creating-mcp-wrappers/SKILL.md)
+
+**What it provides**:
+- Schema discovery (Claude explores MCP interactively)
+- Test design (Claude reasons about test cases - ≥18 tests across 6 categories)
+- Implementation guidance (Claude implements from schema discovery docs)
+- CLI gates (verify-red, verify-green enforce TDD mechanically)
+
+**Use this for**: End-to-end wrapper creation with hybrid approach (instruction-based discovery/design + CLI enforcement).
+
+**Time**: ~20-30 minutes (vs ~45 minutes manual workflow)
+
 ## Related
 
-- **mcp-manager**: Create/update/audit MCP wrappers (use `/mcp-manager` command)
+- **mcp-manager**: Wrapper lifecycle management - update/audit/fix existing wrappers (use `/mcp-manager` command)
+- **creating-mcp-wrappers**: Create new wrappers with instruction-driven workflow (use skill above)
 - **Full architecture**: `docs/MCP-TOOLS-ARCHITECTURE.md`
 
 ## MCP Tools

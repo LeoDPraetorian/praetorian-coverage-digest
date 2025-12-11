@@ -12,14 +12,21 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 
 ## Quick Reference
 
-### TDD Workflow (Enforced Order)
+### Create Workflow (Instruction-Driven)
+
+| Operation | Method | Time |
+|-----------|--------|------|
+| **Create** | Use `creating-mcp-wrappers` skill | 20-30 min |
+| Update | `npm run update -- <service> <tool>` | 10-20 min |
+| Audit | `npm run audit -- <service>/<tool>` | 2-5 min |
+
+### TDD Workflow (CLI Gates - Used by creating-mcp-wrappers)
 
 | Step | Command | What It Does |
 |------|---------|--------------|
-| 1. Create Test | `npm run create -- <service> <tool>` | Generates test file ONLY |
-| 2. Verify RED | `npm run verify-red -- <service>/<tool>` | Confirms tests fail |
-| 3. Generate | `npm run generate-wrapper -- <service>/<tool>` | Creates wrapper (blocks if RED fails) |
-| 4. Verify GREEN | `npm run verify-green -- <service>/<tool>` | Confirms tests pass (≥80%) |
+| 1. Verify RED | `npm run verify-red -- <service>/<tool>` | Confirms tests fail (mechanical) |
+| 2. Generate | `npm run generate-wrapper -- <service>/<tool>` | Creates wrapper (blocks if RED fails) |
+| 3. Verify GREEN | `npm run verify-green -- <service>/<tool>` | Confirms tests pass (≥80%) (mechanical) |
 
 ### Other Operations
 
@@ -96,33 +103,40 @@ npm run verify-green -- <service>/<tool>      # 4. MUST PASS with ≥80% coverag
 
 ## Operations
 
-### Create (TDD-Enforced Wrapper Creation)
+### Create (Delegated to creating-mcp-wrappers)
 
-**Enforces RED-GREEN-REFACTOR cycle from the start.**
+**Wrapper creation is now instruction-driven via the `creating-mcp-wrappers` skill.**
 
-```bash
-# Navigate to workspace from any location
-cd "$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)/.claude/skills/mcp-manager/scripts"
-
-# Step 1: Create test file (RED phase setup)
-npm run create -- <service> <tool>
-
-# Step 2: Verify tests fail (proves tests work)
-npm run verify-red -- <service>/<tool>
-
-# Step 3: Generate wrapper (blocked until RED passes)
-npm run generate-wrapper -- <service>/<tool>
-
-# Step 4: Implement and verify (GREEN phase)
-npm run verify-green -- <service>/<tool>
+Use the skill:
+```
+skill: "creating-mcp-wrappers"
 ```
 
-**Key Enforcement:**
-- `create` generates test file + `tsconfig.json` (if new service), NOT wrapper
-- `generate-wrapper` checks RED phase first, blocks if not verified
-- `verify-green` requires ≥80% coverage
+The `creating-mcp-wrappers` skill guides you through:
+1. **Schema Discovery** - Interactive MCP exploration with ≥3 test cases
+2. **Test Design** - Claude reasons about test cases (≥18 tests across 6 categories)
+3. **RED Gate** - CLI mechanical verification (`npm run verify-red`)
+4. **Wrapper Generation** - CLI template generation (`npm run generate-wrapper`)
+5. **Implementation** - Claude implements from schema discovery docs
+6. **GREEN Gate** - CLI mechanical verification (`npm run verify-green`, coverage ≥80%)
+7. **Audit** - CLI validates 11 phases (`npm run audit`)
+8. **Service Skill** - CLI updates service skill (`npm run generate-skill`)
 
-**See:** [references/new-workflow.md](references/new-workflow.md)
+**Why instruction-driven?**
+- Claude can explore MCP tools interactively (vs manual schema script)
+- Test cases are tailored to discovered schema (vs generic template)
+- Implementation is guided by schema analysis (vs "customize wrapper" instruction)
+- **CLI gates still enforce mechanical TDD** (verify-red, verify-green are unchanged)
+
+**The CLI becomes the "guard rails" that the skill delegates to for enforcement.**
+
+**After creation, verify compliance:**
+```bash
+npm run audit -- {service}/{tool}
+# Target: ≥10/11 phases pass
+```
+
+**See**: `creating-mcp-wrappers` skill for complete workflow documentation
 
 ### Update (Test-Guarded Changes)
 
