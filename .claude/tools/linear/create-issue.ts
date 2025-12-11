@@ -63,6 +63,7 @@ import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client';
 import {
   validateNoControlChars,
+  validateNoControlCharsAllowWhitespace,
   validateNoPathTraversal,
   validateNoCommandInjection,
 } from '../config/lib/sanitize';
@@ -78,7 +79,7 @@ export const createIssueParams = z.object({
     .refine(validateNoControlChars, 'Control characters not allowed')
     .describe('Issue title'),
   description: z.string()
-    .refine(validateNoControlChars, 'Control characters not allowed')
+    .refine(validateNoControlCharsAllowWhitespace, 'Dangerous control characters not allowed')
     .optional()
     .describe('Issue description (Markdown)'),
   team: z.string()

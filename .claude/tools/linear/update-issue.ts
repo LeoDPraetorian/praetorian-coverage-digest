@@ -61,6 +61,7 @@ import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client';
 import {
   validateNoControlChars,
+  validateNoControlCharsAllowWhitespace,
   validateNoPathTraversal,
   validateNoCommandInjection,
 } from '../config/lib/sanitize';
@@ -83,7 +84,7 @@ export const updateIssueParams = z.object({
     .optional()
     .describe('New title'),
   description: z.string()
-    .refine(validateNoControlChars, 'Control characters not allowed')
+    .refine(validateNoControlCharsAllowWhitespace, 'Dangerous control characters not allowed')
     .optional()
     .describe('New description (Markdown)'),
   // Reference fields - full validation

@@ -1,22 +1,52 @@
 ---
 description: Natural language interface for Linear - just describe what you want, no syntax to memorize!
 argument-hint: <describe your operation naturally>
-allowed-tools: Bash, Read
+allowed-tools: Bash, Read, Skill
 ---
 
 # Linear Issue Management
 
 **Speak naturally!** Just describe what you want after `/linear` - I'll figure it out.
 
+## Quick Operations vs Epic Creation
+
+**For quick operations** (seconds to minutes):
+- Create single issue, get issue, list issues, update fields
+- Uses `mcp-tools-linear` skill
+
+**For comprehensive epics** (2-4 hours):
+- Create epic with codebase research, breakdown, detailed docs
+- Uses `writing-linear-epics-stories` skill
+- Example: `/linear create epic for real-time notifications with research`
+
+I'll automatically detect which workflow you need based on your request.
+
+---
+
 ## Natural Language Examples
 
-### Creating Issues
+### Creating Issues (Quick)
 ```bash
 # All of these work:
 /linear create issue for fixing auth bug with description needs OAuth migration
 /linear make a new issue about performance regression in dashboard
 /linear create task: implement rate limiting, description: add Redis-based rate limiter
 /linear new issue for the memory leak in worker pool
+```
+
+### Creating Epics (Comprehensive)
+```bash
+# Triggers full research workflow:
+/linear create epic for real-time notifications with research
+/linear create epic for asset discovery automation with proper breakdown
+/linear build epic for multi-factor authentication, research first
+/linear create comprehensive epic for API rate limiting
+
+# These trigger the writing-linear-epics-stories skill which will:
+# 1. Research codebase (30-60 min)
+# 2. Design epic/story breakdown (20-40 min)
+# 3. Write detailed descriptions with diagrams (30-60 min)
+# 4. Create Linear tickets (10-20 min)
 ```
 
 ### Getting Issues
@@ -59,24 +89,46 @@ allowed-tools: Bash, Read
 
 When you invoke this command, I will:
 
-1. Read the Linear MCP tools skill for available operations and examples:
+### Step 1: Detect Workflow Type
+
+Analyze your input for keywords:
+- **Epic workflow**: "epic", "comprehensive", "with research", "with breakdown", "stories"
+- **Quick operation**: "issue", "get", "list", "update", single operations
+
+### Step 2: Route to Appropriate Skill
+
+**If epic creation detected:**
+```bash
+Skill: "writing-linear-epics-stories"
+```
+→ Starts comprehensive workflow with research, breakdown, documentation
+
+**If quick operation detected:**
 ```bash
 Read: .claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md
 ```
+→ Parse natural language and execute wrapper directly
 
-2. Parse your natural language input to identify:
-   - **Operation**: create, get, list, update, etc.
-   - **Parameters**: title, description, issue ID, limit, etc.
-   - **Context**: any additional details or preferences
+### Step 3: Execute Workflow
 
-3. Execute the matching wrapper operation from the skill's documentation
+**For epics:**
+- Follow structured research → breakdown → documentation → creation process
+- Create TodoWrite todos to track progress
+- Deliver epic + sub-issues with full context
 
-4. Format and display the results in a user-friendly way
+**For quick operations:**
+- Parse parameters from natural language
+- Execute appropriate Linear wrapper
+- Display clean results
+
+### Step 4: Confirm and Deliver
+
+- Show created tickets with URLs
+- Summarize what was accomplished
 
 ## What You Can Do
 
-Based on the Linear skill, common operations include:
-
+### Quick Operations (mcp-tools-linear)
 - **Create issues**: Provide title and optional description
 - **Get issue**: Provide issue ID (e.g., CHARIOT-1234)
 - **List issues**: Optionally specify limit (default 20)
@@ -84,7 +136,13 @@ Based on the Linear skill, common operations include:
 - **Search issues**: Find issues by title, description, or labels
 - **Comment on issues**: Add comments to existing issues
 
-The skill will show me exactly how to execute your request!
+### Epic Creation (writing-linear-epics-stories)
+- **Create comprehensive epics**: With codebase research and breakdown
+- **Generate detailed sub-issues**: With architecture diagrams and workflows
+- **Manage dependencies**: Automatic parent/child linking
+- **Rich documentation**: ASCII diagrams, code examples, success criteria
+
+The appropriate skill will guide me through your request!
 
 ## Tips for Best Results
 

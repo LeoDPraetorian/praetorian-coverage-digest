@@ -53,8 +53,17 @@ const XSS_PATTERNS = [
 
 /**
  * Control character range (ASCII 0-31 and 127)
+ * Used for strict validation (IDs, paths, etc.)
  */
 const CONTROL_CHAR_PATTERN = /[\x00-\x1F\x7F]/;
+
+/**
+ * Dangerous control characters only (excludes tab, newline, carriage return)
+ * Used for permissive validation (descriptions, markdown content)
+ * Allows: \x09 (tab), \x0A (LF), \x0D (CR)
+ * Blocks: null bytes, backspace, form feed, etc.
+ */
+const DANGEROUS_CONTROL_CHAR_PATTERN = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/;
 
 /**
  * Validate that a string does not contain path traversal sequences
@@ -97,13 +106,26 @@ export function validateNoXSS(input: string): boolean {
 }
 
 /**
- * Validate that a string does not contain control characters
+ * Validate that a string does not contain control characters (strict)
+ * Use for IDs, paths, and other structured inputs.
  *
  * @param input - String to validate
  * @returns true if safe, false if control characters detected
  */
 export function validateNoControlChars(input: string): boolean {
   return !CONTROL_CHAR_PATTERN.test(input);
+}
+
+/**
+ * Validate that a string does not contain dangerous control characters (permissive)
+ * Use for descriptions, comments, and other markdown/text content.
+ * Allows: tab (\t), newline (\n), carriage return (\r)
+ *
+ * @param input - String to validate
+ * @returns true if safe, false if dangerous control characters detected
+ */
+export function validateNoControlCharsAllowWhitespace(input: string): boolean {
+  return !DANGEROUS_CONTROL_CHAR_PATTERN.test(input);
 }
 
 /**
