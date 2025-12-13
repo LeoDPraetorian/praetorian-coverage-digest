@@ -114,23 +114,117 @@ devtools(
 
 ## Immer Middleware
 
-Allows mutable state updates (Immer handles immutability):
+### Do You Actually Need Immer?
+
+**IMPORTANT**: Zustand's `set()` already does shallow merging. You often don't need Immer.
 
 ```typescript
+// ✅ Zustand's set() handles this WITHOUT Immer
+set({ count: state.count + 1 })           // Shallow merge built-in
+set({ user: { ...state.user, name } })    // One level deep is easy
+
+// ⚠️ Immer ONLY helps with deeply nested updates (3+ levels)
+set(state => ({
+  ...state,
+  level1: {
+    ...state.level1,
+    level2: {
+      ...state.level2,
+      level3: {
+        ...state.level3,
+        value: newValue  // This is painful without Immer
+      }
+    }
+  }
+}))
+```
+
+### When to Use Immer
+
+| Scenario | Use Immer? |
+|----------|------------|
+| Flat state (primitives, shallow objects) | ❌ No - overhead not worth it |
+| 1-2 levels of nesting | ❌ No - spread operator is fine |
+| 3+ levels of nesting | ✅ Yes - reduces boilerplate significantly |
+| Frequent array mutations (push, splice) | ✅ Yes - cleaner syntax |
+| Performance-critical hot paths | ❌ No - Immer is 2-3x slower |
+
+### Performance Considerations
+
+From [Immer docs](https://immerjs.github.io/immer/performance/):
+
+> "Immer with proxies is roughly speaking **2-3x slower** than a handwritten reducer"
+
+However, Immer can detect "no-op" changes and skip unnecessary updates, which can sometimes make it faster in practice.
+
+**Alternative**: [Mutative](https://github.com/unadlib/mutative) is 10x faster than Immer with similar API.
+
+### Basic Usage (When You Actually Need It)
+
+```typescript
+import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
+
+// ⚠️ REQUIRES: npm install immer (peer dependency, not bundled!)
 
 const useStore = create<Store>()(
   immer((set) => ({
-    todos: [],
+    deeply: { nested: { todos: [] } },
     addTodo: (text) => set((state) => {
-      // Mutate directly!
-      state.todos.push({ id: Date.now(), text })
+      // Mutate directly - Immer handles immutability
+      state.deeply.nested.todos.push({ id: Date.now(), text })
     }),
   }))
 )
 ```
 
-**When to use**: Complex nested state updates
+### TypeScript + Immer Gotchas
+
+```typescript
+// ❌ WRONG - void return not properly typed in some versions
+set((state) => {
+  state.count++
+  // TypeScript may complain about void return
+})
+
+// ✅ CORRECT - explicit no return or return nothing
+set((state) => {
+  state.count++
+  return  // Explicit return
+})
+
+// ✅ ALSO CORRECT - return the draft (though unnecessary)
+set((state) => {
+  state.count++
+  return state
+})
+```
+
+### Consider Valtio Instead
+
+If you want mutation-style updates throughout your app, **consider [Valtio](https://github.com/pmndrs/valtio)** instead of Zustand + Immer:
+
+- Same maintainers (Poimandres)
+- Built-in proxy-based mutations
+- Automatic render optimization
+- No middleware needed
+
+```typescript
+// Valtio - mutation is the default
+import { proxy, useSnapshot } from 'valtio'
+
+const state = proxy({ count: 0, nested: { value: 1 } })
+
+// Mutate anywhere, anytime
+state.count++
+state.nested.value = 2
+
+// React component
+function Counter() {
+  const snap = useSnapshot(state)
+  return <div>{snap.count}</div>
+}
+```
 
 ---
 

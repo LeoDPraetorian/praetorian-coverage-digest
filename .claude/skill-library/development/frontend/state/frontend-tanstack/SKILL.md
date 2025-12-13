@@ -282,6 +282,37 @@ createTodo.mutate({ title: 'New todo', completed: false })
 4. **`initialPageParam` required** for infinite queries
 5. **Callbacks moved to mutate calls** (not in hook config)
 
+### Query Key Design Principles
+
+Query keys are the foundation of TanStack Query's caching. **Unstable keys = infinite refetches**.
+
+**Problem: Complex objects create new references every render:**
+```tsx
+// ❌ WRONG: New object = new fetch every render
+const filters = { status: 'active', search: term };
+useQuery({ queryKey: ['todos', filters], queryFn: ... });  // Refetches constantly!
+```
+
+**Solutions for stable keys:**
+```tsx
+// ✅ Option 1: Primitives only
+useQuery({ queryKey: ['todos', status, search, page], queryFn: ... });
+
+// ✅ Option 2: JSON.stringify for complex objects
+const filterKey = JSON.stringify({ status, search, sort });
+useQuery({ queryKey: ['todos', filterKey], queryFn: ... });
+
+// ✅ Option 3: Query key factory pattern
+export const todoKeys = {
+  all: ['todos'] as const,
+  list: (filters: Filters) => [...todoKeys.all, 'list', filters] as const,
+  detail: (id: string) => [...todoKeys.all, 'detail', id] as const,
+};
+useQuery({ queryKey: todoKeys.list({ status: 'active' }), queryFn: ... });
+```
+
+**Deep Dive:** [references/query-best-practices.md#query-key-design-principles](references/query-best-practices.md)
+
 ### Common Patterns
 
 **Query with filters:**
@@ -317,10 +348,101 @@ useMutation({
 })
 ```
 
+### useInfiniteQuery Re-execution Patterns
+
+When re-running an infinite query with the **same parameters** (e.g., user clicks "Run Query" again):
+
+**Use `refetch()`, not `enabled` toggling:**
+```tsx
+const infiniteQuery = useInfiniteQuery({
+  queryKey: ['items', filters],
+  queryFn: fetchItems,
+  enabled: !!filters,
+  initialPageParam: 0,
+  getNextPageParam: (lastPage) => lastPage.nextCursor,
+});
+
+const handleRunQuery = async (newFilters: Filters) => {
+  if (isEqual(newFilters, filters) && infiniteQuery.data) {
+    // CORRECT: Same params - use refetch()
+    await infiniteQuery.refetch();
+  } else {
+    // Different params - update state (changes query key)
+    setFilters(newFilters);
+  }
+};
+```
+
+**Avoid stale closures with Zustand:**
+```tsx
+// WRONG: Captures stale value
+const { filters } = useMyStore();
+const handleComplete = (data) => {
+  console.log(filters);  // May be stale!
+};
+
+// CORRECT: Read fresh state
+const handleComplete = (data) => {
+  const { filters } = useMyStore.getState();  // Always fresh
+  console.log(filters);
+};
+```
+
+**Critical Rules:**
+1. **Never toggle `enabled` for re-execution** - causes race conditions
+2. **Use `refetch()` for same-parameter re-runs** - resets all pages
+3. **Read fresh state from Zustand** - avoid closure staleness
+4. **Reset completion guards before triggering** - ensures handlers fire
+
+**Deep Dive:** [references/query-infinite-scroll-patterns.md](references/query-infinite-scroll-patterns.md)
+
+### Error Handling Patterns
+
+**Conditional retry based on HTTP status:**
+```tsx
+useQuery({
+  queryKey: ['data'],
+  queryFn: fetchData,
+  retry: (failureCount, error) => {
+    // Don't retry client errors (4xx)
+    const status = (error as any).status;
+    if (status >= 400 && status < 500) return false;
+    return failureCount < 3;  // Retry server errors up to 3 times
+  },
+  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+});
+```
+
+**Wiring refetch to retry buttons:**
+```tsx
+const { data, isPending, isError, error, refetch } = useQuery({ ... });
+
+if (isError) {
+  return (
+    <ErrorState
+      message={error.message}
+      onRetry={() => refetch()}  // Wire refetch directly
+    />
+  );
+}
+```
+
+**Error boundary integration:**
+```tsx
+useQuery({
+  queryKey: ['critical-data'],
+  queryFn: fetchCriticalData,
+  throwOnError: (error) => error.status >= 500,  // Only 5xx to boundary
+});
+```
+
+**Deep Dive:** [references/query-best-practices.md#error-handling-patterns](references/query-best-practices.md)
+
 ### Advanced Topics
 
 - **Optimistic updates:** [references/query-best-practices.md#optimistic-updates](references/query-best-practices.md)
 - **Infinite scroll:** [references/query-common-patterns.md#infinite-scroll](references/query-common-patterns.md)
+- **Infinite query re-execution:** [references/query-infinite-scroll-patterns.md](references/query-infinite-scroll-patterns.md) (refetch patterns, stale closures)
 - **SSR/Hydration:** [references/query-ssr-hydration.md](references/query-ssr-hydration.md)
 - **Performance optimization:** [references/query-performance-optimization.md](references/query-performance-optimization.md)
 - **v4 to v5 migration:** [references/query-v4-to-v5-migration.md](references/query-v4-to-v5-migration.md)
@@ -651,6 +773,55 @@ const rowVirtualizer = useVirtualizer({
 
 ---
 
+## Production Readiness
+
+### Debug Logging Pattern
+
+```typescript
+// Controlled debug flag - disabled by default in production
+const DEBUG = import.meta.env.DEV && false;  // Toggle when debugging
+
+const { data } = useQuery({
+  queryKey: ['todos', filters],
+  queryFn: async () => {
+    if (DEBUG) console.log('[DEBUG] Fetching:', filters);
+    const result = await fetchTodos(filters);
+    if (DEBUG) console.log('[DEBUG] Received:', result.length, 'items');
+    return result;
+  },
+});
+```
+
+**Better: Use React Query DevTools instead of console.log**
+
+### Cache Configuration Decision Matrix
+
+| Data Type | staleTime | gcTime | Example |
+|-----------|-----------|--------|---------|
+| Real-time | 5s | 1min | Stock prices, live feeds |
+| User settings | 30s | 5min | Preferences, configs |
+| Lists/Tables | 1min | 10min | Search results |
+| Static data | `Infinity` | `Infinity` | Countries, categories |
+| Infinite scroll | 5min | 30min | Paginated lists |
+
+### Production Checklist
+
+Before deploying, verify:
+
+- [ ] Query keys are stable (no new object references per render)
+- [ ] Appropriate staleTime/gcTime for each data type
+- [ ] Error handling with user-friendly messages
+- [ ] Retry logic excludes 4xx errors
+- [ ] Loading states for all pending queries
+- [ ] Error boundaries for critical data paths
+- [ ] Retry buttons wired to `refetch()`
+- [ ] Debug logging disabled or conditional
+- [ ] Server data NOT duplicated in client state
+
+**Deep Dive:** [references/query-best-practices.md#production-readiness-checklist](references/query-best-practices.md)
+
+---
+
 ## Troubleshooting
 
 ### Top 5 Errors Across All Libraries
@@ -672,6 +843,8 @@ const rowVirtualizer = useVirtualizer({
 
 **Complete error reference:** [references/query-top-errors.md](references/query-top-errors.md), [references/table-common-errors.md](references/table-common-errors.md)
 
+**Anti-patterns to avoid:** [references/query-anti-patterns.md](references/query-anti-patterns.md)
+
 ---
 
 ## Resources
@@ -685,8 +858,10 @@ const rowVirtualizer = useVirtualizer({
 
 **Query:**
 - [API Configuration](references/query-api-configuration.md)
-- [Best Practices](references/query-best-practices.md)
+- [Best Practices](references/query-best-practices.md) - Query keys, caching, error handling, production checklist
+- [Anti-Patterns](references/query-anti-patterns.md) - What NOT to do, common mistakes
 - [Common Patterns](references/query-common-patterns.md)
+- [Infinite Scroll Patterns](references/query-infinite-scroll-patterns.md) - Re-execution, stale closures, completion guards
 - [Performance Optimization](references/query-performance-optimization.md)
 - [SSR/Hydration](references/query-ssr-hydration.md)
 - [Testing](references/query-testing.md)
@@ -718,6 +893,6 @@ const rowVirtualizer = useVirtualizer({
 
 ---
 
-**Last Updated:** 2025-01-29
-**Skill Version:** 1.0.0
+**Last Updated:** 2025-12-11
+**Skill Version:** 1.1.0
 **Libraries:** @tanstack/react-query v5.9+, @tanstack/react-router latest, @tanstack/react-table v8.21.3+

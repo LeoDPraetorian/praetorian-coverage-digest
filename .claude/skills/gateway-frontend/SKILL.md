@@ -43,6 +43,9 @@ Each skill is organized by domain for easy discovery.
 
 ## Testing
 
+**Debugging Chrome Console**: `.claude/skill-library/development/frontend/testing/debugging-chrome-console/SKILL.md`
+- Autonomous browser debugging workflow - launches Chrome, analyzes console logs, iteratively fixes errors
+
 **Frontend E2E Testing Patterns**: `.claude/skill-library/development/frontend/testing/frontend-e2e-testing-patterns/SKILL.md`
 - End-to-end testing with Playwright
 
@@ -109,6 +112,7 @@ These foundational skills apply across all frontend development:
 | React components | frontend-react-component-generator |
 | Server state (API calls) | frontend-tanstack |
 | Client state | frontend-zustand-state-management |
+| Browser console debugging | debugging-chrome-console |
 | E2E testing | frontend-e2e-testing-patterns |
 | Form handling | frontend-react-hook-form-zod |
 | Performance issues | frontend-performance-optimization |
