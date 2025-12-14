@@ -1,3 +1,14 @@
+## [Date: 2025-12-13]
+
+### Changed
+- Added gerund naming convention validation to Phase 1 (description-format) as WARNING level
+
+### Reason
+- Phase 1 did not warn about non-gerund skill names (e.g., "code-review", "skill-check")
+- Anthropic best practices (references/anthropic-best-practices.md lines 155-184) recommend gerund form (verb + -ing)
+- New validation checks for gerund patterns, with exceptions for gateway-* and *-manager skills
+- Warns users to use action-oriented naming for better clarity and consistency
+
 - **2025-12-01**: Phase 8 test scoping fix - single-skill audits now run only that skill's tests (e.g., 23 tests for skill-manager) instead of all workspace tests (102+ files). Prevents false negatives from unrelated test failures. All-skills audits still run workspace-wide tests.
 - **2025-12-01**: Automatic gateway synchronization - create/migrate operations now auto-update gateway skills. New `sync-gateways` command validates and repairs gateway consistency with `--fix` flag.
 - **2025-12-01**: Fix phase count maintenance issue - adding a new audit phase requires updating multiple places manually.

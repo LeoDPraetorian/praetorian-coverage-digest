@@ -1,0 +1,22 @@
+# Changelog - creating-agents
+
+## 2025-12-13 - Agent vs Skill Description Patterns
+
+**Problem**: Phase 4.1 didn't clarify that agent descriptions follow different patterns than skill descriptions, leading to verbose agent descriptions that dilute agent selection effectiveness.
+
+**Solution**: Added comprehensive clarification section in Phase 4.1:
+- Added "Agent Descriptions vs Skill Descriptions" comparison table
+- Clarified purpose: Skills for search discovery (keyword matching) vs Agents for selection (task type matching)
+- Added character count guidance specific to agents:
+  - Ideal: 80-100 chars (trigger phrase)
+  - Acceptable: 100-150 chars
+  - Warning: 150-200 chars
+  - Problem: >200 chars
+- Updated validation rules with trigger phrase-specific warnings
+- Added examples of good vs bad agent descriptions
+- Emphasized agents need action-oriented summaries, not verbose explanations
+
+**Files Modified**:
+- `references/configuration-rules.md` - Added Agent vs Skill description comparison and updated validation rules
+
+**Impact**: Agents will now have more concise, scannable descriptions that improve Claude's agent selection accuracy.

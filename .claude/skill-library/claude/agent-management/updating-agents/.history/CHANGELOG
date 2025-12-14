@@ -1,0 +1,17 @@
+# Changelog
+
+All notable changes to this skill.
+
+- **2025-12-13 (15:45)**: Enhance EXTREMELY_IMPORTANT block verification requirements with obra/superpowers patterns.
+
+Key changes:
+1. Added "Critical Understanding" section explaining skills: frontmatter does NOT auto-invoke (discovery vs execution cost)
+2. Updated template with obra/superpowers absolute language ("MUST", "not optional", "cannot rationalize")
+3. Added all 5 anti-rationalization patterns with explicit counters
+4. Enhanced verification section (3.3.4) to check BOTH process + behavioral compliance
+5. Added evaluation matrix: PASS, FAIL (silent), FAIL (lip service), FAIL (ignored)
+6. Expanded manual checklist (5.3) with 7 specific checks for Mandatory Skills updates
+7. Added "Why fresh session?" explanation (agent metadata caching)
+8. Added "Common failure" note about behavioral vs process compliance gap
+
+Reason: User feedback revealed agents with updated Mandatory Skills sections weren't consistently showing explicit skill invocation, making verification impossible.

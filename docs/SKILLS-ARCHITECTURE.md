@@ -18,6 +18,20 @@ It builds a list of skill names + descriptions and injects this into the Skill t
 
 **Key insight**: Only the metadata (name + description) is loaded at startup. The full SKILL.md content loads on-demand when Claude invokes the skill. But if Claude can't see a skill exists, it can never invoke it.
 
+### Problem 2: Lifecycle Management Complexity (RESOLVED via Hybrid Pattern)
+
+**Previous state**: Unclear whether to use instruction-based skills or TypeScript CLI directly for operations like auditing and fixing.
+
+**Current state**: Hybrid Pattern with clear separation:
+- **Instruction-based skills** (`.claude/skill-library/claude/skill-management/`) provide guidance, decision points, and result interpretation
+- **TypeScript CLI** (`.claude/skills/skill-manager/scripts/`) provides fast, deterministic execution
+- **Skills invoke CLI** when needed via Bash tool for batch operations
+
+**Resolution**: Layered orchestration eliminates confusion while maintaining:
+- Speed for batch operations (147 skills validated in 5-10 min)
+- Guidance for complex workflows (TDD, progressive disclosure)
+- Automation for CI/CD integration (deterministic validation)
+
 ---
 
 ## The Solution: Hybrid Librarian Architecture
@@ -212,6 +226,273 @@ The `skills: gateway-frontend` line makes the gateway tool available in the agen
 
 ---
 
+## Skill Organization
+
+### Directory Structure
+
+```
+.claude/skills/                           # Core skills (auto-discovered)
+├── creating-skills/                      # Instruction-based creation
+│   ├── SKILL.md                          # TDD workflow guidance
+│   └── references/                       # Detailed workflow steps
+├── testing-skills-with-subagents/        # Pressure testing framework
+│   ├── SKILL.md                          # RED-GREEN-REFACTOR for skills
+│   └── examples/                         # Pressure scenario templates
+├── skill-manager/                        # Lifecycle management (Hybrid Pattern)
+│   ├── SKILL.md                          # Router to sub-skills
+│   ├── scripts/                          # TypeScript CLI implementation
+│   │   ├── src/
+│   │   │   ├── audit.ts                  # 16-phase validation
+│   │   │   ├── fix.ts                    # Auto-remediation
+│   │   │   ├── update.ts                 # Test-guarded updates
+│   │   │   ├── rename.ts                 # Safe renaming
+│   │   │   ├── migrate.ts                # Core ↔ Library movement
+│   │   │   ├── search.ts                 # Dual-location search
+│   │   │   ├── list.ts                   # Comprehensive listing
+│   │   │   ├── sync-gateways.ts          # Gateway validation
+│   │   │   └── lib/
+│   │   │       ├── audit-engine.ts       # Phase orchestration
+│   │   │       ├── phases/               # 16 phase implementations
+│   │   │       │   ├── phase1-description-format.ts
+│   │   │       │   ├── phase2-allowed-tools.ts
+│   │   │       │   ├── phase3-word-count.ts
+│   │   │       │   └── ... (13 more phases)
+│   │   │       ├── fix-applier.ts        # Deterministic fixes
+│   │   │       ├── fix-suggest.ts        # Semantic fix suggestions
+│   │   │       └── ...
+│   │   └── package.json
+│   ├── references/                       # Detailed documentation
+│   └── templates/                        # Skill generation templates
+├── gateway-frontend/
+├── gateway-backend/
+├── gateway-testing/
+├── gateway-mcp-tools/
+├── gateway-security/
+├── gateway-integrations/
+├── gateway-capabilities/
+└── ... (other core skills)
+
+.claude/skill-library/                    # Library skills (on-demand)
+├── claude/
+│   ├── skill-management/                 # Instruction-based guidance
+│   │   ├── auditing-skills/              # Guides audit workflow
+│   │   ├── fixing-skills/                # Guides fix workflow
+│   │   ├── updating-skills/              # Guides update workflow
+│   │   ├── renaming-skills/              # Guides rename workflow
+│   │   ├── migrating-skills/             # Guides migration workflow
+│   │   ├── searching-skills/             # Guides search workflow
+│   │   └── listing-skills/               # Guides listing workflow
+│   ├── agent-management/                 # Agent lifecycle skills
+│   │   ├── auditing-agents/
+│   │   ├── fixing-agents/
+│   │   └── ... (8 agent management skills)
+│   └── mcp-tools/                        # MCP wrapper skills
+│       ├── mcp-tools-linear/
+│       ├── mcp-tools-praetorian-cli/
+│       └── mcp-tools-context7/
+├── development/
+│   ├── frontend/
+│   │   ├── frontend-zustand-state-management/
+│   │   ├── frontend-tanstack-query/
+│   │   └── frontend-tanstack-tables/
+│   ├── backend/
+│   │   ├── backend-go-concurrency/
+│   │   └── backend-api-design/
+│   └── capabilities/
+│       ├── capabilities-vql-development/
+│       ├── capabilities-nuclei-templates/
+│       └── capabilities-scanner-integration/
+├── testing/
+│   ├── testing-e2e-patterns/
+│   └── testing-api-contracts/
+├── security/
+│   ├── security-authentication/
+│   └── security-authorization/
+└── operations/
+    └── ops-aws-lambda/
+```
+
+### Skill Categories
+
+| Category | Count | Purpose | Pattern |
+|----------|-------|---------|---------|
+| `Core Workflow` | 3 | Creation, testing, navigation | Instruction-based |
+| `Lifecycle (skill-manager)` | 1+8 | Create, audit, fix, rename, migrate, search, list, sync | **Hybrid** (instruction + CLI) |
+| `Lifecycle (agent-manager)` | 1+8 | Agent creation, audit, fix, rename, test, search, list | **Pure Router** (instruction only) |
+| `Gateways` | 7 | Domain routing (frontend, backend, testing, mcp-tools, security, integrations, capabilities) | Instruction-based |
+| `Library Skills` | 120+ | Domain-specific patterns, library documentation, tool wrappers | Instruction-based |
+
+**Total**: ~150 skills across all categories
+
+**Key Distinction**: skill-manager uses Hybrid Pattern (instruction-based skills that invoke TypeScript CLI), while agent-manager uses Pure Router Pattern (instruction-based skills only). See [Skill Manager](#skill-manager) section for detailed explanation.
+
+---
+
+## Skill Anatomy
+
+### Frontmatter Structure
+
+```yaml
+---
+name: skill-name                    # REQUIRED: kebab-case, <64 chars, matches directory
+description: Use when [trigger]...  # REQUIRED: Single-line, <120 chars, third-person
+allowed-tools: Read, Write, Bash    # OPTIONAL: Tool access control
+---
+```
+
+### Description Syntax (CRITICAL)
+
+**Rule**: Must be third-person voice with "Use when" trigger pattern.
+
+```yaml
+# ✅ CORRECT: Third-person, "Use when" trigger
+description: Use when creating skills - guides through TDD workflow with validation
+
+# ❌ WRONG: First-person
+description: I help you create skills
+
+# ❌ WRONG: Second-person
+description: You can use this to create skills
+
+# ❌ WRONG: Missing "Use when"
+description: Creates skills with TDD validation
+```
+
+**Why third-person**: Descriptions appear in system prompt. Consistent voice improves skill selection accuracy. First or second person creates point-of-view confusion that degrades matching.
+
+### Description Pattern
+
+```
+Use when [ACTION/TRIGGER] - [HIGH-SIGNAL KEYWORDS]
+```
+
+| Component | Purpose | Example |
+|-----------|---------|---------|
+| `Use when...` | The anchor. Tells Claude "this is a condition" | `Use when` |
+| `[Action]` | The trigger. Matches user's verb | `creating`, `auditing`, `testing` |
+| `[Keywords]` | The match. Specific technologies/domains | `skills, TDD, validation` |
+
+**Examples**:
+
+```yaml
+# Process skill (115 chars)
+description: Use when creating skills - guides through TDD workflow (RED-GREEN-REFACTOR) with validation and testing
+
+# Library skill (98 chars)
+description: Use when using TanStack Query - patterns for queries, mutations, caching, and optimistic updates
+
+# Tool wrapper skill (105 chars)
+description: Use when accessing Linear API - issue management, project tracking, and team collaboration workflows
+```
+
+### Structure (Target: <500 lines)
+
+```markdown
+---
+name: skill-name
+description: Use when [trigger] - [capabilities]
+allowed-tools: Read, Write, Edit, Bash
+---
+
+# Skill Name
+
+**Brief description of what this skill provides.**
+
+## When to Use
+
+- Bullet points of when to use this skill
+- Specific triggers and scenarios
+- Symptoms that indicate this skill applies
+
+## Quick Reference
+
+| Operation | Command/Pattern | Time |
+|-----------|----------------|------|
+| Key action 1 | `command` or pattern | Est. time |
+| Key action 2 | `command` or pattern | Est. time |
+
+## Core Workflow
+
+[High-level steps with links to detailed references]
+
+1. **Step 1** - Brief description
+2. **Step 2** - Brief description
+3. **Step 3** - Brief description
+
+See [Detailed Workflow](references/workflow.md) for step-by-step instructions.
+
+## Critical Rules
+
+[Non-negotiable constraints that cannot live in references]
+
+- ✅ Do this
+- ❌ Never do that
+
+## Best Practices
+
+[Summary bullets only]
+
+- Pattern 1: Why it works
+- Pattern 2: Why it works
+
+## Troubleshooting
+
+[Common issues with quick solutions]
+
+**Problem**: Description of issue
+**Solution**: How to fix it
+
+## References
+
+- [Detailed Workflow](references/workflow.md)
+- [API Reference](references/api-reference.md) (for library skills)
+- [Examples](references/examples.md)
+
+## Related Skills
+
+- `related-skill-name` - Why it's related and when to use it instead
+```
+
+**Progressive Disclosure**: Keep SKILL.md <500 lines. Move detailed content to `references/` directory:
+
+| Content Type | Location | Why |
+|--------------|----------|-----|
+| Overview, when-to-use | SKILL.md | Helps Claude decide if skill applies |
+| Quick examples (<10 lines) | SKILL.md | Shows basic usage immediately |
+| Core workflow (high-level) | SKILL.md | Provides roadmap |
+| Best practices (summary) | SKILL.md | Quick reference |
+| Critical rules | SKILL.md | Must-know constraints |
+| Detailed explanations | references/ | Load only when implementing |
+| API references | references/ | Reference material |
+| Advanced patterns | references/ | Specialized techniques |
+| Complete examples | examples/ | Full case studies |
+
+### Tool Access Control (Optional)
+
+Use `allowed-tools` to restrict which tools Claude can use when executing this skill:
+
+```yaml
+# Read-only file access (safe for analysis skills)
+allowed-tools: Read, Grep, Glob
+
+# Git operations only
+allowed-tools: Bash(git:*), Read, Write
+
+# NPM/Node operations only
+allowed-tools: Bash(npm:*), Bash(node:*), Read, Write
+
+# Full access (no restrictions)
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
+```
+
+**Why use scoping**:
+- Prevents accidental destructive operations
+- Makes skill intent explicit
+- Easier to audit what skill can do
+- Security isolation for sensitive operations
+
+---
+
 ## Token Budget: The Two-State Economy
 
 Understanding the token budget requires distinguishing between **Discovery Cost** (expensive, constant) and **Execution Cost** (cheap, on-demand).
@@ -373,6 +654,130 @@ With optimized "Use when" descriptions, we use ~16% of the 15K budget, leaving m
 
 ---
 
+## Quality Gates
+
+### The 16 Skill Quality Phases
+
+Skills must pass compliance validation across 16 phases:
+
+| Phase | Name | Auto-Fix | Description |
+|-------|------|----------|-------------|
+| 1 | Description Format | ❌ | "Use when" trigger, <120 chars, third-person, no block scalars |
+| 2 | Allowed-Tools Field | ✅ | Comma-separated, valid tool names |
+| 3 | Word Count | ❌ | SKILL.md <500 lines (progressive disclosure) |
+| 4 | Broken Links | ✅ | All references/ and examples/ paths resolve |
+| 5 | File Organization | ✅ | SKILL.md + references/ + examples/ structure |
+| 6 | Script Organization | ✅ | scripts/ with src/, package.json, tsconfig.json |
+| 7 | Output Directory Pattern | ✅ | .output/ for CLI outputs, .local/ for temp data |
+| 8 | TypeScript Structure | ❌ | tsc compiles, vitest types resolve, 100% test pass |
+| 9 | Bash-TypeScript Migration | ❌ | No bash scripts (except POSIX-portable wrappers) |
+| 10 | Reference Audit | ✅ | All SKILL.md references resolve to actual files |
+| 11 | Command Example Audit | ❌ | cd commands use portable REPO_ROOT pattern |
+| 12 | CLI Error Handling | ✅ | Scripts exit with proper codes, user-friendly errors |
+| 13 | State Externalization | ❌ | TodoWrite mandate for multi-step operations |
+| 16 | Windows Path Detection | ✅ | No hardcoded Unix paths |
+
+**Fix Categories**:
+- **Deterministic (auto-apply)**: Phases 2, 4, 5, 6, 7, 10, 12, 16
+- **Semantic (Claude-mediated)**: Phases 1, 3, 9, 11, 13 (use `--suggest` mode)
+- **Specialized CLI**: Phase 8 (TypeScript compilation guidance)
+
+### Validation Commands
+
+```bash
+# Setup (one-time for humans)
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$REPO_ROOT/.claude/skills/skill-manager/scripts"
+
+# Audit single skill (auto-detects location)
+npm run audit -- skill-name
+
+# Audit all skills (both core and library)
+npm run audit
+
+# Auto-fix deterministic issues
+npm run fix -- skill-name
+
+# Semantic fix suggestions (JSON output for Claude)
+npm run fix -- skill-name --suggest
+
+# Apply specific semantic fix
+npm run fix -- skill-name --apply phase1-description --value "new description"
+```
+
+### Line Count Targets
+
+| Skill Type | Target | Maximum | Rationale |
+|------------|--------|---------|-----------|
+| Process | 200-400 | 500 | Methodology with examples |
+| Library | 400-600 | 800 | API documentation needs more content |
+| Integration | 300-500 | 700 | Service connection patterns |
+| Tool Wrapper | 200-300 | 500 | Focused on single tool |
+
+**If skill exceeds maximum**: Extract detailed content to `references/` directory using progressive disclosure pattern.
+
+### Critical Phase Details
+
+#### Phase 1: Description Format
+
+**Checks**:
+- ✅ Starts with "Use when"
+- ✅ No block scalars (`|` or `>`)
+- ✅ <120 characters (warning if >120, <1024)
+- ✅ Third-person voice
+
+**Common failures**:
+```yaml
+# ❌ WRONG: Block scalar
+description: |
+  Use when creating skills
+
+# ❌ WRONG: First person
+description: I help you create skills
+
+# ✅ CORRECT: Single-line, third-person
+description: Use when creating skills - guides through TDD workflow
+```
+
+#### Phase 3: Word Count (Critical)
+
+**Limit**: <500 lines for SKILL.md
+
+**Why**: Attention degradation beyond 500 lines. Skills should use progressive disclosure pattern.
+
+**Fix**: Extract detailed content to `references/` directory:
+```markdown
+## Detailed Workflow
+
+See [Workflow Reference](references/workflow.md) for step-by-step instructions.
+```
+
+#### Phase 8: TypeScript Structure (If scripts/ exists)
+
+**Checks**:
+- `tsc` compiles without errors
+- `vitest` types resolve
+- All tests pass (100%)
+
+**Why**: Broken TypeScript = broken skill functionality
+
+#### Phase 13: State Externalization
+
+**Checks**: Multi-step skills use TodoWrite for tracking
+
+**Why**: Mental tracking = steps get skipped
+
+**Pattern**:
+```markdown
+**IMPORTANT**: Use TodoWrite to track phases.
+
+1. Phase 1: Task description
+2. Phase 2: Another task
+```
+
+---
+
 ## Governance & Maintenance
 
 To prevent regression of the 15k limit and broken paths:
@@ -391,18 +796,41 @@ Use when [TRIGGER] - [KEYWORDS]
 
 Gateway skills contain hardcoded paths to library skills. If a library skill moves, the gateway silently breaks—Claude tries to read the path, fails, and potentially hallucinates content.
 
-**Solution**: A pre-commit hook or CI step validates that all paths in gateway skills resolve to actual files:
+**Solution**: The `sync-gateways` command validates and repairs gateway consistency:
 
 ```bash
-# scripts/verify-gateways.sh (conceptual)
-for gateway in .claude/skills/gateway-*.md; do
-  grep -oE '\.claude/skill-library/[^)]+' "$gateway" | while read path; do
-    if [[ ! -f "$path" ]]; then
-      echo "ERROR: $gateway references missing file: $path"
-      exit 1
-    fi
-  done
-done
+# Check for discrepancies (report only)
+cd .claude/skills/skill-manager/scripts
+npm run sync-gateways
+
+# Preview fixes without applying
+npm run sync-gateways -- --dry-run
+
+# Apply fixes automatically
+npm run sync-gateways -- --fix
+```
+
+**What it validates**:
+1. **Broken entries** - Gateway references skills that don't exist (removes them)
+2. **Missing entries** - Library skills not in any gateway (adds them to appropriate gateway)
+3. **Category mapping** - Skills automatically added to correct gateway based on category:
+   - `development/frontend/*` → `gateway-frontend`
+   - `development/backend/*` → `gateway-backend`
+   - `testing/*` → `gateway-testing`
+   - `claude/mcp-tools/*` → `gateway-mcp-tools`
+
+**Automatic updates**:
+- **On create**: Library skills automatically added to appropriate gateway
+- **On migrate**: Gateway paths updated or skill moved between gateways
+- **On sync**: Validates all gateways and repairs discrepancies
+
+**CI/CD Integration** (planned):
+```bash
+# Add to .github/workflows/validate.yml
+- name: Validate Gateway Consistency
+  run: |
+    cd .claude/skills/skill-manager/scripts
+    npm run sync-gateways
 ```
 
 ### Skill Consolidation Policy
@@ -413,18 +841,114 @@ When skills share significant overlap (e.g., `skill-audit`, `skill-fix`, `skill-
 
 ## Skill Manager
 
-The Skill Manager is the lifecycle management system for Claude Code skills. It enforces quality standards across all three tiers (Core, Gateway, Library), validates compliance through 13 audit phases, and provides comprehensive tooling for creating, updating, auditing, fixing, renaming, migrating, searching, and listing skills.
+The Skill Manager is the lifecycle management system for skills. It uses a **Hybrid Pattern** combining instruction-based guidance with TypeScript CLI execution for fast, deterministic operations.
 
 ### Overview
 
 | Aspect | Details |
 |--------|---------|
 | **Location** | `.claude/skills/skill-manager/` |
-| **Purpose** | Unified skill lifecycle management with TDD enforcement |
-| **Philosophy** | Test-first: skills must prove gap exists before creation |
-| **Coverage** | 13 validation phases for skill quality |
-| **Invocation** | Via `/skill-manager` command or `skill-manager` skill |
+| **Purpose** | Create, audit, fix, rename, migrate, search, list skills |
+| **Architecture** | **Hybrid**: Instruction-based skills + TypeScript CLI |
+| **Command Router** | `/skill-manager` delegates to 8 instruction-based skills |
+| **Coverage** | 16 validation phases, TDD enforcement |
 | **Scope** | Manages both Core (`.claude/skills/`) and Library (`.claude/skill-library/`) skills |
+
+### Hybrid Architecture Pattern
+
+The skill-manager uses **layered orchestration** where instruction-based skills provide guidance and invoke TypeScript CLI for execution:
+
+```
+┌─────────────────────────────────────────┐
+│  Command Router                         │
+│  (.claude/commands/skill-manager.md)   │
+│  Pattern: Pure delegation to skills     │
+└──────────────┬──────────────────────────┘
+               │ skill: "auditing-skills"
+               ▼
+┌─────────────────────────────────────────┐
+│  Instruction Layer                      │
+│  (8 skills in skill-library)            │
+│  Pattern: Guide, interpret, decide      │
+│  Tools: Read, Write, Bash, AskUser      │
+└──────────────┬──────────────────────────┘
+               │ Bash tool
+               │ npm run audit -- skill-name
+               ▼
+┌─────────────────────────────────────────┐
+│  Execution Layer                        │
+│  (TypeScript CLI in scripts/src/)       │
+│  Pattern: Fast, deterministic execution │
+└──────────────┬──────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────────┐
+│  Phase Implementation                   │
+│  (lib/phases/phase*.ts)                 │
+│  Pattern: Validation logic              │
+└─────────────────────────────────────────┘
+```
+
+**Example workflow (auditing a skill)**:
+
+```
+User: /skill-manager audit my-skill
+        ↓
+1. Command routes: skill: "auditing-skills"
+2. auditing-skills/SKILL.md loads
+3. Explains: What audit does (16 phases)
+4. Executes via Bash: npm run audit -- my-skill
+5. CLI runs 16 phases in parallel
+6. Skill interprets results:
+   ✅ Pass → "Ready to commit"
+   ⚠️ Warnings → "Review but not blocking"
+   ❌ Failures → "Run: npm run fix -- my-skill"
+7. Guides next steps based on results
+```
+
+### Why Hybrid vs Pure Router?
+
+Unlike agent-manager (which aims for Pure Router), skill-manager benefits from TypeScript CLI:
+
+| Aspect | skill-manager (Hybrid) | agent-manager (Partial Hybrid) |
+|--------|------------------------|-------------------------------|
+| **Operations** | File validation, structure checks | Description quality, recommendations |
+| **Determinism** | High (structural validation) | Mixed (3/8 ops use CLI) |
+| **Semantic Decisions** | Few (mostly auto-fixable) | Many (requires Claude analysis) |
+| **Batch Performance** | Critical (147 skills to validate) | Less critical (49 agents) |
+| **CLI Benefit** | High (5-10 min for all skills) | Medium (only for audit/search) |
+| **Design** | Full Hybrid (8/8 ops have CLI) | Partial Hybrid (3/8 ops have CLI) |
+
+**Decision**: Skill operations are **deterministic enough** to benefit from TypeScript CLI speed, while most agent operations require too much semantic analysis to automate.
+
+### Dual Implementation: How They Work Together
+
+**Instruction-based skills provide**:
+- Context and explanation for what operations do
+- Decision points via AskUserQuestion when needed
+- Error interpretation and troubleshooting guidance
+- Next-step recommendations based on results
+
+**TypeScript CLI provides**:
+- Fast execution (2-3 min for single skill, 5-10 min for all)
+- Deterministic validation (no subjective decisions)
+- Batch operations for CI/CD integration
+- Structured JSON output for parsing
+
+### The 8 Instruction-Based Skills
+
+| Skill | Purpose | Calls CLI? | Interactive? | Time |
+|-------|---------|------------|--------------|------|
+| `creating-skills` | TDD-driven skill creation | ❌ No | ✅ Yes - location, type, research | 15-30 min |
+| `updating-skills` | Test-guarded updates | ✅ Yes (`audit`) | ✅ Yes - confirm changes | 10-20 min |
+| `auditing-skills` | 16-phase validation | ✅ Yes (`audit`) | ❌ No - automated | 2-5 min |
+| `fixing-skills` | Compliance remediation | ✅ Yes (`audit`, `fix`) | ✅ Yes - choose fix strategy | 5-15 min |
+| `renaming-skills` | Safe renaming | ✅ Yes (`rename`) | ✅ Yes - confirm impact | 5-10 min |
+| `migrating-skills` | Core ↔ Library movement | ✅ Yes (`migrate`) | ✅ Yes - confirm target | 5-10 min |
+| `searching-skills` | Keyword discovery | ✅ Yes (`search`) | ❌ No - automated | 1-2 min |
+| `listing-skills` | Comprehensive list | ✅ Yes (`list`) | ❌ No - automated | 1 min |
+
+**Pattern**: 7/8 operations invoke TypeScript CLI. Only `creating-skills` is fully instruction-based (uses native tools + delegates to `researching-skills`).
 
 ### Directory Structure
 
@@ -514,9 +1038,9 @@ The Skill Manager enforces a strict Red-Green-Refactor cycle for all skill creat
 - All operations include automatic audit validation
 - Pressure testing ensures skills remain effective under agent rationalization
 
-### The 13 Audit Phases
+### The 16 Audit Phases (Implemented in TypeScript CLI)
 
-Skills must pass compliance validation across 13 phases:
+Skills must pass compliance validation across 16 phases:
 
 | Phase | Name | Auto-Fix | Description |
 |-------|------|----------|-------------|
@@ -533,11 +1057,14 @@ Skills must pass compliance validation across 13 phases:
 | 11 | Command Example Audit | ❌ | cd commands use portable REPO_ROOT pattern |
 | 12 | CLI Error Handling | ✅ | Scripts exit with proper codes, user-friendly errors |
 | 13 | State Externalization | ❌ | TodoWrite mandate for multi-step operations |
+| 16 | Windows Path Detection | ✅ | No hardcoded Unix paths |
 
 **Fix Categories**:
-- **Deterministic (auto-apply)**: Phases 2, 4, 5, 6, 7, 10, 12
+- **Deterministic (auto-apply)**: Phases 2, 4, 5, 6, 7, 10, 12, 16
 - **Semantic (Claude-mediated)**: Phases 1, 3, 9, 11, 13 (use `--suggest` mode)
 - **Specialized CLI**: Phase 8 (TypeScript compilation guidance)
+
+**Note**: Phases 14-15 are reserved for future use.
 
 ### CLI Reference
 
@@ -558,7 +1085,7 @@ npm run create -- <args>
 |---------|-------------|------|
 | `npm run create -- <name> "<desc>" --location <loc>` | TDD-driven skill creation | 15-30 min |
 | `npm run update -- <name> "<changes>"` | Test-guarded updates | 10-20 min |
-| `npm run audit -- [name]` | 13-phase compliance check | 2-5 min |
+| `npm run audit -- [name]` | 16-phase compliance check | 2-5 min |
 | `npm run fix -- <name> [--dry-run\|--suggest]` | Compliance remediation | 5-15 min |
 | `npm run rename -- <old> <new>` | Safe renaming with updates | 5-10 min |
 | `npm run migrate -- <name> <target>` | Move Core ↔ Library | 5-10 min |
@@ -718,15 +1245,30 @@ npm run migrate -- my-skill to-library:testing
 
 ### Skill Consolidation Policy
 
-When multiple skills have overlapping functionality, consolidate into a unified skill:
+When multiple skills have overlapping functionality, consolidate into a unified skill with operation routing.
 
-**Example**: `claude-skill-write`, `claude-skill-compliance`, `claude-skill-search` → `skill-manager`
+**Consolidation Examples**:
+
+| Original Skills | Consolidated To | Slots Reclaimed | Pattern |
+|----------------|-----------------|-----------------|---------|
+| `claude-skill-write`, `claude-skill-compliance`, `claude-skill-search` | `skill-manager` | 2 slots | Unified lifecycle management |
+| `claude-agent-write`, `claude-agent-audit`, `claude-agent-fix` | `agent-manager` | 2 slots | Unified lifecycle management |
+| `mcp-create`, `mcp-verify`, `mcp-test` | `mcp-manager` | 2 slots | Unified wrapper management |
+
+**Total reclaimed**: 6 Core skill slots through consolidation
 
 **Benefits**:
-- Reclaims Core skill slots (3 skills → 1)
-- Unified CLI with consistent patterns
-- Shared utilities and validation logic
-- Single source of truth for skill operations
+- Reclaims Core skill slots (3× improvement: 9 skills → 3)
+- Unified CLI with consistent patterns across all operations
+- Shared utilities and validation logic (no duplication)
+- Single source of truth for lifecycle operations
+- Better user experience (one command for all operations: `/skill-manager`, `/agent-manager`, `/mcp-manager`)
+
+**Consolidation Criteria** (when to consolidate):
+- Skills share >60% of code (utilities, validation, file operations)
+- Operations form a natural lifecycle (create → audit → fix → update)
+- Users would benefit from unified interface
+- CLI commands follow same patterns
 
 ---
 

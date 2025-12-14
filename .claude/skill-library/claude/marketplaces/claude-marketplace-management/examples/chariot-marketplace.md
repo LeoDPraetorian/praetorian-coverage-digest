@@ -119,7 +119,7 @@ Actual `.claude/settings.json` in Chariot repository:
 - claude-plugin-settings
 - claude-marketplace-management
 - chariot-brand-guidelines
-- frontend-information-architecture
+- enforcing-information-architecture
 - react-modernization
 - tanstack-query
 - (and 60 more)
@@ -213,7 +213,7 @@ cd chariot-development-platform
 ├── brainstorming/
 ├── debugging-systematically/
 ├── claude-agent-write/
-├── frontend-information-architecture/
+├── enforcing-information-architecture/
 └── (84 more skill directories)
 ```
 

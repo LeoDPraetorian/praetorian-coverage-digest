@@ -26,6 +26,11 @@ Each skill is organized by domain for easy discovery.
 **Error Handling Patterns**: `.claude/skill-library/development/error-handling-patterns/SKILL.md`
 - Error wrapping, context propagation, custom error types
 
+## Code Quality Metrics
+
+**Analyzing Cyclomatic Complexity**: `.claude/skill-library/quality/analyzing-cyclomatic-complexity/SKILL.md`
+- Measures decision logic complexity, identifies refactoring candidates, sets quality gates for CI/CD
+
 ## Database & Persistence
 
 **Neo4j Cypher Guide**: `.claude/skill-library/development/neo4j-cypher-guide/SKILL.md`
@@ -81,6 +86,7 @@ Each skill is organized by domain for easy discovery.
 |------|----------------|
 | Concurrent Go code | go-errgroup-concurrency |
 | Error handling | error-handling-patterns |
+| Code complexity metrics | analyzing-cyclomatic-complexity |
 | Graph database queries | neo4j-cypher-guide |
 | Cloud architecture | cloud-advanced-patterns |
 | Cost optimization | cloud-cost-optimization |

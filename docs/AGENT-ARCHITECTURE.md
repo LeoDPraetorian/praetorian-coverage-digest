@@ -57,6 +57,42 @@ Agent prompts directly enter the sub-agent's context window when spawned. Excess
 
 **Resolution**: Domain-based orchestration eliminates selection ambiguity. Agents know exactly which orchestrator to use based on task domain.
 
+### Problem 4: Skill Invocation Gap (Discovered 2025)
+
+Agents with mandatory skills in their `skills:` frontmatter follow principles behaviorally but don't explicitly invoke skills, making their skill usage untestable and unauditable.
+
+**Root Cause:**
+
+The `skills:` frontmatter field makes skills **available** but does NOT automatically invoke them:
+
+```yaml
+skills: adhering-to-yagni  # Makes skill available to agent
+                          # Does NOT force explicit invocation
+```
+
+Agents internalize principles from the Mandatory Skills section but skip the explicit Skill tool call that makes invocation visible:
+
+```markdown
+Expected: skill: "adhering-to-yagni"  # Visible invocation
+Actual: [implements with YAGNI principles but no invocation shown]
+```
+
+**Impact:**
+
+| Aspect | Behavioral Compliance | Process Compliance |
+|--------|----------------------|-------------------|
+| **Definition** | Follows skill principles in implementation | Shows explicit skill invocation |
+| **Evidence** | Code matches methodology | `skill: "skill-name"` in output |
+| **Testing** | ❌ Can't verify which skills used | ✅ Can audit and test |
+| **Accountability** | ❌ No audit trail | ✅ Clear skill usage record |
+
+**The Gap**: Agents were passing behavioral tests (correct implementation) but failing process tests (no visible skill invocation). This meant:
+- No way to verify mandatory skills were actually consulted
+- Testing could only check outcomes, not workflow adherence
+- Audit trails incomplete for compliance validation
+
+**Discovery**: Identified December 2025 during `testing-agent-skills` validation of `frontend-developer` agent with `adhering-to-yagni` skill.
+
 ---
 
 ## The Solution: Lean Agent Pattern
@@ -224,6 +260,23 @@ Use when [TRIGGER] - [CAPABILITIES].\n\n<example>\nContext: [SITUATION]\nuser: "
 ```markdown
 # Agent Name
 
+<EXTREMELY_IMPORTANT>
+You MUST explicitly invoke mandatory skills using the Skill tool. This is not optional.
+
+Before starting ANY implementation task:
+1. Check if it matches a mandatory skill trigger (see Mandatory Skills section below)
+2. If yes, invoke the skill with: `skill: "skill-name"`
+3. Show the invocation in your output
+4. Follow the skill's instructions exactly
+
+Common rationalizations to avoid:
+- "This is just a simple feature" → NO. Check for skills.
+- "I can implement this quickly" → NO. Invoke skills first.
+- "The skill is overkill" → NO. If a skill exists, use it.
+
+If you skip mandatory skill invocation, your work will fail validation.
+</EXTREMELY_IMPORTANT>
+
 You are [role statement - 1-2 sentences].
 
 ## Core Responsibilities
@@ -251,13 +304,15 @@ You are [role statement - 1-2 sentences].
 
 ## Mandatory Skills (Must Use)
 
-### [Skill 1 Name]
-**When**: [Trigger condition]
-**Use**: `skill-name` skill
+**CRITICAL**: You MUST explicitly invoke these skills using the Skill tool. Do not just follow principles implicitly.
 
-### [Skill 2 Name]
-**When**: [Trigger condition]
-**Use**: `skill-name` skill
+1. **`[skill-1-name]`** - **INVOKE WHEN [TRIGGER]**: `skill: "skill-1-name"`
+   - [Brief principle summary]
+   - [Key rule or requirement]
+
+2. **`[skill-2-name]`** - **INVOKE WHEN [TRIGGER]**: `skill: "skill-2-name"`
+   - [Brief principle summary]
+   - [Key rule or requirement]
 
 ## Output Format (Standardized)
 
@@ -299,7 +354,7 @@ Before completing, verify:
 
 ## Quality Gates
 
-### The 6 Agent Quality Phases
+### The 9 Agent Quality Phases
 
 | Phase | Name | Auto-Fix | Description |
 |-------|------|----------|-------------|
@@ -309,6 +364,9 @@ Before completing, verify:
 | 4 | Skill Integration | ✅ | Uses gateway skills, not direct library paths |
 | 5 | Output Standardization | ❌ | Returns structured JSON with handoff |
 | 6 | Escalation Protocol | ❌ | Clear stopping conditions, agent recommendations |
+| 7 | Body References | ✅ | Phantom skill detection (referenced skills that don't exist) |
+| 8 | Skill Coverage | ❌ | Recommended skills based on agent type and keywords |
+| 9 | Explicit Skill Invocation | ❌ | EXTREMELY_IMPORTANT block present, explicit invocation syntax, anti-rationalization patterns |
 
 ### Validation Commands
 
@@ -394,63 +452,127 @@ User: What is the description for the [agent-name] agent? Quote it exactly.
 
 ## Agent Manager
 
-The Agent Manager is the lifecycle management system for Claude Code agents. It enforces the lean agent pattern (<300 lines), validates compliance through 8 audit phases, fixes the critical block scalar description problem, and provides comprehensive tooling for creating, updating, auditing, fixing, renaming, testing, searching, and listing agents.
+The Agent Manager is the lifecycle management system for agents. It uses a **Partial Hybrid Pattern**: instruction-based skills provide guidance, with selective TypeScript CLI for deterministic operations (audit, search, test).
 
 ### Overview
 
 | Aspect | Details |
 |--------|---------|
 | **Location** | `.claude/skills/agent-manager/` |
-| **Purpose** | Unified agent lifecycle management with TDD enforcement |
-| **Philosophy** | Test-first: agents must prove gap exists before creation |
-| **Coverage** | 8 validation phases for agent quality |
-| **Invocation** | Via `/agent-manager` command or `agent-manager` skill |
+| **Purpose** | Create, audit, fix, rename, test, search, list agents |
+| **Architecture** | **Partial Hybrid**: Instruction-based skills + selective CLI |
+| **Command Router** | `/agent-manager` delegates to 8 instruction-based skills |
+| **Coverage** | 9 validation phases, TDD enforcement |
 | **Scope** | Manages all agents across 8 categories in `.claude/agents/` |
 
-### Directory Structure
+### Partial Hybrid Architecture Pattern
+
+The agent-manager uses **layered orchestration** where instruction-based skills provide guidance, invoking TypeScript CLI selectively for deterministic operations:
 
 ```
-.claude/skills/agent-manager/
-├── SKILL.md                    # Main skill documentation
-├── scripts/
-│   ├── src/
-│   │   ├── create.ts           # TDD-driven agent creation
-│   │   ├── update.ts           # Test-guarded updates
-│   │   ├── audit.ts            # 8-phase compliance validation
-│   │   ├── fix.ts              # Compliance remediation (3 modes)
-│   │   ├── rename.ts           # Safe renaming with reference updates
-│   │   ├── test.ts             # Discovery and skill testing
-│   │   ├── search.ts           # Keyword agent search
-│   │   ├── list.ts             # List all agents with status
-│   │   └── lib/
-│   │       ├── agent-finder.ts         # Find agents by name/pattern
-│   │       ├── agent-parser.ts         # Parse agent frontmatter/body
-│   │       ├── audit-runner.ts         # Audit orchestration
-│   │       ├── fix-handlers.ts         # Fix application logic
-│   │       ├── skill-checker.ts        # Validate skill references
-│   │       ├── skill-recommender.ts    # Suggest missing skills
-│   │       ├── phases/                 # 8 audit implementations
-│   │       │   ├── phase1-frontmatter-syntax.ts
-│   │       │   ├── phase2-description-quality.ts
-│   │       │   ├── phase3-prompt-efficiency.ts
-│   │       │   ├── phase4-skill-integration.ts
-│   │       │   ├── phase5-output-standardization.ts
-│   │       │   ├── phase6-escalation-protocol.ts
-│   │       │   ├── phase7-body-references.ts
-│   │       │   └── phase8-skill-coverage.ts
-│   │       └── types.ts                # TypeScript type definitions
-│   ├── package.json
-│   └── tsconfig.json
-├── templates/                  # Agent generation templates
-└── references/                 # Workflow documentation
-    ├── create-workflow.md
-    ├── update-workflow.md
-    ├── audit-phases.md
-    ├── fix-workflow.md
-    ├── rename-protocol.md
-    ├── test-workflow.md
-    └── search-workflow.md
+┌─────────────────────────────────────────┐
+│  Command Router                         │
+│  (.claude/commands/agent-manager.md)   │
+│  Pattern: Pure delegation to skills     │
+└──────────────┬──────────────────────────┘
+               │ skill: "auditing-agents"
+               ▼
+┌─────────────────────────────────────────┐
+│  Instruction Layer                      │
+│  (8 skills in skill-library)            │
+│  Pattern: Guide, interpret, decide      │
+│  Tools: Read, Edit, Bash, AskUser       │
+└──────────────┬──────────────────────────┘
+               │ Selective invocation
+               │ (3/8 ops use CLI)
+               ▼
+┌─────────────────────────────────────────┐
+│  Execution Layer (Selective)            │
+│  TypeScript CLI: audit-critical, search │
+│  Native Tools: create, update, fix, etc │
+└──────────────┬──────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────────┐
+│  Implementation                         │
+│  Phase validation / Edit operations     │
+└─────────────────────────────────────────┘
 ```
+
+**Example workflow (auditing an agent)**:
+
+```
+User: /agent-manager audit frontend-developer
+        ↓
+1. Command routes: skill: "auditing-agents"
+2. auditing-agents/SKILL.md loads
+3. Explains: Critical vs extended checks (9 phases)
+4. Executes via Bash: npm run audit-critical -- frontend-developer
+5. CLI validates block scalars, name, description (fast)
+6. Skill interprets results:
+   ✅ Pass → "Agent ready to use"
+   ⚠️ Warnings → "Review extended checks"
+   ❌ Critical failures → "Run: skill: 'fixing-agents'"
+7. Guides next steps based on results
+```
+
+### The 8 Instruction-Based Skills
+
+| Skill | Purpose | Uses CLI? | CLI Script | Interactive? | Time |
+|-------|---------|-----------|------------|--------------|------|
+| `creating-agents` | TDD-driven agent creation | ✅ Yes | `audit-critical` | ✅ Yes - type, description, examples | 60-90 min |
+| `updating-agents` | Test-guarded updates | ❌ No | - | ✅ Yes - confirm changes | 20-40 min |
+| `auditing-agents` | 9-phase validation | ✅ Yes | `audit-critical`, `test` | ❌ No - automated | 30-60 sec |
+| `fixing-agents` | Interactive remediation | ✅ Yes (indirect) | via `auditing-agents` | ✅ Yes - choose fixes | 2-5 min |
+| `renaming-agents` | Safe renaming | ❌ No | - | ✅ Yes - confirm impact | 2-5 min |
+| `testing-agent-skills` | Behavioral validation | ✅ Yes | `test` | ❌ No - spawns subagents | 10-25 min/skill |
+| `searching-agents` | Keyword discovery | ✅ Yes | `search` | ❌ No - automated | 30-60 sec |
+| `listing-agents` | Comprehensive list | ❌ No | - | ❌ No - automated | 30-60 sec |
+
+**Pattern**: 5/8 operations invoke TypeScript CLI (create, audit, fix, search, test). The rest use native tools (Edit, Grep, Glob, Write).
+
+### TypeScript CLI (Selective Operations)
+
+3 CLI scripts provide fast, deterministic execution for specific operations:
+
+| Script | Purpose | Called By | Why CLI? |
+|--------|---------|-----------|----------|
+| `audit-critical.ts` | Block scalar detection, name validation, description checks | `auditing-agents`, `creating-agents`, `fixing-agents` | Fast batch validation (49 agents in 1-2 min) |
+| `search.ts` | Keyword search with relevance scoring | `searching-agents` | Algorithm performance, scoring logic |
+| `test.ts` | Discovery + behavioral validation framework | `testing-agent-skills` | Structured test execution, result parsing |
+
+**Other operations** use native tools because they require:
+- Semantic decisions (create: description quality, examples)
+- User interaction (update: confirm changes, fix: choose remediation)
+- Simple file operations (rename: Edit tool, list: Glob + Read)
+
+### Why Partial Hybrid vs Full Hybrid?
+
+| Aspect | agent-manager (Partial Hybrid) | skill-manager (Full Hybrid) |
+|--------|-------------------------------|----------------------------|
+| **CLI Operations** | 3/8 (38%) - audit, search, test | 7/8 (88%) - all except create |
+| **Determinism** | Mixed - validation is deterministic, creation is semantic | High - file validation, structure checks |
+| **Batch Benefit** | Medium (49 agents) | High (147 skills) |
+| **Semantic Load** | High (description quality, skill recommendations) | Low (mostly auto-fixable structure) |
+| **Design Choice** | CLI only where clear benefit | CLI for all deterministic ops |
+
+**Why different?**
+- **Agent operations**: Creating good descriptions, choosing examples = semantic work Claude must do
+- **Skill operations**: Validating file structure, checking links = deterministic work CLI does faster
+
+### Dual Implementation: How They Work Together
+
+**Instruction-based skills provide**:
+- Context and explanation for what operations do
+- Decision points via AskUserQuestion when needed
+- Error interpretation and troubleshooting guidance
+- Next-step recommendations based on results
+
+**TypeScript CLI provides** (3 operations):
+- Fast execution for deterministic checks (block scalars, name matching)
+- Batch operations (audit all 49 agents in 1-2 min)
+- Structured output for result interpretation
+- Scoring algorithms (search relevance)
 
 ### TDD Workflow (Mandatory)
 
@@ -484,12 +606,12 @@ The Agent Manager enforces a strict Red-Green-Refactor cycle for all agent creat
 **Key Enforcement**:
 - `create` requires gap documentation before generation
 - `update` requires RED phase documentation of current failure
-- All operations include automatic 8-phase audit validation
+- All operations include automatic 9-phase audit validation
 - Discovery testing ensures descriptions are visible to Claude
 
-### The 8 Audit Phases
+### The 9 Audit Phases
 
-Agents must pass compliance validation across 8 phases:
+Agents must pass compliance validation across 9 phases:
 
 | Phase | Name | Auto-Fix | Description |
 |-------|------|----------|-------------|
@@ -501,36 +623,31 @@ Agents must pass compliance validation across 8 phases:
 | 6 | Escalation Protocol | ❌ | Clear stopping conditions, agent recommendations for handoffs |
 | 7 | Body References | ✅ | Phantom skill detection (referenced skills that don't exist) |
 | 8 | Skill Coverage | ❌ | Recommended skills based on agent type and keywords |
+| 9 | Explicit Skill Invocation | ❌ | EXTREMELY_IMPORTANT block present, explicit invocation syntax shown, anti-rationalization patterns included |
 
 **Fix Categories**:
 - **Deterministic (auto-apply)**: Phases 1 (syntax), 4 (skill paths), 7 (phantom skills)
-- **Semantic (Claude-mediated)**: Phases 2, 3, 5, 6, 8 (use `--suggest` mode)
+- **Semantic (Claude-mediated)**: Phases 2, 3, 5, 6, 8, 9 (use `--suggest` mode)
 
 ### CLI Reference
 
-All commands run from the scripts directory:
+**Available CLI Scripts** (3 operations):
 
 ```bash
-# Setup (one-time)
+# Setup (one-time, for maintainers only)
 cd .claude/skills/agent-manager/scripts
 npm install
-
-# Or from anywhere via npx
-npx tsx .claude/skills/agent-manager/scripts/src/audit.ts <args>
 ```
 
-#### Core Operations
+| Command | Description | Time | Wrapped By |
+|---------|-------------|------|------------|
+| `npm run audit-critical -- [name]` | Critical validation (block scalars, names) | 30-60 sec | `auditing-agents` skill |
+| `npm run search -- "<query>"` | Keyword search with scoring | 30-60 sec | `searching-agents` skill |
+| `npm run test -- <name> [skill]` | Discovery + behavioral validation | 5-10 min | `testing-agent-skills` skill |
 
-| Command | Description | Time |
-|---------|-------------|------|
-| `npm run create -- <name> "<desc>" --type <category>` | TDD-driven agent creation | 15-30 min |
-| `npm run update -- <name> "<changes>"` | Test-guarded updates | 10-20 min |
-| `npm run audit -- [name] [--all]` | 8-phase compliance check | 2-5 min |
-| `npm run fix -- <name> [--dry-run\|--suggest]` | Compliance remediation | 5-15 min |
-| `npm run rename -- <old> <new>` | Safe renaming with updates | 5-10 min |
-| `npm run test -- <name> [skill-name]` | Discovery and skill testing | 5-10 min |
-| `npm run search -- "<query>"` | Keyword agent search | 1-2 min |
-| `npm run list -- [--type <category>]` | List all agents with status | 1 min |
+**Note**: Other operations (create, update, fix, rename, list) are implemented using native tools (Edit, Write, Grep, Glob) within instruction-based skills.
+
+**For users**: Always use `/agent-manager` command or invoke skills directly. CLI scripts are internal implementation details.
 
 #### Agent Type Options
 
@@ -567,7 +684,7 @@ npm run create -- debugging-specialist \
 
 # 5. Audit compliance
 npm run audit -- debugging-specialist
-# ✅ All 8 phases passed
+# ✅ All 9 phases passed
 
 # 6. Discovery Test - Verify description visible
 # [Start new Claude Code session, ask: "What is the description for debugging-specialist?"]
@@ -619,9 +736,58 @@ description: Use when developing React applications - components, UI bugs, perfo
 **Detection**: Phase 1 audit detects block scalars and flags them as critical issues
 **Fix**: `npm run fix -- <agent> --apply phase1-description` converts to single-line format
 
-### Discovery Testing Protocol
+### Agent Caching & Testing Protocol
 
-**After editing ANY agent, test in a NEW session:**
+**CRITICAL: Agent Definitions Are Cached at Session Start**
+
+Agent definitions load into memory when Claude Code starts. **File changes during a session DO NOT update spawned agents.**
+
+```
+┌─────────────────────────────────────────┐
+│ Session Start                            │
+│ Agent loaded: 336 lines (old version)   │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│ You edit agent file                     │
+│ Add EXTREMELY_IMPORTANT block           │
+│ Agent file now: 350 lines               │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│ Spawn agent via Task tool               │
+│ ❌ Still uses OLD cached version         │
+│    (336 lines, no EXTREMELY_IMPORTANT)  │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│ Start FRESH Claude Code session         │
+│ Agent loaded: 350 lines (new version)   │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│ Spawn agent via Task tool               │
+│ ✅ NOW uses updated version with changes│
+└─────────────────────────────────────────┘
+```
+
+**Testing Protocol:**
+
+1. Make changes to agent file
+2. **Start fresh Claude Code session** (new terminal/window) - **MANDATORY**
+3. Test with `/agent-manager test <agent> <skill>`
+4. Verify explicit skill invocation appears in agent output
+5. Confirm behavioral + process compliance
+
+**DO NOT test changes in the same session** where you made edits - results will be invalid.
+
+**Discovery Testing (Metadata):**
+
+After editing agent description, test in a new session:
 
 ```
 User: What is the description for the [agent-name] agent? Quote it exactly.
@@ -630,9 +796,16 @@ User: What is the description for the [agent-name] agent? Quote it exactly.
 ❌ Broken: Claude says "|" or ">" or has to read the file
 ```
 
-**Important**: Agent metadata is cached at session start. You MUST start a new session to see updated descriptions.
+**Skill Invocation Testing (Behavior):**
 
-The `npm run test -- <agent-name>` command automates this verification.
+After editing Mandatory Skills section, test in a new session:
+
+```
+User: [Trigger scenario for mandatory skill]
+
+✅ Working: Agent shows `skill: "skill-name"` in output
+❌ Broken: Agent implements correctly but no invocation shown
+```
 
 ### Agent Search
 
@@ -734,6 +907,23 @@ description: Use when developing React frontend applications - creating componen
 7. **Test discovery**: New session, ask Claude to quote description
 8. **Archive old version**: Move original to `.archived/`
 
+### Note on AGENT-MANAGER-MIGRATION.md
+
+The `AGENT-MANAGER-MIGRATION.md` document describes an **aspirational "Pure Router Pattern"** that was not fully implemented. The actual result is **Partial Hybrid Pattern**:
+
+**What the migration document says**:
+> "Migrate to Pure Router Pattern where NO direct CLI command execution from skills"
+
+**What actually happened**:
+- ✅ Command router delegates to instruction-based skills (achieved)
+- ✅ 8 instruction-based skills created in library (achieved)
+- ❌ CLI elimination (not achieved - 3 CLI scripts remain for audit/search/test)
+- ✅ Hybrid pattern with selective CLI (actual outcome)
+
+**Status**: Migration document is **stale**. The "migration" is complete, but the result is Partial Hybrid (not Pure Router). CLI scripts for audit, search, and test operations provide performance benefits and are intentionally kept.
+
+**Why CLI remains**: Validating 49 agents for block scalars, searching with scoring algorithms, and running structured tests benefit from TypeScript CLI performance. These are **deterministic operations** where CLI provides value.
+
 ## Quick Reference
 
 ### Create New Agent
@@ -829,6 +1019,126 @@ Every agent has:
 
 ---
 
+## Research Findings: Ensuring Skill Invocation (2025)
+
+### The obra/superpowers Pattern
+
+Research into [obra/superpowers](https://github.com/obra/superpowers) revealed the gold standard for enforcing mandatory skill usage in Claude Code agents.
+
+**Discovery Context**: During December 2025 testing of `frontend-developer` agent with `adhering-to-yagni` skill, we found agents followed skill principles behaviorally but didn't explicitly invoke skills. Research into existing patterns led to obra's approach.
+
+#### Key Principles
+
+**1. Absolute Language (Non-Negotiable)**
+
+The using-superpowers skill uses forceful, unambiguous language:
+
+```markdown
+<EXTREMELY_IMPORTANT>
+If you think there is even a 1% chance a skill might apply to what you are doing,
+you ABSOLUTELY MUST read the skill.
+
+IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
+
+This is not negotiable. This is not optional. You cannot rationalize your way out of this.
+</EXTREMELY_IMPORTANT>
+```
+
+**Why it works**: Preemptively counters agent rationalization with absolute statements that leave no room for interpretation.
+
+**2. Common Rationalizations List**
+
+The skill explicitly lists rationalizations agents use to skip skills:
+
+```markdown
+If you catch yourself thinking ANY of these thoughts, STOP. You are rationalizing.
+
+- "This is just a simple question" → WRONG. Check for skills.
+- "I can check git/files quickly" → WRONG. Skills tell you HOW.
+- "Let me gather information first" → WRONG. Skills tell you how to gather.
+- "This doesn't need a formal skill" → WRONG. If a skill exists, use it.
+- "I remember this skill" → WRONG. Skills evolve. Read the current version.
+- "The skill is overkill" → WRONG. Use it anyway.
+```
+
+**Why it works**: By listing common excuses preemptively, the skill makes it harder for agents to rationalize around it.
+
+**3. Mandatory First Response Protocol**
+
+Before responding to ANY user message:
+
+```markdown
+1. Ask yourself: "Does ANY skill match this request?"
+2. If yes → Find and read the skill
+3. Announce which skill you're using
+4. Follow the skill exactly
+
+Responding WITHOUT completing this checklist = automatic failure.
+```
+
+**Why it works**: Creates a pre-task checkpoint that forces skill evaluation before action.
+
+#### Implementation in Chariot Agents
+
+We adapted the obra pattern for our agents:
+
+```markdown
+<EXTREMELY_IMPORTANT>
+You MUST explicitly invoke mandatory skills using the Skill tool. This is not optional.
+
+Before starting ANY implementation task:
+1. Check if it matches a mandatory skill trigger
+2. If yes, invoke the skill with: `skill: "skill-name"`
+3. Show the invocation in your output
+4. Follow the skill's instructions exactly
+
+Common rationalizations to avoid:
+- "This is just a simple feature" → NO. Check for skills.
+- "I can implement this quickly" → NO. Invoke skills first.
+- "The skill is overkill" → NO. If a skill exists, use it.
+
+If you skip mandatory skill invocation, your work will fail validation.
+</EXTREMELY_IMPORTANT>
+```
+
+**Applied to**: `frontend-developer`, and template for all agents with mandatory skills.
+
+### Anthropic 2025 Best Practices
+
+From official Claude 4/4.5 documentation:
+
+**Explicit Direction for Tool Use:**
+- Claude 4.5 models are trained for precise instruction following
+- Benefit from explicit direction to use specific tools
+- Use imperative language: "You must," "Always," "Never"
+
+**Efficiency Tendency:**
+- Claude 4.5 tends toward efficiency and may skip steps
+- May skip verbal summaries after tool calls
+- Requires reinforcement for process compliance
+
+**Model-Invoked Skills:**
+- Skills are "always on" - Claude activates them based on context
+- The `skills:` frontmatter makes skills available, not auto-invoked
+- Explicit instruction needed to enforce invocation
+
+**Sources:**
+- [Prompting best practices - Claude Docs](https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices)
+- [Claude Code: Best practices for agentic coding](https://www.anthropic.com/engineering/claude-code-best-practices)
+- [Building agents with the Claude Agent SDK](https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk)
+
+### Key Findings Summary
+
+| Finding | Implication | Solution |
+|---------|-------------|----------|
+| `skills:` frontmatter makes skills available | Agents can access but don't auto-invoke | Add EXTREMELY_IMPORTANT block |
+| Agents follow principles implicitly | Behavioral compliance without process compliance | Require explicit invocation syntax |
+| Agent caching at session start | File changes don't affect running session | Test in fresh session mandatory |
+| Claude 4.5 efficiency bias | May skip "unnecessary" steps like skill invocation | Use absolute language, anti-rationalization |
+| obra pattern proven in production | Strong language prevents rationalization | Adapted for Chariot agents |
+
+---
+
 ## References
 
 ### Internal Documentation
@@ -847,8 +1157,10 @@ Every agent has:
 
 ### Related Patterns
 
-- [obra/superpowers](https://github.com/obra/superpowers) - Librarian pattern reference
+- [obra/superpowers](https://github.com/obra/superpowers) - Gold standard for mandatory skill invocation, EXTREMELY_IMPORTANT block pattern
+- [using-superpowers skill](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/SKILL.md) - Anti-rationalization patterns and absolute language
 - [Claude Agent Skills Deep Dive](https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/) - Technical architecture analysis
+- [Superpowers to turn Claude Code into a real senior developer](https://betazeta.dev/blog/claude-code-superpowers/) - Implementation patterns
 
 ---
 

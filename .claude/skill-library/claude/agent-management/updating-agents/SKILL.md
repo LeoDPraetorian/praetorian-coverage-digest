@@ -97,7 +97,7 @@ find .claude/agents -name "{name}.md"
 
 **If searching**:
 ```bash
-cd .claude/skills/agent-manager/scripts && npm run --silent search -- "{keywords}"
+cd .claude/skill-library/claude/agent-management/searching-agents/scripts && npm run --silent search -- "{keywords}"
 ```
 
 ### 2.2 Read Current Agent
@@ -124,6 +124,7 @@ Understand current structure before changing.
 | Wrong skills | Frontmatter skills field or Skill References |
 | Missing escalation | Escalation Protocol |
 | Wrong output | Output Format |
+| Skills not invoked | Mandatory Skills section (see 3.3) |
 
 ### 3.2 Apply Minimal Edit
 
@@ -138,6 +139,107 @@ Edit {
 ```
 
 **Minimal diff**: Change only what's needed to fix RED failure.
+
+### 3.3 Special Case: Updating Mandatory Skills Section
+
+**If updating the Mandatory Skills section**, ensure:
+
+#### 3.3.1 EXTREMELY_IMPORTANT Block at Top
+
+The agent MUST have an `<EXTREMELY_IMPORTANT>` block at the very top (after frontmatter, before main content).
+
+**Critical Understanding**: The `skills:` field in agent frontmatter makes skills AVAILABLE (0 token discovery cost), but does NOT automatically invoke them. Agents must EXPLICITLY use the Skill tool. This pattern comes from obra/superpowers research.
+
+**Template**:
+
+```markdown
+---
+[frontmatter]
+---
+
+<EXTREMELY_IMPORTANT>
+You MUST explicitly invoke mandatory skills using the Skill tool. This is not optional.
+
+Before starting ANY implementation task:
+1. Check if it matches a mandatory skill trigger
+2. If yes, invoke the skill with: `skill: "skill-name"`
+3. Show the invocation in your output
+4. Follow the skill's instructions exactly
+
+**Mandatory Skills for This Agent:**
+- `{skill-1}` - Use when {trigger condition}
+- `{skill-2}` - Use when {trigger condition}
+- `{skill-3}` - Use when {trigger condition}
+
+**Common rationalizations to avoid:**
+- "This is just a simple feature" → NO. Check for skills.
+- "I can implement this quickly" → NO. Invoke skills first.
+- "The skill is overkill" → NO. If a skill exists, use it.
+- "I remember the skill's content" → NO. Skills evolve. Read current version.
+- "This doesn't count as {skill trigger}" → NO. When in doubt, use the skill.
+
+If you skip mandatory skill invocation, your work will fail validation.
+</EXTREMELY_IMPORTANT>
+
+# Agent Name
+
+[Rest of agent content]
+```
+
+**Key Requirements**:
+- Absolute language: "MUST", "not optional", "cannot rationalize" (obra/superpowers pattern)
+- Explicit invocation syntax shown: `skill: "skill-name"`
+- Anti-rationalization patterns preemptively counter agent shortcuts
+- Clear consequence: "fail validation"
+
+#### 3.3.2 Explicit Invocation Syntax
+
+Each mandatory skill MUST show the exact invocation syntax:
+
+```markdown
+### Test-Driven Development
+**When**: Writing any code or fixing bugs
+**Invoke**: `skill: "developing-with-tdd"`
+
+Not "use TDD" or "follow TDD principles" - you must INVOKE the skill.
+```
+
+#### 3.3.3 Anti-Rationalization Patterns
+
+Include explicit counters to agent bypass attempts:
+
+```markdown
+**NOT OPTIONAL**:
+- Not even when "it's just a small fix"
+- Not even when "the user described the solution"
+- Not even when "I know the pattern"
+- Not even when "I'm under time pressure"
+```
+
+#### 3.3.4 Verification Requirement
+
+**CRITICAL**: After updating Mandatory Skills, you MUST verify BOTH process and behavioral compliance in a fresh session.
+
+**Why fresh session?** Agent frontmatter and descriptions are cached at session start. Testing in the same session shows OLD behavior.
+
+**Verification Steps**:
+
+1. **Start new Claude Code session** (mandatory - caching issue)
+2. **Spawn agent with test task** that triggers mandatory skill
+3. **Check for BOTH compliance types**:
+   - **Process Compliance**: Does output show `skill: "skill-name"` or "I'm using the X skill"?
+   - **Behavioral Compliance**: Does agent follow the skill's patterns correctly?
+4. **Evaluate Result**:
+   - ✅ PASS: Both process AND behavioral compliance
+   - ❌ FAIL (silent): Correct behavior, no invocation announced
+   - ❌ FAIL (lip service): Invocation announced, wrong behavior
+   - ❌ FAIL (ignored): Neither invocation nor correct behavior
+
+**Why both matter**:
+- **Process without behavioral** = Agent announces skill but doesn't follow it (lip service)
+- **Behavioral without process** = Agent follows patterns but doesn't announce (unverifiable, breaks trust)
+
+**Common failure**: Agent implements correctly (behavioral) but doesn't show invocation (process). This is a CRITICAL failure because users cannot verify the skill was used.
 
 ---
 
@@ -182,7 +284,7 @@ Options:
 ### 5.1 Critical Audit
 
 ```bash
-cd .claude/skills/agent-manager/scripts && npm run --silent audit-critical -- {agent-name}
+cd .claude/skill-library/claude/agent-management/auditing-agents/scripts && npm run --silent audit-critical -- {agent-name}
 ```
 
 **If fails**: Fix issues, re-run.
@@ -197,10 +299,20 @@ wc -l .claude/agents/{type}/{name}.md
 
 ### 5.3 Manual Checks
 
+**General**:
 - [ ] Description still valid (if changed)
 - [ ] Tools/skills still alphabetized
 - [ ] All sections still present
 - [ ] No block scalars introduced
+
+**If Mandatory Skills Updated** (CRITICAL):
+- [ ] EXTREMELY_IMPORTANT block exists at top (after frontmatter)
+- [ ] Uses obra/superpowers template with absolute language ("MUST", "not optional")
+- [ ] Each skill shows explicit syntax: `skill: "skill-name"`
+- [ ] Includes all 5 anti-rationalization patterns
+- [ ] States clear consequence: "fail validation"
+- [ ] **Critical Understanding section** present (explains skills: frontmatter ≠ auto-invoke)
+- [ ] **Will test in fresh session** for BOTH process + behavioral compliance
 
 ---
 

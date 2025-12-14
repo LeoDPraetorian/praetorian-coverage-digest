@@ -87,7 +87,7 @@ Fix: Increase contrast and visual prominence of primary action, not just size"
 | Visual testing            | `.claude/skill-library/development/frontend/frontend-visual-testing-advanced/SKILL.md`  |
 | Accessibility compliance  | `.claude/skill-library/development/frontend/compatibility-testing/SKILL.md`             |
 | Design system components  | `.claude/skill-library/development/frontend/frontend-shadcn-ui/SKILL.md`                |
-| Information architecture  | `.claude/skill-library/development/frontend/frontend-information-architecture/SKILL.md` |
+| Information architecture  | `.claude/skill-library/development/frontend/patterns/enforcing-information-architecture/SKILL.md` |
 | Performance optimization  | `.claude/skill-library/development/frontend/frontend-performance-optimization/SKILL.md` |
 
 ---

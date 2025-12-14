@@ -1,0 +1,162 @@
+# Changelog
+
+All notable changes to this skill.
+
+## [Date: 2025-12-13 - Update 8: Frontmatter Organization Check]
+
+### Changed
+- Added Phase 1 manual check: Frontmatter Organization (after Phase 2 in Step 3 workflow)
+- Workflow now validates frontmatter fields appear in canonical order
+- Canonical order: name, description, type, permissionMode, tools, skills, model, color
+- Instructions: 1) Extract raw frontmatter, 2) Parse field order, 3) Compare to canonical, 4) Report out-of-order fields
+- Reports WARNING for out-of-order fields (not ERROR - this is maintenance/consistency, not functional)
+- Renamed old Phase 1 (PermissionMode Alignment) to Phase 0 to maintain numbering clarity
+- Updated all workflow references from "Phases 9,8,7,4,3,2,1" to "Phases 9,8,7,4,3,2,1,0"
+
+### Reason
+- Maintenance and consistency: Consistent field ordering reduces merge conflicts and improves readability
+- Makes diffs more predictable when multiple developers edit agents
+- Easier to spot missing required fields when fields follow standard order
+- This is a LOW-MEDIUM PRIORITY check (maintenance issue, not functional)
+- Instruction-based: parse YAML line by line and check order against canonical list
+- Complements existing structural checks with organizational consistency
+
+---
+
+## [Date: 2025-12-13 - Update 7: Tool Validation Check]
+
+### Changed
+- Added Phase 2 manual check: Tool Validation (Step 7 in workflow)
+- Workflow now validates agents have appropriate tools for their type
+- Type → Required Tools: development→[Edit,Write,Bash], testing→[Bash]
+- Type → Forbidden Tools: quality→[Edit,Write], analysis→[Edit,Write] (read-only)
+- Reports ERROR for missing required tools or forbidden tools present
+- Optional suggestions: architecture→[Read,Glob,Grep,TodoWrite], orchestrator→[Task,TodoWrite]
+- Restructured workflow from 11 steps (Phases 9,7,4,3,1) to 12 steps (Phases 9,7,4,3,2,1)
+
+### Reason
+- Type safety: ensures agents can only perform operations appropriate for their role
+- Quality/analysis agents MUST be read-only (can't have Edit/Write)
+- Development agents MUST be able to write code (requires Edit/Write/Bash)
+- Testing agents MUST be able to run tests (requires Bash)
+- This is a HIGH PRIORITY check (type safety / security issue)
+- Instruction-based: simple field comparison and list checking, no TypeScript needed
+- Prevents misuse: quality reviewers modifying code they're reviewing, architecture agents writing during planning phase
+
+---
+
+## [Date: 2025-12-13 - Update 6: Progressive Disclosure Refactor]
+
+### Changed
+- **MAJOR REFACTOR**: Implemented progressive disclosure pattern
+- Extracted 6 sections to `references/` directory (868 lines total)
+- Reduced main SKILL.md from 1167 lines to 326 lines (72% reduction)
+- All detailed content now loads on-demand via reference links
+
+**Reference files created:**
+- `references/common-issues.md` (130 lines) - Issues 1-5 detailed troubleshooting
+- `references/extended-issues.md` (258 lines) - Issues 6-12 with templates
+- `references/interpreting-results.md` (107 lines) - Exit code interpretation
+- `references/examples.md` (80 lines) - Workflow examples
+- `references/technical-details.md` (85 lines) - CLI implementation details
+- `references/workflow-manual-checks.md` (208 lines) - Phase 9/7/4/3/1 procedures
+
+### Reason
+- **Violated updating-skills Phase 4.3 and 7.2** - Added 5 updates without extracting content
+- File grew from 921 → 1167 lines (133% over target) by ignoring progressive disclosure requirements
+- **This is the fix** - Now compliant with <500 line target (326 lines, 174 under target)
+- Context efficiency: 72% reduction in initial load, detailed content loads on-demand
+- Maintainability: Modular sections easier to update and navigate
+
+---
+
+## [Date: 2025-12-13 - Update 5]
+
+### Changed
+- Added Phase 1 manual check: PermissionMode Alignment (Step 7 in workflow)
+- Workflow now validates permissionMode matches agent type for security
+- Type→permissionMode mapping: architecture/quality/analysis→plan, all others→default
+- Reports ERROR for mismatches with security implications explained
+- Restructured workflow from 11 steps to 12 steps
+
+### Reason
+- Security risk: wrong permission level allows unauthorized operations
+- Architecture/quality/analysis agents MUST be read-only (plan mode)
+- Development/testing agents need write permissions (default mode)
+- This is a MEDIUM-HIGH PRIORITY check (security issue)
+- Instruction-based: simple field comparison, no TypeScript needed
+- Phase 1 was in archived code but not in current workflow
+
+---
+
+## [Date: 2025-12-13 - Update 4]
+
+### Changed
+- Added Phase 3 manual check: Pattern Delegation (Step 6 in workflow)
+- Workflow now checks for embedded workflow patterns that should be delegated to skills
+- Detects: TDD workflows (RED-GREEN-REFACTOR), debugging steps, verification checklists >5 items
+- Only flags patterns >200 chars (threshold for bloat)
+- Reports WARNING with skill delegation suggestions
+- Restructured workflow from 10 steps to 11 steps
+
+### Reason
+- Embedded patterns cause agent bloat (>300 lines), duplication, harder maintenance
+- Lean agent pattern requires delegating to skills instead of embedding
+- This is a MEDIUM PRIORITY check (maintainability issue)
+- Instruction-based: keyword search + character counting, no TypeScript needed
+- Phase 3 was in archived code but not in current workflow
+
+---
+
+## [Date: 2025-12-13 - Update 3]
+
+### Changed
+- Added Phase 4 manual check: Gateway Enforcement (Step 5 in workflow)
+- Workflow now checks if agents use direct library paths instead of gateway-* skills
+- Instructions include: read skills: frontmatter, check for path separators, detect .claude/skill-library/ references
+- Reports ERROR for direct paths with gateway replacement suggestions
+- Restructured workflow from 9 steps to 10 steps
+
+### Reason
+- Direct library paths defeat progressive loading architecture
+- Causes high token costs at agent spawn (defeats gateway pattern)
+- This is a MEDIUM-HIGH PRIORITY check (architectural violation)
+- Instruction-based: simple text pattern check, no TypeScript needed
+- Phase 4 was in archived code but not in current workflow
+
+---
+
+## [Date: 2025-12-13 - Update 2]
+
+### Changed
+- Added Phase 7 manual check: Phantom Skills Detection (Step 4 in workflow)
+- Workflow now checks for skills referenced in agent body via `skill: "name"` that don't exist
+- Instructions include: grep for skill patterns, extract names, verify file existence
+- Reports ERROR for phantom skills (functional failure, not cosmetic)
+- Restructured workflow from 8 steps to 9 steps
+
+### Reason
+- Phantom skills cause runtime failures when agents try to invoke non-existent skills
+- This is a HIGH PRIORITY check (functional error)
+- Instruction-based: simple grep + file existence, no TypeScript needed
+- Phase 7 was in archived code but not in current workflow
+
+---
+
+## [Date: 2025-12-13 - Update 1]
+
+### Changed
+- Added Phase 9 manual check instructions to workflow section (Step 3)
+- Workflow now includes instruction-based check for EXTREMELY_IMPORTANT blocks
+- Restructured workflow from 6 steps to 8 steps with explicit Phase 9 verification
+- Added checklist for verifying block contains: absolute language, invocation syntax, anti-rationalization, validation warning
+
+### Reason
+- Phase 9 was documented in "Extended Structural Issues" (lines 495-608) but missing from workflow
+- Users running audits didn't know to manually check for EXTREMELY_IMPORTANT blocks
+- Clarified that Phase 9 is instruction-based (Claude reads and checks), not TypeScript-based
+- Simple text matching doesn't require complex regex like block scalar detection
+
+---
+
+- **2025-12-13**: Add Phase 9: Explicit Skill Invocation Verification. Check that agents with mandatory skills include: 1) EXTREMELY_IMPORTANT block at top of prompt with 'You MUST explicitly invoke' language, 2) Each mandatory skill lists explicit invocation syntax, 3) Anti-rationalization patterns listed (based on obra/superpowers pattern), 4) Warning about validation failure if skills not invoked. This is separate from checking skills: frontmatter field - that's Phase 4.

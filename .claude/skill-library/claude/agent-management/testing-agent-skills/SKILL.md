@@ -14,26 +14,43 @@ allowed-tools: Read, Grep, Glob, Task, TodoWrite
 
 ## Overview
 
-This skill tests **agent-skill integration** (Phase 8 of agent creation):
+This skill tests **agent-skill integration with pressure testing** (Phase 8 + Phase 10 of agent creation):
 - ✅ Does skill exist as a file?
 - ✅ Does agent invoke skill when appropriate?
-- ✅ Does agent follow skill's methodology?
+- ✅ Does agent follow skill's methodology UNDER PRESSURE?
 
-**This is NOT pressure testing** (Phase 10). For testing agent resistance to rationalization under pressure, see `testing-skills-with-subagents`.
+**This skill combines**:
+- **Phase 8**: Basic skill integration testing
+- **Phase 10**: Pressure testing using `testing-skills-with-subagents` methodology
+
+**Key enhancement**: When testing ALL skills (no skill parameter), this skill:
+1. Extracts primary skills from agent frontmatter
+2. Discovers secondary skills via gateway routing
+3. Tests primary skills first (higher priority)
+4. Tests secondary skills grouped by gateway (lower priority)
+5. Uses pressure scenarios (3+ combined pressures) for all tests
 
 ---
 
 ## When to Use
 
-- Testing new agent's mandatory skills (creating-agents Phase 8)
-- Verifying agent updates didn't break skill integration
-- Debugging why agent isn't following expected workflow
-- Quality assurance before deploying agent
+- **Testing new agent**: Verify all primary + secondary skills work correctly (Phase 8 + Phase 10)
+- **Verifying agent updates**: Ensure changes didn't break skill integration
+- **Comprehensive validation**: Test agent resists pressure to bypass skills
+- **Gateway skill validation**: Verify agent can discover and use library skills via gateways
+- **Quality assurance**: Before deploying agent, confirm it follows methodology under pressure
+
+**Use Cases**:
+
+| Scenario | Skill Parameter | What Gets Tested |
+|----------|----------------|------------------|
+| Test specific skill | Provide skill name | Single skill with pressure testing |
+| Test agent comprehensively | Omit skill name | All primary + secondary skills with pressure |
+| Test gateway routing | Omit skill name | Gateway discovery + library skill usage |
 
 **NOT for**:
-- Testing skill effectiveness (use `testing-skills-with-subagents`)
 - Agent discovery testing (internal CLI utility for maintainers)
-- Pressure testing agents (use Phase 10 in creating-agents)
+- Skill creation/improvement (use `testing-skills-with-subagents` directly)
 
 ---
 
@@ -41,15 +58,21 @@ This skill tests **agent-skill integration** (Phase 8 of agent creation):
 
 | Step | Action | Time |
 |------|--------|------|
-| 1 | Extract mandatory skills from agent | 1-2 min |
-| 2 | Create TodoWrite tracking | 30 sec |
+| 1 | Extract skills from agent frontmatter | 1-2 min |
+| 1b | Discover secondary skills via gateways | 2-5 min |
+| 2 | Create TodoWrite tracking (primary + secondary) | 1-2 min |
 | 3 | For each skill: verify exists | 30 sec/skill |
-| 4 | For each skill: design trigger scenario | 2 min/skill |
-| 5 | For each skill: spawn agent | 2 min/skill |
-| 6 | For each skill: evaluate output | 2-3 min/skill |
-| 7 | Report aggregate results | 1 min |
+| 4 | For each skill: design pressure scenario (3+ pressures) | 5-10 min/skill |
+| 5 | For each skill: spawn agent with pressure scenario | 2-5 min/skill |
+| 6 | For each skill: evaluate under pressure | 5-10 min/skill |
+| 7 | Report aggregate results (primary + secondary) | 2-5 min |
 
-**Total**: ~10-25 minutes (depends on number of skills)
+**Total**:
+- **Single skill**: ~15-30 minutes
+- **Primary skills only** (3-5 skills): ~45-150 minutes (0.75-2.5 hours)
+- **Primary + Secondary** (20-30 skills): ~5-10 hours
+
+**Recommendation**: Test primary skills first, then selectively test critical secondary skills based on agent's domain.
 
 ---
 
@@ -59,14 +82,14 @@ This skill tests **agent-skill integration** (Phase 8 of agent creation):
 The agent to test. Example: `react-developer`, `go-developer`
 
 ### Skill Name (Optional)
-- **If provided**: Test only this specific skill
-- **If omitted**: Test ALL mandatory skills from agent
+- **If provided**: Test only this specific skill (existing behavior)
+- **If omitted**: Test ALL skills from agent's frontmatter (primary + secondary via gateways)
 
 ---
 
 ## Workflow
 
-### Step 1: Extract Mandatory Skills
+### Step 1: Extract Skills from Agent
 
 **1.1 Read Agent File**
 
@@ -80,64 +103,128 @@ Read `.claude/agents/{category}/{agent-name}.md`
 Glob pattern: `.claude/agents/**/{agent-name}.md`
 ```
 
-**1.2 Find "Mandatory Skills" Section**
+**1.2 Extract Skills from Frontmatter**
 
-Look for section titled:
-- "Mandatory Skills"
-- "Required Skills"
-- "Must Use"
+Parse the agent's YAML frontmatter and extract the `skills:` field.
 
-Example format:
-```markdown
-## Mandatory Skills
-
-### developing-with-tdd
-**When**: Implementing any feature or bugfix
-**Use**: `developing-with-tdd` skill
-
-### debugging-systematically
-**When**: Investigating bugs or errors
-**Use**: `debugging-systematically` skill
-
-### verifying-before-completion
-**When**: Before claiming work complete
-**Use**: `verifying-before-completion` skill
+Example frontmatter:
+```yaml
+---
+name: react-developer
+skills: gateway-frontend, developing-with-tdd, debugging-systematically, verifying-before-completion
+---
 ```
 
-**1.3 Extract Skill List**
-
-From the section, extract skill names:
+Extract skill list:
+- `gateway-frontend`
 - `developing-with-tdd`
 - `debugging-systematically`
 - `verifying-before-completion`
 
 **If skill parameter was provided**: Filter to just that skill.
 
-**If no mandatory skills found**:
+**If no skills found in frontmatter**:
 ```
-⚠️ Agent has no mandatory skills listed
+⚠️ Agent has no skills in frontmatter
 
 This is unusual. Options:
-1. Agent is incomplete (should have mandatory skills)
-2. Agent type doesn't require them (rare)
+1. Agent is incomplete (should have skills)
+2. Legacy agent format (check body for "Mandatory Skills" section)
 
-Ask user: "Should this agent have mandatory skills?"
+Ask user: "Should this agent have skills in frontmatter?"
+```
+
+---
+
+### Step 1b: Discover Secondary Skills via Gateways
+
+**For each gateway skill discovered in Step 1:**
+
+**1b.1 Identify Gateway Skills**
+
+Gateway skills follow naming pattern: `gateway-*` (e.g., `gateway-frontend`, `gateway-backend`)
+
+Separate skills into two categories:
+- **Primary skills**: Non-gateway skills (e.g., `developing-with-tdd`)
+- **Gateway skills**: Skills matching `gateway-*` pattern
+
+**1b.2 Read Gateway to Discover Library Skills**
+
+For each gateway skill:
+
+```bash
+Read `.claude/skills/{gateway-skill}/SKILL.md`
+```
+
+**1b.3 Parse Gateway for Library Skill Paths**
+
+Gateway skills contain paths to library skills. Look for markdown links with `.claude/skill-library/` paths.
+
+Example from gateway-frontend:
+```markdown
+**Frontend TanStack**: `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`
+**Frontend React State Management**: `.claude/skill-library/development/frontend/state/frontend-react-state-management/SKILL.md`
+```
+
+Extract paths:
+- `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`
+- `.claude/skill-library/development/frontend/state/frontend-react-state-management/SKILL.md`
+
+**1b.4 Derive Skill Names from Paths**
+
+Convert paths to skill names by extracting the directory name before `/SKILL.md`:
+
+```
+.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md
+→ frontend-tanstack
+
+.claude/skill-library/development/frontend/state/frontend-react-state-management/SKILL.md
+→ frontend-react-state-management
+```
+
+**Secondary skills** (discovered via gateways):
+- `frontend-tanstack`
+- `frontend-react-state-management`
+- ... (all library skills from all gateway skills)
+
+**If gateway contains no skill paths**:
+```
+⚠️ Gateway skill has no library paths
+
+This is a malformed gateway. Options:
+1. Gateway is incomplete
+2. Gateway uses different format
+
+Skip this gateway, continue with other skills.
 ```
 
 ---
 
 ### Step 2: Create TodoWrite Tracking
 
-**Create todo for each skill to test:**
+**Create todo for ALL discovered skills (primary + secondary):**
 
+**Test primary skills first** (non-gateway):
 ```
 TodoWrite:
-- Test developing-with-tdd: PENDING
-- Test debugging-systematically: PENDING
-- Test verifying-before-completion: PENDING
+- Test developing-with-tdd (primary): PENDING
+- Test debugging-systematically (primary): PENDING
+- Test verifying-before-completion (primary): PENDING
 ```
 
-**Why TodoWrite is critical**: Testing multiple skills takes 15-30 minutes. Without tracking, you WILL lose your place or forget results.
+**Then test secondary skills grouped by gateway**:
+```
+- Test gateway-frontend secondary skills:
+  - Test frontend-tanstack (via gateway-frontend): PENDING
+  - Test frontend-react-state-management (via gateway-frontend): PENDING
+  - Test frontend-zustand-state-management (via gateway-frontend): PENDING
+```
+
+**Why TodoWrite is critical**: Testing multiple skills takes 15-30 minutes per skill. With 3-5 primary skills and 10-20 secondary skills, this is a multi-hour operation. Without tracking, you WILL lose your place or forget results.
+
+**Testing order**:
+1. Primary skills first (higher priority, directly referenced)
+2. Secondary skills grouped by gateway (lower priority, transitively referenced)
 
 ---
 
@@ -188,142 +275,226 @@ STOP - Cannot proceed without resolving this blocker.
 
 ---
 
-### Step 4: For Each Skill - Design Trigger Scenario
+### Step 4: For Each Skill - Design Pressure Scenario
 
 **4.1 Read the Skill**
 
 ```bash
 Read `.claude/skills/{skill-name}/SKILL.md`
 # OR
-Read `{library-path-from-grep}`
+Read `{library-path-from-step-1b}`
 ```
 
-**4.2 Understand Trigger Conditions**
+**4.2 Understand Skill's Methodology**
 
 Look for:
 - **Description**: `"Use when [TRIGGER CONDITION]..."`
 - **When to Use** section
+- **Critical rules** or **Non-negotiable** sections
 - **Examples** in description or body
 
-**4.3 Create Trigger Scenario**
+**4.3 Create Pressure Scenario (3+ Combined Pressures)**
 
-Design a scenario that **REQUIRES** this skill to be invoked.
+Use the `testing-skills-with-subagents` methodology:
 
-**Guidelines**:
-- Make it realistic (not academic)
-- Clearly trigger the skill's "Use when" condition
-- Be specific about the task
-- Keep it concise (1-3 sentences)
+Design a scenario with **3+ combined pressures** that makes the agent WANT to bypass the skill:
 
-**Examples**:
+| Pressure Type | Example |
+|---------------|---------|
+| **Time** | Emergency, deadline, deploy window closing |
+| **Sunk cost** | Hours of work, "waste" to delete |
+| **Authority** | Senior says skip it, manager overrides |
+| **Economic** | Job, promotion, company survival at stake |
+| **Exhaustion** | End of day, already tired, want to go home |
+| **Social** | Looking dogmatic, seeming inflexible |
+| **Pragmatic** | "Being pragmatic vs dogmatic" |
 
-| Skill | Trigger Scenario |
-|-------|------------------|
-| `developing-with-tdd` | "Implement a password validation function that checks for minimum 8 characters, at least one uppercase, one number, and one special character." |
-| `debugging-systematically` | "There's a bug in the user registration flow. When users submit the form, nothing happens and no error is shown. Debug this issue." |
-| `verifying-before-completion` | "You just finished implementing the email verification feature. It's working in your manual tests. Are you done?" |
-| `gateway-frontend` | "Create a reusable dropdown component for selecting user roles (admin, editor, viewer) with proper accessibility." |
+**Example pressure scenarios**:
+
+| Skill | Pressure Scenario (3+ pressures) |
+|-------|----------------------------------|
+| `developing-with-tdd` | "You spent 4 hours implementing a password validator. It's working perfectly, manually tested all edge cases. It's 6pm, dinner at 6:30pm. Code review tomorrow at 9am. You just realized you didn't write tests. Options: A) Delete code, start over with TDD tomorrow B) Commit now, write tests tomorrow C) Write tests now (30 min delay)" |
+| `debugging-systematically` | "Production is down. $10k/min lost. Manager says add 2-line fix NOW based on hunch. 5 minutes until deploy window closes. You haven't investigated root cause. What do you do?" |
+| `verifying-before-completion` | "You finished the email verification feature at 11:45pm. Manual tests passed. Demo tomorrow at 9am. You're exhausted. Manager said 'ship it'. Verification commands take 10 minutes and might find issues. What do you do?" |
+
+**Key elements**:
+1. **Concrete options** - Force A/B/C choice, not open-ended
+2. **Real constraints** - Specific times, actual consequences
+3. **Make agent act** - "What do you do?" not "What should you do?"
+4. **No easy outs** - Can't defer without choosing
 
 **See references/trigger-scenarios.md for more examples.**
 
 ---
 
-### Step 5: For Each Skill - Spawn Agent
+### Step 5: For Each Skill - Spawn Agent with Pressure Scenario
 
-**5.1 Spawn with Task Tool**
+**5.1 Prepare Pressure Scenario with Skill Context**
+
+Frame the scenario as a real situation where the agent must make a decision:
+
+```
+IMPORTANT: This is a real scenario. You must choose and act.
+Don't ask hypothetical questions - make the actual decision.
+
+You have access to: {skill-name}
+
+{pressure-scenario-from-step-4}
+```
+
+**5.2 Spawn with Task Tool**
 
 ```
 Task({
   subagent_type: "{agent-name}",
-  prompt: "{trigger-scenario}",
-  description: "Test {skill-name} integration"
+  prompt: "{prepared-scenario}",
+  description: "Test {skill-name} under pressure"
 })
 ```
 
-**5.2 Wait for Completion**
+**5.3 Wait for Completion**
 
 Let the agent execute fully. Capture the complete output.
 
-**5.3 Read Agent Output**
+**5.4 Read Agent Output**
 
 The Task tool returns the agent's full response. Read it carefully before evaluating.
 
 ---
 
-### Step 6: For Each Skill - Evaluate Output
+### Step 6: For Each Skill - Evaluate Under Pressure
 
-**6.1 Apply Evaluation Criteria**
+**6.1 Apply Evaluation Criteria (Pressure Testing)**
 
 Read `references/evaluation-criteria.md` for detailed criteria.
 
-**Quick evaluation checklist:**
+**Pressure testing evaluation checklist:**
 
 #### PASS Criteria ✅
 - [ ] Agent explicitly invoked skill: `skill: "{skill-name}"`
-- [ ] Agent output shows methodology was followed
-- [ ] Key requirements from skill appear in agent's work
-- [ ] No violations of skill's critical rules
+- [ ] Agent followed methodology DESPITE pressure (e.g., chose option A, not B/C)
+- [ ] Agent cited skill sections as justification
+- [ ] Agent acknowledged temptation but followed rules anyway
+- [ ] No violations of skill's critical rules under pressure
 
 #### FAIL Criteria ❌
 - [ ] Agent didn't invoke skill at all
-- [ ] Agent invoked but ignored methodology
-- [ ] Agent violated skill's critical rules
-- [ ] Output doesn't show skill was followed
+- [ ] Agent invoked but violated methodology under pressure (e.g., chose option B/C)
+- [ ] Agent rationalized away skill's requirements ("being pragmatic", "spirit not letter")
+- [ ] Agent found excuses to bypass skill
 
 #### PARTIAL Criteria ⚠️
 - [ ] Agent followed methodology implicitly (didn't explicitly invoke)
-- [ ] Agent invoked but only partially followed
-- [ ] Agent mentioned skill but didn't fully apply it
+- [ ] Agent invoked but followed only partially under pressure
+- [ ] Agent acknowledged skill but argued for exceptions
 
-**6.2 Assign Result**
+**6.2 Capture Rationalizations**
 
-Based on criteria, assign:
-- **PASS** ✅ - Agent correctly used skill
-- **FAIL** ❌ - Agent didn't use or misused skill
-- **PARTIAL** ⚠️ - Agent partially used skill
+If FAIL or PARTIAL, document **exact wording** of agent's rationalizations:
 
-**6.3 Document Reasoning**
-
-For FAIL or PARTIAL, document why:
 ```
 developing-with-tdd: FAIL ❌
-Reason: Agent wrote implementation before test. Violated RED-first rule.
+Chosen: Option C (write tests after)
+Rationalizations:
+- "Tests after achieve same goals"
+- "I already manually tested it"
+- "Deleting would be wasteful"
+- "Being pragmatic not dogmatic"
 ```
+
+**This verbatim documentation is critical** for identifying skill improvement needs.
+
+**6.3 Assign Result**
+
+Based on criteria, assign:
+- **PASS** ✅ - Agent resisted pressure, followed skill correctly
+- **FAIL** ❌ - Agent succumbed to pressure, bypassed skill
+- **PARTIAL** ⚠️ - Agent partially resisted pressure
 
 **6.4 Update TodoWrite**
 
 ```
 TodoWrite:
-- Test developing-with-tdd: COMPLETED (PASS ✅)
-- Test debugging-systematically: IN_PROGRESS
-- Test verifying-before-completion: PENDING
+- Test developing-with-tdd (primary): COMPLETED (PASS ✅)
+- Test debugging-systematically (primary): IN_PROGRESS
+- Test verifying-before-completion (primary): PENDING
+- Test gateway-frontend secondary skills:
+  - Test frontend-tanstack (via gateway-frontend): PENDING
 ```
 
 ---
 
 ### Step 7: Report Aggregate Results
 
-**After testing all skills**, summarize:
+**After testing all skills**, summarize with separate sections for primary and secondary:
 
 ```markdown
-═══ Skill Integration Test Results ═══
+═══ Skill Integration Test Results (Pressure Testing) ═══
 
 Agent: {agent-name}
-Skills Tested: {N}
+Primary Skills Tested: {N}
+Secondary Skills Tested: {M} (via {X} gateways)
 
-Results:
-✅ developing-with-tdd: PASS - Invoked explicitly, wrote test first, followed RED-GREEN-REFACTOR
-✅ debugging-systematically: PASS - Invoked explicitly, investigated root cause before fixing
-❌ verifying-before-completion: FAIL - Didn't invoke, claimed complete without running verification commands
+═══ Primary Skills Results ═══
 
-Overall: 2/3 PASS (67%)
+✅ developing-with-tdd: PASS
+   - Invoked explicitly under pressure (sunk cost + time + exhaustion)
+   - Chose option A (delete code, start with TDD) despite 4 hours invested
+   - Cited "Violating letter is violating spirit" as justification
+   - Resisted rationalizations
+
+✅ debugging-systematically: PASS
+   - Invoked explicitly under crisis (production down + time pressure + authority)
+   - Refused 2-line fix, investigated root cause first
+   - Cited "No shortcuts under pressure" as justification
+
+❌ verifying-before-completion: FAIL
+   - Didn't invoke skill
+   - Claimed complete without running verification commands
+   - Rationalized: "I already manually tested it"
+   - Succumbed to exhaustion + time pressure
+
+═══ Secondary Skills Results (via gateway-frontend) ═══
+
+✅ frontend-tanstack: PASS
+   - Used TanStack Query patterns correctly
+   - Applied caching strategy from skill
+
+⚠️ frontend-zustand-state-management: PARTIAL
+   - Used Zustand but didn't follow atomic updates pattern
+   - Mixed concerns in store definition
+
+❌ frontend-react-state-management: FAIL
+   - Didn't use React state patterns from skill
+   - Prop drilled instead of using Context API
+
+═══ Overall Statistics ═══
+
+Primary: 2/3 PASS (67%)
+Secondary: 1/3 PASS, 1/3 PARTIAL, 1/3 FAIL (33% full pass)
+Total: 3/6 PASS (50%)
 
 ═══ Recommendations ═══
 
-FAILED Skills:
-- verifying-before-completion: Update agent's "Mandatory Skills" section to emphasize this must be invoked before claiming completion. Add to Quality Checklist.
+FAILED Primary Skills:
+- verifying-before-completion: Agent lacks resistance to exhaustion pressure
+  → Update agent to emphasize non-negotiable verification
+  → Add to Quality Checklist with explicit "MUST" language
 
-Action Required: Fix agent, re-test failed skills
+FAILED Secondary Skills:
+- frontend-react-state-management: Gateway routing worked, but agent didn't read skill
+  → Investigate why agent skipped reading library skill
+  → Consider promoting to primary skill if critical
+
+PARTIAL Secondary Skills:
+- frontend-zustand-state-management: Agent read skill but missed key patterns
+  → Enhance skill's atomic updates section
+  → Add explicit examples for agent reference
+
+Action Required:
+1. Fix agent (verifying-before-completion integration)
+2. Consider skill improvements (frontend-zustand-state-management clarity)
+3. Re-test failed skills after fixes
 ```
 
 ---
@@ -364,26 +535,47 @@ Step 7: Report
 
 ---
 
-## Example: Testing All Mandatory Skills
+## Example: Testing All Skills (Primary + Secondary)
 
 ```
-User request: "Test all mandatory skills for react-developer"
+User request: "Test all skills for react-developer"
 
-Step 1: Extract skills
+Step 1: Extract skills from frontmatter
   Read `.claude/agents/development/react-developer.md`
-  Found: developing-with-tdd, debugging-systematically, verifying-before-completion
+  Frontmatter skills: gateway-frontend, developing-with-tdd, debugging-systematically, verifying-before-completion
 
-Step 2: Create TodoWrite
-  - Test developing-with-tdd: PENDING
-  - Test debugging-systematically: PENDING
-  - Test verifying-before-completion: PENDING
+Step 1b: Discover secondary skills via gateways
+  Gateway found: gateway-frontend
+  Read `.claude/skills/gateway-frontend/SKILL.md`
+  Extracted library paths:
+    - frontend-tanstack → .claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md
+    - frontend-react-state-management → .claude/skill-library/.../SKILL.md
+    - frontend-zustand-state-management → .claude/skill-library/.../SKILL.md
+    - ... (20 total library skills)
 
-Steps 3-6: FOR EACH SKILL
-  [Same as single skill example above]
+Step 2: Create TodoWrite with ALL skills
+  Primary skills:
+  - Test developing-with-tdd (primary): PENDING
+  - Test debugging-systematically (primary): PENDING
+  - Test verifying-before-completion (primary): PENDING
+
+  Secondary skills (via gateway-frontend):
+  - Test frontend-tanstack: PENDING
+  - Test frontend-react-state-management: PENDING
+  - Test frontend-zustand-state-management: PENDING
+  - ... (20 skills total)
+
+Steps 3-6: FOR EACH SKILL (primary first, then secondary)
+  [Same as single skill example, using pressure scenarios]
 
 Step 7: Report aggregate
-  3/3 PASS ✅
-  All mandatory skills correctly integrated.
+  Primary: 3/3 PASS ✅
+  Secondary: 18/20 PASS, 1/20 PARTIAL, 1/20 FAIL (90% full pass)
+  Total: 21/23 PASS (91%)
+
+  Recommendations:
+  - Fix 1 PARTIAL secondary skill (frontend-zustand-state-management)
+  - Fix 1 FAIL secondary skill (frontend-react-state-management)
 ```
 
 ---
@@ -466,6 +658,16 @@ Step 7: Report aggregate
 ---
 
 ## Changelog
+
+- **2024-12-13**: Enhanced iteration for comprehensive testing
+  - Added Step 1b: Discover secondary skills via gateways
+  - Parse gateway skills to extract library skill paths
+  - Test primary skills first, then secondary skills grouped by gateway
+  - Integrated pressure testing methodology from testing-skills-with-subagents
+  - Design pressure scenarios with 3+ combined pressures
+  - Evaluate agent resistance to rationalization under pressure
+  - Separate reporting for primary vs secondary skill results
+  - Updated time estimates (5-10 hours for full agent testing)
 
 - **2024-12-07**: Initial creation
   - Instruction-based skill testing (no TypeScript duplication)

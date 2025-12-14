@@ -33,8 +33,6 @@ chariot-development-platform/                  # Super-repo root
 │   └── ai-research/                           # AI security research and experiments
 ├── Makefile                                   # Super-repo automation
 ├── docs/CLEAN_CODE.md                         # Summary of 'Clean code' by Robert C. Martin
-├── docs/TECH-STACK.md                              # Technology stack reference
-├── docs/DESIGN-PATTERNS.md                         # Architecture patterns and guidelines
 ```
 
 ## Initial Repository Setup (First Time Only)
@@ -478,9 +476,6 @@ allowedColumns := map[string]bool{
 
 - @docs/TECH-STACK.md - Complete technology stack with versions and dependencies
 - @docs/DESIGN-PATTERNS.md - Architectural patterns and security guidelines
-- @docs/SKILLS-ARCHITECTURE.md - Hybrid skill system: Core, Gateway, Library tiers
-- @docs/AGENT-ARCHITECTURE.md - Lean agent pattern with skill delegation
-- @docs/MCP-TOOLS-ARCHITECTURE.md - TypeScript MCP wrappers for progressive loading
 
 **Module Documentation:**
 

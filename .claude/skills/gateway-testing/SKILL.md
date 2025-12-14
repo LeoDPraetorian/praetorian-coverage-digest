@@ -46,6 +46,11 @@ Each skill is organized by domain for easy discovery.
 **Condition-Based Waiting**: `.claude/skill-library/testing/condition-based-waiting/SKILL.md`
 - Proper wait strategies, polling patterns, and async handling
 
+## Code Quality Metrics
+
+**Analyzing Cyclomatic Complexity**: `.claude/skill-library/quality/analyzing-cyclomatic-complexity/SKILL.md`
+- Measures decision logic complexity, identifies refactoring candidates, sets quality gates for CI/CD
+
 ## Mocking & Doubles
 
 **Mock Chariot Task**: `.claude/skill-library/testing/mock-chariot-task/SKILL.md`
@@ -71,6 +76,7 @@ Each skill is organized by domain for easy discovery.
 | Async/wait patterns | condition-based-waiting |
 | Mocking strategies | mock-contract-validation |
 | Performance tests | performance-testing |
+| Code complexity metrics | analyzing-cyclomatic-complexity |
 
 ## When to Use This Gateway
 

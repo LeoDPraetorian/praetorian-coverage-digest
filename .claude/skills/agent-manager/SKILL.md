@@ -16,8 +16,8 @@ allowed-tools: 'Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, Skill, Ask
 |-----------|-------|------|---------|
 | **Create** | `creating-agents` | 60-90 min | Full TDD workflow with pressure testing |
 | **Update** | `updating-agents` | 20-40 min | Simplified TDD with conditional pressure testing |
-| **Test** | `testing-agent-skills` | 10-25 min | Behavioral validation - spawns agents, tests skill invocation |
-| **Audit** | `auditing-agents` | 30-60 sec | Critical validation - block scalars, name mismatches |
+| **Test** | `testing-agent-skills` | 10-25 min/skill, hours for full agent | Behavioral validation - spawns agents with Task tool, tests skill invocation under pressure |
+| **Audit** | `auditing-agents` | 30-60 sec | Structural/lint validation - file format, syntax, description, line count |
 | **Fix** | `fixing-agents` | 2-5 min | Interactive remediation - auto-fixes and manual guidance |
 | **Rename** | `renaming-agents` | 2-5 min | Safe renaming - validates, updates all references, verifies integrity |
 | **Search** | `searching-agents` | 30-60 sec | Keyword discovery - relevance scoring, filtering, result interpretation |
@@ -76,12 +76,13 @@ When user invokes `/agent-manager <operation>`:
 
 ### Internal Implementation Details
 
-**CLI scripts exist** but are wrapped by skills:
-- `audit-critical.ts` → Wrapped by `auditing-agents` skill
-- `search.ts` → Wrapped by `searching-agents` skill
-- `test.ts` → Used internally by `testing-agent-skills` skill
+**CLI scripts are located within the library skills** they support:
+- `audit-critical.ts` → Located in `auditing-agents/scripts/src/`
+- `search.ts` → Located in `searching-agents/scripts/src/`
 
-**Users should NEVER invoke CLI scripts directly.** Always use skills.
+**Users should NEVER invoke CLI scripts directly.** Always use the routing skills.
+
+**Note:** The `test.ts` CLI script is deprecated. Behavioral validation is now handled entirely by the `testing-agent-skills` skill, which spawns agents and evaluates skill integration through the `testing-skills-with-subagents` workflow.
 
 ---
 
@@ -89,15 +90,7 @@ When user invokes `/agent-manager <operation>`:
 
 **For users:** None. All operations use skills that handle setup internally.
 
-**For maintainers** (if modifying CLI scripts):
-```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skills/agent-manager/scripts"
-npm install
-```
-
-**Note:** Skills wrap CLI scripts automatically. Users never need to run npm commands directly.
+**For maintainers:** CLI tools are maintained within their respective library skills (`.claude/skill-library/claude/agent-management/`). See individual skill documentation for setup instructions.
 
 ## Critical Problem: Block Scalar Descriptions
 
@@ -156,23 +149,28 @@ description: Use when developing React applications - components, UI bugs, perfo
 
 ### Understanding Audit vs Test
 
-**Critical distinction** between structural and behavioral validation:
+**Critical distinction** between structural/lint validation and behavioral validation:
 
 | Aspect | Audit (Structural) | Test (Behavioral) |
 |--------|-------------------|-------------------|
-| **Purpose** | Lint check - format, syntax, compliance | Behavioral validation - does agent work correctly? |
-| **Method** | Static analysis of agent file | Spawns agent instances with Task tool |
-| **What it checks** | YAML syntax, description format, line count, file structure | Skill invocation, methodology compliance, workflow correctness |
-| **Speed** | Fast (2-5 min) | Slower (10-25 min per skill) |
-| **When to use** | Before committing, after editing agent file | After major changes, before deployment, when debugging behavior |
-| **Tool** | Instruction skill (`auditing-agents`) | Instruction skill (`testing-agent-skills`) |
-| **Output** | 8-phase compliance report | PASS/FAIL/PARTIAL per skill with reasoning |
+| **Purpose** | Lint validation - file format, syntax, description, line count, required sections | Behavioral validation - does agent correctly invoke and follow skills under realistic pressure? |
+| **Method** | Static analysis via `audit-critical.ts` CLI + extended structural checks | Spawns actual agents with Task tool, evaluates skill integration with pressure scenarios |
+| **What it checks** | YAML frontmatter syntax, description format (no block scalars), name consistency, line count limits, file structure | Skill invocation behavior, methodology compliance (TDD/debugging/verification), workflow execution under time/authority/sunk cost pressure |
+| **Speed** | Fast (30-60 seconds) | Slower (10-25 min per skill, potentially hours for full agent with all gateway skills) |
+| **When to use** | Before committing, after editing agent file, quick compliance checks | After major changes, before deployment, when debugging why agent bypasses skills, validating TDD enforcement |
+| **Implementation** | Uses `auditing-agents` skill (wraps `audit-critical.ts`) | Uses `testing-agent-skills` skill (delegates to `testing-skills-with-subagents` for pressure scenarios) |
+| **Output** | 8-phase compliance report (PASS/FAIL per phase with auto-fix suggestions) | PASS/FAIL/PARTIAL per skill with detailed reasoning (why agent succeeded/failed at skill invocation) |
 
 **Analogy:**
-- **Audit** = TypeScript compiler (syntax, types, structure)
-- **Test** = Jest/Vitest (runtime behavior, correctness)
+- **Audit** = ESLint (syntax, formatting, structure rules)
+- **Test** = Jest/Vitest (runtime behavior, correctness under execution)
 
-**Use both:** Audit catches format issues quickly. Test catches behavior issues that only appear when agents execute.
+**Important:**
+- The `test.ts` CLI script is deprecated - it was performing structural checks that belong in audit
+- The `test` operation now ONLY routes to `testing-agent-skills` skill for behavioral validation
+- Never invoke `test.ts` directly - always use the `testing-agent-skills` skill
+
+**Use both:** Audit catches format/structure issues quickly (seconds). Test catches behavioral issues that only appear when agents execute under pressure (minutes/hours).
 
 ---
 
@@ -552,10 +550,16 @@ User: What is the description for the [agent-name] agent? Quote it exactly.
 
 ## Changelog
 
+- **2024-12-13**: Clarified Audit vs Test distinction
+  - Updated "Understanding Audit vs Test" section with precise definitions
+  - AUDIT = structural/lint validation (file format, syntax, description, line count) via audit-critical.ts CLI - fast 30-60 seconds
+  - TEST = behavioral validation (skill invocation under pressure) via testing-agent-skills skill delegating to testing-skills-with-subagents - slower 10-25 min/skill, hours for full agent
+  - Deprecated test.ts CLI script - structural checks belong in audit, not test
+  - Test operation now ONLY routes to testing-agent-skills for behavioral validation
 - **2024-12-07**: Migrated to Pure Router Pattern
   - All operations now use instruction-based skills (create, update, test, audit, fix, rename, search, list)
   - Audit workflow integrated with fixing-agents skill for automatic remediation
-  - CLI scripts wrapped by skills (audit-critical, search, test)
+  - CLI scripts wrapped by skills (audit-critical, search)
 - **2024-11-30**: Expanded to 8-phase audit system
   - Phase 1: Added color field, permissionMode alignment, field ordering, alphabetical sorting
   - Phase 4: Added tool appropriateness checks (required/forbidden/recommended by type)

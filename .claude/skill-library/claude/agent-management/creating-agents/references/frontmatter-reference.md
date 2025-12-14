@@ -205,24 +205,125 @@ description: Use when developing Python applications - CLI tools, pytest
 
 ### model (Optional)
 
-**Valid values**: `sonnet`, `opus`, `haiku`
+**Valid values**: `inherit`, `sonnet`, `opus`, `haiku`
 
-**Default if omitted**: `sonnet`
+**Default if omitted**: `inherit` (inherits from main session's model)
 
-**When to use opus**:
-- architecture (trade-off reasoning)
-- orchestrator (complex coordination)
-- Complex development (highly specialized domains)
+**CRITICAL**: This controls MODEL selection, not context. Context is ALWAYS isolated for sub-agents.
 
-**When to use sonnet**:
-- Most agents (default choice)
-- Development, testing, quality, analysis, research
+---
 
-**When to use haiku**:
-- Rare (only very simple agents)
-- Example: Simple list/search operations
+#### When to use `inherit` (Recommended for 40%+ of agents)
 
-**Recommendation**: `sonnet` for most, `opus` for architecture/orchestrator.
+**Use inherit when task complexity varies and user's session model reflects their current priority.**
+
+**Development agents** (backend-developer, frontend-developer, python-developer, integration-developer):
+- Opus session: User needs careful reasoning for complex feature
+- Sonnet session: User wants fast iteration for simple fix
+
+**Testing agents** (unit, e2e, integration, acceptance, coverage):
+- Opus session: User wants comprehensive test suite with edge cases
+- Sonnet session: User wants quick test coverage for simple feature
+
+**MCP tool agents** (praetorian-cli-expert, chromatic-test-engineer):
+- Opus session: User needs complex data analysis
+- Sonnet session: User wants quick data retrieval
+
+**Benefit**: Agents adapt to user's workflow preference (speed vs thoroughness).
+
+**Research**: [Anthropic Multi-Agent Research](https://www.anthropic.com/engineering/multi-agent-research-system)
+> "Using 'inherit' is particularly useful when you want your subagents to adapt to the model choice of the main conversation"
+
+---
+
+#### When to use `opus` (Architecture, Security, Quality)
+
+**Use opus when errors are costly and deep reasoning is non-negotiable.**
+
+**Architecture agents** (backend-architect, frontend-architect, security-architect):
+- Reason: System design requires trade-off analysis
+- Cost of error: Architectural mistakes are expensive to fix later
+
+**Security analysis** (backend-security-reviewer, frontend-security-reviewer):
+- Reason: Vulnerability detection requires thoroughness
+- Cost of error: Missing vulnerabilities is unacceptable
+
+**Code review** (backend-reviewer, frontend-reviewer):
+- Reason: Quality gates, subtle bug detection
+- Cost of error: Bad code merges create technical debt
+
+**UX design** (uiux-designer):
+- Reason: WCAG 2.1 AA compliance, design system consistency
+- Cost of error: Accessibility violations, poor user experience
+
+**Benefit**: Guaranteed high-quality output regardless of user's main session model.
+
+---
+
+#### When to use `sonnet` (Orchestration, Infrastructure)
+
+**Use sonnet when speed is valuable and task is well-defined.**
+
+**Orchestrators** (backend-orchestrator, frontend-orchestrator):
+- Reason: Coordination and delegation, not deep analysis
+- Benefit: Faster coordination, responsive task delegation
+
+**Infrastructure** (aws-infrastructure-specialist):
+- Reason: Mechanical tasks (CDK patterns, resource configuration)
+- Benefit: Faster execution, sufficient reasoning for patterns
+
+**Pattern analysis** (code-pattern-analyzer):
+- Reason: Pattern matching, not complex reasoning
+- Benefit: Faster iterative refinement
+
+**Benefit**: Faster execution for tasks that don't benefit from Opus-level reasoning.
+
+---
+
+#### When to use `haiku` (Rare)
+
+**Use haiku only for very simple tasks**:
+- Simple list operations
+- Basic formatting tasks
+- Minimal reasoning required
+
+**Note**: Very rare in practice. If considering haiku, question whether the task needs an agent at all.
+
+---
+
+#### Context vs Model Clarification
+
+**CRITICAL**: Do not confuse context isolation with model inheritance.
+
+| Aspect | Configuration | Behavior |
+|--------|---------------|----------|
+| **Context** | NOT configurable | ALWAYS isolated (sub-agents never see main conversation) |
+| **Model** | `inherit` / `sonnet` / `opus` / `haiku` | Can inherit from main session OR be explicit |
+
+**Why this matters**:
+- Context isolation prevents information overload
+- Model inheritance allows adaptation to user preference
+- These are independent concerns
+
+---
+
+#### Decision Flowchart
+
+```
+START: What type of agent?
+│
+├─ Architecture / Security / Code Review?
+│  └─ YES → opus (non-negotiable quality)
+│
+├─ Orchestrator / Infrastructure?
+│  └─ YES → sonnet (speed beneficial)
+│
+├─ Development / Testing / MCP Tools?
+│  └─ YES → inherit (user controls priority)
+│
+└─ Very simple task?
+   └─ YES → haiku (rare)
+```
 
 ---
 

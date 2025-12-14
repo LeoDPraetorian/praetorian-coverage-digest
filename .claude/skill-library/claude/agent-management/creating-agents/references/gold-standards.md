@@ -51,7 +51,7 @@ color: green
 ```markdown
 | Task | Skill to Read |
 | ------------------------ | |
-| File organization | `.claude/skill-library/development/frontend/patterns/frontend-information-architecture/SKILL.md` |
+| File organization | `.claude/skill-library/development/frontend/patterns/enforcing-information-architecture/SKILL.md` |
 | Data fetching | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md` |
 ...
 ```

@@ -63,5 +63,15 @@
     "type": "renamed",
     "replacedBy": "using-eslint",
     "deprecatedOn": "2025-12-08"
+  },
+  "frontend-react-modernization": {
+    "type": "renamed",
+    "replacedBy": "using-modern-react-patterns",
+    "deprecatedOn": "2025-12-14"
+  },
+  "frontend-information-architecture": {
+    "type": "renamed",
+    "replacedBy": "enforcing-information-architecture",
+    "deprecatedOn": "2025-12-14"
   }
 }

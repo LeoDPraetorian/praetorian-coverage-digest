@@ -54,7 +54,7 @@ Search → Find relevant agents → Select best match → Use with Task tool
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skills/agent-manager/scripts"
+cd "$REPO_ROOT/.claude/skill-library/claude/agent-management/searching-agents/scripts"
 ```
 
 **Execute:**
@@ -173,7 +173,7 @@ if (descriptionStatus === 'valid') score += 5;
 User: "Which agents handle React development?"
 
 You:
-1. cd .claude/skills/agent-manager/scripts
+1. cd .claude/skill-library/claude/agent-management/searching-agents/scripts
 2. npm run search -- "react"
 3. Interpret results:
 

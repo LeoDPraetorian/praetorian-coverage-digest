@@ -1,0 +1,23 @@
+## [Date: 2025-12-13]
+
+### Changed
+- Added Phase 2.3: Mandatory line count check with size strategy decision
+- Split Phase 4 into Phase 4a (Extract to References) and Phase 4b (Inline Edit)
+- Enhanced Phase 7.2 with HARD LIMIT enforcement (fails if >500 lines)
+- Updated Quick Reference table to reflect new phases and timing
+- Added decision matrix for line count thresholds (350/400/500)
+- Added AskUserQuestion for size strategy when >400 lines or adding >50 lines
+
+### Reason
+- Agents were ignoring progressive disclosure instructions, causing SKILL.md files to bloat beyond 500 lines
+- Progressive disclosure was positioned as optional cleanup rather than mandatory workflow
+- Line count check happened too late (after content written), making extraction feel like rework
+- No enforcement mechanism - agents could rationalize away the 500 line limit
+- Fixed by making size check mandatory upfront (Phase 2.3) with forced decision before editing
+
+### Impact
+- Progressive disclosure is now enforced as gatekeeper, not suggestion
+- Size strategy must be decided before any editing
+- Hard limit at 500 lines with script that exits on failure
+- Extraction workflow (4a) is now equal to inline workflow (4b), not an exception
+- Cannot skip size check - it's a TodoWrite checkpoint

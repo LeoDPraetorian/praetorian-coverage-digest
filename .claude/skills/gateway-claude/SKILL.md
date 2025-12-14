@@ -52,15 +52,40 @@ Read: .claude/skill-library/claude/agent-management/creating-agents/SKILL.md
 
 ---
 
-## Skill Management
+## Skill Management (8 operations)
 
 **Router Skill:** `.claude/skills/skill-manager/SKILL.md`
 
-**Operations:** create, update, audit, fix, rename, migrate, search, list
+The skill-manager skill routes to:
+
+| Operation | Skill |
+|-----------|-------|
+| Create | `.claude/skills/creating-skills/SKILL.md` |
+| Update | `.claude/skill-library/claude/skill-management/updating-skills/SKILL.md` |
+| Audit | `.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md` |
+| Fix | `.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md` |
+| Rename | `.claude/skill-library/claude/skill-management/renaming-skills/SKILL.md` |
+| Migrate | `.claude/skill-library/claude/skill-management/migrating-skills/SKILL.md` |
+| Search | `.claude/skill-library/claude/skill-management/searching-skills/SKILL.md` |
+| List | `.claude/skill-library/claude/skill-management/listing-skills/SKILL.md` |
 
 **Usage:**
 ```
+# Via command (recommended)
 /skill-manager <operation> <args>
+
+# Via skill-manager skill
+skill: "skill-manager"
+
+# Direct skill access (instruction-based operations)
+Read: .claude/skills/creating-skills/SKILL.md
+Read: .claude/skill-library/claude/skill-management/updating-skills/SKILL.md
+Read: .claude/skill-library/claude/skill-management/auditing-skills/SKILL.md
+Read: .claude/skill-library/claude/skill-management/fixing-skills/SKILL.md
+Read: .claude/skill-library/claude/skill-management/renaming-skills/SKILL.md
+Read: .claude/skill-library/claude/skill-management/migrating-skills/SKILL.md
+Read: .claude/skill-library/claude/skill-management/searching-skills/SKILL.md
+Read: .claude/skill-library/claude/skill-management/listing-skills/SKILL.md
 ```
 
 ---

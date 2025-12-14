@@ -22,40 +22,28 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, Skill, AskU
 | List          | `npm run list`                                                                                      | 1 min     | List all skills (both locations)   |
 | Sync Gateways | `npm run sync-gateways -- [--dry-run\|--fix]`                                                       | 1-2 min   | Validate gateway consistency       |
 
-## For Claude Code (Programmatic Invocation)
+## Router Architecture
 
-**Create uses the `creating-skills` skill (instruction-based, not TypeScript):**
-```
-skill: "creating-skills"
-```
+**skill-manager is a pure router skill.** It delegates to specialized library skills:
 
-**All other operations use TypeScript CLI:**
-```bash
-# ✅ CORRECT: Simple invocation from anywhere in the repo
-npx tsx .claude/skills/skill-manager/scripts/src/audit.ts <args>
+| Operation | Delegated To | Implementation Location |
+|-----------|--------------|------------------------|
+| Create | `creating-skills` | Instruction-based (no CLI) |
+| Update | `updating-skills` | `updating-skills/scripts/src/update.ts` |
+| Audit | `auditing-skills` | `auditing-skills/scripts/src/audit.ts` |
+| Fix | `fixing-skills` | `fixing-skills/scripts/src/fix.ts` |
+| Search | `auditing-skills` | `auditing-skills/scripts/src/search.ts` |
+| Rename | `renaming-skills` | Instruction-based |
+| Migrate | `migrating-skills` | Instruction-based |
+| List | `listing-skills` | Instruction-based |
 
-# ✅ CORRECT: Navigate once, then use npm run
-cd .claude/skills/skill-manager/scripts && npm run audit -- <args>
-```
+**CLI scripts are located in:** `.claude/skill-library/claude/skill-management/`
 
-**Available scripts:** `audit`, `fix`, `update`, `rename`, `migrate`, `search`, `list`, `sync-gateways`
+**Shared library** (audit-engine, phases, utilities):
+- Located in `auditing-skills/scripts/src/lib/`
+- Used by fixing-skills and updating-skills via relative imports
 
-**Why simple patterns work:**
-- `findProjectRoot()` handles path detection internally
-- Works from anywhere in the repo
-
-## Prerequisites (Human CLI Setup - One-Time Only)
-
-**Initial workspace setup for human developers:**
-
-```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skills/skill-manager/scripts"
-npm install
-```
-
-**After setup:** Use `npm run <command>` from the scripts directory.
+**Users should NEVER invoke CLI scripts directly.** Always use this routing skill.
 
 ## TDD Workflow (MANDATORY)
 

@@ -1,3 +1,4 @@
+- **2025-12-13**: Update the 'Understanding Audit vs Test' section to clearly distinguish: AUDIT = structural/lint validation (file format, syntax, description, line count, required sections) - runs audit-critical.ts CLI + extended structural checks - fast 30-60 seconds. TEST = behavioral validation (does agent correctly invoke and follow skills under realistic pressure?) - uses testing-agent-skills which spawns actual agents with Task tool and evaluates skill integration - runs testing-skills-with-subagents pressure scenarios - slower 10-25 minutes per skill, potentially hours for full agent with all gateway skills. Add note that test.ts CLI is deprecated - it was doing structural checks that belong in audit. Remove references to test.ts as internal utility. The test operation should ONLY route to testing-agent-skills skill which does behavioral validation.
 - **2025-12-01**: Implement JSON-based interactive fix workflow (like skill-manager create)
 
 CHANGES NEEDED:

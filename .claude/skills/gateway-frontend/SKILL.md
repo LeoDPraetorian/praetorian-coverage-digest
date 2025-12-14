@@ -60,13 +60,13 @@ Each skill is organized by domain for easy discovery.
 **Chariot Brand Guidelines**: `.claude/skill-library/development/frontend/patterns/chariot-brand-guidelines/SKILL.md`
 - Chariot-specific UI/UX patterns and brand standards
 
-**Frontend Information Architecture**: `.claude/skill-library/development/frontend/patterns/frontend-information-architecture/SKILL.md`
+**Enforcing Information Architecture**: `.claude/skill-library/development/frontend/patterns/enforcing-information-architecture/SKILL.md`
 - Application structure and navigation patterns
 
 **Frontend Performance Optimization**: `.claude/skill-library/development/frontend/patterns/frontend-performance-optimization/SKILL.md`
 - Performance tuning, lazy loading, and optimization techniques
 
-**Frontend React Modernization**: `.claude/skill-library/development/frontend/patterns/frontend-react-modernization/SKILL.md`
+**Frontend React Modernization**: `.claude/skill-library/development/frontend/patterns/using-modern-react-patterns/SKILL.md`
 - Upgrading React applications and modern patterns
 
 ## Forms & Validation
@@ -79,6 +79,11 @@ Each skill is organized by domain for easy discovery.
 **Frontend Smart ESLint**: `.claude/skill-library/development/frontend/using-eslint/SKILL.md`
 - ESLint configuration and linting strategies for TypeScript/React
 
+## Code Quality Metrics
+
+**Analyzing Cyclomatic Complexity**: `.claude/skill-library/quality/analyzing-cyclomatic-complexity/SKILL.md`
+- Measures decision logic complexity, identifies refactoring candidates, sets quality gates for CI/CD
+
 ## Shared Standards & Architecture
 
 These foundational skills apply across all frontend development:
@@ -86,7 +91,7 @@ These foundational skills apply across all frontend development:
 **Testing Anti-Patterns**: `.claude/skill-library/testing/testing-anti-patterns/SKILL.md`
 - Common testing mistakes to avoid and proper patterns
 
-**DRY Refactoring**: `.claude/skill-library/architecture/dry-refactor/SKILL.md`
+**DRY Refactoring**: `.claude/skill-library/architecture/adhering-to-dry/SKILL.md`
 - Don't Repeat Yourself principles and refactoring techniques
 
 
@@ -118,7 +123,8 @@ These foundational skills apply across all frontend development:
 | Performance issues | frontend-performance-optimization |
 | UI animations | frontend-animation-designer |
 | Shadcn components | frontend-shadcn-ui |
-| Code quality | using-eslint |
+| Code quality (linting) | using-eslint |
+| Code complexity metrics | analyzing-cyclomatic-complexity |
 
 ## When to Use This Gateway
 
