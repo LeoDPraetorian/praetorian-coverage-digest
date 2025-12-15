@@ -21,6 +21,9 @@ Each skill is organized by domain for easy discovery.
 **Go Errgroup Concurrency**: `.claude/skill-library/development/backend/go-errgroup-concurrency/SKILL.md`
 - Concurrent operations with errgroup, goroutine patterns, error aggregation
 
+**Burp DAST Integration**: `.claude/skill-library/development/backend/burp-integration/SKILL.md`
+- Burp Suite GraphQL API integration, scan lifecycle management, site provisioning, result processing
+
 ## Error Handling
 
 **Error Handling Patterns**: `.claude/skill-library/development/error-handling-patterns/SKILL.md`
@@ -85,6 +88,7 @@ Each skill is organized by domain for easy discovery.
 | Need | Read This Skill |
 |------|----------------|
 | Concurrent Go code | go-errgroup-concurrency |
+| Burp Suite integration | burp-integration |
 | Error handling | error-handling-patterns |
 | Code complexity metrics | analyzing-cyclomatic-complexity |
 | Graph database queries | neo4j-cypher-guide |
