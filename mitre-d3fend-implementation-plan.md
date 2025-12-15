@@ -1,7 +1,8 @@
 # MITRE D3FEND Implementation Plan
 
 **Date**: 2025-12-14
-**Status**: Research Complete - Awaiting Implementation Approval
+**Status**: ✅ Stakeholder Approved - Implementation Ready
+**Architecture Review**: Complete (frontend-architect + frontend-reviewer)
 **Research Sources**: CardinalOps, Mandiant M-Trends, Red Canary, Picus Security, MITRE D3FEND v1.0
 
 ---
@@ -391,108 +392,449 @@ The D3FEND heatmap uses a **two-layer approach** because each technique has TWO 
 
 ---
 
-## 7. Implementation Roadmap
+## 7. Architecture Decisions (Approved)
 
-### Phase 1: Data Foundation (Week 1)
+Based on consultation with frontend-architect and frontend-reviewer, the following decisions are approved:
 
-**Objective**: Create D3FEND data model and generation infrastructure
-
-**Tasks**:
-1. Create TypeScript type definitions
-   - File: `modules/chariot/ui/src/sections/validations/d3fend-types.ts`
-   - Types: `D3FENDTechnique`, `PresenceStatus`, `EffectivenessScore`
-
-2. Build D3FEND data generator
-   - File: `modules/chariot/ui/src/sections/validations/generateD3FENDData.mjs`
-   - Crawl https://d3fend.mitre.org/ to extract techniques
-   - Apply realistic presence/effectiveness distributions
-   - Generate `d3fend-data.json`
-
-3. Create color constants
-   - File: `modules/chariot/ui/src/sections/validations/constants/d3fendColors.ts`
-   - Define `presenceColors` and `effectivenessColors`
-
-**Deliverables**:
-- `d3fend-types.ts` (type definitions)
-- `generateD3FENDData.mjs` (data generator script)
-- `d3fend-data.json` (~400KB estimated)
-- `d3fendColors.ts` (color constants)
+| Decision Area | Approved Approach | Rationale |
+|--------------|-------------------|-----------|
+| **Tab Structure** | React Router URL paths (`/validations/overview`, `/attack`, etc.) | Shareable links, browser history, matches settings pattern |
+| **Component Org** | Tier 3 Hook-Based Pattern with `hooks/`, `tabs/`, `components/` | 40-60 files expected; data correlation needs |
+| **Data Loading** | Dynamic import with React 19 `use()` hook + Suspense | Prevents 1.2MB blocking load |
+| **Gap Computation** | Custom hooks with `useMemo` (client-side) | Reusable, supports future real-time updates |
+| **Score Formula** | Weighted by prevalence (Picus Red Report data) | More meaningful than simple percentage |
+| **Component Reuse** | Generic `FrameworkHeatmap` with config | DRY but not over-abstracted |
 
 ---
 
-### Phase 2: D3FEND Visualization Components (Week 2)
+## 8. Detailed Implementation Roadmap
 
-**Objective**: Build standalone D3FEND visualization matching ATT&CK structure
+### Phase 1: Infrastructure & Tab Structure (Days 1-2)
 
-**Tasks**:
-1. Create D3FEND graph component
-   - File: `modules/chariot/ui/src/sections/validations/components/D3FENDGraph.tsx`
-   - Mirror `MitreAttackGraph.tsx` structure
-   - Lines: Not Implemented, Planned, Partial, Deployed, Validated
-   - Effectiveness lines: Unknown, Ineffective, Partially Effective, Effective, Highly Effective
+**Objective**: Refactor existing validations to support four-tab architecture with lazy loading
 
-2. Create D3FEND heatmap table
-   - File: `modules/chariot/ui/src/sections/validations/components/D3FENDTable.tsx`
-   - Two-layer color coding (presence + effectiveness)
-   - 6 tactic columns (Model, Harden, Detect, Isolate, Deceive, Evict)
+#### Day 1: Infrastructure Setup
+
+- [ ] **Create hooks directory structure**
+  - File: `modules/chariot/ui/src/sections/validations/hooks/index.ts`
+  - File: `modules/chariot/ui/src/sections/validations/hooks/useAttackData.ts`
+    - Implement dynamic import with React 19 `use()` hook
+    - Replace static import in MitreAttackGraph.tsx
+    - Cache promise at module level
+  - File: `modules/chariot/ui/src/sections/validations/hooks/useD3FENDData.ts` (placeholder for Phase 2)
+
+- [ ] **Reorganize type definitions**
+  - Create: `modules/chariot/ui/src/sections/validations/types/attack.ts`
+    - Move existing types from `types.ts`
+  - Create: `modules/chariot/ui/src/sections/validations/types/d3fend.ts`
+    - `D3FENDTechnique`, `PresenceStatus`, `EffectivenessScore`
+  - Create: `modules/chariot/ui/src/sections/validations/types/gaps.ts`
+    - `Gap`, `GapAnalysisSummary`, `RemediationPriority`
+  - Create: `modules/chariot/ui/src/sections/validations/types/index.ts` (barrel export)
+
+- [ ] **Create data directory**
+  - Create: `modules/chariot/ui/src/sections/validations/data/` directory
+  - Move: `data.json` → `data/attack-data.json`
+  - Update all import paths
+
+- [ ] **Update existing components to use hooks**
+  - Update: `components/MitreAttackGraph.tsx`
+    - Replace `import tactics from '../data.json'` with `const tactics = useAttackData()`
+    - Add Suspense requirement comment
+  - Update: `components/MitreAttackTable.tsx`
+    - Same hook-based data fetching
+
+#### Day 2: Tab Structure Implementation
+
+- [ ] **Create tabs directory**
+  - Create: `modules/chariot/ui/src/sections/validations/tabs/` directory
+  - Create: `tabs/AttackCoverageTab.tsx`
+    - Extract existing MitreAttackGraph + MitreAttackTable
+    - Wrap in ErrorBoundary
+  - Create: `tabs/OverviewTab.tsx` (placeholder with "Coming Soon")
+  - Create: `tabs/DefenseCoverageTab.tsx` (placeholder)
+  - Create: `tabs/GapAnalysisTab.tsx` (placeholder)
+
+- [ ] **Refactor main index.tsx**
+  - Update: `modules/chariot/ui/src/sections/validations/index.tsx`
+  - Add tab state management with `useSearchParams`
+  - Implement React Router URL navigation (`/validations/overview`, etc.)
+  - Add `startTransition` for smooth tab switching (follow Insights pattern)
+  - Lazy load all tab components with `lazy()`
+  - Add Suspense boundary with `<TabLoadingSkeleton />`
+  - Add ErrorBoundary for graceful failures
+  - Default to Overview tab on first visit
+
+- [ ] **Verify Phase 1**
+  - Run: `npm run ts` (0 errors)
+  - Run: `npm run eslint` (0 errors)
+  - Test: Navigate between tabs, verify URL updates
+  - Test: Refresh page, tab state persists
+  - Test: Attack Coverage tab shows existing ATT&CK visualization
 
 **Deliverables**:
-- `D3FENDGraph.tsx` (line chart)
-- `D3FENDTable.tsx` (heatmap table)
+- ✅ Lazy-loading infrastructure
+- ✅ Four-tab structure with URL routing
+- ✅ Existing ATT&CK functionality preserved in Attack Coverage tab
 
 ---
 
-### Phase 3: ATT&CK ↔ D3FEND Linking (Week 3)
+### Phase 2: D3FEND Defense Coverage Tab (Days 3-5)
 
-**Objective**: Connect offensive and defensive views through digital artifacts
+**Objective**: Build D3FEND visualization mirroring ATT&CK structure
 
-**Tasks**:
-1. Create digital artifacts mapping
-   - File: `modules/chariot/ui/src/sections/validations/data/digitalArtifacts.json`
-   - Map each ATT&CK technique → digital artifacts → D3FEND techniques
-   - Source: https://d3fend.mitre.org/resources/ (downloadable mappings)
+#### Day 3: D3FEND Data Foundation
 
-2. Build coverage gap analysis component
-   - File: `modules/chariot/ui/src/sections/validations/components/CoverageGapAnalysis.tsx`
-   - Show ATT&CK techniques with no D3FEND coverage
-   - Calculate "Security Posture Completeness Score"
+- [ ] **Generate D3FEND data**
+  - Create: `modules/chariot/ui/src/sections/validations/scripts/generateD3FENDData.mjs`
+    - Crawl https://d3fend.mitre.org/ matrix page
+    - Extract 6 tactics: Model, Harden, Detect, Isolate, Deceive, Evict
+    - For each tactic, fetch techniques from tactic detail pages
+    - Apply realistic presence probabilities by tactic (from research)
+    - Apply realistic effectiveness probabilities (for Deployed/Validated)
+    - Generate: `data/d3fend-data.json`
 
-3. Add interactive drill-down
-   - Click ATT&CK technique → show related D3FEND defenses
-   - Click D3FEND technique → show covered ATT&CK techniques
-   - Highlight gaps in red
+- [ ] **Create D3FEND color constants**
+  - Create: `modules/chariot/ui/src/sections/validations/constants/d3fendColors.ts`
+  - Define `presenceColors` with hex stroke values:
+    - Not Implemented: `#1e293b` (slate-800) - dark gray
+    - Planned: `#475569` (slate-600) - medium gray
+    - Partial: `#1d4ed8` (blue-700) - blue
+    - Deployed: `#ca8a04` (yellow-600) - yellow (unvalidated warning)
+    - Validated: `#047857` (emerald-700) - green
+  - Define `effectivenessColors` for overlay/borders:
+    - Unknown: `#6b7280` (gray-500)
+    - Ineffective: `#dc2626` (red-600)
+    - Partially Effective: `#f97316` (orange-500)
+    - Effective: `#16a34a` (green-600)
+    - Highly Effective: `#10b981` (emerald-500)
+
+- [ ] **Run data generation**
+  - Execute: `node scripts/generateD3FENDData.mjs`
+  - Verify: `data/d3fend-data.json` created (~200KB)
+  - Verify: JSON structure matches TypeScript types
+
+#### Day 4: D3FEND Visualization Components
+
+- [ ] **Create generic heatmap component**
+  - Create: `modules/chariot/ui/src/sections/validations/components/shared/FrameworkHeatmap.tsx`
+    - Generic configuration-driven heatmap
+    - Props: `tactics`, `config` (framework type, colors, status derivation)
+    - Supports both ATT&CK and D3FEND via config
+    - Include TacticHeader, TechniqueCell sub-components
+
+- [ ] **Create D3FEND graph component**
+  - Create: `modules/chariot/ui/src/sections/validations/components/D3FENDGraph.tsx`
+    - Mirror MitreAttackGraph structure
+    - Use `useD3FENDData()` hook for data loading
+    - Aggregate presence counts: Not Implemented, Planned, Partial, Deployed, Validated
+    - Aggregate effectiveness counts: Unknown, Ineffective, Partially Effective, Effective, Highly Effective
+    - Use presenceColors and effectivenessColors
+    - Pass explicit `stroke` hex values to LineChart
+    - Title: "D3FEND Defensive Coverage by Tactic"
+    - Subtitle: "Security control deployment and effectiveness validation"
+
+- [ ] **Create D3FEND table component**
+  - Create: `modules/chariot/ui/src/sections/validations/components/D3FENDTable.tsx`
+    - Use `FrameworkHeatmap` with D3FEND config
+    - Config: framework='d3fend', colorMap=presenceColors
+    - `getDisplayStatus()`: Returns presence status (Not Implemented → Validated)
+    - External links to https://d3fend.mitre.org/technique/[id]
+    - 6 tactic columns (narrower than ATT&CK's 14)
+
+- [ ] **Update Defense Coverage Tab**
+  - Update: `tabs/DefenseCoverageTab.tsx`
+    - Add D3FENDGraph component
+    - Add D3FENDTable component
+    - Wrap in Suspense for useD3FENDData
+    - Match layout of AttackCoverageTab
+
+#### Day 5: Testing & Refinement
+
+- [ ] **Create unit tests for D3FEND components**
+  - Create: `components/__tests__/D3FENDGraph.test.tsx`
+    - Test data aggregation logic
+    - Mock useD3FENDData hook
+  - Create: `components/__tests__/D3FENDTable.test.tsx`
+    - Test color mapping
+    - Test external links
+
+- [ ] **Visual verification**
+  - Run: `npm start`
+  - Navigate: /validations?tab=defense
+  - Verify: 6 tactic columns displayed
+  - Verify: Presence colors applied correctly
+  - Verify: Graph shows realistic distribution (Detect highest, Deceive lowest)
 
 **Deliverables**:
-- `digitalArtifacts.json` (mapping data)
-- `CoverageGapAnalysis.tsx` (gap visualization)
-- Interactive linking between ATT&CK and D3FEND tables
+- ✅ D3FEND Defense Coverage tab fully functional
+- ✅ Generic FrameworkHeatmap component
+- ✅ Test coverage for new components
 
 ---
 
-### Phase 4: Integration & Polish (Week 4)
+### Phase 3: Overview Tab with Security Posture Score (Days 6-8)
 
-**Objective**: Integrate into existing validations section with feature flag
+**Objective**: Build executive dashboard with completeness scoring
 
-**Tasks**:
-1. Update validations index
-   - File: `modules/chariot/ui/src/sections/validations/index.tsx`
-   - Add tabbed interface: "ATT&CK Coverage" | "D3FEND Coverage" | "Gap Analysis"
-   - Reuse existing `enableBreachAndAttack` feature flag
+#### Day 6: Score Calculation Infrastructure
 
-2. Add tooltips and help text
-   - Explain presence vs effectiveness
-   - Link to MITRE D3FEND documentation
-   - Provide guidance on interpreting colors
+- [ ] **Create score calculation utility**
+  - Create: `modules/chariot/ui/src/sections/validations/utils/scoreCalculation.ts`
+    - Function: `calculateSecurityPostureScore(attacks, defenses, mappings, weights)`
+    - Weighted formula: `Σ(weight × coverage) / Σ(weight) × 100`
+    - Weight source: Picus Red Report prevalence data
+  - Create: `modules/chariot/ui/src/sections/validations/data/prevalence-weights.json`
+    - Top 10 techniques from Picus with weights
+    - Default weight: 1.0 for unmapped techniques
 
-3. Testing and documentation
-   - Create unit tests for D3FEND components
-   - Update `modules/chariot/ui/CLAUDE.md` with D3FEND patterns
+- [ ] **Create gap analysis utility**
+  - Create: `modules/chariot/ui/src/sections/validations/utils/gapAnalysis.ts`
+    - Function: `computeGapAnalysis(attacks, defenses, mappings)`
+    - Returns: `{ undefendedTechniques, ineffectiveControls }`
+    - Function: `computeGapSummary(gaps)` → returns counts by priority
+
+- [ ] **Create gap analysis hook**
+  - Create: `modules/chariot/ui/src/sections/validations/hooks/useGapAnalysis.ts`
+    - Use `useAttackData()`, `useD3FENDData()`, and digital artifacts mapping
+    - `useMemo` for expensive computation
+    - Return gaps and summary statistics
+
+- [ ] **Create security posture score hook**
+  - Create: `modules/chariot/ui/src/sections/validations/hooks/useSecurityPostureScore.ts`
+    - Use gap analysis data
+    - Calculate weighted completeness score
+    - Return: `{ score, breakdown, trend }`
+
+#### Day 7: Overview Tab Components
+
+- [ ] **Create security posture score widget**
+  - Create: `modules/chariot/ui/src/sections/validations/components/overview/SecurityPostureScore.tsx`
+    - Circular progress indicator (0-100)
+    - Large centered score number
+    - Color-coded: Red (<40), Yellow (40-70), Green (70+)
+    - Subtitle with interpretation
+
+- [ ] **Create mini coverage graphs**
+  - Create: `modules/chariot/ui/src/sections/validations/components/overview/MiniCoverageGraph.tsx`
+    - Simplified bar chart showing ATT&CK vs D3FEND coverage percentages
+    - ATT&CK: "21% techniques detected"
+    - D3FEND: "45% techniques validated"
+    - Side-by-side comparison
+
+- [ ] **Create top gaps table**
+  - Create: `modules/chariot/ui/src/sections/validations/components/overview/TopGapsTable.tsx`
+    - Show top 5-10 critical gaps
+    - Columns: ATT&CK Tactic, # Undetected, # Missing Defenses, Priority
+    - Click row → navigate to Gap Analysis tab with filter
+
+- [ ] **Create recommendations widget**
+  - Create: `modules/chariot/ui/src/sections/validations/components/overview/Recommendations.tsx`
+    - Auto-generated recommendations
+    - Example: "Deploy D3-PLA (Process Lineage Analysis) → Covers 15 techniques"
+    - Link to D3FEND technique detail
+
+#### Day 8: Overview Tab Assembly
+
+- [ ] **Implement Overview Tab**
+  - Update: `tabs/OverviewTab.tsx`
+    - Layout: 2-column grid (score left, mini-graphs right)
+    - Top gaps table below
+    - Recommendations at bottom
+    - Use `useSecurityPostureScore()` and `useGapAnalysis()` hooks
+
+- [ ] **Add loading states**
+  - Create: `components/overview/OverviewSkeleton.tsx`
+    - Skeleton UI for score widget
+    - Placeholder for graphs and tables
 
 **Deliverables**:
-- Tabbed validations interface
-- Comprehensive tooltips
-- Test coverage
-- Documentation updates
+- ✅ Security Posture Score calculation and display
+- ✅ Overview tab with executive summary
+- ✅ Mini-graphs and top gaps preview
+
+---
+
+### Phase 4: Gap Analysis Tab (Days 9-11)
+
+**Objective**: Build action-oriented gap analysis with drill-down capabilities
+
+#### Day 9: Gap Analysis Components
+
+- [ ] **Create undefended techniques table**
+  - Create: `modules/chariot/ui/src/sections/validations/components/gaps/UndefendedTechniquesTable.tsx`
+    - Use `@tanstack/react-table` for sorting/filtering
+    - Columns:
+      - ATT&CK ID (with link)
+      - Technique Name
+      - Tactic
+      - Testing Status (Tested/Untested)
+      - Outcome (if tested)
+      - Missing D3FEND Count
+      - Risk Score
+      - Recommended Action
+    - Virtual scrolling if >100 rows
+    - Click row → open detail drawer
+
+- [ ] **Create ineffective controls table**
+  - Create: `modules/chariot/ui/src/sections/validations/components/gaps/IneffectiveControlsTable.tsx`
+    - Show D3FEND techniques marked "Ineffective"
+    - Columns: D3FEND ID, Name, Tactic, Effectiveness Rate, Protected ATT&CK Count
+    - Recommendation: "Tune" or "Replace"
+
+- [ ] **Create coverage completeness widget**
+  - Create: `modules/chariot/ui/src/sections/validations/components/gaps/CoverageCompleteness.tsx`
+    - Donut chart or stacked bar
+    - Show: Fully Covered, Partially Covered, No Coverage
+    - Percentage breakdown
+
+#### Day 10: Gap Detail Drawer
+
+- [ ] **Create gap detail drawer**
+  - Create: `components/gaps/GapDetailDrawer.tsx`
+    - Opens when user clicks gap row
+    - Shows:
+      - ATT&CK technique details
+      - Current testing status
+      - Recommended D3FEND techniques (with deployment status)
+      - Action buttons: "Mark as Deployed", "Schedule Test"
+    - Links to MITRE ATT&CK and D3FEND docs
+
+- [ ] **Create ATT&CK to D3FEND mapping**
+  - Create: `modules/chariot/ui/src/sections/validations/data/attack-to-d3fend-mapping.json`
+    - Structure: `{ "T1059": ["D3-PLA", "D3-CLA", "D3-SEA"], ... }`
+    - Source: Extract from D3FEND website or API
+    - Use in gap computation
+
+#### Day 11: Gap Analysis Tab Assembly
+
+- [ ] **Implement Gap Analysis Tab**
+  - Update: `tabs/GapAnalysisTab.tsx`
+    - Use `useGapAnalysis()` hook
+    - Layout: Summary stats at top, tables below
+    - Add filters: Priority, Tactic, Testing Status
+    - Add export functionality (CSV/JSON)
+
+- [ ] **Add interactive features**
+  - Implement click-to-filter: Click "Defense Evasion" in summary → filters table
+  - Implement drawer open/close with URL state
+  - Add bulk actions: "Mark selected as priority", "Export to JIRA"
+
+**Deliverables**:
+- ✅ Gap Analysis tab with prioritized action items
+- ✅ Interactive drill-down with detail drawer
+- ✅ Export and filtering capabilities
+
+---
+
+### Phase 5: Polish, Testing & Documentation (Days 12-14)
+
+**Objective**: Comprehensive testing, performance optimization, documentation
+
+#### Day 12: Testing Infrastructure
+
+- [ ] **Unit tests for utilities**
+  - Create: `utils/__tests__/gapAnalysis.test.ts`
+    - Test gap computation logic with mock data
+    - Edge cases: no mappings, all gaps, no gaps
+  - Create: `utils/__tests__/scoreCalculation.test.ts`
+    - Test weighted score formula
+    - Verify prevalence weighting
+
+- [ ] **Unit tests for hooks**
+  - Create: `hooks/__tests__/useGapAnalysis.test.ts`
+    - Mock data loading
+    - Test memoization behavior
+  - Create: `hooks/__tests__/useSecurityPostureScore.test.ts`
+    - Test score calculation integration
+
+- [ ] **Component tests**
+  - Create: `tabs/__tests__/OverviewTab.test.tsx`
+  - Create: `tabs/__tests__/DefenseCoverageTab.test.tsx`
+  - Create: `tabs/__tests__/GapAnalysisTab.test.tsx`
+
+#### Day 13: E2E Tests
+
+- [ ] **Create E2E test suite**
+  - Create: `modules/chariot/ui/e2e/src/tests/validations/four-tab-navigation.spec.ts`
+    - Test tab switching
+    - Test URL state persistence
+    - Test data loading for each tab
+  - Create: `e2e/src/tests/validations/gap-analysis-drill-down.spec.ts`
+    - Test clicking gap row → drawer opens
+    - Test recommendations display
+    - Test external links
+
+- [ ] **Create page objects**
+  - Create: `e2e/src/pages/validations/validations.page.ts`
+    - Page object for tab navigation
+  - Create: `e2e/src/pages/validations/gap-detail-drawer.page.ts`
+    - Page object for drawer interactions
+
+#### Day 14: Documentation & Finalization
+
+- [ ] **Update documentation**
+  - Update: `modules/chariot/ui/CLAUDE.md`
+    - Add D3FEND patterns section
+    - Document four-tab architecture
+    - Add examples of hook usage
+  - Update: `modules/chariot/ui/src/sections/validations/README.md` (create if needed)
+    - Explain ATT&CK vs D3FEND
+    - Document gap analysis methodology
+    - Include screenshot examples
+
+- [ ] **Performance optimization**
+  - Run bundle analyzer: `npm run build -- --mode analyze`
+  - Verify: Each tab loads independently
+  - Verify: JSON files code-split correctly
+  - Profile: Gap analysis computation time (<500ms target)
+
+- [ ] **Accessibility audit**
+  - Run: `npm run test:accessibility` (if available)
+  - Verify: ARIA labels on all interactive elements
+  - Verify: Keyboard navigation works for tabs
+  - Verify: Screen reader announces tab changes
+
+- [ ] **Final verification**
+  - Run: `npm run ts` (0 errors)
+  - Run: `npm run eslint` (0 errors)
+  - Run: `npm test` (all tests pass)
+  - Run: `npm run build` (successful)
+  - Test: All 4 tabs functional on local server
+  - Test: URL sharing works (copy/paste tab URL)
+  - Test: Browser back/forward navigation
+
+**Deliverables**:
+- ✅ Complete test coverage (unit + E2E)
+- ✅ Documentation updated
+- ✅ Performance verified
+- ✅ Accessibility compliant
+
+---
+
+### Phase 6: Advanced Features (Future - Optional)
+
+**Not in initial scope, but documented for future enhancement:**
+
+- [ ] **Real-time D3FEND integration**
+  - Query deployed security tools (EDR, SIEM, WAF) via API
+  - Auto-populate presence status from actual deployments
+  - Link to Chariot capabilities for automatic validation
+
+- [ ] **Interactive effectiveness testing**
+  - "Test this defense" button → triggers BAS simulation
+  - Update effectiveness score from test results
+  - Track testing history and trends
+
+- [ ] **Recommendation engine**
+  - ML-based prioritization (not just prevalence weights)
+  - ROI calculator: cost to deploy vs risk reduction
+  - Integration with procurement systems
+
+- [ ] **Compliance mapping**
+  - Map D3FEND techniques to NIST 800-53, CIS Controls, ISO 27001
+  - Generate compliance reports
+  - Gap analysis by compliance framework
 
 ---
 
@@ -908,6 +1250,80 @@ Many Chariot capabilities already align with D3FEND techniques:
 
 ---
 
-**Document Version**: 1.0
+---
+
+## 18. Quick Reference: Todo Checklist
+
+### Phase 1: Infrastructure (Days 1-2) - 13 tasks
+- [ ] Create hooks directory + useAttackData.ts with dynamic import
+- [ ] Create types/ directory (attack.ts, d3fend.ts, gaps.ts)
+- [ ] Create data/ directory, move attack-data.json
+- [ ] Update MitreAttackGraph to use useAttackData hook
+- [ ] Update MitreAttackTable to use useAttackData hook
+- [ ] Create tabs/ directory
+- [ ] Create AttackCoverageTab.tsx (wrap existing components)
+- [ ] Create placeholder tabs (Overview, Defense, Gaps)
+- [ ] Refactor index.tsx with URL routing + Suspense
+- [ ] Add startTransition for tab switching
+- [ ] Add ErrorBoundary
+- [ ] Verify TypeScript + ESLint
+- [ ] Test tab navigation + URL persistence
+
+### Phase 2: D3FEND Tab (Days 3-5) - 11 tasks
+- [ ] Create generateD3FENDData.mjs script
+- [ ] Create d3fendColors.ts with presence + effectiveness colors
+- [ ] Run data generation → d3fend-data.json
+- [ ] Create FrameworkHeatmap.tsx (generic)
+- [ ] Create D3FENDGraph.tsx
+- [ ] Create D3FENDTable.tsx
+- [ ] Update DefenseCoverageTab.tsx with components
+- [ ] Create unit tests for D3FEND components
+- [ ] Visual verification
+- [ ] Verify 6 tactic columns display
+- [ ] Verify realistic distribution (Detect high, Deceive low)
+
+### Phase 3: Overview Tab (Days 6-8) - 10 tasks
+- [ ] Create scoreCalculation.ts utility
+- [ ] Create prevalence-weights.json
+- [ ] Create gapAnalysis.ts utility
+- [ ] Create useGapAnalysis.ts hook
+- [ ] Create useSecurityPostureScore.ts hook
+- [ ] Create SecurityPostureScore.tsx widget
+- [ ] Create MiniCoverageGraph.tsx
+- [ ] Create TopGapsTable.tsx
+- [ ] Create Recommendations.tsx
+- [ ] Implement OverviewTab.tsx assembly
+
+### Phase 4: Gap Analysis Tab (Days 9-11) - 8 tasks
+- [ ] Create UndefendedTechniquesTable.tsx
+- [ ] Create IneffectiveControlsTable.tsx
+- [ ] Create CoverageCompleteness.tsx widget
+- [ ] Create GapDetailDrawer.tsx
+- [ ] Create attack-to-d3fend-mapping.json
+- [ ] Implement GapAnalysisTab.tsx
+- [ ] Add filtering + export
+- [ ] Add interactive drill-down
+
+### Phase 5: Testing & Polish (Days 12-14) - 13 tasks
+- [ ] Unit tests for utils (gapAnalysis, scoreCalculation)
+- [ ] Unit tests for hooks (useGapAnalysis, useSecurityPostureScore)
+- [ ] Component tests for all tabs
+- [ ] E2E: four-tab-navigation.spec.ts
+- [ ] E2E: gap-analysis-drill-down.spec.ts
+- [ ] Create page objects
+- [ ] Update CLAUDE.md documentation
+- [ ] Performance: bundle analysis
+- [ ] Performance: profile gap computation (<500ms)
+- [ ] Accessibility audit
+- [ ] Final verification: TypeScript, ESLint, tests, build
+- [ ] Test URL sharing
+- [ ] Test browser back/forward
+
+**Total Tasks**: 55 tasks across 14 days
+
+---
+
+**Document Version**: 2.0
 **Last Updated**: 2025-12-14
-**Next Review**: After stakeholder approval
+**Status**: ✅ Approved for Implementation
+**Next Review**: After Phase 1 completion (Day 2)
