@@ -32,7 +32,7 @@ User: "Implement user dashboard with metrics display"
 Skill workflow:
 1. Brainstorm design → Human checkpoint
 2. Write implementation plan → Human checkpoint
-3. Task(frontend-architect) → Architecture decisions
+3. Task(frontend-architect) + Task(frontend-reviewer) in parallel → Architecture validation
 4. Task(frontend-developer) → Implementation
 5. Task(frontend-unit-test-engineer) → Tests
 ```
@@ -75,11 +75,11 @@ This skill coordinates five phases with detailed workflows in references:
                   │ Checkpoint
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  Phase 3: Architecture                                      │
-│  Tool: Task(subagent_type: "*-architect")                   │
-│  Exit: Architecture documented                              │
+│  Phase 3: Dual-Agent Architecture Review                    │
+│  Tool: Task("*-architect") + Task("*-reviewer") parallel    │
+│  Exit: Architecture validated, conflicts resolved           │
 └─────────────────┬───────────────────────────────────────────┘
-                  │ (No checkpoint - automated)
+                  │ (No checkpoint - automated with user input if conflicts)
                   ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  Phase 4: Implementation                                    │
@@ -179,13 +179,15 @@ On resume:
 
 ## Determining Agent Types
 
-| Feature Domain | Architect | Developer | Tester |
-|----------------|-----------|-----------|--------|
-| React UI | frontend-architect | frontend-developer | frontend-unit-test-engineer |
-| Go API | backend-architect | backend-developer | backend-unit-test-engineer |
-| Full-stack | Both architects | Both developers | Both test engineers |
+| Feature Domain | Architect | Reviewer | Developer | Tester |
+|----------------|-----------|----------|-----------|--------|
+| React UI | frontend-architect | frontend-reviewer | frontend-developer | frontend-unit-test-engineer |
+| Go API | backend-architect | backend-reviewer | backend-developer | backend-unit-test-engineer |
+| Full-stack | Both architects | Both reviewers | Both developers | Both test engineers |
 
-**Rule**: Match agent to feature domain, not codebase composition.
+**Rule**: Match agents to feature domain, not codebase composition.
+
+**Phase 3 Note**: Always spawn architect AND reviewer in parallel for quality assurance.
 
 ## Troubleshooting
 

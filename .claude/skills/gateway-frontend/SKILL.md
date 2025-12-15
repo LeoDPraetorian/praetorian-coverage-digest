@@ -57,6 +57,9 @@ Each skill is organized by domain for easy discovery.
 
 ## Patterns & Architecture
 
+**Adhering to UI/UX Laws**: `.claude/skill-library/quality/adhering-to-uiux-laws/SKILL.md`
+- Applies 31 cognitive psychology and UX laws (Hick's, Fitts', Miller's, Gestalt, Nielsen's heuristics) to interface design
+
 **Chariot Brand Guidelines**: `.claude/skill-library/development/frontend/patterns/chariot-brand-guidelines/SKILL.md`
 - Chariot-specific UI/UX patterns and brand standards
 
@@ -123,6 +126,7 @@ These foundational skills apply across all frontend development:
 | Performance issues | frontend-performance-optimization |
 | UI animations | frontend-animation-designer |
 | Shadcn components | frontend-shadcn-ui |
+| UI/UX design laws | adhering-to-uiux-laws |
 | Code quality (linting) | using-eslint |
 | Code complexity metrics | analyzing-cyclomatic-complexity |
 

@@ -97,6 +97,17 @@ git commit -m "feat: add specific feature"
 
 ## Execution Handoff
 
+**IMPORTANT:** This skill may be used standalone OR within a larger orchestration workflow (orchestrating-feature-development).
+
+### If Used Within Orchestration
+
+When called from orchestrating-feature-development:
+- **Do NOT** offer execution choices
+- **Simply announce:** "Plan complete and saved to `docs/plans/<filename>.md`. Returning control to orchestration workflow."
+- The orchestration skill will handle Phase 3 (Architecture) next
+
+### If Used Standalone
+
 After saving the plan, offer execution choice:
 
 **"Plan complete and saved to `docs/plans/<filename>.md`. Two execution options:**
@@ -115,3 +126,10 @@ After saving the plan, offer execution choice:
 **If Parallel Session chosen:**
 - Guide them to open new session in worktree
 - **REQUIRED SUB-SKILL:** New session uses superpowers:executing-plans
+
+### Detection Logic
+
+To detect orchestration context:
+- Check if TodoWrite contains phases (brainstorming, planning, architecture, implementation, testing)
+- Check if skill was explicitly called via orchestrating-feature-development
+- If uncertain, assume standalone and offer execution choices
