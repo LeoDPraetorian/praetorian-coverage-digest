@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, TodoWrite, Task, Skill, AskUserQue
 
 **Instruction-driven agent updates with TDD enforcement (simplified RED-GREEN for updates).**
 
-**IMPORTANT**: Use TodoWrite to track phases. Updates still require validation.
+**MANDATORY**: You MUST use TodoWrite to track phases. Updates still require validation.
 
 ---
 
@@ -107,6 +107,31 @@ Read `.claude/agents/{type}/{name}.md`
 ```
 
 Understand current structure before changing.
+
+### 2.3 Create Backup (Before Changes)
+
+**Before making any changes**, create a backup:
+
+```bash
+mkdir -p .claude/agents/{type}/.local
+cp .claude/agents/{type}/{name}.md \
+   .claude/agents/{type}/.local/{name}.md.backup.$(date +%Y%m%d_%H%M%S)
+```
+
+**Why:** Enables rollback if update causes issues.
+
+### 2.4 How to Rollback
+
+If update causes issues after Phase 4:
+
+```bash
+# Find latest backup
+ls -la .claude/agents/{type}/.local/
+
+# Restore
+cp .claude/agents/{type}/.local/{name}.md.backup.{timestamp} \
+   .claude/agents/{type}/{name}.md
+```
 
 ---
 

@@ -1,0 +1,23 @@
+## [2025-12-15] - Extraction and Enhancement
+
+### Changed
+- Extracted rename examples to `references/rename-examples.md`
+- Extracted error handling to `references/error-handling.md`
+- Extracted patterns and pitfalls to `references/patterns-and-pitfalls.md`
+- Reduced SKILL.md from 845 to 278 lines (67% reduction)
+
+### Added
+- Unified TodoWrite mandate: "MANDATORY: You MUST use TodoWrite"
+
+### Purpose
+- Progressive disclosure: Core workflow in SKILL.md, details in references/
+- Token efficiency: Load detailed content only when needed
+- Maintainability: Smaller files easier to review and update
+
+## [2024-12-07] - Initial Creation
+
+### Created
+- Safe agent renaming with reference tracking
+- 7-step validation workflow
+- Word boundary grep for accurate reference finding
+- replace_all pattern for atomic updates

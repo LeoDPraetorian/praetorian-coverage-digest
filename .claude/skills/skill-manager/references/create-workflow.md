@@ -27,13 +27,13 @@ The create operation follows the RED-GREEN-REFACTOR TDD cycle to ensure skills a
 
 ### Step 2: Generate Skill Structure
 
-**Command:**
-```bash
-cd .claude/skills/skill-manager/scripts
-npm run create -- skill-name "Use when description" --suggest
+**Instruction-based operation. Use the `creating-skills` skill:**
+
+```
+skill: "creating-skills"
 ```
 
-The create command uses a **multi-stage interactive workflow** when using `--suggest`. Each stage asks one question and returns JSON for Claude to present via AskUserQuestion.
+The creating-skills skill guides you through a **multi-stage interactive workflow**. Each stage asks one question and Claude presents options via AskUserQuestion.
 
 #### Multi-Stage Workflow
 

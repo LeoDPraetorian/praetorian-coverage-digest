@@ -147,11 +147,11 @@ Don't auto-fix teaching examples.
 
 ## Manual Remediation
 
-**Using skill-manager CLI:**
+**Using audit/fix CLI from .claude/ root:**
 
 ```bash
-# Navigate to skill-manager scripts
-cd .claude/skills/skill-manager/scripts
+# From .claude/ root (using workspace shortcuts)
+cd .claude
 
 # Audit for Phase 11 issues
 npm run audit -- my-skill --phase 11

@@ -8,7 +8,7 @@ allowed-tools: Bash, Read, Grep, TodoWrite
 
 **Comprehensive validation of skill files for structural compliance and quality.**
 
-> **IMPORTANT**: Use TodoWrite to track audit progress when checking multiple skills.
+> **You MUST use TodoWrite** to track audit progress when checking multiple skills.
 
 ---
 
@@ -205,7 +205,14 @@ description: Use when creating skills - guides through TDD workflow
 
 ### Phase 3: Word Count (Critical)
 
-**Limit:** <500 lines for SKILL.md
+**Thresholds** (unified across all skill management):
+
+| Lines | Status | Action |
+|-------|--------|--------|
+| < 350 | ✅ Pass | No action needed |
+| 350-450 | ⚠️ Warning | Consider extraction for next update |
+| 450-500 | ⚠️ Warning | Plan extraction before adding content |
+| > 500 | ❌ Fail | MUST extract to references/ |
 
 **Why:** Attention degradation beyond 500 lines. Skills should use progressive disclosure pattern.
 
@@ -407,7 +414,6 @@ See the `magic-skill` skill for details.
 
 ## Related Skills
 
-- `creating-skills` - Create new skills (uses this for validation)
-- `updating-skills` - Update existing skills (uses this for compliance)
+- `creating-skills` - Create new skills (invokes audit after creation)
+- `updating-skills` - Update existing skills (invokes audit for compliance)
 - `fixing-skills` - Fix audit issues systematically
-- `skill-manager` - Router to this skill

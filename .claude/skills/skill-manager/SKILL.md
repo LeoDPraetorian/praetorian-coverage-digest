@@ -10,40 +10,78 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, Skill, AskU
 
 ## Quick Reference
 
-| Operation     | Method                                                                                              | Time      | Purpose                            |
-| ------------- | --------------------------------------------------------------------------------------------------- | --------- | ---------------------------------- |
-| **Create**    | Use `creating-skills` skill                                                                         | 15-30 min | Instruction-driven skill creation  |
-| Update        | `npm run update -- <name> "<changes>"` + progressive disclosure if >500 lines                       | 10-20 min | Minimal updates with TDD           |
-| Audit         | `npm run audit -- [name]`                                                                           | 2-5 min   | 16-phase + semantic review         |
-| Fix           | `npm run fix -- <name> [--dry-run\|--suggest]`                                                      | 5-15 min  | Auto-remediation (3 modes)         |
-| Rename        | `npm run rename -- <old> <new>`                                                                     | 5-10 min  | Safe renaming with updates         |
-| Migrate       | `npm run migrate -- <name> <target>`                                                                | 5-10 min  | Move core ↔ library                |
-| Search        | `npm run search -- "<query>"`                                                                       | 1-2 min   | Keyword discovery (both locations) |
-| List          | `npm run list`                                                                                      | 1 min     | List all skills (both locations)   |
-| Sync Gateways | `npm run sync-gateways -- [--dry-run\|--fix]`                                                       | 1-2 min   | Validate gateway consistency       |
+| Operation | Delegated To | CLI Location | Time |
+|-----------|--------------|--------------|------|
+| **Create** | `creating-skills` | Instruction-based | 15-30 min |
+| **Update** | `updating-skills` | `updating-skills/scripts` | 10-20 min |
+| **Audit** | `auditing-skills` | `auditing-skills/scripts` | 2-5 min |
+| **Fix** | `fixing-skills` | `fixing-skills/scripts` | 5-15 min |
+| **Search** | `searching-skills` | `auditing-skills/scripts` | 1-2 min |
+| **List** | `listing-skills` | Instruction-based | 1 min |
+| **Rename** | `renaming-skills` | Instruction-based | 5-10 min |
+| **Migrate** | `migrating-skills` | Instruction-based | 5-10 min |
+
+### Running CLI Commands
+
+CLI commands are run from the library skill that owns them:
+
+```bash
+# Audit (owned by auditing-skills)
+cd .claude/skill-library/claude/skill-management/auditing-skills/scripts
+npm run audit -- <skill-name>
+
+# Fix (owned by fixing-skills)
+cd .claude/skill-library/claude/skill-management/fixing-skills/scripts
+npm run fix -- <skill-name>
+
+# Search (owned by auditing-skills)
+cd .claude/skill-library/claude/skill-management/auditing-skills/scripts
+npm run search -- "<query>"
+
+# Update (owned by updating-skills)
+cd .claude/skill-library/claude/skill-management/updating-skills/scripts
+npm run update -- <skill-name>
+```
+
+Or from `.claude/` root using workspace shortcuts:
+```bash
+cd .claude
+npm run audit -- <skill-name>
+npm run fix -- <skill-name>
+npm run search -- "<query>"
+npm run update -- <skill-name>
+```
 
 ## Router Architecture
 
-**skill-manager is a pure router skill.** It delegates to specialized library skills:
+**skill-manager is a pure router.** It has NO scripts of its own.
 
-| Operation | Delegated To | Implementation Location |
-|-----------|--------------|------------------------|
-| Create | `creating-skills` | Instruction-based (no CLI) |
-| Update | `updating-skills` | `updating-skills/scripts/src/update.ts` |
-| Audit | `auditing-skills` | `auditing-skills/scripts/src/audit.ts` |
-| Fix | `fixing-skills` | `fixing-skills/scripts/src/fix.ts` |
-| Search | `auditing-skills` | `auditing-skills/scripts/src/search.ts` |
-| Rename | `renaming-skills` | Instruction-based |
-| Migrate | `migrating-skills` | Instruction-based |
-| List | `listing-skills` | Instruction-based |
+### Delegation Map
 
-**CLI scripts are located in:** `.claude/skill-library/claude/skill-management/`
+| When user says... | Delegate to... | Implementation |
+|-------------------|----------------|----------------|
+| "create a skill" | `creating-skills` | Instruction-based workflow |
+| "update X skill" | `updating-skills` | CLI in `updating-skills/scripts` |
+| "audit X skill" | `auditing-skills` | CLI in `auditing-skills/scripts` |
+| "fix X skill" | `fixing-skills` | CLI in `fixing-skills/scripts` |
+| "search for skills" | `searching-skills` | Instruction-based (uses auditing-skills CLI) |
+| "list all skills" | `listing-skills` | Instruction-based |
+| "rename X to Y" | `renaming-skills` | Instruction-based |
+| "migrate X to library" | `migrating-skills` | Instruction-based |
+
+### CLI Ownership
+
+Scripts live in the library skill that owns the functionality:
+
+| Package | Location | Commands |
+|---------|----------|----------|
+| `@chariot/auditing-skills` | `skill-library/claude/skill-management/auditing-skills/scripts` | `audit`, `search` |
+| `@chariot/fixing-skills` | `skill-library/claude/skill-management/fixing-skills/scripts` | `fix` |
+| `@chariot/updating-skills` | `skill-library/claude/skill-management/updating-skills/scripts` | `update` |
 
 **Shared library** (audit-engine, phases, utilities):
 - Located in `auditing-skills/scripts/src/lib/`
 - Used by fixing-skills and updating-skills via relative imports
-
-**Users should NEVER invoke CLI scripts directly.** Always use this routing skill.
 
 ## TDD Workflow (MANDATORY)
 
@@ -221,11 +259,9 @@ npm run fix -- frontend-patterns --apply phase13-todowrite
 
 ### Rename (Safe Skill Renaming)
 
-**Renames skill and updates all references.**
+**Instruction-based operation. Delegates to `renaming-skills`.**
 
-```bash
-npm run rename -- old-skill-name new-skill-name
-```
+Renames skill and updates all references using Claude's native tools.
 
 **7-Step Protocol:**
 
@@ -241,18 +277,9 @@ npm run rename -- old-skill-name new-skill-name
 
 ### Migrate (Move Between Locations)
 
-**Safely moves skills between core and library.**
+**Instruction-based operation. Delegates to `migrating-skills`.**
 
-```bash
-# Move core skill to library
-npm run migrate -- my-skill to-library:development/frontend
-
-# Move library skill to core
-npm run migrate -- my-skill to-core
-
-# Move within library
-npm run migrate -- my-skill to-library:testing
-```
+Safely moves skills between core and library using Claude's native tools.
 
 **Migration targets:**
 
@@ -296,16 +323,9 @@ npm run search -- "backend" --location library
 
 ### List (Show All Skills - Both Locations)
 
-**Display all skills with compliance status.**
+**Instruction-based operation. Delegates to `listing-skills`.**
 
-```bash
-# List all skills (core + library)
-npm run list
-
-# Filter by location
-npm run list -- --location core
-npm run list -- --location library
-```
+Display all skills using Claude's native tools (Glob, Read).
 
 **Output:** Table with skill name, location, and path
 
@@ -319,18 +339,9 @@ npm run list -- --location library
 
 ### Sync Gateways (Validate Gateway Consistency)
 
-**Validates that gateway skills are synchronized with library skills.**
+**Instruction-based operation. Not yet implemented as CLI.**
 
-```bash
-# Check for discrepancies (report only)
-npm run sync-gateways
-
-# Preview fixes without applying
-npm run sync-gateways -- --dry-run
-
-# Apply fixes automatically
-npm run sync-gateways -- --fix
-```
+Validates that gateway skills are synchronized with library skills using Claude's native tools (Grep, Read, Edit).
 
 **What it checks:**
 
@@ -348,13 +359,12 @@ npm run sync-gateways -- --fix
 | `claude/mcp-tools/*`       | `gateway-mcp-tools`      |
 | `development/integrations/*` | `gateway-integrations` |
 
-**Automatic updates:**
+**Manual workflow:**
 
-- **On create**: Library skills automatically added to appropriate gateway
-- **On migrate**: Gateway paths updated or skill moved between gateways
-- **On sync**: Validates all gateways and repairs discrepancies
-
-**Output:** Report of broken/missing entries with optional auto-fix
+1. List all library skills with `listing-skills`
+2. Check each gateway skill for broken references
+3. Add missing skills to appropriate gateways
+4. Remove broken references
 
 **See:** [references/sync-gateways-workflow.md](references/sync-gateways-workflow.md)
 

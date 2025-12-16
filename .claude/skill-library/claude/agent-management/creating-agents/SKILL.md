@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion, 
 
 **Instruction-driven agent creation with mandatory TDD and subagent pressure testing.**
 
-**IMPORTANT**: You MUST use TodoWrite to track all 10 phases. Complex workflow - mental tracking leads to skipped steps.
+**MANDATORY**: You MUST use TodoWrite to track all 10 phases. Complex workflow - mental tracking leads to skipped steps.
 
 ---
 
@@ -134,6 +134,28 @@ Ask user to select from 8 types via AskUserQuestion:
    fi
    ```
 7. **Gateway Enforcement**: Ensure `skills:` uses gateways, not direct paths
+
+8. **Create Initial Changelog**:
+   ```bash
+   mkdir -p .claude/agents/{type}/.history
+   cat > .claude/agents/{type}/.history/{agent-name}-CHANGELOG << 'EOF'
+## [$(date +%Y-%m-%d)] - Initial Creation
+
+### Created
+- Initial agent creation with 10-phase TDD workflow
+- Type: {type}
+- Purpose: {one-line description from Phase 1}
+
+### RED Phase Evidence
+- Gap: {documented gap from Phase 1}
+- Failure: {captured failure scenario}
+
+### Validation
+- GREEN: Pending
+- REFACTOR: Pending
+- Compliance: Pending
+EOF
+   ```
 
 **Color mapping**: architecture=blue, development=green, testing=yellow, quality=purple, analysis=orange, research=cyan, orchestrator=magenta, mcp-tools=teal
 
@@ -332,6 +354,48 @@ Phase 10: REFACTOR passed (3/3 tests)
 ```
 
 **All must be complete before claiming agent ready** ✅
+
+---
+
+## Error Handling
+
+### If Creation Fails Mid-Process
+
+**Cleanup procedure for partial creation:**
+
+1. **If file was created but validation failed (Phase 7-10):**
+   ```bash
+   # Keep file for debugging
+   # Review which phase failed (check TodoWrite)
+   # Address the failure cause
+   # Resume from that phase
+   ```
+
+2. **If Phase 7 (GREEN) failed:**
+   - Keep file, review RED phase documentation
+   - Consider if gap was correctly identified
+   - May need to revise agent content
+
+3. **If Phase 10 (REFACTOR) failed:**
+   - Strengthen Critical Rules
+   - Add explicit counters to anti-rationalization patterns
+   - Re-run pressure tests
+
+4. **If abandoning creation entirely:**
+   ```bash
+   # Remove partially created agent
+   rm .claude/agents/{type}/{agent-name}.md
+
+   # Remove changelog if created
+   rm -f .claude/agents/{type}/.history/{agent-name}-CHANGELOG
+   ```
+
+### Recovery
+
+To resume failed creation:
+1. Review which phase failed (check TodoWrite)
+2. Address the failure cause
+3. Resume from that phase
 
 ---
 

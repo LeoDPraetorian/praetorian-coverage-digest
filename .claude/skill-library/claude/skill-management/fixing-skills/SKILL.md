@@ -8,7 +8,12 @@ allowed-tools: Read, Edit, Write, Bash, AskUserQuestion, TodoWrite, Skill
 
 **Interactive compliance remediation for skill audit issues.**
 
-> **IMPORTANT**: Use TodoWrite to track fix progress when handling multiple issues.
+> **You MUST use TodoWrite** to track fix progress when handling multiple issues.
+
+**Relationship to auditing-skills:**
+- This skill provides **interactive guidance** for fixing audit issues
+- For **batch auto-fix**, use `auditing-skills --fix` directly: `npm run audit -- {skill-name} --fix`
+- This skill wraps audit --fix with additional user interaction and manual fix guidance
 
 ---
 
@@ -66,12 +71,14 @@ Copy this checklist and track progress with TodoWrite:
 Fix Progress:
 - [ ] Step 1: Run audit to identify issues
 - [ ] Step 2: Read skill file
-- [ ] Step 3: Categorize fixes (auto vs manual)
-- [ ] Step 4: Present options via AskUserQuestion
-- [ ] Step 5: Apply auto-fixes with Edit tool
-- [ ] Step 6: Guide manual fixes with user input
-- [ ] Step 7: Re-audit to verify all fixes worked
-- [ ] Step 8: Report final status
+- [ ] Step 3: Create backup before any changes
+- [ ] Step 4: Categorize fixes (auto vs manual)
+- [ ] Step 5: Present options via AskUserQuestion
+- [ ] Step 6: Apply auto-fixes with Edit tool
+- [ ] Step 7: Guide manual fixes with user input
+- [ ] Step 8: Re-audit to verify all fixes worked
+- [ ] Step 9: Update changelog with fixes applied
+- [ ] Step 10: Report final status
 ```
 
 ### Step 1: Run Audit
@@ -132,7 +139,30 @@ Read `.claude/skill-library/{category}/{skill-name}/SKILL.md`
 - Reference file organization
 - Script directory structure (if exists)
 
-### Step 3: Categorize Fixes
+### Step 3: Create Backup
+
+**🚨 MANDATORY: Create backup before any fixes.**
+
+```bash
+# Create .local directory if it doesn't exist
+mkdir -p {skill-path}/.local
+
+# Backup SKILL.md with timestamp
+TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
+cp {skill-path}/SKILL.md {skill-path}/.local/${TIMESTAMP}-pre-fix.bak
+
+# Verify backup was created
+ls -la {skill-path}/.local/
+```
+
+**Why this matters:**
+- Auto-fixes can modify multiple files
+- Rollback needed if fix breaks something
+- Audit trail for changes
+
+**Cannot proceed to fixes without backup** ✅
+
+### Step 4: Categorize Fixes
 
 Based on audit output, categorize each issue:
 
@@ -165,7 +195,7 @@ Auto-fixes: 2
 Manual fixes: 2
 ```
 
-### Step 4: Present Options
+### Step 5: Present Options
 
 Use AskUserQuestion to let user choose fixes:
 
@@ -197,7 +227,7 @@ AskUserQuestion({
 })
 ```
 
-### Step 5: Apply Auto-Fixes
+### Step 6: Apply Auto-Fixes
 
 For each auto-fixable issue, apply deterministic fixes. See [Phase-Specific Fix Details](references/phase-fixes.md) for complete examples.
 
@@ -210,7 +240,7 @@ For each auto-fixable issue, apply deterministic fixes. See [Phase-Specific Fix 
 - **Phase 10:** Remove phantom skill references
 - **Phase 12:** Add CLI error handling and exit codes
 
-### Step 6: Guide Manual Fixes
+### Step 7: Guide Manual Fixes
 
 For manual issues, provide interactive guidance. See [Phase-Specific Fix Details](references/phase-fixes.md) for complete workflows.
 
@@ -222,7 +252,7 @@ For manual issues, provide interactive guidance. See [Phase-Specific Fix Details
 - **Phase 11:** Update cd commands to REPO_ROOT pattern
 - **Phase 13:** Add TodoWrite mandates for multi-step workflows
 
-### Step 7: Re-Audit
+### Step 8: Re-Audit
 
 After applying fixes, verify success:
 
@@ -238,9 +268,43 @@ npm run audit -- {skill-name}
   16/16 phases passed
 ```
 
-**If failures remain:** Repeat Steps 3-7 for remaining issues
+**If failures remain:** Repeat Steps 4-8 for remaining issues
 
-### Step 8: Report Status
+### Step 9: Update Changelog
+
+**After fixes pass audit, document what was fixed:**
+
+```bash
+# Create .history directory if it doesn't exist
+mkdir -p {skill-path}/.history
+
+# Check for existing changelog
+cat {skill-path}/.history/CHANGELOG 2>/dev/null || echo "No existing changelog"
+```
+
+**Append entry to CHANGELOG:**
+
+```markdown
+## [Date: YYYY-MM-DD] - Auto-Fix
+
+### Fixed
+- Phase X: {Description of fix applied}
+- Phase Y: {Description of fix applied}
+
+### Method
+- Auto-fix via `auditing-skills --fix`
+- Manual fix for: {list if any}
+
+### Backup
+- Pre-fix backup: .local/{timestamp}-pre-fix.bak
+```
+
+**Why changelog matters:**
+- Audit trail of automated changes
+- Enables rollback if fix causes issues
+- Documents what was changed and why
+
+### Step 10: Report Status
 
 Summarize what was fixed:
 
@@ -334,4 +398,3 @@ Apply these 3 fixes? [Yes/No/Preview each]
 - `creating-skills` - Create new skills (uses this for final cleanup)
 - `updating-skills` - Update existing skills (uses this for compliance)
 - `auditing-skills` - Validate skills (identifies issues to fix)
-- `skill-manager` - Router to this skill

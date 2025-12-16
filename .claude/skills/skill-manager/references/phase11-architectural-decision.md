@@ -16,36 +16,42 @@ Phase 11 audits bash command examples and enforces the REPO_ROOT pattern for por
 # Required pattern per Phase 11
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skills/skill-manager/scripts"
-npm run create -- <args>
+cd "$REPO_ROOT/.claude/skill-library/claude/skill-management/auditing-skills/scripts"
+npm run audit -- <args>
 ```
 
 **Rationale**: Ensures commands work from any directory, including submodule contexts.
 
-**Implementation**: `phase11-command-audit.ts:100-111` flags any `cd .claude/skills/...` without repo-root detection as WARNING.
+**Implementation**: `phase11-command-audit.ts:100-111` flags any `cd .claude/skill-library/...` without repo-root detection as WARNING.
 
 ### "For Claude Code" Guidance
 
-SKILL.md (lines 28-60) recommends simple invocation for Claude Code:
+CLI commands can be run from `.claude/` root using workspace shortcuts:
 
 ```bash
-# ✅ CORRECT: Simple invocation from anywhere in the repo
-npx tsx .claude/skills/skill-manager/scripts/src/create.ts <args>
+# ✅ CORRECT: Simple invocation from .claude/ root
+cd .claude && npm run audit -- <skill-name>
+cd .claude && npm run fix -- <skill-name>
+cd .claude && npm run search -- "<query>"
 
-# ✅ CORRECT: Navigate once, then use npm run
-cd .claude/skills/skill-manager/scripts && npm run create -- <args>
+# ✅ CORRECT: Navigate to specific library skill scripts
+cd .claude/skill-library/claude/skill-management/auditing-skills/scripts
+npm run audit -- <skill-name>
 
-# ❌ WRONG: Unnecessary REPO_ROOT pattern (only for human CLI setup)
+# Note: skill-manager has NO scripts of its own - it's a pure router
 ```
 
 **Rationale**:
 - `findProjectRoot()` handles path detection internally via `CLAUDE_PROJECT_DIR` env var, git, and filesystem search
 - TypeScript execution doesn't need bash path setup
-- Verbose patterns duplicate work
+- CLI ownership is in library skills, not skill-manager
 
-### The Contradiction
+### The Contradiction (Resolved)
 
-**If SKILL.md is audited by Phase 11, it will FAIL** because the "For Claude Code" section contains `cd .claude/skills/` examples without REPO_ROOT detection.
+skill-manager is now a **pure router** with NO scripts. CLI operations are delegated to library skills:
+- `@chariot/auditing-skills` - audit, search
+- `@chariot/fixing-skills` - fix
+- `@chariot/updating-skills` - update
 
 ## Why This Matters
 
@@ -188,8 +194,8 @@ If Option C is chosen:
 
 ## Related Files
 
-- `.claude/skills/skill-manager/SKILL.md` (lines 28-60) - "For Claude Code" section
-- `.claude/skills/skill-manager/scripts/src/lib/phases/phase11-command-audit.ts` (lines 100-111) - REPO_ROOT enforcement
+- `.claude/skills/skill-manager/SKILL.md` - Pure router skill (NO scripts)
+- `.claude/skill-library/claude/skill-management/auditing-skills/scripts/src/lib/phases/phase11-command-audit.ts` - REPO_ROOT enforcement
 - `.claude/skills/skill-manager/references/phase-11-command-examples.md` - Phase 11 documentation
 - `.claude/lib/find-project-root.ts` - TypeScript path resolution
 

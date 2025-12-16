@@ -40,7 +40,12 @@ Gap: Skill doesn't explicitly forbid implementation-first
 
 **Command:**
 ```bash
-cd .claude/skills/skill-manager/scripts
+# From .claude/ root (using workspace shortcut)
+cd .claude
+npm run update -- skill-name "Brief description of change"
+
+# Or from the updating-skills scripts directory
+cd .claude/skill-library/claude/skill-management/updating-skills/scripts
 npm run update -- skill-name "Brief description of change"
 ```
 

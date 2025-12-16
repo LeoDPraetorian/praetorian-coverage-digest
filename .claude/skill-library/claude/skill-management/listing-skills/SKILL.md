@@ -198,4 +198,3 @@ Options:
 
 - `searching-skills` - Find skills by keyword
 - `auditing-skills` - Validate skill compliance
-- `skill-manager` - Router to this skill

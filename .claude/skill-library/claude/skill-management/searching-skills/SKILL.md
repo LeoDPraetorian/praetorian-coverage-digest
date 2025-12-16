@@ -158,4 +158,16 @@ Found {count} matches
 
 - `listing-skills` - List all skills
 - `creating-skills` - Create new skills
-- `skill-manager` - Router to this skill
+- `auditing-skills` - Owns the search CLI
+
+## CLI Alternative
+
+The search command is owned by `auditing-skills`:
+
+```bash
+cd .claude/skill-library/claude/skill-management/auditing-skills/scripts
+npm run search -- "<query>"
+
+# Or from .claude/ root
+cd .claude && npm run search -- "<query>"
+```

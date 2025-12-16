@@ -8,7 +8,7 @@ allowed-tools: Bash, Read, TodoWrite
 
 **Critical validation of agent files before committing or deploying.**
 
-> **IMPORTANT**: You MUST use TodoWrite to track audit progress when checking multiple agents.
+> **MANDATORY**: You MUST use TodoWrite to track audit progress when checking multiple agents.
 
 ---
 

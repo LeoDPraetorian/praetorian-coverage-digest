@@ -151,28 +151,24 @@ claude-skill-audit/scripts/node_modules/
     "lib",
     "lib/testing",
     "tools/*",
-    "skills/*/scripts",
-    "skill-library/lib"
+    "skill-library/lib",
+    "skill-library/claude/skill-management/*/scripts",
+    "skill-library/claude/agent-management/*/scripts",
+    "skill-library/claude/mcp-tools/*/scripts"
   ],
-  "devDependencies": {
-    "@types/node": "^20.11.24",
-    "@vitest/ui": "^1.3.1",
-    "tsx": "^4.20.6",
-    "typescript": "^5.3.3",
-    "vitest": "^1.3.1"
-  },
   "scripts": {
-    "test": "vitest",
-    "test:run": "vitest run",
-    "build:skills": "npm run build --workspaces --if-present -- --filter='skills/*'"
+    "audit": "npm run -w @chariot/auditing-skills audit --",
+    "fix": "npm run -w @chariot/fixing-skills fix --",
+    "search": "npm run -w @chariot/auditing-skills search --",
+    "update": "npm run -w @chariot/updating-skills update --"
   }
 }
 ```
 
 **Key config:**
-- `"workspaces"` includes `lib`, `lib/testing`, `tools/*`, `skills/*/scripts`, and `skill-library/lib`
-- Shared devDependencies: tsx, typescript, vitest, @types/node
-- Skills DON'T need their own devDependencies for these packages
+- `"workspaces"` includes library skill script directories, NOT core skills
+- CLI commands delegate to library skill packages (@chariot/auditing-skills, etc.)
+- Core skills (in `.claude/skills/`) are instruction-based with NO scripts
 
 ### Step 2: Structure Individual Skills
 

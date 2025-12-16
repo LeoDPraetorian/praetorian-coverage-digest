@@ -483,4 +483,3 @@ ls {new-path}  # Should error
 - `creating-skills` - Create new skills
 - `updating-skills` - Update existing skills
 - `migrating-skills` - Move skills between core ↔ library
-- `skill-manager` - Router to this skill

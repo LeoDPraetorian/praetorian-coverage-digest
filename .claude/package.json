@@ -8,12 +8,10 @@
     "lib",
     "lib/testing",
     "tools/*",
-    "skills/*/scripts",
     "skill-library/lib",
-    "skill-library/claude/skills/*/scripts",
-    "!skill-library/claude/skills/claude-skill-search/scripts",
-    "skill-library/claude/agents/*/scripts",
-    "skill-library/claude/mcp-code/*/scripts"
+    "skill-library/claude/skill-management/*/scripts",
+    "skill-library/claude/agent-management/*/scripts",
+    "skill-library/claude/mcp-tools/*/scripts"
   ],
   "devDependencies": {
     "@types/node": "^20.11.24",
@@ -32,10 +30,10 @@
     "test:coverage": "vitest run --coverage",
     "build:skills": "npm run build --workspaces --if-present -- --filter='skills/*'",
     "clean:all": "rm -rf node_modules tools/*/node_modules skills/*/scripts/node_modules lib/testing/node_modules",
-    "audit": "npm run -w @chariot/skill-manager audit --",
-    "fix": "npm run -w @chariot/skill-manager fix --",
-    "validate": "npm run -w @chariot/skill-manager audit --",
-    "agent:audit": "npm run -w @chariot/agent-manager audit --",
-    "agent:fix": "npm run -w @chariot/agent-manager fix --"
+    "audit": "npm run -w @chariot/auditing-skills audit --",
+    "fix": "npm run -w @chariot/fixing-skills fix --",
+    "search": "npm run -w @chariot/auditing-skills search --",
+    "update": "npm run -w @chariot/updating-skills update --",
+    "agent:audit": "npm run -w @chariot/auditing-agents audit-critical --"
   }
 }

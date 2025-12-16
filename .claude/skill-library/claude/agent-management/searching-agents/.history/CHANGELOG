@@ -1,0 +1,18 @@
+## [2025-12-15] - Extraction and Enhancement
+
+### Changed
+- Extracted search examples to `references/search-examples.md`
+- Reduced SKILL.md from 506 to 206 lines (59% reduction)
+
+### Purpose
+- Progressive disclosure: Core usage in SKILL.md, detailed examples in references/
+- Token efficiency: Load detailed content only when needed
+- Maintainability: Smaller files easier to review and update
+
+## [2024-12-07] - Initial Creation
+
+### Created
+- Keyword discovery across all agents
+- Relevance scoring algorithm (name, description, type, skills)
+- Category filtering support
+- CLI integration via npm run search

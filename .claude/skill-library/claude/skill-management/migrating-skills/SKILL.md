@@ -271,4 +271,3 @@ Edit {
 
 - `renaming-skills` - Rename skills (different operation)
 - `creating-skills` - Create new skills
-- `skill-manager` - Router to this skill

@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, TodoWrite, Task, Skill, AskUserQue
 
 **Instruction-driven skill updates with TDD enforcement (simplified RED-GREEN for updates).**
 
-**IMPORTANT**: Use TodoWrite to track phases. Updates still require validation.
+**You MUST use TodoWrite** to track phases. Updates still require validation.
 
 ---
 
@@ -35,9 +35,9 @@ allowed-tools: Read, Write, Edit, Bash, Grep, TodoWrite, Task, Skill, AskUserQue
 | **5. Changelog** | Document change | 2 min | Entry added |
 | **6. 🟢 GREEN** | Verify fix works | 5 min | Skill solves problem |
 | **7. Compliance** | Quality checks + HARD line limit | 5 min | Audit passed, <500 lines |
-| **8. 🔵 REFACTOR** | Pressure test (if major change) | 10-15 min | Optional for minor changes |
+| **8. 🔵 REFACTOR** | Pressure test (mandatory for non-trivial) | 10-15 min | REFACTOR documented |
 
-**Total**: 20-45 minutes (inline ~20 min, extraction ~35 min, major changes ~45 min with REFACTOR)
+**Total**: 25-50 minutes (inline ~25 min, extraction ~40 min, includes REFACTOR for non-trivial changes)
 
 **Note**: Phase 4a (Extract) OR Phase 4b (Inline) - not both. Strategy determined in Phase 2.3.
 
@@ -69,11 +69,33 @@ Header: Failure Demo
 Options:
   - I'll describe what goes wrong
   - Let me test the skill and show you
+  - Create regression test for this failure
 ```
 
 **If "test skill"**: Use Skill tool or read skill, capture wrong behavior.
 
 **If "describe"**: Record their description.
+
+**If "regression test"**: Create structured test case for regression testing.
+
+### 1.2a: Structured Test Format (Optional)
+
+For critical changes, create regression tests in `evaluations/test-case-{n}.json`:
+
+**See [Structured Test Format](references/structured-test-format.md)** for:
+- Complete JSON schema with all fields
+- Example test cases (rule changes, workflow changes, content updates)
+- When to use structured tests vs. conversational testing
+- How to run tests manually
+
+**Quick format:**
+```json
+{
+  "name": "Test name",
+  "query": "User request that triggered this update",
+  "expected_behavior": ["What skill should do after update"]
+}
+```
 
 ### 1.3 Confirm This Needs Skill Update
 
@@ -120,6 +142,10 @@ Read `.claude/skill-library/{category}/{name}/SKILL.md`
 
 Understand current structure before changing.
 
+### 2.2a Research Integration (Major Updates)
+
+For major updates (>30% content): `skill: "researching-skills"` to refresh knowledge.
+
 ### 2.3 Check Size and Determine Strategy
 
 **MANDATORY CHECK** - Cannot proceed without this:
@@ -128,24 +154,25 @@ Understand current structure before changing.
 wc -l {skill-path}/SKILL.md
 ```
 
-**Decision Matrix**:
+**Decision Matrix** (unified thresholds across all skill management):
 
 | Current Lines | Strategy | Action |
 |--------------|----------|--------|
-| < 350 | Inline edit OK | Proceed to Phase 4b (inline) |
-| 350-400 | Caution zone | Evaluate content size, may need extraction |
-| > 400 | MUST extract | Proceed to Phase 4a (extraction workflow) |
+| < 350 | ✅ Safe zone | Proceed to Phase 4b (inline edit) |
+| 350-450 | ⚠️ Caution zone | Evaluate content size carefully |
+| 450-500 | ⚠️ Warning zone | Plan extraction for next change |
+| > 500 | ❌ Hard limit | MUST extract before proceeding |
 
-**If > 400 lines OR adding >50 lines of content**:
+**If > 450 lines OR adding >30 lines of content**:
 
 Use AskUserQuestion:
 ```
-Question: This skill is at {current_lines} lines. Adding significant content will approach 500 line limit. How should we proceed?
+Question: This skill is at {current_lines} lines. Adding content will approach the 500 line limit. How should we proceed?
 Header: Size Strategy
 Options:
   - Extract to references/ - Create reference file for new content (Recommended)
   - Extract existing content - Move current detailed sections to references/
-  - Inline with caution - Only if staying well under 500 lines
+  - Inline with caution - Only if staying under 450 lines
 ```
 
 **Cannot proceed to editing without size strategy decision** ✅
@@ -174,6 +201,10 @@ ls -la {skill-path}/.local/
 ```
 
 **Cannot proceed without backup** ✅
+
+### 3.3 How to Rollback
+
+**To revert:** `cp {skill-path}/.local/{timestamp}-{skill-name}.bak {skill-path}/SKILL.md`
 
 ---
 
@@ -398,45 +429,46 @@ fi
 
 **Cannot proceed past this checkpoint if >500 lines** ✅
 
-### 7.3 Manual Checks
+### 7.3 Gateway Check (Library Skills Only)
 
-- [ ] Description still valid (if changed)
-- [ ] All internal links work
-- [ ] References resolve to actual files
-- [ ] No broken skill/agent references
-- [ ] Progressive disclosure maintained (SKILL.md < 500 lines)
-- [ ] Backup created in `.local/`
-- [ ] Changelog updated in `.history/`
+**If description changed:** Check `grep -r "{skill-name}" .claude/skills/gateway-*/SKILL.md` and update gateway if outdated.
+
+### 7.4 Manual Checks
+
+- [ ] Description valid, Gateway updated (if library), Links work, References resolve
+- [ ] SKILL.md < 500 lines, Backup in `.local/`, Changelog in `.history/`
 
 ---
 
-## Phase 8: 🔵 REFACTOR (Conditional)
+## Phase 8: 🔵 REFACTOR (Mandatory for Non-Trivial Changes)
 
-### When to Run Pressure Tests
+**🚨 CRITICAL: REFACTOR is MANDATORY unless change is purely cosmetic.**
 
-**Run REFACTOR if**:
-- Changed Critical Rules (rules might not resist pressure)
-- Changed workflow instructions (process might be weaker)
-- Added new mandatory steps (new ways to skip)
+**See [REFACTOR Phase Details](references/refactor-phase.md)** for complete workflow.
 
-**Skip REFACTOR if**:
-- Minor wording changes
-- Fixed typos
-- Updated file paths
-- Added examples
+### Quick Decision
 
-### If Running REFACTOR
+**Run REFACTOR if ANY of these**:
+- Changed rules, workflows, or mandatory steps
+- Modified validation logic or skip conditions
+- Added rationalization warnings
 
-**Use same process as creating-skills Phase 9**:
+**Skip ONLY if ALL true**: Cosmetic only, no behavior change, <10 lines
+
+### Run REFACTOR
 
 ```
 skill: "testing-skills-with-subagents"
 ```
 
-Run 1-3 pressure tests (depending on change scope):
-- Major rule change: All 3 tests
-- Minor rule change: 1-2 relevant tests
-- New mandatory step: 1 test specific to that step
+Run 1-3 pressure tests based on change scope. Document in changelog:
+```markdown
+### REFACTOR
+- Tests run: [Time pressure, Authority pressure]
+- All tests: PASSED
+```
+
+**Cannot mark complete without REFACTOR documentation for non-trivial changes** ✅
 
 ---
 
@@ -450,11 +482,12 @@ Update complete when:
 4. ✅ Changelog updated (.history/)
 5. ✅ GREEN passed (fix verified)
 6. ✅ Compliance passed (audit + line count)
-7. ✅ REFACTOR passed if needed (pressure tests)
-8. ✅ TodoWrite complete
+7. ✅ REFACTOR passed (pressure tests for non-trivial changes)
+8. ✅ REFACTOR documented in changelog (tests run, results)
+9. ✅ TodoWrite complete
 
-**For minor changes**: 1-6 sufficient
-**For major changes**: All 8 required
+**For cosmetic-only changes** (typos, formatting, <10 lines): 1-6 + 9 sufficient
+**For all other changes**: All 9 required (REFACTOR is mandatory)
 
 ---
 
@@ -462,6 +495,5 @@ Update complete when:
 
 - `creating-skills` - Create new skills
 - `testing-skills-with-subagents` - Pressure testing (if REFACTOR needed)
-- `skill-manager` - Router to this skill
 - `developing-with-tdd` - TDD philosophy
 - `verifying-before-completion` - Final validation
