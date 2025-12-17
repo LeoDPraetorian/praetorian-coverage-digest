@@ -1,0 +1,48 @@
+## [Date: 2025-12-16]
+
+### Changed
+- **MAJOR REFACTORING**: Extracted 8 sections to references/ (reduced from 560 to 354 lines)
+- **NEW SECTION**: Contract Verification (MANDATORY) - 2-minute protocol to prevent mock drift
+- **NEW SECTION**: When NOT to Mock - guidance on using real implementations, prefer MSW over vi.mock()
+- **NEW SECTION**: Anti-Patterns to Avoid - The Mockery, The Inspector, Mock Drift, False Sense of Security
+- **NEW SECTION**: Test Doubles Terminology - Clarified mock vs stub vs fake vs spy per Martin Fowler
+- **MERGED CONTENT**: Integrated mock-contract-validation skill content into Contract Verification section
+
+### Extracted to References
+1. `test-setup.md` - Test setup configuration and global mocks
+2. `mocking-patterns.md` - Module mocking, component mocking, partial mocking patterns
+3. `test-organization.md` - File naming conventions, test structure, grouping
+4. `best-practices.md` - Detailed best practices for Chariot platform
+5. `running-tests.md` - Test commands, coverage requirements, CI/CD integration
+6. `common-scenarios.md` - Async operations, error states, user interactions
+7. `troubleshooting.md` - Common issues and solutions
+8. `examples.md` - Component, hook, and integration test examples
+
+### Reason
+- **RED Failure**: Skill was missing critical mocking discipline that causes tests to pass while production fails:
+  - No contract verification protocol (developers guessed API contracts, creating mock drift)
+  - No "when NOT to mock" guidance (led to over-mocking and testing mocks instead of code)
+  - Missing anti-patterns warnings from industry best practices
+  - No test doubles terminology (confusion between mock/stub/fake/spy)
+- **Size Issue**: Skill exceeded 500 line hard limit (560 lines), blocking updates
+- **Solution**: Extracted detailed content to references/ for progressive disclosure, added 4 critical sections with industry best practices
+
+### Sources
+- Kent C. Dodds: "Mocking severs the real-world connection" philosophy
+- Martin Fowler: Test doubles taxonomy (mock/stub/fake/spy/dummy)
+- Industry consensus: Contract verification prevents mock-production divergence
+- Anti-patterns: The Mockery, The Inspector (from DZone, Codepipes, Vladimir Khorikov)
+
+### Impact
+- Developers now have mandatory contract verification workflow before writing MSW handlers
+- Clear guidance on when to avoid mocking entirely
+- Awareness of common anti-patterns that create false confidence
+- Proper terminology to reason about test doubles effectively
+- Skill is now maintainable (<500 lines) with detailed content in references
+
+### REFACTOR Status
+**REQUIRED** (non-trivial changes: rules, validation, rationalizations)
+- Recommended: Run `skill: "testing-skills-with-subagents"` in separate session
+- Pressure scenarios: Time pressure (skip contract verification), Authority pressure (manager wants tests passing), Sunk cost (already wrote handler)
+- Validate: Contract Verification protocol enforced, Anti-pattern warnings effective, Test doubles terminology improves reasoning
+- **Status**: PENDING - To be run in follow-up session due to extent of refactoring

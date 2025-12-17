@@ -1,0 +1,32 @@
+# Changelog: skill-manager Command
+
+## [Date: 2024-12-16]
+
+### Changed
+- Updated all 8 operation routing instructions to provide explicit paths instead of ambiguous "Invoke" language
+- Changed from "ACTION: Invoke the `{operation}-skills` skill" to "ACTION: Read and follow the {operation}-skills skill" with explicit Path line
+- Added explicit paths for:
+  - create → `.claude/skills/creating-skills/SKILL.md` (core skill)
+  - update → `.claude/skill-library/claude/skill-management/updating-skills/SKILL.md`
+  - audit → `.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md`
+  - fix → `.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md`
+  - rename → `.claude/skill-library/claude/skill-management/renaming-skills/SKILL.md`
+  - migrate → `.claude/skill-library/claude/skill-management/migrating-skills/SKILL.md`
+  - search → `.claude/skill-library/claude/skill-management/searching-skills/SKILL.md`
+  - list → `.claude/skill-library/claude/skill-management/listing-skills/SKILL.md`
+
+### Reason
+- Router provides complete routing information (fulfills router's responsibility)
+- Eliminates ambiguity - agents know exactly where to go and how to access skills
+- Works without requiring architecture knowledge (core vs library distinction)
+- Prevents wasted time trying Skill tool for library skills
+- Zero cognitive load - just read the path and execute
+
+### Impact
+- Line count: 179 → 187 lines (still well under 350 line threshold)
+- Breaking: No - all paths are valid and skills exist
+- Benefits: Fresh agents can immediately execute without understanding skill architecture
+
+### REFACTOR
+- Tests run: None - REFACTOR skipped (mechanical routing change)
+- Rationale: This is a router providing mechanical instructions with no decision points or rationalization opportunities. Change makes instructions MORE explicit (reduces ambiguity), not less. No rules to bypass, no validation to skip.

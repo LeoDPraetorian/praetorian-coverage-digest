@@ -216,6 +216,7 @@ Agent: "I'll use vi.mock() for this API call..."
 
 **THEN use:**
 - **react-testing** - If React tests and MSW is available
+- **frontend-testing-patterns** - For contract verification with MSW handlers (verify real API contracts before mocking)
 - **developing-with-tdd** - For TDD workflow
 - **testing-anti-patterns** - To avoid common mistakes
 - **debugging-systematically** - When tests fail unexpectedly

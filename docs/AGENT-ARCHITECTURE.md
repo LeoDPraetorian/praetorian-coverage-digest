@@ -164,54 +164,56 @@ We implemented a **thin orchestrator architecture** that keeps agent prompts lea
 
 ```
 .claude/agents/
-├── architecture/     # 7 agents - system design, patterns, decisions
-│   ├── go-architect.md
-│   ├── react-architect.md
-│   ├── security-architect.md
-│   └── ...
-├── development/      # 16 agents - implementation, coding, features
-│   ├── react-developer.md
-│   ├── go-developer.md
-│   ├── typescript-developer.md
-│   └── ...
-├── testing/          # 8 agents - unit, integration, e2e, quality
-│   ├── frontend-browser-test-engineer.md
-│   ├── backend-unit-test-engineer.md
-│   └── ...
-├── quality/          # 5 agents - code review, auditing, standards
-│   ├── go-code-reviewer.md
-│   ├── react-code-reviewer.md
-│   └── ...
-├── analysis/         # 6 agents - security, complexity, intent
-│   ├── security-risk-assessor.md
-│   ├── complexity-assessor.md
-│   └── ...
-├── research/         # 3 agents - web search, patterns, documentation
-│   ├── web-research-specialist.md
-│   ├── code-pattern-analyzer.md
-│   └── ...
+├── analysis/         # 2 agents - security review
+│   ├── backend-security-reviewer.md
+│   └── frontend-security-reviewer.md
+├── architecture/     # 3 agents - system design, patterns, decisions
+│   ├── backend-architect.md
+│   ├── frontend-architect.md
+│   └── security-architect.md
+├── development/      # 5 agents - implementation, coding, features
+│   ├── aws-infrastructure-specialist.md
+│   ├── backend-developer.md
+│   ├── frontend-developer.md
+│   ├── integration-developer.md
+│   └── python-developer.md
+├── mcp-tools/        # 2 agents - specialized MCP tool access
+│   ├── chromatic-test-engineer.md
+│   └── praetorian-cli-expert.md
 ├── orchestrator/     # 2 agents - domain-specific coordination
 │   ├── backend-orchestrator.md
 │   └── frontend-orchestrator.md
-└── mcp-tools/        # 2 agents - specialized MCP tool access
-    ├── praetorian-cli-expert.md
-    └── chromatic-test-engineer.md
+├── quality/          # 3 agents - code review, auditing, standards
+│   ├── backend-reviewer.md
+│   ├── frontend-reviewer.md
+│   └── uiux-designer.md
+├── research/         # 1 agent - pattern analysis
+│   └── code-pattern-analyzer.md
+└── testing/          # 8 agents - unit, integration, e2e, quality
+    ├── acceptance-test-engineer.md
+    ├── backend-integration-test-engineer.md
+    ├── backend-unit-test-engineer.md
+    ├── frontend-e2e-test-engineer.md
+    ├── frontend-integration-test-engineer.md
+    ├── frontend-unit-test-engineer.md
+    ├── test-coverage-auditor.md
+    └── test-quality-assessor.md
 ```
 
 ### Agent Categories
 
 | Category | Count | Purpose | Permission Mode |
 |----------|-------|---------|-----------------|
-| `architecture` | 7 | System design, patterns, decisions | `plan` |
-| `development` | 16 | Implementation, coding, features | `default` |
+| `architecture` | 3 | System design, patterns, decisions | `plan` |
+| `development` | 5 | Implementation, coding, features | `default` |
 | `testing` | 8 | Unit, integration, e2e testing | `default` |
-| `quality` | 5 | Code review, auditing | `default` |
-| `analysis` | 6 | Security, complexity assessment | `plan` |
-| `research` | 3 | Web search, documentation | `plan` |
+| `quality` | 3 | Code review, auditing | `default` |
+| `analysis` | 2 | Security, complexity assessment | `plan` |
+| `research` | 1 | Web search, documentation | `plan` |
 | `orchestrator` | 2 | Domain-specific coordination | `default` |
 | `mcp-tools` | 2 | Specialized MCP access | `default` |
 
-**Total**: 49 agents across 8 categories (6 orchestrators consolidated to 2)
+**Total**: 26 agents across 8 categories (consolidated from 49+ through lean agent initiative)
 
 ---
 
@@ -458,7 +460,7 @@ The Agent Manager is the lifecycle management system for agents. It uses a **Par
 
 | Aspect | Details |
 |--------|---------|
-| **Location** | `.claude/skills/agent-manager/` |
+| **Location** | `.claude/skill-library/claude/agent-management/` (8 distributed skills) |
 | **Purpose** | Create, audit, fix, rename, test, search, list agents |
 | **Architecture** | **Partial Hybrid**: Instruction-based skills + selective CLI |
 | **Command Router** | `/agent-manager` delegates to 8 instruction-based skills |
@@ -537,7 +539,7 @@ User: /agent-manager audit frontend-developer
 
 | Script | Purpose | Called By | Why CLI? |
 |--------|---------|-----------|----------|
-| `audit-critical.ts` | Block scalar detection, name validation, description checks | `auditing-agents`, `creating-agents`, `fixing-agents` | Fast batch validation (49 agents in 1-2 min) |
+| `audit-critical.ts` | Block scalar detection, name validation, description checks | `auditing-agents`, `creating-agents`, `fixing-agents` | Fast batch validation (26 agents in <1 min) |
 | `search.ts` | Keyword search with relevance scoring | `searching-agents` | Algorithm performance, scoring logic |
 | `test.ts` | Discovery + behavioral validation framework | `testing-agent-skills` | Structured test execution, result parsing |
 
@@ -552,7 +554,7 @@ User: /agent-manager audit frontend-developer
 |--------|-------------------------------|----------------------------|
 | **CLI Operations** | 3/8 (38%) - audit, search, test | 7/8 (88%) - all except create |
 | **Determinism** | Mixed - validation is deterministic, creation is semantic | High - file validation, structure checks |
-| **Batch Benefit** | Medium (49 agents) | High (147 skills) |
+| **Batch Benefit** | Medium (26 agents) | High (147 skills) |
 | **Semantic Load** | High (description quality, skill recommendations) | Low (mostly auto-fixable structure) |
 | **Design Choice** | CLI only where clear benefit | CLI for all deterministic ops |
 
@@ -570,7 +572,7 @@ User: /agent-manager audit frontend-developer
 
 **TypeScript CLI provides** (3 operations):
 - Fast execution for deterministic checks (block scalars, name matching)
-- Batch operations (audit all 49 agents in 1-2 min)
+- Batch operations (audit all 26 agents in <1 min)
 - Structured output for result interpretation
 - Scoring algorithms (search relevance)
 
@@ -631,23 +633,25 @@ Agents must pass compliance validation across 9 phases:
 
 ### CLI Reference
 
-**Available CLI Scripts** (3 operations):
+**Distributed CLI Architecture**: Each skill maintains its own CLI scripts in its `scripts/` subdirectory:
 
-```bash
-# Setup (one-time, for maintainers only)
-cd .claude/skills/agent-manager/scripts
-npm install
+```
+.claude/skill-library/claude/agent-management/
+├── auditing-agents/scripts/     # npm run audit-critical
+├── searching-agents/scripts/    # npm run search
+└── testing-agent-skills/scripts/ # npm run test (if applicable)
 ```
 
-| Command | Description | Time | Wrapped By |
-|---------|-------------|------|------------|
-| `npm run audit-critical -- [name]` | Critical validation (block scalars, names) | 30-60 sec | `auditing-agents` skill |
-| `npm run search -- "<query>"` | Keyword search with scoring | 30-60 sec | `searching-agents` skill |
-| `npm run test -- <name> [skill]` | Discovery + behavioral validation | 5-10 min | `testing-agent-skills` skill |
+**Available CLI Scripts** (invoked by skills, not directly):
+
+| Script | Location | Wrapped By |
+|--------|----------|------------|
+| `audit-critical` | `auditing-agents/scripts/` | `auditing-agents` skill |
+| `search` | `searching-agents/scripts/` | `searching-agents` skill |
 
 **Note**: Other operations (create, update, fix, rename, list) are implemented using native tools (Edit, Write, Grep, Glob) within instruction-based skills.
 
-**For users**: Always use `/agent-manager` command or invoke skills directly. CLI scripts are internal implementation details.
+**For users**: Always use `/agent-manager` command or invoke skills directly. CLI scripts are internal implementation details wrapped by skills.
 
 #### Agent Type Options
 
@@ -666,28 +670,23 @@ For `create` command `--type` parameter:
 
 #### Example: Creating a New Agent
 
+**Recommended**: Use the `/agent-manager create` command which invokes the `creating-agents` skill with full TDD workflow.
+
 ```bash
-# 1. Setup (one-time)
-cd .claude/skills/agent-manager/scripts
-npm install
+# Via command (recommended)
+/agent-manager create debugging-specialist "Use when debugging complex issues" --type development
 
-# 2. RED Phase - Document the gap
-# [Document why agent is needed, test without it, capture failure]
-
-# 3. Create agent with type
-npm run create -- debugging-specialist \
-  "Use when debugging complex issues - systematic root cause analysis, breakpoint strategies" \
-  --type development
-
-# 4. GREEN Phase - Verify agent solves the gap
-# [Test with new agent, should pass]
-
-# 5. Audit compliance
-npm run audit -- debugging-specialist
-# ✅ All 9 phases passed
-
-# 6. Discovery Test - Verify description visible
-# [Start new Claude Code session, ask: "What is the description for debugging-specialist?"]
+# The creating-agents skill guides through:
+# 1. 🔴 RED Phase - Document the gap (why agent is needed)
+# 2. Validation - Name format, existence checks
+# 3. Type selection - 8 categories with permission modes
+# 4. Configuration - Description, tools, skills
+# 5. Generation - Create file from template
+# 6. Content - Populate 7 sections + EXTREMELY_IMPORTANT
+# 7. 🟢 GREEN Phase - Verify agent works
+# 8. 🎯 Skill verification - Test process + behavioral compliance
+# 9. Compliance - Quality checks + audit
+# 10. 🔵 REFACTOR Phase - Pressure test
 ```
 
 #### Semantic Fix IDs
@@ -922,30 +921,34 @@ The `AGENT-MANAGER-MIGRATION.md` document describes an **aspirational "Pure Rout
 
 **Status**: Migration document is **stale**. The "migration" is complete, but the result is Partial Hybrid (not Pure Router). CLI scripts for audit, search, and test operations provide performance benefits and are intentionally kept.
 
-**Why CLI remains**: Validating 49 agents for block scalars, searching with scoring algorithms, and running structured tests benefit from TypeScript CLI performance. These are **deterministic operations** where CLI provides value.
+**Why CLI remains**: Validating 26 agents for block scalars, searching with scoring algorithms, and running structured tests benefit from TypeScript CLI performance. These are **deterministic operations** where CLI provides value.
 
 ## Quick Reference
 
 ### Create New Agent
 
 ```bash
-# Use agent-manager skill
-/agent-manager new my-agent "Use when [trigger] - [capabilities]"
+# Use agent-manager command (recommended)
+/agent-manager create my-agent "Use when [trigger] - [capabilities]" --type development
 ```
 
 ### Audit Agent
 
 ```bash
-cd .claude/skills/agent-manager/scripts
-npm run audit -- agent-name        # Single agent
-npm run audit -- --all             # All agents
+# Use agent-manager command (invokes auditing-agents skill)
+/agent-manager audit agent-name        # Single agent
+/agent-manager audit --all             # All agents
+
+# Or invoke skill directly
+skill: "auditing-agents"
 ```
 
 ### Fix Agent Issues
 
 ```bash
-npm run fix -- agent-name --dry-run  # Preview
-npm run fix -- agent-name            # Apply
+# Use agent-manager command (invokes fixing-agents skill)
+/agent-manager fix agent-name --dry-run  # Preview
+/agent-manager fix agent-name            # Apply
 ```
 
 ### Test Agent Discovery
@@ -1143,7 +1146,8 @@ From official Claude 4/4.5 documentation:
 
 ### Internal Documentation
 
-- **Agent Manager**: `.claude/skills/agent-manager/SKILL.md`
+- **Agent Manager (Core Skill)**: `.claude/skills/agent-manager/SKILL.md` (router)
+- **Agent Management Skills (Library)**: `.claude/skill-library/claude/agent-management/` (8 implementation skills)
 - **Skills Architecture**: `docs/SKILLS-ARCHITECTURE.md`
 - **MCP Tools Architecture**: `docs/MCP-TOOLS-ARCHITECTURE.md`
 - **Gold Standard Agent**: `.claude/agents/development/react-developer.md`
@@ -1174,13 +1178,15 @@ From official Claude 4/4.5 documentation:
 - [x] **Lean agent template**: Standardized structure defined
 - [x] **Agent-manager skill**: Audit/fix commands available
 - [x] **Consolidate orchestrators**: 8 → 2 domain-specific orchestrators (backend, frontend)
+- [x] **Consolidate Go agents**: Unified to `backend-developer` (5 development agents total)
+- [x] **Consolidate security agents**: Unified to 2 agents (backend-security-reviewer, frontend-security-reviewer)
+- [x] **Major consolidation**: 49+ agents → 26 agents (47% reduction)
+- [x] **Documentation update (Dec 2025)**: Agent counts, CLI paths, skill locations corrected
 
 ### In Progress
 
-- [ ] **Fix broken descriptions**: Convert all `|` and `>` to single-line
-- [ ] **Consolidate Go agents**: `go-developer` + `go-api-developer`
-- [ ] **Consolidate security agents**: 5 → 1-2 with domain parameter
-- [ ] **Trim verbose agents**: `go-architect` (if >400 lines)
+- [ ] **Fix broken descriptions**: Convert remaining `|` and `>` to single-line
+- [ ] **Trim verbose agents**: Some agents may still exceed 300/400 line limits
 
 ### To Do
 

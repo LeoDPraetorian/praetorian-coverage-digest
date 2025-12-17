@@ -1,9 +1,9 @@
 ---
-description: Skill management - create, update, audit, fix, rename, migrate, search, or list skills
-argument-hint: <create|update|audit|fix|rename|migrate|search|list> [skill-name] [options]
+description: Skill management - create, update, delete, audit, fix, rename, migrate, search, or list skills
+argument-hint: <create|update|delete|audit|fix|rename|migrate|search|list> [skill-name] [options]
 model: sonnet
 allowed-tools: Skill, AskUserQuestion
-skills: skill-manager, creating-skills, updating-skills, auditing-skills, fixing-skills, renaming-skills, migrating-skills, searching-skills, listing-skills
+skills: skill-manager, creating-skills, deleting-skills, updating-skills, auditing-skills, fixing-skills, renaming-skills, migrating-skills, searching-skills, listing-skills
 ---
 
 # Skill Management
@@ -14,6 +14,7 @@ skills: skill-manager, creating-skills, updating-skills, auditing-skills, fixing
 |------------|-----------------|
 | `create`   | `creating-skills` (instruction-based TDD workflow) |
 | `update`   | `updating-skills` (instruction-based TDD workflow) |
+| `delete`   | `deleting-skills` (instruction-based safe deletion) |
 | `audit`    | `auditing-skills` (instruction-based validation) |
 | `fix`      | `fixing-skills` (instruction-based remediation) |
 | `rename`   | `renaming-skills` (instruction-based safe rename) |
@@ -25,7 +26,8 @@ skills: skill-manager, creating-skills, updating-skills, auditing-skills, fixing
 
 ## For `create` Subcommand
 
-**ACTION:** Invoke the `creating-skills` skill.
+**ACTION:** Read and follow the creating-skills skill
+**Path:** `.claude/skills/creating-skills/SKILL.md`
 
 The `creating-skills` skill guides through:
 1. 🔴 RED phase (prove gap exists)
@@ -42,7 +44,8 @@ The `creating-skills` skill guides through:
 
 ## For `update` Subcommand
 
-**ACTION:** Invoke the `updating-skills` skill.
+**ACTION:** Read and follow the updating-skills skill
+**Path:** `.claude/skill-library/claude/skill-management/updating-skills/SKILL.md`
 
 The `updating-skills` skill guides through:
 1. 🔴 RED phase (document current failure)
@@ -58,9 +61,34 @@ The `updating-skills` skill guides through:
 
 ---
 
+## For `delete` Subcommand
+
+**ACTION:** Read and follow the deleting-skills skill
+**Path:** `.claude/skill-library/claude/skill-management/deleting-skills/SKILL.md`
+
+The `deleting-skills` skill guides through:
+1. Validate skill exists (core or library)
+2. Discover all references (gateways, commands, other skills)
+3. Analyze impact and show to user
+4. Confirm deletion with user (mandatory)
+5. Remove skill directory (with safety checks)
+6. Cleanup all references
+7. Verify no orphaned references remain
+
+**Safety features:**
+- Mandatory user confirmation before deletion
+- Path safety check (must contain `.claude/skill`)
+- Comprehensive reference discovery
+- Verification ensures no orphans
+
+**Output:** Follow the skill's interactive workflow.
+
+---
+
 ## For `audit` Subcommand
 
-**ACTION:** Invoke the `auditing-skills` skill.
+**ACTION:** Read and follow the auditing-skills skill
+**Path:** `.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md`
 
 The `auditing-skills` skill guides through:
 1. Locate skill file (core or library)
@@ -77,7 +105,8 @@ The `auditing-skills` skill guides through:
 
 ## For `fix` Subcommand
 
-**ACTION:** Invoke the `fixing-skills` skill.
+**ACTION:** Read and follow the fixing-skills skill
+**Path:** `.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md`
 
 The `fixing-skills` skill guides through:
 1. Run audit to identify issues
@@ -95,7 +124,8 @@ The `fixing-skills` skill guides through:
 
 ## For `rename` Subcommand
 
-**ACTION:** Invoke the `renaming-skills` skill.
+**ACTION:** Read and follow the renaming-skills skill
+**Path:** `.claude/skill-library/claude/skill-management/renaming-skills/SKILL.md`
 
 The `renaming-skills` skill guides through:
 1. Validate source skill exists
@@ -114,7 +144,8 @@ The `renaming-skills` skill guides through:
 
 ## For `migrate` Subcommand
 
-**ACTION:** Invoke the `migrating-skills` skill.
+**ACTION:** Read and follow the migrating-skills skill
+**Path:** `.claude/skill-library/claude/skill-management/migrating-skills/SKILL.md`
 
 The `migrating-skills` skill guides through:
 1. Validate source skill exists
@@ -130,7 +161,8 @@ The `migrating-skills` skill guides through:
 
 ## For `search` Subcommand
 
-**ACTION:** Invoke the `searching-skills` skill.
+**ACTION:** Read and follow the searching-skills skill
+**Path:** `.claude/skill-library/claude/skill-management/searching-skills/SKILL.md`
 
 The `searching-skills` skill guides through:
 1. Get search query
@@ -145,7 +177,8 @@ The `searching-skills` skill guides through:
 
 ## For `list` Subcommand
 
-**ACTION:** Invoke the `listing-skills` skill.
+**ACTION:** Read and follow the listing-skills skill
+**Path:** `.claude/skill-library/claude/skill-management/listing-skills/SKILL.md`
 
 The `listing-skills` skill guides through:
 1. List core skills with status
@@ -169,7 +202,8 @@ The `listing-skills` skill guides through:
 |------------------------------------------------|----------------------------------|
 | `/skill-manager create <name>`                  | Create skill (uses creating-skills) |
 | `/skill-manager update <name> "<changes>"`      | Update skill                     |
-| `/skill-manager audit <name>`                   | Validate skill (13 phases)       |
+| `/skill-manager delete <name>`                  | Delete skill with reference cleanup |
+| `/skill-manager audit <name>`                   | Validate skill (16 phases)       |
 | `/skill-manager audit`                          | Validate all skills              |
 | `/skill-manager fix <name> [--dry-run]`         | Fix issues (preview)             |
 | `/skill-manager fix <name> --apply <id>`        | Apply specific fix               |

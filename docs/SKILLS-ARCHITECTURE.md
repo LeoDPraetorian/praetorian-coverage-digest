@@ -4,7 +4,7 @@
 
 Claude Code has a **hard limit of ~15,000 characters** for skill metadata in the Skill tool. This translates to approximately **70 skills** before truncation occurs. Skills beyond this limit are completely invisible to Claude—it cannot select or use them.
 
-We have **147 skills**. Claude only sees the first ~70 alphabetically. The remaining 77 skills are invisible, including critical ones like `test-driven-development`, `systematic-debugging`, and `verification-before-completion`.
+We have **144 skills** (36 core + 108 library). Claude only sees the first ~70 alphabetically. The remaining skills are invisible, including critical ones like `test-driven-development`, `systematic-debugging`, and `verification-before-completion`.
 
 ### Why This Happens
 
@@ -29,7 +29,7 @@ It builds a list of skill names + descriptions and injects this into the Skill t
 - **Skills invoke CLI** when needed via Bash tool for batch operations
 
 **Resolution**: Layered orchestration eliminates confusion while maintaining:
-- Speed for batch operations (147 skills validated in 5-10 min)
+- Speed for batch operations (144 skills validated in 5-10 min)
 - Guidance for complex workflows (TDD, progressive disclosure)
 - Automation for CI/CD integration (deterministic validation)
 
@@ -37,12 +37,12 @@ It builds a list of skill names + descriptions and injects this into the Skill t
 
 ## The Solution: Hybrid Librarian Architecture
 
-We're implementing a three-tier architecture that keeps us well under the 70-skill limit while maintaining access to all 147 skills.
+We're implementing a three-tier architecture that keeps us well under the 70-skill limit while maintaining access to all 144 skills.
 
 ### Tier 1: Core Skills (Native)
 
-**Location**: `.claude/skills/` (flat structure)  
-**Count**: ~10-15 skills  
+**Location**: `.claude/skills/` (flat structure)
+**Count**: ~28 non-gateway skills + 8 gateways = 36 total
 **Purpose**: High-frequency, universally needed skills
 
 These are auto-discovered and accessible via the normal Skill tool. They consume the 15K budget but are used constantly.
@@ -60,7 +60,7 @@ These are auto-discovered and accessible via the normal Skill tool. They consume
 ### Tier 2: Gateway Skills (Domain Entry Points)
 
 **Location**: `.claude/skills/` (flat structure)
-**Count**: 7 skills
+**Count**: 8 skills
 **Purpose**: Single entry points that route to library skills
 
 Each gateway consumes one slot in the 15K budget but provides access to 4-16+ library skills.
@@ -78,6 +78,7 @@ Each gateway consumes one slot in the 15K budget but provides access to 4-16+ li
 | `gateway-capabilities` | VQL development, Scanner integration, Tool orchestration | 9 skills |
 | `gateway-security` | Auth, Secrets, Cryptography, Defense | 6 skills |
 | `gateway-integrations` | API research, Chariot patterns, Validation | 5 skills |
+| `gateway-claude` | Agent management, Skill management, MCP tools | 8 skills |
 
 #### Gateway Selection by Agent Type
 
@@ -98,7 +99,7 @@ Each gateway consumes one slot in the 15K budget but provides access to 4-16+ li
 ### Tier 3: Library Skills (Extended)
 
 **Location**: `.claude/skill-library/` (nested structure)
-**Count**: ~120+ skills
+**Count**: ~108 skills
 **Purpose**: Specialized, domain-specific skills
 
 These are **not** auto-discovered. They don't consume the 15K budget. Claude accesses them via:
@@ -256,12 +257,13 @@ The `skills: gateway-frontend` line makes the gateway tool available in the agen
 ├── claude/
 │   ├── skill-management/                 # Instruction-based guidance
 │   │   ├── auditing-skills/              # Guides audit workflow
+│   │   ├── deleting-skills/              # Guides safe deletion workflow
 │   │   ├── fixing-skills/                # Guides fix workflow
-│   │   ├── updating-skills/              # Guides update workflow
-│   │   ├── renaming-skills/              # Guides rename workflow
+│   │   ├── listing-skills/               # Guides listing workflow
 │   │   ├── migrating-skills/             # Guides migration workflow
+│   │   ├── renaming-skills/              # Guides rename workflow
 │   │   ├── searching-skills/             # Guides search workflow
-│   │   └── listing-skills/               # Guides listing workflow
+│   │   └── updating-skills/              # Guides update workflow
 │   ├── agent-management/                 # Agent lifecycle skills
 │   │   ├── auditing-agents/
 │   │   ├── fixing-agents/
@@ -299,10 +301,10 @@ The `skills: gateway-frontend` line makes the gateway tool available in the agen
 | `Core Workflow` | 3 | Creation, testing, navigation | Instruction-based |
 | `Lifecycle (skill-manager)` | 1+8 | Create, audit, fix, rename, migrate, search, list, sync | **Hybrid** (instruction + CLI) |
 | `Lifecycle (agent-manager)` | 1+8 | Agent creation, audit, fix, rename, test, search, list | **Pure Router** (instruction only) |
-| `Gateways` | 7 | Domain routing (frontend, backend, testing, mcp-tools, security, integrations, capabilities) | Instruction-based |
-| `Library Skills` | 120+ | Domain-specific patterns, library documentation, tool wrappers | Instruction-based |
+| `Gateways` | 8 | Domain routing (frontend, backend, testing, mcp-tools, security, integrations, capabilities, claude) | Instruction-based |
+| `Library Skills` | ~108 | Domain-specific patterns, library documentation, tool wrappers | Instruction-based |
 
-**Total**: ~150 skills across all categories
+**Total**: ~144 skills across all categories (36 core + 108 library)
 
 **Key Distinction**: skill-manager uses Hybrid Pattern (instruction-based skills that invoke TypeScript CLI), while agent-manager uses Pure Router Pattern (instruction-based skills only). See [Skill Manager](#skill-manager) section for detailed explanation.
 
@@ -607,12 +609,12 @@ Once loaded, you have ample budget. Be verbose here:
 
 | Tier           | Location                  | Count   | Avg Description | Total Budget |
 | -------------- | ------------------------- | ------- | --------------- | ------------ |
-| Core Skills    | `.claude/skills/`         | ~18     | ~100 chars      | ~1,800       |
-| Gateway Skills | `.claude/skills/`         | 7       | ~100 chars      | ~700         |
-| Library Skills | `.claude/skill-library/`  | ~120    | N/A             | **0**        |
-| **Total**      |                           | **~145**|                 | **~2,500**   |
+| Core Skills    | `.claude/skills/`         | ~28     | ~100 chars      | ~2,800       |
+| Gateway Skills | `.claude/skills/`         | 8       | ~100 chars      | ~800         |
+| Library Skills | `.claude/skill-library/`  | ~108    | N/A             | **0**        |
+| **Total**      |                           | **~144**|                 | **~3,600**   |
 
-With optimized "Use when" descriptions, we use ~16% of the 15K budget, leaving massive room for growth.
+With optimized "Use when" descriptions, we use ~24% of the 15K budget, leaving room for growth.
 
 **Current Gateway Budget**:
 
@@ -625,6 +627,7 @@ With optimized "Use when" descriptions, we use ~16% of the 15K budget, leaving m
 | `gateway-security` | 88 chars | ✅ Optimized |
 | `gateway-integrations` | 96 chars | ✅ Optimized |
 | `gateway-capabilities` | 111 chars | ✅ Optimized |
+| `gateway-claude` | ~95 chars | ✅ Optimized |
 
 **Target limits**:
 
@@ -990,13 +993,15 @@ Instruction-based operations (no CLI): `creating-skills`, `renaming-skills`, `mi
 │   └── scripts/                # @chariot/updating-skills package
 │       ├── src/update.ts       # Test-guarded updates
 │       └── package.json
-├── searching-skills/           # Instruction-based (uses auditing-skills CLI)
+├── deleting-skills/            # Instruction-based (safe deletion)
 │   └── SKILL.md
 ├── listing-skills/             # Instruction-based
 │   └── SKILL.md
+├── migrating-skills/           # Instruction-based
+│   └── SKILL.md
 ├── renaming-skills/            # Instruction-based
 │   └── SKILL.md
-└── migrating-skills/           # Instruction-based
+└── searching-skills/           # Instruction-based (uses auditing-skills CLI)
     └── SKILL.md
 ```
 
@@ -1357,11 +1362,11 @@ Our domain-specific agents (frontend-developer, backend-developer) with auto-loa
 
 ### The Result
 
-Instead of 147 skills competing for attention in a crowded context window, we have:
+Instead of 144 skills competing for attention in a crowded context window, we have:
 
-- ~15 high-signal skills visible to the Skill tool
+- 36 core skills visible to the Skill tool (28 workflow + 8 gateways)
 - Domain-specific agents with focused, relevant context
-- 130+ specialized skills available on-demand without attention cost
+- 108 specialized skills available on-demand without attention cost
 
 This isn't just a workaround for a token limit—it's better context engineering that will improve Claude's performance even if limits increase.
 

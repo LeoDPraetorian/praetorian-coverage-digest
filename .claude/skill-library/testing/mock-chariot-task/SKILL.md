@@ -10,6 +10,10 @@ allowed-tools: 'Read, Write, Edit, Bash, Grep'
 
 Chariot capabilities use the **collector pattern** for deterministic testing. Collectors abstract external dependencies (CLI, HTTP, DNS) with mock implementations that return canned responses. Never use generic Go mocking - use the established collector system.
 
+### Test Doubles Terminology
+
+**Note on terminology**: Per Martin Fowler's test doubles taxonomy, our "mock collectors" are technically **Fakes** - working implementations with shortcuts (canned responses instead of real network calls). This differs from true Mocks (behavior verification with expectations) or Stubs (minimal implementations returning hardcoded values). We use "mock" in filenames (`*_mock.go`) for consistency with existing codebase conventions, but understand that these are **working test implementations** that follow the collector interface contract.
+
 ## When to Use
 
 Use when:
@@ -176,6 +180,108 @@ for _, entity := range entities {
         StatusCode: 200,
         Body:       body,
     })
+}
+```
+
+## Testing Failure Modes
+
+Mock collectors should test both success and failure scenarios to ensure proper error handling:
+
+### HTTP Error Responses
+
+```go
+// Test 500 Internal Server Error
+c.MustRegisterHTTP("GET", "https://api.example.com/data", http.CannedHTTPResponse{
+    StatusCode: 500,
+    Body:       `{"error": "internal server error"}`,
+})
+
+// Test 404 Not Found
+c.MustRegisterHTTP("GET", "https://api.example.com/missing", http.CannedHTTPResponse{
+    StatusCode: 404,
+    Body:       `{"error": "not found"}`,
+})
+
+// Test 429 Rate Limit
+c.MustRegisterHTTP("GET", "https://api.example.com/throttled", http.CannedHTTPResponse{
+    StatusCode: 429,
+    Body:       `{"error": "rate limit exceeded"}`,
+})
+```
+
+### Timeout Handling
+
+```go
+// Test timeout scenario (capability should handle gracefully)
+// Mock collector returns response, but capability may have timeout logic
+c.MustRegisterHTTP("GET", "https://api.example.com/slow", http.CannedHTTPResponse{
+    StatusCode: 200,
+    Body:       `{"data": "response"}`,
+    // Note: Actual timeout testing may require capability-level context cancellation
+})
+```
+
+### Empty and Malformed Responses
+
+```go
+// Empty response body
+c.MustRegisterHTTP("GET", "https://api.example.com/empty", http.CannedHTTPResponse{
+    StatusCode: 200,
+    Body:       "",
+})
+
+// Malformed JSON
+c.MustRegisterHTTP("GET", "https://api.example.com/malformed", http.CannedHTTPResponse{
+    StatusCode: 200,
+    Body:       `{"incomplete": "json"`,  // Missing closing brace
+})
+
+// Unexpected data structure
+c.MustRegisterHTTP("GET", "https://api.example.com/unexpected", http.CannedHTTPResponse{
+    StatusCode: 200,
+    Body:       `{"wrong": "schema", "missing": "expected_field"}`,
+})
+```
+
+### CLI Command Failures
+
+```go
+// Command exits with error
+c.MustRegisterCommand(`failing-command.*`, "Error: command failed\nexit status 1")
+
+// Empty output
+c.MustRegisterCommand(`empty-command.*`, "")
+
+// Malformed output
+c.MustRegisterCommand(`malformed-command.*`, "Not the expected format")
+```
+
+### Test Assertions for Failures
+
+```go
+// Verify capability handles errors gracefully
+func TestCapabilityHTTPError(t *testing.T) {
+    asset := model.NewAsset("test.com", "192.168.1.1")
+    job := model.NewJob("capability-name", &asset)
+
+    // Create mock with error response
+    mockHTTP := http.NewMockHTTPCollector()
+    mockHTTP.MustRegisterHTTP("GET", "https://api.example.com/data", http.CannedHTTPResponse{
+        StatusCode: 500,
+        Body:       `{"error": "server error"}`,
+    })
+
+    task := NewYourCapability(job, &asset, xyz.WithHTTPCollector(mockHTTP))
+    aws := mock.NewMockAWS("test@praetorian.com")
+
+    invoker := mock.NewInvoker(aws, task)
+    err := invoker.Invoke()
+
+    // Verify error is handled (not propagated as panic)
+    require.NoError(t, err)
+
+    // Verify no spurious graph items created
+    assertions.GraphSize(t, aws, 0)
 }
 ```
 

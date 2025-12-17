@@ -1,0 +1,22 @@
+# Changelog - test-infrastructure-discovery
+
+## [Date: 2025-12-16]
+
+### Changed
+- Added reference to **frontend-testing-patterns** skill in "Integration with Other Skills" section
+- Clarified that frontend-testing-patterns provides contract verification guidance for MSW handlers (verify real API contracts before mocking)
+
+### Reason
+- `mock-contract-validation` skill has been deprecated
+- Contract verification guidance now consolidated in `frontend-testing-patterns` skill
+- Ensure developers are directed to the correct skill for API contract verification when using MSW
+
+### Line Count
+- Before: 240 lines
+- After: 241 lines
+- Still within safe zone (<350 lines)
+
+### REFACTOR
+- Skipped: Change is purely cosmetic (reference update)
+- Criteria: <10 lines, no behavioral change, no rule modifications
+- No pressure testing needed for skill reference updates

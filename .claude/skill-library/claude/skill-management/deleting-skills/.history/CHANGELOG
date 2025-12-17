@@ -1,0 +1,33 @@
+# Changelog - deleting-skills
+
+## [Date: 2025-12-16] - Initial Creation
+
+### Created
+- Skill created via creating-skills workflow
+- RED failure documented: No systematic workflow for safe skill deletion (orphaned references, no impact analysis, no verification)
+- Category: claude/skill-management
+- Type: process/pattern
+- Line count: 443 lines (within safe zone)
+
+### Phases Implemented
+1. Validate - Verify skill exists
+2. Discover - Find all references (gateways, commands, skills)
+3. Analyze - Show impact to user
+4. Confirm - User approval before deletion
+5. Remove - Delete skill directory with safety checks
+6. Cleanup - Remove references systematically
+7. Verify - Ensure no orphaned references remain
+
+### Safety Features
+- Mandatory user confirmation before deletion
+- Path safety check (must contain `.claude/skill`)
+- Comprehensive reference discovery
+- Verification phase ensures no orphans
+- TodoWrite tracking for all phases
+
+### REFACTOR
+- Tests run: [Time pressure + exhaustion, Authority pressure + "already checked"]
+- Scenario 1: Agent chose full workflow despite exhaustion and time pressure (PASSED)
+- Scenario 2: Agent chose full workflow despite senior engineers saying "it's unused" (PASSED)
+- All tests: PASSED
+- Counter-rationalizations added: None needed (workflow structure prevents bypass)

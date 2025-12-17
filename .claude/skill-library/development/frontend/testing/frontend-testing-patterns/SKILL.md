@@ -42,127 +42,196 @@ export default defineConfig({
 
 **Detailed Configuration:** [Vitest Configuration Reference](references/vitest-configuration.md)
 
-### Test Setup File
+**Test Setup:** [Test Setup Configuration](references/test-setup.md) - Essential mocks for matchMedia, IntersectionObserver, etc.
 
-Essential mocks for Chariot UI testing (`src/test/setup.ts`):
+---
 
-```typescript
-import "@testing-library/jest-dom/vitest";
-import { cleanup } from "@testing-library/react";
-import { afterEach, vi } from "vitest";
+## Contract Verification (MANDATORY)
 
-afterEach(() => cleanup());
+**Before writing ANY MSW handler, verify the real API contract.**
 
-// Mock window.matchMedia (responsive components)
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-});
+Under time pressure, you'll guess. Guessing creates mocks that pass tests but don't match production.
 
-// Mock IntersectionObserver (virtualized lists)
-global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  takeRecords() { return []; }
-  unobserve() {}
-} as any;
+**Core principle:** 2 minutes verifying saves 2 hours debugging why production fails despite passing tests.
+
+### The 2-Minute Verification Protocol
+
+**STOP. Do NOT write handler code until you complete this:**
+
+```bash
+# Step 1: Find the real API hook implementation
+grep -r "useMy\|useEndpoint" src/hooks/
+
+# Step 2: Read the hook to see actual parameters
+cat src/hooks/useMy.ts | grep -A 10 "queryKey\|url"
+
+# Step 3: Find existing handlers (don't recreate)
+grep -r "http.get.*my" src/test/mocks/
 ```
 
-## Component Testing Patterns
-
-### Quick Example: Table Cell Component Test
+### Document What You Found
 
 ```typescript
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+/**
+ * Real API Contract (verified YYYY-MM-DD)
+ * Source: src/hooks/useMy.ts lines 45-52
+ *
+ * URL: /my
+ * Parameters: resource (NOT label, NOT type)
+ * Response: { count: number, [pluralizedResource]: T[] }
+ *
+ * Example: GET /my?resource=setting
+ * Returns: { count: 2, settings: [...] }
+ */
+```
 
-describe("CVSSCell", () => {
-  it("should render CVSS score when available", () => {
-    const risk: Partial<RiskWithVulnerability> = {
-      cvss: 9.8,
-      name: "Test Vulnerability",
-    };
+### Red Flags - STOP Immediately
 
-    render(<CVSSCell risk={risk as RiskWithVulnerability} />);
+If you're thinking ANY of these, you're about to create mock drift:
+- "Parameter is probably called X"
+- "Response structure seems like Y"
+- "I'll guess and fix if wrong"
+- "Don't have time to check the real API"
 
-    expect(screen.getByText("9.8")).toBeInTheDocument();
-  });
+**2 minutes verifying > 2 hours debugging mock-production mismatches.**
 
-  it("should render dash when CVSS is undefined", () => {
-    const risk: Partial<RiskWithVulnerability> = {
-      name: "Test Vulnerability",
-    };
+### After Verification, Then Mock
 
-    const { container } = render(<CVSSCell risk={risk as RiskWithVulnerability} />);
+```typescript
+// NOW write handler using VERIFIED contract
+http.get('*/my', ({ request }) => {
+  const url = new URL(request.url);
+  const resource = url.searchParams.get('resource'); // ✅ Verified parameter name
 
-    expect(container.textContent).toBe("-");
-  });
+  if (resource === 'setting') {
+    return HttpResponse.json({
+      count: 2,
+      settings: [mockSettings] // ✅ Verified pluralized key
+    });
+  }
+
+  return HttpResponse.json({ count: 0 }); // ✅ Match real API empty response
 });
 ```
+
+---
+
+## When NOT to Mock
+
+Mocking severs the real-world connection between what you're testing and what you're mocking. Every mock trades confidence for practicality.
+
+### Use Real Implementations When:
+- Behavior is completely deterministic
+- No setup involved
+- No performance hit
+- **Examples:** utility functions, date formatting, string manipulation, standard collections
+
+### Prefer MSW Over vi.mock() for Network Calls
+
+```typescript
+// ❌ AVOID: Mocking the module
+vi.mock('@/hooks/useAxios');
+(useAxios as Mock).mockReturnValue({ get: mockGet });
+
+// ✅ PREFER: MSW at network level
+http.get('/api/users', () => HttpResponse.json({ users: mockUsers }))
+```
+
+**Why MSW wins:**
+- Tests real request/response serialization
+- Catches Content-Type and header issues
+- Works regardless of HTTP client used
+- No coupling to internal implementation
+
+> "The classical TDD style is to use real objects if possible and a double if it's awkward to use the real thing." — Martin Fowler
+
+---
+
+## Anti-Patterns to Avoid
+
+### 1. The Mockery
+**Problem:** So many mocks that you test mocks, not code.
+
+```typescript
+// ❌ BAD: What are we even testing?
+vi.mock('@/hooks/useAuth');
+vi.mock('@/hooks/useData');
+vi.mock('@/hooks/usePermissions');
+vi.mock('@/components/Header');
+vi.mock('@/components/Footer');
+```
+
+**Warning:** As mock count grows, probability of testing mock instead of code increases.
+
+### 2. The Inspector
+**Problem:** Tests know too much about implementation, breaking on refactor.
+
+```typescript
+// ❌ BAD: Implementation details
+expect(mockFn).toHaveBeenCalledTimes(3);
+expect(wrapper.instance().state.counter).toBe(5);
+
+// ✅ GOOD: Behavior
+expect(screen.getByText('5 items')).toBeInTheDocument();
+```
+
+> "If your tests resemble the way your software is used, they won't fail when you refactor." — Kent C. Dodds
+
+### 3. Mock Drift
+**Problem:** Mocks diverge from production API over time.
+
+**Symptoms:** Tests pass, production fails. Mock returns `{data: [...]}` but API returns `{items: [...]}`
+
+**Prevention:** Always use Contract Verification protocol above.
+
+### 4. False Sense of Security
+**Problem:** Mocks increase coverage without increasing confidence.
+
+> "It's worse to have bad mocks than no mocks, because they give you a wrong feeling of confidence in your tests."
+
+**Ask:** Does this mock help catch real bugs, or just make tests pass?
+
+---
+
+## Test Doubles Terminology
+
+Per Martin Fowler, there are 5 types of test doubles:
+
+| Type | Purpose | Behavior Verification? |
+|------|---------|----------------------|
+| **Dummy** | Fill parameter lists, never used | No |
+| **Fake** | Working implementation with shortcuts (e.g., in-memory DB) | No |
+| **Stub** | Canned answers to calls | No |
+| **Spy** | Stub that records calls | Sometimes |
+| **Mock** | Pre-programmed expectations | Yes (always) |
+
+### What MSW Handlers Are
+MSW handlers are **Stubs** — they provide canned responses to network requests.
+
+### Key Insight
+Only true mocks verify behavior (e.g., `expect(mock).toHaveBeenCalledWith(x)`). If you're just returning canned data, you have a stub, not a mock. This distinction matters because:
+- Stubs: Test your code's handling of responses
+- Mocks: Test your code called dependencies correctly (couples to implementation)
+
+---
+
+## Component Testing
+
+**Quick Example:** [Examples Reference](references/examples.md)
 
 **Comprehensive Patterns:** [Component Testing Patterns](references/component-testing-patterns.md)
 
-### Integration Tests with User Interactions
+**Integration Tests:** [Common Scenarios](references/common-scenarios.md)
 
-```typescript
-import userEvent from "@testing-library/user-event";
+---
 
-it("should allow clicking preseed tab", async () => {
-  const user = userEvent.setup();
-  const mockOnTabChange = vi.fn();
+## Hook Testing
 
-  render(<SeedsHeader activeTab="domain" onTabChange={mockOnTabChange} />);
-
-  const preseedTab = screen.getByTestId("tab-preseed");
-  await user.click(preseedTab);
-
-  expect(mockOnTabChange).toHaveBeenCalledWith("preseed");
-});
-```
-
-## Hook Testing Patterns
-
-### Custom Hook with Mocked Dependencies
-
-```typescript
-import { renderHook } from "@testing-library/react";
-import { beforeEach, vi } from "vitest";
-
-vi.mock("./useSortableColumn");
-
-import { useSortableColumn } from "./useSortableColumn";
-
-describe("useSmartColumnPositioning", () => {
-  beforeEach(() => {
-    (useSortableColumn as ReturnType<typeof vi.fn>).mockReturnValue({
-      activeColumns: ["identifier", "name"],
-      setActiveColumns: vi.fn(),
-      columns: mockColumns,
-    });
-  });
-
-  it("should return columns and activeColumns", () => {
-    const { result } = renderHook(() =>
-      useSmartColumnPositioning({ key: "test", defaultColumns, defaultConfig })
-    );
-
-    expect(result.current.columns).toBeDefined();
-    expect(result.current.activeColumns).toEqual(["identifier", "name"]);
-  });
-});
-```
+**Custom Hook with Mocked Dependencies:** [Hook Testing Patterns](references/hook-testing-patterns.md)
 
 **React Query Integration:** [Hook Testing Patterns](references/hook-testing-patterns.md)
+
+---
 
 ## MSW (Mock Service Worker) for HTTP Mocking
 
@@ -203,255 +272,54 @@ export const server = setupServer(...handlers);
 
 **Complete MSW Guide:** [MSW Mocking Reference](references/msw-mocking.md)
 
+---
+
 ## Mocking Patterns
 
-### Pattern 1: Vitest Module Mocking
+**Module Mocking:** [Mocking Patterns](references/mocking-patterns.md)
 
-```typescript
-// Mock module BEFORE importing
-vi.mock("@/hooks/useAxios");
+**Component Mocking:** [Mocking Patterns](references/mocking-patterns.md)
 
-// Import mocked modules
-import { useAxios } from "@/hooks/useAxios";
+**Global State/Auth Mocking:** [Mocking Patterns](references/mocking-patterns.md)
 
-// Set mock implementation
-(useAxios as Mock).mockReturnValue({
-  get: mockAxiosGet,
-  post: mockAxiosPost,
-});
-
-// Mock specific function calls
-mockAxiosGet.mockResolvedValueOnce({ data: mockData });
-mockAxiosGet.mockRejectedValueOnce(new Error("API error"));
-```
-
-### Pattern 2: Component Mocking for Integration Tests
-
-```typescript
-vi.mock("@/components/Tabs", () => ({
-  default: ({ tabs, onSelect }: TabsProps) => (
-    <div data-testid="tabs-component">
-      {tabs.map((tab) => (
-        <button key={tab.value} onClick={() => onSelect(tab)}>
-          {tab.label}
-        </button>
-      ))}
-    </div>
-  ),
-}));
-```
+---
 
 ## Test Organization
 
-### File Naming Conventions
+**File Naming:** [Test Organization](references/test-organization.md)
 
-Tests live **alongside source files**:
+**Test Structure:** [Test Organization](references/test-organization.md)
 
-- Component tests: `ComponentName.test.tsx`
-- Hook tests: `useHookName.test.ts`
-- Utility tests: `utilityName.test.ts`
-- Integration tests: `FeatureName.integration.test.tsx`
+**Grouping Tests:** [Test Organization](references/test-organization.md)
 
-### Test Structure
+---
 
-```typescript
-describe("FeatureName", () => {
-  beforeEach(() => {
-    // Initialize mocks and state
-  });
+## Best Practices
 
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
+**Quick Reference:**
+- Use `Partial<Type>` for mock data
+- Use `data-testid` for E2E integration
+- Test user interactions with `@testing-library/user-event`
+- Include JSDoc comments
+- Test actual DOM, not component instantiation
+- Use descriptive test names
+- Group related tests
 
-  describe("Feature Group 1", () => {
-    it("should do something specific", () => {
-      // Arrange
-      const input = setupTestData();
+**Detailed Best Practices:** [Best Practices Reference](references/best-practices.md)
 
-      // Act
-      const result = performAction(input);
-
-      // Assert
-      expect(result).toBe(expected);
-    });
-  });
-
-  describe("edge cases", () => {
-    it("should handle boundary conditions", () => {
-      // Test edge cases
-    });
-  });
-});
-```
-
-## Best Practices for Chariot Platform
-
-### 1. Use Partial<Type> for Mock Data
-
-```typescript
-// ✅ GOOD: Use Partial for mock data
-const mockRisk: Partial<RiskWithVulnerability> = {
-  cvss: 9.8,
-  name: "Test Vulnerability",
-};
-
-// ❌ BAD: Creating full objects with all required fields
-const mockRisk: RiskWithVulnerability = {
-  // ... 50+ required fields
-};
-```
-
-### 2. Use data-testid for E2E Integration
-
-```typescript
-// Component
-<button data-testid="preseed-tab">Preseed</button>
-
-// Test
-const preseedTab = screen.getByTestId("preseed-tab");
-expect(preseedTab).toBeInTheDocument();
-```
-
-### 3. Test User Interactions with @testing-library/user-event
-
-```typescript
-import userEvent from "@testing-library/user-event";
-
-it("should handle user interactions", async () => {
-  const user = userEvent.setup();
-  render(<Component />);
-
-  await user.click(screen.getByRole("button"));
-  await user.type(screen.getByRole("textbox"), "test input");
-});
-```
-
-### 4. Include JSDoc Comments
-
-```typescript
-/**
- * Component Name - Integration Tests
- *
- * These tests verify actual component rendering and behavior,
- * NOT just that components render without crashing.
- *
- * Related: CHARIOT-1566 - Feature description
- */
-```
-
-### 5. Test Actual DOM, Not Component Instantiation
-
-```typescript
-// ✅ GOOD: Verify actual DOM content
-const preseedTab = screen.getByTestId("tab-preseed");
-expect(preseedTab).toBeInTheDocument();
-expect(preseedTab).not.toBeDisabled();
-
-// ❌ BAD: Just checking render doesn't throw
-render(<SeedsHeader />);
-// No assertions - doesn't verify behavior!
-```
-
-### 6. Descriptive Test Names
-
-```typescript
-// ✅ GOOD: Clear, behavior-focused names
-it("should render preseed tab in actual DOM for non-Praetorian users", () => {});
-it("should display preseed count with thousands separator", () => {});
-
-// ❌ BAD: Vague test names
-it("works", () => {});
-it("test preseed", () => {});
-```
-
-### 7. Group Related Tests
-
-```typescript
-describe("Component", () => {
-  describe("rendering", () => { /* rendering tests */ });
-  describe("user interactions", () => { /* interaction tests */ });
-  describe("loading states", () => { /* loading tests */ });
-  describe("edge cases", () => { /* edge case tests */ });
-});
-```
+---
 
 ## Running Tests
 
-### Commands
+**Commands:** [Running Tests](references/running-tests.md)
 
-```bash
-# Run all tests in watch mode
-npm test
-
-# Run tests once
-npm run test:run
-
-# Run with coverage
-npm run test:coverage
-
-# Run with UI dashboard
-npm run test:ui
-
-# Run specific test file
-npm test -- path/to/file.test.tsx
-
-# Run tests matching pattern
-npm test -- --grep "preseed"
-```
-
-### Coverage Requirements
-
+**Coverage Requirements:**
 - **Configuration**: 100% coverage for config files
 - **Hooks**: 80%+ coverage for custom hooks
 - **Components**: Focus on integration tests
 - **Utilities**: Comprehensive unit tests with edge cases
 
-## Common Testing Scenarios
-
-### Testing Async Operations
-
-```typescript
-it("should fetch data successfully", async () => {
-  mockAxiosGet.mockResolvedValueOnce({ data: mockData });
-
-  const { result } = renderHook(() => useCustomHook(), { wrapper });
-
-  await waitFor(() => {
-    expect(result.current.status).toBe("success");
-  });
-
-  expect(result.current.data).toEqual(mockData);
-});
-```
-
-### Testing Error States
-
-```typescript
-it("should handle API errors gracefully", async () => {
-  mockAxiosGet.mockRejectedValueOnce({
-    response: { status: 500 },
-    message: "Network error",
-  });
-
-  const { result } = renderHook(() => useCustomHook(), { wrapper });
-
-  await waitFor(() => {
-    expect(result.current.status).toBe("error");
-  });
-});
-```
-
-### Testing Loading States
-
-```typescript
-it("should show loading state initially", () => {
-  const { result } = renderHook(() => useCustomHook());
-
-  expect(result.current.status).toBe("pending");
-  expect(result.current.isLoading).toBe(true);
-});
-```
+---
 
 ## Key Dependencies
 
@@ -466,87 +334,13 @@ it("should show loading state initially", () => {
 }
 ```
 
+---
+
 ## Troubleshooting
 
-### Issue: Tests Fail with "IntersectionObserver is not defined"
+**Common Issues:** [Troubleshooting Guide](references/troubleshooting.md)
 
-**Solution**: Ensure `src/test/setup.ts` includes IntersectionObserver mock (see Test Setup section)
-
-### Issue: Tests Fail with "matchMedia is not defined"
-
-**Solution**: Ensure `src/test/setup.ts` includes matchMedia mock (see Test Setup section)
-
-### Issue: Async Tests Timing Out
-
-**Solution**: Increase timeout or use `waitFor` with proper conditions:
-
-```typescript
-await waitFor(
-  () => {
-    expect(result.current.status).toBe("success");
-  },
-  { timeout: 5000 }
-);
-```
-
-### Issue: Mock Not Working
-
-**Solution**: Ensure mock is defined BEFORE import:
-
-```typescript
-// ✅ GOOD: Mock before import
-vi.mock("@/hooks/useAxios");
-import { useAxios } from "@/hooks/useAxios";
-
-// ❌ BAD: Import before mock
-import { useAxios } from "@/hooks/useAxios";
-vi.mock("@/hooks/useAxios"); // Too late!
-```
-
-## Chariot-Specific Considerations
-
-### Security-Critical Components
-
-When testing security-critical UI components:
-
-- Test all user input validation
-- Verify XSS prevention
-- Test authentication flows
-- Verify authorization checks
-- Test error handling and error messages
-
-### Data Attributes for E2E Tests
-
-Always add `data-testid` attributes for E2E test integration:
-
-```typescript
-<button data-testid="approve-seed-button">Approve</button>
-```
-
-### Testing with Global State
-
-```typescript
-// Mock global state when needed
-vi.mock("@/state/global.state", () => ({
-  useGlobalState: () => ({
-    drawerState: mockDrawerState,
-    setDrawerState: mockSetDrawerState,
-  }),
-}));
-```
-
-### Testing with Authentication
-
-```typescript
-// Mock auth context
-vi.mock("@/state/auth", () => ({
-  useAuth: () => ({
-    user: mockUser,
-    isPraetorianUser: true,
-    logout: vi.fn(),
-  }),
-}));
-```
+---
 
 ## Resources
 

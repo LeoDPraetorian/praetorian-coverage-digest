@@ -1,6 +1,6 @@
 ---
 name: skill-manager
-description: Use when creating, updating, auditing, fixing, renaming, migrating, searching, or listing skills - unified lifecycle management with TDD enforcement, 16-phase compliance validation, and progressive disclosure. Searches both core (.claude/skills) and library (.claude/skill-library) locations.
+description: Use when creating, updating, deleting, auditing, fixing, renaming, migrating, searching, or listing skills - unified lifecycle management with TDD enforcement, 16-phase compliance validation, and progressive disclosure. Searches both core (.claude/skills) and library (.claude/skill-library) locations.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, Skill, AskUserQuestion
 ---
 
@@ -14,6 +14,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, Skill, AskU
 |-----------|--------------|--------------|------|
 | **Create** | `creating-skills` | Instruction-based | 15-30 min |
 | **Update** | `updating-skills` | `updating-skills/scripts` | 10-20 min |
+| **Delete** | `deleting-skills` | Instruction-based | 10-15 min |
 | **Audit** | `auditing-skills` | `auditing-skills/scripts` | 2-5 min |
 | **Fix** | `fixing-skills` | `fixing-skills/scripts` | 5-15 min |
 | **Search** | `searching-skills` | `auditing-skills/scripts` | 1-2 min |
@@ -62,6 +63,7 @@ npm run update -- <skill-name>
 |-------------------|----------------|----------------|
 | "create a skill" | `creating-skills` | Instruction-based workflow |
 | "update X skill" | `updating-skills` | CLI in `updating-skills/scripts` |
+| "delete X skill" | `deleting-skills` | Instruction-based workflow |
 | "audit X skill" | `auditing-skills` | CLI in `auditing-skills/scripts` |
 | "fix X skill" | `fixing-skills` | CLI in `fixing-skills/scripts` |
 | "search for skills" | `searching-skills` | Instruction-based (uses auditing-skills CLI) |
@@ -171,6 +173,31 @@ npm run update -- tanstack-query-skill --refresh-context7 --context7-data /tmp/n
 **🚨 CRITICAL:** If audit shows word count warning (>500 lines), you MUST restructure with progressive disclosure before continuing. See Step 7 in update-workflow.md.
 
 **See:** [references/update-workflow.md](references/update-workflow.md)
+
+### Delete (Safe Skill Deletion)
+
+**Instruction-based operation. Delegates to `deleting-skills`.**
+
+Safely removes skills with comprehensive reference cleanup using Claude's native tools.
+
+**7-Phase Protocol:**
+
+1. **Validate** - Verify skill exists (core or library)
+2. **Discover** - Find all references (gateways, commands, other skills)
+3. **Analyze** - Show impact to user
+4. **Confirm** - Get explicit user approval before deletion
+5. **Remove** - Delete skill directory (with path safety check)
+6. **Cleanup** - Remove all references systematically
+7. **Verify** - Ensure no orphaned references remain
+
+**Safety features:**
+
+- Mandatory user confirmation before deletion
+- Path safety check (must contain `.claude/skill`)
+- Comprehensive reference discovery (gateways, commands, skills)
+- Verification phase ensures no orphans
+
+**See:** `.claude/skill-library/claude/skill-management/deleting-skills/SKILL.md`
 
 ### Audit (16-Phase Structural + Semantic Review)
 
@@ -415,6 +442,7 @@ This skill consolidates:
 ## Related Skills
 
 - **creating-skills** - Instruction-driven skill creation workflow (location, type, templates)
+- **deleting-skills** - Safe skill deletion with reference cleanup and verification
 - **researching-skills** - Interactive research orchestrator for skill creation (source selection, Context7, web research)
 - **testing-skills-with-subagents** - For meta-testing skills with pressure scenarios
 - **using-skills** - Navigator/librarian for skill discovery
