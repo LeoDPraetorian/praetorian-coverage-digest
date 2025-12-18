@@ -1,6 +1,6 @@
 ---
 name: testing-anti-patterns
-description: Use when writing or changing tests, adding mocks, or tempted to add test-only methods to production code - prevents testing mock behavior, production pollution with test-only methods, and mocking without understanding dependencies
+description: Use when writing or changing tests, adding mocks, or tempted to add test-only methods to production code - prevents testing mock behavior, production pollution with test-only methods, mocking without understanding dependencies, and guessing API contracts when writing MSW handlers
 allowed-tools: 'Read, Bash, Grep, Glob'
 ---
 
@@ -20,6 +20,7 @@ Tests must verify real behavior, not mock behavior. Mocks are a means to isolate
 1. NEVER test mock behavior
 2. NEVER add test-only methods to production classes
 3. NEVER mock without understanding dependencies
+4. NEVER write MSW handlers without verifying the real API contract first
 ```
 
 ## Anti-Pattern 1: Testing Mock Behavior
@@ -252,6 +253,108 @@ TDD cycle:
 4. THEN claim complete
 ```
 
+## Anti-Pattern 6: Guessing API Contracts
+
+**The violation:**
+```typescript
+// ❌ BAD: Writing MSW handler without verifying real API
+http.get('*/my', ({ request }) => {
+  const url = new URL(request.url);
+  const label = url.searchParams.get('label');  // Guessed parameter name!
+
+  return HttpResponse.json({
+    data: [mockData]  // Guessed response structure!
+  });
+});
+```
+
+**Why this is wrong:**
+- **Guessed parameter name** - Real API uses `resource`, not `label`
+- **Guessed response structure** - Real API returns `{count, settings: [...]}`, not `{data: [...]}`
+- **Tests pass with wrong mock** - Production fails despite passing tests
+- **Mock-reality divergence** - Undetected until production
+
+**The Iron Law:** **NO HANDLER CODE WITHOUT CONTRACT VERIFICATION FIRST**
+
+### The Contract-First Protocol
+
+**MANDATORY 2-minute check BEFORE writing any handler code:**
+
+```bash
+# Step 1: Find the real API hook implementation
+grep -r "useMy\|useEndpoint" src/hooks/
+
+# Step 2: Read the hook to see actual parameters
+cat src/hooks/useMy.ts | grep -A 10 "queryKey\|url"
+
+# Step 3: Find existing handlers (don't recreate)
+grep -r "http.get.*my" src/test/mocks/
+```
+
+**Document what you verified:**
+```typescript
+/**
+ * Real API Contract (verified 2025-12-17)
+ * Source: src/hooks/useMy.ts lines 45-52
+ *
+ * URL: /my
+ * Parameters: resource (NOT label, NOT type)
+ * Response: { count: number, [pluralizedResource]: T[] }
+ *
+ * Example: GET /my?resource=setting
+ * Returns: { count: 2, settings: [...] }
+ */
+http.get('*/my', ({ request }) => {
+  const url = new URL(request.url);
+  const resource = url.searchParams.get('resource'); // ✅ Verified
+
+  if (resource === 'setting') {
+    return HttpResponse.json({
+      count: 2,
+      settings: [mockSettings] // ✅ Verified pluralized key
+    });
+  }
+
+  return HttpResponse.json({ count: 0 }); // ✅ Match real API
+});
+```
+
+### Gate Function
+
+```
+BEFORE writing any MSW handler code:
+  STOP - Do NOT write handler yet
+
+  Ask: "Do I KNOW the contract or am I GUESSING?"
+
+  IF guessing ANY of these:
+    - Parameter names
+    - URL path
+    - Response structure
+    - Header names
+
+  THEN:
+    1. Run 2-minute verification protocol
+    2. Document verified contract in comment
+    3. THEN write handler using verified details
+
+  Red flags you're guessing:
+    - "Parameter is probably called X"
+    - "Don't have time to check the real API"
+    - "I'll guess and fix if wrong"
+    - "Response structure seems reasonable"
+    - "Just need tests passing quickly"
+
+  ALL red flags mean: STOP, verify first
+
+  Time pressure response:
+    "2 minutes verifying saves 2 hours debugging"
+```
+
+**Why verification is the fast path:**
+- Guessing: 2 min now, 2 hours debugging later
+- Verifying: 2 min now, 5 min implementation, done
+
 ## When Mocks Become Too Complex
 
 **Warning signs:**
@@ -283,6 +386,7 @@ TDD cycle:
 | Mock without understanding | Understand dependencies first, mock minimally |
 | Incomplete mocks | Mirror real API completely |
 | Tests as afterthought | TDD - tests first |
+| Guessing API contracts | Verify contract BEFORE writing handler (2 min check) |
 | Over-complex mocks | Consider integration tests |
 
 ## Red Flags
@@ -293,6 +397,10 @@ TDD cycle:
 - Test fails when you remove mock
 - Can't explain why mock is needed
 - Mocking "just to be safe"
+- Writing MSW handler without verifying real API contract
+- Thinking "parameter is probably called X"
+- "Don't have time to check" when writing mocks
+- "I'll guess and fix if wrong" for API details
 
 ## The Bottom Line
 

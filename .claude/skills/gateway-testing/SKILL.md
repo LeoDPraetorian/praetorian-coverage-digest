@@ -56,8 +56,8 @@ Each skill is organized by domain for easy discovery.
 **Mock Chariot Task**: `.claude/skill-library/testing/mock-chariot-task/SKILL.md`
 - Mocking Chariot-specific tasks and operations
 
-**Mock Contract Validation**: `.claude/skill-library/testing/mock-contract-validation/SKILL.md`
-- Contract testing and mock validation patterns
+**Testing Anti-Patterns**: `.claude/skill-library/testing/testing-anti-patterns/SKILL.md`
+- Testing anti-patterns including mock behavior testing, test-only methods, incomplete mocks, and API contract validation (see Anti-Pattern 6)
 
 ## Performance & Load Testing
 
@@ -74,7 +74,7 @@ Each skill is organized by domain for easy discovery.
 | Test organization | acceptance-test-suite |
 | Behavior-focused tests | behavior-vs-implementation-testing |
 | Async/wait patterns | condition-based-waiting |
-| Mocking strategies | mock-contract-validation |
+| Mocking strategies | testing-anti-patterns |
 | Performance tests | performance-testing |
 | Code complexity metrics | analyzing-cyclomatic-complexity |
 

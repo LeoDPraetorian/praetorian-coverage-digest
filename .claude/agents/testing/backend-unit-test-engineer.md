@@ -174,6 +174,72 @@ Fix: Fix counter initialization to 0, not change assertion"
 
 ---
 
+## MANDATORY: Testing Anti-Patterns
+
+**When writing or changing tests:**
+
+Use testing-anti-patterns skill (via gateway-testing) for complete anti-pattern guidance.
+
+**Critical for backend unit tests:**
+- **Iron Law 1**: NEVER test mock behavior (test real function/handler outcomes)
+- **Iron Law 2**: NEVER add test-only methods to production classes
+- **Iron Law 3**: NEVER mock without understanding dependencies
+- **Gate Question**: Before asserting on mocks: "Am I testing real behavior or just mock existence?"
+
+**Example - testing anti-patterns:**
+
+```go
+// ❌ WRONG: Test mock behavior
+mockDB.AssertCalled(t, "Save", mock.Anything) // Only verifies mock called!
+
+// ✅ CORRECT: Test real behavior (user sees result)
+resp, err := handler.CreateAsset(req)
+assert.NoError(t, err)
+assert.Equal(t, "created", resp.Status)
+mockDB.AssertCalled(t, "Save", mock.Anything) // PLUS outcome verification
+```
+
+**Red flag**: Asserting on mocks without verifying user-visible outcome = STOP and use testing-anti-patterns skill
+
+**REQUIRED SKILL:** Use testing-anti-patterns (via gateway-testing) to avoid testing mock behavior, test-only methods, incomplete mocks
+
+---
+
+## MANDATORY: Chariot Mock Collectors
+
+**When testing Chariot capabilities with CLI/HTTP/DNS calls:**
+
+Use mock-chariot-task skill (via gateway-testing) for collector pattern implementation.
+
+**Critical for Chariot capability testing:**
+- **Pattern**: Use collector pattern (NOT generic Go mocking with testify/mock)
+- **Three files**: `capability.go` (MockCollectors method), `capability_mock.go` (constructors), `*_test.go` (tests)
+- **Collectors**: CLI (MustRegisterCommand), HTTP (MustRegisterHTTP), DNS (MustRegisterResolve)
+- **Deterministic**: Canned responses for reproducible tests
+
+**Example - Chariot mock collector:**
+
+```go
+// ❌ WRONG: Generic Go mocking
+mockCLI := new(MockCLI)
+mockCLI.On("Run", "nmap", mock.Anything).Return("output", nil)
+
+// ✅ CORRECT: Chariot collector pattern
+func NewMockNucleiCLICollector(target *model.Port) cli.CLICollector {
+    c := cli.NewMockCLICollector()
+    c.MustRegisterCommand(`nuclei -target .*`, generateNucleiOutput(target))
+    return c
+}
+
+task := NewMockNucleiCapability(job, &port) // Uses collector
+```
+
+**Red flag**: Using testify/mock for CLI/HTTP/DNS instead of collectors = STOP and use mock-chariot-task skill
+
+**REQUIRED SKILL:** Use mock-chariot-task (via gateway-testing) for Chariot collector pattern implementation
+
+---
+
 Your core responsibilities:
 
 **Testing Strategy & Architecture:**

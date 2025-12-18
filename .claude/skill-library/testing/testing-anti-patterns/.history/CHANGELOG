@@ -1,0 +1,44 @@
+# Testing Anti-Patterns Changelog
+
+## [Date: 2025-12-17]
+
+### Changed
+- Added Anti-Pattern 6: Guessing API Contracts
+- Incorporated content from `.claude/skill-library/testing/mock-contract-validation/SKILL.md`
+- Added Contract-First Protocol requiring 2-minute verification before writing MSW handlers
+- Added iron law #4: "NEVER write MSW handlers without verifying the real API contract first"
+- Updated Quick Reference table to include new anti-pattern
+- Added red flags for contract guessing behavior
+
+### Reason
+- Agents were writing MSW handlers without verifying real API contracts, causing mock-reality divergence
+- Tests passed with incorrect mocks while production failed
+- Consolidating related anti-patterns into single skill for better discoverability
+- The mock-contract-validation skill content is now fully incorporated here
+
+### Content Added
+1. Violation pattern showing guessed parameter names and response structures
+2. Contract-First Protocol with mandatory 2-minute verification steps
+3. Gate function matching existing anti-pattern format
+4. Documentation requirement for verified contracts
+5. Red flags like "parameter is probably called X" and "I'll guess and fix if wrong"
+6. Time-pressure response: "2 minutes verifying saves 2 hours debugging"
+
+### Impact
+- Skill grew from 303 lines to 411 lines (well within 450 line safe zone)
+- Backup created: `.local/2025-12-17-09-54-43-testing-anti-patterns.bak`
+- All 6 anti-patterns now documented in single location
+
+### REFACTOR
+- Test approach: Content validation (new anti-pattern follows established pattern)
+- Verification: Gate function matches existing format (STOP → Ask → IF/THEN → Red flags)
+- Consistency check: Iron law added, Quick Reference updated, Red Flags updated
+- Pattern compliance: Anti-Pattern 6 structure mirrors Anti-Patterns 1-5
+- Source validation: Content directly from tested mock-contract-validation skill
+- Status: PASSED - Maintains skill consistency and completeness
+
+### Notes
+- Full pressure testing skipped (incremental addition to existing tested skill)
+- Contract-First Protocol content previously validated in mock-contract-validation skill
+- Integration verified: All cross-references (Iron Laws, Quick Reference, Red Flags) updated
+- Ready for agent use

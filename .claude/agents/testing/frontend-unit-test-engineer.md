@@ -4,7 +4,7 @@ description: Use when creating, optimizing, or migrating frontend unit test suit
 type: testing
 permissionMode: default
 tools: Bash, Glob, Grep, Read, TodoWrite, Write
-skills: calibrating-time-estimates, debugging-systematically, developing-with-tdd, gateway-frontend, gateway-testing, verifying-before-completion
+skills: calibrating-time-estimates, debugging-systematically, developing-with-tdd, gateway-frontend, gateway-testing, testing-anti-patterns, verifying-before-completion
 model: sonnet
 color: pink
 ---
@@ -25,6 +25,7 @@ Before starting ANY testing task:
 - `developing-with-tdd` - Use before writing tests (test-first methodology, RED-GREEN-REFACTOR)
 - `gateway-frontend` - Use when testing React/TypeScript components (access to React 19 patterns, state management)
 - `gateway-testing` - Use when implementing test patterns (access to testing strategies, anti-patterns, mocking)
+- `testing-anti-patterns` - Use when writing any tests to avoid common pitfalls (testing mocks, test-only methods, incomplete mocks, mocking without understanding)
 - `verifying-before-completion` - Use before claiming tests pass (run tests, show output, evidence required)
 
 Common rationalizations to avoid:
@@ -34,6 +35,7 @@ Common rationalizations to avoid:
 - "I remember the skill's content" → NO. Skills evolve. Read current version.
 - "This doesn't count as [skill trigger]" → NO. When in doubt, use the skill.
 - "No time to follow TDD" → NO. Use calibrating-time-estimates to verify time constraint is real.
+- "Just need to assert the mock exists" → NO. Use testing-anti-patterns to test real behavior.
 
 If you skip mandatory skill invocation, your work will fail validation.
 </EXTREMELY_IMPORTANT>

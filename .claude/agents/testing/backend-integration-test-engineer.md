@@ -220,7 +220,7 @@ Your core responsibilities:
 
 **Test Implementation Strategy:**
 
-**🚨 MANDATORY: Use mock-contract-validation skill before creating ANY API mocks**
+**🚨 MANDATORY: Use testing-anti-patterns skill (Anti-Pattern 6: Guessing API Contracts) before creating ANY API mocks**
 
 **Before creating mock services or test stubs:**
 1. ✅ Verify the real API contract (read API documentation, check actual requests/responses)
@@ -380,7 +380,7 @@ modules/chariot/backend/pkg/
 | Task | Skill to Read |
 |------|---------------|
 | API Testing | `.claude/skill-library/testing/api-testing-patterns/SKILL.md` |
-| Mock & Contract Validation | `.claude/skill-library/testing/mock-contract-validation/SKILL.md` |
+| Testing Anti-Patterns (API Contract Validation) | `.claude/skill-library/testing/testing-anti-patterns/SKILL.md` |
 | Behavior vs Implementation | `.claude/skill-library/testing/behavior-vs-implementation-testing/SKILL.md` |
 | Acceptance Testing | `.claude/skill-library/testing/acceptance-test-suite/SKILL.md` |
 | CLI Testing | `.claude/skill-library/testing/cli-testing-patterns/SKILL.md` |

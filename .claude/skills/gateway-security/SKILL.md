@@ -42,6 +42,20 @@ Each skill is organized by domain for easy discovery.
 **Defense in Depth**: `.claude/skill-library/security/defense-in-depth/SKILL.md`
 - Layered security, principle of least privilege, attack surface reduction, zero trust
 
+## Threat Modeling
+
+**Codebase Mapping** (Phase 1): `.claude/skill-library/security/codebase-mapping/SKILL.md`
+- Systematic codebase analysis for threat modeling, identifies architecture, components, data flows, entry points, trust boundaries
+
+**Security Controls Mapping** (Phase 2): `.claude/skill-library/security/security-controls-mapping/SKILL.md`
+- Maps security controls to STRIDE categories, identifies authentication, authorization, validation, cryptography, logging controls and gaps
+
+**Threat Modeling** (Phase 3): `.claude/skill-library/security/threat-modeling/SKILL.md`
+- Combines STRIDE, PASTA, and DFD principles to identify threats, generate abuse cases, create attack trees, and produce risk-scored threat intelligence
+
+**Security Test Planning** (Phase 4): `.claude/skill-library/security/security-test-planning/SKILL.md`
+- Converts threat models into prioritized code review targets, SAST/DAST/SCA recommendations, and threat-driven manual test cases
+
 ## Quick Reference
 
 | Need | Read This Skill |
@@ -52,6 +66,10 @@ Each skill is organized by domain for easy discovery.
 | Finding hardcoded creds | secret-scanner |
 | Encryption/hashing | discover-cryptography |
 | Security architecture | defense-in-depth |
+| Threat modeling Phase 1 (architecture) | codebase-mapping |
+| Threat modeling Phase 2 (controls) | security-controls-mapping |
+| Threat modeling Phase 3 (threats) | threat-modeling |
+| Threat modeling Phase 4 (test plan) | security-test-planning |
 
 ## When to Use This Gateway
 
@@ -61,6 +79,7 @@ Use this gateway skill when:
 - Adding encryption or cryptographic operations
 - Reviewing code for security vulnerabilities
 - Designing security architecture
+- Performing threat modeling on codebases
 
 For specific implementations, always load the individual skill rather than working from this gateway alone.
 
@@ -68,11 +87,15 @@ For specific implementations, always load the individual skill rather than worki
 
 When doing security work, consider this sequence:
 
-1. **Architecture**: Start with `defense-in-depth` for design principles
-2. **Auth**: Use `auth-implementation-patterns` for identity management
-3. **Secrets**: Apply `secrets-management` for credential handling
-4. **Validation**: Run `authorization-testing` to verify controls
-5. **Scan**: Use `secret-scanner` before committing code
+1. **Threat Model Phase 1**: Start with `codebase-mapping` to understand attack surface
+2. **Threat Model Phase 2**: Use `security-controls-mapping` to identify existing controls and gaps
+3. **Threat Model Phase 3**: Use `threat-modeling` to identify threats and abuse cases
+4. **Threat Model Phase 4**: Use `security-test-planning` to generate prioritized test plans
+5. **Architecture**: Use `defense-in-depth` for design principles
+6. **Auth**: Use `auth-implementation-patterns` for identity management
+7. **Secrets**: Apply `secrets-management` for credential handling
+8. **Validation**: Run `authorization-testing` to verify controls
+9. **Scan**: Use `secret-scanner` before committing code
 
 ## Related Gateways
 

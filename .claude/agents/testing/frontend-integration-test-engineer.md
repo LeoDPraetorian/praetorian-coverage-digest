@@ -26,6 +26,7 @@ Before starting ANY integration testing task:
 - `gateway-frontend` - Use when testing React/TypeScript components (access to React 19 patterns, TanStack Query)
 - `gateway-integrations` - Use when testing API integrations (access to integration patterns, API research)
 - `gateway-testing` - Use when implementing test patterns (access to MSW patterns, testing strategies, anti-patterns)
+- `testing-anti-patterns` - Use when writing any tests to avoid common pitfalls (implementation details, brittle selectors, test pollution)
 - `verifying-before-completion` - Use before claiming tests pass (run tests, show output, evidence required)
 
 Common rationalizations to avoid:
@@ -92,7 +93,7 @@ Starting with timer to validate calibration"
 
 ## MANDATORY: Mock Contract Validation
 
-**REQUIRED SKILL:** Use `mock-contract-validation` skill for API contract verification protocol.
+**REQUIRED SKILL:** Use `testing-anti-patterns` skill (Anti-Pattern 6: Guessing API Contracts) for API contract verification protocol.
 
 **Critical**: Verify the real API contract FIRST (grep hook implementation, read actual parameters) before creating MSW handlers. 2 minutes of verification prevents 2 hours of debugging.
 
@@ -223,7 +224,7 @@ Return results as structured JSON:
 **Must use before testing:**
 - **test-infrastructure-discovery**: Before writing any test code, discover existing infrastructure
 - **integration-first-testing**: Before planning tests for multi-component features, use integration-first hierarchy (workflows before components)
-- **mock-contract-validation**: Before writing ANY MSW handler code, verify the real API contract (MANDATORY - no exceptions for time pressure)
+- **testing-anti-patterns** (Anti-Pattern 6): Before writing ANY MSW handler code, verify the real API contract (MANDATORY - no exceptions for time pressure)
 - **react-testing**: Comprehensive MSW and React Testing Library patterns
 - **testing-anti-patterns**: What to avoid in React tests
 

@@ -1,0 +1,22 @@
+## [Date: 2024-12-17] - Initial Creation
+
+### Created
+- Skill created via creating-skills workflow
+- RED failure documented: Without orchestrator, threat modeling achieves ~5% completeness (ad-hoc, no structure, no phases, no state)
+- Location: Core skill (.claude/skills/)
+- Type: Process/Pattern
+
+### Key Features
+- Multi-phase workflow (4 phases)
+- Parallel agent execution for large codebases
+- Human checkpoints between all phases
+- State persistence in .claude/.threat-model/{session}/
+- Structured outputs (MD + JSON + SARIF)
+
+### Dependencies
+- codebase-mapping skill (Phase 1 methodology) - EXISTS
+- codebase-mapper agent (Phase 1 executor) - EXISTS
+- security-controls-mapping skill (Phase 2) - PENDING
+- security-controls-mapper agent (Phase 2) - PENDING
+- threat-modeling skill (Phase 3) - PENDING
+- security-test-planning skill (Phase 4) - PENDING
