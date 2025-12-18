@@ -60,3 +60,77 @@
 - Line count: 284 lines (safe zone, under 500 limit)
 - Audit: Ready for final validation
 - Pressure tests: 3/3 PASSED (bulletproof after hardening)
+
+---
+
+## [Date: 2024-12-18] - Phase 0 Business Context Integration
+
+### Changed
+- **Added Phase 0 Context section** (lines 186-228)
+  - Documents business-impact.json, compliance-requirements.json, data-classification.json requirements
+  - Enhanced test priority calculation: Base Risk + Compliance Weight (+3) + Crown Jewel Weight (+2)
+  - Added compliance validation test generation guidance
+  - Example shows Priority 14 = Base 9 + Compliance +3 + Crown Jewel +2
+
+- **Updated Priority Mapping** (lines 154-171)
+  - Changed from simple "Risk 9-12 = P0" to business risk-based calculation
+  - New priority levels: Critical (15+), High (10-14), Medium (5-9), Low (1-4)
+  - Added reference to detailed Phase 0 Context section
+
+- **Added business_context Schema Requirement** (lines 302-321)
+  - MUST include business_context section in test-priorities.json
+  - Schema includes: base_risk_score, targets_crown_jewel, compliance_required, business_impact_if_fails
+  - Example shows $365M breach cost + $100K monthly fines
+
+- **Updated Related Skills** (line 353)
+  - Added business-context-discovery as Phase 0 methodology (marked NEW)
+
+### Reason
+- **RED failure**: security-test-planning used generic test prioritization without business context from Phase 0, producing tests prioritized by technical severity rather than actual business risk
+- **Business impact**: Cannot answer "Why test this first?" with actual financial data ($365M breach vs generic "critical")
+- **Test prioritization**: Compliance tests (PCI-DSS 3.4) and crown jewel tests (payment_card_data) should score higher than generic OWASP tests
+- **Justification**: Test budgets need business justification - "prevents $365M breach" is more actionable than "fixes SQL injection"
+
+### TDD Workflow
+
+**🔴 RED Phase**:
+- Current failure documented: No Phase 0 integration, generic test priorities, no compliance weight
+- Gap identified in threat-model-business-integration.md Task 5
+
+**🟢 GREEN Phase**: ✅ COMPLETE
+- All 5 Phase 0 integration points verified present
+- Enhanced priority calculation working (Base + Compliance + Crown Jewel)
+- business_context schema requirement documented
+- Compliance validation tests guidance added
+
+**🔵 REFACTOR Phase**: ✅ COMPLETE
+
+**Hardening Applied** (lines 237-241):
+- Added "No exceptions" with 4 explicit counters
+- Don't skip compliance/crown jewel weighting under time pressure
+- Don't estimate business impact yourself - load Phase 0 data
+- Don't omit business_context from test-priorities.json
+- Base risk scores from Phase 3 already include Phase 0 data - use them directly
+
+**Rationale for Minimal Hardening**:
+- Skill already has extensive hardening (EXTREMELY_IMPORTANT section, 127 lines)
+- Core 7-file schema requirement unchanged (strong existing protection)
+- Phase 0 changes are additive (enhance priority calculation, don't change interface)
+- Added minimal counters to prevent skipping business risk calculation
+
+**Predicted Pressure Test Results**:
+- Time pressure rationalization: "Skip Phase 0 weighting to meet deadline" → Countered by "No exceptions" + existing time reality section (30 min for AI)
+- Estimation rationalization: "I can estimate business impact" → Countered by explicit "load Phase 0 data"
+- Optional field rationalization: "business_context is extra" → Countered by "MUST include" in Critical Rules
+
+### Files Modified
+- SKILL.md: 284 → 363 lines (+79 lines total: +73 integration, +6 hardening; under 500 hard limit ✅)
+- .history/CHANGELOG.md: Updated (this entry)
+- Backup: .local/2025-12-18-14-42-30-security-test-planning.bak
+
+### Impact
+- Enables business-driven test prioritization using actual financial impact from Phase 0
+- Compliance tests (PCI-DSS, HIPAA, SOC2) automatically generated with regulatory impact
+- Crown jewel tests (+2 bonus) focus on high-value assets (payment_card_data)
+- Test priorities justified with actual cost ($365M breach + $100K/month fines vs "high priority")
+- Completes Task 5 of threat-model-business-integration.md (final phase skill integration)

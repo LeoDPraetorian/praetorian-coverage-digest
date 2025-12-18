@@ -82,6 +82,33 @@ Risk Matrix:
 
 **Load Phase 1 and Phase 2 summaries** to understand system before detailed threat analysis.
 
+### From Phase 0 (Business Context) **MANDATORY**
+```
+.claude/.threat-model/{session}/phase-0/
+├── summary.md                  # <2000 token business context summary
+├── threat-actors.json          # Relevant attacker profiles (filter STRIDE)
+├── business-impact.json        # Actual financial impact data (risk scoring)
+└── data-classification.json    # Crown jewels (threat prioritization)
+```
+
+**Phase 0 drives risk-based threat modeling**:
+- **Threat actors** filter STRIDE (apply ONLY actors from Phase 0, skip all others)
+- **Business impact** provides actual financial data (not generic "high/medium/low")
+- **Crown jewels** add +2 priority bonus to high-value asset threats
+- **Compliance** adds +1 priority bonus to regulatory violation threats
+
+**CRITICAL: Phase 0 must be loaded BEFORE starting STRIDE. Cannot retrofit business context after threat analysis.**
+
+**No exceptions**:
+- Don't skip Phase 0 under time pressure
+- Don't use generic scoring even with authority approval
+- Don't retrofit business_context fields after completing analysis
+- Don't estimate business impact yourself - use actual Phase 0 data
+
+**If Phase 0 files missing**: Stop. Cannot proceed to Phase 3 without Phase 0 completion.
+
+**For detailed Phase 0 integration guidance, see [Phase 0 Integration Guide](references/phase-0-integration.md)**.
+
 ## Core Workflow
 
 **You MUST use TodoWrite** to track progress through all steps.
@@ -99,18 +126,27 @@ cat .claude/.threat-model/{session}/phase-2/summary.md
 
 **Understanding check**: Can you articulate the system architecture and existing controls in 2-3 sentences?
 
-### Step 2: Apply STRIDE Systematically
+### Step 2: Apply STRIDE Systematically (Filtered by Phase 0 Threat Actors)
 
-For EACH component identified in Phase 1:
+**Load threat actors from Phase 0 first**:
+```bash
+cat .claude/.threat-model/{session}/phase-0/threat-actors.json
+```
 
-1. **Spoofing**: Can attacker impersonate users/services?
-2. **Tampering**: Can attacker modify data in transit/at rest?
+For EACH component identified in Phase 1, apply STRIDE **filtered by relevant threat actors**:
+
+1. **Spoofing**: Can attacker impersonate users/services? (Check if relevant to threat actors)
+2. **Tampering**: Can attacker modify data in transit/at rest? (Check if relevant to threat actors)
 3. **Repudiation**: Can attacker deny actions? Are audit logs sufficient?
-4. **Info Disclosure**: Can attacker access sensitive data?
-5. **DoS**: Can attacker disrupt service availability?
+4. **Info Disclosure**: Can attacker access sensitive data? (High priority if targets crown jewels)
+5. **DoS**: Can attacker disrupt service availability? (Check if ransomware is threat actor tactic)
 6. **Elevation of Privilege**: Can attacker escalate permissions?
 
+**Key principle**: If Phase 0 identifies "financially_motivated_cybercriminals", apply payment fraud and ransomware threats. If Phase 0 does NOT identify "nation-state APTs", skip advanced persistent threat scenarios.
+
 **Map to control gaps from Phase 2**: Missing authentication = Spoofing risk
+
+**For detailed threat actor filtering, see [Phase 0 Integration Guide](references/phase-0-integration.md#section-2-applying-stride-with-threat-actor-context)**.
 
 ### Step 3: Execute PASTA Risk Analysis
 
@@ -200,34 +236,46 @@ For Critical/High threats, visualize attack paths from attacker perspective.
 
 See [references/attack-tree-patterns.md](references/attack-tree-patterns.md) for detailed guidance.
 
-### Step 7: Score Risks
+### Step 7: Score Risks (Using Phase 0 Business Impact Data)
 
-Apply risk scoring formula to ALL identified threats:
-
-```
-Risk Score = Business Impact (1-4) × Likelihood (1-3)
-
-For each threat:
-1. Assess Business Impact (Critical=4, High=3, Medium=2, Low=1)
-2. Assess Likelihood (High=3, Medium=2, Low=1)
-3. Calculate Risk Score
-4. Assign priority (Critical 9-12, High 6-8, Medium 3-5, Low 1-2)
+**Load business impact scenarios from Phase 0**:
+```bash
+cat .claude/.threat-model/{session}/phase-0/business-impact.json
+cat .claude/.threat-model/{session}/phase-0/data-classification.json
 ```
 
-**Business Impact Factors**:
-- Regulatory compliance violations?
-- Customer data exposure?
-- Financial loss magnitude?
-- Reputation damage?
-- Service disruption duration?
+Apply risk scoring with **actual business impact numbers** (not generic estimates):
 
-**Likelihood Factors**:
-- Is exploit publicly available?
-- Does it require authentication?
-- What skill level needed?
-- Are there existing controls?
+```
+Risk Score = Business Impact (from Phase 0) × Likelihood (from analysis)
+Priority = Risk Score + Crown Jewel Bonus + Compliance Bonus
 
-See [references/risk-scoring-guide.md](references/risk-scoring-guide.md) for detailed examples.
+Business Impact Score (from Phase 0 scenarios):
+  Critical (4) = >$50M, business-ending, regulatory violation
+  High (3)     = $5M-$50M, significant data exposure
+  Medium (2)   = $500K-$5M, limited impact
+  Low (1)      = <$500K, minimal impact
+
+Likelihood (from threat analysis):
+  High (3)   = Easily exploitable, public knowledge
+  Medium (2) = Requires skill or insider knowledge
+  Low (1)    = Difficult, requires significant resources
+
+Crown Jewel Bonus = +2 if targets crown jewel from Phase 0
+Compliance Bonus = +1 if causes regulatory violation from Phase 0
+```
+
+**Example**:
+- Threat: SQL injection in payment processor
+- Phase 0 scenario: "data_breach_1M_card_records" = $365M
+- Business Impact: 4 (Critical)
+- Likelihood: 3 (High - no input validation)
+- Base Risk: 12
+- Crown Jewel Bonus: +2 (targets payment_card_data)
+- Compliance Bonus: +1 (PCI-DSS violation)
+- **Final Priority: 15 (CRITICAL)**
+
+**For detailed risk scoring with Phase 0 data, see [Phase 0 Integration Guide](references/phase-0-integration.md#section-3-risk-scoring-with-business-impact-data)**.
 
 ### Step 8: Generate Structured Outputs
 
@@ -241,7 +289,7 @@ mkdir -p .claude/.threat-model/{session}/phase-3/attack-trees
 
 **Required output files**:
 
-1. **threat-model.json** - Structured threat entries (ALL threats, scored)
+1. **threat-model.json** - Structured threat entries (ALL threats, scored) **with business_context section**
 2. **abuse-cases/authentication-abuse.json** - Auth-related abuse cases
 3. **abuse-cases/authorization-abuse.json** - Authz-related abuse cases
 4. **abuse-cases/data-abuse.json** - Data handling abuse cases
@@ -251,9 +299,22 @@ mkdir -p .claude/.threat-model/{session}/phase-3/attack-trees
 8. **attack-trees/privilege-escalation.md** - Attack paths for privesc
 9. **dfd-threats.json** - Threats mapped to DFD elements
 10. **risk-matrix.json** - Risk scores and prioritization
-11. **summary.md** - <2000 token summary with top 5 risks
+11. **summary.md** - <2000 token summary with top 5 risks **and Phase 0 business context**
 
-See [references/output-schemas.md](references/output-schemas.md) for exact JSON schemas.
+**NEW: Each threat in threat-model.json must include business_context section**:
+```json
+{
+  "threat_id": "THR-001",
+  "business_context": {
+    "targets_crown_jewel": true,
+    "crown_jewel": "payment_card_data",
+    "business_impact_financial": "$365M (from Phase 0)",
+    "relevant_threat_actor": "financially_motivated_cybercriminals"
+  }
+}
+```
+
+See [references/output-schemas.md](references/output-schemas.md) for exact JSON schemas and [Phase 0 Integration Guide](references/phase-0-integration.md#section-5-updated-output-schema) for business_context schema details.
 
 ### Step 9: Generate Summary for Phase 4
 
@@ -385,6 +446,7 @@ Phase 4 orchestrator loads summary.md into context. If >2000 tokens, agent conte
 
 ## References
 
+- **[references/phase-0-integration.md](references/phase-0-integration.md) - Phase 0 business context integration (NEW)**
 - [references/stride-framework.md](references/stride-framework.md) - Detailed STRIDE methodology
 - [references/pasta-methodology.md](references/pasta-methodology.md) - 7-stage PASTA process
 - [references/dfd-threat-mapping.md](references/dfd-threat-mapping.md) - Data flow diagram analysis
@@ -395,6 +457,7 @@ Phase 4 orchestrator loads summary.md into context. If >2000 tokens, agent conte
 
 ## Related Skills
 
+- `business-context-discovery` - Phase 0 methodology (produces business context inputs) **NEW**
 - `codebase-mapping` - Phase 1 methodology (produces architecture inputs)
 - `security-controls-mapping` - Phase 2 methodology (produces control gap inputs)
 - `security-test-planning` - Phase 4 methodology (consumes threat model outputs)

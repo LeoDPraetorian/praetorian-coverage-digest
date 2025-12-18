@@ -1,0 +1,14 @@
+## [Date: 2025-12-18] - Initial Creation
+
+### Created
+- Skill created via creating-skills workflow
+- RED failure documented: Threat modeling workflow lacked business context discovery (Phase 0), producing technically sound but business-blind threat models
+- Category: security
+- Type: process/pattern
+- Lines: 331 (safe - under 500 limit)
+
+### Context
+- Part of threat modeling architecture enhancement
+- Implements PASTA Stage 1 ("Define Objectives")
+- Feeds business context to Phases 1-4 of threat modeling workflow
+- Enables risk-based (not just technical) threat modeling

@@ -125,7 +125,7 @@ submodule-init-robust: ## Initialize submodules with retry logic, progress track
 			COUNT=$$((COUNT + 1)); \
 			REPO_NAME=$$(basename $$submodule); \
 			echo "📦 [$$COUNT/$$TOTAL] Initializing $$REPO_NAME..."; \
-			if git submodule update --init --progress "$$submodule"; then \
+			if git submodule update --init --recursive --progress "$$submodule"; then \
 				echo "✅ [$$COUNT/$$TOTAL] $$REPO_NAME completed"; \
 			else \
 				echo "❌ [$$COUNT/$$TOTAL] $$REPO_NAME failed"; \
@@ -149,16 +149,16 @@ submodule-init-robust: ## Initialize submodules with retry logic, progress track
 	done
 
 .PHONY: submodule-pull
-submodule-pull: ## Pull latest changes from all submodules
-	@echo "Pulling latest changes from all submodules..."
-	@git submodule foreach 'git fetch && git checkout main && git pull origin main' || true
+submodule-pull: ## Pull latest changes from all submodules (including nested)
+	@echo "Pulling latest changes from all submodules (including nested)..."
+	@git submodule foreach --recursive 'git fetch && git checkout main && git pull origin main' || true
 	@echo "✅ Submodule pull completed"
 	@echo "⚠️  Note: Warnings about nested submodules with missing URLs are expected and safe to ignore"
 
 .PHONY: submodule-status
-submodule-status: ## Show status of all submodules
-	@echo "Submodule status:"
-	git submodule status
+submodule-status: ## Show status of all submodules (including nested)
+	@echo "Submodule status (including nested):"
+	git submodule status --recursive
 
 .PHONY: submodule-update
 submodule-update: submodule-init-robust submodule-pull submodule-status ## Complete submodule update workflow

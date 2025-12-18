@@ -17,7 +17,7 @@ Use this skill when:
 - Analyzing large codebases that exceed context windows
 - Need human approval between analysis phases
 
-**You MUST use TodoWrite** to track progress through all 4 phases.
+**You MUST use TodoWrite** to track progress through all 5 phases (Phase 0-4).
 
 ---
 
@@ -25,6 +25,7 @@ Use this skill when:
 
 | Phase | Purpose | Execution | Checkpoint |
 |-------|---------|-----------|------------|
+| 0. Business Context | Crown jewels, threat actors, compliance, business impact | Interactive skill | ⏸️ User approval |
 | 1. Codebase Mapping | Architecture, components, data flows | Parallel agents | ⏸️ User approval |
 | 2. Security Controls | Auth, authz, validation, crypto | Parallel agents | ⏸️ User approval |
 | 3. Threat Modeling | STRIDE + PASTA + DFD threats | Sequential skill | ⏸️ User approval |
@@ -54,6 +55,27 @@ Use this skill when:
 
 **Why:** Errors compound across phases. Early validation prevents wasted work.
 
+### Phase 0 Is Mandatory
+
+**Phase 0 (Business Context Discovery) MUST execute before Phase 1.** You cannot perform risk-based threat modeling without understanding:
+- **WHAT** you're protecting (crown jewels, sensitive data)
+- **WHY** it matters (business impact, compliance requirements)
+- **WHO** would attack (threat actor profiles)
+
+Without business context, technical threat models produce "security theater" instead of risk management.
+
+**Enforcement**: Phase 1 cannot proceed without Phase 0 approval checkpoint.
+
+**No exceptions:**
+- **Not even when**: Manager says skip it, client says skip it, user says "we already know"
+- **Not even when**: Time pressure, deadline, emergency, audit tomorrow
+- **Not even when**: Previous Phase 0 exists (for incremental: validate changes in 30-60 min, don't skip)
+- **Not even when**: Client claims "no sensitive data" (they're often wrong - validate with Phase 0)
+- **Not even when**: "Just internal tool" or "only 10 users" (insiders are threat actors too)
+- **Not even when**: Budget constraints (explain Phase 0 is 20-25% of total, not optional)
+
+**If anyone claims "we can skip Phase 0"**: They're wrong. Run it anyway. Document their assumptions in Phase 0 outputs to prove they were incomplete.
+
 ### State Must Be Persisted
 
 All artifacts go to: `.claude/.threat-model/{session}/`
@@ -76,7 +98,7 @@ All artifacts go to: `.claude/.threat-model/{session}/`
 1. **Generate session ID**: `YYYYMMDD-HHMMSS` format
 2. **Create session directory**:
    ```bash
-   mkdir -p .claude/.threat-model/{session-id}/phase-{1,2,3,4}
+   mkdir -p .claude/.threat-model/{session-id}/phase-{0,1,2,3,4}
    mkdir -p .claude/.threat-model/{session-id}/checkpoints
    mkdir -p .claude/.threat-model/{session-id}/handoffs
    mkdir -p .claude/.threat-model/{session-id}/final-report
@@ -96,6 +118,41 @@ What would you like to threat model?
 ```
 
 Record selection in `scope.json`.
+
+### Step 1.5: Phase 0 - Business Context Discovery
+
+**Goal**: Understand WHAT you're protecting and WHY before analyzing HOW it's built.
+
+**Execution**: Interactive session with user. Invoke `business-context-discovery` skill:
+
+```
+skill: "business-context-discovery"
+```
+
+**The skill guides through**:
+1. Business Purpose Interview (20-30 min)
+2. Data Classification - Identify crown jewels (20-30 min)
+3. Threat Actor Profiling - Who would attack and why (15-20 min)
+4. Business Impact Assessment - Quantify consequences (20-30 min)
+5. Compliance Mapping - SOC2, PCI-DSS, HIPAA, GDPR (15-20 min)
+6. Security Objectives - Protection priorities (10-15 min)
+
+**Artifacts produced** (in `phase-0/`):
+- `business-objectives.json` - App purpose, users, value
+- `data-classification.json` - Crown jewels, PII/PHI/PCI
+- `threat-actors.json` - Who attacks, motivations, capabilities
+- `business-impact.json` - Financial, operational, regulatory consequences
+- `compliance-requirements.json` - Applicable regulations
+- `security-objectives.json` - Protection priorities, CIA, RTO/RPO
+- `summary.md` - <2000 token handoff
+
+**Checkpoint**: Present business context findings, ask for approval before Phase 1.
+
+**How this drives later phases**:
+- Phase 1: Focus mapping on crown jewel components
+- Phase 2: Evaluate controls against compliance requirements
+- Phase 3: Apply relevant threat actor profiles, use actual business impact for risk scoring
+- Phase 4: Prioritize tests by business risk scores
 
 ### Step 2: Phase 1 - Codebase Mapping
 
@@ -202,9 +259,12 @@ Between each phase, write a handoff file:
   "summary": {
     "keyFindings": ["..."],
     "criticalRisks": ["..."],
+    "crownJewels": ["payment_data", "user_credentials"],
+    "complianceContext": ["PCI-DSS Level 1"],
     "userFeedback": ["..."]
   },
   "artifacts": [
+    {"name": "phase-0-summary", "path": "phase-0/summary.md", "loadWhen": "always"},
     {"name": "entry-points.json", "path": "phase-1/entry-points.json", "loadWhen": "always"}
   ],
   "nextPhaseGuidance": "Focus on authentication controls first"
@@ -213,6 +273,8 @@ Between each phase, write a handoff file:
 
 **Why handoffs matter**: Phases run in separate contexts. Handoffs compress findings for downstream use.
 
+**Phase 0 in handoffs**: All handoffs from Phase 1+ must include Phase 0 summary with crown jewels and compliance context to enable risk-based analysis.
+
 See [references/handoff-schema.md](references/handoff-schema.md) for complete schema.
 
 ---
@@ -220,6 +282,34 @@ See [references/handoff-schema.md](references/handoff-schema.md) for complete sc
 ## Checkpoint Prompts
 
 Use these templates for human approval gates:
+
+### After Phase 0
+```markdown
+## Phase 0 Complete: Business Context Discovery
+
+### What I Found:
+- **Application**: {One-line business purpose}
+- **Crown Jewels**: {Top 3-5 most sensitive assets}
+- **Threat Actors**: {Relevant attacker profiles}
+- **Business Impact**: {Quantified breach/downtime consequences}
+- **Compliance**: {Applicable regulations}
+
+### Key Insights:
+- {Business-specific finding that shapes approach}
+- {Compliance requirement determining controls}
+- {Threat actor profile guiding threats}
+
+### Questions for You:
+- Is this business understanding correct?
+- Any sensitive data I missed?
+- Any threat actors I should consider?
+- Any compliance requirements I overlooked?
+- Does the business impact seem reasonable?
+
+**Approve to proceed to Phase 1: Codebase Mapping?** [Yes/No/Revise]
+
+If approved, Phase 1 will focus on: {Components handling crown jewels}
+```
 
 ### After Phase 1
 ```markdown
@@ -252,19 +342,22 @@ See [references/checkpoint-prompts.md](references/checkpoint-prompts.md) for all
 ├── config.json              # Session configuration
 ├── scope.json               # User-selected scope
 ├── checkpoints/             # Human approval records
+│   ├── phase-0-checkpoint.json
 │   ├── phase-1-checkpoint.json
 │   ├── phase-2-checkpoint.json
 │   ├── phase-3-checkpoint.json
 │   └── phase-4-checkpoint.json
+├── phase-0/                 # Business context outputs (MANDATORY FIRST)
 ├── phase-1/                 # Codebase mapping outputs
 ├── phase-2/                 # Security controls outputs
 ├── phase-3/                 # Threat model outputs
 ├── phase-4/                 # Test plan outputs
 ├── handoffs/                # Phase transition records
+│   ├── phase-0-to-1.json
 │   ├── phase-1-to-2.json
 │   ├── phase-2-to-3.json
 │   └── phase-3-to-4.json
-└── final-report/            # Consolidated outputs
+└── final-report/            # Consolidated outputs (includes business context)
     ├── threat-model-report.md
     ├── threat-model-data.json
     └── threat-model.sarif
@@ -330,10 +423,11 @@ Task("codebase-mapper", "Analyze infra: ./modules/devops")
 
 ## Related Skills
 
+- `business-context-discovery` - Phase 0 methodology (MANDATORY FIRST)
 - `codebase-mapping` - Phase 1 methodology (used by codebase-mapper agent)
-- `security-controls-mapping` - Phase 2 methodology (pending creation)
-- `threat-modeling` - Phase 3 methodology (pending creation)
-- `security-test-planning` - Phase 4 methodology (pending creation)
+- `security-controls-mapping` - Phase 2 methodology
+- `threat-modeling` - Phase 3 methodology
+- `security-test-planning` - Phase 4 methodology
 
 ## Related Agents
 

@@ -20,3 +20,36 @@
 - security-controls-mapper agent (Phase 2) - PENDING
 - threat-modeling skill (Phase 3) - PENDING
 - security-test-planning skill (Phase 4) - PENDING
+
+## [Date: 2024-12-18] - Phase 0 Integration
+
+### Changed
+- Integrated Phase 0 (Business Context Discovery) into threat modeling workflow
+- Added Phase 0 to Quick Reference table (now 5 phases: 0-4)
+- Inserted Step 1.5: Phase 0 execution between scope selection and Phase 1
+- Added Phase 0 enforcement rule (mandatory before Phase 1)
+- Updated session setup to create phase-0/ directory
+- Updated handoff protocol to include Phase 0 summary (crown jewels, compliance context)
+- Added Phase 0 checkpoint template
+- Updated session directory structure to include phase-0/
+- Updated related skills to include business-context-discovery
+
+### Reason
+- RED failure: Orchestrator lacked Phase 0 invocation, producing technically accurate but business-blind threat models (security theater vs risk management)
+- Cannot assess risk without business context (WHAT to protect, WHY it matters, WHO attacks)
+- Phase 0 enables risk-based threat modeling by providing crown jewels, threat actors, business impact, and compliance requirements
+- Integration plan: threat-model-business-integration.md Task 1
+
+### Impact
+- Line count: 341 → 425 lines (+84 lines, still in safe zone)
+- Enables business-driven threat modeling (PASTA Stage 1 compliance)
+- Phases 1-4 can now use business context for prioritization and risk scoring
+- Next: Update Phases 1-4 skills to consume Phase 0 outputs (Tasks 2-5)
+
+### REFACTOR
+- Tests run: [Time+Authority+Emergency, Expertise+Pragmatic+Sunk Cost, Deadline+Client Service+Efficiency]
+- Vulnerabilities found: 3 bypass scenarios (manager approval, previous Phase 0, "no sensitive data" claims)
+- Counters added: "No exceptions" section with 6 explicit anti-rationalization rules
+- Line count after hardening: 425 → 437 lines (+12 lines)
+- Re-test result: **PASSED** - All three scenarios now explicitly countered
+- Skill is bulletproof against Phase 0 bypass attempts

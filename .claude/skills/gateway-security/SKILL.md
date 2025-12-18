@@ -44,6 +44,9 @@ Each skill is organized by domain for easy discovery.
 
 ## Threat Modeling
 
+**Business Context Discovery** (Phase 0): `.claude/skill-library/security/business-context-discovery/SKILL.md`
+- Discovers business context, data classification, threat actors, compliance requirements, and security objectives before technical analysis - PASTA Stage 1
+
 **Codebase Mapping** (Phase 1): `.claude/skill-library/security/codebase-mapping/SKILL.md`
 - Systematic codebase analysis for threat modeling, identifies architecture, components, data flows, entry points, trust boundaries
 
@@ -66,6 +69,7 @@ Each skill is organized by domain for easy discovery.
 | Finding hardcoded creds | secret-scanner |
 | Encryption/hashing | discover-cryptography |
 | Security architecture | defense-in-depth |
+| Threat modeling Phase 0 (business context) | business-context-discovery |
 | Threat modeling Phase 1 (architecture) | codebase-mapping |
 | Threat modeling Phase 2 (controls) | security-controls-mapping |
 | Threat modeling Phase 3 (threats) | threat-modeling |
@@ -87,15 +91,16 @@ For specific implementations, always load the individual skill rather than worki
 
 When doing security work, consider this sequence:
 
-1. **Threat Model Phase 1**: Start with `codebase-mapping` to understand attack surface
-2. **Threat Model Phase 2**: Use `security-controls-mapping` to identify existing controls and gaps
-3. **Threat Model Phase 3**: Use `threat-modeling` to identify threats and abuse cases
-4. **Threat Model Phase 4**: Use `security-test-planning` to generate prioritized test plans
-5. **Architecture**: Use `defense-in-depth` for design principles
-6. **Auth**: Use `auth-implementation-patterns` for identity management
-7. **Secrets**: Apply `secrets-management` for credential handling
-8. **Validation**: Run `authorization-testing` to verify controls
-9. **Scan**: Use `secret-scanner` before committing code
+1. **Threat Model Phase 0**: Start with `business-context-discovery` to understand business purpose, crown jewels, threat actors, and compliance requirements
+2. **Threat Model Phase 1**: Use `codebase-mapping` to understand attack surface and technical architecture
+3. **Threat Model Phase 2**: Use `security-controls-mapping` to identify existing controls and gaps
+4. **Threat Model Phase 3**: Use `threat-modeling` to identify threats and abuse cases
+5. **Threat Model Phase 4**: Use `security-test-planning` to generate prioritized test plans
+6. **Architecture**: Use `defense-in-depth` for design principles
+7. **Auth**: Use `auth-implementation-patterns` for identity management
+8. **Secrets**: Apply `secrets-management` for credential handling
+9. **Validation**: Run `authorization-testing` to verify controls
+10. **Scan**: Use `secret-scanner` before committing code
 
 ## Related Gateways
 

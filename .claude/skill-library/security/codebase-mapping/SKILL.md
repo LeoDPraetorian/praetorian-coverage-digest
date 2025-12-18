@@ -21,6 +21,39 @@ Use this skill when:
 
 ---
 
+## Phase 0 Context (Required Inputs)
+
+**This skill is Phase 1 of threat modeling. It MUST load Phase 0 business context to prioritize analysis.**
+
+### What Phase 0 Provides
+
+Phase 0 (Business Context Discovery) produces:
+- **Crown jewels** - Most sensitive assets that drive prioritization (60% effort on components handling them)
+- **Compliance requirements** - Regulations that determine required controls
+- **Threat actors** - Relevant attacker profiles that guide attack surface mapping
+
+**Without Phase 0**: All components analyzed equally (security theater).
+**With Phase 0**: Analysis focused on protecting what matters most (risk management).
+
+### Required Files
+
+**Load before Step 1**:
+- `../phase-0/summary.md` - Quick business context overview
+- `../phase-0/data-classification.json` - Crown jewels for component prioritization
+
+**Error Handling**: If Phase 0 files missing, skill MUST error and instruct user to run `business-context-discovery` skill first.
+
+### For Complete Phase 0 Integration Details
+
+**See [references/phase-0-integration.md](references/phase-0-integration.md)** for:
+- Crown jewel prioritization strategy (60/30/10 split)
+- Component JSON schema with `handles_crown_jewels` flag
+- Summary generation with business context reference
+- Testing scenarios and error handling patterns
+- Complete examples for all three prioritization tiers
+
+---
+
 ## Critical Rules
 
 ### This is Formal Threat Modeling, Not a Quick Security Scan
@@ -125,7 +158,14 @@ find {scope} -type f \( -name "*.go" -o -name "*.ts" -o -name "*.tsx" \
 
 ### Step 2: Component Identification
 
-**Goal**: Map logical components and their responsibilities.
+**Goal**: Map logical components and their responsibilities, prioritized by crown jewel handling from Phase 0.
+
+**Prioritization Strategy** (from Phase 0 crown jewels):
+- **Tier 1 (60% effort)**: Components handling crown jewels
+- **Tier 2 (30% effort)**: External interfaces and auth boundaries
+- **Tier 3 (10% effort)**: Supporting infrastructure
+
+**See [references/phase-0-integration.md](references/phase-0-integration.md)** for complete prioritization logic, component JSON schema with `handles_crown_jewels` flag, and examples.
 
 **Component Types to Identify**:
 
@@ -391,6 +431,7 @@ Each parallel instance:
 
 ## Related Skills
 
+- `business-context-discovery` - Phase 0: REQUIRED before this skill - discovers crown jewels, compliance requirements, threat actors
 - `security-controls-mapping` - Phase 2: Maps security controls to components
 - `threat-modeling` - Phase 3: STRIDE + PASTA threat identification
 - `security-test-planning` - Phase 4: Generates security test plan

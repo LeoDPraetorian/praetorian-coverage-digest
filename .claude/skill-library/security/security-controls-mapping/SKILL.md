@@ -21,6 +21,39 @@ Use this skill when:
 
 ---
 
+## Phase 0 Context (Required Inputs)
+
+**Phase 2 evaluates security controls against Phase 0 compliance requirements.**
+
+### What Phase 0 Provides
+
+Phase 0 (Business Context Discovery) produces:
+- **Compliance requirements** (SOC2, PCI-DSS, HIPAA, GDPR) → Validate specific regulatory controls
+- **Regulatory gaps** → Document which requirements are not met
+- **Compliance status** → Track progress toward compliance (requirements met/gaps)
+
+**Without Phase 0**: Control mapping is generic (finds controls, but doesn't validate compliance).
+**With Phase 0**: Mapping validates regulatory requirements (compliance-driven evaluation).
+
+### Required Files
+
+**Load before control analysis**:
+- `../phase-0/summary.md` - Quick compliance overview
+- `../phase-0/compliance-requirements.json` - Specific regulatory requirements to validate
+
+**Error Handling**: If Phase 0 files missing, skill MUST error and instruct user to run `business-context-discovery` skill first.
+
+### For Complete Phase 0 Integration Details
+
+**See [references/phase-0-compliance-integration.md](references/phase-0-compliance-integration.md)** for:
+- Compliance validation workflow (load requirements, map to control categories, validate, generate status)
+- `control-gaps.json` schema with `compliance_requirement` field
+- Summary generation with compliance evaluation section
+- Testing scenarios and validation examples
+- Complete examples for PCI-DSS, SOC2, HIPAA validation
+
+---
+
 ## Critical Rules
 
 ### This is Formal Threat Modeling, Not a Quick Security Review
@@ -463,6 +496,7 @@ Orchestrator spawns:
 
 ## Related Skills
 
+- `business-context-discovery` - Phase 0: REQUIRED before this skill - discovers compliance requirements (SOC2, PCI-DSS, HIPAA, GDPR)
 - `codebase-mapping` - Phase 1: Maps architecture before controls mapping
 - `threat-modeling` - Phase 3: Uses control maps for threat identification
 - `security-test-planning` - Phase 4: Uses control gaps for test prioritization
