@@ -43,55 +43,100 @@ const GetRunsInputSchema = z.object({
   limit: z.number().int().min(1).max(50).optional().default(50),
 });
 
-// Raw MCP response interface (based on schema discovery)
+// Raw MCP response interface (based on actual API response)
+interface RawGroupData {
+  instances?: {
+    overall?: number;
+    claimed?: number;
+    complete?: number;
+    passes?: number;
+    failures?: number;
+  };
+  tests?: {
+    overall?: number;
+    tests?: number;
+    passes?: number;
+    failures?: number;
+    pending?: number;
+    skipped?: number;
+    flaky?: number;
+  };
+  groupId?: string;
+}
+
 interface RawRunData {
-  id?: string;
+  runId?: string;
+  projectId?: string;
   status?: string;
+  completionState?: string;
   createdAt?: string;
-  specs?: number;
-  tests?: number;
+  durationMs?: number;
+  timeout?: {
+    isTimeout?: boolean;
+    timeoutValueMs?: number;
+  };
+  groups?: RawGroupData[];
+  tags?: string[];
+  cursor?: string;
+  meta?: {
+    ciBuildId?: string;
+    commit?: {
+      branch?: string;
+      sha?: string;
+      message?: string;
+      authorName?: string;
+    };
+  };
   [key: string]: unknown;
 }
 
 interface RawMCPResponse {
-  runs?: RawRunData[];
-  cursor?: string;
+  status?: string;
+  data?: RawRunData[];
+  has_more?: boolean;
   [key: string]: unknown;
 }
 
 /**
- * Schema Discovery Results (MCP Response Format: Object with array)
+ * Schema Discovery Results (MCP Response Format: Object with data array)
  *
- * Based on analysis of Currents API responses:
- * - Response Format: Object containing 'runs' array + pagination metadata
- * - REQUIRED FIELDS (runs array items): id, status, createdAt, specs, tests
- * - OPTIONAL FIELDS: cursor (pagination token when hasMore is true)
+ * Based on actual API response analysis:
+ * - Response Format: { status: "OK", data: [...], has_more: boolean }
+ * - Run fields: runId, status, completionState, createdAt, groups[], tags[], meta
+ * - Groups contain instances (specs) and tests counts
  *
- * Field Type Observations:
- * - All numeric fields are consistently numbers
- * - status is always a string (values: 'running', 'completed', 'failed', 'cancelled', 'timeout')
- * - createdAt is ISO 8601 timestamp string
- * - cursor is opaque pagination token (string)
+ * Status values: 'RUNNING', 'FAILED', 'PASSED', 'CANCELLED'
+ * CompletionState values: 'TIMEOUT', 'COMPLETE', 'CANCELLED'
  */
 const GetRunsOutputSchema = z.object({
   runs: z.array(
     z.object({
       id: z.string(),
-      status: z.union([
-        z.literal('running'),
-        z.literal('completed'),
-        z.literal('failed'),
-        z.literal('cancelled'),
-        z.literal('timeout'),
-        z.string(), // Fallback for unknown status values
-      ]),
+      status: z.string(),
+      completionState: z.string(),
       createdAt: z.string(),
-      specs: z.number(),
-      tests: z.number(),
+      durationMs: z.number(),
+      isTimeout: z.boolean(),
+      specs: z.object({
+        total: z.number(),
+        complete: z.number(),
+        passes: z.number(),
+        failures: z.number(),
+      }),
+      tests: z.object({
+        total: z.number(),
+        passes: z.number(),
+        failures: z.number(),
+        pending: z.number(),
+        flaky: z.number(),
+      }),
+      branch: z.string().optional(),
+      commit: z.string().optional(),
+      ciBuildId: z.string().optional(),
+      tags: z.array(z.string()),
     })
   ),
   totalRuns: z.number(),
-  cursor: z.string().optional(),
   hasMore: z.boolean(),
   estimatedTokens: z.number(),
 });
@@ -106,24 +151,63 @@ export const getRuns = {
 
     const rawData = await callMCPTool<RawMCPResponse>('currents', 'currents-get-runs', validated);
 
-    // Handle null/undefined rawData
+    // Handle null/undefined rawData - API returns { status, data, has_more }
     const safeData = rawData ?? {};
-    const safeRuns = safeData.runs ?? [];
+    const safeRuns = safeData.data ?? [];
 
-    // Filter to essentials only with type coercion for robustness
-    const runs = safeRuns.slice(0, validated.limit).map((r) => ({
-      id: r.id || 'unknown',
-      status: r.status || 'unknown',
-      createdAt: r.createdAt || new Date().toISOString(),
-      specs: Number(r.specs) || 0,
-      tests: Number(r.tests) || 0,
-    }));
+    // Transform API response to our schema
+    const runs = safeRuns.slice(0, validated.limit).map((r) => {
+      // Aggregate stats across all groups (chromium, slow, etc.)
+      const aggregatedSpecs = {
+        total: 0,
+        complete: 0,
+        passes: 0,
+        failures: 0,
+      };
+      const aggregatedTests = {
+        total: 0,
+        passes: 0,
+        failures: 0,
+        pending: 0,
+        flaky: 0,
+      };
+
+      for (const group of r.groups ?? []) {
+        if (group.instances) {
+          aggregatedSpecs.total += group.instances.overall ?? 0;
+          aggregatedSpecs.complete += group.instances.complete ?? 0;
+          aggregatedSpecs.passes += group.instances.passes ?? 0;
+          aggregatedSpecs.failures += group.instances.failures ?? 0;
+        }
+        if (group.tests) {
+          aggregatedTests.total += group.tests.overall ?? 0;
+          aggregatedTests.passes += group.tests.passes ?? 0;
+          aggregatedTests.failures += group.tests.failures ?? 0;
+          aggregatedTests.pending += group.tests.pending ?? 0;
+          aggregatedTests.flaky += group.tests.flaky ?? 0;
+        }
+      }
+
+      return {
+        id: r.runId || 'unknown',
+        status: r.status || 'unknown',
+        completionState: r.completionState || 'unknown',
+        createdAt: r.createdAt || new Date().toISOString(),
+        durationMs: r.durationMs ?? 0,
+        isTimeout: r.timeout?.isTimeout ?? false,
+        specs: aggregatedSpecs,
+        tests: aggregatedTests,
+        branch: r.meta?.commit?.branch,
+        commit: r.meta?.commit?.sha,
+        ciBuildId: r.meta?.ciBuildId,
+        tags: r.tags ?? [],
+      };
+    });
 
     const filtered = {
       runs,
       totalRuns: safeRuns.length,
-      cursor: safeData.cursor,
-      hasMore: !!safeData.cursor,
+      hasMore: safeData.has_more ?? false,
       estimatedTokens: Math.ceil(JSON.stringify(runs).length / 4),
     };
 

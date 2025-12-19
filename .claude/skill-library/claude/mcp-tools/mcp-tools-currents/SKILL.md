@@ -19,6 +19,8 @@ Enable granular agent access control for currents operations.
 **Include this skill when:** Agent needs currents access
 **Exclude this skill when:** Agent should NOT access currents
 
+**TodoWrite Mandate:** You MUST use TodoWrite before starting to track all workflow steps when using these tools for multi-step operations (e.g., debugging failed tests across multiple runs).
+
 ## Available Tools (Auto-discovered: 8 wrappers)
 
 ### get-projects
@@ -27,9 +29,11 @@ Enable granular agent access control for currents operations.
 - **Token cost:** ~unknown tokens
 
 ### get-run-details
-- **Purpose:** MCP wrapper for get-run-details
+- **Purpose:** Get detailed information about a specific test run (status, test counts, duration)
+- **Required parameter:** `runId` (string) - The run identifier
 - **Import:** `import { getRunDetails } from './.claude/tools/currents/get-run-details.ts'`
 - **Token cost:** ~unknown tokens
+- **Use when:** You have a run ID and want to see its overall statistics
 
 ### get-runs
 - **Purpose:** MCP wrapper for get-runs
@@ -47,9 +51,12 @@ Enable granular agent access control for currents operations.
 - **Token cost:** ~unknown tokens
 
 ### get-test-results
-- **Purpose:** MCP wrapper for get-test-results
+- **Purpose:** Get test execution results for a specific test signature (for debugging failed tests)
+- **Required parameter:** `signature` (string) - Test identifier from get-tests-signatures
+- **Optional parameters:** `status`, `authors`, `branches`, `tags`, `cursor`, `limit`
 - **Import:** `import { getTestResults } from './.claude/tools/currents/get-test-results.ts'`
 - **Token cost:** ~unknown tokens
+- **Use when:** You have a test signature and want to see its execution history
 
 ### get-tests-performance
 - **Purpose:** MCP wrapper for get-tests-performance
@@ -62,17 +69,106 @@ Enable granular agent access control for currents operations.
 - **Token cost:** ~unknown tokens
 
 
+## Tool Mapping Guide
+
+**CRITICAL:** Choose the correct tool for your use case:
+
+| Your Goal | Tool to Use | Required Parameter | Example Value |
+|-----------|-------------|-------------------|---------------|
+| Get all projects | `get-projects` | none | - |
+| Get details for run X | `get-run-details` | `runId` | `"run-abc123"` |
+| Get results for test Y | `get-test-results` | `signature` | `"spec-file.ts:test-name"` |
+| Get latest runs | `get-runs` | `projectId` | `"proj-456"` |
+| Get test signatures | `get-tests-signatures` | `projectId` | `"proj-456"` |
+| Get test performance | `get-tests-performance` | `projectId` | `"proj-456"` |
+| Get spec performance | `get-spec-files-performance` | `projectId` | `"proj-456"` |
+| Get spec instance | `get-spec-instance` | `instanceId` | `"inst-789"` |
+
+**Common confusion:**
+- ❌ WRONG: "Get test results for run X" → `get-test-results` with `runId`
+- ✅ CORRECT: "Get test results for run X" → `get-run-details` with `runId`
+- ✅ CORRECT: "Get results for test Y" → `get-test-results` with `signature`
+
 ## Quick Examples
 
 See mcp-tools-registry for complete Bash + tsx execution patterns.
 
-**Inline execution:**
+**CRITICAL: Dynamic repository root detection**
+
+All tool executions MUST use dynamic root detection to work from any subdirectory:
+
 ```bash
-# Note: 2>/dev/null suppresses MCP debug logs
+# ✅ CORRECT: Works from any subdirectory (e.g., modules/chariot/)
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
+cd "$REPO_ROOT" && npx tsx -e "(async () => {
+  const { getProjects } = await import('./.claude/tools/currents/get-projects.ts');
+  const result = await getProjects.execute({});
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+```bash
+# ❌ WRONG: Fails when executed from modules/chariot/
 npx tsx -e "(async () => {
   const { getProjects } = await import('./.claude/tools/currents/get-projects.ts');
-  const result = await getProjects.execute({ /* params */ });
+  const result = await getProjects.execute({});
   console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+## Comprehensive Code Examples
+
+### Example 1: Get Run Details (runId parameter)
+
+```bash
+# Get details for a specific run
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
+cd "$REPO_ROOT" && npx tsx -e "(async () => {
+  const { getRunDetails } = await import('./.claude/tools/currents/get-run-details.ts');
+  const result = await getRunDetails.execute({ runId: 'run-abc123' });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### Example 2: Get Test Results (signature parameter)
+
+```bash
+# Get execution history for a specific test
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
+cd "$REPO_ROOT" && npx tsx -e "(async () => {
+  const { getTestResults } = await import('./.claude/tools/currents/get-test-results.ts');
+  const result = await getTestResults.execute({
+    signature: 'spec-file.ts:test-name',
+    status: 'failed',
+    limit: 5
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### Example 3: Complete Workflow
+
+```bash
+# 1. Get projects
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
+cd "$REPO_ROOT" && npx tsx -e "(async () => {
+  const { getProjects } = await import('./.claude/tools/currents/get-projects.ts');
+  const projects = await getProjects.execute({});
+  console.log('Projects:', projects.projects.map(p => p.id));
+})();" 2>/dev/null
+
+# 2. Get latest runs for project
+cd "$REPO_ROOT" && npx tsx -e "(async () => {
+  const { getRuns } = await import('./.claude/tools/currents/get-runs.ts');
+  const runs = await getRuns.execute({ projectId: 'proj-456' });
+  console.log('Latest runs:', runs.runs.map(r => r.id));
+})();" 2>/dev/null
+
+# 3. Get run details
+cd "$REPO_ROOT" && npx tsx -e "(async () => {
+  const { getRunDetails } = await import('./.claude/tools/currents/get-run-details.ts');
+  const details = await getRunDetails.execute({ runId: 'run-abc123' });
+  console.log('Run stats:', details.run);
 })();" 2>/dev/null
 ```
 
