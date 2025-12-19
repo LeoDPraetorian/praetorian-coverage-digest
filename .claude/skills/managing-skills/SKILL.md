@@ -1,5 +1,5 @@
 ---
-name: skill-manager
+name: managing-skills
 description: Use when creating, updating, deleting, auditing, fixing, renaming, migrating, searching, or listing skills - unified lifecycle management with TDD enforcement, 16-phase compliance validation, and progressive disclosure. Searches both core (.claude/skills) and library (.claude/skill-library) locations.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, Skill, AskUserQuestion
 ---

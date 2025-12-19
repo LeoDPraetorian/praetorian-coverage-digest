@@ -1,5 +1,5 @@
 ---
-name: agent-manager
+name: managing-agents
 description: Use when creating, updating, auditing, fixing, renaming, testing, searching, or listing agents - unified lifecycle management with 8-phase compliance validation, TDD enforcement, lean agent pattern (<300 lines), and description syntax enforcement (no block scalars).
 allowed-tools: 'Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, Skill, AskUserQuestion'
 ---
@@ -542,9 +542,9 @@ User: What is the description for the [agent-name] agent? Quote it exactly.
 
 ## Related Skills
 
-- **skill-manager** - For skill lifecycle (similar pattern)
-- **mcp-manager** - For MCP wrapper lifecycle
-- **command-manager** - For slash command lifecycle
+- **managing-skills** - For skill lifecycle (similar pattern)
+- **managing-mcp-wrappers** - For MCP wrapper lifecycle
+- **managing-commands** - For slash command lifecycle
 - **developing-with-tdd** - TDD methodology
 - **verifying-before-completion** - Final validation
 

@@ -184,7 +184,7 @@ Options:
 
 **CLI Command**:
 ```bash
-cd .claude/skills/mcp-manager/scripts
+cd .claude/skills/managing-mcp-wrappers/scripts
 npm run verify-red -- {service}/{tool}
 ```
 
@@ -442,7 +442,7 @@ npx -y @modelcontextprotocol/server-{service} --version
 
 **MCP manager CLI setup** (one-time):
 ```bash
-cd .claude/skills/mcp-manager/scripts
+cd .claude/skills/managing-mcp-wrappers/scripts
 npm install
 ```
 
@@ -484,7 +484,7 @@ npm install
 
 ## Related Skills
 
-- `mcp-manager` - Main MCP manager skill (delegates here)
+- `managing-mcp-wrappers` - Main MCP manager skill (delegates here)
 - `developing-with-tdd` - TDD methodology
 - `verifying-before-completion` - Final validation
 - `gateway-mcp-tools` - Routes to this skill

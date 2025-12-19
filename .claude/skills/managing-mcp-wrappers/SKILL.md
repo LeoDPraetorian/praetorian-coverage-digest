@@ -1,5 +1,5 @@
 ---
-name: mcp-manager
+name: managing-mcp-wrappers
 description: Use when creating, updating, auditing, or fixing MCP wrappers - enforces TDD (tests first), validates compliance (10 phases), supports batch operations. Handles errors like "ENOENT", "validation failed", "coverage below 80%", "RED phase not verified", TypeScript errors. Manages wrapper.ts files, test.ts files, schema discovery docs. Works with MCP servers (context7, praetorian-cli, linear). CLI-based with mandatory ≥80% test coverage.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 ---
@@ -47,7 +47,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 **Workspace setup:**
 ```bash
 # Navigate to workspace from any location
-cd "$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)/.claude/skills/mcp-manager/scripts"
+cd "$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)/.claude/skills/managing-mcp-wrappers/scripts"
 npm install
 ```
 
@@ -358,12 +358,12 @@ When CLI commands fail, distinguish between:
 This is a tool execution error, not a compliance violation.
 
 Possible causes:
-1. Not in correct directory (need .claude/skills/mcp-manager/scripts)
+1. Not in correct directory (need .claude/skills/managing-mcp-wrappers/scripts)
 2. npm dependencies not installed
 3. Invalid service/tool name format
 
 Corrective action:
-cd $(git rev-parse --show-toplevel)/.claude/skills/mcp-manager/scripts && npm install
+cd $(git rev-parse --show-toplevel)/.claude/skills/managing-mcp-wrappers/scripts && npm install
 ```
 
 ## Related Skills

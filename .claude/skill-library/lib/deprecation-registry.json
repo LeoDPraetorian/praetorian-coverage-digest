@@ -1,7 +1,7 @@
 {
   "$schema": "./deprecation-registry.schema.json",
   "version": "1.0.0",
-  "lastUpdated": "2025-11-29",
+  "lastUpdated": "2025-12-19",
   "description": "Central registry of deprecated commands, skills, agents, and patterns. Used by audit-references and fix-references skills to detect and remediate outdated references.",
 
   "commands": {
@@ -284,10 +284,34 @@
       "migrationNotes": "Use: npm run -w @chariot/skill-manager audit -- [name] [--phase N] OR npm run -w @chariot/skill-manager fix -- <name> [--dry-run]"
     },
     "claude-skill-search": {
-      "replacedBy": "skill-manager",
+      "replacedBy": "managing-skills",
       "deprecatedDate": "2025-11-29",
-      "reason": "Consolidated into unified skill-manager skill with enhanced dual-location search",
-      "migrationNotes": "Use: npm run -w @chariot/skill-manager search -- \"<query>\" (NOW searches both core and library locations)"
+      "reason": "Consolidated into unified managing-skills skill with enhanced dual-location search",
+      "migrationNotes": "Use: skill: \"managing-skills\" or /skill-manager command"
+    },
+    "agent-manager": {
+      "replacedBy": "managing-agents",
+      "deprecatedDate": "2025-12-19",
+      "reason": "Renamed to avoid namespace collision with /agent-manager command (same name caused skill resolution instead of command)",
+      "migrationNotes": "Use: skill: \"managing-agents\" - command /agent-manager remains unchanged"
+    },
+    "skill-manager": {
+      "replacedBy": "managing-skills",
+      "deprecatedDate": "2025-12-19",
+      "reason": "Renamed to avoid namespace collision with /skill-manager command (same name caused skill resolution instead of command)",
+      "migrationNotes": "Use: skill: \"managing-skills\" - command /skill-manager remains unchanged"
+    },
+    "command-manager": {
+      "replacedBy": "managing-commands",
+      "deprecatedDate": "2025-12-19",
+      "reason": "Renamed to avoid namespace collision with /command-manager command (same name caused skill resolution instead of command)",
+      "migrationNotes": "Use: skill: \"managing-commands\" - command /command-manager remains unchanged"
+    },
+    "mcp-manager": {
+      "replacedBy": "managing-mcp-wrappers",
+      "deprecatedDate": "2025-12-19",
+      "reason": "Renamed to avoid namespace collision with /mcp-manager command (same name caused skill resolution instead of command)",
+      "migrationNotes": "Use: skill: \"managing-mcp-wrappers\" - command /mcp-manager remains unchanged"
     }
   },
 

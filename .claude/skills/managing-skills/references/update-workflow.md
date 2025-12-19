@@ -136,7 +136,7 @@ wc -l SKILL.md  # Should be < 500 lines
 **Step 7.1: Read Progressive Disclosure Guide**
 
 ```
-Read: .claude/skills/skill-manager/references/progressive-disclosure.md
+Read: .claude/skills/managing-skills/references/progressive-disclosure.md
 ```
 
 This reference explains:

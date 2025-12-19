@@ -132,7 +132,7 @@ For specific implementations, load the individual service skill.
 
 ## Related
 
-- **mcp-manager**: Wrapper lifecycle management - update/audit/fix existing wrappers (use `/mcp-manager` command)
+- **managing-mcp-wrappers**: Wrapper lifecycle management - update/audit/fix existing wrappers (use `/mcp-manager` command)
 - **creating-mcp-wrappers**: Create new wrappers with instruction-driven workflow (use skill above)
 - **Full architecture**: `docs/MCP-TOOLS-ARCHITECTURE.md`
 

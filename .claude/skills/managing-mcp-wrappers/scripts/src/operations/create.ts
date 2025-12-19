@@ -63,7 +63,7 @@ export async function createWrapper(options: CLIOptions): Promise<number> {
   const tsconfigPath = path.join(serviceDir, 'tsconfig.json');
   if (!fs.existsSync(tsconfigPath)) {
     // Create new tsconfig.json from template
-    const tsconfigTemplatePath = path.join(repoRoot, '.claude', 'skills', 'mcp-manager', 'templates', 'tsconfig.json.tmpl');
+    const tsconfigTemplatePath = path.join(repoRoot, '.claude', 'skills', 'managing-mcp-wrappers', 'templates', 'tsconfig.json.tmpl');
     if (fs.existsSync(tsconfigTemplatePath)) {
       let tsconfigContent = fs.readFileSync(tsconfigTemplatePath, 'utf-8');
       tsconfigContent = tsconfigContent.replace(/\{\{TOOL_NAME\}\}/g, tool);
@@ -93,7 +93,7 @@ export async function createWrapper(options: CLIOptions): Promise<number> {
   console.log('📡 STEP 1: Schema Discovery\n');
   console.log('Run the schema discovery script with 3+ test cases:');
   console.log(`
-  npx tsx .claude/skills/mcp-manager/templates/discover-schema.ts \\
+  npx tsx .claude/skills/managing-mcp-wrappers/templates/discover-schema.ts \\
     --mcp ${service} \\
     --tool ${tool} \\
     --cases 3
@@ -109,7 +109,7 @@ export async function createWrapper(options: CLIOptions): Promise<number> {
   console.log('🔴 STEP 2: Generate Tests (RED Phase)\n');
 
   // Read template and generate test file
-  const templatePath = path.join(repoRoot, '.claude', 'skills', 'mcp-manager', 'templates', 'unit-test.ts.tmpl');
+  const templatePath = path.join(repoRoot, '.claude', 'skills', 'managing-mcp-wrappers', 'templates', 'unit-test.ts.tmpl');
   if (!fs.existsSync(templatePath)) {
     console.error(`❌ Test template not found: ${templatePath}`);
     return EXIT_ERROR;
@@ -154,7 +154,7 @@ export async function createWrapper(options: CLIOptions): Promise<number> {
   console.log('This ensures tests are written and failing before implementation.\n');
 
   console.log('Documentation:');
-  console.log('  .claude/skills/mcp-manager/references/new-workflow.md\n');
+  console.log('  .claude/skills/managing-mcp-wrappers/references/new-workflow.md\n');
 
   return EXIT_SUCCESS;
 }

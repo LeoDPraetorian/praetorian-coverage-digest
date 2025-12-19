@@ -79,7 +79,7 @@ For heavily reused skills, create `evaluations/test-case-{n}.json` with query, e
 ### 1.4 Confirm RED State
 
 Ask: "Does this failure accurately capture why we need this skill?"
-**If unsure**: Use `skill-manager search` to check for existing skills first.
+**If unsure**: Use `managing-skills search` to check for existing skills first.
 
 ---
 
@@ -472,7 +472,7 @@ Empty skills with TODO placeholders are useless. Always populate with real conte
 **If you create a skill >500 lines:**
 1. You violated the creation workflow
 2. You must immediately restructure with progressive disclosure
-3. See `.claude/skills/skill-manager/references/progressive-disclosure.md`
+3. See `.claude/skills/managing-skills/references/progressive-disclosure.md`
 
 **Real example**: `frontend-architecture` skill has 293-line SKILL.md + 7 reference files (16KB total content). This is the standard.
 
@@ -485,5 +485,5 @@ Avoid info that becomes outdated. Use "Old Patterns" section with `<details>` ta
 ## Related Skills
 
 - `researching-skills` - Research workflow for populating skill content
-- `skill-manager` - Audit and fix existing skills (TypeScript CLI)
+- `managing-skills` - Audit and fix existing skills (TypeScript CLI)
 - `testing-skills-with-subagents` - Detailed pressure testing methodology for REFACTOR phase

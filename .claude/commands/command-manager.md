@@ -3,12 +3,12 @@ description: Command management - create, audit, fix, list slash commands
 argument-hint: <create|audit|fix|list> [command-name] [options]
 model: sonnet
 allowed-tools: Skill, AskUserQuestion
-skills: command-manager
+skills: managing-commands
 ---
 
 # Command Management
 
-**ACTION:** Invoke the `command-manager` skill immediately.
+**ACTION:** Invoke the `managing-commands` skill immediately.
 
 **Arguments:**
 
@@ -18,20 +18,11 @@ skills: command-manager
 
 **Critical Rules:**
 
-1. **ROUTER PATTERN:** Commands delegate to skills, contain zero logic.
-2. **DELEGATE COMPLETELY:** Invoke the skill and display output verbatim.
-3. **DO NOT SEARCH:** Do not attempt to find command files yourself.
-4. **Output:** Display the CLI output verbatim.
+1. **DELEGATE COMPLETELY:** The managing-commands skill handles all command lifecycle operations.
+2. **USE INTERACTION:** Skills may use `AskUserQuestion` for user choices.
+3. **DISPLAY OUTPUT:** Display the skill output verbatim.
+4. **DO NOT BYPASS:** Do not attempt to execute operations yourself.
+
+**Note:** The `managing-commands` skill enforces the Router Pattern and validates frontmatter compliance.
 
 ---
-
-## Quick Reference
-
-| Command                                    | Description                     |
-| ------------------------------------------ | ------------------------------- |
-| `/command-manager create <name> ["desc"]`  | Create command (Router Pattern) |
-| `/command-manager audit <name>`            | Validate single command         |
-| `/command-manager audit`                   | Validate all commands           |
-| `/command-manager audit <name> --phase N`  | Run specific audit phase (1-8)  |
-| `/command-manager fix <name> [--dry-run]`  | Fix compliance issues           |
-| `/command-manager list`                    | List all commands               |

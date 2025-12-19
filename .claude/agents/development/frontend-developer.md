@@ -169,6 +169,15 @@ className = "bg-gray-900 text-white";
    - Runs ESLint only on modified files (not entire codebase)
    - Use before committing to verify code quality
 
+   **Example:**
+   ```markdown
+   ❌ WRONG - Manual ESLint:
+   npx eslint --fix src/sections/assets/AssetSearch.tsx
+
+   ✅ RIGHT - Invoke skill:
+   skill: "using-eslint"
+   ```
+
 8. **`verifying-before-completion`** - **INVOKE BEFORE CLAIMING DONE**: `skill: "verifying-before-completion"`
 
    - Run `npm test` and `npm run build`

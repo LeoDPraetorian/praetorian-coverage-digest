@@ -23,9 +23,9 @@ allowed-tools: Read, Skill
 
 ## Agent Management (8 operations)
 
-**Router Skill:** `.claude/skills/agent-manager/SKILL.md`
+**Router Skill:** `.claude/skills/managing-agents/SKILL.md`
 
-The agent-manager skill routes to:
+The managing-agents skill routes to:
 
 | Operation | Skill |
 |-----------|-------|
@@ -43,8 +43,8 @@ The agent-manager skill routes to:
 # Via command (recommended)
 /agent-manager <operation> <args>
 
-# Via agent-manager skill
-skill: "agent-manager"
+# Via managing-agents skill
+skill: "managing-agents"
 
 # Direct skill access
 Read: .claude/skill-library/claude/agent-management/creating-agents/SKILL.md
@@ -54,9 +54,9 @@ Read: .claude/skill-library/claude/agent-management/creating-agents/SKILL.md
 
 ## Skill Management (9 operations)
 
-**Router Skill:** `.claude/skills/skill-manager/SKILL.md`
+**Router Skill:** `.claude/skills/managing-skills/SKILL.md`
 
-The skill-manager skill routes to:
+The managing-skills skill routes to:
 
 | Operation | Skill |
 |-----------|-------|
@@ -75,8 +75,8 @@ The skill-manager skill routes to:
 # Via command (recommended)
 /skill-manager <operation> <args>
 
-# Via skill-manager skill
-skill: "skill-manager"
+# Via managing-skills skill
+skill: "managing-skills"
 
 # Direct skill access (instruction-based operations)
 Read: .claude/skills/creating-skills/SKILL.md
@@ -94,7 +94,7 @@ Read: .claude/skill-library/claude/skill-management/listing-skills/SKILL.md
 
 ## Command Management
 
-**Router Skill:** `.claude/skills/command-manager/SKILL.md`
+**Router Skill:** `.claude/skills/managing-commands/SKILL.md`
 
 **Operations:** create, audit, fix, list
 
@@ -107,7 +107,7 @@ Read: .claude/skill-library/claude/skill-management/listing-skills/SKILL.md
 
 ## MCP Management
 
-**Router Skill:** `.claude/skills/mcp-manager/SKILL.md`
+**Router Skill:** `.claude/skills/managing-mcp-wrappers/SKILL.md`
 
 **Operations:** create, verify-red, generate-wrapper, verify-green, update, audit, fix, test
 
@@ -133,7 +133,7 @@ OR
 User: "How do I manage agents in Claude Code?"
 → Read this gateway
 → See agent management section
-→ Follow to agent-manager skill
+→ Follow to managing-agents skill
 ```
 
 **Pattern 3: Direct library access**
@@ -148,10 +148,10 @@ User: "I need to audit an agent"
 
 | What to Manage | Router Skill | Location |
 |----------------|--------------|----------|
-| **Agents** | `agent-manager` | `.claude/skills/agent-manager/SKILL.md` |
-| **Skills** | `skill-manager` | `.claude/skills/skill-manager/SKILL.md` |
-| **Commands** | `command-manager` | `.claude/skills/command-manager/SKILL.md` |
-| **MCP Wrappers** | `mcp-manager` | `.claude/skills/mcp-manager/SKILL.md` |
+| **Agents** | `managing-agents` | `.claude/skills/managing-agents/SKILL.md` |
+| **Skills** | `managing-skills` | `.claude/skills/managing-skills/SKILL.md` |
+| **Commands** | `managing-commands` | `.claude/skills/managing-commands/SKILL.md` |
+| **MCP Wrappers** | `managing-mcp-wrappers` | `.claude/skills/managing-mcp-wrappers/SKILL.md` |
 
 **All router skills stay in Core. All operation skills moved to Library.**
 
@@ -181,7 +181,7 @@ User: "I need to audit an agent"
 
 ## See Also
 
-- `agent-manager` - Agent lifecycle operations (routes to library)
-- `skill-manager` - Skill lifecycle operations
-- `command-manager` - Command lifecycle operations
-- `mcp-manager` - MCP wrapper lifecycle operations
+- `managing-agents` - Agent lifecycle operations (routes to library)
+- `managing-skills` - Skill lifecycle operations
+- `managing-commands` - Command lifecycle operations
+- `managing-mcp-wrappers` - MCP wrapper lifecycle operations

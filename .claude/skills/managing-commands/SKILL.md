@@ -1,5 +1,5 @@
 ---
-name: command-manager
+name: managing-commands
 description: Use when creating, auditing, fixing, or listing slash commands - enforces Router Pattern (commands delegate to skills), validates frontmatter compliance, detects Tool/Logic Leakage
 allowed-tools: Bash, Edit, Glob, Grep, Read, Write
 ---
@@ -24,7 +24,7 @@ Unified command lifecycle management with Router Pattern enforcement.
 | Fix       | `npm run fix -- <name> [--dry-run]`   | Auto-fix compliance issues             |
 | List      | `npm run list`                        | Show all commands with status          |
 
-**CLI Location:** `.claude/skills/command-manager/scripts/`
+**CLI Location:** `.claude/skills/managing-commands/scripts/`
 
 ## Router Pattern
 

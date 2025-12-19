@@ -80,7 +80,7 @@ Options:
   - Unclear - help me determine
 ```
 
-**If "skill"**: Recommend using `skill-manager` instead.
+**If "skill"**: Recommend using `managing-skills` instead.
 
 **Cannot proceed without confirming agent update needed** ✅
 

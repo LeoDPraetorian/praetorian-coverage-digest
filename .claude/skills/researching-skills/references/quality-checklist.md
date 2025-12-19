@@ -12,7 +12,7 @@ Create these todos after generating the skill:
 3. "Validate line count"
 4. "Validate code examples"
 5. "Validate references"
-6. "Run skill-manager audit"
+6. "Run managing-skills audit"
 ```
 
 ## Checklist Items
@@ -80,7 +80,7 @@ wc -l .claude/skill-library/CATEGORY/SKILL_NAME/SKILL.md
 Run the audit to catch additional issues:
 
 ```bash
-cd .claude/skills/skill-manager/scripts
+cd .claude/skills/managing-skills/scripts
 npm run audit -- SKILL_NAME
 ```
 

@@ -80,7 +80,7 @@ export async function updateWrapper(options: CLIOptions): Promise<number> {
   console.log('📡 STEP 3: Schema Discovery (New Fields)\n');
   console.log('If adding new fields, run schema discovery:');
   console.log(`
-  npx tsx .claude/skills/mcp-manager/templates/discover-schema.ts \\
+  npx tsx .claude/skills/managing-mcp-wrappers/templates/discover-schema.ts \\
     --mcp ${service} \\
     --tool ${tool} \\
     --cases 3
@@ -141,7 +141,7 @@ export async function updateWrapper(options: CLIOptions): Promise<number> {
   console.log('□ 8. Integration tests pass');
   console.log('□ 9. Audit passes (11 phases)');
   console.log('\nDocumentation:');
-  console.log('  .claude/skills/mcp-manager/references/update-workflow.md\n');
+  console.log('  .claude/skills/managing-mcp-wrappers/references/update-workflow.md\n');
 
   // Check skill-schema synchronization (Phase 11)
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

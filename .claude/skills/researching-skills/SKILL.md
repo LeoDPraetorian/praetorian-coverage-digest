@@ -302,5 +302,5 @@ Run quality checklist. See [Quality Checklist](references/quality-checklist.md).
 ## Related Skills
 
 - `creating-skills` - Skill creation workflow (uses this skill for research)
-- `skill-manager` - Lifecycle management (audit, fix, rename)
+- `managing-skills` - Lifecycle management (audit, fix, rename)
 - `gateway-mcp-tools` - MCP tool access routing

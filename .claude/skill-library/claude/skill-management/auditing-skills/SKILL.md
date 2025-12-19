@@ -161,7 +161,7 @@ npm run audit -- <skill-name> --fix
   Phase 3 (Word Count): FAILURE
     SKILL.md has 687 lines (limit: 500)
     Extract content to references/ directory
-    See: .claude/skills/skill-manager/references/progressive-disclosure.md
+    See: .claude/skills/managing-skills/references/progressive-disclosure.md
 
   Phase 4 (Broken Links): FAILURE
     2 broken references found:
