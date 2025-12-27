@@ -5,6 +5,7 @@ Structured JSON format for passing context between phases and agents.
 ## Purpose
 
 Enable clean coordination between phases by:
+
 - Standardizing agent output format
 - Providing context for next phase
 - Tracking completion status
@@ -41,15 +42,16 @@ All Task agents **MUST** return this JSON structure:
 
 ### status
 
-| Value | When to Use |
-|-------|-------------|
-| `complete` | All work finished successfully, ready for next phase |
-| `blocked` | Cannot proceed without user input or external dependency |
+| Value          | When to Use                                                |
+| -------------- | ---------------------------------------------------------- |
+| `complete`     | All work finished successfully, ready for next phase       |
+| `blocked`      | Cannot proceed without user input or external dependency   |
 | `needs_review` | Work complete but requires user approval before next phase |
 
 ### phase
 
 Current phase being completed:
+
 - `architecture` - From architect agents
 - `implementation` - From developer agents
 - `testing` - From test engineer agents
@@ -108,6 +110,7 @@ Evidence that work is correct:
 ```
 
 For architecture phase:
+
 ```json
 "verification": {
   "patterns_referenced": true,
@@ -119,6 +122,7 @@ For architecture phase:
 ### handoff.next_phase
 
 Next phase in the sequence:
+
 - `implementation` - After architecture
 - `testing` - After implementation
 - `complete` - After testing (feature done)
@@ -220,7 +224,7 @@ Only populated when `status: "blocked"`:
   },
   "handoff": {
     "next_phase": "testing",
-    "recommended_agent": "backend-unit-test-engineer",
+    "recommended_agent": "backend-tester",
     "context": "Handler at pkg/handler/handlers/dashboard/get_metrics.go. Accepts query params: timeRange (7d|30d|90d), metricTypes (scans|vulns|assets). Returns aggregated metrics from DynamoDB. Added unit tests but need more edge case coverage: invalid timeRange, missing auth, empty results. Target 80% coverage.",
     "blockers": []
   }
@@ -262,9 +266,7 @@ Only populated when `status: "blocked"`:
   "status": "blocked",
   "phase": "implementation",
   "summary": "Partially implemented dashboard, blocked on missing API specification",
-  "files_modified": [
-    "modules/chariot/ui/src/sections/dashboard/index.tsx"
-  ],
+  "files_modified": ["modules/chariot/ui/src/sections/dashboard/index.tsx"],
   "artifacts": [],
   "verification": {
     "build_success": false,
@@ -294,9 +296,9 @@ Only populated when `status: "blocked"`:
 const handoff = previousAgentResult.handoff;
 
 // Check status
-if (previousAgentResult.status === 'blocked') {
-  console.log('Previous phase blocked:');
-  handoff.blockers.forEach(b => console.log(`- ${b.description}`));
+if (previousAgentResult.status === "blocked") {
+  console.log("Previous phase blocked:");
+  handoff.blockers.forEach((b) => console.log(`- ${b.description}`));
 
   // Resolve blockers before continuing
   await resolveBlockers(handoff.blockers);
@@ -310,7 +312,7 @@ const nextAgentPrompt = `
   ${handoff.context}
 
   FILES MODIFIED:
-  ${previousAgentResult.files_modified.join('\n')}
+  ${previousAgentResult.files_modified.join("\n")}
 `;
 ```
 
@@ -324,12 +326,12 @@ function validateHandoff(handoff: AgentHandoff): boolean {
   if (!handoff.summary) return false;
 
   // Context required unless status is complete at end
-  if (handoff.handoff.next_phase !== 'complete' && !handoff.handoff.context) {
+  if (handoff.handoff.next_phase !== "complete" && !handoff.handoff.context) {
     return false;
   }
 
   // Blockers required if status is blocked
-  if (handoff.status === 'blocked' && handoff.handoff.blockers.length === 0) {
+  if (handoff.status === "blocked" && handoff.handoff.blockers.length === 0) {
     return false;
   }
 

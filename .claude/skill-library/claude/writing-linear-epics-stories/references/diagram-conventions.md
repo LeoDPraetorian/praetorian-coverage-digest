@@ -5,12 +5,14 @@ ASCII art patterns for documenting system architecture, workflows, and dependenc
 ## Why Use ASCII Diagrams?
 
 **Benefits:**
+
 - ✅ Renders in plain text (Linear, GitHub, Slack)
 - ✅ Version control friendly (diffs work)
 - ✅ No external tools needed
 - ✅ Fast to create and modify
 
 **Use for:**
+
 - System architecture (components + connections)
 - Data flow (how information moves)
 - Workflows (step-by-step processes)
@@ -33,6 +35,7 @@ ASCII art patterns for documenting system architecture, workflows, and dependenc
 **When to use:** Show how major components connect
 
 **Example: Real-Time Notifications**
+
 ```
 ┌─────────────┐       ┌──────────────┐       ┌─────────────┐
 │   Client    │──WS──→│   API GW     │──────→│   Lambda    │
@@ -298,6 +301,7 @@ Connectors:     ▼ ▲ ◄ ►
 ```
 
 **Creating boxes:**
+
 ```
 ┌─────────────┐
 │   Content   │
@@ -305,6 +309,7 @@ Connectors:     ▼ ▲ ◄ ►
 ```
 
 **Creating connections:**
+
 ```
 Component A ──→ Component B
 Component C ←── Component D
@@ -336,6 +341,7 @@ Component C ←── Component D
 ### Example 1: Nuclei Template Intelligence (CHARIOT-1853)
 
 **Architecture diagram showing agent coordination:**
+
 ```
                          ┌─────────────────────────┐
                          │  (1) Agent Sandbox      │
@@ -367,6 +373,7 @@ Component C ←── Component D
 ```
 
 **What it shows:**
+
 - Agent Sandbox is foundation (built first)
 - Multiple agents depend on Sandbox
 - Comparison Engine depends on Mapping
@@ -376,6 +383,7 @@ Component C ←── Component D
 ### Example 2: Template Refinement Workflow (CHARIOT-1852)
 
 **User flow showing interaction:**
+
 ```
 Evidence Tab (Enhanced)
 ├── Attributes section (existing)
@@ -397,6 +405,7 @@ Evidence Tab (Enhanced)
 ```
 
 **What it shows:**
+
 - Hierarchical UI structure
 - User interaction flow
 - Modal workflow
@@ -409,6 +418,7 @@ Evidence Tab (Enhanced)
 Copy-paste these as starting points:
 
 ### Simple Linear Flow
+
 ```
 Step 1
   │
@@ -420,6 +430,7 @@ Step 3
 ```
 
 ### Component Connection
+
 ```
 ┌─────────┐       ┌─────────┐
 │ Comp A  │──────→│ Comp B  │
@@ -427,6 +438,7 @@ Step 3
 ```
 
 ### Three-Tier Architecture
+
 ```
 ┌───────────────────────┐
 │   Frontend Layer      │
@@ -444,6 +456,7 @@ Step 3
 ```
 
 ### Parallel Branches
+
 ```
 Input
   ├─→ Branch A

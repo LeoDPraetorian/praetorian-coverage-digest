@@ -1,258 +1,137 @@
 # Agent Creation Workflow
 
-> **⚠️ DEPRECATION NOTICE (December 2024)**
->
-> **This workflow documents ARCHIVED CLI commands (`npm run create`).**
->
-> **For agent creation, use the instruction-based skill instead:**
-> ```
-> skill: "creating-agents"
-> ```
->
-> **Why the change?** Analysis showed 97% of TypeScript code duplicated Claude's native capabilities. The instruction-based workflow provides:
-> - Full 10-phase TDD with pressure testing (Phase 10)
-> - Skill verification phase (Phase 8)
-> - Interactive AskUserQuestion guidance
-> - More flexibility than TypeScript code
->
-> **See:** `.claude/skills/creating-agents/SKILL.md` for the current workflow
->
-> ---
->
-> **The content below is kept for historical reference only.**
+**Instruction-based workflow with full 10-phase TDD cycle.**
 
-## Overview (ARCHIVED)
+⚠️ **As of December 2024, agent creation uses instruction-based workflow, not CLI commands.**
 
-Creating a new agent follows a TDD workflow:
-1. **RED**: Document the gap this agent fills
-2. **GREEN**: Generate from lean template
-3. **REFACTOR**: Run audit and customize
-
-## Quick Start
-
-```bash
-# Create a new agent
-npm run --silent create -- my-agent "Use when [trigger] - [capabilities]" --type development
-
-# Get description suggestions
-npm run --silent create -- my-agent --suggest
-
-# Preview without writing
-npm run --silent create -- my-agent "Use when..." --type development --dry-run
-```
-
-## Command Reference
-
-```bash
-npm run --silent create -- <name> "<description>" --type <category>
-npm run --silent create -- <name> --suggest
-```
-
-### Parameters
-
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `name` | Yes | Agent name in kebab-case |
-| `description` | Yes (unless --suggest) | Must start with "Use when" |
-| `--type` | No | Category (default: development) |
-| `--suggest` | No | Get description suggestions |
-| `--dry-run` | No | Preview without writing |
-
-### Valid Categories
-
-- architecture
-- development
-- testing
-- quality
-- analysis
-- research
-- orchestrator
-- mcp-tools
-
-## TDD Workflow
-
-### Phase 1: RED - Document the Gap
-
-Before creating an agent, document what gap it fills:
-
-1. **What problem does this solve?**
-   - What task is currently unhandled?
-   - What user requests trigger this need?
-
-2. **Why can't existing agents handle this?**
-   - List agents you considered
-   - Explain the gap
-
-3. **What will success look like?**
-   - Define the expected output
-   - List verification criteria
-
-### Phase 2: GREEN - Generate from Template
-
-Run the create command:
-
-```bash
-npm run --silent create -- my-agent "Use when developing..." --type development
-```
-
-The template includes:
-- Standard frontmatter with gateway skill
-- Role statement placeholder
-- Skill references table
-- Critical rules section
-- Mandatory skills (TDD, debugging, verification)
-- Output format (standardized JSON)
-- Escalation protocol
-- Quality checklist
-
-### Phase 3: REFACTOR - Customize and Verify
-
-1. **Customize the template**:
-   - Update role statement
-   - Add specific responsibilities
-   - Fill skill references table
-   - Define critical rules
-   - Specify escalation conditions
-
-2. **Run audit**:
-   ```bash
-   npm run --silent audit -- my-agent
-   ```
-
-3. **Fix any issues**:
-   ```bash
-   npm run --silent fix -- my-agent --suggest
-   ```
-
-4. **Test discovery**:
-   ```bash
-   npm run --silent test -- my-agent
-   ```
-
-## Description Best Practices
-
-### Required Pattern
-
-```
-Use when [TRIGGER] - [CAPABILITIES].
-```
-
-### With Examples (Recommended)
-
-```yaml
-description: Use when developing React applications - components, UI bugs, performance.\n\n<example>\nContext: User needs dashboard\nuser: "Create metrics dashboard"\nassistant: "I'll use react-developer"\n</example>
-```
-
-### Capabilities Listing
-
-Include comma-separated capabilities:
-- Be specific (not "help with code")
-- Use action verbs
-- Keep it scannable
-
-### Example Generation
-
-Use `--suggest` to get starting points:
-
-```bash
-npm run --silent create -- data-processor --suggest
-
-# Output:
-# 1. Use when developing data-processor features - [capabilities].
-# 2. Use when implementing data-processor functionality - [capabilities].
-# 3. Use when working on data-processor tasks - [capabilities].
-```
-
-## Lean Template Structure
-
-The generated template follows this structure (target: <300 lines):
-
-```markdown
----
-name: agent-name
-description: Use when [trigger] - [capabilities]
-type: development
-permissionMode: default
-tools: Read, Write, Edit, Bash, Glob, Grep
-skills: gateway-frontend
-model: sonnet
 ---
 
-# Agent Name
+## Overview
 
-You are a specialized [category] agent.
+Creating a new agent follows a comprehensive TDD workflow with skill verification and pressure testing. This ensures agents are needed, functional, and resistant to bypass rationalization.
 
-## Core Responsibilities
-[3-5 bullet points]
+## How to Create an Agent
 
-## Skill References (Load On-Demand via Gateway)
-[Table of tasks to skills]
+**Route to the creating-agents skill:**
 
-## Critical Rules (Non-Negotiable)
-[Agent-specific rules]
-
-## Mandatory Skills (Must Use)
-[TDD, debugging, verification references]
-
-## Output Format (Standardized)
-[JSON structure]
-
-## Escalation Protocol
-[Stopping conditions and handoffs]
-
-## Quality Checklist
-[Final verification items]
+```
+Read: .claude/skill-library/claude/agent-management/creating-agents/SKILL.md
 ```
 
-## Gateway Selection
+The `creating-agents` skill provides the complete workflow.
 
-The template auto-selects a gateway based on category:
+---
 
-| Category | Gateway |
-|----------|---------|
-| development (frontend) | gateway-frontend |
-| development (backend) | gateway-backend |
-| testing | gateway-testing |
-| analysis | gateway-security |
-| mcp-tools | gateway-mcp-tools |
-| default | gateway-frontend |
+## What the Workflow Provides
 
-## Post-Creation Checklist
+### Full 10-Phase TDD Workflow
 
-After creating an agent:
+The creating-agents skill implements RED-GREEN-REFACTOR with additional verification phases:
 
-- [ ] Customize all placeholder sections
-- [ ] Run `npm run --silent audit -- <name>`
-- [ ] Address any errors or warnings
-- [ ] Run `npm run --silent test -- <name>`
-- [ ] Test discovery in new Claude Code session
-- [ ] Update cross-references if needed
+1. **Phase 1:** Gap Analysis (RED)
+2. **Phase 2:** Agent Type Selection
+3. **Phase 3:** Description Design
+4. **Phase 4:** Agent Generation (GREEN)
+5. **Phase 5:** Audit Compliance
+6. **Phase 6:** Discovery Testing
+7. **Phase 7:** Skill Integration
+8. **Phase 8:** Skill Verification (NEW)
+9. **Phase 9:** Final Audit
+10. **Phase 10:** Pressure Testing (REFACTOR)
 
-## Example: Creating a New Agent
+### Key Features
 
-```bash
-# 1. Document the gap (mentally or in notes)
-# Need an agent for GraphQL API development
+- **Phase 8: Skill Verification** - Tests each mandatory skill individually to ensure agent actually invokes them
+- **Phase 10: Pressure Testing** - Subagent-based testing with time/authority/sunk cost pressure scenarios
+- **Interactive guidance** - Uses AskUserQuestion for decisions (type selection, skill choices)
+- **TDD enforcement** - Cannot proceed without RED phase demonstrating gap
 
-# 2. Create the agent
-npm run --silent create -- graphql-developer "Use when developing GraphQL APIs - schema design, resolvers, queries, mutations" --type development
+---
 
-# 3. Review output
-# Created: .claude/agents/development/graphql-developer.md
+## Why Instruction-Based?
 
-# 4. Audit
-npm run --silent audit -- graphql-developer
+December 2024 analysis of the previous CLI-based workflow (`npm run create`) showed:
 
-# 5. Customize the template in your editor
+- **97% code duplication** - TypeScript implementation duplicated Claude's native capabilities
+- **Inflexibility** - Hard to add interactive workflows like pressure testing
+- **Skill verification gaps** - CLI couldn't spawn subagents to test skill invocation
+- **Maintenance overhead** - Code changes required for workflow adjustments
 
-# 6. Test
-npm run --silent test -- graphql-developer
+**Instruction-based benefits:**
 
-# 7. Verify discovery in new session
-```
+- Uses Claude's native tools (Read, Write, Edit, Task, AskUserQuestion)
+- Flexible for interactive workflows
+- Enables subagent-based pressure testing (Phase 10)
+- Enables per-skill verification (Phase 8)
+- Easy to update workflows (change instructions, not code)
 
-## References
+---
 
-- [Lean Agent Template](./lean-agent-template.md)
-- [Audit Phases](./audit-phases.md)
-- [Agent Architecture](../../../docs/AGENT-ARCHITECTURE.md)
+## Agent Type Options
+
+Selected in Phase 3 of the creating-agents workflow:
+
+| Type           | Purpose                            | Permission Mode |
+| -------------- | ---------------------------------- | --------------- |
+| `architecture` | System design, patterns, decisions | `plan`          |
+| `development`  | Implementation, coding, features   | `default`       |
+| `testing`      | Unit, integration, e2e testing     | `default`       |
+| `quality`      | Code review, auditing              | `default`       |
+| `analysis`     | Security, complexity assessment    | `plan`          |
+| `research`     | Web search, documentation          | `plan`          |
+| `orchestrator` | Coordination, workflows            | `default`       |
+| `mcp-tools`    | Specialized MCP access             | `default`       |
+
+---
+
+## Time Estimate
+
+- **Minimum (happy path):** 60 minutes
+  - All phases pass on first try
+  - No pressure test failures
+
+- **Typical:** 75-90 minutes
+  - 1-2 audit fix cycles
+  - 1-2 pressure test iterations
+
+- **Complex (with iterations):** 2-3 hours
+  - Multiple pressure test failures
+  - Skill verification issues
+  - Description refinement needed
+
+---
+
+## Prerequisites
+
+None - the creating-agents skill handles all setup internally.
+
+---
+
+## Documentation
+
+**Full workflow details:**
+`.claude/skill-library/claude/agent-management/creating-agents/SKILL.md`
+
+**Related references:**
+
+- [TDD Workflow](tdd-workflow.md) - RED-GREEN-REFACTOR methodology
+- [Lean Agent Pattern](lean-agent-pattern.md) - Template and guidelines
+- [Directory Structure](directory-structure.md) - Where agents are organized
+- [Discovery Testing](discovery-testing.md) - Verification protocol
+
+---
+
+## Historical Note: CLI Workflow (ARCHIVED)
+
+The previous TypeScript CLI workflow (`npm run create --`) was deprecated in December 2024.
+
+**Why deprecated:**
+
+- 97% code duplication with Claude's native capabilities
+- Could not support interactive workflows
+- Could not spawn subagents for pressure testing
+- Required code changes for workflow updates
+
+**Migration:** All agent creation now uses the instruction-based creating-agents skill.
+
+If you encounter references to `npm run create`, they are outdated and should be replaced with instructions to use the creating-agents skill.

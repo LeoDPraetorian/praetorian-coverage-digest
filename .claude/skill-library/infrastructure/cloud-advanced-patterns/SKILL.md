@@ -1,7 +1,7 @@
 ---
 name: cloud-advanced-patterns
 description: Use when implementing AWS Step Functions orchestration, EventBridge event routing, Lambda layers for code sharing, or DynamoDB stream processing - covers advanced AWS patterns for serverless orchestration, event-driven architecture, observability, and distributed systems coordination
-allowed-tools: 'Read, Write, Bash'
+allowed-tools: "Read, Write, Bash"
 ---
 
 # AWS Advanced Patterns

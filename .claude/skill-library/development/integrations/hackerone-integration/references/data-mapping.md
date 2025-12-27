@@ -10,32 +10,33 @@ This document defines the canonical mapping between HackerOne report fields and 
 
 ### Identity Fields
 
-| HackerOne Field | Chariot Field | Transformation | Notes |
-|----------------|---------------|----------------|-------|
-| `report.id` | `Risk.ExternalID` | String | Store as-is |
-| `report.type` | `Risk.Source` | Constant | Always "hackerone" |
-| `report.attributes.created_at` | `Risk.CreatedAt` | ISO8601 → Time | Parse timestamp |
-| `report.attributes.updated_at` | `Risk.UpdatedAt` | ISO8601 → Time | Parse timestamp |
+| HackerOne Field                | Chariot Field     | Transformation | Notes              |
+| ------------------------------ | ----------------- | -------------- | ------------------ |
+| `report.id`                    | `Risk.ExternalID` | String         | Store as-is        |
+| `report.type`                  | `Risk.Source`     | Constant       | Always "hackerone" |
+| `report.attributes.created_at` | `Risk.CreatedAt`  | ISO8601 → Time | Parse timestamp    |
+| `report.attributes.updated_at` | `Risk.UpdatedAt`  | ISO8601 → Time | Parse timestamp    |
 
 ### Content Fields
 
-| HackerOne Field | Chariot Field | Transformation | Notes |
-|----------------|---------------|----------------|-------|
-| `report.attributes.title` | `Risk.Title` | String | Prefix with "[HackerOne]" |
+| HackerOne Field                               | Chariot Field      | Transformation   | Notes                     |
+| --------------------------------------------- | ------------------ | ---------------- | ------------------------- |
+| `report.attributes.title`                     | `Risk.Title`       | String           | Prefix with "[HackerOne]" |
 | `report.attributes.vulnerability_information` | `Risk.Description` | Markdown → Plain | Strip markdown formatting |
-| `report.attributes.weakness.name` | `Risk.Category` | CWE → Category | See CWE mapping below |
+| `report.attributes.weakness.name`             | `Risk.Category`    | CWE → Category   | See CWE mapping below     |
 
 ### Severity Mapping
 
 | HackerOne Severity | CVSS Score | Chariot Priority | Chariot Numeric |
-|-------------------|------------|------------------|-----------------|
-| `critical` | 9.0 - 10.0 | P0 | 0 |
-| `high` | 7.0 - 8.9 | P1 | 1 |
-| `medium` | 4.0 - 6.9 | P2 | 2 |
-| `low` | 0.1 - 3.9 | P3 | 3 |
-| `none` | 0.0 | P4 | 4 |
+| ------------------ | ---------- | ---------------- | --------------- |
+| `critical`         | 9.0 - 10.0 | P0               | 0               |
+| `high`             | 7.0 - 8.9  | P1               | 1               |
+| `medium`           | 4.0 - 6.9  | P2               | 2               |
+| `low`              | 0.1 - 3.9  | P3               | 3               |
+| `none`             | 0.0        | P4               | 4               |
 
 **Implementation:**
+
 ```go
 func MapSeverityToPriority(severity string) int {
     mapping := map[string]int{
@@ -55,16 +56,16 @@ func MapSeverityToPriority(severity string) int {
 
 ### State Mapping
 
-| HackerOne State | Chariot Status | Description |
-|----------------|----------------|-------------|
-| `new` | `open` | Newly submitted report |
-| `triaged` | `confirmed` | Validated by security team |
-| `needs-more-info` | `pending` | Waiting for researcher response |
-| `resolved` | `resolved` | Fixed and verified |
-| `not-applicable` | `rejected` | Out of scope or invalid |
-| `informative` | `info` | Informational only |
-| `duplicate` | `duplicate` | Already reported |
-| `spam` | `rejected` | Invalid submission |
+| HackerOne State   | Chariot Status | Description                     |
+| ----------------- | -------------- | ------------------------------- |
+| `new`             | `open`         | Newly submitted report          |
+| `triaged`         | `confirmed`    | Validated by security team      |
+| `needs-more-info` | `pending`      | Waiting for researcher response |
+| `resolved`        | `resolved`     | Fixed and verified              |
+| `not-applicable`  | `rejected`     | Out of scope or invalid         |
+| `informative`     | `info`         | Informational only              |
+| `duplicate`       | `duplicate`    | Already reported                |
+| `spam`            | `rejected`     | Invalid submission              |
 
 ### Asset Mapping
 
@@ -108,20 +109,21 @@ func mapAssetType(h1Type string) string {
 
 HackerOne uses CWE (Common Weakness Enumeration) IDs. Map to Chariot categories:
 
-| CWE ID | CWE Name | Chariot Category |
-|--------|----------|------------------|
-| 79 | Cross-Site Scripting | XSS |
-| 89 | SQL Injection | SQL_INJECTION |
-| 287 | Improper Authentication | AUTH_BYPASS |
-| 352 | Cross-Site Request Forgery | CSRF |
-| 20 | Improper Input Validation | INPUT_VALIDATION |
-| 22 | Path Traversal | PATH_TRAVERSAL |
-| 78 | OS Command Injection | COMMAND_INJECTION |
-| 200 | Information Exposure | INFO_DISCLOSURE |
-| 434 | Unrestricted File Upload | FILE_UPLOAD |
-| 502 | Deserialization of Untrusted Data | DESERIALIZATION |
+| CWE ID | CWE Name                          | Chariot Category  |
+| ------ | --------------------------------- | ----------------- |
+| 79     | Cross-Site Scripting              | XSS               |
+| 89     | SQL Injection                     | SQL_INJECTION     |
+| 287    | Improper Authentication           | AUTH_BYPASS       |
+| 352    | Cross-Site Request Forgery        | CSRF              |
+| 20     | Improper Input Validation         | INPUT_VALIDATION  |
+| 22     | Path Traversal                    | PATH_TRAVERSAL    |
+| 78     | OS Command Injection              | COMMAND_INJECTION |
+| 200    | Information Exposure              | INFO_DISCLOSURE   |
+| 434    | Unrestricted File Upload          | FILE_UPLOAD       |
+| 502    | Deserialization of Untrusted Data | DESERIALIZATION   |
 
 **Implementation:**
+
 ```go
 var cweMapping = map[string]string{
     "79":  "XSS",
@@ -222,6 +224,7 @@ func MapReportToRisk(report *Report) (*model.Risk, error) {
 ### Required Fields
 
 Before creating a Risk entity, validate:
+
 - ✅ Report has title (non-empty)
 - ✅ Report has severity rating
 - ✅ Report has valid state
@@ -230,7 +233,7 @@ Before creating a Risk entity, validate:
 
 ### Data Sanitization
 
-```go
+````go
 func sanitizeMarkdown(md string) string {
     // Remove markdown formatting for plain text description
     md = strings.ReplaceAll(md, "**", "")
@@ -246,7 +249,7 @@ func sanitizeMarkdown(md string) string {
 
     return strings.TrimSpace(md)
 }
-```
+````
 
 ## Related References
 

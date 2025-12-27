@@ -14,6 +14,7 @@ skills: threat-modeling-orchestrator
 **ACTION:** Invoke the `threat-modeling-orchestrator` skill.
 
 **Arguments:**
+
 - `scope`: $1 (Optional - can be path, "full", or "incremental:ref")
 
 **Output:** Display the tool output verbatim.
@@ -21,5 +22,5 @@ skills: threat-modeling-orchestrator
 ## Error Handling
 
 If skill returns error:
-  Display the error message verbatim.
-  Do not attempt workarounds.
+Display the error message verbatim.
+Do not attempt workarounds.

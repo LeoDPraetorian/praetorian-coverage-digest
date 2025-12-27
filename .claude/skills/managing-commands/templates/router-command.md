@@ -4,7 +4,7 @@ Use this template when your command delegates to a backing skill.
 
 ```markdown
 ---
-description: Use when [trigger] - [keywords]  # < 120 chars
+description: Use when [trigger] - [keywords] # < 120 chars
 argument-hint: <subcommand> [arg1] [arg2]
 allowed-tools: Skill, AskUserQuestion
 skills: backing-skill-name
@@ -23,6 +23,7 @@ skills: backing-skill-name
 **ACTION:** Invoke the `backing-skill-name` skill.
 
 **Arguments:**
+
 - `operation`: "subcommand-1"
 - `target`: $2 (Required)
 - `options`: $3 (Optional)
@@ -34,6 +35,7 @@ skills: backing-skill-name
 **ACTION:** Invoke the `backing-skill-name` skill.
 
 **Arguments:**
+
 - `operation`: "subcommand-2"
 - `target`: $2 (Required)
 
@@ -42,12 +44,12 @@ skills: backing-skill-name
 ## Error Handling
 
 If $1 invalid or missing:
-  Explain valid subcommands: subcommand-1, subcommand-2
-  Show usage: /command-name <subcommand> [args]
+Explain valid subcommands: subcommand-1, subcommand-2
+Show usage: /command-name <subcommand> [args]
 
 If skill returns error:
-  Display the error message verbatim.
-  Do not attempt workarounds.
+Display the error message verbatim.
+Do not attempt workarounds.
 ```
 
 ## Template Notes

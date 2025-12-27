@@ -1,0 +1,27 @@
+# test-quality-assessor Changelog
+
+## 2025-12-27 - Enhanced Testing Skills Coverage
+
+### Added
+- **Tier 1**: Added `test-infrastructure-discovery` skill for systematic discovery of existing test infrastructure (MSW, fixtures, utilities) before implementation
+- **Tier 3**: Added 11 specialized testing skills:
+  - `acceptance-test-assertors` - Assertion patterns in Chariot tests (QueueAssertor, TableAssertor, APIAssertor, FilesAssertor)
+  - `acceptance-test-operations` - TestHelper pattern for business-level test abstractions
+  - `acceptance-test-suite` - Chariot acceptance test architecture, environment setup, CI/CD
+  - `api-testing-patterns` - Contract testing, REST/GraphQL, integration patterns
+  - `cli-testing-patterns` - CLI testing strategies for Jest and pytest
+  - `compatibility-testing` - Cross-browser, cross-platform, cross-device testing
+  - `creating-mocks` - Comprehensive Vitest mocking patterns (vi.mock, MSW, factories)
+  - `frontend-interactive-form-testing` - State machine testing for forms (button states, uploads, workflows)
+  - `performance-testing` - Load testing, stress testing, performance benchmarks
+  - `verifying-vitest-test-integrity` - Detects test-production logic duplication anti-pattern
+  - `vitest-prepush-testing` - Configures pre-push hooks with Vitest
+
+### Changed
+- Reorganized Tier 3 table to alphabetical order for easier navigation
+- Expanded coverage from 8 to 19 Tier 3 skills (138% increase)
+
+### Impact
+- Agent now has comprehensive coverage across all testing dimensions: unit, integration, E2E, acceptance, performance, and compatibility
+- Enhanced ability to assess test quality for backend Go tests, frontend React/TypeScript tests, Python CLI tests, and Playwright E2E tests
+- Better detection of anti-patterns and infrastructure misuse through specialized skills

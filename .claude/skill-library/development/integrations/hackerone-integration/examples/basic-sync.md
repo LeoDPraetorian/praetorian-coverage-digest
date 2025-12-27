@@ -5,6 +5,7 @@
 ## Overview
 
 This example shows how to implement a basic one-way sync that:
+
 1. Fetches new HackerOne reports periodically
 2. Maps reports to Chariot Risk entities
 3. Creates Risks in Chariot database
@@ -12,6 +13,7 @@ This example shows how to implement a basic one-way sync that:
 ## Use Case
 
 Perfect for:
+
 - Initial HackerOne integration
 - Read-only vulnerability ingestion
 - Testing integration before full bidirectional sync
@@ -36,8 +38,8 @@ SyncHackerOneReportsFunction:
           Schedule: rate(15 minutes)
     Environment:
       Variables:
-        HACKERONE_API_ID: !Sub '{{resolve:secretsmanager:hackerone-credentials:SecretString:api_id}}'
-        HACKERONE_API_TOKEN: !Sub '{{resolve:secretsmanager:hackerone-credentials:SecretString:api_token}}'
+        HACKERONE_API_ID: !Sub "{{resolve:secretsmanager:hackerone-credentials:SecretString:api_id}}"
+        HACKERONE_API_TOKEN: !Sub "{{resolve:secretsmanager:hackerone-credentials:SecretString:api_token}}"
 ```
 
 ### Step 2: Sync Logic
@@ -199,6 +201,7 @@ func recordSyncMetrics(ctx context.Context, reportsProcessed, errorCount int) {
 ## Limitations
 
 This basic sync has limitations:
+
 - ❌ No real-time updates (15 minute polling delay)
 - ❌ No Chariot → HackerOne updates
 - ❌ No report activity/comment sync

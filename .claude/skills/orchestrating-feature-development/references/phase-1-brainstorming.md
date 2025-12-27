@@ -5,6 +5,7 @@ Refine the feature concept through collaborative questioning before creating det
 ## Purpose
 
 Transform rough feature requests into well-defined designs by:
+
 - Exploring alternatives
 - Identifying constraints
 - Clarifying requirements
@@ -19,6 +20,7 @@ skill: "brainstorming"
 ```
 
 The brainstorming skill uses Socratic method to:
+
 - Ask clarifying questions
 - Explore edge cases
 - Suggest alternatives
@@ -99,12 +101,14 @@ TodoWrite: Mark "Phase 2: Planning" as in_progress
 ## Exit Criteria
 
 ✅ Proceed to Phase 2 when:
+
 - Design documented in `design.md`
 - User explicitly approves design
 - Progress file updated
 - TodoWrite marked complete
 
 ❌ Do NOT proceed if:
+
 - User hasn't approved
 - Design has unresolved questions
 - Constraints not identified

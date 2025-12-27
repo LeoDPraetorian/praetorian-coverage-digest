@@ -11,6 +11,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "It's only 2 lines of code, I'll just add it."
 
 **Why it's wrong**:
+
 - Small changes compound (10 "small" changes = large scope creep)
 - Small changes still require review, testing, maintenance
 - "Small" is subjective - user might have different priorities
@@ -18,6 +19,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: Size doesn't matter. If it wasn't requested, ask first.
 
 **Example**:
+
 ```
 ❌ WRONG: User asks to add button → You add button + icon + tooltip
 ✅ RIGHT: Add button, then ask: "Should I add icon and tooltip?"
@@ -30,6 +32,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "If I make this generic now, we won't have to refactor later."
 
 **Why it's wrong**:
+
 - You don't know what "later" will require
 - Premature abstraction adds complexity
 - YAGNI means build for NOW, refactor when needs are ACTUAL
@@ -37,6 +40,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: Build the simplest thing that works. Refactor when you ACTUALLY need the flexibility.
 
 **Example**:
+
 ```
 ❌ WRONG: User asks for one report → You build a flexible reporting framework
 ✅ RIGHT: Build one report, refactor to framework when 2nd report is requested
@@ -49,6 +53,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "Best practices say I should add tests/docs/validation."
 
 **Why it's wrong**:
+
 - Best practices are context-dependent
 - User might have different standards or strategy
 - "Best practice" doesn't override explicit scope
@@ -56,6 +61,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: Mention the best practice, ask if it should be included.
 
 **Example**:
+
 ```
 ❌ WRONG: User asks for feature → You add feature + comprehensive tests
 ✅ RIGHT: Add feature, ask: "Should I add tests in this PR or separately?"
@@ -68,6 +74,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "Obviously they'll want error handling/validation/logging."
 
 **Why it's wrong**:
+
 - You're mind-reading, not listening
 - User might be prototyping (doesn't need production-quality yet)
 - User might have existing infrastructure you're duplicating
@@ -75,6 +82,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: Don't assume. Ask explicitly.
 
 **Example**:
+
 ```
 ❌ WRONG: User asks for API endpoint → You add endpoint + rate limiting + caching
 ✅ RIGHT: Add endpoint, ask: "Should I add rate limiting and caching?"
@@ -87,6 +95,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "Since I'm editing this file, I'll also fix/improve nearby code."
 
 **Why it's wrong**:
+
 - Mixing concerns makes PR harder to review
 - Adjacent changes might break things
 - User asked for ONE thing, not a package deal
@@ -94,6 +103,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: Finish requested change, note opportunities, ask separately.
 
 **Example**:
+
 ```
 ❌ WRONG: User asks to fix line 50 → You refactor lines 1-100
 ✅ RIGHT: Fix line 50, report: "I noticed lines 30-40 could be improved. Separate PR?"
@@ -106,6 +116,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "I'll add error handling/validation to make it more robust."
 
 **Why it's wrong**:
+
 - "Robust" adds complexity and code
 - User might want simple first, robust later
 - Robustness has trade-offs (performance, code size)
@@ -113,6 +124,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: Implement as requested, ask if robustness is needed.
 
 **Example**:
+
 ```
 ❌ WRONG: User asks for form field → You add comprehensive validation
 ✅ RIGHT: Add form field, ask: "What validation rules should I implement?"
@@ -125,6 +137,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "I'm technically just fixing bugs, not adding features."
 
 **Why it's wrong**:
+
 - User asked to fix ONE bug
 - Other "bugs" might be intentional behavior
 - User might have priority order for bug fixes
@@ -132,6 +145,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: Fix the requested bug. Report other bugs separately.
 
 **Example**:
+
 ```
 ❌ WRONG: User asks to fix search bug → You fix search + 3 other bugs you noticed
 ✅ RIGHT: Fix search bug, report: "I noticed 3 other bugs. Should I fix those too?"
@@ -144,6 +158,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "This is obviously what they meant."
 
 **Why it's wrong**:
+
 - "Obvious" is subjective
 - You might be inferring incorrectly
 - User might have reasons you don't know
@@ -151,6 +166,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: If it's not explicit, ask for clarification.
 
 **Example**:
+
 ```
 ❌ WRONG: User asks for "login page" → You add login + forgot password + signup
 ✅ RIGHT: Add login page, ask: "Should I also add forgot password and signup?"
@@ -163,6 +179,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "Every X includes Y, so I'll add Y too."
 
 **Why it's wrong**:
+
 - Standards vary by project/team/context
 - User might not want the standard approach
 - "Standard" doesn't override explicit request
@@ -170,6 +187,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: Mention the standard, ask if it applies.
 
 **Example**:
+
 ```
 ❌ WRONG: User asks for REST endpoint → You add endpoint + OpenAPI docs + versioning
 ✅ RIGHT: Add endpoint, ask: "Should I add OpenAPI docs and versioning?"
@@ -182,6 +200,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "I already wrote this code, might as well include it."
 
 **Why it's wrong**:
+
 - Sunk cost fallacy
 - More code = more review time, more bugs, more maintenance
 - User might not want it even if it's "free"
@@ -189,6 +208,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: Ask before implementing. Don't write code speculatively.
 
 **Example**:
+
 ```
 ❌ WRONG: Pre-write 3 features, include all of them
 ✅ RIGHT: Implement requested feature, offer to add others separately
@@ -201,6 +221,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "I'll add this check/validation defensively, just in case."
 
 **Why it's wrong**:
+
 - Defensive code adds complexity
 - User might have validation elsewhere
 - "Just in case" scenarios might never happen
@@ -208,6 +229,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: Implement as requested, ask if defensive code is needed.
 
 **Example**:
+
 ```
 ❌ WRONG: User asks for calculation → You add null checks, type guards, error boundaries
 ✅ RIGHT: Add calculation, ask: "What error handling should I include?"
@@ -220,6 +242,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **Thought**: "I can improve this variable name/structure/pattern while I'm here."
 
 **Why it's wrong**:
+
 - "Better" is subjective
 - Improvements have costs (time, risk, review overhead)
 - User might like current approach
@@ -227,6 +250,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 **What to do**: Make requested change only. Note improvement opportunities separately.
 
 **Example**:
+
 ```
 ❌ WRONG: User asks to add field → You refactor entire component
 ✅ RIGHT: Add field, report: "Component could be refactored. Separate task?"
@@ -239,6 +263,7 @@ When you catch yourself thinking ANY of these thoughts → STOP and use AskUserQ
 ### Step 1: Recognize the Thought
 
 When you catch yourself thinking:
+
 - "I should..."
 - "It would be better if..."
 - "While I'm here..."
@@ -257,6 +282,7 @@ Ask yourself: **"Did the user explicitly request this?"**
 ### Step 3: Use AskUserQuestion
 
 Template:
+
 ```
 "I can implement [REQUESTED CHANGE]. I'm considering also [ADDITIONAL CHANGE] because [RATIONALIZATION]. Should I:
 1. Implement only [REQUESTED CHANGE]
@@ -267,11 +293,13 @@ Template:
 ### Step 4: Document the Rationalization
 
 In your response, note:
+
 ```
 "While implementing, I considered adding [X] because [RATIONALIZATION], but I'm asking first to stay in scope."
 ```
 
 This shows:
+
 - You're aware of opportunities
 - You're respecting scope boundaries
 - You're following YAGNI discipline
@@ -291,6 +319,7 @@ Memorize these:
 **User Request**: "Add dark mode toggle to settings page"
 
 **Your thoughts**:
+
 1. "I should add the toggle" ✅ (Requested)
 2. "I should also persist the preference" ⚠️ (Not requested - ask)
 3. "I should add theme colors for all components" ⚠️ (Not requested - ask)
@@ -298,6 +327,7 @@ Memorize these:
 5. "While I'm here, I'll refactor the settings page" ❌ (Rationalization trap)
 
 **Correct Response**:
+
 ```
 "I can add the dark mode toggle to the settings page. A few questions:
 

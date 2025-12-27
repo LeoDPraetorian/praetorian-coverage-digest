@@ -196,14 +196,21 @@ export class SkillParser {
   }
 
   /**
-   * Extract markdown links from content
+   * Extract markdown links from content (excluding links inside code blocks)
    */
   static extractMarkdownLinks(content: string): Array<{ text: string; path: string }> {
+    // Remove fenced code blocks (```...```) before extracting links
+    // This prevents false positives from example code
+    const withoutCodeBlocks = content.replace(/```[\s\S]*?```/g, '');
+
+    // Also remove inline code (`...`)
+    const withoutInlineCode = withoutCodeBlocks.replace(/`[^`]*`/g, '');
+
     const linkRegex = /\[([^\]]+)\]\(([^)]+\.md)\)/g;
     const links: Array<{ text: string; path: string }> = [];
     let match;
 
-    while ((match = linkRegex.exec(content)) !== null) {
+    while ((match = linkRegex.exec(withoutInlineCode)) !== null) {
       links.push({
         text: match[1],
         path: match[2],

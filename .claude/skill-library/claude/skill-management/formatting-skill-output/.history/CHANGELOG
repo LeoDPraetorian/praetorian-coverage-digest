@@ -1,0 +1,20 @@
+## [2025-12-26] - Initial Creation
+
+**RED Failure Documentation:**
+Multiple skills (auditing-skills, finding-agents-for-skills) need Claude to output structured results (tables). But Claude's text generation is inherently non-deterministic - same instructions produce different formatting, prose, spacing each run. User observed audit semantic review outputting "horrible format that will be non-deterministic." Known issue: anthropics/claude-code#3370.
+
+**Category:** Library (claude/skill-management/)
+**Skill Type:** Infrastructure/Library (shared TypeScript library)
+
+**What this skill provides:**
+- Shared `table-formatter.ts` library for deterministic ANSI table output
+- JSON schemas for semantic findings, agent recommendations
+- CLI entry point for standalone formatting
+- Pattern documentation: "Claude Reasons, CLI Formats"
+
+**Consumer skills:**
+- auditing-skills - semantic review findings
+- finding-agents-for-skills - agent recommendations
+- syncing-gateways - gateway sync results
+
+**Key principle:** Same input → Same output, ALWAYS.

@@ -11,6 +11,7 @@ Systematically guides feature development through five phases with quality gates
 ## When to Use This Skill
 
 Use this skill when you need to:
+
 - Implement a complete feature from concept to tested code
 - Ensure systematic quality assurance through all phases
 - Coordinate multiple specialized agents (architects, developers, testers)
@@ -18,6 +19,7 @@ Use this skill when you need to:
 - Get human approval at key checkpoints
 
 **Symptoms this skill addresses:**
+
 - Manual orchestration of skills and agents
 - Lost context between sessions
 - Skipped phases or quality gates
@@ -42,6 +44,7 @@ Skill workflow:
 This skill coordinates five phases with detailed workflows in references:
 
 ### Core Phases
+
 - **[Phase 1: Brainstorming](references/phase-1-brainstorming.md)** - Design refinement with human-in-loop
 - **[Phase 2: Planning](references/phase-2-planning.md)** - Detailed implementation plan creation
 - **[Phase 3: Architecture](references/phase-3-architecture.md)** - Design decisions via architect agents
@@ -49,6 +52,7 @@ This skill coordinates five phases with detailed workflows in references:
 - **[Phase 5: Testing](references/phase-5-testing.md)** - Test creation via test engineer agents
 
 ### Supporting Documentation
+
 - **[Progress Persistence](references/progress-persistence.md)** - Resume workflow, progress file format
 - **[Agent Handoffs](references/agent-handoffs.md)** - Structured JSON handoff format
 - **[Troubleshooting](references/troubleshooting.md)** - Common issues and solutions
@@ -109,11 +113,11 @@ This skill coordinates five phases with detailed workflows in references:
      "created": "2024-12-13",
      "current_phase": "brainstorming",
      "phases": {
-       "brainstorming": {"status": "in_progress"},
-       "planning": {"status": "pending"},
-       "architecture": {"status": "pending"},
-       "implementation": {"status": "pending"},
-       "testing": {"status": "pending"}
+       "brainstorming": { "status": "in_progress" },
+       "planning": { "status": "pending" },
+       "architecture": { "status": "pending" },
+       "implementation": { "status": "pending" },
+       "testing": { "status": "pending" }
      }
    }
    ```
@@ -129,6 +133,7 @@ See [Progress Persistence](references/progress-persistence.md) for complete sche
 ### Human Checkpoints Are Mandatory
 
 **After brainstorming and planning phases**, you MUST:
+
 1. Use AskUserQuestion to confirm approval
 2. Do NOT proceed to next phase without approval
 3. Record approval in progress file
@@ -136,6 +141,7 @@ See [Progress Persistence](references/progress-persistence.md) for complete sche
 ### Agent Handoffs Must Be Structured
 
 All Task agents must return JSON with:
+
 ```json
 {
   "status": "complete|blocked|needs_review",
@@ -156,6 +162,7 @@ See [Agent Handoffs](references/agent-handoffs.md) for complete format.
 **Every phase must save progress** to `.claude/features/{feature-id}/progress.json`.
 
 On resume:
+
 1. Read progress file
 2. Identify current phase from `current_phase` field
 3. Continue from that phase
@@ -164,6 +171,7 @@ On resume:
 ## Best Practices
 
 ✅ **Do:**
+
 - Create TodoWrite todos at start
 - Save progress after each phase
 - Use AskUserQuestion for human checkpoints
@@ -171,6 +179,7 @@ On resume:
 - Read existing code before architecture phase
 
 ❌ **Don't:**
+
 - Skip human checkpoints
 - Track progress mentally
 - Spawn all agents at once (sequence matters)
@@ -179,11 +188,11 @@ On resume:
 
 ## Determining Agent Types
 
-| Feature Domain | Architect | Reviewer | Developer | Tester |
-|----------------|-----------|----------|-----------|--------|
-| React UI | frontend-architect | frontend-reviewer | frontend-developer | frontend-unit-test-engineer |
-| Go API | backend-architect | backend-reviewer | backend-developer | backend-unit-test-engineer |
-| Full-stack | Both architects | Both reviewers | Both developers | Both test engineers |
+| Feature Domain | Architect          | Reviewer          | Developer          | Tester                      |
+| -------------- | ------------------ | ----------------- | ------------------ | --------------------------- |
+| React UI       | frontend-architect | frontend-reviewer | frontend-developer | frontend-unit-test-engineer |
+| Go API         | backend-architect  | backend-reviewer  | backend-developer  | backend-tester              |
+| Full-stack     | Both architects    | Both reviewers    | Both developers    | Both test engineers         |
 
 **Rule**: Match agents to feature domain, not codebase composition.
 
@@ -198,6 +207,7 @@ On resume:
 ### "Agent returned blocked status"
 
 **Solution**:
+
 1. Read agent's `handoff.context` for details
 2. Use AskUserQuestion to get user input
 3. Update plan/architecture as needed
@@ -206,6 +216,7 @@ On resume:
 ### "How do I handle parallel work?"
 
 **Solution**:
+
 - Frontend + Backend implementation → Spawn in parallel
 - Architecture → Implementation → Sequence required
 - Unit tests + E2E tests → Spawn in parallel
@@ -223,6 +234,7 @@ See [Troubleshooting](references/troubleshooting.md) for more scenarios.
 ## Exit Criteria
 
 Feature development is complete when:
+
 - ✅ All 5 phases marked "complete" in progress file
 - ✅ Tests passing
 - ✅ Build successful

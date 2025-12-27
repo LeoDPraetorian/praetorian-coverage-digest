@@ -13,6 +13,7 @@ allowed-tools: Task, TodoWrite, Read, Glob, Grep, AskUserQuestion
 From Anthropic's multi-agent research: "A lead agent analyzes queries, develops strategy, and spawns specialized subagents to explore different aspects simultaneously."
 
 Orchestration is NOT implementation. The orchestrator's responsibilities are:
+
 1. **Analyze** task scope and complexity
 2. **Decompose** into specialized subtasks
 3. **Delegate** to appropriate agents
@@ -24,6 +25,7 @@ Orchestration is NOT implementation. The orchestrator's responsibilities are:
 **MUST use TodoWrite BEFORE starting any orchestration workflow.**
 
 Multi-phase orchestration involves coordinating multiple agents across sequential and parallel phases. Without external state tracking, context drift causes:
+
 - Forgotten completed phases
 - Repeated agent spawns for same task
 - Lost handoff context between agents
@@ -34,12 +36,14 @@ Multi-phase orchestration involves coordinating multiple agents across sequentia
 ## When to Orchestrate vs Delegate Directly
 
 **Use orchestration when:**
+
 - Task spans 2+ concerns (architecture + implementation + testing)
 - Feature requires coordination between multiple agents
 - Complex refactoring affecting multiple files/packages
 - User requests "implement AND test" or "design AND build"
 
 **Delegate directly when:**
+
 - Simple single-agent task (bug fix, add one component)
 - Pure architecture question → architect agent directly
 - Pure implementation → developer agent directly
@@ -47,19 +51,20 @@ Multi-phase orchestration involves coordinating multiple agents across sequentia
 
 ## Quick Reference
 
-| Phase | Purpose | Pattern |
-|-------|---------|---------|
-| Analyze | Understand scope | Ask: Architecture? Implementation? Testing? Review? |
-| Decompose | Break into tasks | Sequential vs Parallel vs Hybrid |
-| Delegate | Spawn agents | Clear objective + context + scope + expected output |
-| Synthesize | Combine results | Check conflicts, run tests, integrate |
-| Track | Progress persistence | TodoWrite + progress files for long tasks |
+| Phase      | Purpose              | Pattern                                             |
+| ---------- | -------------------- | --------------------------------------------------- |
+| Analyze    | Understand scope     | Ask: Architecture? Implementation? Testing? Review? |
+| Decompose  | Break into tasks     | Sequential vs Parallel vs Hybrid                    |
+| Delegate   | Spawn agents         | Clear objective + context + scope + expected output |
+| Synthesize | Combine results      | Check conflicts, run tests, integrate               |
+| Track      | Progress persistence | TodoWrite + progress files for long tasks           |
 
 ## Task Decomposition
 
 ### Step 1: Analyze Complexity
 
 Determine which concerns apply:
+
 - Does the task need architecture decisions? (new patterns, service boundaries, schemas)
 - Does the task need implementation? (handlers, services, components)
 - Does the task need testing? (unit, integration, E2E, acceptance)
@@ -69,6 +74,7 @@ Determine which concerns apply:
 ### Step 2: Identify Dependencies
 
 Map which phases depend on others:
+
 - Architecture → Implementation (sequential - design informs code)
 - Implementation → Testing (sequential - need code to test)
 - Unit tests ↔ E2E tests (parallel - independent of each other)
@@ -76,11 +82,13 @@ Map which phases depend on others:
 ### Step 3: Determine Execution Pattern
 
 **Sequential Pattern** - Use when later steps depend on earlier decisions:
+
 ```
 Architecture → Implementation → Unit Tests → Integration → E2E
 ```
 
 **Parallel Pattern** - Use when tasks are independent:
+
 ```
                     ┌─ Unit Tests ────────┐
 Implementation ─────┼─ Integration Tests ──┼─ Synthesize
@@ -88,6 +96,7 @@ Implementation ─────┼─ Integration Tests ──┼─ Synthesize
 ```
 
 **Hybrid Pattern** - Use when partial dependencies exist:
+
 ```
 Architecture → Implementation → ┌─ Unit Tests ────────┐
                                ├─ Integration Tests ──├─ Synthesize
@@ -111,6 +120,7 @@ When delegating to a specialist agent, provide:
 Task: Create unit tests for the AssetFilter component
 
 Context from implementation:
+
 - Component location: src/sections/assets/components/AssetFilter.tsx
 - Uses TanStack Query for data fetching
 - Has 3 filter types: status, severity, date range
@@ -118,7 +128,8 @@ Context from implementation:
 Scope: Unit tests only. Do NOT create integration or E2E tests.
 
 Expected output:
-- Test file at src/sections/assets/components/__tests__/AssetFilter.test.tsx
+
+- Test file at src/sections/assets/components/**tests**/AssetFilter.test.tsx
 - Cover: rendering, filter selection, loading states
 - Return structured JSON with test results
 ```
@@ -129,9 +140,9 @@ Expected output:
 
 ```typescript
 // All three run concurrently - single message with multiple Task calls
-Task("frontend-unit-test-engineer", "Create unit tests for AssetFilter...")
-Task("frontend-e2e-test-engineer", "Create E2E tests for asset filtering workflow...")
-Task("frontend-integration-test-engineer", "Create MSW integration tests...")
+Task("frontend-unit-test-engineer", "Create unit tests for AssetFilter...");
+Task("frontend-e2e-test-engineer", "Create E2E tests for asset filtering workflow...");
+Task("frontend-integration-test-engineer", "Create MSW integration tests...");
 ```
 
 **Do NOT spawn sequentially when tasks are independent** - this wastes time.
@@ -153,6 +164,7 @@ When an agent returns:
 ### Conflict Detection
 
 After parallel agents return:
+
 - Review each summary
 - Check for file conflicts (did agents edit same code?)
 - Run full test suite
@@ -166,20 +178,24 @@ After parallel agents return:
 ## Orchestration: [Feature Name]
 
 ### Phase 1: Architecture (if needed)
+
 - [ ] Spawn architect for design decisions
 - [ ] Review architecture output
 - [ ] Validate approach with user (if major decisions)
 
 ### Phase 2: Implementation
+
 - [ ] Spawn developer with architecture context
 - [ ] Verify implementation complete
 
 ### Phase 3: Testing (parallel when possible)
+
 - [ ] Spawn unit test engineer
 - [ ] Spawn integration test engineer (if API involved)
 - [ ] Spawn E2E test engineer (if user workflow)
 
 ### Phase 4: Quality Gates
+
 - [ ] Spawn code reviewer
 - [ ] Spawn security reviewer (if auth/input handling)
 - [ ] Synthesize all results
@@ -196,8 +212,8 @@ Return orchestration results as:
   "status": "complete|in_progress|blocked",
   "summary": "1-2 sentence description of what was accomplished",
   "phases_completed": [
-    {"phase": "architecture", "agent": "...", "result": "..."},
-    {"phase": "implementation", "agent": "...", "result": "..."}
+    { "phase": "architecture", "agent": "...", "result": "..." },
+    { "phase": "implementation", "agent": "...", "result": "..." }
   ],
   "files_created": ["path/to/file1", "path/to/file2"],
   "verification": {
@@ -213,12 +229,14 @@ Return orchestration results as:
 ## Escalation Protocol
 
 **Stop and escalate to user if:**
+
 - Architecture decision has major trade-offs requiring user input
 - Agent is blocked by missing requirements
 - Multiple agents return conflicting recommendations
 - Task scope significantly larger than initially understood
 
 **Escalate to different orchestrator if:**
+
 - Task requires different domain (frontend ↔ backend)
 - Task requires full-stack coordination (use both orchestrators)
 - Task is pure research/exploration (use specialist directly)

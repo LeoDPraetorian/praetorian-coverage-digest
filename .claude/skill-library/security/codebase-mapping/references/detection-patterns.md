@@ -11,6 +11,7 @@
 **Indicator Files**: `go.mod`, `go.sum`, `go.work`
 
 **Framework Detection**:
+
 ```bash
 # AWS Lambda
 grep -l "aws-lambda-go" go.mod
@@ -23,6 +24,7 @@ grep -E "go-sql-driver/mysql|lib/pq|neo4j-go-driver|aws-sdk-go-v2.*dynamodb" go.
 ```
 
 **Entry Point Patterns**:
+
 ```bash
 # HTTP handlers
 grep -rn "func.*\(w http.ResponseWriter, r \*http.Request\)" {scope}
@@ -36,6 +38,7 @@ grep -rn "func main\(\)" {scope}/cmd/
 ```
 
 **Data Access Patterns**:
+
 ```bash
 # SQL queries
 grep -rn "\.Query\|\.Exec\|\.QueryRow" {scope}
@@ -54,6 +57,7 @@ grep -rn "session\.Run\|\.ExecuteQuery" {scope}
 **Indicator Files**: `package.json`, `tsconfig.json`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`
 
 **Framework Detection**:
+
 ```bash
 # React
 jq -r '.dependencies.react // .devDependencies.react // empty' package.json
@@ -69,6 +73,7 @@ jq -r '.dependencies.fastify // empty' package.json
 ```
 
 **Entry Point Patterns**:
+
 ```bash
 # Express routes
 grep -rn "app\.\(get\|post\|put\|delete\|patch\|all\)\(" {scope}
@@ -83,6 +88,7 @@ grep -rn "createRoot\|ReactDOM.render" {scope}
 ```
 
 **Data Access Patterns**:
+
 ```bash
 # Fetch/Axios calls
 grep -rn "fetch\(\|axios\.\(get\|post\|put\|delete\)" {scope}
@@ -101,6 +107,7 @@ grep -rn "DynamoDBClient\|S3Client\|@aws-sdk" {scope}
 **Indicator Files**: `requirements.txt`, `pyproject.toml`, `setup.py`, `Pipfile`
 
 **Framework Detection**:
+
 ```bash
 # Flask
 grep -E "^flask" requirements.txt
@@ -116,6 +123,7 @@ grep -E "^click" requirements.txt
 ```
 
 **Entry Point Patterns**:
+
 ```bash
 # Flask routes
 grep -rn "@app\.route\|@blueprint\.route" {scope}
@@ -131,6 +139,7 @@ grep -rn "@click\.command\|@click\.group" {scope}
 ```
 
 **Data Access Patterns**:
+
 ```bash
 # SQLAlchemy
 grep -rn "session\.query\|session\.execute\|\.filter\(" {scope}
@@ -152,6 +161,7 @@ grep -rn "boto3\.client\|boto3\.resource" {scope}
 **Indicator Files**: `Cargo.toml`, `Cargo.lock`
 
 **Framework Detection**:
+
 ```bash
 # Actix-web
 grep -E "actix-web" Cargo.toml
@@ -164,6 +174,7 @@ grep -E "axum" Cargo.toml
 ```
 
 **Entry Point Patterns**:
+
 ```bash
 # Actix handlers
 grep -rn "#\[get\|#\[post\|#\[put\|#\[delete\|web::\(get\|post\)" {scope}
@@ -182,6 +193,7 @@ grep -rn "fn main\(\)" {scope}/src/main.rs
 **Indicator Files**: `pom.xml`, `build.gradle`, `build.gradle.kts`
 
 **Framework Detection**:
+
 ```bash
 # Spring Boot
 grep -E "spring-boot" pom.xml build.gradle 2>/dev/null
@@ -191,6 +203,7 @@ grep -E "quarkus" pom.xml build.gradle 2>/dev/null
 ```
 
 **Entry Point Patterns**:
+
 ```bash
 # Spring controllers
 grep -rn "@RestController\|@Controller\|@RequestMapping\|@GetMapping\|@PostMapping" {scope}
@@ -208,6 +221,7 @@ grep -rn "extends HttpServlet\|doGet\|doPost" {scope}
 **Indicator Files**: `Dockerfile`, `docker-compose.yml`, `docker-compose.yaml`
 
 **Patterns**:
+
 ```bash
 # Base images (security relevant)
 grep -E "^FROM" Dockerfile
@@ -224,6 +238,7 @@ grep -E "^ENV\|^ARG" Dockerfile
 **Indicator Files**: `*.yaml` in `k8s/`, `kubernetes/`, `manifests/`
 
 **Patterns**:
+
 ```bash
 # Service definitions
 grep -rn "kind: Service" {scope}
@@ -240,6 +255,7 @@ grep -rn "kind: Secret" {scope}
 **Indicator Files**: `*.tf`, `terraform.tfstate`
 
 **Patterns**:
+
 ```bash
 # AWS resources
 grep -rn "aws_\(lambda\|api_gateway\|dynamodb\|s3\|iam\)" {scope}
@@ -256,6 +272,7 @@ grep -rn "aws_iam_policy\|aws_iam_role" {scope}
 **Indicator Files**: `template.yaml`, `template.yml`, `samconfig.toml`
 
 **Patterns**:
+
 ```bash
 # Lambda functions
 grep -rn "Type: AWS::Serverless::Function\|Type: AWS::Lambda::Function" {scope}
@@ -272,21 +289,25 @@ grep -rn "Type: AWS::IAM::Role" {scope}
 ## Authentication Detection
 
 ### JWT
+
 ```bash
 grep -rn "jwt\|jsonwebtoken\|jose\|JWT\|Bearer" {scope}
 ```
 
 ### OAuth/OIDC
+
 ```bash
 grep -rn "oauth\|oidc\|openid\|authorization_code\|client_credentials" {scope}
 ```
 
 ### Session-based
+
 ```bash
 grep -rn "session\|cookie\|express-session\|gorilla/sessions" {scope}
 ```
 
 ### API Keys
+
 ```bash
 grep -rn "api.key\|apikey\|x-api-key\|Authorization.*Key" {scope}
 ```
@@ -296,6 +317,7 @@ grep -rn "api.key\|apikey\|x-api-key\|Authorization.*Key" {scope}
 ## Sensitive Data Detection
 
 ### Secrets in Code (Anti-patterns)
+
 ```bash
 # Hardcoded secrets (should flag for review)
 grep -rn "password\s*=\s*['\"].\+['\"]\|secret\s*=\s*['\"].\+['\"]\|api_key\s*=\s*['\"].\+['\"]" {scope}
@@ -308,6 +330,7 @@ grep -rn "BEGIN RSA PRIVATE KEY\|BEGIN PRIVATE KEY" {scope}
 ```
 
 ### Sensitive Endpoints
+
 ```bash
 # Admin paths
 grep -rn "/admin\|/management\|/internal\|/debug" {scope}

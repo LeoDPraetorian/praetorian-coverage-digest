@@ -8,54 +8,54 @@ Integration tests verify that multiple CLI commands work together correctly, tes
 
 ## Key Differences from Unit Tests
 
-| Unit Tests | Integration Tests |
-|------------|-------------------|
-| Test individual commands | Test command sequences |
-| Mock external dependencies | May use real dependencies |
-| Fast execution | Slower execution |
-| Isolated state | Shared state across commands |
+| Unit Tests                 | Integration Tests            |
+| -------------------------- | ---------------------------- |
+| Test individual commands   | Test command sequences       |
+| Mock external dependencies | May use real dependencies    |
+| Fast execution             | Slower execution             |
+| Isolated state             | Shared state across commands |
 
 ## Node.js Integration Testing
 
 ### Multi-Command Workflow
 
 ```typescript
-describe('Complete Deployment Workflow', () => {
+describe("Complete Deployment Workflow", () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-integration-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "cli-integration-"));
   });
 
   afterEach(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test('full deployment workflow', () => {
+  test("full deployment workflow", () => {
     // Step 1: Initialize project
     let result = runCLI(`init my-project --cwd ${tempDir}`);
     expect(result.code).toBe(0);
-    expect(fs.existsSync(path.join(tempDir, 'my-project'))).toBe(true);
+    expect(fs.existsSync(path.join(tempDir, "my-project"))).toBe(true);
 
     // Step 2: Configure
-    const projectDir = path.join(tempDir, 'my-project');
+    const projectDir = path.join(tempDir, "my-project");
     result = runCLI(`config set api_key test_key --cwd ${projectDir}`);
     expect(result.code).toBe(0);
 
     // Step 3: Build
     result = runCLI(`build --production --cwd ${projectDir}`);
     expect(result.code).toBe(0);
-    expect(fs.existsSync(path.join(projectDir, 'dist'))).toBe(true);
+    expect(fs.existsSync(path.join(projectDir, "dist"))).toBe(true);
 
     // Step 4: Deploy
     result = runCLI(`deploy staging --cwd ${projectDir}`);
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain('Deployed successfully');
+    expect(result.stdout).toContain("Deployed successfully");
 
     // Step 5: Verify
     result = runCLI(`status --cwd ${projectDir}`);
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain('staging');
+    expect(result.stdout).toContain("staging");
   });
 });
 ```
@@ -63,8 +63,8 @@ describe('Complete Deployment Workflow', () => {
 ### State Persistence Testing
 
 ```typescript
-describe('State Persistence', () => {
-  test('state persists across commands', () => {
+describe("State Persistence", () => {
+  test("state persists across commands", () => {
     const workspace = createTempWorkspace();
 
     try {
@@ -75,18 +75,18 @@ describe('State Persistence', () => {
 
       // Verify state persists
       let result = runCLI(`config get key1 --cwd ${workspace}`);
-      expect(result.stdout).toContain('value1');
+      expect(result.stdout).toContain("value1");
 
       // Modify state
       runCLI(`config set key1 updated --cwd ${workspace}`);
 
       // Verify modification
       result = runCLI(`config get key1 --cwd ${workspace}`);
-      expect(result.stdout).toContain('updated');
+      expect(result.stdout).toContain("updated");
 
       // Verify other keys unchanged
       result = runCLI(`config get key2 --cwd ${workspace}`);
-      expect(result.stdout).toContain('value2');
+      expect(result.stdout).toContain("value2");
     } finally {
       cleanupWorkspace(workspace);
     }

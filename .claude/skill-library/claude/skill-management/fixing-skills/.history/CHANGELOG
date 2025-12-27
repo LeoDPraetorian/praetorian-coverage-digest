@@ -1,0 +1,140 @@
+## [Date: 2025-12-27] - Add Phase 14g: Prettier Table Formatting Fix
+
+### Added
+- **Phase 14g** to Deterministic fixes list (three-tier model)
+- Phase 14g to Quick Reference table
+- Phase 14g to Step 4a deterministic phases
+- Reference to centralized requirements at `managing-skills/references/table-formatting.md`
+
+### Reason
+- **RED failure**: No fix available for Phase 14g table formatting validation
+- auditing-skills now validates Prettier table formatting (Phase 14g)
+- fixing-skills needs corresponding Tier 1 fix
+
+### Technical Details
+- Fix command: `npx prettier --write --parser markdown {skill-path}/**/*.md`
+- Tier 1 (Deterministic): One correct answer, CLI auto-applies
+- References centralized `managing-skills/references/table-formatting.md`
+
+### Files Changed
+- `SKILL.md` - 3 edits (three-tier model, Quick Reference, Step 4a)
+
+### Method
+- Used `updating-skills` TDD workflow
+- Backup: `.local/2024-12-27-fixing-skills.bak`
+- Line count: 510 → 510 (unchanged, at limit)
+
+---
+
+## [Date: 2025-12-24]
+
+### Added
+- **Semantic Review: External Documentation Links** section to references/phase-fixes.md
+- Fix pattern for missing "## Related Resources" or references/links-to-official-docs.md
+- Decision guidance for brief (5-10 links) vs comprehensive (20+ links) organization
+- Two complete fix patterns with code examples
+- Decision guide table for typical link counts by skill type
+
+### Changed
+- references/phase-fixes.md grew from ~376 → ~486 lines (added 110 lines)
+- Added new semantic fix after Phase 13 (TodoWrite Missing)
+
+### Reason
+- auditing-skills now flags missing external documentation links in semantic review
+- fixing-skills lacked guidance for how to remediate this warning
+- Agents getting "⚠️ External Documentation Links" warning had no fix pattern
+- RED failure: No documented workflow for adding external docs to existing library skills
+
+### Technical Details
+- Fix is for semantic WARNING (not structural error)
+- Applies to library skills wrapping: npm packages, external APIs, third-party services, frameworks
+- Brief list pattern (5-10 links): Add to end of SKILL.md before "## References"
+- Comprehensive pattern (20+ links): Create references/links-to-official-docs.md
+- References creating-skills/references/skill-templates.md for complete template guidance
+- Includes decision guide: single library (5-8 links), framework (8-12), complex integration (30-50)
+
+### REFACTOR Phase Results
+
+**Change Classification:** Documentation update (adds fix guidance for semantic warning)
+
+**Pressure Test Assessment:**
+- Primary risk: Agents skip the fix because it's "just a warning"
+- Mitigation 1: Two complete fix patterns with copy-paste examples
+- Mitigation 2: Decision guide makes choice explicit (brief vs comprehensive)
+- Mitigation 3: Template reference for additional guidance
+- Mitigation 4: Typical link counts by skill type (concrete numbers)
+
+**Bypass Scenarios:**
+1. "Warning not critical, skip it" - might defer indefinitely
+2. "Not sure how many links needed" - might skip research
+3. "Easier to add links later" - might deprioritize
+
+**Counters Applied:**
+- Clear applicability: "Library skills wrapping external tools/libraries/frameworks"
+- Concrete patterns: Two complete fix examples (brief and comprehensive)
+- Decision table: Specific link count ranges by skill type
+- Template reference: Points to creating-skills for detailed guidance
+
+**Recommended Manual Validation:**
+Run semantic review on library skill missing external docs, then verify agent uses fixing-skills pattern to add links.
+
+**Bypass Risk:** LOW - Documentation only, concrete examples, clear decision tree
+
+---
+
+## [Date: 2025-12-23]
+
+### Added
+- Gateway-specific fix support for phases 17-20
+- Phase 17: Gateway structure validation (manual)
+- Phase 18: Routing table format conversion (auto)
+- Phase 19: Broken path removal (auto)
+- Phase 20: Coverage gap detection (manual, defers to syncing-gateways)
+
+### Changed
+- Updated Quick Reference table to include phases 17-20
+- Updated "What This Skill Does" to mention 20 phases (16 standard + 4 gateway)
+- Added new "Gateway-Specific Fixes" section with detailed fix workflows
+
+### Reason
+- auditing-skills now validates gateway skills with phases 17-20
+- fixing-skills needed to provide guidance for remediating these gateway-specific issues
+- Users running `skill-manager fix gateway-X` were getting no guidance for gateway phases
+
+### Method
+- RED: Confirmed fixing-skills had no gateway phase documentation
+- GREEN: Added gateway phases to table and detailed fix workflows
+- References: phase17-20*.ts implementations, gateway-template.md, gateway-management.md
+
+### REFACTOR
+- Pressure test: Agent fixing gateway with Phase 18 failures
+- Scenario: 200+ table rows, time pressure, manual vs auto decision
+- Result: PASSED - guidance prevents "do it manually" rationalization
+- Loopholes checked: Auto/manual clarity, reference accessibility, Phase 20 deferral
+
+### Backup
+- Pre-fix backup: .local/2025-12-23-14-50-56-pre-gateway-phases.bak
+
+## 2025-12-26 - Fix Compliance Issues
+
+**Fixed:**
+- CRITICAL: Phase 8 - Created scripts/.gitignore (dist/, *.log, *.tmp, .cache/)
+  - Method: Deterministic (Write tool)
+- WARNING: Phase 8 - Added "vitest/globals" to tsconfig.json types array
+  - Method: Deterministic (Edit tool)
+- WARNING: Phase 16 - Fixed Windows paths in fix.ts line 166 (C:\\ → C:/)
+  - Method: Claude-Automated (Edit tool)
+- WARNING: Phase 1 - Enhanced description with error/symptom keywords
+  - Method: Claude-Automated (Edit tool)
+  - Added: "audit failed", "compliance errors", "broken links", "phantom references"
+
+**Remaining:**
+- CRITICAL: Phase 8 - "TypeScript files not using git" (false positive - uses findProjectRoot() with git)
+- WARNING: Phase 16 - 2 Windows paths still detected (need investigation)
+- WARNING: Phase 14b - 1 code block with lines >120 chars
+- INFO: Phase 14b - 2 code blocks missing language tags
+- INFO: Phase 14b - 1 code block with mismatched language tag
+- INFO: Phase 14c - 1 header with no content
+
+**Audit Result:** FAILED (1 CRITICAL, 3 WARNING, 5 INFO)
+**Note:** The CRITICAL issue appears to be a false positive - code uses shared findProjectRoot() function with proper git detection

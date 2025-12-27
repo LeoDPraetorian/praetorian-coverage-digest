@@ -23,6 +23,7 @@ Burp Enterprise
 **Purpose:** Organize sites by username/account for multi-tenancy.
 
 **Properties:**
+
 ```go
 type Folder struct {
     ID   string `json:"id"`   // UUID assigned by Burp
@@ -31,17 +32,20 @@ type Folder struct {
 ```
 
 **Chariot Pattern:**
+
 ```go
 // One folder per username
 folderName := FolderNameFromUsername(username) // e.g., "user-example-com"
 ```
 
 **Operations:**
+
 - Create: `client.CreateFolder(name)`
 - List: `client.Tree()` returns all folders
 - No delete operation exposed (orphan sites if deleted)
 
 **Key Relationships:**
+
 - Parent of zero or more sites
 - Root folder has ID `"0"`
 
@@ -52,6 +56,7 @@ folderName := FolderNameFromUsername(username) // e.g., "user-example-com"
 **Purpose:** Scan targets (web applications or API services).
 
 **Properties:**
+
 ```go
 type Site struct {
     ID       string `json:"id"`        // UUID assigned by Burp
@@ -61,6 +66,7 @@ type Site struct {
 ```
 
 **Chariot Pattern:**
+
 ```go
 // One site per WebApplication
 siteName := SiteNameFromURL(primaryURL) // Extract domain from URL
@@ -69,6 +75,7 @@ siteName := SiteNameFromURL(primaryURL) // Extract domain from URL
 **Configuration Types:**
 
 ### Web Application (Scope-based)
+
 ```go
 input := map[string]any{
     "scope_v2": map[string]any{
@@ -83,6 +90,7 @@ input := map[string]any{
 ---
 
 ### Web Service (API-based)
+
 ```go
 input := map[string]any{
     "api_definitions": []map[string]any{
@@ -104,6 +112,7 @@ input := map[string]any{
 ---
 
 **Required Settings:**
+
 ```go
 // ALWAYS include Chariot headers for attribution
 "settings": map[string]any{
@@ -123,12 +132,14 @@ input := map[string]any{
 ```
 
 **Operations:**
+
 - Create: `client.CreateSiteInFolder()` or `client.EnsureSiteExists()`
 - Read: `client.Tree()` returns all sites
 - Update: via mutations (not commonly used)
 - Delete: `client.DeleteSite(siteID)`
 
 **Key Relationships:**
+
 - Belongs to exactly one folder
 - Has zero or more schedule items
 - Has zero or more API definitions
@@ -137,9 +148,10 @@ input := map[string]any{
 
 ## Schedule Items
 
-**Purpose:** Define *when* and *how* a site should be scanned.
+**Purpose:** Define _when_ and _how_ a site should be scanned.
 
 **Properties:**
+
 ```go
 type ScheduleItem struct {
     ID    string `json:"id"`              // UUID assigned by Burp
@@ -148,17 +160,20 @@ type ScheduleItem struct {
 ```
 
 **Critical Distinction:**
+
 - **Schedule Item = Configuration** (when/how to scan)
 - **Scan = Execution Instance** (actual running scan)
 
 **Types:**
 
 ### One-Time (On-Demand)
+
 ```go
 scheduleID, err := client.CreateOnDemandSiteSchedule(siteID, configID)
 ```
 
 **Characteristics:**
+
 - Runs immediately (within ~5 minutes)
 - Single execution
 - Uses `ON_DEMAND_POOL = "3"` agent pool
@@ -168,11 +183,13 @@ scheduleID, err := client.CreateOnDemandSiteSchedule(siteID, configID)
 ---
 
 ### Recurring (Daily)
+
 ```go
 scheduleID, err := client.CreateDailySiteSchedule(siteID, configID, labelSuffix)
 ```
 
 **Characteristics:**
+
 - Runs daily at midnight UTC
 - RFC 5545 recurrence rule: `FREQ=DAILY;INTERVAL=1`
 - Uses `DEFAULT_POOL = "-1"` agent pool
@@ -182,6 +199,7 @@ scheduleID, err := client.CreateDailySiteSchedule(siteID, configID, labelSuffix)
 ---
 
 **Scan Configuration:**
+
 ```go
 // Praetorian's balanced security test profile
 const PRAETORIAN_BALANCED_CONFIG = "d8b8e107-ff32-42d8-94c5-ffe4b9800fda"
@@ -191,11 +209,13 @@ configs, _ := client.GetScanConfigurations()
 ```
 
 **Operations:**
+
 - Create: `client.CreateScheduleItem()` or helper methods
 - Read: `client.GetScanFromScheduleItem(scheduleID)` to get scans
 - Delete: `client.CancelScan(scanID)` (cancels active scan, not schedule)
 
 **Key Relationships:**
+
 - References one or more sites (usually one in Chariot)
 - References one or more scan configurations
 - Produces zero or more scans (executions)
@@ -207,6 +227,7 @@ configs, _ := client.GetScanConfigurations()
 **Purpose:** Individual execution instances of a schedule.
 
 **Properties:**
+
 ```go
 type ScanSummary struct {
     ID         string `json:"id"`
@@ -220,6 +241,7 @@ type ScanSummary struct {
 ```
 
 **Status Lifecycle:**
+
 ```
 queued → running → succeeded
                  → failed
@@ -227,6 +249,7 @@ queued → running → succeeded
 ```
 
 **Polling Pattern:**
+
 ```go
 // 1. Get scan from schedule
 scanResp, _ := client.GetScanFromScheduleItem(scheduleID)
@@ -250,11 +273,13 @@ for {
 ```
 
 **Operations:**
+
 - Read: `client.GetScanSummary(scanID)` for status
 - List: `client.GetScanFromScheduleItem(scheduleID)` or `client.ListScansFromTime(beforeTime)`
 - Cancel: `client.CancelScan(scanID)`
 
 **Key Relationships:**
+
 - Created by exactly one schedule item
 - Produces zero or more issues (findings)
 - Produces zero or more scanned items (discovered endpoints)
@@ -266,6 +291,7 @@ for {
 **Purpose:** Security vulnerabilities discovered during scan.
 
 **Properties:**
+
 ```go
 type Issue struct {
     IssueType struct {
@@ -284,22 +310,26 @@ type Issue struct {
 ```
 
 **Severity Levels:**
+
 - `high` - Critical security issues (e.g., SQL injection, XSS)
 - `medium` - Important security issues (e.g., weak crypto)
 - `low` - Minor security issues (e.g., info disclosure)
 - `info` - Informational findings (not vulnerabilities)
 
 **Confidence Levels:**
+
 - `certain` - Confirmed vulnerability (exploit succeeded)
 - `firm` - High confidence (strong indicators)
 - `tentative` - Low confidence (potential false positive)
 
 **Operations:**
+
 - List: `client.ListIssues(scanID)` for summaries
 - Read: `client.GetIssue(scanID, serialNumber)` for details
 - Convert: `client.GetEntities(scanID)` for Tabularium models
 
 **Key Relationships:**
+
 - Belongs to exactly one scan
 - Converted to `model.Risk` in Chariot platform
 
@@ -310,6 +340,7 @@ type Issue struct {
 **Purpose:** All URLs/endpoints discovered during crawl and audit phases.
 
 **Union Type:**
+
 ```go
 type ScannedItem struct {
     AuditItem *AuditItem `json:",omitempty"` // Tested for vulnerabilities
@@ -329,6 +360,7 @@ type CrawlItem struct {
 ```
 
 **Filtering:**
+
 ```go
 // Filter out-of-scope items
 func FilterScannedItems(items []ScannedItem) []ScannedItem {
@@ -349,10 +381,12 @@ func FilterScannedItems(items []ScannedItem) []ScannedItem {
 ```
 
 **Operations:**
+
 - List: `client.ListScannedItems(scanID)`
 - Convert: Included in `client.GetEntities(scanID)` as attributes
 
 **Key Relationships:**
+
 - Belongs to exactly one scan
 - Converted to `model.Attribute` in Chariot platform
 

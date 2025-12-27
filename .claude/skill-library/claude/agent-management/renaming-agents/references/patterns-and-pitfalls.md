@@ -6,14 +6,14 @@ Reference file for renaming-agents - search patterns and common mistakes to avoi
 
 ## Where Agents Are Referenced
 
-| Location | Pattern Example | Context |
-|----------|-----------------|---------|
-| **Agent tables** | `\| frontend-developer \| desc \|` | Orchestrator delegation tables |
-| **Task calls** | `Task("frontend-developer", ...)` | Agent spawning code |
-| **Recommendations** | `Recommend: frontend-developer` | Escalation protocols |
-| **Examples** | See `frontend-developer` for... | Documentation |
-| **Lists** | `- frontend-developer handles X` | Capability lists |
-| **Prose** | The frontend-developer agent... | Explanatory text |
+| Location            | Pattern Example                    | Context                        |
+| ------------------- | ---------------------------------- | ------------------------------ |
+| **Agent tables**    | `\| frontend-developer \| desc \|` | Orchestrator delegation tables |
+| **Task calls**      | `Task("frontend-developer", ...)`  | Agent spawning code            |
+| **Recommendations** | `Recommend: frontend-developer`    | Escalation protocols           |
+| **Examples**        | See `frontend-developer` for...    | Documentation                  |
+| **Lists**           | `- frontend-developer handles X`   | Capability lists               |
+| **Prose**           | The frontend-developer agent...    | Explanatory text               |
 
 ---
 
@@ -36,6 +36,7 @@ Grep pattern: "\\bfrontend-developer\\b"
 ```
 
 **Why this matters:**
+
 - Prevents false positives
 - Ensures exact agent name matches
 - Avoids breaking unrelated content
@@ -47,14 +48,16 @@ Grep pattern: "\\bfrontend-developer\\b"
 ### Pitfall 1: Substring Matches
 
 **Problem:**
+
 ```bash
 # Searching for "test" finds:
 - test-engineer ✅ (want to rename this)
 - testing-agent-skills ✗ (don't want to change)
-- backend-unit-test-engineer ✗ (don't want to change)
+- backend-tester ✗ (don't want to change)
 ```
 
 **Solution:** Use word boundaries in Grep:
+
 ```bash
 Grep pattern: "\\btest\\b"  # ← Word boundaries
 
@@ -66,6 +69,7 @@ Grep pattern: "\\btest\\b"  # ← Word boundaries
 ### Pitfall 2: Case Sensitivity
 
 **Problem:**
+
 ```
 References might vary:
 - Frontend-Developer (capitalized)
@@ -74,6 +78,7 @@ References might vary:
 ```
 
 **Solution:**
+
 - Search case-insensitive first: `grep -riw "agent-name"`
 - Review each match for context
 - Preserve original case when updating
@@ -83,6 +88,7 @@ References might vary:
 ### Pitfall 3: Partial References
 
 **Problem:**
+
 ```
 Found: "For frontend work, use frontend-developer or backend-developer"
 
@@ -95,6 +101,7 @@ If renaming frontend-developer → react-developer, need to update:
 ### Pitfall 4: Comments vs Active Code
 
 **Problem:**
+
 ```
 # Archived agent references (in .archived/ or comments)
 # Old: use frontend-developer
@@ -102,6 +109,7 @@ If renaming frontend-developer → react-developer, need to update:
 ```
 
 **Solution:**
+
 - Search excludes `.archived/` directories
 - Comments in active files DO get updated (keeps docs accurate)
 - If intentionally preserving old name in comment, manual review

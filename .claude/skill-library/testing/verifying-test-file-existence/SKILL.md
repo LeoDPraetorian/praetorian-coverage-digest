@@ -15,6 +15,7 @@ allowed-tools: Read, Bash, Grep, Glob
 ## When to Use
 
 Use BEFORE:
+
 - "Fix failing tests in X.test.tsx"
 - "Create tests for Y component"
 - "Update tests in Z"
@@ -22,6 +23,7 @@ Use BEFORE:
 - Dispatching test work to agents
 
 **Especially when:**
+
 - Receiving list of test files to fix
 - User provides file paths
 - Asked to "complete" or "finish" tests
@@ -100,6 +102,7 @@ You:
 **DO NOT**: Create UserProfileForm.test.tsx if it doesn't exist
 
 **Correct Response if Missing**:
+
 ```
 "UserProfileForm.test.tsx does not exist. I cannot fix non-existent tests.
 
@@ -193,17 +196,20 @@ Agent: "Test file exists but production file missing.
 ## Integration with Other Skills
 
 **This skill is REQUIRED before**:
+
 - developing-with-tdd (RED phase)
 - interactive-form-testing
 - Any test creation/fixing work
 
 **Use with**:
+
 - test-infrastructure-discovery (after verifying files exist)
 - debugging-systematically (when tests fail unexpectedly)
 
 ## Real-World Impact
 
 **From 22-hour test session**:
+
 - **Without this skill**: Agents created 266 tests for 9 files, 3 didn't exist (22 hours wasted)
 - **With this skill**: 5-minute check would have caught 3 missing files immediately
 
@@ -214,6 +220,7 @@ Agent: "Test file exists but production file missing.
 ## Red Flags - STOP and Verify
 
 If you catch yourself:
+
 - Writing test file when asked to "fix" tests
 - Assuming file path is correct without checking
 - Creating comprehensive tests without reading production file
@@ -231,6 +238,7 @@ NO TEST WORK WITHOUT FILE VERIFICATION FIRST
 5 minutes of verification prevents 22 hours of waste.
 
 **No exceptions:**
+
 - Not for "simple" test fixes
 - Not when "pretty sure" file exists
 - Not when "user wouldn't give wrong path"

@@ -5,6 +5,7 @@ Execute the implementation plan by spawning developer agents with architecture c
 ## Purpose
 
 Transform plans and architecture into working code by:
+
 - Implementing features following architecture decisions
 - Maintaining code quality standards
 - Verifying builds pass
@@ -16,14 +17,15 @@ Transform plans and architecture into working code by:
 
 Based on feature domain:
 
-| Feature Type | Developer Agent(s) | Parallelization |
-|--------------|-------------------|-----------------|
-| React UI only | `frontend-developer` | Single agent |
-| Go API only | `backend-developer` | Single agent |
-| Full-stack (independent) | Both developers | ✅ Parallel |
-| Full-stack (dependent) | Backend first, then frontend | ❌ Sequential |
+| Feature Type             | Developer Agent(s)           | Parallelization |
+| ------------------------ | ---------------------------- | --------------- |
+| React UI only            | `frontend-developer`         | Single agent    |
+| Go API only              | `backend-developer`          | Single agent    |
+| Full-stack (independent) | Both developers              | ✅ Parallel     |
+| Full-stack (dependent)   | Backend first, then frontend | ❌ Sequential   |
 
 **Dependency test**: Can frontend work without backend completion?
+
 - Yes (mocked APIs) → Parallel
 - No (needs real backend) → Sequential
 
@@ -112,6 +114,7 @@ frontend_result = Task(
 ### Step 3: Validate Developer Output
 
 Check that developer returned:
+
 - ✅ `status: "complete"` (not blocked)
 - ✅ Files modified list populated
 - ✅ Build verification included
@@ -119,12 +122,14 @@ Check that developer returned:
 - ✅ All plan tasks addressed
 
 If `status: "blocked"`:
+
 1. Read `handoff.context` for blocker details
 2. Use AskUserQuestion to resolve blocker
 3. Update plan/architecture if needed
 4. Re-spawn developer with resolution
 
 If `status: "needs_review"`:
+
 1. Present implementation to user
 2. Get approval/feedback
 3. If changes needed, spawn developer again with feedback
@@ -179,6 +184,7 @@ TodoWrite: Mark "Phase 5: Testing" as in_progress
 ## Exit Criteria
 
 ✅ Proceed to Phase 5 when:
+
 - All developers returned `status: "complete"`
 - Build passes
 - Files modified documented
@@ -187,6 +193,7 @@ TodoWrite: Mark "Phase 5: Testing" as in_progress
 - TodoWrite marked complete
 
 ❌ Do NOT proceed if:
+
 - Any developer blocked
 - Build failing
 - Lint errors present
@@ -214,6 +221,7 @@ Are frontend tasks independent?
 ### "Developer agent ignores architecture decisions"
 
 **Solution**: Make architecture context more prominent in prompt:
+
 ```
 CRITICAL: Follow these architecture decisions:
 1. {decision 1}
@@ -225,9 +233,11 @@ Deviating from these decisions requires user approval.
 ### "Build fails after implementation"
 
 **Solution**:
+
 1. Capture build error output
 2. Create issue context with error
 3. Re-spawn developer with:
+
    ```
    Previous implementation caused build failure:
 
@@ -239,6 +249,7 @@ Deviating from these decisions requires user approval.
 ### "Developer modifies unexpected files"
 
 **Solution**: Review `files_modified` list. If out of scope:
+
 1. Use AskUserQuestion: "Developer modified {file}. Was this expected?"
 2. If no, revert and re-run with constraint: "Only modify files in plan.md"
 

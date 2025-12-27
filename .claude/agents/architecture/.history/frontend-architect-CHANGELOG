@@ -1,0 +1,57 @@
+## [2025-12-26] - Update Applied
+
+### Changed
+- Added `securing-react-implementations` skill to frontmatter skills field
+- Added "Security patterns" trigger in Tier 3 with path to securing-react-implementations skill
+
+### Reason
+- Agent was missing security guidance for React implementations
+- Architects needed access to security patterns when designing React applications
+
+### Verification
+- GREEN: PASSED
+- Compliance: Pending
+- Re-audit: Pending
+
+## [2025-12-27] - Update Applied
+
+### Changed
+- Added `adhering-to-yagni` skill to frontmatter skills field (alphabetically)
+- Added `adhering-to-yagni` to Tier 1 Read() calls
+- Added "TanStack component integration" trigger in Tier 3 with path to integrating-tanstack-components skill
+- Added "Context API patterns" trigger in Tier 3 with path to using-context-api skill
+
+### Reason
+- Agent needed scope discipline to prevent over-engineering in architectural decisions (adhering-to-yagni)
+- Agent required TanStack integration patterns for coordinating Router, Query, Table, and Virtual (integrating-tanstack-components)
+- Agent needed Context API patterns with React 19.2+ conventions for state management decisions (using-context-api)
+- Skills identified via finding-skills-for-agents analysis (85%, 80%, 70% relevance respectively)
+
+### Verification
+- GREEN: PASSED - All three skills properly integrated (frontmatter, Tier 1, Tier 3)
+- Compliance: Pending
+- Re-audit: Pending
+
+## [2025-12-27] - Skill Integration from find-skills Analysis
+
+### Changed
+- Added 7 new skills to Tier 3 (triggered by task type):
+  - UI/UX design principles → adhering-to-uiux-laws (90% relevance)
+  - Component library architecture → using-shadcn-ui (85% relevance)
+  - Form architecture patterns → implementing-react-hook-form-zod (80% relevance)
+  - Server state patterns → using-tanstack-query (75% relevance)
+  - Data table architecture → using-tanstack-table (70% relevance)
+  - Client state patterns → using-zustand-state-management (65% relevance)
+  - Routing architecture → using-tanstack-router (60% relevance)
+
+### Reason
+- Skills identified via `/agent-manager find-skills frontend-architect` command
+- User selected 7 of 9 recommended skills through interactive selection workflow
+- Provides architects with implementation-specific patterns when designing features involving forms, tables, routing, or UI components
+- Complements existing gateway-frontend skill with focused architectural guidance
+
+### Verification
+- GREEN: PASSED - All 7 skills added to Tier 3 with appropriate triggers
+- Compliance: Pending
+- Re-audit: Pending
+

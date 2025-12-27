@@ -267,13 +267,11 @@ it crystal clear that Option A was the only acceptable answer?
 **Three possible responses:**
 
 1. **"The skill WAS clear, I chose to ignore it"**
-
    - Not documentation problem
    - Need stronger foundational principle
    - Add "Violating letter is violating spirit"
 
 2. **"The skill should have said X"**
-
    - Documentation problem
    - Add their suggestion verbatim
 
@@ -297,6 +295,28 @@ it crystal clear that Option A was the only acceptable answer?
 - Agent argues skill is wrong
 - Agent creates "hybrid approaches"
 - Agent asks permission but argues strongly for violation
+
+## Content Testing vs Deployment Testing
+
+This skill tests **skill content effectiveness** - does the documentation change agent behavior?
+
+**After content testing passes**, verify **deployment configuration** works:
+
+| Skill Type  | Deployed Location        | Agent Access Method      | Verify With            |
+| ----------- | ------------------------ | ------------------------ | ---------------------- |
+| **Core**    | `.claude/skills/`        | `skill: "name"`          | `testing-agent-skills` |
+| **Library** | `.claude/skill-library/` | Gateway → `Read("path")` | `testing-agent-skills` |
+
+**Why both tests matter:**
+
+- Content testing proves the skill WORKS (prevents failures)
+- Deployment testing proves agents FIND and USE it correctly
+
+**Workflow:**
+
+1. Use THIS skill to bulletproof content (RED-GREEN-REFACTOR)
+2. Deploy skill to appropriate location (core or library)
+3. Use `testing-agent-skills` to verify agents invoke/load it correctly
 
 ## Example: TDD Skill Bulletproofing
 

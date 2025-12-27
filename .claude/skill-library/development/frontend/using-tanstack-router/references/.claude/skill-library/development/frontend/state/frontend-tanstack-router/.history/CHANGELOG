@@ -1,0 +1,30 @@
+## [Date: 2025-12-24] - Initial Creation
+
+### Created
+- Skill created via creating-skills workflow
+- RED failure documented: Monolithic frontend-tanstack skill hinders router pattern discovery
+- Category: development/frontend/state
+- Type: Library/Framework (TanStack Router documentation)
+- SKILL.md: 446 lines (under 500 limit ✅)
+
+### Core Topics
+- File-based routing setup and conventions
+- Route loaders for data prefetching
+- Search params with Zod validation
+- Type-safe navigation (useNavigate, Link)
+- Route context and authentication guards
+- Code splitting and lazy loading
+- Integration with TanStack Query (ensureQueryData in loaders)
+
+### Reference Files
+Placeholder files created (3 total):
+- router-routing-guide.md
+- router-route-loaders.md
+- router-navigation-patterns.md
+
+### Related Skills
+- frontend-tanstack-query (Query + Router integration)
+- using-tanstack-table (Table + Router URL state sync)
+
+### Status
+Production-ready. Audit pending, follows proven pattern from frontend-tanstack-query and using-tanstack-table.

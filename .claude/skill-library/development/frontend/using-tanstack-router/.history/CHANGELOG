@@ -1,0 +1,282 @@
+# Changelog - using-tanstack-router
+
+## [Date: 2025-12-25]
+
+### Changed
+- Fixed incorrect `createRootRouteWithContext` API pattern in SKILL.md (lines 189-213)
+- Fixed incorrect `createRootRouteWithContext` API pattern in references/router-routing-guide.md (lines 144-161)
+
+### Reason
+- **RED Failure**: Skill showed `createRootRoute` with `context: ()` in options, which is not the correct API
+- **Correct API**: Must use `createRootRouteWithContext<TContext>()()` factory function
+- **Context Location**: Context must be passed to `createRouter({ context: {...} })`, not in route options
+- This was causing TypeScript errors and non-functional code for anyone following the skill
+
+### Impact
+- Updated 2 code examples to show correct factory pattern with type-safe context
+- Added explicit import statement for `createRootRouteWithContext`
+- Added `RouterContext` interface definition
+- Added example of passing context to `createRouter`
+
+### References
+- TanStack Router Docs: https://tanstack.com/router/v1/docs/framework/react/api/router/createRootRouteWithContextFunction
+- Web research confirmed this is the recommended pattern for TanStack Query integration
+
+### REFACTOR
+- **Assessment**: Documentation pattern fix, not workflow/rule change
+- **Decision**: REFACTOR pressure testing skipped (user approval)
+- **Rationale**: This corrects code examples without modifying skill workflow, mandatory steps, or validation logic
+
+---
+
+## [Date: 2025-12-25] - Update 2
+
+### Changed
+- Fixed incorrect code splitting example in SKILL.md (lines 216-245)
+
+### Reason
+- **RED Failure**: Example showed `Route.useLoaderData()` being called incorrectly in component function
+- **Unclear file separation**: Example didn't properly show which options go in base file vs `.lazy.tsx` file
+- **Correct pattern**: Critical options (`loader`, `validateSearch`) stay in base file, non-critical options (`component`, `errorComponent`, `pendingComponent`) go in `.lazy.tsx` file using `createLazyFileRoute`
+
+### Impact
+- Updated code splitting example to show proper file separation
+- Added clear comments indicating which file each code block belongs to
+- Added explicit list of critical vs non-critical options
+- Removed invalid `Route.useLoaderData()` call from component function
+- Showed correct usage of `Route.useLoaderData()` inside the component body
+
+### References
+- TanStack Router Code Splitting Docs: https://tanstack.com/router/latest/docs/framework/react/guide/code-splitting
+- Web research confirmed `.lazy.tsx` convention and option separation
+
+### REFACTOR
+- **Assessment**: Documentation pattern fix, not workflow/rule change
+- **Decision**: REFACTOR pressure testing skipped (consistent with Update 1)
+- **Rationale**: This corrects code examples without modifying skill workflow, mandatory steps, or validation logic
+
+---
+
+## [Date: 2025-12-25] - Update 3
+
+### Changed
+- Added `@tanstack/zod-adapter` pattern documentation
+- Created `references/search-validation.md` (comprehensive Zod adapter guide)
+- Updated Search Params with Zod section in SKILL.md (lines 99-132)
+
+### Reason
+- **RED Failure**: Skill was missing the recommended `@tanstack/zod-adapter` pattern
+- **Production approach**: `zodValidator()` wrapper and `fallback()` utility are recommended for production apps
+- **Missing distinctions**: No documentation of `.default()` (missing values) vs `.catch()` (invalid values)
+
+### Impact
+- Added new reference file covering:
+  - `zodValidator()` wrapper usage
+  - `fallback()` utility for combined default/catch behavior
+  - `.default()` vs `.catch()` distinction with examples
+  - Error handling strategies
+  - Complete production examples
+  - Type inference patterns
+  - Best practices and common patterns
+- Updated main SKILL.md example to show adapter pattern
+- Added concise link with bullet points to reference file
+- Progressive disclosure: Kept SKILL.md lean, detailed content in reference
+
+### References
+- TanStack Router Validation Docs: https://tanstack.com/router/latest/docs/framework/react/how-to/validate-search-params
+- Web research confirmed zodValidator and fallback utilities as recommended approach
+
+### REFACTOR
+- **Assessment**: Documentation addition (new pattern), not workflow/rule change
+- **Decision**: REFACTOR pressure testing skipped (consistent with Updates 1-2)
+- **Rationale**: Adds missing content without modifying skill workflow, mandatory steps, or validation logic
+
+---
+
+## [Date: 2025-12-25] - Update 4
+
+### Changed
+- Added `loaderDeps` pattern to Route Loaders section in SKILL.md (lines 97-107)
+
+### Reason
+- **RED Failure**: Skill was missing the recommended `loaderDeps` pattern for search param dependencies
+- **Cache keying**: Direct search param access in loaders breaks proper cache key generation
+- **Preloading**: `loaderDeps` explicitly declares dependencies for consistent preload behavior
+
+### Impact
+- Added brief inline example showing loaderDeps usage
+- Shows proper pattern: loaderDeps extracts search params, loader accesses deps
+- Clear comment indicating deps access instead of direct search access
+- Kept addition minimal (11 lines) due to approaching line limit (473 lines)
+
+### References
+- TanStack Router Data Loading: https://tanstack.com/router/latest/docs/framework/react/guide/data-loading
+
+### REFACTOR
+- **Assessment**: Documentation addition (best practice pattern)
+- **Decision**: REFACTOR skipped (consistent with Updates 1-3)
+- **Rationale**: Adds recommended pattern without workflow changes
+
+---
+
+## [Date: 2025-12-25] - Update 5: MAJOR REFACTOR
+
+### Changed
+- **SKILL.md**: Reduced from 485 lines to 282 lines (42% reduction)
+- Created 4 new reference files:
+  - `references/loader-patterns.md` (395 lines) - beforeLoad vs loader, loaderDeps, context flow, parallel loading, ensureQueryData vs prefetchQuery
+  - `references/error-handling.md` (401 lines) - notFoundComponent setup, notFoundMode, notFound() function, errorComponent, pendingComponent
+  - `references/code-splitting.md` (375 lines) - .lazy.tsx convention, critical vs non-critical options, bundle optimization
+  - `references/file-conventions.md` (310 lines) - Complete naming table ($param, _layout, (folder), -prefix, [escape], .route.tsx, _suffix), route groups
+- Restructured SKILL.md as lean navigation hub:
+  - Frontmatter + Overview (~24 lines)
+  - Quick Reference table with links (~15 lines)
+  - Core Patterns with minimal examples (~150 lines)
+  - Reference Navigation section (~18 lines)
+  - Anti-patterns brief list (~31 lines)
+  - Chariot Patterns brief (~28 lines)
+  - Related Skills + Official Docs (~16 lines)
+
+### Reason
+- **RED Failure**: Skill at 485/500 lines (97% capacity), only 15 lines remaining for future additions
+- **Blocked updates**: 4 remaining critical updates couldn't fit:
+  - beforeLoad vs loader distinction
+  - notFoundComponent patterns
+  - File naming conventions
+  - meta → head API fix
+- **Future needs**: Room needed for TanStack Router v2 documentation
+- **Progressive disclosure violation**: Detailed patterns inline prevented quick navigation
+
+### Impact
+- **Line reduction**: 485 → 282 lines (203 lines extracted)
+- **Future capacity**: 218 lines available for additions (vs 15 before)
+- **Progressive disclosure**: Quick answers in SKILL.md, comprehensive deep-dives in 9 reference files
+- **Content preservation**: ALL technical content preserved, reorganized for better access
+- **Navigation**: Clear reference navigation section with organized links
+- **Patterns added**: 4 missing critical patterns now documented in dedicated references
+
+### Reference Files Structure
+| File | Lines | Content |
+|------|-------|---------|
+| loader-patterns.md | 395 | beforeLoad vs loader table, execution order, loaderDeps, context flow, parallel loading, ensureQueryData vs prefetchQuery, preloading |
+| error-handling.md | 401 | notFoundComponent setup, notFoundMode (fuzzy/root), notFound() function, errorComponent, pendingComponent, combined strategies |
+| code-splitting.md | 375 | .lazy.tsx convention, critical vs non-critical options table, bundle optimization, dynamic imports, preloading strategies |
+| file-conventions.md | 310 | Complete naming table, route groups, pathless layouts, exclusions, escaping, splat routes, examples |
+
+### Existing References Preserved
+- `router-routing-guide.md` (9KB)
+- `router-route-loaders.md` (11KB)
+- `router-navigation-patterns.md` (10KB)
+- `integration-patterns.md` (15KB)
+- `search-validation.md` (7KB)
+
+### Total Reference Files
+9 reference files (4 new + 5 existing) covering all TanStack Router patterns
+
+### Migration Strategy
+- **Code blocks >5 lines** → Extracted to references, replaced with 2-line summary + link
+- **Detailed explanations** → Moved to references
+- **Edge cases and gotchas** → Documented in references
+- **Minimal examples** → Kept inline in SKILL.md for quick reference
+
+### Progressive Disclosure Architecture
+**SKILL.md (282 lines)**: Quick scan answers, minimal illustrative examples
+**9 Reference Files**: Comprehensive deep-dives, production patterns, edge cases
+
+### REFACTOR
+- **Assessment**: Major structural reorganization, not workflow/rule change
+- **Decision**: REFACTOR pressure testing skipped
+- **Rationale**:
+  - No changes to skill workflows, mandatory steps, or validation logic
+  - Pure content reorganization for progressive disclosure
+  - All technical content preserved (reorganized, not deleted)
+  - Consistent with Updates 1-4 (documentation fixes/additions)
+  - Enables future additions (218 lines capacity vs 15 before)
+
+---
+
+## [Date: 2025-12-25] - Update 6: Fix Deprecated meta API
+
+### Changed
+- Fixed deprecated `meta` route option to `head` API in `references/router-routing-guide.md` (lines 318-361)
+- Section title changed from "Route Meta Tags" to "Document Head Management"
+- Updated API from `meta: ({ loaderData }) => [...]` to `head: ({ loaderData }) => ({ meta: [...] })`
+- Added required `<HeadContent />` component documentation with root route example
+- Added reference link to official Document Head Management Guide
+
+### Reason
+- **RED Failure**: Skill documented deprecated `meta` API instead of current `head` API
+- **Breaking change**: TanStack Router changed meta handling between versions
+- **Missing requirement**: No documentation that `<HeadContent />` must be rendered in root route
+- **Current API**: `head` returns object with `meta` property, not array directly
+
+### Impact
+- Developers following skill will now use correct current API
+- Added complete working example showing both route-level `head` option and root-level `<HeadContent />`
+- Added reference link to official documentation
+- Reference file only - no SKILL.md line count impact
+
+### Code Changes
+
+**Before (deprecated):**
+```typescript
+meta: ({ loaderData }) => [
+  { title: loaderData.post.title },
+]
+```
+
+**After (current):**
+```typescript
+head: ({ loaderData }) => ({
+  meta: [
+    { title: loaderData.post.title },
+  ],
+})
+```
+
+**Added requirement:**
+```typescript
+// In __root.tsx
+import { HeadContent } from '@tanstack/react-router'
+
+<head>
+  <HeadContent />  {/* Required */}
+</head>
+```
+
+### References
+- [Document Head Management Guide](https://tanstack.com/router/v1/docs/framework/react/guide/document-head-management)
+
+### REFACTOR
+- **Assessment**: Documentation fix (API update)
+- **Decision**: REFACTOR skipped (consistent with Updates 1-5)
+- **Rationale**: Corrects deprecated API without modifying skill workflow, mandatory steps, or validation logic
+
+---
+
+## [Date: 2025-12-25] - Update 7: Add abortController Warning
+
+### Changed
+- Added "⚠️ Known Issues with abortController" section to `references/router-route-loaders.md` (lines 432-461)
+- Documented known bugs with GitHub issue links (#1339, #3014, #4517, #3928)
+- Added recommended workaround using TanStack Query's signal instead
+- Added code examples showing both approaches with clear warnings
+
+### Reason
+- **RED Failure**: Skill documented abortController pattern without warning about known reliability issues
+- **Known bugs**: Signal may not fire, AbortError bubbles without reason, race conditions
+- **User protection**: Developers need to know about potential issues before relying on router's abort handling
+
+### Impact
+- Developers now warned about abortController reliability issues
+- Clear workaround provided (use TanStack Query's signal)
+- GitHub issue links for tracking bug status
+- Code examples show recommended vs cautionary patterns
+
+### References
+- GitHub Issues: #1339, #3014, #4517, #3928
+
+### REFACTOR
+- **Assessment**: Documentation addition (warning/known issue)
+- **Decision**: REFACTOR skipped (consistent with Updates 1-6)
+- **Rationale**: Adds warning without modifying skill workflow, mandatory steps, or validation logic

@@ -9,6 +9,7 @@ How to break down features into well-structured epics and sub-issues.
 An epic represents a **complete user-facing feature or initiative**.
 
 **Characteristics:**
+
 - Delivers end-to-end value
 - Spans multiple technical domains (frontend + backend + infrastructure)
 - Requires coordination across 4-8 sub-issues
@@ -16,6 +17,7 @@ An epic represents a **complete user-facing feature or initiative**.
 - Has clear success criteria
 
 **Examples:**
+
 - ✅ "Real-Time Notification System"
 - ✅ "Asset Discovery Automation"
 - ✅ "Multi-Factor Authentication"
@@ -27,6 +29,7 @@ An epic represents a **complete user-facing feature or initiative**.
 A sub-issue is an **independently testable unit of work**.
 
 **Characteristics:**
+
 - Can be completed by one person
 - Has clear start and end conditions
 - Produces testable output
@@ -34,6 +37,7 @@ A sub-issue is an **independently testable unit of work**.
 - Minimal dependencies on other sub-issues
 
 **Examples:**
+
 - ✅ "Implement WebSocket server Lambda function"
 - ✅ "Create notification toast component"
 - ✅ "Add DynamoDB table for notification storage"
@@ -61,15 +65,18 @@ Sub-Issues:
 ```
 
 **When to use:**
+
 - Full-stack features
 - Clear technical boundaries
 - Independent layer development possible
 
 **Pros:**
+
 - Easy to parallelize (frontend + backend can work concurrently after infrastructure)
 - Clear ownership (backend team vs frontend team)
 
 **Cons:**
+
 - Risk of integration issues at end
 - May need frequent sync meetings
 
@@ -88,16 +95,19 @@ Sub-Issues:
 ```
 
 **When to use:**
+
 - Features with multiple related workflows
 - Want to ship incrementally
 - Single team owns full stack
 
 **Pros:**
+
 - Each sub-issue delivers end-to-end value
 - Can deploy incrementally
 - Easier to demo progress
 
 **Cons:**
+
 - More context switching between frontend/backend
 - Harder to parallelize work
 
@@ -118,15 +128,18 @@ Dependencies:
 ```
 
 **When to use:**
+
 - Heavy infrastructure dependencies
 - Complex orchestration
 - Need strict ordering
 
 **Pros:**
+
 - Clear build order
 - Reduces rework (foundation solid before building on it)
 
 **Cons:**
+
 - Less parallelization
 - Delays visible progress (UI comes late)
 
@@ -136,12 +149,12 @@ Dependencies:
 
 **Sweet spot: 4-8 sub-issues per epic**
 
-| Count | Assessment | Action |
-|-------|------------|--------|
-| 1-3 | Too few - sub-issues likely too large | Split sub-issues into smaller pieces |
-| 4-8 | Optimal - manageable coordination | Proceed as planned |
-| 9-12 | Getting complex - consider splitting | Review if epic can be split |
-| 13+ | Too many - coordination overhead high | Split into multiple epics |
+| Count | Assessment                            | Action                               |
+| ----- | ------------------------------------- | ------------------------------------ |
+| 1-3   | Too few - sub-issues likely too large | Split sub-issues into smaller pieces |
+| 4-8   | Optimal - manageable coordination     | Proceed as planned                   |
+| 9-12  | Getting complex - consider splitting  | Review if epic can be split          |
+| 13+   | Too many - coordination overhead high | Split into multiple epics            |
 
 **Example: Too many sub-issues**
 
@@ -161,27 +174,32 @@ Epic: Complete Platform Redesign (20 sub-issues)
 ### Types of Dependencies
 
 **1. Technical Dependencies**
+
 - Infrastructure must exist before application code
 - Backend APIs must exist before frontend can call them
 - Database schema must exist before querying
 
 **2. Domain Dependencies**
+
 - Authentication before authorization
 - User creation before user management
 - Asset discovery before asset enrichment
 
 **3. Shared Dependencies**
+
 - Multiple sub-issues depend on same foundation
 - Shared component used by multiple features
 
 ### Visualizing Dependencies
 
 **Simple Linear:**
+
 ```
 A → B → C → D
 ```
 
 **Parallel with Merge:**
+
 ```
     ┌─→ B ──┐
 A ──┤       ├─→ D
@@ -189,6 +207,7 @@ A ──┤       ├─→ D
 ```
 
 **Complex Tree:**
+
 ```
         A (Infrastructure)
        ↙ ↓ ↘
@@ -204,12 +223,14 @@ A ──┤       ├─→ D
 **Strategy 1: Minimize Dependencies**
 
 **Before:**
+
 ```
 Sub-Issue 1 → Sub-Issue 2 → Sub-Issue 3 → Sub-Issue 4
 (Everything sequential, nothing parallel)
 ```
 
 **After:**
+
 ```
 Sub-Issue 1 (Foundation)
     ↓
@@ -222,6 +243,7 @@ Sub-Issue 1 (Foundation)
 **Strategy 2: Create Shared Foundation Issue**
 
 Instead of:
+
 ```
 Sub-Issue A needs DB schema
 Sub-Issue B needs DB schema
@@ -229,6 +251,7 @@ Sub-Issue C needs DB schema
 ```
 
 Do:
+
 ```
 Sub-Issue 1: Create DB schema + models (foundation)
 Sub-Issue 2-4: Use schema (depend on 1)
@@ -252,6 +275,7 @@ Sub-Issue: "Implement notification service"
 ### When to Split an Epic
 
 **Symptoms of too-large epic:**
+
 - More than 10 sub-issues
 - Timeline > 8 weeks
 - Multiple teams involved
@@ -260,12 +284,14 @@ Sub-Issue: "Implement notification service"
 **How to split:**
 
 **Option 1: Phase-based split**
+
 ```
 Epic 1: Notification MVP (4 sub-issues, 3 weeks)
 Epic 2: Advanced Notifications (6 sub-issues, 4 weeks)
 ```
 
 **Option 2: Component-based split**
+
 ```
 Epic 1: Email Notifications (5 sub-issues)
 Epic 2: Push Notifications (5 sub-issues)
@@ -273,6 +299,7 @@ Epic 3: In-App Notifications (4 sub-issues)
 ```
 
 **Option 3: Platform-based split**
+
 ```
 Epic 1: Backend Notification Infrastructure (6 sub-issues)
 Epic 2: Frontend Notification UI (5 sub-issues)
@@ -281,6 +308,7 @@ Epic 2: Frontend Notification UI (5 sub-issues)
 ### When to Merge Sub-Issues
 
 **Symptoms of too-small sub-issues:**
+
 - Sub-issue < 2 hours of work
 - No testable output
 - Purely refactoring or cleanup
@@ -289,6 +317,7 @@ Epic 2: Frontend Notification UI (5 sub-issues)
 **How to merge:**
 
 **Before:**
+
 ```
 Sub-Issue 1: Create component file
 Sub-Issue 2: Add props interface
@@ -297,6 +326,7 @@ Sub-Issue 4: Add styling
 ```
 
 **After:**
+
 ```
 Sub-Issue: Implement notification toast component
 - Create component with props interface
@@ -311,17 +341,18 @@ Sub-Issue: Implement notification toast component
 
 ### T-Shirt Sizing
 
-| Size | Duration | Characteristics |
-|------|----------|----------------|
-| S | <1 day | Clear approach, minimal unknowns |
-| M | 2-4 days | Some unknowns, moderate complexity |
-| L | 5+ days | Research needed, high complexity |
+| Size | Duration | Characteristics                    |
+| ---- | -------- | ---------------------------------- |
+| S    | <1 day   | Clear approach, minimal unknowns   |
+| M    | 2-4 days | Some unknowns, moderate complexity |
+| L    | 5+ days  | Research needed, high complexity   |
 
 **Don't estimate in hours** - use relative sizing
 
 ### Complexity Factors
 
 **Increases size:**
+
 - New technology/library to learn
 - Unclear requirements
 - Many integration points
@@ -329,6 +360,7 @@ Sub-Issue: Implement notification toast component
 - Performance optimization needed
 
 **Decreases size:**
+
 - Similar pattern exists in codebase
 - Clear specification
 - Well-understood domain
@@ -337,12 +369,14 @@ Sub-Issue: Implement notification toast component
 ### Example Estimations
 
 **S - Simple API endpoint:**
+
 - Copy existing pattern
 - Standard CRUD operation
 - Minimal validation
 - Estimated: 4-6 hours
 
 **M - New React component:**
+
 - Design UI layout
 - Implement state management
 - Handle edge cases
@@ -350,6 +384,7 @@ Sub-Issue: Implement notification toast component
 - Estimated: 2-3 days
 
 **L - WebSocket infrastructure:**
+
 - Research WebSocket patterns
 - Set up API Gateway
 - Implement connection management
@@ -381,6 +416,7 @@ Before finalizing epic breakdown, verify:
 **Breakdown approach:** Dependency-first + layer-based
 
 **Sub-Issues:**
+
 1. **CHARIOT-1854**: Agent Sandbox Infrastructure (L)
    - Foundation - must exist first
    - No dependencies
@@ -407,6 +443,7 @@ Before finalizing epic breakdown, verify:
    - Used by: 1852, 1856, 1857
 
 **Why this works:**
+
 - 6 sub-issues (optimal range)
 - Clear foundation (Sandbox)
 - Parallel opportunities (1852 + 1855 can start together)

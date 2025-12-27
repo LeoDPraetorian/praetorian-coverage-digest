@@ -26,6 +26,7 @@ For Chariot, we primarily use **User Pools** for authentication and authorizatio
 **Purpose**: Manage user authentication and identity
 
 **Features**:
+
 - User registration and sign-in
 - Password policies and MFA
 - JWT token issuance
@@ -34,6 +35,7 @@ For Chariot, we primarily use **User Pools** for authentication and authorizatio
 - User groups for RBAC
 
 **Use Cases**:
+
 - API authentication
 - User management
 - Role-based access control
@@ -43,11 +45,13 @@ For Chariot, we primarily use **User Pools** for authentication and authorizatio
 **Purpose**: Provide temporary AWS credentials
 
 **Features**:
+
 - Federated identity access
 - AWS service authorization
 - Temporary credentials via STS
 
 **Use Cases** (Not currently used in Chariot):
+
 - Direct S3 access from mobile apps
 - DynamoDB access from client
 - AWS service delegation
@@ -61,6 +65,7 @@ Cognito issues three types of JWT tokens after successful authentication:
 **Purpose**: User identity information
 
 **Contains**:
+
 - `sub` (subject) - Unique user ID
 - `cognito:username` - Username
 - `email` - User email
@@ -70,6 +75,7 @@ Cognito issues three types of JWT tokens after successful authentication:
 **Usage**: Pass user identity to application
 
 **Example Claims**:
+
 ```json
 {
   "sub": "f8c3f9e4-1234-5678-90ab-cdef12345678",
@@ -87,6 +93,7 @@ Cognito issues three types of JWT tokens after successful authentication:
 **Purpose**: Authorize API requests
 
 **Contains**:
+
 - `sub` - User ID
 - `cognito:groups` - User groups
 - `scope` - OAuth scopes
@@ -95,6 +102,7 @@ Cognito issues three types of JWT tokens after successful authentication:
 **Usage**: Validate API requests
 
 **Example Claims**:
+
 ```json
 {
   "sub": "f8c3f9e4-1234-5678-90ab-cdef12345678",
@@ -111,6 +119,7 @@ Cognito issues three types of JWT tokens after successful authentication:
 **Purpose**: Obtain new access/id tokens without re-authentication
 
 **Characteristics**:
+
 - Opaque (not JWT, can't decode)
 - Long-lived (default 30 days, configurable up to 10 years)
 - Can be revoked
@@ -183,6 +192,7 @@ Cognito → Return tokens
 ```
 
 **Why Each Step Matters**:
+
 - **Signature verification**: Proves token issued by Cognito
 - **Expiration check**: Prevents replay attacks
 - **Issuer verification**: Prevents token substitution
@@ -195,11 +205,13 @@ See [JWT Validation](jwt-validation.md) for implementation.
 **What**: Public keys used to verify JWT signatures
 
 **Location**:
+
 ```
 https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json
 ```
 
 **Structure**:
+
 ```json
 {
   "keys": [
@@ -215,6 +227,7 @@ https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json
 ```
 
 **Caching Strategy**:
+
 - Cache JWK Set locally (reduce latency)
 - Refresh every 6-24 hours
 - Force refresh if `kid` not found

@@ -140,6 +140,7 @@ export class Phase13StateExternalization {
 
   /**
    * Validate a single skill for state externalization compliance
+   * Returns consolidated issues with recommendation and context embedded
    */
   static validate(skill: SkillFile): Issue[] {
     const issues: Issue[] = [];
@@ -151,14 +152,12 @@ export class Phase13StateExternalization {
     if (complexity.isComplex && mandate.strength === MandateStrength.MISSING) {
       issues.push({
         severity: 'CRITICAL',
-        message: `Complex skill missing TodoWrite mandate (Reasons: ${complexity.reasons.join(', ')})`,
+        message: `Complex skill missing TodoWrite mandate`,
+        recommendation: 'Add mandate: "You MUST use TodoWrite before starting to track all steps"',
+        context: complexity.reasons,
         autoFixable: false,
       });
-      issues.push({
-        severity: 'INFO',
-        message: 'Add mandate: "You MUST use TodoWrite before starting to track all steps"',
-        autoFixable: false,
-      });
+      return issues;
     }
 
     // Case 2: Complex skill with weak mandate
@@ -166,13 +165,11 @@ export class Phase13StateExternalization {
       issues.push({
         severity: 'WARNING',
         message: `Complex skill has weak TodoWrite mandate (found: "${mandate.examples[0]}")`,
+        recommendation: 'Upgrade to strong mandate: Replace "should" with "MUST"',
+        context: complexity.reasons,
         autoFixable: false,
       });
-      issues.push({
-        severity: 'INFO',
-        message: 'Upgrade to strong mandate: Replace "should" with "MUST"',
-        autoFixable: false,
-      });
+      return issues;
     }
 
     // Case 3: Complex skill with strong mandate - PASS (no issue)
@@ -182,22 +179,11 @@ export class Phase13StateExternalization {
       issues.push({
         severity: 'INFO',
         message: `Simple skill has TodoWrite mandate (may be unnecessary overhead)`,
+        recommendation: 'Consider if TodoWrite is needed for this simple skill',
+        context: [`${complexity.sectionCount} sections, ${complexity.wordCount} words`],
         autoFixable: false,
       });
-      issues.push({
-        severity: 'INFO',
-        message: `Skill has ${complexity.sectionCount} sections, ${complexity.wordCount} words - consider if TodoWrite is needed`,
-        autoFixable: false,
-      });
-    }
-
-    // Add complexity metadata for transparency (only for complex skills)
-    if (complexity.isComplex && issues.length > 0) {
-      issues.push({
-        severity: 'INFO',
-        message: `Complexity detected: ${complexity.reasons.join(', ')}`,
-        autoFixable: false,
-      });
+      return issues;
     }
 
     return issues;

@@ -21,11 +21,13 @@ Without Phase 0 context, control mapping is generic (finds controls, but doesn't
 ### Load at Start (Always)
 
 **`../phase-0/summary.md`** - Quick compliance overview
+
 - Purpose: Fast orientation on applicable regulations
 - When: Read before control category analysis
 - Contains: List of regulations (SOC2, PCI-DSS, HIPAA, GDPR) with key requirements
 
 **`../phase-0/compliance-requirements.json`** - Required standards
+
 - Purpose: Specific regulatory requirements to validate
 - When: Read before control category analysis
 - Contains: Regulations with sub-requirements, each with validation criteria
@@ -87,11 +89,11 @@ Without Phase 0 context, control mapping is generic (finds controls, but doesn't
 
 ## How Phase 0 Drives Control Evaluation
 
-| Phase 0 Input | Impact on Controls Mapping | Example |
-|---------------|---------------------------|---------|
-| **PCI-DSS Level 1** | Validate all 12 requirements | Check Req 3 (protect stored card data), Req 4 (encrypt transmission), Req 6 (secure development), Req 7-8 (access controls), Req 10 (logging) |
-| **HIPAA** | Validate §164.312 technical safeguards | Check §164.312(a) access control, §164.312(b) audit logging, §164.312(c) integrity, §164.312(e) transmission security |
-| **SOC2 Type II** | Validate CC6 security criteria | Check CC6.1 (access controls), CC6.7 (encryption), CC6.8 (vulnerability management), CC7.2 (audit logging) |
+| Phase 0 Input       | Impact on Controls Mapping             | Example                                                                                                                                       |
+| ------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **PCI-DSS Level 1** | Validate all 12 requirements           | Check Req 3 (protect stored card data), Req 4 (encrypt transmission), Req 6 (secure development), Req 7-8 (access controls), Req 10 (logging) |
+| **HIPAA**           | Validate §164.312 technical safeguards | Check §164.312(a) access control, §164.312(b) audit logging, §164.312(c) integrity, §164.312(e) transmission security                         |
+| **SOC2 Type II**    | Validate CC6 security criteria         | Check CC6.1 (access controls), CC6.7 (encryption), CC6.8 (vulnerability management), CC7.2 (audit logging)                                    |
 
 ---
 
@@ -100,6 +102,7 @@ Without Phase 0 context, control mapping is generic (finds controls, but doesn't
 ### Before Phase 0 Integration (OLD)
 
 Generic gap identification:
+
 ```json
 {
   "control_category": "cryptography",
@@ -165,6 +168,7 @@ jq -r '.applicable_regulations[] | "\(.regulation): \(.requirements | length) re
 ```
 
 **Output**:
+
 ```
 PCI-DSS: 12 requirements
 SOC2 Type II: 18 controls
@@ -173,13 +177,13 @@ HIPAA: 8 safeguards
 
 ### Step 2: Map Requirements to Control Categories
 
-| Regulation | Requirement | Control Categories |
-|------------|-------------|-------------------|
-| PCI-DSS 3.4 | Render PAN unreadable | `cryptography.json`, `secrets-management.json` |
-| PCI-DSS 8.2 | Unique user credentials | `authentication.json`, `authorization.json` |
-| SOC2 CC6.7 | Encryption | `cryptography.json` |
-| SOC2 CC7.2 | Audit logging | `logging-audit.json` |
-| HIPAA §164.312(a) | Access control | `authentication.json`, `authorization.json` |
+| Regulation        | Requirement             | Control Categories                             |
+| ----------------- | ----------------------- | ---------------------------------------------- |
+| PCI-DSS 3.4       | Render PAN unreadable   | `cryptography.json`, `secrets-management.json` |
+| PCI-DSS 8.2       | Unique user credentials | `authentication.json`, `authorization.json`    |
+| SOC2 CC6.7        | Encryption              | `cryptography.json`                            |
+| SOC2 CC7.2        | Audit logging           | `logging-audit.json`                           |
+| HIPAA §164.312(a) | Access control          | `authentication.json`, `authorization.json`    |
 
 ### Step 3: Validate Each Requirement
 
@@ -237,6 +241,7 @@ Track met vs. missing requirements:
 ### New Field: `compliance_requirement`
 
 **Before** (generic gaps):
+
 ```json
 {
   "gaps": [
@@ -250,6 +255,7 @@ Track met vs. missing requirements:
 ```
 
 **After** (compliance-driven gaps):
+
 ```json
 {
   "gaps": [
@@ -281,13 +287,13 @@ Track met vs. missing requirements:
 
 ```typescript
 interface ControlGap {
-  control_category: string;              // Which control file this relates to
-  gap_description: string;               // What's missing
-  compliance_requirement?: string;       // NEW: Regulation requirement ID (e.g., "PCI-DSS Req 3.4")
+  control_category: string; // Which control file this relates to
+  gap_description: string; // What's missing
+  compliance_requirement?: string; // NEW: Regulation requirement ID (e.g., "PCI-DSS Req 3.4")
   severity: "critical" | "high" | "medium" | "low";
-  business_impact?: string;              // NEW: From Phase 0 - what happens if not fixed
-  remediation: string;                   // How to fix
-  estimated_effort?: string;             // NEW: Time to remediate
+  business_impact?: string; // NEW: From Phase 0 - what happens if not fixed
+  remediation: string; // How to fix
+  estimated_effort?: string; // NEW: Time to remediate
   priority: "critical" | "high" | "medium" | "low"; // NEW: From Phase 0 business risk
 }
 ```
@@ -304,11 +310,13 @@ Add this section to `summary.md` after control inventory:
 # Security Controls Summary
 
 ## Control Inventory
+
 [Existing section...]
 
 ## Compliance Evaluation (from Phase 0)
 
 ### PCI-DSS Level 1
+
 - **Status**: 8/12 requirements met (66.7%)
 - **Critical Gaps**:
   - ❌ Requirement 3.4 (partial): No encryption for archived transactions
@@ -321,6 +329,7 @@ Add this section to `summary.md` after control inventory:
   - ✅ [... 4 more]
 
 ### SOC2 Type II
+
 - **Status**: 15/18 controls met (83.3%)
 - **Critical Gaps**:
   - ❌ CC6.7 (partial): Key rotation not automated
@@ -332,6 +341,7 @@ Add this section to `summary.md` after control inventory:
   - ✅ [... 13 more]
 
 ### HIPAA (if applicable)
+
 - **Status**: Not applicable per Phase 0 (no PHI handling)
 
 ---
@@ -391,6 +401,7 @@ fi
 ### Test Scenario 1: With PCI-DSS Compliance
 
 **Setup**:
+
 ```json
 // phase-0/compliance-requirements.json
 {
@@ -412,6 +423,7 @@ fi
 ```
 
 **Expected Behavior**:
+
 1. Control mapping validates PCI-DSS Requirement 3.4
 2. `control-gaps.json` includes `compliance_requirement: "PCI-DSS Requirement 3.4"` if gap found
 3. Summary shows "PCI-DSS: 1/1 requirements" (met or gap)
@@ -422,6 +434,7 @@ fi
 **Setup**: Delete `phase-0/` directory
 
 **Expected Behavior**:
+
 1. Skill errors immediately: "Phase 0 not complete"
 2. Provides guidance to run `business-context-discovery` skill
 3. Does NOT proceed to control category analysis
@@ -436,10 +449,12 @@ fi
 **Requirement**: "Render primary account number (PAN) unreadable"
 
 **Control Categories to Check**:
+
 - `cryptography.json` - Encryption at rest
 - `secrets-management.json` - Tokenization services
 
 **Validation Logic**:
+
 ```bash
 # Check for card data encryption
 ENCRYPTION=$(jq -r '.controls[] | select(.data_protected | contains("payment_card_data"))' \
@@ -462,10 +477,12 @@ fi
 **Control**: "Logical and physical access controls"
 
 **Control Categories to Check**:
+
 - `authentication.json` - Identity verification
 - `authorization.json` - Access restrictions
 
 **Validation Logic**:
+
 ```bash
 # Check for authentication mechanisms
 AUTH=$(jq -r '.controls[] | select(.mechanism | contains("jwt", "cognito", "oauth"))' \
@@ -488,11 +505,13 @@ fi
 ## Related Sections in Main Skill
 
 This reference file is loaded from:
+
 - **Control Category Analysis** - Compliance validation per category
 - **Control Gaps Detection** - Compliance-driven gap identification
 - **Summary Generation** - Compliance status section
 
 **Main skill includes**:
+
 - Brief overview of Phase 0 compliance integration (3-5 sentences)
 - Link to this reference for detailed validation patterns
 - Error handling if Phase 0 missing

@@ -19,6 +19,7 @@
 ### WARNING Issues
 
 **1. Scripts at Root**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -27,6 +28,7 @@ my-skill/
 ```
 
 **2. Scripts in Wrong Subdirectory**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -39,10 +41,10 @@ my-skill/
 ✅ **AUTO-FIXABLE** - can move scripts to scripts/ directory
 
 **Fix logic:**
+
 ```typescript
 // Move all .sh, .py, .ts, .js files to scripts/
-if (file.endsWith('.sh') || file.endsWith('.py') ||
-    file.endsWith('.ts') || file.endsWith('.js')) {
+if (file.endsWith(".sh") || file.endsWith(".py") || file.endsWith(".ts") || file.endsWith(".js")) {
   moveToScripts(file);
 }
 ```
@@ -52,6 +54,7 @@ if (file.endsWith('.sh') || file.endsWith('.py') ||
 ### Example 1: Simple Scripts
 
 **Before:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -60,6 +63,7 @@ my-skill/
 ```
 
 **After:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -71,6 +75,7 @@ my-skill/
 ### Example 2: TypeScript CLI
 
 **Before:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -80,6 +85,7 @@ my-skill/
 ```
 
 **After:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -96,6 +102,7 @@ my-skill/
 **1. Test Files**
 
 Keep with scripts:
+
 ```
 scripts/
 ├── src/
@@ -107,6 +114,7 @@ scripts/
 **2. Config Files**
 
 Script-related configs go in scripts/:
+
 ```
 scripts/
 ├── package.json
@@ -117,6 +125,7 @@ scripts/
 **3. Documentation Scripts**
 
 If script generates docs:
+
 ```
 scripts/
 └── generate-docs.sh  # Outputs to .local/
@@ -131,6 +140,7 @@ scripts/
 3. Update SKILL.md if it references script locations
 
 **For TypeScript projects:**
+
 ```bash
 # After organizing, init npm workspace
 cd scripts/
@@ -145,11 +155,11 @@ npm init -y
 
 ## Quick Reference
 
-| Script Type | Location |
-|-------------|----------|
-| Bash (.sh) | scripts/ |
-| Python (.py) | scripts/ |
-| TypeScript (.ts) | scripts/src/ |
-| JavaScript (.js) | scripts/ or scripts/src/ |
-| Config files | scripts/ (if script-related) |
-| Tests | scripts/tests/ or scripts/src/__tests__/ |
+| Script Type      | Location                                 |
+| ---------------- | ---------------------------------------- |
+| Bash (.sh)       | scripts/                                 |
+| Python (.py)     | scripts/                                 |
+| TypeScript (.ts) | scripts/src/                             |
+| JavaScript (.js) | scripts/ or scripts/src/                 |
+| Config files     | scripts/ (if script-related)             |
+| Tests            | scripts/tests/ or scripts/src/**tests**/ |

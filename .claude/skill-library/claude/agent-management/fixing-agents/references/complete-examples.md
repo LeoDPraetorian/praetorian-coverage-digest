@@ -301,6 +301,7 @@ You:
 ### Used After Auditing
 
 Natural workflow:
+
 ```
 Audit → Reports issues
   ↓
@@ -310,6 +311,7 @@ Re-audit → Verifies success
 ```
 
 **Example:**
+
 ```
 User: "Audit and fix react-developer"
 
@@ -324,6 +326,7 @@ You:
 ### Used During Create/Update
 
 **creating-agents (Phase 9):**
+
 ```
 Phase 9: Compliance
   → skill: "auditing-agents"
@@ -332,6 +335,7 @@ Phase 9: Compliance
 ```
 
 **updating-agents (Phase 5):**
+
 ```
 Phase 5: Compliance
   → skill: "auditing-agents"

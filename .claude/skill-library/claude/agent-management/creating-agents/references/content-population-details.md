@@ -13,12 +13,14 @@ Before creating the agent file, validate the full path follows the correct patte
 ```
 
 Where:
+
 - `{type}` = Agent type selected in Phase 3 (architecture/development/testing/quality/analysis/research/orchestrator/mcp-tools)
 - `{agent-name}` = Agent name validated in Phase 2 (kebab-case, lowercase)
 
 ### Validation Steps
 
 1. **Construct Path**: Build path from Phase 2 name and Phase 3 type
+
    ```
    const path = `.claude/agents/${type}/${agentName}.md`
    ```
@@ -49,6 +51,7 @@ Where:
 **Valid Path**: `.claude/agents/testing/api-test-engineer.md` ✅
 
 **Invalid Paths**:
+
 - `.claude/agents/api-test-engineer.md` ❌ (missing type directory)
 - `.claude/agents/development/api-test-engineer.md` ❌ (wrong type)
 - `.claude/agents/testing/api_test_engineer.md` ❌ (underscore instead of hyphen)
@@ -57,6 +60,7 @@ Where:
 ### Before Writing File
 
 **Checklist**:
+
 - [ ] Path constructed from Phase 2 name and Phase 3 type
 - [ ] Path matches pattern `.claude/agents/{type}/{agent-name}.md`
 - [ ] Type directory matches Phase 3 selection
@@ -65,50 +69,44 @@ Where:
 
 **If validation fails**: Auto-correct path, show user the corrected path, then proceed with corrected path.
 
-## 7 Required Sections (Phase 6)
+## Required Sections (Phase 6)
 
 Populate these sections via Edit tool:
 
-### Section 1: EXTREMELY_IMPORTANT Block (MANDATORY)
+### Section 1: Skill Loading Protocol (MANDATORY)
 
-Add immediately after frontmatter.
+Add immediately after role statement.
 
-- Use template from `references/extremely-important-pattern.md`
-- Replace `{skill-1}`, `{skill-2}`, etc. with agent's mandatory skills
-- Include all anti-rationalization rules
-- Verify placement: First content after `---` closing frontmatter
+- Use template from [Skill Loading Protocol](../../../../../skills/managing-agents/references/patterns/skill-loading-protocol.md)
+- Configure Tier 1: List core skills (calibrating, gateway-{domain}, TDD, YAGNI, verifying)
+- Configure Tier 3: Populate trigger tables for agent's domain-specific skills
+- Add Anti-Bypass section (3 bullet points)
+- Verify Output Format includes skills_read array
 
-**CRITICAL**: This section is NON-NEGOTIABLE. Every agent must have it.
+**IMPORTANT**: This section is required for all agents.
 
-### Section 2: Core Responsibilities (3-5 items)
+### Section 2: Platform Rules (type-specific)
 
-Ask user what the agent's primary responsibilities are, then update agent.
+Brief, essential constraints for the agent's domain. Ask user for platform-specific rules.
 
-### Section 3: Critical Rules (type-specific)
+### Section 3: Output Format
 
-Ask user for type-specific rules, then update agent.
+Verify JSON present with:
+- status (complete/blocked/needs_review)
+- summary
+- skills_read array
+- files_modified
+- verification
 
-### Section 4: Skill References (if gateway present)
+### Section 4: Escalation Protocol
 
-Generate from `references/skill-integration-guide.md`.
-
-### Section 5: Output Format
-
-Verify JSON present for structured outputs.
-
-### Section 6: Escalation Protocol
-
-Ask user for escalation conditions, then update agent.
-
-### Section 7: Quality Checklist (6-8 items)
-
-Generate type-specific quality checklist.
+Ask user for escalation conditions (when to stop, who to recommend).
 
 **Each section**: Ask user (if needed) → Edit agent → Verify updated.
 
 ## Success Criteria Verification
 
-After populating all 7 sections, validate agent has clear completion criteria.
+After populating all sections, validate agent has clear completion criteria.
 
 ### Why This Matters
 
@@ -141,6 +139,7 @@ Common patterns not found:
 ### User Options
 
 **Ask User** via AskUserQuestion:
+
 ```
 Question: How should we add completion criteria?
 Header: Success Criteria
@@ -201,16 +200,16 @@ Before completing task, verify:
 
 ### Type-Specific Success Criteria
 
-| Agent Type | Typical Success Criteria |
-|-----------|--------------------------|
-| architecture | Design document complete, diagrams created, patterns documented, user approved |
-| development | Code written, tests pass, type checking clean, no linting errors |
-| testing | Tests written, all tests pass, coverage meets threshold, no flaky tests |
-| quality | Review complete, issues documented, recommendations provided, checklist complete |
-| analysis | Analysis complete, findings documented, recommendations provided, metrics calculated |
-| research | Information gathered, sources documented, summary provided, user confirmed relevance |
+| Agent Type   | Typical Success Criteria                                                                |
+| ------------ | --------------------------------------------------------------------------------------- |
+| architecture | Design document complete, diagrams created, patterns documented, user approved          |
+| development  | Code written, tests pass, type checking clean, no linting errors                        |
+| testing      | Tests written, all tests pass, coverage meets threshold, no flaky tests                 |
+| quality      | Review complete, issues documented, recommendations provided, checklist complete        |
+| analysis     | Analysis complete, findings documented, recommendations provided, metrics calculated    |
+| research     | Information gathered, sources documented, summary provided, user confirmed relevance    |
 | orchestrator | All sub-tasks complete, coordination successful, results aggregated, no blocking issues |
-| mcp-tools | Tool executed, results validated, errors handled, output formatted |
+| mcp-tools    | Tool executed, results validated, errors handled, output formatted                      |
 
 ## Verification Steps Validation
 
@@ -229,6 +228,7 @@ Grep -i "verify\|confirm\|check that\|ensure\|validate\|test that" .claude/agent
 ```
 
 Count verification-related instructions (exclude frontmatter, count only in body content):
+
 - "verify", "confirm", "check that", "ensure", "validate", "test that"
 - Case-insensitive matches
 - Focus on imperative usage (instructions, not descriptions)
@@ -255,6 +255,7 @@ Common verification gaps:
 ### User Options for Verification
 
 **Ask User** via AskUserQuestion:
+
 ```
 Question: How should we add verification instructions?
 Header: Verification Steps
@@ -316,15 +317,15 @@ Task complete when:
 
 ### Type-Specific Verification Examples
 
-| Agent Type | Typical Verification Instructions |
-|-----------|----------------------------------|
+| Agent Type   | Typical Verification Instructions                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------ |
 | architecture | Verify design covers all requirements, confirm diagrams render correctly, validate patterns documented |
-| development | Run tests and confirm 0 failures, build code and check exit 0, verify linter passes with no errors |
-| testing | Run test suite and confirm all pass, verify coverage meets threshold, check no flaky tests |
-| quality | Verify all issues documented, confirm recommendations actionable, validate checklist complete |
-| analysis | Verify all metrics calculated, confirm findings documented, validate recommendations provided |
-| research | Verify sources documented, confirm information accurate, validate summary complete |
-| orchestrator | Verify all sub-tasks complete, confirm no blocking issues, validate results aggregated |
-| mcp-tools | Verify tool executed successfully, confirm output formatted correctly, validate errors handled |
+| development  | Run tests and confirm 0 failures, build code and check exit 0, verify linter passes with no errors     |
+| testing      | Run test suite and confirm all pass, verify coverage meets threshold, check no flaky tests             |
+| quality      | Verify all issues documented, confirm recommendations actionable, validate checklist complete          |
+| analysis     | Verify all metrics calculated, confirm findings documented, validate recommendations provided          |
+| research     | Verify sources documented, confirm information accurate, validate summary complete                     |
+| orchestrator | Verify all sub-tasks complete, confirm no blocking issues, validate results aggregated                 |
+| mcp-tools    | Verify tool executed successfully, confirm output formatted correctly, validate errors handled         |
 
 **Reference Pattern**: See `verifying-before-completion` skill for detailed verification requirements.

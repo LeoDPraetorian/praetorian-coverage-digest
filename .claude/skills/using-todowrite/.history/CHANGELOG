@@ -1,0 +1,46 @@
+# Changelog
+
+All notable changes to this skill.
+
+## [Date: 2025-12-25]
+
+### Changed
+- **Threshold lowered from ≥3 to ≥2 tasks** - TodoWrite now required for 2+ separate actions
+- Updated complexity trigger: "≥3 distinct steps" → "≥2 distinct steps" (line 17)
+- Updated don't use condition: "<3 steps" → "<2 steps" and "1-2 steps" → "1 step" (line 32)
+- Updated decision flowchart: "Is this ≥3 steps?" → "Is this ≥2 steps?" (lines 110, 406)
+- Updated minimum tasks guideline: "Minimum: 3 tasks" → "Minimum: 2 tasks" (line 422)
+
+### Reason
+- **RED failure**: User reports agents get lost even with 2 tasks
+- **Empirical evidence**: Agents experience context drift and lose track with just 2 separate actions
+- **Current threshold too high**: ≥3 allows failures in 2-task scenarios
+- **Fix**: Lower complexity trigger to catch 2-task scenarios that need TodoWrite tracking
+
+### Impact
+- ✅ Agents will now use TodoWrite for 2+ task scenarios
+- ✅ Reduces context drift in simple 2-task operations
+- ✅ Better prevents agents from losing track of progress
+- ⚠️ Slightly increases TodoWrite usage (but prevents failures)
+
+### REFACTOR Phase Documentation
+
+**Pressure Test Scenarios:**
+
+1. **Time Pressure**: "Just 2 tasks, can skip TodoWrite"
+   - ❌ NO - 2 tasks triggers ≥2 threshold
+   - ✅ Explicit mandate: "≥2 distinct steps" requires TodoWrite
+
+2. **Authority Rationalization**: "2 tasks is too simple for TodoWrite"
+   - ❌ NO - User reports agents get lost with 2 tasks
+   - ✅ Empirical evidence supports ≥2 threshold
+
+3. **Sunk Cost**: "Already started without TodoWrite"
+   - ❌ NO - Must initialize TodoWrite before any work
+   - ✅ "BEFORE starting" language enforced
+
+**Test Results:**
+- ✅ All 5 edits applied consistently (lines 17, 32, 110, 406, 422)
+- ✅ Threshold lowered from ≥3 to ≥2 across all references
+- ✅ Compliance passed (line count, audit)
+- ✅ No functionality lost, improves tracking coverage

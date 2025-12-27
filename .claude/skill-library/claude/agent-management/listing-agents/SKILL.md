@@ -8,11 +8,14 @@ allowed-tools: Bash, Read, Glob
 
 **Display all agents grouped by category for discovery and browsing.**
 
+> **Compliance**: This skill USES the [Agent Compliance Contract](../../../../skills/managing-agents/references/agent-compliance-contract.md).
+
 ---
 
 ## What This Skill Does
 
 Lists all agents in the repository:
+
 - **Grouped by category** (8 categories)
 - **Alphabetically sorted** within each category
 - **Shows descriptions** (first 80 chars)
@@ -31,6 +34,7 @@ Lists all agents in the repository:
 - Verifying agent inventory
 
 **NOT for:**
+
 - Finding specific agents by keyword (use `searching-agents`)
 - Checking if specific agent exists (use `searching-agents`)
 - Metadata inspection (use `auditing-agents`)
@@ -39,28 +43,46 @@ Lists all agents in the repository:
 
 ## Quick Reference
 
-| Command | Purpose | Output |
-|---------|---------|--------|
-| List all | Show every agent | 8 categories, ~49 agents |
-| List by category | Show one category | Single category with agents |
-| Count only | Quick inventory | Total and per-category counts |
+| Command          | Purpose           | Output                        |
+| ---------------- | ----------------- | ----------------------------- |
+| List all         | Show every agent  | 8 categories, ~49 agents      |
+| List by category | Show one category | Single category with agents   |
+| Count only       | Quick inventory   | Total and per-category counts |
 
 ---
 
 ## Agent Categories
 
-| Category | Purpose | Permission Mode | Typical Count |
-|----------|---------|-----------------|---------------|
-| **architecture** | System design, patterns, decisions | plan | 7 agents |
-| **development** | Implementation, coding, features | default | 16 agents |
-| **testing** | Unit, integration, e2e testing | default | 8 agents |
-| **quality** | Code review, auditing | default | 5 agents |
-| **analysis** | Security, complexity assessment | plan | 6 agents |
-| **research** | Web search, documentation | plan | 3 agents |
-| **orchestrator** | Coordination, workflows | default | 2 agents |
-| **mcp-tools** | Specialized MCP access | default | 2 agents |
+| Category         | Purpose                            | Permission Mode | Typical Count |
+| ---------------- | ---------------------------------- | --------------- | ------------- |
+| **architecture** | System design, patterns, decisions | plan            | 7 agents      |
+| **development**  | Implementation, coding, features   | default         | 16 agents     |
+| **testing**      | Unit, integration, e2e testing     | default         | 8 agents      |
+| **quality**      | Code review, auditing              | default         | 5 agents      |
+| **analysis**     | Security, complexity assessment    | plan            | 6 agents      |
+| **research**     | Web search, documentation          | plan            | 3 agents      |
+| **orchestrator** | Coordination, workflows            | default         | 2 agents      |
+| **mcp-tools**    | Specialized MCP access             | default         | 2 agents      |
 
 **Total:** ~49 agents (as of December 2024)
+
+---
+
+## Step 0: Navigate to Repository Root (MANDATORY)
+
+**Execute BEFORE any list operation:**
+
+```bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+```
+
+**See:** [Repository Root Navigation](../../../../skills/managing-agents/references/patterns/repo-root-detection.md)
+
+**⚠️ If agent file not found:** You are in the wrong directory. Navigate to repo root first. Never assume "built-in agent" or "system agent" - the file exists, you're looking in the wrong place.
+
+**Cannot proceed without navigating to repo root** ✅
 
 ---
 
@@ -71,9 +93,11 @@ Lists all agents in the repository:
 **Workflow:**
 
 1. **Find all agent files:**
+
    ```bash
    Glob pattern: ".claude/agents/**/*.md"
    ```
+
    Excludes: `.archived/` directories
 
 2. **Group by category:**
@@ -90,25 +114,29 @@ Lists all agents in the repository:
    - Truncate to first 80 chars if needed
 
 5. **Format output:**
+
    ```markdown
    # Available Agents (Total: 49)
 
    ## Architecture (7 agents)
+
    - backend-architect: Use when designing Go backend architecture...
    - frontend-architect: Use when designing React frontend architecture...
    - security-architect: Use when designing security architecture...
-   [...]
+     [...]
 
    ## Development (16 agents)
+
    - backend-developer: Use when developing Go backend services...
    - frontend-developer: Use when developing React applications...
    - python-developer: Use when developing Python applications...
-   [...]
+     [...]
 
    ## Testing (8 agents)
+
    - acceptance-test-engineer: Use when creating end-to-end acceptance tests...
-   - backend-unit-test-engineer: Use when creating backend unit tests...
-   [...]
+   - backend-tester: Use when creating backend unit tests...
+     [...]
 
    [Continue for all 8 categories...]
    ```
@@ -118,6 +146,7 @@ Lists all agents in the repository:
 **Workflow:**
 
 1. **Find agents in specific category:**
+
    ```bash
    Glob pattern: ".claude/agents/development/*.md"
    ```
@@ -125,10 +154,11 @@ Lists all agents in the repository:
 2. **Read and format:**
    ```markdown
    ## Development Agents (16)
+
    - backend-developer: Use when developing Go backend services...
    - frontend-developer: Use when developing React applications...
    - integration-developer: Use when integrating third-party APIs...
-   [...]
+     [...]
    ```
 
 ### Count Only
@@ -136,6 +166,7 @@ Lists all agents in the repository:
 **Workflow:**
 
 1. **Count files per category:**
+
    ```bash
    # For each category directory
    ls .claude/agents/architecture/*.md | wc -l
@@ -144,6 +175,7 @@ Lists all agents in the repository:
    ```
 
 2. **Format summary:**
+
    ```
    Total: 49 agents
 
@@ -282,11 +314,13 @@ You:
 # Available Agents (Total: {count})
 
 ## {Category Name} ({count} agents)
+
 - {agent-name}: {description-first-80-chars}...
 - {agent-name}: {description-first-80-chars}...
-[...]
+  [...]
 
 ## {Next Category} ({count} agents)
+
 [...]
 ```
 
@@ -294,9 +328,10 @@ You:
 
 ```markdown
 ## {Category Name} ({count})
+
 - {agent-name}
 - {agent-name}
-[...]
+  [...]
 ```
 
 **Use compact when:** User wants quick overview without descriptions
@@ -304,10 +339,11 @@ You:
 ### Table Format (Alternative)
 
 ```markdown
-| Agent | Category | Description |
-|-------|----------|-------------|
-| backend-architect | architecture | Use when designing... |
+| Agent              | Category     | Description           |
+| ------------------ | ------------ | --------------------- |
+| backend-architect  | architecture | Use when designing... |
 | frontend-architect | architecture | Use when designing... |
+
 [...]
 ```
 
@@ -407,16 +443,17 @@ You:
 
 ## Comparison: List vs Search
 
-| Aspect | listing-agents | searching-agents |
-|--------|----------------|------------------|
-| **Purpose** | Browse all agents | Find specific agents |
-| **Input** | None or category | Keyword query |
-| **Output** | All agents grouped | Scored matches |
-| **Sorting** | By category, then alphabetical | By relevance score |
-| **Use when** | Don't know what exists | Know what you're looking for |
-| **Speed** | Slower (reads all) | Faster (filters early) |
+| Aspect       | listing-agents                 | searching-agents             |
+| ------------ | ------------------------------ | ---------------------------- |
+| **Purpose**  | Browse all agents              | Find specific agents         |
+| **Input**    | None or category               | Keyword query                |
+| **Output**   | All agents grouped             | Scored matches               |
+| **Sorting**  | By category, then alphabetical | By relevance score           |
+| **Use when** | Don't know what exists         | Know what you're looking for |
+| **Speed**    | Slower (reads all)             | Faster (filters early)       |
 
 **Rule of thumb:**
+
 - Know what you need → search
 - Want to explore → list
 

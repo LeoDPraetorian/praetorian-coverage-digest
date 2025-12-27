@@ -43,6 +43,7 @@ Psychological laws describing how humans naturally organize visual elements into
 ```
 
 **Spacing guide:**
+
 - **Within group:** 12-16px (0.75-1rem)
 - **Between groups:** 32-48px (2-3rem)
 - **Ratio:** 2-3x difference makes grouping obvious
@@ -99,6 +100,7 @@ Psychological laws describing how humans naturally organize visual elements into
 ```
 
 **Similarity signals:**
+
 - **Color:** Same color = same category
 - **Shape:** Consistent button shapes for actions
 - **Size:** Similar importance = similar size
@@ -119,6 +121,7 @@ Psychological laws describing how humans naturally organize visual elements into
 ```
 
 **Users instantly understand:**
+
 - Green = positive states
 - Yellow = caution states
 - Red = critical states
@@ -147,6 +150,7 @@ Psychological laws describing how humans naturally organize visual elements into
 ```
 
 **Region indicators:**
+
 - **Background color:** Distinguishes sections
 - **Borders:** Clear boundaries
 - **Shadows:** Depth creates separation
@@ -177,6 +181,7 @@ Psychological laws describing how humans naturally organize visual elements into
 ```
 
 **Benefits:**
+
 - Single card = all related settings
 - Dividers = separate items within group
 - Common region = unified concept
@@ -260,6 +265,7 @@ Psychological laws describing how humans naturally organize visual elements into
 ```
 
 **Benefits:**
+
 - Cleaner design
 - Less visual weight
 - Still recognizable
@@ -309,6 +315,7 @@ Psychological laws describing how humans naturally organize visual elements into
 ```
 
 **Alignment guide:**
+
 - Left-align labels and inputs (vertical flow)
 - Consistent spacing creates rhythm
 - Eye follows natural path top-to-bottom
@@ -334,6 +341,7 @@ Psychological laws describing how humans naturally organize visual elements into
 ```
 
 **Benefits:**
+
 - Clear chronological flow
 - Dots on line = connected events
 - Easy to scan and follow
@@ -365,6 +373,7 @@ Psychological laws describing how humans naturally organize visual elements into
 ```
 
 **Techniques:**
+
 - **Contrast:** High contrast = figure
 - **Depth:** Shadows create layers
 - **Color:** Brighter = foreground

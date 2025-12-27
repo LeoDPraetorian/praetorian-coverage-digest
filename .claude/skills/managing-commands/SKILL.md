@@ -16,13 +16,13 @@ Unified command lifecycle management with Router Pattern enforcement.
 
 ## Quick Reference
 
-| Operation | Command                               | Description                            |
-| --------- | ------------------------------------- | -------------------------------------- |
-| Create    | `npm run create -- <name> ["desc"]`   | Create new command with Router Pattern |
-| Audit     | `npm run audit -- [name]`             | Validate command compliance (8 checks) |
-| Audit     | `npm run audit -- <name> --phase N`   | Run specific audit phase (1-8)         |
-| Fix       | `npm run fix -- <name> [--dry-run]`   | Auto-fix compliance issues             |
-| List      | `npm run list`                        | Show all commands with status          |
+| Operation | Command                             | Description                            |
+| --------- | ----------------------------------- | -------------------------------------- |
+| Create    | `npm run create -- <name> ["desc"]` | Create new command with Router Pattern |
+| Audit     | `npm run audit -- [name]`           | Validate command compliance (8 checks) |
+| Audit     | `npm run audit -- <name> --phase N` | Run specific audit phase (1-8)         |
+| Fix       | `npm run fix -- <name> [--dry-run]` | Auto-fix compliance issues             |
+| List      | `npm run list`                      | Show all commands with status          |
 
 **CLI Location:** `.claude/skills/managing-commands/scripts/`
 
@@ -33,34 +33,34 @@ Unified command lifecycle management with Router Pattern enforcement.
 Commands should delegate to Skills, not execute logic directly.
 
 **Router Pattern command:**
+
 ```yaml
 ---
 description: Create and audit slash commands
 allowed-tools: Skill, AskUserQuestion
 skills: command-manager
 ---
-
 Invoke the `command-manager` skill.
 **Output:** Display the tool output verbatim.
 ```
 
 **Direct command (only when no skill exists):**
+
 ```yaml
 ---
 description: Show git status
 allowed-tools: Bash(git:*)
 ---
-
 Execute: !`git status`
 ```
 
 ### Why It Matters
 
-| Aspect | Without Router Pattern | With Router Pattern |
-|--------|----------------------|---------------------|
-| Token usage | Commands loaded every invocation | Skills loaded on-demand |
-| Safety | LLM can work around failures | Forced to report failures |
-| Maintainability | Logic scattered | Logic centralized in skills |
+| Aspect          | Without Router Pattern           | With Router Pattern         |
+| --------------- | -------------------------------- | --------------------------- |
+| Token usage     | Commands loaded every invocation | Skills loaded on-demand     |
+| Safety          | LLM can work around failures     | Forced to report failures   |
+| Maintainability | Logic scattered                  | Logic centralized in skills |
 
 **Details:** [references/router-pattern.md](references/router-pattern.md)
 
@@ -69,12 +69,14 @@ Execute: !`git status`
 ### Create Command
 
 **Usage:**
+
 ```bash
 cd .claude/skill-library/claude/commands/command-manager/scripts
 npm run create -- my-command "Brief description"
 ```
 
 **Workflow:**
+
 1. Prompts for command details
 2. Detects if backing skill exists → uses Router Pattern template
 3. Generates command file with proper frontmatter
@@ -85,6 +87,7 @@ npm run create -- my-command "Brief description"
 ### Audit Command
 
 **Usage:**
+
 ```bash
 # Audit specific command
 npm run audit -- my-command
@@ -94,6 +97,7 @@ npm run audit
 ```
 
 **8-Check Protocol:**
+
 1. Frontmatter presence
 2. Required fields (description)
 3. Optional recommended fields
@@ -108,6 +112,7 @@ npm run audit
 ### Fix Command
 
 **Usage:**
+
 ```bash
 # Dry run (show what would change)
 npm run fix -- my-command --dry-run
@@ -117,6 +122,7 @@ npm run fix -- my-command
 ```
 
 **Auto-fixes:**
+
 - Removes unnecessary tools from `allowed-tools`
 - Adds verbatim output directive
 - Optimizes description to < 120 chars
@@ -127,28 +133,29 @@ npm run fix -- my-command
 ### List Commands
 
 **Usage:**
+
 ```bash
 npm run list
 ```
 
 **Output:** Table showing all commands with compliance status
 
-| Command | Description | Status |
-|---------|-------------|--------|
+| Command       | Description      | Status  |
+| ------------- | ---------------- | ------- |
 | agent-manager | Agent management | ⚠️ WARN |
 | skill-manager | Skill management | ✅ PASS |
-| plan-execute | Execute plans | ✅ PASS |
+| plan-execute  | Execute plans    | ✅ PASS |
 
 ## Tool Restrictions
 
 ### When to Allow Which Tools
 
-| Scenario | Allowed Tools | Rationale |
-|----------|---------------|-----------|
-| Delegates to skill | `Skill, AskUserQuestion` | Skill has all tools it needs |
-| Direct git commands | `Bash(git:*)` | No skill exists for raw git |
-| File listing | `Bash(ls:*)`, `Glob` | Simple system utility |
-| Complex logic | NONE in command | Move to skill |
+| Scenario            | Allowed Tools            | Rationale                    |
+| ------------------- | ------------------------ | ---------------------------- |
+| Delegates to skill  | `Skill, AskUserQuestion` | Skill has all tools it needs |
+| Direct git commands | `Bash(git:*)`            | No skill exists for raw git  |
+| File listing        | `Bash(ls:*)`, `Glob`     | Simple system utility        |
+| Complex logic       | NONE in command          | Move to skill                |
 
 **Decision tree:** [references/tool-restrictions.md](references/tool-restrictions.md)
 
@@ -158,15 +165,16 @@ npm run list
 
 **Violations detected:**
 
-| Issue | Severity | Fix |
-|-------|----------|-----|
-| Has `skills:` + extra tools | CRITICAL | Remove extra tools |
-| Vague instructions | CRITICAL | Use imperative language |
-| Missing verbatim output | WARNING | Add directive |
-| Command > 50 lines | WARNING | Move logic to skill |
-| No argument mapping | WARNING | Add explicit mapping |
+| Issue                       | Severity | Fix                     |
+| --------------------------- | -------- | ----------------------- |
+| Has `skills:` + extra tools | CRITICAL | Remove extra tools      |
+| Vague instructions          | CRITICAL | Use imperative language |
+| Missing verbatim output     | WARNING  | Add directive           |
+| Command > 50 lines          | WARNING  | Move logic to skill     |
+| No argument mapping         | WARNING  | Add explicit mapping    |
 
 **Example violation:**
+
 ```yaml
 # BAD: Tool Leakage
 ---
@@ -176,6 +184,7 @@ skills: my-skill
 ```
 
 **Fixed:**
+
 ```yaml
 # GOOD: Router Pattern
 ---
@@ -224,25 +233,25 @@ npm run list
 
 ### Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success (audit passed, fix applied) |
-| 1 | Issues found (audit failed, fix needed) |
-| 2 | Tool error (file not found, invalid args) |
+| Code | Meaning                                   |
+| ---- | ----------------------------------------- |
+| 0    | Success (audit passed, fix applied)       |
+| 1    | Issues found (audit failed, fix needed)   |
+| 2    | Tool error (file not found, invalid args) |
 
 ## Templates
 
-| Template | Use Case |
-|----------|----------|
+| Template                                         | Use Case                      |
+| ------------------------------------------------ | ----------------------------- |
 | [router-command.md](templates/router-command.md) | Commands delegating to skills |
-| [system-command.md](templates/system-command.md) | Direct system utilities |
-| [audit-report.md](templates/audit-report.md) | Compliance report format |
+| [system-command.md](templates/system-command.md) | Direct system utilities       |
+| [audit-report.md](templates/audit-report.md)     | Compliance report format      |
 
 ## Examples
 
-| Example | Description |
-|---------|-------------|
-| [good-router.md](examples/good-router.md) | Perfect Router Pattern |
+| Example                                   | Description                      |
+| ----------------------------------------- | -------------------------------- |
+| [good-router.md](examples/good-router.md) | Perfect Router Pattern           |
 | [bad-leakage.md](examples/bad-leakage.md) | Tool/Logic Leakage anti-patterns |
 
 ## Migration
@@ -250,6 +259,7 @@ npm run list
 ### From Fragmented Skills
 
 This skill consolidates:
+
 - `claude-command-fix-references` → use `npm run fix`
 - `claude-command-audit-references` → use `npm run audit`
 - `claude-command-rename` → use `npm run fix -- <old> --rename <new>`

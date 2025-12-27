@@ -1,39 +1,29 @@
 ---
 name: auditing-skills
-description: Use when validating skill compliance - guides through 16-phase audit with structural and semantic checks
-allowed-tools: Bash, Read, Grep, TodoWrite
+description: Use when validating skill compliance - 21-phase audit with fix workflow integration
+allowed-tools: Bash, Read, Grep, TodoWrite, AskUserQuestion
 ---
 
 # Auditing Skills
 
 **Comprehensive validation of skill files for structural compliance and quality.**
 
-> **You MUST use TodoWrite** to track audit progress when checking multiple skills.
+> **You MUST use TodoWrite** to track audit progress for all audits to ensure no phases are skipped.
 
 ---
 
 ## What This Skill Does
 
-Audits skills across **16 validation phases**:
+Audits skills across **21 validation phases** (+ 3 sub-phases) organized by fix type. See [Phase Categorization](../../../../skills/managing-skills/references/patterns/phase-categorization.md) for complete breakdown.
 
-### Structural Phases (Auto-Fixable)
-1. **Description format** - "Use when" trigger, <120 chars, no block scalars
-2. **Allowed-tools field** - Comma-separated, valid tool names
-3. **Word count** - SKILL.md <500 lines (progressive disclosure)
-4. **Broken links** - All references/ and examples/ paths resolve
-5. **File organization** - SKILL.md + references/ + examples/ structure
-6. **Script organization** - scripts/ with src/, package.json, tsconfig.json
-7. **Output directory pattern** - .output/ for CLI outputs, .local/ for temp data
-10. **Reference audit** - All SKILL.md references resolve to actual files
-12. **CLI error handling** - Scripts exit with proper codes, user-friendly errors
+**Phase categories (three-tier fix model):**
+- **Deterministic (8 phases):** 2, 5, 7, 14a-c, 14g, 18 - CLI auto-fix, one correct answer
+- **Hybrid (5 phases):** 4, 6, 10, 12, 19 - CLI + Claude reasoning for ambiguous cases
+- **Claude-Automated (6 phases):** 1, 3, 11, 13, 17, 21 - Claude applies without human input
+- **Human-Required (3 phases):** 8, 9, 20 - genuine human judgment needed
+- **Gateway-only (4 phases):** 17-20 - apply only to `gateway-*` skills
 
-### Semantic Phases (Manual Review)
-8. **TypeScript structure** - tsc compiles, vitest types resolve, 100% test pass
-9. **Bash-to-TypeScript migration** - No bash scripts (except POSIX-portable wrappers)
-11. **Command example audit** - cd commands use portable REPO_ROOT pattern
-13. **State externalization** - TodoWrite mandate for multi-step operations
-
-**Why this matters:** Structural issues prevent skills from loading correctly. Progressive disclosure keeps skills under 500 lines. Semantic issues impact maintainability and usability.
+**Why this matters:** Structural issues prevent skills from loading correctly. Progressive disclosure keeps skills under 500 lines. Semantic issues impact maintainability and usability. Gateway phases ensure the two-tier skill system functions correctly.
 
 ---
 
@@ -45,6 +35,7 @@ Audits skills across **16 validation phases**:
 - As part of create/update workflows (automatic)
 
 **Automatically invoked by:**
+
 - `creating-skills` (Phase 8: GREEN - run audit)
 - `updating-skills` (Phase 7: Compliance checks)
 
@@ -52,14 +43,34 @@ Audits skills across **16 validation phases**:
 
 ## Quick Reference
 
-| Command | Purpose | Time |
-|---------|---------|------|
-| `npm run audit -- <name>` | Full 16-phase audit (single skill) | 2-3 min |
-| `npm run audit` | Full 16-phase audit (all skills) | 5-10 min |
-| `npm run audit -- <name> --fix` | Auto-fix deterministic issues | 3-5 min |
+| Command                                 | Purpose                              | Time     |
+| --------------------------------------- | ------------------------------------ | -------- |
+| `npm run audit -- <name>`               | Full 21-phase audit (single skill)   | 2-3 min  |
+| `npm run audit -- <name> --agents-data` | Output JSON for agent analysis       | 1 min    |
+| `npm run audit`                         | Full 21-phase audit (all skills)     | 5-10 min |
 
-**Auto-fixable phases:** 2, 4, 5, 6, 7, 10, 12 (deterministic transformations)
-**Manual phases:** 1, 3, 8, 9, 11, 13 (require semantic decisions)
+**Phase categories:** See [Phase Categorization](../../../../skills/managing-skills/references/patterns/phase-categorization.md) for complete breakdown.
+
+**Compliance Contract:**
+This skill validates against the [Skill Compliance Contract](../../../../skills/managing-skills/references/skill-compliance-contract.md).
+
+---
+
+## Step 0: Navigate to Repository Root (MANDATORY)
+
+**Execute BEFORE any audit operation:**
+
+```bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+```
+
+**See:** [Repository Root Navigation](references/patterns/repo-root-detection.md)
+
+**⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
+
+**Cannot proceed without navigating to repo root** ✅
 
 ---
 
@@ -67,19 +78,29 @@ Audits skills across **16 validation phases**:
 
 ### Audit Single Skill
 
-**Setup:**
+**Setup (from anywhere in the repo):**
+
+See [Repo Root Detection](../../../../skills/managing-skills/references/patterns/repo-root-detection.md) for the full pattern details.
+
 ```bash
+# Get repo root (works from super-repo or any submodule)
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skill-library/claude/skill-management/auditing-skills/scripts"
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT/.claude"
 ```
 
+**Note:** Using `test -z` for compatibility with Claude Code's Bash tool.
+
 **Execute:**
+
 ```bash
 npm run audit -- <skill-name>
 ```
 
+> **Note:** This uses workspace shortcuts from `.claude/` root. Ensure you've run `npm install` in `.claude/` first.
+
 **Example:**
+
 ```bash
 npm run audit -- creating-skills
 ```
@@ -87,204 +108,235 @@ npm run audit -- creating-skills
 ### Audit All Skills
 
 **Execute:**
+
 ```bash
 npm run audit
 ```
 
 **What it does:** Recursively checks all SKILL.md files in:
+
 - `.claude/skills/` (core)
 - `.claude/skill-library/` (library)
 
-### Auto-Fix Issues
+### Fixing Issues
 
-**Execute:**
+After audit identifies issues, use the `fixing-skills` skill to orchestrate remediation.
+
+**Two-step workflow:**
+
 ```bash
-npm run audit -- <skill-name> --fix
+# 1. Detection (audit)
+npm run audit -- <skill-name>
+
+# 2. Remediation (fixing-skills)
+# Invoke fixing-skills skill via Read tool
+Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")
 ```
 
-**What it fixes:**
-- Phase 2: Malformed allowed-tools field
-- Phase 4: Broken reference links
-- Phase 5: Missing directory structure
-- Phase 6: Missing script files
-- Phase 7: Missing .output/.local directories
-- Phase 10: Phantom skill references
-- Phase 12: CLI error handling patterns
+**Or use the fixing-skills CLI for deterministic fixes only:**
 
-**What it won't fix (manual):**
-- Phase 1: Description format (needs semantic rewrite)
-- Phase 3: Line count >500 (needs progressive disclosure restructuring)
+```bash
+npm run -w @chariot/fixing-skills fix -- <skill-name>
+```
+
+**fixing-skills handles all fix types:**
+
+- Phase 1: Description format (Claude-automated)
+- Phase 3: Line count >500 (Claude-automated)
+- Phase 4: Broken links (hybrid - path correction or content creation)
+- Phase 6: Missing scripts (hybrid - opt-in only)
+- Phase 10: Phantom references (hybrid - fuzzy matching)
+- Phase 11: cd command patterns (Claude-automated)
+- Phase 12: CLI error handling (hybrid - exit codes + messages)
+- Phase 13: TodoWrite enforcement (Claude-automated)
+- Phase 19: Broken gateway paths (hybrid - Claude-primary)
+
+**What requires human judgment:**
+
 - Phase 8: TypeScript compilation errors
-- Phase 9: Bash scripts (needs rewrite in TypeScript)
-- Phase 11: cd command patterns
-- Phase 13: TodoWrite enforcement
+- Phase 9: Bash scripts migration
+- Phase 20: Coverage gaps (use `syncing-gateways`)
 
 ---
 
 ## Interpreting Results
 
-### ✅ Success (Exit Code 0)
+**⚠️ CRITICAL: DO NOT REFORMAT SCRIPT OUTPUT**
+
+The CLI produces deterministic table output with all structural validation results.
+
+After running the audit CLI, the structural findings appear in Bash output. **Do NOT display any completion message yet.**
+
+**What NOT to do:**
+- ❌ Do NOT reformat or summarize the script's table output
+- ❌ Do NOT extract information from Bash output and recreate it
+- ❌ Do NOT say "Key Issues Identified" or list specific script findings
+- ❌ Do NOT display "✅ Audit complete" or any completion message at this point
+
+**Why:** The script produces deterministic output. The audit is NOT complete until semantic review is also performed.
+
+**NEXT STEP:** Proceed immediately to "Performing Semantic Review" section below. Do NOT output anything else.
+
+See [Audit Output Examples](../../../../skills/managing-skills/references/examples/audit-output-examples.md) for complete output formats.
+
+**Quick reference:**
+- **✅ Success (Exit 0):** All phases passed, ready to commit
+- **⚠️ Warnings (Exit 0):** Passed with non-blocking issues, review recommended
+- **❌ Failure (Exit 1):** Critical issues, must fix before committing
+
+---
+
+## Performing Semantic Review
+
+**MANDATORY: After displaying script output, you MUST perform semantic review for ALL audits.**
+
+This applies even if the script passed with zero warnings. Semantic review catches issues that code cannot detect.
+
+### Semantic Review Checklist
+
+Evaluate the skill against these 6 criteria (full details in [Post-Audit Semantic Review](#post-audit-semantic-review) section below):
+
+1. **Description Quality (CSO)** - Does description include key trigger terms for discovery?
+2. **Skill Categorization** - Is this frontend/backend/testing/security/tooling/claude?
+3. **Gateway Membership** - Should this skill be listed in a gateway? Is it in the correct gateway(s)?
+4. **Tool Appropriateness** - Are allowed-tools appropriate for the skill's purpose?
+5. **Content Density** - If >500 lines, is the length justified?
+6. **External Documentation** - Do library skills link to official docs?
+
+### Output Format
+
+**⛔ CRITICAL: Output semantic findings as JSON ONLY. Do NOT output tables or prose.**
+
+The CLI handles all formatting via the shared formatter from `formatting-skill-output` skill. Your role is to provide structured data, not formatted output.
+
+After evaluating the 6 criteria, write findings to a temporary JSON file:
+
+```bash
+TMPFILE=/tmp/semantic-findings-${SKILL_NAME}.json
+cat > $TMPFILE << 'EOF'
+{
+  "findings": [
+    {
+      "severity": "WARNING",
+      "criterion": "Gateway Membership",
+      "issue": "Frontend skill missing from gateway-frontend",
+      "recommendation": "Add to gateway-frontend routing table"
+    }
+  ]
+}
+EOF
+```
+
+**If no semantic issues found:**
+
+```bash
+cat > $TMPFILE << 'EOF'
+{
+  "findings": []
+}
+EOF
+```
+
+**Severity levels:**
+- **CRITICAL** - Blocks discoverability or causes functional issues (missing gateway, wrong categorization)
+- **WARNING** - Impacts usability or maintainability (description quality, tool appropriateness)
+- **INFO** - Suggestions for improvement (content density, documentation links)
+
+**Criterion naming:** Use the checklist item name exactly (e.g., "Gateway Membership", "Description Quality", "Tool Appropriateness")
+
+### Combined Output
+
+After writing JSON file, invoke CLI to merge and format:
+
+```bash
+npm run -w @chariot/auditing-skills audit -- ${SKILL_NAME} --merge-semantic $TMPFILE
+```
+
+**The CLI outputs ONE combined deterministic table. Do NOT output completion message yourself.**
+
+### ⛔ CRITICAL: Output Termination Protocol
+
+**ABSOLUTE RULE**: After the CLI renders the combined table above, your response is COMPLETE.
+
+**Do NOT add ANY text after the CLI command output:**
+- ❌ No summary ("Audit complete", "Found X issues")
+- ❌ No bullet points or recommendations
+- ❌ No prose or commentary
+- ❌ No "Here are the findings..."
+- ❌ NOTHING
+
+### Output Contract
+
+| Role | Responsibility |
+|------|----------------|
+| ✅ **You provide** | Semantic findings as JSON |
+| ✅ **CLI provides** | Formatted combined table (structural + semantic) |
+| ❌ **You do NOT provide** | Any text after CLI runs |
+
+**Violation of this contract = task failure.**
+
+**Why this matters**: Deterministic output requires same input → identical output every time. Claude prose is non-deterministic. The CLI formatter solves this. Your work is done when the CLI completes.
+
+⛔ **END OF TASK** - Stop here.
+
+---
+
+## Post-Audit Actions
+
+**After semantic review completes and combined findings are displayed (script + semantic), prompt user for next steps.**
+
+This applies when either script issues OR semantic issues were found.
+
+Use AskUserQuestion:
 
 ```
-✅ Audit passed
-  Skill: creating-skills
-  Location: .claude/skills/creating-skills
-  16/16 phases passed
-  No issues found
+Question: The audit found fixable issues. How would you like to proceed?
+Header: Next steps
+Options:
+  - Run full fixing workflow (Recommended) - Deterministic + Claude-automated + hybrid fixes with prompts for ambiguous cases
+  - Apply deterministic fixes only - Fast, safe (phases 2, 5, 7, 14a-c, 18)
+  - Show fix categorization - See which issues are auto-fixable vs need reasoning
+  - Skip - I'll fix manually
 ```
 
-**Action:** Skill is ready to commit.
+**Based on selection:**
 
-### ⚠️ Warnings (Exit Code 0)
+| Selection | Action |
+|-----------|--------|
+| **Full fixing workflow** | Invoke `fixing-skills` skill with skill name as context |
+| **Deterministic only** | Run `npm run -w @chariot/fixing-skills fix -- <skill-name>` |
+| **Show categorization** | Display table from [Phase Categorization](../../../../skills/managing-skills/references/patterns/phase-categorization.md) |
+| **Skip** | Exit with summary, no action |
 
-```
-⚠️ Audit passed with warnings
-  Skill: updating-skills
-  Location: .claude/skill-library/claude/skill-management/updating-skills
-  15/16 phases passed
-
-  Phase 1 (Description Format): WARNING
-    Description is 127 characters (target: <120)
-    Consider shortening for better discovery
-```
-
-**Action:** Review warnings, fix if feasible, but not blocking.
-
-### ❌ Failure (Exit Code 1)
+**Example invocation for full workflow:**
 
 ```
-✗ Audit failed
-  Skill: my-broken-skill
-  Location: .claude/skills/my-broken-skill
-  12/16 phases passed
-
-  Phase 3 (Word Count): FAILURE
-    SKILL.md has 687 lines (limit: 500)
-    Extract content to references/ directory
-    See: .claude/skills/managing-skills/references/progressive-disclosure.md
-
-  Phase 4 (Broken Links): FAILURE
-    2 broken references found:
-      - [Workflow](references/workflow.md) → File not found
-      - [Examples](references/examples.md) → File not found
-
-  Phase 10 (Reference Audit): FAILURE
-    1 phantom skill reference found:
-      - Line 45: References "non-existent-skill" that doesn't exist
-
-  Run with --fix to auto-fix phases 4 and 10
-  Phase 3 requires manual restructuring
+skill: "fixing-skills"
+# Context: Audit found issues in <skill-name>
+# fixing-skills will orchestrate: deterministic → Claude-automated → hybrid → report human-required
 ```
 
-**Action:** Fix critical issues before committing.
+**When NOT to prompt:**
+- **✅ Success** - Script passed AND semantic review found no issues
 
 ---
 
 ## Phase Details
 
-### Phase 1: Description Format
+**For detailed phase explanations**, see [Phase Details Reference](references/phase-details.md).
 
-**Checks:**
-- ✅ Starts with "Use when"
-- ✅ No block scalars (`|` or `>`)
-- ✅ <120 characters (warning if >120, <1024)
-- ✅ Third-person voice
+**Key phases:**
+- **Phase 1**: Description format (starts with "Use when", no block scalars)
+- **Phase 3**: Word count (< 500 lines HARD LIMIT)
+- **Phase 4**: Broken links (auto-fixed with placeholders)
+- **Phase 5**: File organization (SKILL.md + references/ + scripts/)
+- **Phase 8**: TypeScript structure (must compile, all tests pass)
+- **Phase 10**: Reference audit (all referenced skills/agents exist)
+- **Phase 13**: State externalization (TodoWrite for multi-step workflows)
+- **Phase 14g**: Prettier table formatting (auto-fix via `prettier --write`)
 
-**Common failures:**
-```yaml
-# ❌ WRONG: Block scalar
-description: |
-  Use when creating skills
-
-# ❌ WRONG: First person
-description: I help you create skills
-
-# ✅ CORRECT: Single-line, third-person
-description: Use when creating skills - guides through TDD workflow
-```
-
-### Phase 3: Word Count (Critical)
-
-**Thresholds** (unified across all skill management):
-
-| Lines | Status | Action |
-|-------|--------|--------|
-| < 350 | ✅ Pass | No action needed |
-| 350-450 | ⚠️ Warning | Consider extraction for next update |
-| 450-500 | ⚠️ Warning | Plan extraction before adding content |
-| > 500 | ❌ Fail | MUST extract to references/ |
-
-**Why:** Attention degradation beyond 500 lines. Skills should use progressive disclosure pattern.
-
-**Fix:** Extract detailed content to `references/` directory:
-```markdown
-## Detailed Workflow
-
-See [Workflow Reference](references/workflow.md) for step-by-step instructions.
-```
-
-### Phase 4: Broken Links
-
-**Checks:** All markdown links resolve to actual files
-
-**Auto-fix:** Creates placeholder files in references/ directory
-
-### Phase 5: File Organization
-
-**Required structure:**
-```
-skill-name/
-├── SKILL.md
-├── references/
-│   └── (reference files)
-├── examples/
-│   └── (example files)
-└── scripts/ (optional)
-    ├── src/
-    ├── package.json
-    └── tsconfig.json
-```
-
-### Phase 6: Script Organization (If scripts/ exists)
-
-**Required:**
-- `scripts/src/` directory with TypeScript files
-- `scripts/package.json` with dependencies
-- `scripts/tsconfig.json` with compiler options
-
-### Phase 8: TypeScript Structure (If scripts/ exists)
-
-**Checks:**
-- `tsc` compiles without errors
-- `vitest` types resolve
-- All tests pass (100%)
-
-**Why:** Broken TypeScript = broken skill functionality
-
-### Phase 10: Reference Audit
-
-**Checks:** All referenced skills/agents exist
-
-**Example failure:**
-```markdown
-See the `non-existent-skill` skill for details.
-```
-
-**Auto-fix:** Removes phantom references or suggests corrections
-
-### Phase 13: State Externalization
-
-**Checks:** Multi-step skills use TodoWrite for tracking
-
-**Why:** Mental tracking = steps get skipped
-
-**Pattern:**
-```markdown
-**IMPORTANT**: Use TodoWrite to track phases.
-
-1. Phase 1: Task description
-2. Phase 2: Another task
-```
+**Table Formatting (Phase 14g):**
+Validates markdown tables are formatted with Prettier. See centralized requirements: [Table Formatting](../../../../skills/managing-skills/references/table-formatting.md)
 
 ---
 
@@ -300,19 +352,22 @@ npm run audit -- <skill-name>
 
 Review failures and warnings in output.
 
-### 3. Auto-Fix Deterministic Issues
+### 3. Fix Deterministic Issues
 
 ```bash
-npm run audit -- <skill-name> --fix
+npm run -w @chariot/fixing-skills fix -- <skill-name>
 ```
 
-**Fixes phases:** 2, 4, 5, 6, 7, 10, 12
+**Fixes phases:** 2, 4, 5, 6, 7, 10, 12, 14g (deterministic only)
+
+**For hybrid/Claude-automated phases:** Use `fixing-skills` skill
 
 ### 4. Manually Fix Semantic Issues
 
 **Phase 1 (Description):** Rewrite to meet format requirements
 
 **Phase 3 (Line count):** Extract to references/
+
 ```bash
 # Move detailed content
 vim {skill-path}/references/detailed-workflow.md
@@ -320,6 +375,7 @@ vim {skill-path}/references/detailed-workflow.md
 ```
 
 **Phase 8 (TypeScript):** Fix compilation errors
+
 ```bash
 cd {skill-path}/scripts
 npm run build  # See errors
@@ -329,11 +385,12 @@ npm run build  # See errors
 **Phase 9 (Bash migration):** Rewrite bash scripts in TypeScript
 
 **Phase 11 (cd commands):** Update to REPO_ROOT pattern
+
 ```bash
 # ❌ WRONG
 cd /absolute/path && command
 
-# ✅ CORRECT
+# ✅ CORRECT (see repo-root-detection.md for pattern)
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
 cd "$REPO_ROOT/relative/path" && command
@@ -353,62 +410,33 @@ npm run audit -- <skill-name>
 
 ## Common Failure Patterns
 
-### "Description too long"
+**Quick fixes for frequently encountered audit failures.**
 
-**Symptom:** Phase 1 warning, description >120 chars
+See [Common Failure Patterns](references/common-failure-patterns.md) for detailed solutions:
+- Description too long (Phase 1)
+- SKILL.md too long (Phase 3)
+- Broken references (Phase 4)
+- Phantom skill references (Phase 10)
+- TypeScript compilation errors (Phase 8)
+- Missing REPO_ROOT pattern (Phase 11)
 
-**Fix:** Compress description, remove filler words
-```yaml
-# Before (140 chars)
-description: Use when you need to create a new skill from scratch - this skill guides you through the complete TDD workflow with validation
+---
 
-# After (98 chars)
-description: Use when creating skills - guides through TDD workflow (RED-GREEN-REFACTOR) with validation
-```
+## Post-Audit Semantic Review
 
-### "SKILL.md too long"
+**After structural audit completes, perform semantic review to catch issues code cannot detect.**
 
-**Symptom:** Phase 3 failure, >500 lines
+Semantic review checklist includes:
+1. **Description Quality (CSO)** - Discovery optimization
+2. **Skill Categorization** - Frontend/backend/testing/security/tooling
+3. **Gateway Membership** - Is skill in appropriate gateway?
+4. **Tool Appropriateness** - Are allowed-tools appropriate for purpose?
+5. **Content Density** - Is >500 line count justified?
+6. **External Documentation Links** - Do library skills have official docs links?
 
-**Fix:** Progressive disclosure - extract to references/
-```markdown
-# In SKILL.md (summary only)
-## Workflow
+**For complete semantic review workflow, see:** `.claude/skills/managing-skills/references/audit-phases.md` (Post-Audit Semantic Review section)
 
-1. Phase 1: Setup
-2. Phase 2: Implementation
-3. Phase 3: Validation
-
-See [Detailed Workflow](references/workflow.md) for step-by-step instructions.
-
-# In references/workflow.md (full details)
-# Detailed Workflow
-
-## Phase 1: Setup
-[Complete instructions...]
-```
-
-### "Broken references"
-
-**Symptom:** Phase 4 failure, links to missing files
-
-**Fix:** Run auto-fix or create referenced files
-```bash
-npm run audit -- <skill-name> --fix
-```
-
-### "Phantom skill reference"
-
-**Symptom:** Phase 10 failure, references non-existent skill
-
-**Fix:** Either remove reference or create the skill
-```markdown
-# ❌ References non-existent skill
-See the `magic-skill` skill for details.
-
-# ✅ Option 1: Remove reference
-# ✅ Option 2: Create magic-skill
-```
+**For library skill patterns, see:** [references/library-skill-patterns.md](references/library-skill-patterns.md)
 
 ---
 

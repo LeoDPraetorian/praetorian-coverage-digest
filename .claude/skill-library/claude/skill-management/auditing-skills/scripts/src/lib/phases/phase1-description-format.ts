@@ -128,16 +128,11 @@ export class Phase1DescriptionFormat {
       issues.push({
         severity: 'WARNING',
         message: `Description doesn't start with "Use when"`,
+        recommendation: suggestion
+          ? `Transform to: "${suggestion}"`
+          : 'Rewrite description starting with "Use when..." pattern',
         autoFixable: false, // Requires reasoning and context understanding
       });
-
-      if (suggestion) {
-        issues.push({
-          severity: 'INFO',
-          message: `Suggested: ${suggestion}`,
-          autoFixable: false,
-        });
-      }
     }
 
     // Check description length (max 1,024 chars)
@@ -176,7 +171,7 @@ export class Phase1DescriptionFormat {
 
   /**
    * Validate CSO (Claude Search Optimization) for discoverability
-   * Integrated from claude-skill-validate-schema
+   * Returns consolidated issues with context embedded
    */
   private static validateCSO(skill: SkillFile, description: string): Issue[] {
     const issues: Issue[] = [];
@@ -186,30 +181,19 @@ export class Phase1DescriptionFormat {
     const range = COMPLEXITY_RANGES[complexity];
     const descLength = description.length;
 
-    // Character count by complexity
-    if (descLength < range.min) {
+    // Character count by complexity - only report if there's an actionable issue
+    if (complexity === 'complex' && descLength < 400) {
+      // Over-reduction trap: Complex skill with short description
       issues.push({
-        severity: 'INFO',
-        message: `Description is ${descLength} chars (${complexity} skill: target ${range.min}-${range.max})`,
-        autoFixable: false,
-      });
-
-      if (complexity === 'complex' && descLength < 400) {
-        issues.push({
-          severity: 'WARNING',
-          message: 'Over-reduction trap: Complex skill with short description may miss keywords',
-          autoFixable: false,
-        });
-      }
-    } else if (descLength > range.max && descLength <= 1024) {
-      issues.push({
-        severity: 'INFO',
-        message: `Description is ${descLength} chars (${complexity} skill: target ${range.min}-${range.max}, but acceptable)`,
+        severity: 'WARNING',
+        message: `Complex skill with short description (${descLength} chars)`,
+        recommendation: 'Add error keywords, symptom keywords, and API names for better discoverability',
+        context: [`Target: ${range.min}-${range.max} chars for complex skills`],
         autoFixable: false,
       });
     }
 
-    // Keyword coverage analysis
+    // Keyword coverage analysis - consolidated
     const keywordIssues = this.analyzeKeywordCoverage(skill, description, complexity);
     issues.push(...keywordIssues);
 
@@ -257,58 +241,47 @@ export class Phase1DescriptionFormat {
 
   /**
    * Analyze keyword coverage for discoverability
+   * Returns consolidated issue with recommendation
    */
   private static analyzeKeywordCoverage(
     skill: SkillFile,
     description: string,
     complexity: SkillComplexity
   ): Issue[] {
-    const issues: Issue[] = [];
-
     if (complexity !== 'complex') {
       return []; // Only check complex skills
     }
-
-    const lower = description.toLowerCase();
 
     // Check for common CSO elements in complex skills
     const hasErrorKeywords = /error|exception|warning|failure|issue/i.test(description);
     const hasSymptomKeywords = /flaky|inconsistent|hanging|stale|slow|broken/i.test(description);
     const hasAPINames = /use\w+|get\w+|set\w+|create\w+/i.test(description); // Common API patterns
 
-    let missingCount = 0;
     const missing: string[] = [];
 
     if (!hasErrorKeywords) {
-      missingCount++;
-      missing.push('error keywords');
+      missing.push('error keywords (error, exception, failure)');
     }
 
     if (!hasSymptomKeywords) {
-      missingCount++;
-      missing.push('symptom keywords');
+      missing.push('symptom keywords (flaky, slow, broken)');
     }
 
     if (!hasAPINames && /api|library|framework/i.test(skill.content)) {
-      missingCount++;
       missing.push('API names');
     }
 
-    if (missingCount >= 2) {
-      issues.push({
+    if (missing.length >= 2) {
+      return [{
         severity: 'INFO',
-        message: `CSO: Complex skill missing ${missingCount} keyword types (${missing.join(', ')})`,
+        message: `CSO: Complex skill missing ${missing.length} keyword types for discoverability`,
+        recommendation: 'Add error messages users see, symptom keywords, and specific API names',
+        context: missing,
         autoFixable: false,
-      });
-
-      issues.push({
-        severity: 'INFO',
-        message: 'Consider adding: error messages users see, symptom keywords, specific API names',
-        autoFixable: false,
-      });
+      }];
     }
 
-    return issues;
+    return [];
   }
 
   /**

@@ -32,17 +32,20 @@ color: green
 **Format**: `^[a-z][a-z0-9-]*$` (kebab-case)
 
 **Rules**:
+
 - Lowercase letters, numbers, hyphens only
 - Must start with lowercase letter
 - Must match filename (if file is `python-developer.md`, name must be `python-developer`)
 - Max 64 characters
 
 **Valid examples**:
+
 - `python-developer`
 - `frontend-architect`
 - `backend-security-reviewer`
 
 **Invalid examples**:
+
 - `Python-Developer` (capitals)
 - `python_developer` (underscore)
 - `python developer` (space)
@@ -59,6 +62,7 @@ color: green
 **Pattern**: `"Use when [trigger] - [capabilities].\n\n<example>...\n</example>"`
 
 **Rules**:
+
 - Max 1,024 characters
 - Must start with "Use when" (discovery trigger)
 - Must include at least one `<example>` block
@@ -66,11 +70,13 @@ color: green
 - Single-line in YAML (no block scalars)
 
 **Valid example**:
+
 ```yaml
 description: Use when developing Python applications - CLI tools, Lambda functions, pytest patterns.\n\n<example>\nContext: User needs CLI\nuser: "Create Click CLI"\nassistant: "I'll use python-developer"\n</example>
 ```
 
 **Invalid examples**:
+
 ```yaml
 # ❌ Block scalar (returns literal "|")
 description: |
@@ -106,6 +112,7 @@ description: Use when developing Python applications - CLI tools, pytest
 **Valid values**: `architecture`, `development`, `testing`, `quality`, `analysis`, `research`, `orchestrator`, `mcp-tools`
 
 **Determines**:
+
 - Directory location (`.claude/agents/{type}/`)
 - Default permissionMode
 - Color
@@ -120,10 +127,12 @@ description: Use when developing Python applications - CLI tools, pytest
 **Valid values**: `default`, `plan`, `acceptEdits`, `bypassPermissions`
 
 **Common values**:
+
 - `default` - Normal file operations (most agents)
 - `plan` - Read-only during planning (architecture, analysis, research)
 
 **Rare values**:
+
 - `acceptEdits` - Pre-approve all edits (not recommended)
 - `bypassPermissions` - Skip permission prompts (dangerous, avoid)
 
@@ -148,6 +157,7 @@ description: Use when developing Python applications - CLI tools, pytest
 **Example**: `Bash, Edit, Grep, Glob, Read, TodoWrite, Write`
 
 **Available tools**:
+
 - Read, Write, Edit (file operations)
 - Bash (command execution)
 - Grep, Glob (search)
@@ -161,6 +171,7 @@ description: Use when developing Python applications - CLI tools, pytest
 **Required for all types**: `Read`, `TodoWrite`
 
 **By type** (see type-selection-guide.md for details):
+
 - development: Read, Write, Edit, Bash, TodoWrite (+ Grep, Glob, MultiEdit useful)
 - architecture: Read, Grep, Glob, Bash, TodoWrite (+ WebFetch, WebSearch useful)
 - testing: Read, Write, Edit, Bash, TodoWrite (+ Grep, Glob)
@@ -176,6 +187,7 @@ description: Use when developing Python applications - CLI tools, pytest
 **Format**: Comma-separated list, alphabetically sorted
 
 **Gateway skills**:
+
 - `gateway-frontend` - React, TypeScript, UI
 - `gateway-backend` - Go, APIs, infrastructure
 - `gateway-testing` - Test patterns and frameworks
@@ -184,6 +196,7 @@ description: Use when developing Python applications - CLI tools, pytest
 - `gateway-integrations` - Third-party API patterns
 
 **Process skills**:
+
 - `brainstorming` - Explore alternatives before deciding (architecture mandatory)
 - `developing-with-tdd` - RED-GREEN-REFACTOR for code (development, testing mandatory)
 - `debugging-systematically` - Root cause investigation (most agents)
@@ -194,6 +207,7 @@ description: Use when developing Python applications - CLI tools, pytest
 - `dispatching-parallel-agents` - Parallel coordination (orchestrator)
 
 **By type**:
+
 - architecture: brainstorming, calibrating-time-estimates, verifying-before-completion, gateway-{domain}
 - development: developing-with-tdd, debugging-systematically, verifying-before-completion, calibrating-time-estimates, gateway-{domain}
 - testing: developing-with-tdd, verifying-before-completion, gateway-testing, gateway-{domain}
@@ -218,20 +232,24 @@ description: Use when developing Python applications - CLI tools, pytest
 **Use inherit when task complexity varies and user's session model reflects their current priority.**
 
 **Development agents** (backend-developer, frontend-developer, python-developer, integration-developer):
+
 - Opus session: User needs careful reasoning for complex feature
 - Sonnet session: User wants fast iteration for simple fix
 
 **Testing agents** (unit, e2e, integration, acceptance, coverage):
+
 - Opus session: User wants comprehensive test suite with edge cases
 - Sonnet session: User wants quick test coverage for simple feature
 
 **MCP tool agents** (praetorian-cli-expert, chromatic-test-engineer):
+
 - Opus session: User needs complex data analysis
 - Sonnet session: User wants quick data retrieval
 
 **Benefit**: Agents adapt to user's workflow preference (speed vs thoroughness).
 
 **Research**: [Anthropic Multi-Agent Research](https://www.anthropic.com/engineering/multi-agent-research-system)
+
 > "Using 'inherit' is particularly useful when you want your subagents to adapt to the model choice of the main conversation"
 
 ---
@@ -241,18 +259,22 @@ description: Use when developing Python applications - CLI tools, pytest
 **Use opus when errors are costly and deep reasoning is non-negotiable.**
 
 **Architecture agents** (backend-architect, frontend-architect, security-architect):
+
 - Reason: System design requires trade-off analysis
 - Cost of error: Architectural mistakes are expensive to fix later
 
 **Security analysis** (backend-security-reviewer, frontend-security-reviewer):
+
 - Reason: Vulnerability detection requires thoroughness
 - Cost of error: Missing vulnerabilities is unacceptable
 
 **Code review** (backend-reviewer, frontend-reviewer):
+
 - Reason: Quality gates, subtle bug detection
 - Cost of error: Bad code merges create technical debt
 
 **UX design** (uiux-designer):
+
 - Reason: WCAG 2.1 AA compliance, design system consistency
 - Cost of error: Accessibility violations, poor user experience
 
@@ -265,14 +287,17 @@ description: Use when developing Python applications - CLI tools, pytest
 **Use sonnet when speed is valuable and task is well-defined.**
 
 **Orchestrators** (backend-orchestrator, frontend-orchestrator):
+
 - Reason: Coordination and delegation, not deep analysis
 - Benefit: Faster coordination, responsive task delegation
 
 **Infrastructure** (aws-infrastructure-specialist):
+
 - Reason: Mechanical tasks (CDK patterns, resource configuration)
 - Benefit: Faster execution, sufficient reasoning for patterns
 
 **Pattern analysis** (code-pattern-analyzer):
+
 - Reason: Pattern matching, not complex reasoning
 - Benefit: Faster iterative refinement
 
@@ -283,6 +308,7 @@ description: Use when developing Python applications - CLI tools, pytest
 #### When to use `haiku` (Rare)
 
 **Use haiku only for very simple tasks**:
+
 - Simple list operations
 - Basic formatting tasks
 - Minimal reasoning required
@@ -295,12 +321,13 @@ description: Use when developing Python applications - CLI tools, pytest
 
 **CRITICAL**: Do not confuse context isolation with model inheritance.
 
-| Aspect | Configuration | Behavior |
-|--------|---------------|----------|
-| **Context** | NOT configurable | ALWAYS isolated (sub-agents never see main conversation) |
-| **Model** | `inherit` / `sonnet` / `opus` / `haiku` | Can inherit from main session OR be explicit |
+| Aspect      | Configuration                           | Behavior                                                 |
+| ----------- | --------------------------------------- | -------------------------------------------------------- |
+| **Context** | NOT configurable                        | ALWAYS isolated (sub-agents never see main conversation) |
+| **Model**   | `inherit` / `sonnet` / `opus` / `haiku` | Can inherit from main session OR be explicit             |
 
 **Why this matters**:
+
 - Context isolation prevents information overload
 - Model inheritance allows adaptation to user preference
 - These are independent concerns
@@ -376,6 +403,7 @@ START: What type of agent?
 ### Block Scalar Description
 
 **Error**:
+
 ```yaml
 description: |
   Use when developing...
@@ -384,6 +412,7 @@ description: |
 **Why wrong**: Parser returns literal `|`, agent is invisible to Claude's selection.
 
 **Fix**:
+
 ```yaml
 description: Use when developing...\n\n<example>...\n</example>
 ```
@@ -393,6 +422,7 @@ description: Use when developing...\n\n<example>...\n</example>
 ### Missing Example
 
 **Error**:
+
 ```yaml
 description: Use when developing Python applications
 ```
@@ -400,6 +430,7 @@ description: Use when developing Python applications
 **Why wrong**: No examples to guide Claude's selection.
 
 **Fix**:
+
 ```yaml
 description: Use when developing Python applications - CLI tools, pytest.\n\n<example>\nContext: User needs CLI\nuser: "Create CLI"\nassistant: "I'll use python-developer"\n</example>
 ```
@@ -409,6 +440,7 @@ description: Use when developing Python applications - CLI tools, pytest.\n\n<ex
 ### Tools Not Alphabetized
 
 **Error**:
+
 ```yaml
 tools: Write, Read, Bash, Edit
 ```
@@ -416,6 +448,7 @@ tools: Write, Read, Bash, Edit
 **Why wrong**: Audit Phase 1 checks alphabetization.
 
 **Fix**:
+
 ```yaml
 tools: Bash, Edit, Read, Write
 ```
@@ -425,14 +458,16 @@ tools: Bash, Edit, Read, Write
 ### Wrong permissionMode for Type
 
 **Error**:
+
 ```yaml
 type: architecture
-permissionMode: default  # WRONG
+permissionMode: default # WRONG
 ```
 
 **Why wrong**: Architecture agents should be plan mode (read-only during design).
 
 **Fix**:
+
 ```yaml
 type: architecture
 permissionMode: plan
@@ -443,14 +478,16 @@ permissionMode: plan
 ### Color Mismatch
 
 **Error**:
+
 ```yaml
 type: development
-color: blue  # WRONG (blue is for architecture)
+color: blue # WRONG (blue is for architecture)
 ```
 
 **Why wrong**: Audit Phase 1 checks color matches type.
 
 **Fix**:
+
 ```yaml
 type: development
 color: green
@@ -461,6 +498,7 @@ color: green
 ## Quick Reference
 
 **Minimal valid frontmatter**:
+
 ```yaml
 ---
 name: my-agent
@@ -473,6 +511,7 @@ color: green
 ```
 
 **Full frontmatter**:
+
 ```yaml
 ---
 name: my-agent

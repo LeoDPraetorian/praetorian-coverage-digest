@@ -9,18 +9,16 @@ import { SkillParser } from '../utils/skill-parser.js';
 export class Phase16WindowsPaths {
   /**
    * Validate that all paths use forward slashes (not backslashes)
+   * Returns consolidated issue with context listing all replacements
    */
   static validate(skill: SkillFile): Issue[] {
     const issues: Issue[] = [];
+    const replacements: string[] = [];
 
     // Check description for backslashes
     const { description } = skill.frontmatter;
     if (description && /\\/.test(description)) {
-      issues.push({
-        severity: 'WARNING',
-        message: 'Description contains backslashes (use forward slashes for paths)',
-        autoFixable: true,
-      });
+      replacements.push('Description contains backslashes');
     }
 
     // Check content for backslashes in file paths
@@ -31,29 +29,26 @@ export class Phase16WindowsPaths {
     if (matches && matches.length > 0) {
       const uniquePaths = [...new Set(matches)];
 
+      // Add replacement suggestions (limit to 10 for context)
+      for (const backslashPath of uniquePaths.slice(0, 10)) {
+        const forwardSlashPath = backslashPath.replace(/\\/g, '/');
+        replacements.push(`"${backslashPath}" → "${forwardSlashPath}"`);
+      }
+
+      if (uniquePaths.length > 10) {
+        replacements.push(`... and ${uniquePaths.length - 10} more Windows path(s)`);
+      }
+    }
+
+    // Create single consolidated issue if any replacements needed
+    if (replacements.length > 0) {
       issues.push({
         severity: 'WARNING',
-        message: `Found ${uniquePaths.length} Windows-style path(s) with backslashes`,
+        message: `Found ${replacements.length} Windows-style path(s) with backslashes`,
+        recommendation: 'Replace backslashes with forward slashes for cross-platform compatibility',
+        context: replacements,
         autoFixable: true,
       });
-
-      // List first 5 examples
-      for (const backslashPath of uniquePaths.slice(0, 5)) {
-        const forwardSlashPath = backslashPath.replace(/\\/g, '/');
-        issues.push({
-          severity: 'INFO',
-          message: `Replace "${backslashPath}" with "${forwardSlashPath}"`,
-          autoFixable: true,
-        });
-      }
-
-      if (uniquePaths.length > 5) {
-        issues.push({
-          severity: 'INFO',
-          message: `... and ${uniquePaths.length - 5} more Windows path(s)`,
-          autoFixable: true,
-        });
-      }
     }
 
     return issues;

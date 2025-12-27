@@ -1,255 +1,83 @@
 # Agent List Workflow
 
+**Display all agents organized by category.**
+
+⚠️ **As of December 2024, agent listing uses instruction-based workflow with Glob discovery.**
+
+---
+
 ## Overview
 
-The list command shows all agents with their status, line count, and compliance metrics.
+Listing shows all available agents grouped by category (architecture, development, testing, etc.) with descriptions and counts.
 
-## Quick Start
+## How to List Agents
 
-```bash
-# List all agents
-npm run --silent list
-
-# Filter by category
-npm run --silent list -- --type development
-
-# Filter by status
-npm run --silent list -- --status broken
-
-# Just names
-npm run --silent list -- --quiet
-
-# JSON output
-npm run --silent list -- --json
-```
-
-## Command Reference
-
-```bash
-npm run --silent list
-npm run --silent list -- --type <category>
-npm run --silent list -- --status <valid|broken|all>
-npm run --silent list -- --quiet
-npm run --silent list -- --json
-```
-
-### Parameters
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `--type` | (all) | Filter by category |
-| `--status` | all | Filter by description status |
-| `--quiet` | false | Only show names |
-| `--json` | false | Output as JSON |
-
-## Output Columns
-
-### Default Table
+**Route to the listing-agents skill:**
 
 ```
-Agents:
-────────────────────────────────────────────────────────────────────────────────────────────────
-Name                               Category       Lines  Description           Gateway  Output
-────────────────────────────────────────────────────────────────────────────────────────────────
-acceptance-test-engineer           testing        189    ✗ block |             ✗        ✗
-react-developer                    development    336    ✓ valid               ✓        ✓
-react-architect                    architecture   248    ✓ valid               ✓        ✓
-────────────────────────────────────────────────────────────────────────────────────────────────
+Read: .claude/skill-library/claude/agent-management/listing-agents/SKILL.md
 ```
 
-| Column | Description |
-|--------|-------------|
-| Name | Agent name (from frontmatter) |
-| Category | architecture, development, testing, etc. |
-| Lines | Total line count (colored by limit) |
-| Description | Status: valid, block \|, block >, missing, empty |
-| Gateway | Has gateway skill in frontmatter |
-| Output | Has output format section |
+The `listing-agents` skill provides the complete workflow.
 
-### Line Count Colors
+---
 
-- **White**: <250 lines (good)
-- **Yellow**: 250-300 lines (warning)
-- **Red**: >300 lines (error)
+## What the Workflow Provides
 
-### Description Status Icons
+### Comprehensive Listing
 
-- ✓ valid - Single-line, properly formatted
-- ✗ block | - Uses pipe block scalar (broken)
-- ✗ block > - Uses folded block scalar (broken)
-- ✗ missing - No description field
-- ⚠ empty - Empty description
+- **Category grouping** - All agents organized by 8 categories
+- **Alphabetical sorting** - Within each category
+- **Descriptions shown** - First 80 chars of each agent's purpose
+- **Counts provided** - Per category and total
+- **Browsing-optimized** - For discovering available agents
 
-## Filter by Category
+### Categories
 
-```bash
-npm run --silent list -- --type development
+| Category     | Count | Purpose                    |
+| ------------ | ----- | -------------------------- |
+| Architecture | 7     | Design decisions, patterns |
+| Development  | 16    | Implementation, coding     |
+| Testing      | 8     | Unit, integration, E2E     |
+| Quality      | 5     | Code review, auditing      |
+| Analysis     | 6     | Security, complexity       |
+| Research     | 3     | Web search, documentation  |
+| Orchestrator | 8     | Coordination, workflows    |
+| MCP Tools    | 2     | Specialized MCP access     |
 
-# Valid categories:
-# - architecture
-# - development
-# - testing
-# - quality
-# - analysis
-# - research
-# - orchestrator
-# - mcp-tools
-```
+**Total:** ~55 agents (as of December 2024)
 
-## Filter by Status
+---
 
-```bash
-# Only valid (discoverable) agents
-npm run --silent list -- --status valid
+## Why Instruction-Based?
 
-# Only broken (invisible) agents
-npm run --silent list -- --status broken
-```
+Listing requires discovery and formatting:
 
-## Output Formats
+- **Glob discovery** - Find all agent files across categories
+- **Frontmatter reading** - Extract name and description
+- **Grouping** - Organize by category
+- **Formatting** - Present in readable table format
 
-### Quiet Mode (Names Only)
+---
 
-```bash
-npm run --silent list -- --quiet
+## Time Estimate
 
-# Output:
-# acceptance-test-engineer
-# agent-sdk-verifier-py
-# react-developer
-# ...
-```
+- **Typical:** 30-60 seconds
 
-### JSON Mode
+---
 
-```bash
-npm run --silent list -- --json
+## Prerequisites
 
-# Output:
-[
-  {
-    "name": "react-developer",
-    "type": "development",
-    "lines": 336,
-    "descriptionStatus": "valid",
-    "hasGatewaySkill": true,
-    "hasOutputFormat": true,
-    "hasEscalationProtocol": true
-  },
-  ...
-]
-```
+None - the listing-agents skill handles all setup internally.
 
-## Summary Statistics
+---
 
-At the bottom of the default output:
+## Documentation
 
-```
-Total: 54 | Valid: 3 | Broken: 51
+**Full workflow details:**
+`.claude/skill-library/claude/agent-management/listing-agents/SKILL.md`
 
-By category: architecture: 7, development: 16, testing: 8, quality: 5, analysis: 6, research: 3, orchestrator: 8, mcp-tools: 2
-```
+**Related references:**
 
-## Common Use Cases
-
-### Find Agents to Fix
-
-```bash
-# List all broken agents
-npm run --silent list -- --status broken
-
-# Get names for scripting
-npm run --silent list -- --status broken --quiet
-```
-
-### Check Category Health
-
-```bash
-# Check testing agents
-npm run --silent list -- --type testing
-
-# Check architecture agents
-npm run --silent list -- --type architecture
-```
-
-### Export for Analysis
-
-```bash
-# Export to JSON file
-npm run --silent list -- --json > agents.json
-
-# Process with jq
-npm run --silent list -- --json | jq '.[] | select(.lines > 300)'
-```
-
-### Count by Status
-
-```bash
-# Count valid agents
-npm run --silent list -- --status valid --quiet | wc -l
-
-# Count broken agents
-npm run --silent list -- --status broken --quiet | wc -l
-```
-
-## Integration with Other Commands
-
-### List Then Audit
-
-```bash
-# Find broken agents and audit them
-for agent in $(npm run --silent list -- --status broken --quiet 2>/dev/null); do
-  echo "Auditing $agent..."
-  npm run --silent audit -- $agent --quiet
-done
-```
-
-### List Then Fix
-
-```bash
-# Fix all broken agents
-for agent in $(npm run --silent list -- --status broken --quiet 2>/dev/null); do
-  echo "Fixing $agent..."
-  npm run --silent fix -- $agent --all-auto
-done
-```
-
-### Generate Report
-
-```bash
-# Create markdown report
-echo "# Agent Status Report" > report.md
-echo "" >> report.md
-echo "## Summary" >> report.md
-npm run --silent list -- --json | jq -r '
-  "- Total: \(length)\n- Valid: \([.[] | select(.descriptionStatus == \"valid\")] | length)\n- Broken: \([.[] | select(.descriptionStatus != \"valid\")] | length)"
-' >> report.md
-```
-
-## Troubleshooting
-
-### Empty List
-
-If no agents shown:
-1. Verify you're in the correct directory
-2. Check `.claude/agents/` exists
-3. Run from repo root
-
-### Wrong Count
-
-If count seems off:
-1. Check for `.archived/` agents (excluded from list)
-2. Verify agents have `.md` extension
-3. Check for parse errors in output
-
-### Parse Warnings
-
-If you see "Warning: Could not parse...":
-1. Check the agent file for YAML errors
-2. Run `npm run --silent audit -- <agent>` for details
-
-## References
-
-- [Search Workflow](./search-workflow.md)
-- [Audit Phases](./audit-phases.md)
-- [Agent Architecture](../../../docs/AGENT-ARCHITECTURE.md)
+- [Search Workflow](search-workflow.md) - Keyword-based discovery
+- [Directory Structure](directory-structure.md) - Agent organization

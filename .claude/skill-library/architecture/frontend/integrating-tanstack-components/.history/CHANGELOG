@@ -1,0 +1,38 @@
+## [Date: 2025-12-25] - Initial Creation
+
+### Created
+
+- Skill created via creating-skills workflow
+- RED failure documented: Claude provides outdated/incorrect TanStack integration patterns without this skill
+- Category: architecture/frontend
+- Type: Integration (Router + Query + Table + Virtual)
+
+### Structure
+
+- SKILL.md: Core integration architecture and quick reference (252 lines)
+- references/: 7 detailed reference files covering all integration patterns
+- examples/: Complete production-ready integration example
+
+### Reference Files
+
+1. router-query-integration.md - Route loaders, ensureQueryData, cache key patterns
+2. query-table-integration.md - Data binding, mutations, optimistic updates
+3. table-virtual-integration.md - Virtualization patterns, dynamic heights
+4. server-side-patterns.md - Server pagination, sorting, filtering
+5. infinite-scroll.md - useInfiniteQuery + Virtual integration
+6. typescript-patterns.md - End-to-end type safety
+7. anti-patterns.md - Common mistakes and fixes
+
+### Gap Addressed
+
+Without this skill, Claude:
+- Uses component-level fetching instead of route loaders
+- Misses proper cache key patterns synced with router
+- Creates state synchronization bugs between Table and Router
+- Uses outdated API patterns (pre-TanStack Router v1, pre-Query v5)
+
+### Audit Results
+
+- Passed with no critical issues
+- Word count warning expected (progressive disclosure architecture)
+- Added to gateway-frontend skill

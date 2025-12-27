@@ -1,0 +1,15 @@
+### Changed - 2025-12-27
+
+**Added 5 skills identified by finding-skills-for-agents analysis:**
+
+**Core skills (added to frontmatter + Tier 1):**
+- adhering-to-dry (75% relevance) - Systematic refactoring of duplicated E2E test patterns (setup, selectors, waits, assertions)
+- adhering-to-yagni (85% relevance) - Prevents test over-engineering and scope creep
+
+**Library skills (added to Tier 3):**
+- testing-security-with-e2e-tests (90% relevance) - XSS, auth flows, authorization, CSRF, input validation testing
+- performance-testing (70% relevance) - Load testing, stress testing, performance optimization strategies
+- compatibility-testing (65% relevance) - Cross-browser, cross-platform, responsive design validation
+
+**Rationale:** Skills selected from finding-skills-for-agents recommendations to fill gaps in test quality, security coverage, and cross-platform testing capabilities.
+

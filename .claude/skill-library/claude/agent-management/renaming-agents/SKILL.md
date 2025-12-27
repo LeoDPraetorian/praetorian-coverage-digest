@@ -8,6 +8,8 @@ allowed-tools: Read, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion
 
 **Safe agent renaming with comprehensive reference tracking and validation.**
 
+> **Compliance**: This skill FOLLOWS the [Agent Compliance Contract](../../../../skills/managing-agents/references/agent-compliance-contract.md).
+
 > **MANDATORY**: You MUST use TodoWrite to track the 7-step rename process. Missing a step can leave broken references.
 
 ---
@@ -15,6 +17,7 @@ allowed-tools: Read, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion
 ## What This Skill Does
 
 Safely renames agents by:
+
 1. ✅ Validating old agent exists
 2. ✅ Validating new name available (no conflicts)
 3. ✅ Updating frontmatter name field
@@ -34,6 +37,7 @@ Safely renames agents by:
 - Reorganizing agent structure
 
 **NOT for:**
+
 - Changing agent behavior (use `updating-agents`)
 - Creating new agents (use `creating-agents`)
 - Moving agents between categories (manual operation)
@@ -42,15 +46,33 @@ Safely renames agents by:
 
 ## Quick Reference - 7-Step Safe Rename
 
-| Step | Action | Tool | Verification |
-|------|--------|------|--------------|
-| 1 | Validate source exists | Glob, Read | File exists, valid agent |
-| 2 | Validate target available | Glob | No conflicts |
-| 3 | Update frontmatter | Edit | Name field updated |
-| 4 | Move file | Bash | New file exists, old gone |
-| 5 | Find references | Grep | List all matches |
-| 6 | Update references | Edit | All updated |
-| 7 | Verify integrity | Grep | Zero matches for old name |
+| Step | Action                    | Tool       | Verification              |
+| ---- | ------------------------- | ---------- | ------------------------- |
+| 1    | Validate source exists    | Glob, Read | File exists, valid agent  |
+| 2    | Validate target available | Glob       | No conflicts              |
+| 3    | Update frontmatter        | Edit       | Name field updated        |
+| 4    | Move file                 | Bash       | New file exists, old gone |
+| 5    | Find references           | Grep       | List all matches          |
+| 6    | Update references         | Edit       | All updated               |
+| 7    | Verify integrity          | Grep       | Zero matches for old name |
+
+---
+
+## Step 0: Navigate to Repository Root (MANDATORY)
+
+**Execute BEFORE any rename operation:**
+
+```bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+```
+
+**See:** [Repository Root Navigation](../../../../skills/managing-agents/references/patterns/repo-root-detection.md)
+
+**⚠️ If agent file not found:** You are in the wrong directory. Navigate to repo root first. Never assume "built-in agent" or "system agent" - the file exists, you're looking in the wrong place.
+
+**Cannot proceed without navigating to repo root** ✅
 
 ---
 
@@ -82,6 +104,7 @@ Glob pattern: ".claude/agents/**/{old-agent-name}.md"
 ```
 
 **Validation checks:**
+
 - [ ] File exists
 - [ ] Has frontmatter (between `---` markers)
 - [ ] Frontmatter has `name:` field
@@ -95,6 +118,7 @@ Glob pattern: ".claude/agents/**/{new-agent-name}.md"
 ```
 
 **Validation checks:**
+
 - [ ] No file found with new name
 - [ ] New name follows kebab-case convention
 
@@ -121,8 +145,8 @@ Proceed with rename?"
 Edit({
   file_path: ".claude/agents/{category}/{old-agent-name}.md",
   old_string: "name: old-agent-name",
-  new_string: "name: new-agent-name"
-})
+  new_string: "name: new-agent-name",
+});
 ```
 
 ### Step 5: Move/Rename File
@@ -133,12 +157,14 @@ mv old-agent-name.md new-agent-name.md
 ```
 
 **Verify:**
+
 - New file exists
 - Old file gone
 
 ### Step 6: Find and Update All References
 
 **Find references (use word boundaries):**
+
 ```bash
 Grep(
   pattern: "\\bold-agent-name\\b",
@@ -148,16 +174,18 @@ Grep(
 ```
 
 **Update each file with references:**
+
 ```typescript
 Edit({
   file_path: "{file-path}",
   old_string: "old-agent-name",
   new_string: "new-agent-name",
-  replace_all: true  // Update ALL occurrences
-})
+  replace_all: true, // Update ALL occurrences
+});
 ```
 
 **Search locations:**
+
 - `.claude/commands/` - Command examples
 - `.claude/skills/` - Skill workflows
 - `.claude/agents/` - Other agents
@@ -212,6 +240,7 @@ You:
 ```
 
 **For complete detailed examples, read:**
+
 ```
 Read references/rename-examples.md
 ```
@@ -221,21 +250,27 @@ Read references/rename-examples.md
 ## Error Handling
 
 ### Source Not Found
+
 → STOP, suggest `searching-agents`
 
 ### Target Conflict
+
 → STOP, offer alternatives or deletion
 
 ### File Move Failed
+
 → Rollback frontmatter change, report error
 
 ### Reference Update Failed
+
 → Continue with other files, report partial success
 
 ### Integrity Check Fails
+
 → Report remaining references, provide manual steps
 
 **For detailed error handling procedures, read:**
+
 ```
 Read references/error-handling.md
 ```
@@ -250,6 +285,7 @@ Read references/error-handling.md
 4. **Archived content** - Exclude `.archived/` directories
 
 **For detailed patterns and pitfalls, read:**
+
 ```
 Read references/patterns-and-pitfalls.md
 ```
@@ -273,6 +309,7 @@ Read references/patterns-and-pitfalls.md
 - `agent-manager` - Routes rename operations
 
 **Reference files:**
+
 - `references/rename-examples.md` - Complete examples
 - `references/error-handling.md` - Error recovery
 - `references/patterns-and-pitfalls.md` - Search patterns

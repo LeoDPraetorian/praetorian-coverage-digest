@@ -1,0 +1,35 @@
+# Changelog - neo4j-cypher-guide
+
+## 2025-12-26 - Compliance Fixes
+
+**Audit Status:** FAILED → PASSED WITH WARNINGS
+
+**Critical Issues Fixed:**
+- Phase 13 (State Externalization): Added TodoWrite mandate for multi-query workflows [Claude-Automated]
+
+**Warnings Fixed:**
+- Phase 1 (Description Format): Updated description to "Use when..." pattern (109 chars) [Claude-Automated]
+- Phase 3 (Word Count): Enriched content from 532 to 1000+ words [Claude-Automated]
+  - Added "Common Pitfalls and Solutions" section with 4 subsections
+  - Added "Integration Patterns" section with driver integration and text-to-cypher patterns
+  - Expanded "Performance Tips" with 8 detailed tips
+
+**Structure Improvements:**
+- Phase 14c (Header Hierarchy): Reduced from 5 to 1 empty headers [Manual]
+  - Added intro content to: Query Pattern Selection Guide, Common Query Transformations, When to Load Reference Documentation, Error Resolution Patterns, Modern Cypher Features, Integration Patterns, Advanced Topics
+
+**Remaining Issues:**
+- WARNING: Phase 1 - Skill name doesn't follow gerund form convention (requires skill rename)
+- INFO: Phase 14b - 2 code blocks with mismatched language tags (commented-out anti-pattern examples)
+- INFO: Phase 14c - 1 header with no content before next header
+
+**Fix Methods Used:**
+- CLI deterministic fixes: Attempted (phases 2, 4, 5, 6, 7, 10, 12) - no issues found
+- Claude-Automated fixes: Phase 1 (description), Phase 3 (word count), Phase 13 (TodoWrite)
+- Manual fixes: Phase 14c (header content)
+
+**Backup Location:** `.local/2025-12-26-12-33-51-pre-fix.bak`
+
+**Next Steps:**
+- Consider renaming skill to follow gerund convention (e.g., "querying-neo4j-with-cypher")
+- Review commented-out code examples in Phase 14b for better formatting

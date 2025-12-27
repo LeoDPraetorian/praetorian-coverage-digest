@@ -14,6 +14,7 @@ Real-world example of migrating from external marketplace to internal marketplac
 ### Before Migration
 
 **.claude/settings.json:**
+
 ```json
 {
   "extraKnownMarketplaces": {
@@ -38,10 +39,12 @@ Real-world example of migrating from external marketplace to internal marketplac
 ```
 
 **Content distribution:**
+
 - **Superpowers marketplace:** 20 foundation skills + 3 commands + 1 agent + 1 hook
 - **Chariot marketplace:** 67 platform-specific skills + 13 commands + 50+ agents
 
 **Dependencies:**
+
 - External: obra/superpowers GitHub repository
 - Requires network access
 - Subject to external changes
@@ -56,6 +59,7 @@ ls ~/.claude/plugins/marketplaces/superpowers-dev/
 ```
 
 **Found:**
+
 ```
 ├── skills/ (20 skills)
 │   ├── brainstorming
@@ -82,6 +86,7 @@ ls ~/.claude/plugins/marketplaces/superpowers-dev/
 ### Step 2: Analyze Dependencies
 
 **Skills referenced in Chariot agents:**
+
 - `debugging-systematically` (9 references)
 - `verifying-before-completion` (12 references)
 - `developing-with-tdd` (8 references)
@@ -89,6 +94,7 @@ ls ~/.claude/plugins/marketplaces/superpowers-dev/
 - `claude-skill-write` (3 references)
 
 **Critical component:**
+
 - SessionStart hook (provides MANDATORY FIRST RESPONSE PROTOCOL)
 
 **Verdict:** Complete migration required, not partial.
@@ -96,6 +102,7 @@ ls ~/.claude/plugins/marketplaces/superpowers-dev/
 ### Step 3: Migration Strategy
 
 **Approach:** Copy-and-configure
+
 1. Copy all 26 components to Chariot
 2. Update hooks to reference new locations
 3. Update settings.json
@@ -103,6 +110,7 @@ ls ~/.claude/plugins/marketplaces/superpowers-dev/
 5. Remove external dependency
 
 **Alternatives considered:**
+
 - ❌ Keep external dependency: Not acceptable (dependency risk)
 - ❌ Submodule approach: Too complex for this case
 - ✅ Full internalization: Clean, complete ownership
@@ -117,6 +125,7 @@ cp -r ~/.claude/plugins/marketplaces/superpowers-dev/skills/* \
 ```
 
 **Result:**
+
 - 20 skills copied
 - Verified: brainstorming, debugging-systematically, developing-with-tdd, etc.
 - Location: `.claude/skills/[skill-name]/`
@@ -126,11 +135,13 @@ cp -r ~/.claude/plugins/marketplaces/superpowers-dev/skills/* \
 **Issue found:** Existing Chariot commands were minimal (no frontmatter).
 
 **Before (Chariot brainstorm.md):**
+
 ```markdown
 Use your brainstorming skill.
 ```
 
 **After (Superpowers brainstorm.md):**
+
 ```markdown
 ---
 description: Interactive design refinement using Socratic method
@@ -158,6 +169,7 @@ chmod +x .claude/hooks/session-start.sh
 ```
 
 **Modified session-start.sh:**
+
 ```bash
 # Changed header
 -# SessionStart hook for superpowers plugin
@@ -192,6 +204,7 @@ chmod +x .claude/lib/initialize-skills.sh
 **.claude/settings.json changes:**
 
 **Removed:**
+
 ```json
 {
   "extraKnownMarketplaces": {
@@ -209,6 +222,7 @@ chmod +x .claude/lib/initialize-skills.sh
 ```
 
 **Result:**
+
 ```json
 {
   "extraKnownMarketplaces": {
@@ -230,38 +244,49 @@ chmod +x .claude/lib/initialize-skills.sh
 ### Step 6: Verification
 
 **Skills check:**
+
 ```bash
 ls .claude/skills/ | grep -E "^(brainstorming|debugging-systematically|developing-with-tdd)$"
 ```
+
 ✅ All 20 skills present
 
 **Commands check:**
+
 ```bash
 head -3 .claude/commands/brainstorm.md
 ```
+
 ✅ Proper frontmatter present
 
 **Hooks check:**
+
 ```bash
 ls .claude/hooks/
 ```
+
 ✅ hooks.json and session-start.sh present
 
 **Agent check:**
+
 ```bash
 ls .claude/agents/code-reviewer.md
 ```
+
 ✅ Agent copied
 
 **Lib check:**
+
 ```bash
 ls .claude/lib/initialize-skills.sh
 ```
+
 ✅ Script copied
 
 ### Step 7: Documentation
 
 Created `.claude/MIGRATION-SUPERPOWERS.md` documenting:
+
 - What was migrated
 - Configuration changes
 - Verification steps
@@ -273,6 +298,7 @@ Created `.claude/MIGRATION-SUPERPOWERS.md` documenting:
 ### After Migration
 
 **File structure:**
+
 ```
 .claude/
 ├── skills/ (87 skills: 67 Chariot + 20 superpowers)
@@ -285,6 +311,7 @@ Created `.claude/MIGRATION-SUPERPOWERS.md` documenting:
 ```
 
 **settings.json:**
+
 ```json
 {
   "extraKnownMarketplaces": {
@@ -309,6 +336,7 @@ Created `.claude/MIGRATION-SUPERPOWERS.md` documenting:
 **Agent:** ✅ code-reviewer available
 
 **Skill references:** ✅ All agents still reference skills correctly
+
 - `debugging-systematically` → works
 - `verifying-before-completion` → works
 - `developing-with-tdd` → works
@@ -318,21 +346,25 @@ Created `.claude/MIGRATION-SUPERPOWERS.md` documenting:
 ### Before vs After
 
 **Component count:**
+
 - Before: 67 Chariot + (20 superpowers external) = 87 total
 - After: 87 internal = 87 total
 - Change: Same functionality, internalized
 
 **Marketplaces:**
+
 - Before: 2 (chariot + superpowers)
 - After: 1 (chariot only)
 - Change: 50% reduction, simplified
 
 **External dependencies:**
+
 - Before: 1 (obra/superpowers GitHub)
 - After: 0
 - Change: Eliminated external dependency
 
 **Team setup:**
+
 - Before: Must access external GitHub
 - After: Only needs project repository
 - Change: Simplified onboarding
@@ -340,6 +372,7 @@ Created `.claude/MIGRATION-SUPERPOWERS.md` documenting:
 ### Time Investment
 
 **Migration execution:** ~30 minutes
+
 - Inventory: 5 minutes
 - Copying: 10 minutes
 - Configuration: 5 minutes
@@ -347,6 +380,7 @@ Created `.claude/MIGRATION-SUPERPOWERS.md` documenting:
 - Documentation: 5 minutes
 
 **ROI:** Significant
+
 - Eliminates ongoing external dependency risk
 - Full control over all content
 - Can customize freely
@@ -365,12 +399,15 @@ Created `.claude/MIGRATION-SUPERPOWERS.md` documenting:
 ### Challenges Encountered
 
 ⚠️ **Minimal commands** - Chariot commands lacked frontmatter
+
 - **Solution:** Used superpowers versions (better)
 
 ⚠️ **Hook customization** - Needed branding changes
+
 - **Solution:** Updated messages and references
 
 ⚠️ **Skill reference format** - Changed from `superpowers:skill-name` to `skill-name`
+
 - **Solution:** Skills work without prefix when internal
 
 ### Best Practices Applied
@@ -398,6 +435,7 @@ This migration pattern works for any external → internal marketplace migration
 ### When to Use This Pattern
 
 **Migrate when:**
+
 - External dependency is a risk
 - Need full control/customization
 - Want to simplify team setup
@@ -405,6 +443,7 @@ This migration pattern works for any external → internal marketplace migration
 - Internal hosting required
 
 **Don't migrate when:**
+
 - External source is stable/trusted
 - Don't need customization
 - Want automatic updates

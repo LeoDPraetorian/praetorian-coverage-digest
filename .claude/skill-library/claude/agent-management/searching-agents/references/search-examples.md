@@ -173,14 +173,17 @@ npm run search -- "security"      # Better than "review"
 ### Understand Score Context
 
 **High scores (80+):**
+
 - Strong match, likely what you want
 - Name contains query or description very relevant
 
 **Medium scores (30-79):**
+
 - Partial match, review description
 - Might be tangential to what you need
 
 **Low scores (5-29):**
+
 - Weak match, probably not what you want
 - Only type/skills match, not capability
 

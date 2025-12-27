@@ -5,17 +5,18 @@ Central registry tracking deprecated commands, skills, agents, MCP tools, and pa
 ## Purpose
 
 Provides a single source of truth for:
+
 - **Detecting** outdated references (audit-references skills)
 - **Fixing** outdated references (fix-references skills)
 - **Tracking** renames automatically (rename skills)
 
 ## Files
 
-| File | Purpose |
-|------|---------|
-| `deprecation-registry.json` | The registry data |
+| File                               | Purpose                    |
+| ---------------------------------- | -------------------------- |
+| `deprecation-registry.json`        | The registry data          |
 | `deprecation-registry.schema.json` | JSON Schema for validation |
-| `DEPRECATION-REGISTRY.md` | This documentation |
+| `DEPRECATION-REGISTRY.md`          | This documentation         |
 
 ## Structure
 
@@ -28,9 +29,15 @@ Provides a single source of truth for:
       "reason": "Why it was renamed/removed"
     }
   },
-  "skills": { /* same structure */ },
-  "agents": { /* same structure */ },
-  "mcpTools": { /* same structure */ },
+  "skills": {
+    /* same structure */
+  },
+  "agents": {
+    /* same structure */
+  },
+  "mcpTools": {
+    /* same structure */
+  },
   "patterns": {
     "old-pattern": {
       "replacedBy": "new-pattern",
@@ -44,6 +51,7 @@ Provides a single source of truth for:
 ## Entry Types
 
 ### Renamed (has replacedBy)
+
 ```json
 "old-name": {
   "replacedBy": "new-name",
@@ -53,6 +61,7 @@ Provides a single source of truth for:
 ```
 
 ### Removed (replacedBy is null)
+
 ```json
 "removed-thing": {
   "replacedBy": null,
@@ -63,6 +72,7 @@ Provides a single source of truth for:
 ```
 
 ### Invalid Pattern
+
 ```json
 "BashOutput": {
   "replacedBy": null,
@@ -77,6 +87,7 @@ Provides a single source of truth for:
 ### Automatic (via rename skills)
 
 When you run:
+
 ```bash
 /skill-manager rename old-skill new-skill
 /agent-manager rename old-agent new-agent
@@ -93,7 +104,7 @@ For bulk deprecations or pattern changes, edit `deprecation-registry.json` direc
 ### Audit Skills (detect issues)
 
 ```typescript
-import registry from '../lib/deprecation-registry.json';
+import registry from "../lib/deprecation-registry.json";
 
 // Check if a skill reference is deprecated
 function isDeprecated(skillName: string): boolean {
@@ -109,7 +120,7 @@ function getReplacement(skillName: string): string | null {
 ### Fix Skills (remediate issues)
 
 ```typescript
-import registry from '../lib/deprecation-registry.json';
+import registry from "../lib/deprecation-registry.json";
 
 // Replace deprecated references in content
 function fixReferences(content: string): string {
@@ -124,21 +135,21 @@ function fixReferences(content: string): string {
 
 ## Consumers
 
-| Skill | How It Uses Registry |
-|-------|---------------------|
+| Skill                           | How It Uses Registry                  |
+| ------------------------------- | ------------------------------------- |
 | `claude-skill-audit-references` | Detects deprecated skill/command refs |
-| `claude-skill-fix-references` | Fixes deprecated skill/command refs |
-| `claude-agent-audit-references` | Detects deprecated refs in agents |
-| `claude-agent-fix-references` | Fixes deprecated refs in agents |
-| `claude-skill-rename` | Adds entries when renaming |
-| `claude-agent-rename` | Adds entries when renaming |
+| `claude-skill-fix-references`   | Fixes deprecated skill/command refs   |
+| `claude-agent-audit-references` | Detects deprecated refs in agents     |
+| `claude-agent-fix-references`   | Fixes deprecated refs in agents       |
+| `claude-skill-rename`           | Adds entries when renaming            |
+| `claude-agent-rename`           | Adds entries when renaming            |
 
 ## Maintainers
 
-| Skill | Role |
-|-------|------|
-| `claude-skill-rename` | Adds skill deprecation entries |
-| `claude-agent-rename` | Adds agent deprecation entries |
+| Skill                   | Role                             |
+| ----------------------- | -------------------------------- |
+| `claude-skill-rename`   | Adds skill deprecation entries   |
+| `claude-agent-rename`   | Adds agent deprecation entries   |
 | `claude-command-rename` | Adds command deprecation entries |
 
 ## Validation

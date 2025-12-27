@@ -7,6 +7,7 @@ Complete guide to configuring automatic marketplace and plugin installation for 
 Use `.claude/settings.json` to automatically install marketplaces and plugins when team members clone your project repository.
 
 **Benefits:**
+
 - Zero manual configuration for team members
 - Consistent plugin setup across team
 - Version controlled in git
@@ -15,6 +16,7 @@ Use `.claude/settings.json` to automatically install marketplaces and plugins wh
 ## Configuration File Location
 
 **Project settings:**
+
 ```
 project-root/
 └── .claude/
@@ -22,6 +24,7 @@ project-root/
 ```
 
 **Personal settings** (don't use for team config):
+
 ```
 ~/.claude/settings.json
 ```
@@ -82,12 +85,13 @@ project-root/
 Defines marketplaces to automatically install.
 
 **Structure:**
+
 ```json
 {
   "extraKnownMarketplaces": {
     "marketplace-identifier": {
       "source": {
-        "source": "github|git|directory",
+        "source": "github|git|directory"
         // source-specific fields
       }
     }
@@ -96,6 +100,7 @@ Defines marketplaces to automatically install.
 ```
 
 **Marketplace identifier:**
+
 - Used in `enabledPlugins` to reference marketplace
 - Can be different from marketplace name in marketplace.json
 - Arbitrary string chosen by you
@@ -104,6 +109,7 @@ Defines marketplaces to automatically install.
 ### Source Types
 
 **GitHub source:**
+
 ```json
 {
   "marketplace-name": {
@@ -116,6 +122,7 @@ Defines marketplaces to automatically install.
 ```
 
 **Git source:**
+
 ```json
 {
   "marketplace-name": {
@@ -128,6 +135,7 @@ Defines marketplaces to automatically install.
 ```
 
 **Directory source (local):**
+
 ```json
 {
   "marketplace-name": {
@@ -144,6 +152,7 @@ Defines marketplaces to automatically install.
 Specifies which plugins to automatically install.
 
 **Structure:**
+
 ```json
 {
   "enabledPlugins": {
@@ -153,11 +162,13 @@ Specifies which plugins to automatically install.
 ```
 
 **Format:**
+
 - `plugin-name`: Name from plugin entry in marketplace.json
 - `@marketplace-identifier`: Marketplace identifier from extraKnownMarketplaces
 - Value is always `true`
 
 **Examples:**
+
 ```json
 {
   "enabledPlugins": {
@@ -242,6 +253,7 @@ git pull
 ### Step 4: Verify Installation
 
 Team members check:
+
 ```bash
 /plugin list
 # Should see configured plugins
@@ -276,6 +288,7 @@ Team members check:
 ```
 
 **Use case:**
+
 - Company-wide standards
 - Project-specific tools
 - Mix of shared and local
@@ -306,6 +319,7 @@ Team members check:
 ```
 
 **Use case:**
+
 - Internal proprietary tools
 - Public open source tools
 - Mix of private and public
@@ -316,6 +330,7 @@ Team members check:
 
 **Before:**
 Team members manually run:
+
 ```bash
 /plugin marketplace add company/tools
 /plugin install dev-tools@tools
@@ -323,6 +338,7 @@ Team members manually run:
 
 **After:**
 Add to `.claude/settings.json`:
+
 ```json
 {
   "extraKnownMarketplaces": {
@@ -340,6 +356,7 @@ Add to `.claude/settings.json`:
 ```
 
 Team members:
+
 ```bash
 git pull
 # Automatic installation
@@ -350,6 +367,7 @@ git pull
 **Scenario:** Migrated superpowers to Chariot (like you just did)
 
 **Before settings.json:**
+
 ```json
 {
   "extraKnownMarketplaces": {
@@ -374,6 +392,7 @@ git pull
 ```
 
 **After settings.json:**
+
 ```json
 {
   "extraKnownMarketplaces": {
@@ -397,24 +416,28 @@ All superpowers content now in Chariot plugin.
 ### Plugins Not Auto-Installing
 
 **Check settings.json location:**
+
 ```bash
 ls .claude/settings.json
 # Must be in project root .claude/ directory
 ```
 
 **Verify JSON syntax:**
+
 ```bash
 jq empty .claude/settings.json
 # Should output nothing if valid
 ```
 
 **Check working directory:**
+
 ```bash
 pwd
 # Must be in project root when starting Claude Code
 ```
 
 **Verify marketplace access:**
+
 - Private repos: Check GitHub access
 - Git URLs: Verify credentials configured
 - Directory paths: Confirm path is correct
@@ -422,19 +445,23 @@ pwd
 ### Wrong Plugins Installing
 
 **Check plugin names:**
+
 - Must match exactly in marketplace.json
 - Case-sensitive
 - Use `@marketplace-identifier` suffix
 
 **Verify marketplace identifier:**
+
 - Must match key in extraKnownMarketplaces
 - Not the marketplace name from marketplace.json
 
 **Example:**
+
 ```json
 {
   "extraKnownMarketplaces": {
-    "my-tools": {  // ← This is the identifier
+    "my-tools": {
+      // ← This is the identifier
       "source": {
         "source": "github",
         "repo": "company/tools"
@@ -442,7 +469,7 @@ pwd
     }
   },
   "enabledPlugins": {
-    "plugin-name@my-tools": true  // ← Use identifier, not marketplace name
+    "plugin-name@my-tools": true // ← Use identifier, not marketplace name
   }
 }
 ```
@@ -452,6 +479,7 @@ pwd
 **User has different personal settings:**
 
 Personal (`~/.claude/settings.json`):
+
 ```json
 {
   "enabledPlugins": {
@@ -461,6 +489,7 @@ Personal (`~/.claude/settings.json`):
 ```
 
 **Resolution:**
+
 - Project settings take precedence for marketplaces
 - Personal settings can add additional plugins
 - Team configuration ensures minimum consistency
@@ -468,6 +497,7 @@ Personal (`~/.claude/settings.json`):
 ### Updates Not Applying
 
 **Force update:**
+
 ```bash
 /plugin marketplace update marketplace-name
 /plugin uninstall plugin-name
@@ -475,6 +505,7 @@ Personal (`~/.claude/settings.json`):
 ```
 
 **Clear cache:**
+
 ```bash
 # Restart Claude Code
 # Pull latest git changes
@@ -485,16 +516,19 @@ Personal (`~/.claude/settings.json`):
 ### Version Control
 
 **Always commit settings.json:**
+
 ```bash
 git add .claude/settings.json
 git commit -m "Update plugin configuration"
 ```
 
 **Document changes:**
+
 ```markdown
 # CHANGELOG.md
 
 ## 2024-01-15
+
 - Added security-scanner plugin
 - Updated dev-tools to v2.0.0
 ```
@@ -502,20 +536,24 @@ git commit -m "Update plugin configuration"
 ### Communication
 
 **Notify team of changes:**
+
 - Slack/Teams message when updating
 - Pull request description
 - Include migration steps if needed
 
 **Breaking changes:**
+
 ```markdown
 # Breaking Change: Plugin Update
 
 ## Action Required
+
 1. Pull latest changes
 2. Run: /plugin marketplace update team-tools
 3. Restart Claude Code
 
 ## What Changed
+
 - Removed deprecated helper-plugin
 - Added new typescript-tools plugin
 ```
@@ -523,6 +561,7 @@ git commit -m "Update plugin configuration"
 ### Organization
 
 **Group related plugins:**
+
 ```json
 {
   "enabledPlugins": {
@@ -536,10 +575,12 @@ git commit -m "Update plugin configuration"
 ```
 
 **Document required plugins:**
+
 ```markdown
 # Required Plugins
 
 All team members must have:
+
 - eslint-tools: Code linting
 - security-scanner: Security checks
 - typescript-helpers: TypeScript utilities
@@ -550,12 +591,14 @@ Configuration in `.claude/settings.json`
 ### Security
 
 **Review before committing:**
+
 - No hardcoded credentials
 - No sensitive paths
 - Public repos only for open source
 - Verify marketplace sources
 
 **Access control:**
+
 - Use private repos for internal tools
 - Document access requirements
 - Regular security audits
@@ -565,6 +608,7 @@ Configuration in `.claude/settings.json`
 ### Conditional Configuration
 
 **Different configs per branch:**
+
 ```json
 {
   "extraKnownMarketplaces": {
@@ -593,6 +637,7 @@ Use different settings.json per branch.
 ### Monorepo Configuration
 
 **Root settings.json:**
+
 ```json
 {
   "extraKnownMarketplaces": {
@@ -610,6 +655,7 @@ Use different settings.json per branch.
 ```
 
 **Workspace-specific:**
+
 ```
 monorepo/
 ├── .claude/settings.json (shared config)
@@ -629,6 +675,7 @@ monorepo/
 ✅ Single source of truth
 
 **Setup steps:**
+
 1. Create `.claude/settings.json` in project root
 2. Define extraKnownMarketplaces
 3. List enabledPlugins
@@ -636,6 +683,7 @@ monorepo/
 5. Team pulls and Claude Code auto-installs
 
 **Remember:**
+
 - Use project settings (`.claude/`), not personal (`~/.claude/`)
 - Marketplace identifier ≠ marketplace name
 - Format: `plugin-name@marketplace-identifier`

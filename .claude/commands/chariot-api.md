@@ -11,6 +11,7 @@ allowed-tools: Bash, Read
 ## Natural Language Examples
 
 ### List Assets
+
 ```bash
 # All of these work:
 /chariot-api list all assets
@@ -20,6 +21,7 @@ allowed-tools: Bash, Read
 ```
 
 ### Get Specific Asset
+
 ```bash
 /chariot-api get asset example.com
 /chariot-api show me asset details for example.com
@@ -27,6 +29,7 @@ allowed-tools: Bash, Read
 ```
 
 ### List Risks
+
 ```bash
 /chariot-api list all risks
 /chariot-api show me high priority risks
@@ -34,6 +37,7 @@ allowed-tools: Bash, Read
 ```
 
 ### List Jobs
+
 ```bash
 /chariot-api list all jobs
 /chariot-api show me recent jobs
@@ -41,12 +45,14 @@ allowed-tools: Bash, Read
 ```
 
 ### Search Operations
+
 ```bash
 /chariot-api search for assets matching "production"
 /chariot-api find all assets with status active
 ```
 
 ### List Other Resources
+
 ```bash
 /chariot-api list integrations
 /chariot-api show me all seeds
@@ -73,6 +79,7 @@ allowed-tools: Bash, Read
 When you invoke this command, I will:
 
 1. Read the Praetorian CLI MCP tools skill for available operations:
+
 ```bash
 Read: .claude/skill-library/claude/mcp-tools/mcp-tools-praetorian-cli/SKILL.md
 ```
@@ -93,30 +100,36 @@ Read: .claude/skill-library/claude/mcp-tools/mcp-tools-praetorian-cli/SKILL.md
 Based on the Praetorian CLI MCP (17 tools available):
 
 **Asset Operations:**
+
 - List all assets (paginated, filtered)
 - Get specific asset by key
 - Filter by asset type or key prefix
 - View asset attributes
 
 **Risk Operations:**
+
 - List all risks
 - Get specific risk by ID
 - Filter by priority or status
 
 **Job Operations:**
+
 - List all jobs
 - Get specific job status
 - Monitor job progress
 
 **Seed Operations:**
+
 - List discovery seeds
 - Get seed details
 
 **Integration Operations:**
+
 - List configured integrations
 - View integration status
 
 **Other Operations:**
+
 - Search by query
 - List Aegis agents
 - List capabilities
@@ -132,10 +145,12 @@ The skill will show me exactly how to execute your request!
 The Praetorian CLI uses credentials from your environment:
 
 **Credentials location**: `.env` or environment variables
+
 - `PRAETORIAN_CLI_USERNAME`
 - `PRAETORIAN_CLI_PASSWORD`
 
 **Setup command** (if needed):
+
 ```bash
 make user  # Generates test user credentials
 ```
@@ -158,6 +173,7 @@ Credentials are automatically loaded by the MCP wrapper.
 For developers or debugging, here are the underlying wrapper patterns:
 
 ### List Assets (Direct Execution)
+
 ```bash
 npx tsx -e "(async () => {
   const { assetsList } = await import('./.claude/tools/praetorian-cli/assets-list.ts');
@@ -171,6 +187,7 @@ npx tsx -e "(async () => {
 ```
 
 ### Get Asset (Direct Execution)
+
 ```bash
 npx tsx -e "(async () => {
   const { assetsGet } = await import('./.claude/tools/praetorian-cli/assets-get.ts');
@@ -182,6 +199,7 @@ npx tsx -e "(async () => {
 ```
 
 ### List Risks (Direct Execution)
+
 ```bash
 npx tsx -e "(async () => {
   const { risksList } = await import('./.claude/tools/praetorian-cli/risks-list.ts');
@@ -193,6 +211,7 @@ npx tsx -e "(async () => {
 ```
 
 ### Search (Direct Execution)
+
 ```bash
 npx tsx -e "(async () => {
   const { searchByQuery } = await import('./.claude/tools/praetorian-cli/search-by-query.ts');
@@ -209,6 +228,7 @@ npx tsx -e "(async () => {
 ## Common Workflows
 
 ### Inventory All Assets
+
 ```bash
 /chariot-api list all assets
 
@@ -219,6 +239,7 @@ npx tsx -e "(async () => {
 ```
 
 ### Find High-Risk Issues
+
 ```bash
 /chariot-api list high priority risks
 
@@ -229,6 +250,7 @@ npx tsx -e "(async () => {
 ```
 
 ### Monitor Job Status
+
 ```bash
 /chariot-api get job JOB-123
 
@@ -238,6 +260,7 @@ npx tsx -e "(async () => {
 ```
 
 ### Search Assets by Query
+
 ```bash
 /chariot-api search for assets with status active
 

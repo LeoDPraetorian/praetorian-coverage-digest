@@ -124,12 +124,12 @@ export function YourIntegrationCard() {
 // ui/src/types/integrations.ts
 export enum IntegrationType {
   // ... existing integrations
-  YOUR_INTEGRATION = 'your-integration',
+  YOUR_INTEGRATION = "your-integration",
 }
 
 export const INTEGRATION_TYPE_MAP = {
   // ... existing mappings
-  [IntegrationType.YOUR_INTEGRATION]: 'Your Integration',
+  [IntegrationType.YOUR_INTEGRATION]: "Your Integration",
 };
 ```
 

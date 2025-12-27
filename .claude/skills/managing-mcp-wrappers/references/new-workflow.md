@@ -5,6 +5,7 @@ Complete TDD (Test-Driven Development) workflow for creating MCP wrappers.
 ## Overview
 
 The MCP Manager enforces TDD through a structured workflow:
+
 1. **RED**: Write failing tests first
 2. **GREEN**: Implement minimum code to pass
 3. **REFACTOR**: Improve code while keeping tests green
@@ -28,6 +29,7 @@ npm run verify-green -- <service>/<tool>
 ```
 
 **Key Enforcement:**
+
 - `create` generates test file + `tsconfig.json` (if new service), NOT the wrapper
 - `generate-wrapper` is BLOCKED until `verify-red` passes
 - `verify-green` requires ≥80% test coverage
@@ -55,22 +57,24 @@ Based on discovery, generate comprehensive test file:
 
 ```typescript
 // {tool}.unit.test.ts
-describe('Service/Tool Wrapper', () => {
-  describe('Schema Validation', () => {
-    it('should validate required fields', async () => {
-      const response = { /* discovered required fields */ };
+describe("Service/Tool Wrapper", () => {
+  describe("Schema Validation", () => {
+    it("should validate required fields", async () => {
+      const response = {
+        /* discovered required fields */
+      };
       // Test will FAIL because wrapper doesn't exist yet
     });
   });
 
-  describe('Filtering', () => {
-    it('should filter to essential fields', async () => {
+  describe("Filtering", () => {
+    it("should filter to essential fields", async () => {
       // Test expected filtering behavior
     });
   });
 
-  describe('Error Handling', () => {
-    it('should handle invalid input', async () => {
+  describe("Error Handling", () => {
+    it("should handle invalid input", async () => {
       // Test error paths
     });
   });
@@ -78,6 +82,7 @@ describe('Service/Tool Wrapper', () => {
 ```
 
 **Verify RED Phase:**
+
 ```bash
 # Use the verify-red CLI command
 npm run verify-red -- <service>/<tool>
@@ -90,7 +95,7 @@ Generate wrapper from template with discovered schema:
 
 ```typescript
 // {tool}.ts
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Schema Discovery Results (3 test cases):
@@ -112,6 +117,7 @@ export async function wrapper(input: Input): Promise<Output> {
 ```
 
 **Verify GREEN Phase:**
+
 ```bash
 # Use the verify-green CLI command (requires ≥80% coverage)
 npm run verify-green -- <service>/<tool>
@@ -158,12 +164,12 @@ npm run audit -- {service}/{tool}
 
 The mcp-manager CLI **enforces** TDD through blocked operations:
 
-| Command | Behavior | Enforcement |
-|---------|----------|-------------|
-| `npm run create` | Generates test file ONLY | No wrapper generated |
-| `npm run verify-red` | Verifies tests fail | Required before wrapper |
-| `npm run generate-wrapper` | Creates wrapper | **BLOCKED** until verify-red passes |
-| `npm run verify-green` | Verifies tests pass | Requires ≥80% coverage |
+| Command                    | Behavior                 | Enforcement                         |
+| -------------------------- | ------------------------ | ----------------------------------- |
+| `npm run create`           | Generates test file ONLY | No wrapper generated                |
+| `npm run verify-red`       | Verifies tests fail      | Required before wrapper             |
+| `npm run generate-wrapper` | Creates wrapper          | **BLOCKED** until verify-red passes |
+| `npm run verify-green`     | Verifies tests pass      | Requires ≥80% coverage              |
 
 **This is not documentation theater - the CLI actually blocks operations.**
 
@@ -186,8 +192,8 @@ $ npm run generate-wrapper -- <service>/<tool>
 function createMockMCPClient(response: any) {
   return {
     callTool: vi.fn().mockResolvedValue({
-      content: [{ type: 'text', text: JSON.stringify(response) }]
-    })
+      content: [{ type: "text", text: JSON.stringify(response) }],
+    }),
   };
 }
 ```
@@ -195,8 +201,8 @@ function createMockMCPClient(response: any) {
 ### Response Format Tests
 
 ```typescript
-it('should return expected format', async () => {
-  const result = await wrapper({ id: '123' });
+it("should return expected format", async () => {
+  const result = await wrapper({ id: "123" });
 
   expect(result).toMatchObject({
     id: expect.any(String),
@@ -208,16 +214,14 @@ it('should return expected format', async () => {
 ### Error Handling Tests
 
 ```typescript
-it('should throw on invalid input', async () => {
-  await expect(wrapper({ invalid: true }))
-    .rejects.toThrow();
+it("should throw on invalid input", async () => {
+  await expect(wrapper({ invalid: true })).rejects.toThrow();
 });
 
-it('should handle MCP errors gracefully', async () => {
-  mockClient.callTool.mockRejectedValue(new Error('MCP Error'));
+it("should handle MCP errors gracefully", async () => {
+  mockClient.callTool.mockRejectedValue(new Error("MCP Error"));
 
-  await expect(wrapper({ id: '123' }))
-    .rejects.toThrow('MCP Error');
+  await expect(wrapper({ id: "123" })).rejects.toThrow("MCP Error");
 });
 ```
 
@@ -247,8 +251,8 @@ export const OutputSchema = z.object({
 
 ```typescript
 // DON'T: Only test happy path
-it('should work', async () => {
-  const result = await wrapper({ id: '123' });
+it("should work", async () => {
+  const result = await wrapper({ id: "123" });
   expect(result).toBeDefined();
 });
 // Missing: null handling, errors, optional fields
@@ -259,10 +263,16 @@ it('should work', async () => {
 ```typescript
 // DON'T: Combine multiple wrappers in one test file
 // .claude/tools/linear/linear.unit.test.ts (1500+ lines)
-describe('Linear Wrappers', () => {
-  describe('get-issue', () => { /* 100 lines */ });
-  describe('create-issue', () => { /* 100 lines */ });
-  describe('update-issue', () => { /* 100 lines */ });
+describe("Linear Wrappers", () => {
+  describe("get-issue", () => {
+    /* 100 lines */
+  });
+  describe("create-issue", () => {
+    /* 100 lines */
+  });
+  describe("update-issue", () => {
+    /* 100 lines */
+  });
   // ... 12 more wrappers
 });
 
@@ -275,12 +285,12 @@ describe('Linear Wrappers', () => {
 
 // DO: One test file per wrapper
 // .claude/tools/linear/get-issue.unit.test.ts (150 lines)
-describe('get-issue', () => {
+describe("get-issue", () => {
   // All tests for this wrapper only
 });
 
 // .claude/tools/linear/create-issue.unit.test.ts (150 lines)
-describe('create-issue', () => {
+describe("create-issue", () => {
   // All tests for this wrapper only
 });
 

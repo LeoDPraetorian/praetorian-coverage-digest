@@ -1,0 +1,38 @@
+## [Date: 2025-12-23] - Initial Creation
+
+### Created
+- Skill created via creating-skills workflow
+- RED failure documented: Manual gateway sync takes 20-30 minutes and is error-prone
+- Category: claude/skill-management (library)
+- Type: Process/Pattern (instruction-based, uses Glob, Read, Edit tools)
+- Line count: 334 lines (target: 300-450)
+
+### Problem Solved
+When library skills are added, renamed, or deleted, gateway routing tables become stale:
+- Orphaned skills: Library skills not listed in any gateway
+- Broken paths: Gateway references to deleted/renamed skills
+- Duplicate entries: Same skill in multiple gateways
+
+### Operations Supported
+1. --dry-run: Preview changes without applying
+2. --full-sync: Sync all 8 gateways with library
+3. --gateway <name>: Sync specific gateway only
+
+### TDD Phases Completed
+- 🔴 RED: Manual sync process documented as error-prone and time-consuming
+- 🟢 GREEN: Skill created with comprehensive workflow and references
+- 🔵 REFACTOR: Anti-rationalization patterns added to Critical Rules section
+
+### References Created
+- gateway-mapping.md - Complete path-to-gateway mapping rules
+- sync-algorithm.md - Detailed comparison logic
+- routing-table-format.md - Exact formatting requirements
+- error-recovery.md - Handling edge cases
+
+### Examples Created
+- dry-run-output.md - Sample dry-run report
+- full-sync-output.md - Sample full-sync report
+- gateway-sync-output.md - Sample single-gateway sync
+
+### Gateway Updated
+- Added to gateway-claude routing table (Skill Management section)

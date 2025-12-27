@@ -1,395 +1,509 @@
 ---
 name: fixing-skills
-description: Use when remediating skill compliance issues - applies deterministic and semantic fixes from audit results
+description: Use when audit failed, fixing compliance errors, broken links, phantom references - orchestrates deterministic/hybrid/Claude-automated fixes
 allowed-tools: Read, Edit, Write, Bash, AskUserQuestion, TodoWrite, Skill
 ---
 
 # Fixing Skills
 
-**Interactive compliance remediation for skill audit issues.**
+**Intelligent compliance remediation using three-tier fix orchestration.**
 
 > **You MUST use TodoWrite** to track fix progress when handling multiple issues.
 
-**Relationship to auditing-skills:**
-- This skill provides **interactive guidance** for fixing audit issues
-- For **batch auto-fix**, use `auditing-skills --fix` directly: `npm run audit -- {skill-name} --fix`
-- This skill wraps audit --fix with additional user interaction and manual fix guidance
+**Three-tier fix model:**
+- **Deterministic**: TypeScript CLI auto-fix (phases 2, 5, 7, 14a-c, 16, 18)
+- **Hybrid**: CLI + Claude reasoning (phases 4, 6, 10, 12, 19)
+- **Claude-Automated**: Claude reasoning only (phases 1, 3, 11, 13, 15, 17, 21)
+- **Human-Required**: Interactive guidance (phases 8, 9, 20)
 
----
+**Note:** Phases 14a-c are the only Phase 14 audit phases with TypeScript implementations. Additional fix procedures documented below (section organization, visual readability, example quality) are Claude-only remediation steps, not audit phases.
 
-## What This Skill Does
-
-Fixes skill issues discovered by `auditing-skills` across 16 audit phases:
-- **Auto-fixes:** Deterministic issues (Phases 2, 4, 5, 6, 7, 10, 12)
-- **Manual guidance:** Issues requiring user decisions (Phases 1, 3, 8, 9, 11, 13)
-- **Interactive:** User chooses which fixes to apply via AskUserQuestion
-- **Verified:** Re-audits after fixes to confirm success
-
----
-
-## When to Use
-
-- After `auditing-skills` reports failures
-- When skill has compliance issues
-- Before committing skill changes
-- As part of create/update workflows
-
-**NOT for:**
-- Creating new skills (use `creating-skills`)
-- Updating skill logic (use `updating-skills`)
-- Running audits (use `auditing-skills`)
+See [Phase Categorization](../../../../skills/managing-skills/references/patterns/phase-categorization.md) for complete breakdown.
 
 ---
 
 ## Quick Reference
 
-| Phase | Issue Type | Auto | Manual | Example |
-|-------|-----------|------|--------|---------|
-| 1 | Description format | - | ✅ | Rewrite to "Use when..." pattern |
-| 2 | allowed-tools field | ✅ | - | Fix comma-separation |
-| 3 | Line count >500 | - | ✅ | Extract to references/ |
-| 4 | Broken links | ✅ | - | Create missing reference files |
-| 5 | Missing structure | ✅ | - | Create references/, examples/ |
-| 6 | Missing scripts | ✅ | - | Add src/, package.json |
-| 7 | Missing .output | ✅ | - | Create .output/, .local/ |
-| 8 | TypeScript errors | - | ✅ | Fix compilation issues |
-| 9 | Bash scripts | - | ✅ | Migrate to TypeScript |
-| 10 | Phantom references | ✅ | - | Remove broken skill refs |
-| 11 | cd commands | - | ✅ | Update to REPO_ROOT pattern |
-| 12 | CLI errors | ✅ | - | Add proper exit codes |
-| 13 | TodoWrite missing | - | ✅ | Add state tracking |
+| Category | Phases | Handler | User Interaction |
+|----------|--------|---------|------------------|
+| Deterministic | 2, 5, 7, 14a-c, 16, 18 | CLI `--fix` | None (auto-apply) |
+| Hybrid | 4, 6, 10, 12, 19 | CLI + Claude | Confirm ambiguous cases |
+| Claude-Automated | 1, 3, 11, 13, 15, 17, 21 | Claude reasoning | None (Claude applies) |
+| Human-Required | 8, 9, 20 | Interactive | Full user guidance |
+
+**Compliance Target:**
+Fixes restore compliance with the [Skill Compliance Contract](../../../../skills/managing-skills/references/skill-compliance-contract.md).
 
 ---
 
-## Workflow
-
-### Complete Fix Workflow
-
-Copy this checklist and track progress with TodoWrite:
+## Workflow Overview
 
 ```
-Fix Progress:
-- [ ] Step 1: Run audit to identify issues
-- [ ] Step 2: Read skill file
-- [ ] Step 3: Create backup before any changes
-- [ ] Step 4: Categorize fixes (auto vs manual)
-- [ ] Step 5: Present options via AskUserQuestion
-- [ ] Step 6: Apply auto-fixes with Edit tool
-- [ ] Step 7: Guide manual fixes with user input
-- [ ] Step 8: Re-audit to verify all fixes worked
-- [ ] Step 9: Update changelog with fixes applied
-- [ ] Step 10: Report final status
+1. Run Audit          → Get issues list
+2. Create Backup      → Protect against mistakes
+3. Categorize Issues  → Route to correct handler
+4. Apply Fixes:
+   a. Deterministic   → CLI auto-fix (no confirmation)
+   b. Claude-Automated→ Claude applies (no confirmation)
+   c. Hybrid          → Claude + confirm ambiguous cases
+   d. Human-Required  → Full interactive guidance
+5. Re-Audit           → Verify all fixes worked
+6. Update Changelog   → Document changes
 ```
 
-### Step 1: Run Audit
+---
 
-Always audit first to get current issues:
+## Step 0: Navigate to Repository Root (MANDATORY)
 
-```
-skill: "auditing-skills"
-```
-
-**Why:** Ensures you're fixing actual problems, not guessing.
-
-**Audit output examples:**
-
-**Success (no fixes needed):**
-```
-✅ Audit passed
-  Skill: creating-skills
-  16/16 phases passed
-  No issues found
-```
-→ **Action:** No fixes needed, skill is compliant
-
-**Failure (fixes needed):**
-```
-✗ Audit failed
-  Skill: my-skill
-  12/16 phases passed
-
-  Phase 3 (Word Count): FAILURE
-    SKILL.md has 687 lines (limit: 500)
-
-  Phase 4 (Broken Links): FAILURE
-    2 broken references found
-
-  Phase 10 (Reference Audit): FAILURE
-    1 phantom skill reference found
-```
-→ **Action:** Proceed to Step 2
-
-### Step 2: Read Skill File
-
-Read the skill to understand context and prepare fixes:
+**Execute BEFORE any fix operation:**
 
 ```bash
-# Check both core and library locations
-# Core:
-Read `.claude/skills/{skill-name}/SKILL.md`
-
-# Library:
-Read `.claude/skill-library/{category}/{skill-name}/SKILL.md`
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
 ```
 
-**What to note:**
-- Current frontmatter structure
-- Description format and length
-- SKILL.md line count
-- Reference file organization
-- Script directory structure (if exists)
+**See:** [Repository Root Navigation](references/patterns/repo-root-detection.md)
 
-### Step 3: Create Backup
+**⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
 
-**🚨 MANDATORY: Create backup before any fixes.**
+**Cannot proceed without navigating to repo root** ✅
+
+---
+
+## Step 1: Run Audit
 
 ```bash
-# Create .local directory if it doesn't exist
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT/.claude" && npm run audit -- {skill-name}
+```
+
+**Capture output for issue categorization.**
+
+---
+
+## Step 2: Create Backup
+
+**🚨 MANDATORY** - See [Backup Strategy](../../../../skills/managing-skills/references/patterns/backup-strategy.md).
+
+```bash
 mkdir -p {skill-path}/.local
-
-# Backup SKILL.md with timestamp
 TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
 cp {skill-path}/SKILL.md {skill-path}/.local/${TIMESTAMP}-pre-fix.bak
+```
 
-# Verify backup was created
-ls -la {skill-path}/.local/
+---
+
+## Step 3: Categorize Issues
+
+Based on audit output, group issues by handler:
+
+```
+Issues found:
+  Deterministic:      Phase 2 (allowed-tools), Phase 5 (directories)
+  Claude-Automated:   Phase 1 (description), Phase 3 (line count)
+  Hybrid:             Phase 10 (phantom ref)
+  Human-Required:     Phase 8 (TypeScript errors)
+```
+
+---
+
+## Step 4a: Apply Deterministic Fixes (fixing-skills CLI)
+
+**Phases: 2, 4, 5, 6, 7, 10, 12, 14a-c, 16, 18**
+For table formatting fixes: `prettier --write` - see [Table Formatting](../../../../skills/managing-skills/references/table-formatting.md)
+
+```bash
+npm run -w @chariot/fixing-skills fix -- {skill-name}
+```
+
+**No confirmation needed.** These are mechanical transformations with one correct answer.
+
+---
+
+## Step 4b: Apply Claude-Automated Fixes
+
+**Phases: 1, 3, 11, 13, 15, 17, 21**
+
+Claude applies these fixes directly using Edit tool. No human confirmation needed - these require semantic understanding but have clear correct outcomes.
+
+**Additional fix procedures** (section organization, visual readability, example quality) documented below are also Claude-automated but aren't tied to specific audit phases.
+
+### Phase 1: Description Format
+
+**When:** Description doesn't match "Use when..." pattern or >120 chars
+
+**Process:**
+1. Read SKILL.md content to understand purpose
+2. Identify trigger condition ("Use when {situation}")
+3. Identify 2-3 key capabilities
+4. Generate: `Use when {trigger} - {capability1}, {capability2}`
+5. Verify <120 characters
+6. Apply with Edit tool
+
+**Example transformation:**
+```yaml
+# Before (wrong format, too long)
+description: This skill helps developers create new skills from scratch using a complete TDD workflow with validation
+
+# After (Claude-generated)
+description: Use when creating skills - TDD workflow (RED-GREEN-REFACTOR) with validation
+```
+
+### Phase 3: Line Count >500
+
+**When:** SKILL.md exceeds 500 lines
+
+**Process:**
+1. Count lines and identify sections >50 lines
+2. Prioritize extraction:
+   - Code examples → `examples/{topic}.md`
+   - Detailed workflows → `references/workflow.md`
+   - Troubleshooting → `references/troubleshooting.md`
+   - Edge cases → `references/advanced.md`
+3. Create reference files with extracted content
+4. Replace inline content with summary + link:
+   ```markdown
+   ### Detailed Workflow
+   See [Detailed Workflow](references/workflow.md) for step-by-step instructions.
+   ```
+5. Re-count lines to verify <500
+
+### Phase 11: cd Commands
+
+**When:** cd commands use absolute paths or relative paths without REPO_ROOT
+
+**Process:**
+1. Find all cd commands in code blocks
+2. For repo-relative paths, replace with:
+   ```bash
+   REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+   test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+   cd "$REPO_ROOT/{relative-path}"
+   ```
+3. Skip cd commands to temp directories or external paths
+
+### Phase 13: TodoWrite Missing
+
+**When:** Multi-step workflow lacks TodoWrite mandate
+
+**Process:**
+1. Detect workflow indicators:
+   - Numbered lists with >3 items
+   - Tables with "Phase" or "Step" columns
+   - Headers like "Step 1:", "Phase 2:", etc.
+2. Add mandate after workflow introduction:
+   ```markdown
+   > **You MUST use TodoWrite** to track progress. Steps get skipped without tracking.
+   ```
+
+### Fix Procedure: Section Organization (not an audit phase)
+
+**When:** Skill missing required sections or sections out of order
+
+**Process:**
+1. Check for required sections:
+   - Quick Reference (summary table at top)
+   - When to Use / Overview (trigger conditions)
+   - Workflow / How to Use (main content)
+   - Related Skills (cross-references at bottom)
+2. If missing section:
+   - Generate section header
+   - Add placeholder content based on skill purpose
+   - Example: `## Related Skills\n\n- [skill-name](path) - Description`
+3. If order is wrong:
+   - Restructure to logical flow
+   - Keep content intact, just reorganize
+
+### Fix Procedure: Visual Readability (not an audit phase)
+
+**When:** Skill has readability issues (wall-of-text, missing emphasis, etc.)
+
+**Process:**
+1. Identify wall-of-text paragraphs (>5-6 lines without breaks)
+   - Break into shorter paragraphs at logical points
+   - Convert lists of items to bullet points
+2. Add emphasis to key terms:
+   - **Bold** for important concepts
+   - `code` for technical terms, commands, file names
+3. Convert comma-separated items to bullet lists:
+   - "A, B, and C" → "- A\n- B\n- C"
+4. Add callouts for important notes:
+   - `> **Note:** Important information here`
+5. Ensure adequate whitespace between sections
+
+### Phase 15: Orphan Detection
+
+**When:** Library skill has no discovery path (not in any gateway or agent)
+
+**Process:**
+1. Run agent matching algorithm
+2. Review suggested HIGH confidence matches
+3. Add skill to appropriate gateway routing table
+4. Or reference in relevant agent instructions
+
+See [Agent Recommendation Patterns](../../../../skills/managing-skills/references/patterns/agent-recommendation-patterns.md).
+
+### Phase 17: Gateway Structure
+
+**When:** Gateway skill missing "Understanding This Gateway" section
+
+**Process:**
+1. Read gateway's routing table to understand coverage
+2. Generate section from template:
+   ```markdown
+   ## Understanding This Gateway
+
+   This gateway covers **{domain}** skills. It routes to {N} specialized skills organized by:
+   - {category1}: {description}
+   - {category2}: {description}
+
+   > **IMPORTANT**: This gateway is part of the two-tier skill system...
+   ```
+
+### Phase 21: Line Number References
+
+**When:** Skill contains static line number references (e.g., `file.go:123-127`)
+
+**Process:**
+1. Detect patterns: `file.ext:123` or `file.ext:123-456`
+2. Read the referenced file (if exists in codebase)
+3. Identify method/function at or near that line
+4. Replace with durable pattern using Edit tool:
+
+**Replacement patterns:**
+```markdown
+# Pattern 1: Method signature (preferred)
+✅ `file.go` - `func (t *Type) MethodName(...)`
+
+# Pattern 2: Structural description
+✅ `file.go (between Match() and Invoke() methods)`
+
+# Pattern 3: File only (for general references)
+✅ `file.go`
+```
+
+**Example fix:**
+```typescript
+// Before
+- Nuclei: `capabilities/nuclei/nuclei.go:167-171` (MockCollectors)
+
+// After
+- Nuclei: `capabilities/nuclei/nuclei.go` - `func (n *Nuclei) MockCollectors(port *model.Port)`
 ```
 
 **Why this matters:**
-- Auto-fixes can modify multiple files
-- Rollback needed if fix breaks something
-- Audit trail for changes
+- Line numbers become outdated with every code change
+- Method signatures are stable across refactors
+- Grep-friendly: developers can find instantly with `rg "func.*MethodName"`
 
-**Cannot proceed to fixes without backup** ✅
+**Reference:** See [code-reference-patterns.md](../../../../skills/managing-skills/references/patterns/code-reference-patterns.md)
 
-### Step 4: Categorize Fixes
+---
 
-Based on audit output, categorize each issue:
+## Step 4c: Apply Hybrid Fixes
 
-**AUTO-FIXABLE (Apply with Edit/Write/Bash):**
-- Phase 2: Malformed allowed-tools → Fix comma-separation
-- Phase 4: Broken links → Create placeholder reference files
-- Phase 5: Missing structure → Create directories
-- Phase 6: Missing scripts → Add boilerplate files
-- Phase 7: Missing .output → Create directories
-- Phase 10: Phantom references → Remove or update refs
-- Phase 12: CLI errors → Add exit codes and error handling
+**Phases: 4, 6, 10, 12, 19**
 
-**MANUAL (Require user input/decisions):**
-- Phase 1: Description format → Need "Use when" rewrite
-- Phase 3: Line count >500 → Need progressive disclosure design
-- Phase 8: TypeScript errors → Need code fixes
-- Phase 9: Bash scripts → Need TypeScript migration
-- Phase 11: cd commands → Need REPO_ROOT updates
-- Phase 13: TodoWrite missing → Need workflow analysis
+These have deterministic parts that Claude handles automatically, but ambiguous cases require user confirmation.
 
-**Example categorization:**
-```
-Issues found:
-  1. Broken links (Phase 4) [AUTO]
-  2. Line count >500 (Phase 3) [MANUAL]
-  3. Phantom skill ref (Phase 10) [AUTO]
-  4. Description too long (Phase 1) [MANUAL]
+### Phase 4: Broken Links (Hybrid)
 
-Auto-fixes: 2
-Manual fixes: 2
-```
+**Deterministic part:** If file exists elsewhere, correct the path automatically.
 
-### Step 5: Present Options
-
-Use AskUserQuestion to let user choose fixes:
-
+**Ambiguous part:** If file doesn't exist anywhere:
 ```typescript
 AskUserQuestion({
   questions: [{
-    question: "Which issues should I fix in {skill-name}?",
-    header: "Fix Selection",
-    multiSelect: true,
+    question: "Broken link to '{filename}'. How should I fix it?",
+    header: "Broken Link",
+    multiSelect: false,
     options: [
-      {
-        label: "Auto-fix all deterministic issues (Phases 2,4,5,6,7,10,12)",
-        description: "Apply all auto-fixes without further prompts"
-      },
-      {
-        label: "Guide me through manual fixes (Phases 1,3,8,9,11,13)",
-        description: "Interactive guidance for semantic issues"
-      },
-      {
-        label: "Fix specific issue: {issue-description}",
-        description: "Apply single fix and re-audit"
-      },
-      {
-        label: "Show me what would change (dry-run)",
-        description: "Preview fixes without applying"
-      }
+      { label: "Create placeholder with generated content", description: "Claude generates relevant content based on link context" },
+      { label: "Remove the reference", description: "Delete the link from SKILL.md" },
+      { label: "Skip for now", description: "Leave broken, fix manually later" }
     ]
   }]
-})
+});
 ```
 
-### Step 6: Apply Auto-Fixes
+### Phase 6: Missing Scripts (Hybrid - Opt-in)
 
-For each auto-fixable issue, apply deterministic fixes. See [Phase-Specific Fix Details](references/phase-fixes.md) for complete examples.
+**Changed behavior:** Do NOT auto-create boilerplate scripts.
 
-**Quick reference:**
-- **Phase 2:** Fix comma-separation in allowed-tools
-- **Phase 4:** Create missing reference files
-- **Phase 5:** Create references/ and examples/ directories
-- **Phase 6:** Add scripts/src/, package.json, tsconfig.json
-- **Phase 7:** Create .output/ and .local/ directories
-- **Phase 10:** Remove phantom skill references
-- **Phase 12:** Add CLI error handling and exit codes
+**Process:**
+1. Analyze skill content for CLI indicators (`npm run`, command examples)
+2. If no CLI indicators: Skip silently (many skills don't need scripts/)
+3. If CLI indicators found:
+   ```typescript
+   AskUserQuestion({
+     questions: [{
+       question: "This skill has CLI commands but no scripts/ directory. Create it?",
+       header: "Scripts",
+       multiSelect: false,
+       options: [
+         { label: "Yes, create scripts/ with boilerplate", description: "Standard TypeScript CLI setup" },
+         { label: "No, CLI commands are for user reference only", description: "Skip scripts/ creation" }
+       ]
+     }]
+   });
+   ```
 
-### Step 7: Guide Manual Fixes
+### Phase 10: Phantom References (Hybrid)
 
-For manual issues, provide interactive guidance. See [Phase-Specific Fix Details](references/phase-fixes.md) for complete workflows.
+**Deterministic part:** References in deprecation registry → Replace automatically.
 
-**Quick reference:**
-- **Phase 1:** Rewrite description to "Use when..." pattern, <120 chars
-- **Phase 3:** Extract detailed content to references/ (progressive disclosure)
-- **Phase 8:** Fix TypeScript compilation errors
-- **Phase 9:** Migrate bash scripts to TypeScript
-- **Phase 11:** Update cd commands to REPO_ROOT pattern
-- **Phase 13:** Add TodoWrite mandates for multi-step workflows
+**Ambiguous part:** References not in registry:
+1. Fuzzy match against existing skills
+2. If close match found:
+   ```typescript
+   AskUserQuestion({
+     questions: [{
+       question: "Reference to '{phantom}' not found. Did you mean '{suggestion}'?",
+       header: "Phantom Ref",
+       multiSelect: false,
+       options: [
+         { label: "Yes, correct to '{suggestion}'", description: "Update reference" },
+         { label: "No, remove the reference", description: "Delete phantom reference" },
+         { label: "No, keep as-is (skill will be created)", description: "Mark for future creation" }
+       ]
+     }]
+   });
+   ```
 
-### Step 8: Re-Audit
+### Phase 12: CLI Error Handling (Hybrid)
 
-After applying fixes, verify success:
+**Deterministic part:** Change `process.exit(1)` → `process.exit(2)` in catch blocks.
+
+**Claude-automated part:** Generate contextual error messages:
+1. Analyze CLI purpose from code
+2. Generate message: `Tool Error - {skill-name}: Failed to {action}`
+3. Apply without confirmation (semantic but deterministic outcome)
+
+### Fix Procedure: Example Quality (Hybrid - not an audit phase)
+
+**Deterministic part:** Check examples have code blocks with language tags.
+
+**Ambiguous part:** Assess example completeness:
+1. Check for before/after pattern in examples
+2. Verify examples are self-contained
+3. If incomplete:
+   ```typescript
+   AskUserQuestion({
+     questions: [{
+       question: "Example at line {N} appears incomplete. How should I improve it?",
+       header: "Example",
+       multiSelect: false,
+       options: [
+         { label: "Add 'Before:' and 'After:' sections", description: "Show transformation" },
+         { label: "Add missing context", description: "Make example self-contained" },
+         { label: "Skip for now", description: "Leave example as-is" }
+       ]
+     }]
+   });
+   ```
+
+See [Visual Style Guidelines](../../../../skills/managing-skills/references/patterns/visual-style-guidelines.md).
+
+### Phase 19: Broken Gateway Paths (Hybrid - Claude-Primary)
+
+**No CLI auto-fix.** Removal is often the wrong fix.
+
+**Process:**
+1. Fuzzy match against existing skills
+2. Present options:
+   ```typescript
+   AskUserQuestion({
+     questions: [{
+       question: "Gateway path '{path}' doesn't exist. How should I fix it?",
+       header: "Gateway Path",
+       multiSelect: false,
+       options: [
+         { label: "Correct to '{suggestion}'", description: "Fuzzy match found similar skill" },
+         { label: "Remove this routing entry", description: "Skill doesn't exist and won't be created" },
+         { label: "Keep entry (skill will be created)", description: "Mark as TODO for skill creation" }
+       ]
+     }]
+   });
+   ```
+
+---
+
+## Step 4d: Guide Human-Required Fixes
+
+**Phases: 8, 9, 20**
+
+These require genuine human judgment. Provide interactive guidance.
+
+### Phase 8: TypeScript Errors
+
+**Process:**
+1. Run `npm run build` in scripts/ to capture errors
+2. Display errors to user
+3. For each error, explain what's wrong
+4. User fixes with guidance; Claude can suggest fixes but human verifies
+
+### Phase 9: Bash Scripts
+
+**Process:**
+1. Identify bash scripts in skill
+2. Explain TypeScript equivalent patterns
+3. User performs migration with Claude guidance
+4. Verify behavior preservation
+
+### Phase 20: Coverage Gaps
+
+**Process:**
+1. Defer to `syncing-gateways` skill
+2. This requires cross-gateway coordination
+3. Human makes organizational decisions
+
+---
+
+## Step 5: Re-Audit
 
 ```bash
-cd .claude/skill-library/claude/skill-management/auditing-skills/scripts
 npm run audit -- {skill-name}
 ```
 
-**Expected:**
-```
-✅ Audit passed
-  Skill: {skill-name}
-  16/16 phases passed
-```
+**Expected:** All phases pass. If failures remain, return to Step 3.
 
-**If failures remain:** Repeat Steps 4-8 for remaining issues
+---
 
-### Step 9: Update Changelog
+## Step 6: Update Changelog
 
-**After fixes pass audit, document what was fixed:**
+See [Changelog Format](../../../../skills/managing-skills/references/patterns/changelog-format.md).
 
 ```bash
-# Create .history directory if it doesn't exist
 mkdir -p {skill-path}/.history
-
-# Check for existing changelog
-cat {skill-path}/.history/CHANGELOG 2>/dev/null || echo "No existing changelog"
 ```
 
-**Append entry to CHANGELOG:**
-
-```markdown
-## [Date: YYYY-MM-DD] - Auto-Fix
-
-### Fixed
-- Phase X: {Description of fix applied}
-- Phase Y: {Description of fix applied}
-
-### Method
-- Auto-fix via `auditing-skills --fix`
-- Manual fix for: {list if any}
-
-### Backup
-- Pre-fix backup: .local/{timestamp}-pre-fix.bak
-```
-
-**Why changelog matters:**
-- Audit trail of automated changes
-- Enables rollback if fix causes issues
-- Documents what was changed and why
-
-### Step 10: Report Status
-
-Summarize what was fixed:
-
-```
-Fix Summary for {skill-name}:
-
-Auto-fixes applied:
-✅ Phase 4: Created 2 missing reference files
-✅ Phase 10: Removed 1 phantom skill reference
-
-Manual fixes completed:
-✅ Phase 1: Rewrote description (now 98 chars)
-✅ Phase 3: Extracted workflow to references/ (now 347 lines)
-
-Final audit: ✅ 16/16 phases passed
-
-The skill is now compliant and ready to commit.
-```
+Document fixes applied with method (CLI, Claude, Hybrid, Manual).
 
 ---
 
-## Common Fix Scenarios
+## Common Scenarios
 
-### Scenario 1: New Skill Needs Cleanup
+### Scenario 1: New Skill Cleanup
+**Typical issues:** Phase 1 (description), Phase 5 (directories), Phase 4 (broken links)
+**Fix order:** CLI (5) → Claude-Auto (1) → Hybrid (4)
 
-**Symptoms:**
-- Missing references/ directory
-- Broken links
-- Description too verbose
-
-**Fix sequence:**
-1. Auto-fix Phase 5 (create structure)
-2. Auto-fix Phase 4 (create placeholders)
-3. Manual fix Phase 1 (rewrite description)
-
-### Scenario 2: Skill Exceeds Line Limit
-
-**Symptoms:**
-- Phase 3 failure (>500 lines)
-- Dense SKILL.md with detailed content
-
-**Fix sequence:**
-1. Identify 3-5 detailed sections
-2. Extract each to references/
-3. Update SKILL.md with summaries + links
-4. Re-audit to verify <500 lines
+### Scenario 2: Over-Long Skill
+**Typical issues:** Phase 3 (>500 lines)
+**Fix:** Claude-Auto (3) - Extract sections to references/
 
 ### Scenario 3: Legacy Skill Migration
+**Typical issues:** Phase 9 (bash), Phase 11 (cd paths), Phase 13 (no TodoWrite)
+**Fix order:** Claude-Auto (11, 13) → Human (9)
 
-**Symptoms:**
-- Bash scripts (Phase 9)
-- Absolute paths (Phase 11)
-- No TodoWrite (Phase 13)
+### Scenario 4: Visual/Style Cleanup
+**Typical issues:** Phase 14a (tables), Phase 14b (code blocks), Phase 14c (headers), Phase 14e (readability)
+**Fix order:** CLI (14a-c) → Claude-Auto (14e)
 
-**Fix sequence:**
-1. Migrate bash to TypeScript (Phase 9)
-2. Update cd commands (Phase 11)
-3. Add TodoWrite mandates (Phase 13)
-4. Re-audit to verify compliance
-
----
-
-## Dry-Run Mode
-
-To preview fixes without applying:
-
-1. Run audit, capture issues
-2. Categorize fixes as normal
-3. For each fix, document **what would change**
-4. Present summary to user
-5. Ask: "Apply these fixes?" via AskUserQuestion
-
-**Example dry-run output:**
-```
-Dry-run for {skill-name}:
-
-Would fix:
-1. Phase 4: Create references/workflow.md (empty placeholder)
-2. Phase 10: Remove line 87 "See non-existent-skill"
-3. Phase 1: Change description to:
-   Before: "This skill helps you when you need to create new skills..." (72 chars)
-   After: "Use when creating skills - TDD workflow, templates" (54 chars)
-
-Apply these 3 fixes? [Yes/No/Preview each]
-```
+### Scenario 5: Orphan Library Skill
+**Typical issues:** Phase 15 (no gateway or agent reference)
+**Fix:** Claude-Auto (15) - Add to appropriate gateway or agent
 
 ---
 

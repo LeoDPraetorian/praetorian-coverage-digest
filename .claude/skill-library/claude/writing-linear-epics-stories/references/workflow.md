@@ -19,6 +19,7 @@ Step-by-step process for creating well-structured Linear epics with comprehensiv
 ### Step 1.1: Understand User Intent
 
 Ask clarifying questions if needed:
+
 - What's the core value being delivered?
 - Who are the primary users/stakeholders?
 - What's the timeline/priority?
@@ -29,12 +30,15 @@ Ask clarifying questions if needed:
 Use the Explore agent for broad discovery:
 
 ```typescript
-Task("Explore codebase for notification patterns",
-     "Find existing notification implementations, WebSocket usage, message queuing patterns",
-     "Explore")
+Task(
+  "Explore codebase for notification patterns",
+  "Find existing notification implementations, WebSocket usage, message queuing patterns",
+  "Explore"
+);
 ```
 
 **What to search for:**
+
 - Similar features already implemented
 - Relevant backend services/APIs
 - Frontend components that might be reused
@@ -80,6 +84,7 @@ Integration Testing (E2E validation)
 ```
 
 **Validation Loop:**
+
 - Do you understand the technical components?
 - Have you identified all dependencies?
 - Can you explain the data flow?
@@ -98,6 +103,7 @@ If yes → Proceed to Phase 2.
 An epic represents the **complete feature/initiative**.
 
 **Epic characteristics:**
+
 - Describes the overarching goal
 - Provides business context
 - Lists all sub-issues
@@ -105,6 +111,7 @@ An epic represents the **complete feature/initiative**.
 - Defines success criteria
 
 **Example epic title:**
+
 ```
 Epic: Real-Time Notification System
 ```
@@ -153,13 +160,14 @@ CHARIOT-1006 (Integration Tests) → Depends on 1003, 1005
 
 Estimate complexity (not time):
 
-| Size | Description | Example |
-|------|-------------|---------|
-| S | <1 day, clear approach | Add a new API endpoint |
-| M | 2-4 days, some unknowns | Implement WebSocket server |
-| L | 5+ days, research needed | Design distributed notification system |
+| Size | Description              | Example                                |
+| ---- | ------------------------ | -------------------------------------- |
+| S    | <1 day, clear approach   | Add a new API endpoint                 |
+| M    | 2-4 days, some unknowns  | Implement WebSocket server             |
+| L    | 5+ days, research needed | Design distributed notification system |
 
 **Validation Loop:**
+
 - Is each sub-issue independently testable?
 - Are dependencies clear and minimal?
 - Is the epic scope reasonable (4-8 sub-issues)?
@@ -189,12 +197,15 @@ If yes → Proceed to Phase 3.
 ## Sub-Issues (Implementation Phases)
 
 ### Phase 1: Foundation
+
 - [ ] CHARIOT-XXXX: [Sub-issue title] - [Purpose]
 
 ### Phase 2: Core Implementation
+
 - [ ] CHARIOT-XXXX: [Sub-issue title] - [Purpose]
 
 ### Phase 3: Integration
+
 - [ ] CHARIOT-XXXX: [Sub-issue title] - [Purpose]
 
 ## Architecture
@@ -206,12 +217,15 @@ If yes → Proceed to Phase 3.
 ## Implementation Phases
 
 **Phase 1: Foundation**
+
 - Description of what gets built first
 
 **Phase 2: Core**
+
 - Description of main functionality
 
 **Phase 3: Integration**
+
 - Description of final integration
 
 ## Success Criteria
@@ -269,6 +283,7 @@ CHARIOT-XXXX: [Epic title]
 Use ASCII art for architecture:
 
 **Data flow diagram:**
+
 ```
 ┌─────────┐       ┌──────────┐       ┌─────────┐
 │ Client  │──WS──→│ API GW   │──────→│ Lambda  │
@@ -282,6 +297,7 @@ Use ASCII art for architecture:
 ```
 
 **Workflow diagram:**
+
 ```
 Event Triggered
     ↓
@@ -299,6 +315,7 @@ Client Receives
 ```
 
 **Decision tree:**
+
 ```
 User Action
     ├─ If critical → Immediate push notification
@@ -315,11 +332,12 @@ Include relevant code snippets:
 const { isConnected, send } = useWebSocket({
   onMessage: (notification) => {
     toast.show(notification.message);
-  }
+  },
 });
 ```
 
 **Validation Loop:**
+
 - Is the epic description comprehensive?
 - Do sub-issue descriptions provide clear scope?
 - Are diagrams included and helpful?
@@ -338,13 +356,13 @@ If yes → Proceed to Phase 4.
 
 ```typescript
 const epicResult = await createIssue.execute({
-  team: 'Chariot',
-  title: 'Epic: Real-Time Notification System',
-  description: epicDescription,  // From Phase 3
-  priority: 2  // High
+  team: "Chariot",
+  title: "Epic: Real-Time Notification System",
+  description: epicDescription, // From Phase 3
+  priority: 2, // High
 });
 
-const epicId = epicResult.issue.id;  // Save for linking sub-issues
+const epicId = epicResult.issue.id; // Save for linking sub-issues
 ```
 
 ### Step 4.2: Create Sub-Issues with Parent Linking
@@ -352,11 +370,11 @@ const epicId = epicResult.issue.id;  // Save for linking sub-issues
 ```typescript
 for (const subIssue of subIssues) {
   const result = await createIssue.execute({
-    team: 'Chariot',
+    team: "Chariot",
     title: subIssue.title,
     description: subIssue.description,
     priority: subIssue.priority,
-    parentId: epicId  // Link to epic
+    parentId: epicId, // Link to epic
   });
 
   console.log(`Created: ${result.issue.identifier}`);
@@ -366,6 +384,7 @@ for (const subIssue of subIssues) {
 ### Step 4.3: Verify Creation
 
 After all tickets created:
+
 - Check epic URL shows all sub-issues
 - Verify descriptions render correctly (markdown, diagrams)
 - Confirm dependencies are clear in descriptions
@@ -375,10 +394,12 @@ After all tickets created:
 **Control character sanitization:**
 
 The Linear wrapper uses `validateNoControlCharsAllowWhitespace` which:
+
 - ✅ Allows: newlines (`\n`), tabs (`\t`), carriage returns (`\r`)
 - ❌ Blocks: null bytes, backspace, form feed, etc.
 
 If you get "Control characters not allowed" error:
+
 1. Check for non-printable characters in source
 2. Remove emojis
 3. Verify no hidden characters in copied text
@@ -386,11 +407,13 @@ If you get "Control characters not allowed" error:
 **Field length limits:**
 
 Linear has field length limits (not documented but exist). If description is very long:
+
 - Use progressive disclosure pattern
 - Link to external docs for details
 - Keep core content in description
 
 **Validation Loop:**
+
 - All tickets created successfully?
 - Parent/child links working?
 - Descriptions rendering correctly?
@@ -402,12 +425,12 @@ If yes → Epic creation complete!
 
 ## Validation Loops Summary
 
-| Phase | Validation Question | Action if No |
-|-------|---------------------|--------------|
-| 1: Research | Understand components & dependencies? | Continue research |
-| 2: Breakdown | Sub-issues independent & scoped well? | Refine structure |
-| 3: Documentation | Epic & sub-issues comprehensive? | Improve content |
-| 4: Creation | All tickets created and linked? | Debug and retry |
+| Phase            | Validation Question                   | Action if No      |
+| ---------------- | ------------------------------------- | ----------------- |
+| 1: Research      | Understand components & dependencies? | Continue research |
+| 2: Breakdown     | Sub-issues independent & scoped well? | Refine structure  |
+| 3: Documentation | Epic & sub-issues comprehensive?      | Improve content   |
+| 4: Creation      | All tickets created and linked?       | Debug and retry   |
 
 **Total time: 2-4 hours for complex epic**
 

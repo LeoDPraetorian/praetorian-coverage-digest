@@ -1,0 +1,213 @@
+## [Date: 2025-12-25] - Query Keys Design Reference File
+
+### Added
+
+- Created `references/query-keys-design.md` to resolve broken link on line 88 of SKILL.md
+- Comprehensive documentation of query key design patterns based on extensive web research
+- Covers: queryOptions pattern (v5 recommended), query key factory pattern, hierarchical structure, object vs array keys, invalidation strategies, TypeScript patterns, feature-based organization
+
+### Reason
+
+- RED failure: Line 88 references `references/query-keys-design.md` which did not exist (Phase 4 broken links audit failure)
+- Query key design is a substantial topic deserving dedicated reference file rather than just removing the link
+- Research conducted from authoritative sources: TkDodo's blog (maintainer), TanStack official docs, @lukemorales/query-key-factory
+
+### Technical Details
+
+**queryOptions pattern (v5)** - Co-locates query keys with query functions for type safety via DataTag
+**Query key factory** - One factory per feature with hierarchical key structure
+**Object keys** - Enable named destructuring and cross-scope invalidation
+**Invalidation strategies** - Prefix matching, exact matching, predicate functions, global MutationCache callbacks
+
+### Research Sources
+
+- [Effective React Query Keys](https://tkdodo.eu/blog/effective-react-query-keys)
+- [The Query Options API](https://tkdodo.eu/blog/the-query-options-api)
+- [Leveraging the Query Function Context](https://tkdodo.eu/blog/leveraging-the-query-function-context)
+- [Query Keys | TanStack Query Docs](https://tanstack.com/query/v5/docs/framework/react/guides/query-keys)
+- [@lukemorales/query-key-factory](https://github.com/lukemorales/query-key-factory)
+
+### REFACTOR Phase
+
+**Evaluated:** Reference file addition only (not rule/workflow changes)
+**Decision:** REFACTOR not required - factual library documentation, not discipline enforcement
+**Compliance:** PASSED WITH WARNINGS (Phase 4 Broken Links: 0 issues, SKILL.md: 325 lines)
+
+---
+
+## [Date: 2025-12-24] - maxPages Bi-Directional Requirement
+
+### Changed
+
+- Added critical requirement section to `references/query-infinite-scroll-patterns.md`
+- Documented MANDATORY requirement: `maxPages` requires BOTH `getNextPageParam` AND `getPreviousPageParam`
+- Added example failure scenario showing purged pages cannot be refetched
+- Added correct implementation with bi-directional fetching
+- Updated existing Pattern 5 examples to include `getPreviousPageParam`
+
+### Reason
+
+- RED failure: Skill documented `maxPages` option but didn't explain that pages get purged from BOTH ends
+- Missing explanation that without both page param functions, users cannot fetch back purged pages
+- Existing code examples showed incomplete maxPages configuration (only forward direction)
+- Research source: [TanStack Query Infinite Queries Guide](https://tanstack.com/query/v5/docs/framework/react/guides/infinite-queries)
+
+### Technical Details
+
+**maxPages behavior** - Automatically purges pages from either end to stay within limit, requiring bi-directional fetching capability
+**Cursor-based pagination** - Recommended over offset/limit for proper bi-directional navigation
+**Return undefined** - Use `undefined` (not `null`) when no more pages in that direction
+
+### REFACTOR Phase
+
+**Evaluated:** Technical API requirement (not process/workflow rule)
+**Decision:** REFACTOR not required - factual library behavior documentation, not discipline enforcement
+**Compliance:** PASSED (SKILL.md: 325 lines, reference file: 542 lines, audit passed with warnings)
+
+---
+
+## [Date: 2025-12-24] - Quick Reference Enhancement
+
+### Changed
+
+- Added "Recommended Tooling" subsection to Quick Reference highlighting `@tanstack/eslint-plugin-query`
+- Documented three critical ESLint rules: `exhaustive-deps`, `no-rest-destructuring`, `stable-query-client`
+- Added `infiniteQueryOptions` to Quick Reference table alongside `queryOptions` for type-safe query configuration
+- Added cross-references to performance optimization and anti-patterns documentation
+
+### Reason
+
+- RED failure: ESLint plugin documented in reference files but not visible in main SKILL.md Quick Reference where developers see it first
+- Missing discoverability for essential tooling that prevents common mistakes
+- `infiniteQueryOptions` helper added in previous update but not surfaced in Quick Reference
+- Research source: TanStack Query v5 official documentation, ESLint plugin docs
+
+### Technical Details
+
+**@tanstack/eslint-plugin-query** - Catches query key dependency mismatches, optimization-breaking patterns, and unstable QueryClient usage
+**infiniteQueryOptions** - Type-safe helper for infinite queries with automatic type inference (parallel to queryOptions for regular queries)
+
+### REFACTOR Phase
+
+**Evaluated:** Content promotion for discoverability (not rule/workflow changes)
+**Decision:** REFACTOR not required - improved visibility of existing documentation
+**Compliance:** PASSED (325 lines, audit passed with warnings)
+
+---
+
+## [Date: 2025-12-24] - API Configuration Clarification
+
+### Changed
+
+- Clarified distinction between `staleTime: Infinity` vs `staleTime: 'static'` in `references/query-api-configuration.md`
+- Added comparison table showing which operations work with each setting
+- Added documentation for `infiniteQueryOptions` helper function (separate from `queryOptions`)
+- Included import statements and usage examples for both helpers
+
+### Reason
+
+- RED failure: Skill mentioned both Infinity and 'static' but didn't explain the critical difference - Infinity allows manual invalidation/refetch, while 'static' prevents ALL refetches including `invalidateQueries()` and `refetchOnMount: 'always'`
+- Missing `infiniteQueryOptions` helper documentation (v5 has separate helper for infinite queries like it has `queryOptions` for regular queries)
+- Research source: [useQuery API Reference](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery), [Query Options Guide](https://tanstack.com/query/v5/docs/framework/react/guides/query-options)
+
+### Technical Details
+
+**staleTime: Infinity** - Never auto-refetches, but manual operations (invalidateQueries, refetch) still work
+**staleTime: 'static'** - Completely immutable, ignores ALL refetch attempts including manual ones
+**infiniteQueryOptions** - Type-safe helper for infinite query definitions with automatic type inference
+
+### REFACTOR Phase
+
+**Evaluated:** Content clarification only (not rule/workflow changes)
+**Decision:** REFACTOR not required - enhanced existing documentation with missing details
+**Compliance:** PASSED (310 lines, audit passed with warnings)
+
+---
+
+## [Date: 2025-12-24] - Performance Optimization Update
+
+### Changed
+
+- Extracted detailed hook examples (useQuery, useMutation, Optimistic Updates, Dependent Queries, Infinite Scroll) to new `references/query-hook-examples.md` file
+- Condensed SKILL.md from 601 lines to 310 lines (48% reduction)
+- Added structural sharing documentation to `references/query-performance-optimization.md`
+- Added object rest destructuring warning to `references/query-performance-optimization.md` and `references/query-anti-patterns.md` (new Anti-Pattern 11)
+- Simplified Common Patterns and Anti-Patterns sections in SKILL.md to summaries with reference links
+
+### Reason
+
+- RED failure: Skill was missing critical performance optimization documentation (structural sharing, object rest destructuring warning) identified through extensive research of official TanStack Query v5 documentation and TkDodo's blog
+- SKILL.md exceeded 500 line hard limit (601 lines), requiring content extraction before adding new material
+- Research sources: [Render Optimizations Guide](https://tanstack.com/query/v5/docs/framework/react/guides/render-optimizations), TkDodo maintainer blog
+
+### Technical Details
+
+**Structural Sharing:** React Query automatically maintains object references when data hasn't changed, only replacing modified portions (JSON-compatible data only)
+
+**Object Rest Destructuring:** Using `const { data, ...rest } = useQuery()` breaks proxy-based tracked queries optimization, causing unnecessary re-renders. ESLint rule `@tanstack/eslint-plugin-query/no-rest-destructuring` catches this.
+
+### REFACTOR Phase
+
+**Evaluated:** Content addition only (not rule/workflow changes)
+**Decision:** REFACTOR not required - added missing documentation patterns, no mandatory workflows changed
+**Compliance:** PASSED (310 lines, under 450 safe zone)
+
+---
+
+## [Date: 2025-12-24] - Initial Creation
+
+### Created
+
+- Skill created via creating-skills workflow
+- RED failure documented: Existing `frontend-tanstack` skill combines Query/Router/Table, causing discovery issues and context overload
+- Category: development/frontend/state
+- Type: Library/Framework (TanStack Query v5 documentation)
+- SKILL.md: 441 lines (target <500, actual within limit)
+
+### Extracted Content
+
+- 13 Query-specific reference files planned for migration from parent skill
+- Core topics: useQuery, useMutation, useInfiniteQuery, cache config, optimistic updates, v5 breaking changes
+
+### Related Skills
+
+- using-tanstack-router (Query + Router integration)
+- using-tanstack-table (Query + Table integration)
+- frontend-react-state-management (client state)
+
+### Testing (REFACTOR Phase)
+
+**Pressure Test Results (2025-12-24):**
+
+All 3 pressure scenarios PASSED - agents followed skill patterns despite multiple pressures:
+
+1. **Scenario 1 (Time + Sunk Cost + Emergency):** Agent chose C (refactor correctly despite 400 lines sunk cost and dinner plans) - ✅ PASSED
+2. **Scenario 2 (Authority + Exhaustion + Demo Pressure):** Agent chose A (full optimistic pattern despite 20 lines vs 40 lines argument) - ✅ PASSED
+3. **Scenario 3 (Exhaustion + Authority + Release Pressure):** Agent chose A (complete v5 migration despite manager saying "ship with warnings") - ✅ PASSED
+
+**Key Findings:**
+- Agents correctly identified anti-patterns (unstable keys, gcTime rule violations, render-phase invalidations)
+- Agents cited skill sections as justification for decisions
+- Agents acknowledged temptation but followed technical correctness
+- No loopholes found - skill is bulletproof for TanStack Query v5 patterns
+
+**Audit Results:**
+- Structural audit: PASSED (no critical issues, 3 warnings)
+- Line count: 441 lines (under 500 limit)
+- Gateway integration: Updated gateway-frontend successfully
+
+### Next Steps
+
+Reference files require content population via researching-skills workflow:
+- query-common-patterns.md
+- query-anti-patterns.md
+- query-testing.md
+- query-top-errors.md
+- query-typescript-patterns.md
+- query-infinite-scroll-patterns.md
+- query-network-mode.md
+- query-performance-optimization.md
+- query-ssr-hydration.md
+- query-suspense-integration.md
+
+(Note: query-api-configuration.md, query-best-practices.md, and query-v4-to-v5-migration.md are already populated)

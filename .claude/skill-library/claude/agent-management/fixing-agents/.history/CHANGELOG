@@ -1,3 +1,107 @@
+## [2025-12-27] - PHASE 3 FIX: Add "Missing Skill Tool" procedure to fix-procedures.md
+
+### Added
+- **New section** - "Missing Skill Tool (Phase 3)" in fix-procedures.md after Tool Validation
+- **Fix steps** - 3-step procedure: Read tools, add Skill alphabetically, use Edit tool
+- **Alphabetical order** - Complete list of all tool names for correct positioning
+- **Edit example** - Concrete typescript example showing old_string → new_string pattern
+- **Why critical** - Explains runtime failure: agent cannot execute `skill: "name"` without Skill tool
+- **Impact documentation** - Lists 4 currently affected agents
+- **References** - Points to agent-compliance-contract.md Section 12 and frontend-developer.md gold standard
+
+### Changed
+- **phase-categorization.md** - Updated Phase 3 to include Skill tool fix as Deterministic category
+- **Phase 3 description** - Expanded to "Missing required tools, forbidden tools present, OR missing Skill tool when skills exist"
+
+### Reason
+- **Audit now detects** - auditing-agents Phase 3 now checks Skill tool requirement
+- **No fix procedure existed** - Fixing workflow had no procedure for this error type
+- **Deterministic fix** - Alphabetization is mechanical, perfect for automated Edit tool fix
+- **Widespread impact** - 4+ agents need this fix
+
+### Impact
+- **Broken agents fixable** - Can now automatically fix all 4+ agents missing Skill tool
+- **Prevention complete** - With audit (auditing-agents) + fix (fixing-agents) + validation (creating/updating-agents), full lifecycle coverage
+- **Compliance enforcement** - Implements agent-compliance-contract.md Section 12 throughout fixing workflow
+
+---
+
+## [2025-12-27] - ARCHITECTURAL CHANGE: Remove CLI Dependency, Pure Claude + Edit Tool
+
+### Changed
+- **Removed all CLI references** - Deleted `npm run -w @chariot/fixing-agents fix` commands
+- **Claude-driven fixes** - All fixes now use Claude reasoning with Edit tool directly
+- **Lean structure** - Reduced from 422 to 114 lines (73% reduction)
+- **Edit patterns table** - Added explicit patterns for each fix type
+- **Fix categories** - Simplified to 3 categories: Deterministic, Semantic, Interactive
+- **Description** - Updated to "Claude applies all fixes using Edit tool"
+
+### Moved to References
+- Detailed procedures → references/fix-procedures.md
+- All Step 4a/4b/4c/4d workflows → references/fix-procedures.md
+- Error handling details → references/fix-procedures.md
+- Quick fix examples → references/fix-procedures.md
+
+### Kept in SKILL.md
+- Quick Reference table (6 steps)
+- Fix Categories table (3 categories)
+- Edit Patterns table (5 common patterns)
+- Brief workflow (5 steps)
+- Common issues (2 scenarios)
+
+### Reason
+- **Self-hosting consistency**: Skills teaching Claude patterns should use those patterns
+- **Maintenance reduction**: Remove TypeScript package, dependencies, build config
+- **Claude 4.5+ reliability**: Instruction following strong enough for all fixes
+- **Token efficiency**: Write operations are infrequent, token cost acceptable
+- **Architectural alignment**: Matches frontend-developer gold standard (Claude reasoning + Edit tool)
+
+### Impact
+- No more CLI to maintain (@chariot/fixing-agents can be deprecated)
+- Claude applies all fixes consistently using Edit patterns
+- Workflow remains: audit → backup → apply fixes → re-audit → changelog
+- All fix procedures preserved in references for detailed guidance
+
+---
+
+## [2025-12-27] - Add Phase 14g (Table Formatting) to Tier 1 Deterministic Fixes
+
+### Changed
+- **Quick Reference table** - Updated Deterministic row to include Phase 14g: "0, 2, 14g, 16"
+- **What This Skill Does** - Updated deterministic phases list to include 14g
+- **Step 3: Categorize Issues** - Added Phase 14g (table formatting) to deterministic CLI list
+- **Step 4a: Apply Deterministic Fixes** - Updated phases list and added description
+  - Runs `npx prettier --write --parser markdown` on agent .md files
+  - No user confirmation needed - one correct answer exists
+  - References managing-agents/references/table-formatting.md for requirements
+
+### Reason
+- Phase 14g (Table Formatting Validation) was implemented in auditing-agents but not in fixing-agents
+- Prettier-based table formatting is deterministic and should be auto-applied
+- Completes the documentation for automated table formatting fixes
+
+### Impact
+- Users now understand that table formatting issues are auto-fixed without confirmation
+- Phase 14g properly categorized as Tier 1 (Deterministic) alongside Phases 0, 2, and 16
+- Clear documentation that fix runs Prettier on markdown files
+
+---
+
+## [2025-12-27] - Add Mandatory Step 0: Repository Root Navigation
+
+### Added
+- **Step 0: Navigate to Repository Root** - New mandatory step before Workflow section
+  - Bash command to navigate to super-repo root
+  - Link to repo-root-detection.md reference
+  - Anti-rationalization warning about "file not found" errors
+- Updated workflow checklist to include Step 0
+
+### Reason
+- Agents operating from submodule directories couldn't find agent files
+- Prevents "file not found" failures caused by wrong working directory
+
+---
+
 ## [2025-12-15] - Extraction and Enhancement
 
 ### Changed
@@ -22,3 +126,79 @@
 - Auto-fixes for block scalars and name mismatches
 - Manual guidance for missing/empty descriptions
 - 8-step workflow with audit verification
+### Added - 2025-12-27
+
+**TypeScript CLI infrastructure for deterministic agent fixes**
+
+Created `scripts/` directory with:
+- `package.json` - @chariot/fixing-agents workspace
+- `tsconfig.json` - TypeScript configuration
+- `src/fix.ts` - CLI handling 4 deterministic fix types:
+  - Phase 0: Block scalar → single-line conversion
+  - Phase 0: Name mismatch → frontmatter update
+  - Phase 2: Frontmatter field reordering to canonical order
+  - Phase 16: Table separator format (< 3 dashes → |---|)
+
+Added `agent:fix` script to root `.claude/package.json`:
+- `npm run agent:fix -- <agent-name>` - Apply deterministic fixes
+- `npm run agent:fix -- <agent-name> --dry-run` - Preview fixes
+- `npm run agent:fix -- <agent-name> --phase <number>` - Fix specific phase
+
+**Reason:** `auditing-agents` Post-Audit Actions references deterministic fixes, but the command didn't exist. This creates CLI infrastructure matching `@chariot/fixing-skills` pattern for architecture parity.
+
+**Model:** Follows pattern from `@chariot/fixing-skills/scripts/` but simpler (4 deterministic fix types vs 7+).
+
+
+### Added - 2025-12-27
+
+**Phase categorization reference for agent fixes**
+
+Created `references/phase-categorization.md`:
+- Comprehensive mapping of all 19 agent audit phases (Phase 0 + Phases 1-18) to fix categories
+- Four categories matching fixing-skills pattern:
+  - Deterministic (CLI): Phases 0, 2, 16 - Auto-apply without confirmation
+  - Claude-Automated: Phases 1, 3, 6, 9, 14, 15 - Claude applies directly
+  - Hybrid: Phases 4-5, 10-11, 17 - Claude detects + user confirms
+  - Human-Required: Phases 7-8, 12-13, 18 - Interactive guidance
+- Complete phase table with handler and user interaction details
+- Fix type details explaining why each phase fits its category
+- Workflow integration guidance for auditing-agents and fixing-agents
+- Comparison to skill phases showing simpler agent fix model
+
+**Reason:** `auditing-agents` Post-Audit Actions offers "Show fix categorization" option, but no reference file existed. Users couldn't see which issues are auto-fixable vs require reasoning.
+
+**References:** workflow-manual-checks.md for detailed phase procedures
+
+
+### Changed - 2025-12-27
+
+**Restructured SKILL.md to three-tier fix model matching fixing-skills pattern**
+
+Replaced simple workflow with structured approach:
+
+**Added Step 3: Categorize Issues**
+- Groups audit failures by fix type (deterministic/Claude-automated/hybrid/human-required)
+- References phase-categorization.md for complete mapping
+
+**Restructured Step 4 into four tiers:**
+- **Step 4a: Deterministic (CLI)** - Phases 0, 2, 16 via `npm run agent:fix`
+- **Step 4b: Claude-Automated** - Phases 1, 3, 6, 9, 14, 15 (Claude applies directly)
+- **Step 4c: Hybrid** - Phases 4-5, 10-11, 17 (Claude + AskUserQuestion)
+- **Step 4d: Human-Required** - Phases 7-8, 12-13, 18 (interactive guidance)
+
+**Created reference files:**
+- `claude-automated-fixes.md` - Detailed procedures for 6 Claude-Automated phases
+- `hybrid-human-fixes.md` - Detailed procedures for Hybrid and Human-Required phases
+
+**Updated sections:**
+- Description in frontmatter now mentions three-tier orchestration
+- "What This Skill Does" now lists all four fix categories
+- Quick Reference table matches fixing-skills format
+- Added Workflow Overview section showing fix orchestration flow
+- Renumbered steps (removed old Step 2 "Read Agent File", Steps 8-10 became 5-7)
+- Updated "See Also" to reference all new documentation
+
+**Line count:** Reduced from 642 to 415 lines via progressive disclosure (detailed content extracted to references/)
+
+**Reason:** fixing-agents had a simple workflow that didn't match the sophistication of fixing-skills. This update creates architecture parity with skill management, enabling proper categorization and handling of all 19 agent audit phases.
+

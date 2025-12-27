@@ -1,7 +1,7 @@
 ---
 name: behavior-vs-implementation-testing
 description: Use when writing tests, reviewing test quality, or when tests pass but production is broken - distinguishes testing user-visible behavior from testing implementation details like mock calls or internal state, preventing false confidence from tests that verify mocks work instead of verifying features work
-allowed-tools: 'Read, Bash, Grep, Glob'
+allowed-tools: "Read, Bash, Grep, Glob"
 ---
 
 # Behavior vs Implementation Testing
@@ -17,6 +17,7 @@ Tests must verify user-visible outcomes and API integration correctness, not jus
 ## When to Use
 
 Use when:
+
 - Writing new tests
 - Reviewing test PRs
 - Tests pass but production broken
@@ -25,6 +26,7 @@ Use when:
 - Form submissions and workflows
 
 **Especially when:**
+
 - Test only checks `toHaveBeenCalled()`
 - Test verifies internal state changes
 - Production fails despite passing tests
@@ -61,6 +63,7 @@ Is this test verifying:
 ### Example 1: Impersonation Feature
 
 **❌ Implementation Testing** (What went wrong in session):
+
 ```typescript
 it('should pass impersonated email to API', async () => {
   let capturedEmail: string | undefined;
@@ -83,6 +86,7 @@ it('should pass impersonated email to API', async () => {
 **Problem**: Tests that HTTP header forwarding works, not that impersonation works
 
 **Production Reality**: Header forwarding worked, but:
+
 - Wrong user data displayed (cache key didn't include email)
 - Edit actions used wrong email (mutation context broken)
 - Feature flags didn't respect impersonation
@@ -92,6 +96,7 @@ it('should pass impersonated email to API', async () => {
 ---
 
 **✅ Behavior Testing** (What should have been tested):
+
 ```typescript
 it('should display impersonated user settings, not admin settings', async () => {
   const customerSettings = {
@@ -135,6 +140,7 @@ it('should display impersonated user settings, not admin settings', async () => 
 ```
 
 **Why this is better**:
+
 - Verifies user sees correct data
 - Verifies edit actions properly disabled
 - Would catch cache key issues
@@ -146,6 +152,7 @@ it('should display impersonated user settings, not admin settings', async () => 
 ### Example 2: Form Submission
 
 **❌ Implementation Testing**:
+
 ```typescript
 it('should call onSubmit when Save clicked', async () => {
   const mockOnSubmit = vi.fn();
@@ -162,6 +169,7 @@ it('should call onSubmit when Save clicked', async () => {
 ```
 
 **Problem**: Only tests callback invoked, not that:
+
 - Data actually saves to backend
 - Success message shows to user
 - Form resets or closes
@@ -170,6 +178,7 @@ it('should call onSubmit when Save clicked', async () => {
 ---
 
 **✅ Behavior Testing**:
+
 ```typescript
 it('should save profile and show success message', async () => {
   server.use(
@@ -196,6 +205,7 @@ it('should save profile and show success message', async () => {
 ```
 
 **Why this is better**:
+
 - Tests complete user workflow
 - Verifies API integration works
 - Verifies UI updates correctly
@@ -207,6 +217,7 @@ it('should save profile and show success message', async () => {
 ### Example 3: File Upload
 
 **❌ Implementation Testing**:
+
 ```typescript
 it('should call onUpload when file selected', async () => {
   const mockOnUpload = vi.fn();
@@ -223,6 +234,7 @@ it('should call onUpload when file selected', async () => {
 ---
 
 **✅ Behavior Testing**:
+
 ```typescript
 it('should upload picture, enable Save, and show preview', async () => {
   server.use(
@@ -251,6 +263,7 @@ it('should upload picture, enable Save, and show preview', async () => {
 ```
 
 **Why this is better**:
+
 - Tests complete workflow (upload → enable → preview)
 - Verifies button state transitions
 - Verifies preview displays
@@ -271,14 +284,14 @@ NO  → Bad test, rewrite to test behavior
 
 ## Quick Reference
 
-| Test Type | What It Verifies | Value |
-|-----------|------------------|-------|
-| **Behavior** | User sees "Success message" | ✅ HIGH - Catches real bugs |
-| **Behavior** | Data persists after save | ✅ HIGH - Verifies integration |
-| **Behavior** | Button enables after input | ✅ HIGH - Tests user flow |
-| **Implementation** | mockFn called | ❌ LOW - Mocks can lie |
-| **Implementation** | Internal state = X | ❌ LOW - Users don't see state |
-| **Implementation** | Function invoked | ❌ LOW - Doesn't test outcome |
+| Test Type          | What It Verifies            | Value                          |
+| ------------------ | --------------------------- | ------------------------------ |
+| **Behavior**       | User sees "Success message" | ✅ HIGH - Catches real bugs    |
+| **Behavior**       | Data persists after save    | ✅ HIGH - Verifies integration |
+| **Behavior**       | Button enables after input  | ✅ HIGH - Tests user flow      |
+| **Implementation** | mockFn called               | ❌ LOW - Mocks can lie         |
+| **Implementation** | Internal state = X          | ❌ LOW - Users don't see state |
+| **Implementation** | Function invoked            | ❌ LOW - Doesn't test outcome  |
 
 ## Common Violations
 
@@ -363,6 +376,7 @@ it('should show loading indicator during submit', async () => {
 **From 22-hour test session:**
 
 **Implementation tests written**:
+
 - Verified email header forwarding (17 tests)
 - Verified callbacks invoked (50+ tests)
 - Verified mock setup worked (266 tests)
@@ -370,6 +384,7 @@ it('should show loading indicator during submit', async () => {
 **Result**: Tests passed, production broken
 
 **Behavior tests missing**:
+
 - Did impersonated user data display?
 - Did edit actions disable correctly?
 - Did mutations use correct context?
@@ -378,6 +393,7 @@ it('should show loading indicator during submit', async () => {
 **Impact**: Production issues not caught by tests
 
 **With behavior testing**:
+
 - Would have caught cache key issues (wrong data displayed)
 - Would have caught mutation context (wrong email used)
 - Would have caught feature flag issues (not respecting impersonation)
@@ -405,6 +421,7 @@ it('should show loading indicator during submit', async () => {
 ## Red Flags - STOP and Rewrite
 
 If you catch yourself:
+
 - Only asserting on `toHaveBeenCalled()`
 - Testing that state variable changed
 - Verifying function invoked

@@ -60,6 +60,7 @@ function AssetToggle({ asset }) {
 ```
 
 **Why this works:**
+
 - User sees change instantly (meets Doherty Threshold)
 - No waiting for server round-trip
 - Automatic rollback if API fails
@@ -88,6 +89,7 @@ function AssetList() {
 ```
 
 **Loading state hierarchy:**
+
 1. **<400ms:** No indicator needed (feels instant)
 2. **400ms-1s:** Subtle spinner or skeleton
 3. **1-3s:** Progress bar with percentage
@@ -121,6 +123,7 @@ function DashboardLoading() {
 ```
 
 **Benefits of skeletons:**
+
 - Shows layout structure (reduces perceived wait time)
 - More informative than spinners
 - Smooth transition when data loads
@@ -162,6 +165,7 @@ function AssetSearch() {
 ```
 
 **Why this works:**
+
 - Typing feels instant (no delay)
 - Search API called after typing stops (reduces requests)
 - Loading indicator shows when search is running
@@ -206,6 +210,7 @@ function BulkDeleteAssets({ assetIds }) {
 ```
 
 **Benefits:**
+
 - User sees continuous progress
 - Estimated time based on current rate
 - No "black box" waiting period
@@ -237,6 +242,7 @@ func GetAssets(ctx context.Context) ([]Asset, error) {
 ```
 
 **Strategies:**
+
 1. **Cache aggressively** - Most Chariot data changes infrequently
 2. **Paginate** - Don't load 10,000 assets at once
 3. **Use CDN** - Static assets load in <50ms
@@ -276,6 +282,7 @@ const handleCopy = async () => {
 ```
 
 **Why this works better than toast alone:**
+
 - Green flash: 0ms (instant visual confirmation)
 - Toast: 50-100ms (secondary confirmation)
 - Double feedback increases perceived responsiveness
@@ -287,6 +294,7 @@ const handleCopy = async () => {
 **Definition:** The time to acquire a target is a function of the distance to and size of the target.
 
 **Formula:** `T = a + b × log₂(D/W + 1)`
+
 - T = time to reach target
 - D = distance to target
 - W = width of target
@@ -313,6 +321,7 @@ const handleCopy = async () => {
 ```
 
 **Sizing guide:**
+
 - **Touch targets:** ≥44x44px (iOS), ≥48x48px (Material Design)
 - **Mouse targets:** ≥32x32px acceptable
 - **Primary CTAs:** Even larger (56x56px+)
@@ -387,6 +396,7 @@ const handleCopy = async () => {
 ```
 
 **Benefits:**
+
 - Mobile: Full-width buttons (easy to tap)
 - Desktop: Side-by-side (less distance between actions)
 - Consistent 48px height meets touch guidelines
@@ -422,6 +432,7 @@ const handleCopy = async () => {
 ```
 
 **Icon button sizing:**
+
 - Desktop: 36-40px (adequate for mouse)
 - Mobile: 44-48px (touch-friendly)
 - Spacing: 8-12px between buttons (prevent mis-clicks)
@@ -446,6 +457,7 @@ const handleCopy = async () => {
 ```
 
 **Why this works:**
+
 - Size: 56x56px (28% larger than minimum)
 - Position: Fixed in corner (consistent location)
 - Distance: Always in same place (reduces D)
@@ -474,6 +486,7 @@ When space is limited, use tooltips to expand effective hit area:
 #### Dense Data Tables
 
 For tables with many rows, prioritize:
+
 1. **Primary action**: Large, always visible
 2. **Secondary actions**: Dropdown menu (single large target)
 
@@ -504,6 +517,7 @@ For tables with many rows, prioritize:
 ```
 
 **Benefits:**
+
 - One large target (dropdown trigger) instead of 4 small icons
 - Reduces visual clutter
 - Meets Fitts' Law guidelines

@@ -1,0 +1,178 @@
+# Changelog
+
+## [2025-12-24] Batch 1: Critical Accuracy Fixes
+
+### Changed
+- Clarified React Compiler is a SEPARATE tool from React 19 (released October 2025)
+- Updated performance thresholds to 2025 standards (FCP <1.8s, added CLS <0.1, FID <100ms)
+- Added useDeferredValue memoization caveat per React docs
+- Added React 19 async transition support and useDeferredValue initialValue option
+
+### Extracted (Progressive Disclosure)
+- Moved virtualization patterns to `references/virtualization-patterns.md`
+- Moved obsolete patterns to `references/obsolete-patterns.md`
+- Reduced SKILL.md from 562 to 464 lines (now under 500 limit)
+
+### Reason
+- Web research revealed 4 critical inaccuracies in skill
+- Skill was over 500 line limit, blocking updates
+- Sources: React docs, DeveloperWay, Growin 2025 best practices
+
+### RED Phase (Documented Failures)
+1. Skill conflated React 19 with React Compiler
+2. Performance thresholds outdated (FCP <1s vs 2025 standard <1.8s)
+3. Missing useDeferredValue memoization caveat
+4. Missing React 19 concurrent feature enhancements
+
+### GREEN Phase (Verified)
+- All 4 accuracy issues fixed
+- Line count: 466 (under 500 limit)
+- Progressive disclosure applied with 2 new reference files
+
+### REFACTOR Phase (Pressure Tests)
+1. ✅ React 19 vs Compiler distinction - Skill correctly states "NOT part of React 19"
+2. ✅ Performance thresholds - Correct 2025 values (FCP <1.8s, CLS <0.1, FID <100ms)
+3. ✅ useDeferredValue caveat - Memoization requirement documented
+
+### Compliance Audit
+- Status: PASSED with 2 warnings (no critical issues)
+- TodoWrite mandate added per Phase 13 requirement
+
+## [2025-12-24] Batch 2: React Server Components
+
+### Added
+- New major section on React Server Components (RSC)
+- Created `references/react-server-components.md` (comprehensive RSC guide)
+- Added RSC summary to SKILL.md with key concepts and reference link
+
+### Content Coverage
+1. What RSC are and performance benefits (40-60% bundle size reduction)
+2. Server vs Client Components - when to use each
+3. `"use client"` and `"use server"` directives
+4. Streaming with Suspense boundaries for progressive loading
+5. Hybrid component strategy
+6. Common pitfalls (improper Suspense boundaries, over-using "use client")
+
+### Reason
+- RSC is critical 2025 performance topic, completely missing from skill
+- RSC is "de facto standard in modern React development" per research
+- Major gap for React 19 performance optimization skill
+
+### RED Phase
+- Skill omitted RSC entirely despite being major React 19 performance feature
+- No mention of server/client distinction, directives, or streaming patterns
+
+### Line Count
+- Added 22 lines to SKILL.md (466 → 488 lines, still under 500 limit)
+
+## [2025-12-24] Batch 3: Completeness Improvements
+
+### Added
+1. **Error Boundaries** - Section on wrapping Suspense with ErrorBoundary for graceful network failure handling
+2. **Loading Skeleton Design** - Guidance on matching content structure to prevent Cumulative Layout Shift
+3. **Virtualization Scroll Handling** - Expanded reference with debounce/throttle, scroll flickering prevention, variable heights, state pitfalls
+4. **Context Optimization** - New section covering scope limiting, frequency splitting, avoiding rapid updates
+5. **Bundle Analysis** - Subsection on Vite visualizer, Webpack Bundle Analyzer, tree-shaking verification
+
+### Created
+- `references/advanced-techniques.md` - Comprehensive guide for Error Boundaries, loading skeletons, Context optimization, bundle analysis
+
+### Extracted (Progressive Disclosure)
+- Moved Error Boundaries detailed content to advanced-techniques.md
+- Moved Context optimization patterns to advanced-techniques.md
+- Moved Bundle analysis setup to advanced-techniques.md
+- Kept concise summaries in SKILL.md with reference links
+
+### Reason
+- Web research identified 5 completeness gaps in skill
+- Topics present in 2025 best practices but missing from skill
+- Sources: web.dev, LogRocket, DEV.to, React docs
+
+### RED Phase
+1. No Error Boundary guidance for lazy loading network failures
+2. Virtualization missing scroll handling best practices
+3. Context optimization completely absent
+4. Bundle analysis tools not mentioned
+5. No loading skeleton CLS prevention guidance
+
+### Line Count
+- Started at 488 lines
+- Briefly went to 625 lines (125 over) with detailed additions
+- Extracted to references, compressed to 488 lines (under 500 limit)
+
+### GREEN Phase
+- All 5 completeness improvements verified
+- Reference files created with comprehensive content
+- SKILL.md maintains concise summaries with links
+
+### REFACTOR Phase (Pressure Test)
+- ✅ Error Boundaries referenced in SKILL.md and detailed in advanced-techniques.md
+- ✅ Virtualization scroll handling added to virtualization-patterns.md
+- ✅ Context optimization present with reference link
+- ✅ Bundle analysis subsection with tool recommendations
+- ✅ All reference links resolve correctly
+
+### Compliance Audit
+- Status: PASSED with 1 warning (no critical issues)
+- Line count: 488 (12 under 500 limit)
+
+## [2025-12-24] Batch 4: Advanced Profiling
+
+### Added
+1. **actualDuration vs baseDuration** - Explanation of Profiler API metrics to verify memoization effectiveness (target: actualDuration <20% of baseDuration for good memoization)
+2. **React Performance Tracks** - Documentation of DevTools Scheduler track with Blocking, Transition, Suspense, and Idle priority subtracks for understanding work prioritization
+3. **Production profiling guidance** - Instructions for using react-dom/profiling build for accurate production measurements (dev builds are 2-5× slower due to validation overhead)
+4. **Production monitoring section** - Coverage of Real User Monitoring tools (Sentry, LogRocket, Web Vitals) for catching performance regressions before users complain
+5. **Lighthouse score targets** - Specific targets (90+ Performance, 100 Accessibility, 90+ Best Practices) with breakdown of weighted metrics and optimization strategies
+
+### Created
+- `references/advanced-profiling.md` - Comprehensive 18KB guide covering:
+  - Profiler API metrics with debugging examples
+  - React Performance Tracks walkthrough (all 4 priority levels)
+  - Production profiling setup (Webpack/Vite configuration)
+  - Production monitoring strategies (Sentry, LogRocket, Web Vitals)
+  - Lighthouse score optimization and CI/CD integration
+
+### Extracted (Progressive Disclosure)
+- Moved detailed profiling content to advanced-profiling.md (18KB)
+- Kept concise summary in SKILL.md (11 lines) with bullet points for all 5 topics
+- Maintained 500 line limit (exactly 500 lines after compression)
+
+### Reason
+- Web research identified advanced profiling gap in Performance Measurement section
+- Current section lacked production-ready profiling guidance critical for 2025 React development
+- Sources: React DevTools docs, Sentry docs, LogRocket docs, web.dev Lighthouse guides
+
+### RED Phase
+1. No actualDuration vs baseDuration explanation - users couldn't verify memoization effectiveness
+2. Missing React Performance Tracks documentation - new DevTools feature not covered
+3. No production profiling guidance - users profiling with dev builds (inaccurate)
+4. No production monitoring section - no RUM tools or regression detection strategies
+5. Missing Lighthouse score targets - no specific performance goals or optimization guidance
+
+### Line Count
+- Started at 488 lines
+- Added detailed content (would have gone to ~568 lines)
+- Extracted to advanced-profiling.md reference
+- Compressed summary to 500 lines (exactly at limit)
+
+### GREEN Phase
+- ✅ All 5 profiling topics present in advanced-profiling.md (verified)
+- ✅ Concise summary + link in SKILL.md (11 lines)
+- ✅ All key concepts accurately represented
+
+### Compliance Audit
+- Status: PASSED with 1 warning (no critical issues)
+- Line count: 500 (exactly at limit, not over)
+- Reference link resolves correctly
+- All 4 reference files present and linked
+
+### REFACTOR Phase (Pressure Tests)
+1. ✅ Profiler API misunderstanding - Skill prevents 45ms/50ms being seen as "good" (explicit <20% target)
+2. ✅ Dev vs prod profiling confusion - Warns dev builds 2-5× slower, shows comparison table
+3. ✅ Scheduler track interpretation - Explains visual indicators, healthy vs problem patterns
+4. ✅ Lighthouse score obsession - Emphasizes weighted metrics (LCP 25%, TBT 30%), not just score
+5. ✅ Missing production monitoring - Dedicated RUM section with Sentry/LogRocket/Web Vitals
+6. ✅ "Good enough" rationalization - Sets clear 90+ targets, CI/CD enforcement examples
+
+All 6 pressure tests passed. Guidance prevents common profiling mistakes and sets clear quality standards.

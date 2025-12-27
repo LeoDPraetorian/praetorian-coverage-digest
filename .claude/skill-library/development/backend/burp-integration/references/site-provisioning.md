@@ -5,6 +5,7 @@ Complete guide to provisioning sites in Burp Enterprise with Chariot patterns.
 ## Overview
 
 Site provisioning ensures:
+
 1. **Folder exists** for username (multi-tenant organization)
 2. **Site exists** in folder with proper configuration
 3. **Chariot headers** injected for attribution
@@ -44,6 +45,7 @@ func (c *BurpEnterpriseClient) EnsureSite(
 ```
 
 **Workflow:**
+
 ```
 Input: WebApplication with Username, PrimaryURL
     ↓
@@ -111,6 +113,7 @@ func (c *BurpEnterpriseClient) EnsureFolder(
 ```
 
 **Idempotency:**
+
 1. If `wa.BurpFolderID` is set and valid → return immediately
 2. If folder exists with matching name → cache ID and return
 3. If folder doesn't exist → create and cache ID
@@ -153,6 +156,7 @@ func (c *BurpEnterpriseClient) CreateFolder(name string) (*CreateFolderResponse,
 ```
 
 **Parameters:**
+
 - `name` - Display name (e.g., "user-example-com")
 - `parent_id: "0"` - Always create at root level
 
@@ -315,6 +319,7 @@ func buildSiteInput(wa model.WebApplication, siteName string) map[string]any {
 ```
 
 **Implementation:**
+
 ```go
 // format.Hash
 func Hash(username string) string {
@@ -329,6 +334,7 @@ func Useragent(username string) string {
 ```
 
 **Why Required:**
+
 1. **Attribution** - Identify which Chariot user initiated scan
 2. **Debugging** - Trace scans back to source
 3. **Rate Limiting** - Burp can apply per-user limits
@@ -367,6 +373,7 @@ func (c *BurpEnterpriseClient) EnsureSiteSchedule(
 ```
 
 **Key Points:**
+
 - Only for seeds (`wa.IsSeed()` returns true)
 - Skip if schedule already exists (`wa.BurpScheduleID != ""`)
 - Uses daily recurring schedule (midnight UTC)
@@ -400,6 +407,7 @@ func (apiDef *FileBasedAPIDefinition) ToAPIDefinitionArray() []map[string]any {
 ```
 
 **Usage:**
+
 ```go
 if wa.IsWebService() {
     input["api_definitions"] = wa.ApiDefinitionContent.ToAPIDefinitionArray()
@@ -513,11 +521,13 @@ fmt.Println("Schedule ID:", wa.BurpScheduleID) // Daily scan configured
 **Symptom:** `result.CreateSite.Site.ID == ""`
 
 **Causes:**
+
 - Invalid scope configuration
 - Malformed API definition
 - Burp API validation error
 
 **Solution:**
+
 ```go
 if result.CreateSite.Site.ID == "" {
     return wa, fmt.Errorf("failed to create site (Burp DAST API error)")
@@ -535,6 +545,7 @@ Check Burp Enterprise logs for detailed error.
 **Cause:** `c.tree` cache not invalidated.
 
 **Solution:** `EnsureSite` invalidates cache at end:
+
 ```go
 c.tree = nil
 ```

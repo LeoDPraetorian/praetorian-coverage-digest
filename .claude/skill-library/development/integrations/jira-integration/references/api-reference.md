@@ -14,11 +14,13 @@ This document will be populated with detailed API documentation during the resea
 ## Placeholder Sections
 
 ### Authentication
+
 - API Token authentication
 - OAuth 2.0 flows
 - Session management
 
 ### Issue Operations
+
 - Create issue
 - Update issue
 - Get issue
@@ -26,15 +28,18 @@ This document will be populated with detailed API documentation during the resea
 - Transitions
 
 ### Project Operations
+
 - Get project
 - List project issue types
 - Get project components
 
 ### Webhook Operations
+
 - Register webhook
 - List webhooks
 - Delete webhook
 
 ### Custom Fields
+
 - Get custom fields
 - Map custom field values

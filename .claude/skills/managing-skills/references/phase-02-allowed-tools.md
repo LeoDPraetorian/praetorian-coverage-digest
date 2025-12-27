@@ -17,6 +17,7 @@ The `allowed-tools` field is **REQUIRED** for all skills. It defines which tools
 ### CRITICAL Issues
 
 **1. Missing Field**
+
 ```yaml
 ---
 name: my-skill
@@ -26,21 +27,24 @@ description: Use when doing something
 ```
 
 **2. Empty Field**
+
 ```yaml
-allowed-tools:   # Empty
+allowed-tools: # Empty
 ```
 
 ### WARNING Issues
 
 **1. Invalid Tool Names**
+
 ```yaml
 allowed-tools: Read, Write, InvalidTool, Bash
 # InvalidTool is not a recognized Claude Code tool
 ```
 
 **2. Inconsistent Formatting**
+
 ```yaml
-allowed-tools: [Read, Write]  # Array format (should be comma-separated string)
+allowed-tools: [Read, Write] # Array format (should be comma-separated string)
 ```
 
 ## Auto-Fix Capability
@@ -48,16 +52,18 @@ allowed-tools: [Read, Write]  # Array format (should be comma-separated string)
 ✅ **AUTO-FIXABLE** - can add default field based on skill purpose
 
 **Fix strategy:**
+
 1. Analyze skill content to infer tool needs
 2. Add appropriate `allowed-tools` field
 3. Default to: `Read, Write, Bash` if cannot infer
 
 **Implementation:**
+
 ```typescript
 // Detects skill purpose and adds appropriate tools
-if (hasScripts) tools.push('Bash');
-if (mentionsEditing) tools.push('Edit', 'Write');
-if (mentionsSearch) tools.push('Grep', 'Glob');
+if (hasScripts) tools.push("Bash");
+if (mentionsEditing) tools.push("Edit", "Write");
+if (mentionsSearch) tools.push("Grep", "Glob");
 ```
 
 ## Examples
@@ -65,6 +71,7 @@ if (mentionsSearch) tools.push('Grep', 'Glob');
 ### Example 1: Missing Field (Auto-Fixed)
 
 **Before:**
+
 ```yaml
 ---
 name: react-testing-patterns
@@ -73,6 +80,7 @@ description: Use when testing React components
 ```
 
 **After:**
+
 ```yaml
 ---
 name: react-testing-patterns
@@ -84,16 +92,17 @@ allowed-tools: Read, Write, Bash
 ### Example 2: Inferred from Content
 
 **Before:**
+
 ```yaml
 ---
 name: debugging-guide
 description: Use when debugging complex issues
 ---
-
 # Content mentions: searching logs, reading files, running commands
 ```
 
 **After:**
+
 ```yaml
 ---
 name: debugging-guide
@@ -111,15 +120,15 @@ TodoWrite, TodoRead, NotebookEdit, NotebookRead, LS
 
 ## Tool Selection Guidelines
 
-| Skill Purpose | Suggested Tools |
-|---------------|-----------------|
-| Documentation/Reference | Read |
-| Code modification | Read, Write, Edit, Bash |
-| Testing/Validation | Read, Bash, Grep, Glob |
-| Web research | Read, WebFetch, WebSearch |
-| Task management | TodoWrite, TodoRead |
-| Search/Analysis | Read, Grep, Glob |
-| MCP integration | Read, Bash, WebFetch |
+| Skill Purpose           | Suggested Tools           |
+| ----------------------- | ------------------------- |
+| Documentation/Reference | Read                      |
+| Code modification       | Read, Write, Edit, Bash   |
+| Testing/Validation      | Read, Bash, Grep, Glob    |
+| Web research            | Read, WebFetch, WebSearch |
+| Task management         | TodoWrite, TodoRead       |
+| Search/Analysis         | Read, Grep, Glob          |
+| MCP integration         | Read, Bash, WebFetch      |
 
 ## Manual Remediation
 
@@ -138,8 +147,8 @@ If auto-fix produces wrong tools:
 
 ## Quick Reference
 
-| Issue | Severity | Auto-Fix | Default Tools |
-|-------|----------|----------|---------------|
-| Missing field | CRITICAL | ✅ Yes | Read, Write, Bash |
-| Empty field | CRITICAL | ✅ Yes | Read, Write, Bash |
-| Invalid tools | WARNING | ✅ Yes | Remove invalid |
+| Issue         | Severity | Auto-Fix | Default Tools     |
+| ------------- | -------- | -------- | ----------------- |
+| Missing field | CRITICAL | ✅ Yes   | Read, Write, Bash |
+| Empty field   | CRITICAL | ✅ Yes   | Read, Write, Bash |
+| Invalid tools | WARNING  | ✅ Yes   | Remove invalid    |

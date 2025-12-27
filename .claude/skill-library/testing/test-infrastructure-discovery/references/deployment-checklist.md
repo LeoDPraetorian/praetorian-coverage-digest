@@ -124,34 +124,37 @@
 
 ## Final Quality Metrics
 
-| Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
-| Frontmatter size | <1024 chars | 330 chars | ✅ PASS |
-| Name format | letters-numbers-hyphens | test-infrastructure-discovery | ✅ PASS |
-| Description starts with | "Use when..." | "Use when writing any tests..." | ✅ PASS |
-| Third person | Yes | Yes | ✅ PASS |
-| Baseline test | Required | Complete | ✅ PASS |
-| GREEN test | Required | Complete | ✅ PASS |
-| REFACTOR test | Required | Complete | ✅ PASS |
-| Rationalizations table | Required | Present (5 entries) | ✅ PASS |
-| Stop signals | Required | Present (5 signals) | ✅ PASS |
-| Common mistakes | Required | Present (4 mistakes) | ✅ PASS |
-| Quick reference | Required | Present (table) | ✅ PASS |
+| Metric                  | Target                  | Actual                          | Status  |
+| ----------------------- | ----------------------- | ------------------------------- | ------- |
+| Frontmatter size        | <1024 chars             | 330 chars                       | ✅ PASS |
+| Name format             | letters-numbers-hyphens | test-infrastructure-discovery   | ✅ PASS |
+| Description starts with | "Use when..."           | "Use when writing any tests..." | ✅ PASS |
+| Third person            | Yes                     | Yes                             | ✅ PASS |
+| Baseline test           | Required                | Complete                        | ✅ PASS |
+| GREEN test              | Required                | Complete                        | ✅ PASS |
+| REFACTOR test           | Required                | Complete                        | ✅ PASS |
+| Rationalizations table  | Required                | Present (5 entries)             | ✅ PASS |
+| Stop signals            | Required                | Present (5 signals)             | ✅ PASS |
+| Common mistakes         | Required                | Present (4 mistakes)            | ✅ PASS |
+| Quick reference         | Required                | Present (table)                 | ✅ PASS |
 
 ## Test Results Summary
 
 **RED Phase:**
+
 - Agent did NOT check infrastructure
 - Agent proposed creating MSW setup that exists
 - Agent jumped to solutions
 
 **GREEN Phase:**
+
 - Agent checked all 5 discovery points
 - Agent found existing infrastructure
 - Agent asked for clarification
 - 8/8 behavior metrics improved
 
 **REFACTOR Phase:**
+
 - No new loopholes found
 - Protocol holds under pressure
 - Ready for deployment
@@ -161,6 +164,7 @@
 ## Deployment Decision: ✅ APPROVED
 
 **Skill is production-ready:**
+
 - ✅ Tested with TDD methodology (RED-GREEN-REFACTOR)
 - ✅ Addresses real problem observed in baseline
 - ✅ Changes agent behavior measurably

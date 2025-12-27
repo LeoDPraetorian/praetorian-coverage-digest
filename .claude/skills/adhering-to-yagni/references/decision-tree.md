@@ -143,6 +143,7 @@ Change 4: Refactor the reset logic for clarity
 **Correct Implementation**: Clear search box on reset click (Change 1 only).
 
 **Report to User**:
+
 ```
 Fixed the search box clear bug. The search box now clears when you click reset.
 
@@ -215,6 +216,7 @@ Let me know if you want any of these addressed.
 **Default to asking. Always.**
 
 When in doubt:
+
 1. Implement ONLY what was explicitly requested
 2. Note opportunities you're skipping
 3. Ask if user wants to address those opportunities

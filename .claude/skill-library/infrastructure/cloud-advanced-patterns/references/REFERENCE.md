@@ -28,17 +28,21 @@ This document contains detailed configuration examples and full code samples ext
       "Type": "Task",
       "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ValidateOrder",
       "Next": "ProcessPayment",
-      "Catch": [{
-        "ErrorEquals": ["ValidationError"],
-        "ResultPath": "$.error",
-        "Next": "NotifyValidationFailure"
-      }],
-      "Retry": [{
-        "ErrorEquals": ["States.TaskFailed"],
-        "IntervalSeconds": 2,
-        "MaxAttempts": 3,
-        "BackoffRate": 2.0
-      }]
+      "Catch": [
+        {
+          "ErrorEquals": ["ValidationError"],
+          "ResultPath": "$.error",
+          "Next": "NotifyValidationFailure"
+        }
+      ],
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ]
     },
     "ProcessPayment": {
       "Type": "Task",
@@ -109,11 +113,13 @@ This document contains detailed configuration examples and full code samples ext
         }
       ],
       "Next": "AggregateResults",
-      "Catch": [{
-        "ErrorEquals": ["States.ALL"],
-        "ResultPath": "$.error",
-        "Next": "HandleFailure"
-      }]
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "HandleFailure"
+        }
+      ]
     },
     "AggregateResults": {
       "Type": "Task",
@@ -145,12 +151,14 @@ This document contains detailed configuration examples and full code samples ext
           "ProcessItem": {
             "Type": "Task",
             "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ProcessItem",
-            "Retry": [{
-              "ErrorEquals": ["States.TaskFailed"],
-              "IntervalSeconds": 1,
-              "MaxAttempts": 2,
-              "BackoffRate": 2.0
-            }],
+            "Retry": [
+              {
+                "ErrorEquals": ["States.TaskFailed"],
+                "IntervalSeconds": 1,
+                "MaxAttempts": 2,
+                "BackoffRate": 2.0
+              }
+            ],
             "End": true
           }
         }
@@ -179,32 +187,38 @@ This document contains detailed configuration examples and full code samples ext
       "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ReserveInventory",
       "ResultPath": "$.reservation",
       "Next": "ChargeCustomer",
-      "Catch": [{
-        "ErrorEquals": ["States.ALL"],
-        "ResultPath": "$.error",
-        "Next": "TransactionFailed"
-      }]
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "TransactionFailed"
+        }
+      ]
     },
     "ChargeCustomer": {
       "Type": "Task",
       "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ChargeCustomer",
       "ResultPath": "$.charge",
       "Next": "SendConfirmation",
-      "Catch": [{
-        "ErrorEquals": ["States.ALL"],
-        "ResultPath": "$.error",
-        "Next": "ReleaseInventory"
-      }]
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "ReleaseInventory"
+        }
+      ]
     },
     "SendConfirmation": {
       "Type": "Task",
       "Resource": "arn:aws:lambda:us-east-1:123456789012:function:SendConfirmation",
       "End": true,
-      "Catch": [{
-        "ErrorEquals": ["States.ALL"],
-        "ResultPath": "$.error",
-        "Next": "RefundCustomer"
-      }]
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "RefundCustomer"
+        }
+      ]
     },
     "ReleaseInventory": {
       "Type": "Task",
@@ -229,9 +243,9 @@ This document contains detailed configuration examples and full code samples ext
 **Node.js - AWS SDK v3:**
 
 ```javascript
-import { SFNClient, StartExecutionCommand } from '@aws-sdk/client-sfn';
+import { SFNClient, StartExecutionCommand } from "@aws-sdk/client-sfn";
 
-const client = new SFNClient({ region: 'us-east-1' });
+const client = new SFNClient({ region: "us-east-1" });
 
 async function startWorkflow(orderId, orderData) {
   const command = new StartExecutionCommand({
@@ -240,16 +254,16 @@ async function startWorkflow(orderId, orderData) {
     input: JSON.stringify({
       orderId,
       ...orderData,
-      timestamp: new Date().toISOString()
-    })
+      timestamp: new Date().toISOString(),
+    }),
   });
 
   try {
     const response = await client.send(command);
-    console.log('Execution started:', response.executionArn);
+    console.log("Execution started:", response.executionArn);
     return response;
   } catch (error) {
-    console.error('Failed to start execution:', error);
+    console.error("Failed to start execution:", error);
     throw error;
   }
 }
@@ -300,10 +314,7 @@ def start_workflow(order_id: str, order_data: dict):
   "detail": {
     "userType": ["premium"],
     "region": ["us-east-1", "us-west-2"],
-    "$or": [
-      { "age": [{ "numeric": [">=", 18] }] },
-      { "verified": [true] }
-    ]
+    "$or": [{ "age": [{ "numeric": [">=", 18] }] }, { "verified": [true] }]
   }
 }
 ```
@@ -313,42 +324,42 @@ def start_workflow(order_id: str, order_data: dict):
 **Node.js:**
 
 ```javascript
-import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
+import { EventBridgeClient, PutEventsCommand } from "@aws-sdk/client-eventbridge";
 
-const client = new EventBridgeClient({ region: 'us-east-1' });
+const client = new EventBridgeClient({ region: "us-east-1" });
 
 async function publishEvent(eventType, detailData) {
   const event = {
     Time: new Date(),
-    Source: 'myapp.orders',
+    Source: "myapp.orders",
     DetailType: eventType,
     Detail: JSON.stringify(detailData),
-    EventBusName: 'default'
+    EventBusName: "default",
   };
 
   const command = new PutEventsCommand({
-    Entries: [event]
+    Entries: [event],
   });
 
   try {
     const response = await client.send(command);
     if (response.FailedEntryCount > 0) {
-      console.error('Failed entries:', response.Entries);
-      throw new Error('Event publication failed');
+      console.error("Failed entries:", response.Entries);
+      throw new Error("Event publication failed");
     }
     return response;
   } catch (error) {
-    console.error('EventBridge error:', error);
+    console.error("EventBridge error:", error);
     throw error;
   }
 }
 
 // Usage
-await publishEvent('OrderPlaced', {
-  orderId: '12345',
-  customerId: 'cust-789',
-  amount: 150.00,
-  status: 'pending'
+await publishEvent("OrderPlaced", {
+  orderId: "12345",
+  customerId: "cust-789",
+  amount: 150.0,
+  status: "pending",
 });
 ```
 
@@ -482,10 +493,10 @@ aws lambda publish-layer-version \
 
 ```javascript
 // Lambda function using layer dependencies
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 // Custom utility from layer
-import { formatResponse, validateInput } from '/opt/nodejs/lib/utils';
+import { formatResponse, validateInput } from "/opt/nodejs/lib/utils";
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -500,12 +511,14 @@ export const handler = async (event) => {
       return formatResponse(400, { error: validation.message });
     }
 
-    await docClient.send(new PutCommand({
-      TableName: process.env.TABLE_NAME,
-      Item: data
-    }));
+    await docClient.send(
+      new PutCommand({
+        TableName: process.env.TABLE_NAME,
+        Item: data,
+      })
+    );
 
-    return formatResponse(200, { message: 'Success' });
+    return formatResponse(200, { message: "Success" });
   } catch (error) {
     return formatResponse(500, { error: error.message });
   }
@@ -519,25 +532,25 @@ export const handler = async (event) => {
 ### Custom Authorizer (JWT Token)
 
 ```javascript
-import { verify } from 'jsonwebtoken';
+import { verify } from "jsonwebtoken";
 
 export const handler = async (event) => {
-  const token = event.authorizationToken.replace('Bearer ', '');
+  const token = event.authorizationToken.replace("Bearer ", "");
 
   try {
     const decoded = verify(token, process.env.JWT_SECRET);
 
     // Generate IAM policy
-    const policy = generatePolicy(decoded.sub, 'Allow', event.methodArn, {
+    const policy = generatePolicy(decoded.sub, "Allow", event.methodArn, {
       userId: decoded.sub,
       email: decoded.email,
-      roles: decoded.roles
+      roles: decoded.roles,
     });
 
     return policy;
   } catch (error) {
-    console.error('Authorization failed:', error);
-    throw new Error('Unauthorized');
+    console.error("Authorization failed:", error);
+    throw new Error("Unauthorized");
   }
 };
 
@@ -545,14 +558,16 @@ function generatePolicy(principalId, effect, resource, context = {}) {
   return {
     principalId,
     policyDocument: {
-      Version: '2012-10-17',
-      Statement: [{
-        Action: 'execute-api:Invoke',
-        Effect: effect,
-        Resource: resource
-      }]
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Action: "execute-api:Invoke",
+          Effect: effect,
+          Resource: resource,
+        },
+      ],
     },
-    context // Available as $context.authorizer.* in integration
+    context, // Available as $context.authorizer.* in integration
   };
 }
 ```
@@ -561,36 +576,38 @@ function generatePolicy(principalId, effect, resource, context = {}) {
 
 ```javascript
 export const handler = async (event) => {
-  const apiKey = event.headers['x-api-key'];
+  const apiKey = event.headers["x-api-key"];
   const sourceIp = event.requestContext.identity.sourceIp;
 
   // Validate API key and IP whitelist
   const isValid = await validateApiKey(apiKey, sourceIp);
 
   if (!isValid) {
-    throw new Error('Unauthorized');
+    throw new Error("Unauthorized");
   }
 
   return {
     isAuthorized: true,
     context: {
       apiKeyId: apiKey,
-      sourceIp: sourceIp
-    }
+      sourceIp: sourceIp,
+    },
   };
 };
 
 async function validateApiKey(apiKey, sourceIp) {
-  const { DynamoDBClient } = await import('@aws-sdk/client-dynamodb');
-  const { DynamoDBDocumentClient, GetCommand } = await import('@aws-sdk/lib-dynamodb');
+  const { DynamoDBClient } = await import("@aws-sdk/client-dynamodb");
+  const { DynamoDBDocumentClient, GetCommand } = await import("@aws-sdk/lib-dynamodb");
 
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
 
-  const result = await docClient.send(new GetCommand({
-    TableName: process.env.API_KEYS_TABLE,
-    Key: { apiKey }
-  }));
+  const result = await docClient.send(
+    new GetCommand({
+      TableName: process.env.API_KEYS_TABLE,
+      Key: { apiKey },
+    })
+  );
 
   if (!result.Item || !result.Item.active) {
     return false;
@@ -649,76 +666,86 @@ async function validateApiKey(apiKey, sourceIp) {
 
 ```javascript
 // AWS SDK v3
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, QueryCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 // 1. Get user profile
 async function getUserProfile(userId) {
-  const result = await docClient.send(new GetCommand({
-    TableName: process.env.TABLE_NAME,
-    Key: {
-      PK: `USER#${userId}`,
-      SK: 'PROFILE'
-    }
-  }));
+  const result = await docClient.send(
+    new GetCommand({
+      TableName: process.env.TABLE_NAME,
+      Key: {
+        PK: `USER#${userId}`,
+        SK: "PROFILE",
+      },
+    })
+  );
   return result.Item;
 }
 
 // 2. Get all orders for user
 async function getUserOrders(userId) {
-  const result = await docClient.send(new QueryCommand({
-    TableName: process.env.TABLE_NAME,
-    KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
-    ExpressionAttributeValues: {
-      ':pk': `USER#${userId}`,
-      ':sk': 'ORDER#'
-    }
-  }));
+  const result = await docClient.send(
+    new QueryCommand({
+      TableName: process.env.TABLE_NAME,
+      KeyConditionExpression: "PK = :pk AND begins_with(SK, :sk)",
+      ExpressionAttributeValues: {
+        ":pk": `USER#${userId}`,
+        ":sk": "ORDER#",
+      },
+    })
+  );
   return result.Items;
 }
 
 // 3. Get orders by status (using GSI)
 async function getOrdersByStatus(status) {
-  const result = await docClient.send(new QueryCommand({
-    TableName: process.env.TABLE_NAME,
-    IndexName: 'GSI1',
-    KeyConditionExpression: 'GSI1PK = :status',
-    ExpressionAttributeValues: {
-      ':status': `STATUS#${status}`
-    }
-  }));
+  const result = await docClient.send(
+    new QueryCommand({
+      TableName: process.env.TABLE_NAME,
+      IndexName: "GSI1",
+      KeyConditionExpression: "GSI1PK = :status",
+      ExpressionAttributeValues: {
+        ":status": `STATUS#${status}`,
+      },
+    })
+  );
   return result.Items;
 }
 
 // 4. Get user by email (using GSI)
 async function getUserByEmail(email) {
-  const result = await docClient.send(new QueryCommand({
-    TableName: process.env.TABLE_NAME,
-    IndexName: 'GSI1',
-    KeyConditionExpression: 'GSI1PK = :email',
-    ExpressionAttributeValues: {
-      ':email': `EMAIL#${email}`
-    },
-    Limit: 1
-  }));
+  const result = await docClient.send(
+    new QueryCommand({
+      TableName: process.env.TABLE_NAME,
+      IndexName: "GSI1",
+      KeyConditionExpression: "GSI1PK = :email",
+      ExpressionAttributeValues: {
+        ":email": `EMAIL#${email}`,
+      },
+      Limit: 1,
+    })
+  );
   return result.Items[0];
 }
 
 // 5. Get order with items
 async function getOrderWithItems(orderId) {
-  const result = await docClient.send(new QueryCommand({
-    TableName: process.env.TABLE_NAME,
-    KeyConditionExpression: 'PK = :pk',
-    ExpressionAttributeValues: {
-      ':pk': `ORDER#${orderId}`
-    }
-  }));
+  const result = await docClient.send(
+    new QueryCommand({
+      TableName: process.env.TABLE_NAME,
+      KeyConditionExpression: "PK = :pk",
+      ExpressionAttributeValues: {
+        ":pk": `ORDER#${orderId}`,
+      },
+    })
+  );
 
-  const metadata = result.Items.find(item => item.SK === 'METADATA');
-  const items = result.Items.filter(item => item.SK.startsWith('ITEM#'));
+  const metadata = result.Items.find((item) => item.SK === "METADATA");
+  const items = result.Items.filter((item) => item.SK.startsWith("ITEM#"));
 
   return { metadata, items };
 }
@@ -727,21 +754,21 @@ async function getOrderWithItems(orderId) {
 ### DynamoDB Streams Processing
 
 ```javascript
-import { unmarshall } from '@aws-sdk/util-dynamodb';
+import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 export const handler = async (event) => {
   for (const record of event.Records) {
     const { eventName, dynamodb } = record;
 
-    if (eventName === 'INSERT' || eventName === 'MODIFY') {
+    if (eventName === "INSERT" || eventName === "MODIFY") {
       const newImage = unmarshall(dynamodb.NewImage);
 
-      if (newImage.PK.startsWith('ORDER#')) {
+      if (newImage.PK.startsWith("ORDER#")) {
         await processOrderChange(newImage, eventName);
-      } else if (newImage.PK.startsWith('USER#')) {
+      } else if (newImage.PK.startsWith("USER#")) {
         await processUserChange(newImage, eventName);
       }
-    } else if (eventName === 'REMOVE') {
+    } else if (eventName === "REMOVE") {
       const oldImage = unmarshall(dynamodb.OldImage);
       await processDelete(oldImage);
     }
@@ -749,7 +776,7 @@ export const handler = async (event) => {
 };
 
 async function processOrderChange(order, eventName) {
-  if (order.SK === 'METADATA' && order.status === 'completed') {
+  if (order.SK === "METADATA" && order.status === "completed") {
     await sendOrderCompletionEmail(order);
     await updateAnalytics(order);
   }
@@ -759,8 +786,8 @@ async function processOrderChange(order, eventName) {
 ### DynamoDB Transactions
 
 ```javascript
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, TransactWriteCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, TransactWriteCommand } from "@aws-sdk/lib-dynamodb";
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -771,46 +798,46 @@ async function transferFunds(fromUserId, toUserId, amount) {
       {
         Update: {
           TableName: process.env.TABLE_NAME,
-          Key: { PK: `USER#${fromUserId}`, SK: 'BALANCE' },
-          UpdateExpression: 'SET balance = balance - :amount',
-          ConditionExpression: 'balance >= :amount',
+          Key: { PK: `USER#${fromUserId}`, SK: "BALANCE" },
+          UpdateExpression: "SET balance = balance - :amount",
+          ConditionExpression: "balance >= :amount",
           ExpressionAttributeValues: {
-            ':amount': amount
-          }
-        }
+            ":amount": amount,
+          },
+        },
       },
       {
         Update: {
           TableName: process.env.TABLE_NAME,
-          Key: { PK: `USER#${toUserId}`, SK: 'BALANCE' },
-          UpdateExpression: 'SET balance = balance + :amount',
+          Key: { PK: `USER#${toUserId}`, SK: "BALANCE" },
+          UpdateExpression: "SET balance = balance + :amount",
           ExpressionAttributeValues: {
-            ':amount': amount
-          }
-        }
+            ":amount": amount,
+          },
+        },
       },
       {
         Put: {
           TableName: process.env.TABLE_NAME,
           Item: {
             PK: `TRANSACTION#${Date.now()}`,
-            SK: 'METADATA',
+            SK: "METADATA",
             from: fromUserId,
             to: toUserId,
             amount: amount,
-            timestamp: new Date().toISOString()
-          }
-        }
-      }
-    ]
+            timestamp: new Date().toISOString(),
+          },
+        },
+      },
+    ],
   });
 
   try {
     await docClient.send(command);
     return { success: true };
   } catch (error) {
-    if (error.name === 'TransactionCanceledException') {
-      console.error('Transaction cancelled:', error.CancellationReasons);
+    if (error.name === "TransactionCanceledException") {
+      console.error("Transaction cancelled:", error.CancellationReasons);
     }
     throw error;
   }
@@ -824,9 +851,9 @@ async function transferFunds(fromUserId, toUserId, amount) {
 ### FIFO Queue Implementation
 
 ```javascript
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
-const client = new SQSClient({ region: 'us-east-1' });
+const client = new SQSClient({ region: "us-east-1" });
 
 async function sendMessage(orderId, orderData) {
   const command = new SendMessageCommand({
@@ -836,22 +863,22 @@ async function sendMessage(orderId, orderData) {
     MessageDeduplicationId: `${orderId}-${Date.now()}`,
     MessageAttributes: {
       OrderType: {
-        DataType: 'String',
-        StringValue: orderData.type
+        DataType: "String",
+        StringValue: orderData.type,
       },
       Priority: {
-        DataType: 'Number',
-        StringValue: String(orderData.priority)
-      }
-    }
+        DataType: "Number",
+        StringValue: String(orderData.priority),
+      },
+    },
   });
 
   try {
     const response = await client.send(command);
-    console.log('Message sent:', response.MessageId);
+    console.log("Message sent:", response.MessageId);
     return response;
   } catch (error) {
-    console.error('Failed to send message:', error);
+    console.error("Failed to send message:", error);
     throw error;
   }
 }
@@ -923,9 +950,9 @@ def publish_order_event(event_type: str, order_data: dict):
 ### Dead-Letter Queue Consumer
 
 ```javascript
-import { SQSClient, DeleteMessageCommand } from '@aws-sdk/client-sqs';
+import { SQSClient, DeleteMessageCommand } from "@aws-sdk/client-sqs";
 
-const client = new SQSClient({ region: 'us-east-1' });
+const client = new SQSClient({ region: "us-east-1" });
 
 export const handler = async (event) => {
   for (const record of event.Records) {
@@ -933,13 +960,14 @@ export const handler = async (event) => {
       const message = JSON.parse(record.body);
       await processMessage(message);
 
-      await client.send(new DeleteMessageCommand({
-        QueueUrl: process.env.QUEUE_URL,
-        ReceiptHandle: record.receiptHandle
-      }));
-
+      await client.send(
+        new DeleteMessageCommand({
+          QueueUrl: process.env.QUEUE_URL,
+          ReceiptHandle: record.receiptHandle,
+        })
+      );
     } catch (error) {
-      console.error('Processing failed:', error);
+      console.error("Processing failed:", error);
       throw error;
     }
   }
@@ -948,7 +976,7 @@ export const handler = async (event) => {
 async function processMessage(message) {
   const alreadyProcessed = await checkProcessingStatus(message.id);
   if (alreadyProcessed) {
-    console.log('Message already processed:', message.id);
+    console.log("Message already processed:", message.id);
     return;
   }
 
@@ -1021,9 +1049,9 @@ OrdersBucket:
 ### X-Ray Distributed Tracing
 
 ```javascript
-import AWSXRay from 'aws-xray-sdk-core';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
+import AWSXRay from "aws-xray-sdk-core";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 
 // Instrument AWS SDK
 const client = AWSXRay.captureAWSv3Client(new DynamoDBClient({}));
@@ -1031,12 +1059,12 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 export const handler = async (event) => {
   const segment = AWSXRay.getSegment();
-  const subsegment = segment.addNewSubsegment('processOrder');
+  const subsegment = segment.addNewSubsegment("processOrder");
 
   try {
-    subsegment.addAnnotation('orderId', event.orderId);
-    subsegment.addAnnotation('customerId', event.customerId);
-    subsegment.addMetadata('orderDetails', event);
+    subsegment.addAnnotation("orderId", event.orderId);
+    subsegment.addAnnotation("customerId", event.customerId);
+    subsegment.addMetadata("orderDetails", event);
 
     const order = await getOrder(event.orderId);
     const processed = await processOrder(order);
@@ -1061,42 +1089,50 @@ export const handler = async (event) => {
     await processOrder(event);
 
     // Emit custom metrics using EMF
-    console.log(JSON.stringify({
-      _aws: {
-        Timestamp: Date.now(),
-        CloudWatchMetrics: [{
-          Namespace: 'OrderProcessing',
-          Dimensions: [['Environment', 'Service']],
-          Metrics: [
-            { Name: 'ProcessingTime', Unit: 'Milliseconds' },
-            { Name: 'OrdersProcessed', Unit: 'Count' }
-          ]
-        }]
-      },
-      Environment: process.env.ENVIRONMENT,
-      Service: 'OrderProcessor',
-      ProcessingTime: Date.now() - startTime,
-      OrdersProcessed: 1,
-      OrderId: event.orderId,
-      CustomerId: event.customerId
-    }));
+    console.log(
+      JSON.stringify({
+        _aws: {
+          Timestamp: Date.now(),
+          CloudWatchMetrics: [
+            {
+              Namespace: "OrderProcessing",
+              Dimensions: [["Environment", "Service"]],
+              Metrics: [
+                { Name: "ProcessingTime", Unit: "Milliseconds" },
+                { Name: "OrdersProcessed", Unit: "Count" },
+              ],
+            },
+          ],
+        },
+        Environment: process.env.ENVIRONMENT,
+        Service: "OrderProcessor",
+        ProcessingTime: Date.now() - startTime,
+        OrdersProcessed: 1,
+        OrderId: event.orderId,
+        CustomerId: event.customerId,
+      })
+    );
 
     return { statusCode: 200 };
   } catch (error) {
-    console.log(JSON.stringify({
-      _aws: {
-        Timestamp: Date.now(),
-        CloudWatchMetrics: [{
-          Namespace: 'OrderProcessing',
-          Dimensions: [['Environment', 'Service']],
-          Metrics: [{ Name: 'Errors', Unit: 'Count' }]
-        }]
-      },
-      Environment: process.env.ENVIRONMENT,
-      Service: 'OrderProcessor',
-      Errors: 1,
-      ErrorType: error.name
-    }));
+    console.log(
+      JSON.stringify({
+        _aws: {
+          Timestamp: Date.now(),
+          CloudWatchMetrics: [
+            {
+              Namespace: "OrderProcessing",
+              Dimensions: [["Environment", "Service"]],
+              Metrics: [{ Name: "Errors", Unit: "Count" }],
+            },
+          ],
+        },
+        Environment: process.env.ENVIRONMENT,
+        Service: "OrderProcessor",
+        Errors: 1,
+        ErrorType: error.name,
+      })
+    );
 
     throw error;
   }
@@ -1119,47 +1155,47 @@ class Logger {
       requestId: this.context.requestId,
       functionName: this.context.functionName,
       functionVersion: this.context.functionVersion,
-      ...metadata
+      ...metadata,
     };
 
     console.log(JSON.stringify(logEntry));
   }
 
   info(message, metadata) {
-    this.log('INFO', message, metadata);
+    this.log("INFO", message, metadata);
   }
 
   error(message, error, metadata) {
-    this.log('ERROR', message, {
+    this.log("ERROR", message, {
       error: {
         name: error.name,
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
       },
-      ...metadata
+      ...metadata,
     });
   }
 
   warn(message, metadata) {
-    this.log('WARN', message, metadata);
+    this.log("WARN", message, metadata);
   }
 }
 
 export const handler = async (event, context) => {
   const logger = new Logger(context);
 
-  logger.info('Processing started', {
+  logger.info("Processing started", {
     orderId: event.orderId,
-    customerId: event.customerId
+    customerId: event.customerId,
   });
 
   try {
     const result = await processOrder(event);
-    logger.info('Processing completed', { result });
+    logger.info("Processing completed", { result });
     return result;
   } catch (error) {
-    logger.error('Processing failed', error, {
-      orderId: event.orderId
+    logger.error("Processing failed", error, {
+      orderId: event.orderId,
     });
     throw error;
   }

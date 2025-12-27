@@ -1,232 +1,124 @@
 # Agent Update Workflow
 
-> **⚠️ DEPRECATION NOTICE (December 2024)**
->
-> **This workflow documents ARCHIVED CLI commands (`npm run update`).**
->
-> **For agent updates, use the instruction-based skill instead:**
-> ```
-> skill: "updating-agents"
-> ```
->
-> **Why the change?** Analysis showed Edit tool + instructions achieve the same result as TypeScript code with more flexibility. The instruction-based workflow provides:
-> - Simplified 6-phase TDD (RED-GREEN with optional REFACTOR)
-> - Minimal diff approach using Edit tool
-> - Conditional pressure testing for major changes
-> - Fast iteration (~20 min for minor updates)
->
-> **See:** `.claude/skills/updating-agents/SKILL.md` for the current workflow
->
-> ---
->
-> **The content below is kept for historical reference only.**
+**Instruction-based workflow with simplified 6-phase TDD cycle.**
 
-## Overview (ARCHIVED)
+⚠️ **As of December 2024, agent updates use instruction-based workflow, not CLI commands.**
 
-Updating an agent follows a TDD workflow to ensure changes don't break existing functionality:
-1. **RED**: Document current state and desired changes
-2. **GREEN**: Apply minimal changes
-3. **REFACTOR**: Re-audit and verify
+---
 
-## Quick Start
+## Overview
 
-```bash
-# Update with change description
-npm run --silent update -- react-developer "Add support for React 19 features"
+Updating an existing agent follows a simplified TDD workflow (RED-GREEN with conditional REFACTOR). This balances speed for minor updates with rigor for major changes.
 
-# Get improvement suggestions
-npm run --silent update -- react-developer --suggest
+## How to Update an Agent
 
-# Create backup before changes
-npm run --silent update -- react-developer "Major refactoring" --backup
+**Route to the updating-agents skill:**
+
+```
+Read: .claude/skill-library/claude/agent-management/updating-agents/SKILL.md
 ```
 
-## Command Reference
+The `updating-agents` skill provides the complete workflow.
 
-```bash
-npm run --silent update -- <name> "<changes>"
-npm run --silent update -- <name> --suggest
-npm run --silent update -- <name> "<changes>" --backup
-```
+---
 
-### Parameters
+## What the Workflow Provides
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `name` | Yes | Agent name to update |
-| `changes` | Yes (unless --suggest) | Description of changes |
-| `--suggest` | No | Show audit-based suggestions |
-| `--backup` | No | Create backup before changes |
+### Simplified 6-Phase TDD Workflow
 
-## TDD Workflow
+The updating-agents skill implements a streamlined RED-GREEN-REFACTOR:
 
-### Phase 1: RED - Document Current State
+1. **Phase 1:** Gap Analysis (RED)
+2. **Phase 2:** Minimal Changes (GREEN)
+3. **Phase 3:** Audit Compliance
+4. **Phase 4:** Discovery Testing
+5. **Phase 5:** Verify No Regressions
+6. **Phase 6:** Pressure Testing (CONDITIONAL)
 
-The update command shows:
-- Current line count
-- Description status
-- Gateway skill presence
-- Output format presence
-- Escalation protocol presence
+### Key Features
 
-```bash
-npm run --silent update -- react-developer "Add support for new patterns"
+- **Minimal diff approach** - Uses Edit tool for surgical changes
+- **Conditional pressure testing** - Only required for major changes (Phase 6)
+- **Fast iteration** - Minor updates complete in ~20 minutes
+- **TDD enforcement** - RED phase still required, but simpler than creation
 
-# Output:
-# ═══ TDD Phase: RED ═══
-# Current agent state:
-#   Lines: 336
-#   Description Status: valid
-#   Has Gateway Skill: ✅
-#   Has Output Format: ✅
-#   Has Escalation: ✅
-#
-# Requested changes: Add support for new patterns
-```
+---
 
-### Phase 2: GREEN - Apply Minimal Changes
+## When to Pressure Test (Phase 6)
 
-1. Open the agent file
-2. Make the requested changes
-3. Keep changes minimal and focused
+Pressure testing is **conditional** based on change scope:
 
-**Key principle**: Only change what's necessary. Don't refactor unrelated code.
+### ✅ Pressure Test Required
 
-### Phase 3: REFACTOR - Re-audit and Verify
+- **Changed Critical Rules** - Rules might not resist rationalization
+- **Added/removed capabilities** - Agent behavior changes significantly
+- **Modified mandatory skills** - Workflow requirements changed
+- **Major refactoring** - >50 lines changed or significant restructure
 
-```bash
-# Run audit after changes
-npm run --silent audit -- react-developer
+### ⏭️ Pressure Test Optional
 
-# Test discovery
-npm run --silent test -- react-developer
-```
+- **Description refinements** - Wording improvements, example updates
+- **Tool additions** - Added new tools to frontmatter
+- **Minor fixes** - Typos, formatting, documentation
+- **Small optimizations** - <20 lines changed
 
-## Improvement Suggestions
+---
 
-Use `--suggest` to see audit-based improvements:
+## Time Estimates
 
-```bash
-npm run --silent update -- react-developer --suggest
+| Update Type                        | Time      | Phases                                    |
+| ---------------------------------- | --------- | ----------------------------------------- |
+| **Minor** (description, tools)     | 20 min    | Phases 1-5 only                           |
+| **Moderate** (add capability)      | 40 min    | Phases 1-6 (pressure test)                |
+| **Major** (refactor, rules change) | 60-90 min | Phases 1-6 (multiple pressure iterations) |
 
-# Output:
-# ═══ Suggested Improvements ═══
-# Found 6 potential improvements:
-#
-# Phase 3: Prompt Efficiency
-#   [MANUAL] phase3-trim: Extract patterns to skills
-#     → Agent is 336 lines (target: <300)
-#
-# Phase 4: Skill Integration
-#   [AUTO] phase4-gateway: Add gateway-frontend to skills
-```
+---
 
-## Backup Strategy
+## Comparison: Update vs Create
 
-For significant changes, use `--backup`:
+| Aspect                 | Create                             | Update                       |
+| ---------------------- | ---------------------------------- | ---------------------------- |
+| **Phases**             | 10 phases                          | 6 phases                     |
+| **RED Phase**          | Comprehensive gap analysis         | Focused gap documentation    |
+| **Skill Verification** | Phase 8 (individual skill testing) | Skipped (assume working)     |
+| **Pressure Testing**   | Phase 10 (always)                  | Phase 6 (conditional)        |
+| **Time**               | 60-90 min minimum                  | 20-90 min (depends on scope) |
 
-```bash
-npm run --silent update -- react-developer "Major restructuring" --backup
+**Rationale:** Updates assume agent is already functional and just needs refinement, so some verification phases can be skipped or made conditional.
 
-# Creates: react-developer.backup-1234567890.md
-```
+---
 
-Backups are stored alongside the original file.
+## Why Instruction-Based?
 
-## Common Update Scenarios
+Same rationale as agent creation:
 
-### Adding a New Responsibility
+- **97% code duplication** with Claude's native capabilities (CLI version)
+- **Flexibility** for conditional workflows (pressure testing based on change scope)
+- **Edit tool precision** - Minimal diffs for targeted changes
+- **AskUserQuestion** - Interactive decision on whether pressure testing is needed
 
-1. Document what gap exists
-2. Add to Core Responsibilities section
-3. Add relevant skill reference
-4. Update escalation if needed
-5. Re-audit
+---
 
-### Reducing Line Count
+## Prerequisites
 
-1. Use `npm run --silent update -- <name> --suggest`
-2. Identify embedded patterns
-3. Move patterns to skill files
-4. Replace with skill references
-5. Re-audit to verify <300 lines
+None - the updating-agents skill handles all setup internally.
 
-### Fixing Block Scalar
+---
 
-```bash
-# Identify the issue
-npm run --silent test -- <name>
+## Documentation
 
-# Fix automatically
-npm run --silent fix -- <name> --apply phase1-description
-```
+**Full workflow details:**
+`.claude/skill-library/claude/agent-management/updating-agents/SKILL.md`
 
-### Adding Gateway Skill
+**Related references:**
 
-```bash
-# Fix automatically
-npm run --silent fix -- <name> --apply phase4-gateway
+- [TDD Workflow](tdd-workflow.md) - RED-GREEN-REFACTOR methodology
+- [Lean Agent Pattern](lean-agent-pattern.md) - Target structure
+- [Discovery Testing](discovery-testing.md) - Verification protocol
+- [Create Workflow](create-workflow.md) - Full creation process for comparison
 
-# Or manually add to frontmatter:
-# skills: gateway-frontend
-```
+---
 
-### Updating Description
+## Historical Note: CLI Workflow (ARCHIVED)
 
-1. Keep single-line format
-2. Start with "Use when"
-3. Include capabilities
-4. Add examples with `\n\n<example>...\n</example>`
-
-## Update Checklist
-
-Before completing an update:
-
-- [ ] Changes are minimal and focused
-- [ ] No regressions introduced
-- [ ] Line count still within limits
-- [ ] `npm run --silent audit -- <name>` passes
-- [ ] `npm run --silent test -- <name>` passes
-- [ ] Discovery works in new session
-
-## Example: Updating an Agent
-
-```bash
-# 1. Check current state
-npm run --silent update -- react-developer --suggest
-
-# 2. Document changes
-npm run --silent update -- react-developer "Add React 19 concurrent features support"
-
-# 3. Open file and make changes (manual step)
-# - Add concurrent features to responsibilities
-# - Add skill reference for react-19-patterns
-# - Update escalation for React 19 edge cases
-
-# 4. Re-audit
-npm run --silent audit -- react-developer
-
-# 5. Test
-npm run --silent test -- react-developer
-
-# 6. Verify in new session
-```
-
-## Handling Warnings vs Errors
-
-**Errors** (must fix):
-- Block scalar in description
-- Line count > 400
-- Missing required fields
-
-**Warnings** (should fix):
-- Line count > 250
-- No gateway skill
-- Missing examples
-- No output format
-
-## References
-
-- [Fix Workflow](./fix-workflow.md)
-- [Audit Phases](./audit-phases.md)
-- [Lean Agent Template](./lean-agent-template.md)
+The previous TypeScript CLI workflow (`npm run update --`) was deprecated in December 2024 for the same reasons as the create workflow: code duplication, inflexibility, and inability to support conditional logic.

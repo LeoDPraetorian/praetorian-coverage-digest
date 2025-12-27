@@ -4,11 +4,11 @@ TypeScript wrappers for chrome-devtools MCP tools with progressive loading to re
 
 ## Token Savings
 
-| Metric | Value |
-|--------|-------|
+| Metric                   | Value                                |
+| ------------------------ | ------------------------------------ |
 | **Original Token Usage** | 7,800 tokens (26 tools × 300 tokens) |
-| **With Wrappers** | 1,560 tokens (26 tools × 60 tokens) |
-| **Reduction** | 6,240 tokens (80% savings) |
+| **With Wrappers**        | 1,560 tokens (26 tools × 60 tokens)  |
+| **Reduction**            | 6,240 tokens (80% savings)           |
 
 ## Architecture
 
@@ -17,6 +17,7 @@ TypeScript wrappers for chrome-devtools MCP tools with progressive loading to re
 The 26 chrome-devtools MCP tools are organized into 6 logical categories:
 
 #### 1. Page Management (5 tools)
+
 - `navigate-page` - Navigate to a URL
 - `new-page` - Create a new browser page
 - `close-page` - Close a page
@@ -24,6 +25,7 @@ The 26 chrome-devtools MCP tools are organized into 6 logical categories:
 - `select-page` - Select the active page
 
 #### 2. User Interactions (7 tools)
+
 - `click` - Click an element
 - `fill` - Fill an input field
 - `fill-form` - Fill multiple form fields
@@ -33,23 +35,27 @@ The 26 chrome-devtools MCP tools are organized into 6 logical categories:
 - `upload-file` - Upload files
 
 #### 3. Browser Control (4 tools)
+
 - `emulate` - Emulate devices/networks
 - `resize-page` - Resize viewport
 - `handle-dialog` - Handle JS dialogs
 - `wait-for` - Wait for conditions
 
 #### 4. Data Extraction (3 tools)
+
 - `evaluate-script` - Execute JavaScript (filtered output)
 - `take-screenshot` - Capture screenshots (no base64)
 - `take-snapshot` - Save page snapshots (metadata only)
 
 #### 5. Debugging (4 tools)
+
 - `get-console-message` - Get specific console message
 - `list-console-messages` - List console messages (filtered)
 - `get-network-request` - Get specific network request
 - `list-network-requests` - List network requests (filtered)
 
 #### 6. Performance (3 tools)
+
 - `performance-start-trace` - Start performance tracing
 - `performance-stop-trace` - Stop and save trace (metadata only)
 - `performance-analyze-insight` - Analyze trace (actionable insights only)
@@ -59,25 +65,25 @@ The 26 chrome-devtools MCP tools are organized into 6 logical categories:
 ### Basic Usage
 
 ```typescript
-import { chromeDevTools } from './.claude/tools/chrome-devtools';
+import { chromeDevTools } from "./.claude/tools/chrome-devtools";
 
 // Navigate to a page
 const result = await chromeDevTools.page.navigate.execute({
-  pageId: 'abc-123',
-  url: 'https://example.com'
+  pageId: "abc-123",
+  url: "https://example.com",
 });
 
 // Click an element
 await chromeDevTools.interact.click.execute({
-  pageId: 'abc-123',
-  selector: 'button.submit'
+  pageId: "abc-123",
+  selector: "button.submit",
 });
 
 // List console messages (filtered)
 const messages = await chromeDevTools.debug.console.list.execute({
-  pageId: 'abc-123',
-  types: ['error', 'warning'],
-  limit: 20
+  pageId: "abc-123",
+  types: ["error", "warning"],
+  limit: 20,
 });
 ```
 
@@ -112,17 +118,18 @@ await chromeDevTools.performance.analyzeInsight.execute({ ... });
 ### Direct Tool Import
 
 ```typescript
-import { navigatePage, click, listConsoleMessages } from './.claude/tools/chrome-devtools';
+import { navigatePage, click, listConsoleMessages } from "./.claude/tools/chrome-devtools";
 
 // Use specific tools directly
-await navigatePage.execute({ pageId: 'abc', url: 'https://example.com' });
-await click.execute({ pageId: 'abc', selector: 'button' });
-const messages = await listConsoleMessages.execute({ pageId: 'abc' });
+await navigatePage.execute({ pageId: "abc", url: "https://example.com" });
+await click.execute({ pageId: "abc", selector: "button" });
+const messages = await listConsoleMessages.execute({ pageId: "abc" });
 ```
 
 ## Filtering Strategies
 
 ### 1. List Operations
+
 - **Default limit**: 50 items
 - **Configurable**: Up to 100 items max
 - **Token savings**: ~70% (returns metadata, not full content)
@@ -131,13 +138,14 @@ const messages = await listConsoleMessages.execute({ pageId: 'abc' });
 // Before: Returns all 500+ console messages (15,000+ tokens)
 // After: Returns top 50 with filters (500 tokens)
 await listConsoleMessages.execute({
-  pageId: 'abc',
-  types: ['error', 'warning'],
-  limit: 20
+  pageId: "abc",
+  types: ["error", "warning"],
+  limit: 20,
 });
 ```
 
 ### 2. Binary Data Exclusion
+
 - **Screenshots**: Return file path, not base64 data
 - **Snapshots**: Return metadata, not full HTML/MHTML
 - **Token savings**: ~95% (5000+ tokens → 200 tokens)
@@ -146,13 +154,14 @@ await listConsoleMessages.execute({
 // Before: Returns base64-encoded image (5000+ tokens)
 // After: Returns file path and metadata (150 tokens)
 const screenshot = await takeScreenshot.execute({
-  pageId: 'abc',
-  path: '/tmp/screenshot.png'
+  pageId: "abc",
+  path: "/tmp/screenshot.png",
 });
 // screenshot.path contains the file location
 ```
 
 ### 3. Summary-Only Responses
+
 - **Performance traces**: Return insights, not raw data
 - **Network requests**: Return metrics, not full payloads
 - **Token savings**: ~90% (10,000+ tokens → 1,000 tokens)
@@ -161,14 +170,15 @@ const screenshot = await takeScreenshot.execute({
 // Before: Full trace data (10,000+ tokens)
 // After: Actionable insights only (1,000 tokens)
 const analysis = await performanceAnalyzeInsight.execute({
-  pageId: 'abc',
-  traceId: 'xyz',
-  focus: ['load-time', 'javascript-execution']
+  pageId: "abc",
+  traceId: "xyz",
+  focus: ["load-time", "javascript-execution"],
 });
 // Returns: summary metrics + top issues + recommendations
 ```
 
 ### 4. Content Truncation
+
 - **JavaScript evaluation**: Truncate results >5000 chars
 - **Console messages**: Limit message text length
 - **Token savings**: ~60% (variable based on content)
@@ -176,8 +186,8 @@ const analysis = await performanceAnalyzeInsight.execute({
 ```typescript
 // Large results are automatically truncated
 const result = await evaluateScript.execute({
-  pageId: 'abc',
-  script: 'document.querySelector("body").innerHTML'
+  pageId: "abc",
+  script: 'document.querySelector("body").innerHTML',
 });
 // result.truncated === true if content was truncated
 // result.estimatedTokens shows approximate size
@@ -186,17 +196,20 @@ const result = await evaluateScript.execute({
 ## Security Features
 
 ### Input Validation (Zod)
+
 - All inputs validated against strict schemas
 - Type-safe with TypeScript inference
 - Automatic error messages for invalid inputs
 
 ### Security Checks
+
 - **URL validation**: Blocks file://, javascript:, data: protocols
 - **Selector sanitization**: XSS pattern detection
 - **Path validation**: Directory traversal prevention
 - **Script validation**: Warning for dangerous patterns
 
 ### Error Handling
+
 - Typed error classes with context
 - Automatic error wrapping with operation name
 - Detailed error messages for debugging
@@ -210,15 +223,15 @@ import type {
   NavigatePageInput,
   NavigatePageOutput,
   ClickInput,
-  ListConsoleMessagesOutput
-} from './.claude/tools/chrome-devtools';
+  ListConsoleMessagesOutput,
+} from "./.claude/tools/chrome-devtools";
 
 // Type-safe function signatures
 async function myTest(pageId: string): Promise<void> {
   const input: NavigatePageInput = {
     pageId,
-    url: 'https://example.com',
-    waitUntil: 'load'
+    url: "https://example.com",
+    waitUntil: "load",
   };
 
   const result: NavigatePageOutput = await navigatePage.execute(input);
@@ -305,46 +318,48 @@ chrome-devtools/
 
 ## Token Savings Breakdown
 
-| Tool | Original | With Wrapper | Savings |
-|------|----------|--------------|---------|
-| list-pages | 500 | 100 | 80% |
-| list-console-messages | 1000 | 200 | 80% |
-| list-network-requests | 1500 | 300 | 80% |
-| take-screenshot | 5000 | 200 | 96% |
-| take-snapshot | 8000 | 200 | 97% |
-| evaluate-script | 3000 | 500 | 83% |
-| performance-stop-trace | 10000 | 500 | 95% |
-| performance-analyze-insight | 8000 | 1000 | 87% |
-| Other tools (18) | 300 each | 60 each | 80% |
+| Tool                        | Original | With Wrapper | Savings |
+| --------------------------- | -------- | ------------ | ------- |
+| list-pages                  | 500      | 100          | 80%     |
+| list-console-messages       | 1000     | 200          | 80%     |
+| list-network-requests       | 1500     | 300          | 80%     |
+| take-screenshot             | 5000     | 200          | 96%     |
+| take-snapshot               | 8000     | 200          | 97%     |
+| evaluate-script             | 3000     | 500          | 83%     |
+| performance-stop-trace      | 10000    | 500          | 95%     |
+| performance-analyze-insight | 8000     | 1000         | 87%     |
+| Other tools (18)            | 300 each | 60 each      | 80%     |
 
 **Total Savings**: 6,240 tokens (80% reduction)
 
 ## Best Practices
 
 ### 1. Use Filtering Options
+
 Always specify filters to reduce token usage:
 
 ```typescript
 // Good: Filtered request
 await listConsoleMessages.execute({
-  pageId: 'abc',
-  types: ['error'],
-  limit: 10
+  pageId: "abc",
+  types: ["error"],
+  limit: 10,
 });
 
 // Avoid: Unfiltered (returns more than needed)
-await listConsoleMessages.execute({ pageId: 'abc' });
+await listConsoleMessages.execute({ pageId: "abc" });
 ```
 
 ### 2. Use Summary Tools
+
 For performance analysis, use insights instead of raw traces:
 
 ```typescript
 // Good: Actionable insights (1000 tokens)
 await performanceAnalyzeInsight.execute({
-  pageId: 'abc',
-  traceId: 'xyz',
-  focus: ['load-time']
+  pageId: "abc",
+  traceId: "xyz",
+  focus: ["load-time"],
 });
 
 // Avoid: Raw trace data (10000+ tokens)
@@ -352,27 +367,29 @@ await performanceAnalyzeInsight.execute({
 ```
 
 ### 3. Use File Paths for Binary Data
+
 For screenshots and snapshots, use file paths:
 
 ```typescript
 // Good: Save to file (200 tokens)
 await takeScreenshot.execute({
-  pageId: 'abc',
-  path: '/tmp/screenshot.png'
+  pageId: "abc",
+  path: "/tmp/screenshot.png",
 });
 
 // Avoid: Requesting base64 in response (5000+ tokens)
 ```
 
 ### 4. Limit List Results
+
 Always set appropriate limits:
 
 ```typescript
 // Good: Limited results
 await listNetworkRequests.execute({
-  pageId: 'abc',
+  pageId: "abc",
   limit: 20,
-  filter: { statusCodes: [500, 503] }
+  filter: { statusCodes: [500, 503] },
 });
 
 // Avoid: No limit (returns 100+ requests)

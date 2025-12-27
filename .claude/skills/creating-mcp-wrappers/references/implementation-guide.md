@@ -24,6 +24,7 @@ cat .claude/tools/{service}/docs/{tool}-discovery.md
 ```
 
 Extract:
+
 - Required vs optional input fields
 - Output fields to include vs exclude
 - Token reduction target (e.g., 80%)
@@ -36,25 +37,25 @@ Extract:
 Based on discovery docs, define Zod schema:
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 const InputSchema = z.object({
   // Required fields (from discovery)
-  issueId: z.string()
-    .min(1)
-    .describe('Linear issue ID (e.g., ENG-1234)'),
+  issueId: z.string().min(1).describe("Linear issue ID (e.g., ENG-1234)"),
 
   // Optional fields (from discovery)
-  includeComments: z.boolean()
+  includeComments: z
+    .boolean()
     .optional()
     .default(false)
-    .describe('Whether to include comments in response'),
+    .describe("Whether to include comments in response"),
 });
 
 type Input = z.infer<typeof InputSchema>;
 ```
 
 **Validation rules**:
+
 - `.min(1)` for non-empty strings
 - `.optional()` for fields not always provided
 - `.default(value)` for optional fields with defaults
@@ -78,11 +79,13 @@ interface FilteredResult {
 ```
 
 **Include only**:
+
 - Fields agents need (id, title, status)
 - As defined in discovery doc's "Fields to Include" section
 
 **Exclude**:
-- Verbose fields (metadata, history, _internal)
+
+- Verbose fields (metadata, history, \_internal)
 - As defined in discovery doc's "Fields to Exclude" section
 
 ---
@@ -90,24 +93,24 @@ interface FilteredResult {
 ## Step 4: Implement execute() Function
 
 ```typescript
-import { callMCPTool } from '../config/lib/mcp-client.js';
+import { callMCPTool } from "../config/lib/mcp-client.js";
 
 async function execute(input: unknown): Promise<FilteredResult> {
   // 1. Validate input
   const validated = InputSchema.parse(input);
 
   // 2. Call MCP (map input to MCP parameters)
-  const raw = await callMCPTool('{service}', '{tool}', {
+  const raw = await callMCPTool("{service}", "{tool}", {
     // Map wrapper params to MCP params (from discovery)
     issue_id: validated.issueId,
-    expand: validated.includeComments ? ['comments'] : []
+    expand: validated.includeComments ? ["comments"] : [],
   });
 
   // 3. Filter response (token reduction)
   return {
     id: raw.id,
     title: raw.title,
-    status: raw.state?.name ?? 'Unknown',
+    status: raw.state?.name ?? "Unknown",
     priority: raw.priority ?? 4,
     assignee: raw.assignee?.name, // Optional chaining
   };
@@ -115,6 +118,7 @@ async function execute(input: unknown): Promise<FilteredResult> {
 ```
 
 **Key patterns**:
+
 - Validate with `InputSchema.parse()`
 - Map wrapper params to MCP params (may differ)
 - Use optional chaining (`?.`) for nested optional fields
@@ -128,7 +132,7 @@ async function execute(input: unknown): Promise<FilteredResult> {
 async function execute(input: unknown): Promise<FilteredResult> {
   try {
     const validated = InputSchema.parse(input);
-    const raw = await callMCPTool('{service}', '{tool}', {
+    const raw = await callMCPTool("{service}", "{tool}", {
       issue_id: validated.issueId,
     });
     return filterResult(raw);
@@ -137,10 +141,10 @@ async function execute(input: unknown): Promise<FilteredResult> {
       throw new Error(`Invalid input: ${error.message}`);
     }
     if (error instanceof TimeoutError) {
-      throw new Error('MCP request timed out after 30s');
+      throw new Error("MCP request timed out after 30s");
     }
     if (error instanceof ConnectionError) {
-      throw new Error('Failed to connect to MCP server');
+      throw new Error("Failed to connect to MCP server");
     }
     // Re-throw unknown errors
     throw error;
@@ -149,6 +153,7 @@ async function execute(input: unknown): Promise<FilteredResult> {
 ```
 
 **Handle**:
+
 - Zod validation errors (invalid input)
 - Timeout errors (slow MCP)
 - Connection errors (MCP unavailable)
@@ -159,9 +164,9 @@ async function execute(input: unknown): Promise<FilteredResult> {
 ## Step 6: Export Tool Definition
 
 ```typescript
-export const {toolCamel} = {
-  name: '{service}.{tool}',
-  description: 'Brief description from discovery',
+export const { toolCamel } = {
+  name: "{service}.{tool}",
+  description: "Brief description from discovery",
   inputSchema: InputSchema,
   execute,
 };
@@ -174,12 +179,12 @@ export const {toolCamel} = {
 ```typescript
 // .claude/tools/linear/get-issue.ts
 
-import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client.js';
+import { z } from "zod";
+import { callMCPTool } from "../config/lib/mcp-client.js";
 
 // 1. Input validation (from discovery)
 const InputSchema = z.object({
-  issueId: z.string().min(1).describe('Linear issue ID'),
+  issueId: z.string().min(1).describe("Linear issue ID"),
   includeComments: z.boolean().optional().default(false),
 });
 
@@ -200,16 +205,16 @@ async function execute(input: unknown): Promise<FilteredResult> {
   const validated = InputSchema.parse(input);
 
   // Call MCP
-  const raw = await callMCPTool('linear', 'get_issue', {
+  const raw = await callMCPTool("linear", "get_issue", {
     issue_id: validated.issueId,
-    expand: validated.includeComments ? ['comments'] : [],
+    expand: validated.includeComments ? ["comments"] : [],
   });
 
   // Filter (token reduction: 2347 → 450 tokens from discovery)
   return {
     id: raw.id,
     title: raw.title,
-    status: raw.state?.name ?? 'Unknown',
+    status: raw.state?.name ?? "Unknown",
     priority: raw.priority ?? 4,
     assignee: raw.assignee?.name,
   };
@@ -217,8 +222,8 @@ async function execute(input: unknown): Promise<FilteredResult> {
 
 // 4. Export
 export const getIssue = {
-  name: 'linear.get_issue',
-  description: 'Get a single Linear issue by ID',
+  name: "linear.get_issue",
+  description: "Get a single Linear issue by ID",
   inputSchema: InputSchema,
   execute,
 };
@@ -240,6 +245,7 @@ npm run verify-green -- {service}/{tool}
 ```
 
 If tests fail:
+
 1. Review error messages
 2. Fix implementation
 3. Re-run verify-green
@@ -267,19 +273,18 @@ Provide defaults for fields that might be missing:
 
 ```typescript
 // Discovery shows 'priority' sometimes missing
-priority: raw.priority ?? 4, // ✅ Defaults to 4
+priority: (raw.priority ?? 4, // ✅ Defaults to 4
+  // Tests should verify default behavior:
+  it("uses default priority when missing", async () => {
+    vi.spyOn(mcpClient, "callMCPTool").mockResolvedValue({
+      id: "123",
+      title: "Test",
+      // priority missing
+    });
 
-// Tests should verify default behavior:
-it('uses default priority when missing', async () => {
-  vi.spyOn(mcpClient, 'callMCPTool').mockResolvedValue({
-    id: '123',
-    title: 'Test'
-    // priority missing
-  });
-
-  const result = await tool.execute({ issueId: 'ENG-1' });
-  expect(result.priority).toBe(4); // Default
-});
+    const result = await tool.execute({ issueId: "ENG-1" });
+    expect(result.priority).toBe(4); // Default
+  }));
 ```
 
 ### Pattern 3: Array Handling
@@ -349,22 +354,22 @@ return {
 export const tool = {
   async execute(input: unknown) {
     const validated = InputSchema.parse(input);
-    return await callMCPTool('service', 'tool', validated);
+    return await callMCPTool("service", "tool", validated);
     // Returns full response (2500 tokens)
-  }
+  },
 };
 
 // Good: Filter to essential fields
 export const tool = {
   async execute(input: unknown) {
     const validated = InputSchema.parse(input);
-    const raw = await callMCPTool('service', 'tool', validated);
+    const raw = await callMCPTool("service", "tool", validated);
     return {
       id: raw.id,
-      title: raw.title
+      title: raw.title,
       // Only essential fields (500 tokens)
     };
-  }
+  },
 };
 ```
 
@@ -412,7 +417,7 @@ return {
 return {
   id: raw.id,
   title: raw.title,
-  status: raw.state?.name ?? 'Unknown',
+  status: raw.state?.name ?? "Unknown",
 };
 ```
 
@@ -440,9 +445,9 @@ const InputSchema = z.object({
 });
 
 // MCP expects snake_case
-const raw = await callMCPTool('linear', 'get_issue', {
+const raw = await callMCPTool("linear", "get_issue", {
   issue_id: validated.issueId, // Map camelCase → snake_case
-  expand: validated.includeHistory ? ['history'] : [],
+  expand: validated.includeHistory ? ["history"] : [],
 });
 ```
 
@@ -483,13 +488,13 @@ interface FilteredResult {
 ```typescript
 // MCP returns nested objects
 const raw = {
-  state: { name: 'In Progress', type: 'started', color: '#fff' },
-  assignee: { id: '123', name: 'Alice', email: '...', avatar: '...' }
+  state: { name: "In Progress", type: "started", color: "#fff" },
+  assignee: { id: "123", name: "Alice", email: "...", avatar: "..." },
 };
 
 // Flatten to essential fields only
 return {
-  status: raw.state?.name ?? 'Unknown', // Flatten state.name
+  status: raw.state?.name ?? "Unknown", // Flatten state.name
   assignee: raw.assignee?.name, // Flatten assignee.name
   // Exclude: state.type, state.color, assignee.id, assignee.email, etc.
 };
@@ -500,13 +505,17 @@ return {
 ```typescript
 // MCP returns large arrays
 const raw = {
-  comments: [ /* 100 items */ ],
-  history: [ /* 200 items */ ]
+  comments: [
+    /* 100 items */
+  ],
+  history: [
+    /* 200 items */
+  ],
 };
 
 // Option 1: Limit size
 return {
-  recentComments: raw.comments?.slice(0, 5) // First 5 only
+  recentComments: raw.comments?.slice(0, 5), // First 5 only
 };
 
 // Option 2: Exclude entirely (preferred)
@@ -518,11 +527,13 @@ return {
 Add test to verify token reduction:
 
 ```typescript
-it('achieves 80% token reduction', async () => {
-  const mockResponse = { /* full response from discovery */ };
-  vi.spyOn(mcpClient, 'callMCPTool').mockResolvedValue(mockResponse);
+it("achieves 80% token reduction", async () => {
+  const mockResponse = {
+    /* full response from discovery */
+  };
+  vi.spyOn(mcpClient, "callMCPTool").mockResolvedValue(mockResponse);
 
-  const result = await tool.execute({ issueId: 'TEST' });
+  const result = await tool.execute({ issueId: "TEST" });
 
   const originalTokens = JSON.stringify(mockResponse).length; // 2347
   const filteredTokens = JSON.stringify(result).length; // 450
@@ -545,9 +556,7 @@ try {
   if (error instanceof z.ZodError) {
     // Extract first error for user-friendly message
     const firstError = error.errors[0];
-    throw new Error(
-      `Invalid ${firstError.path.join('.')}: ${firstError.message}`
-    );
+    throw new Error(`Invalid ${firstError.path.join(".")}: ${firstError.message}`);
   }
 }
 ```
@@ -559,10 +568,10 @@ try {
   const raw = await callMCPTool(service, tool, params);
 } catch (error) {
   // Check error type and provide context
-  if (error.message.includes('timeout')) {
+  if (error.message.includes("timeout")) {
     throw new Error(`MCP request timed out for ${tool}`);
   }
-  if (error.message.includes('connection')) {
+  if (error.message.includes("connection")) {
     throw new Error(`Failed to connect to ${service} MCP server`);
   }
   throw error; // Re-throw unknown errors
@@ -576,7 +585,7 @@ const raw = await callMCPTool(service, tool, params);
 
 // Validate required fields exist
 if (!raw.id || !raw.title) {
-  throw new Error('MCP response missing required fields');
+  throw new Error("MCP response missing required fields");
 }
 
 return {
@@ -593,12 +602,12 @@ return {
 ```typescript
 // .claude/tools/linear/get-issue.ts
 
-import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client.js';
+import { z } from "zod";
+import { callMCPTool } from "../config/lib/mcp-client.js";
 
 // 1. Input validation (from discovery)
 const InputSchema = z.object({
-  issueId: z.string().min(1).describe('Linear issue ID'),
+  issueId: z.string().min(1).describe("Linear issue ID"),
   includeComments: z.boolean().optional().default(false),
 });
 
@@ -620,21 +629,21 @@ async function execute(input: unknown): Promise<FilteredResult> {
     const validated = InputSchema.parse(input);
 
     // Call MCP
-    const raw = await callMCPTool('linear', 'get_issue', {
+    const raw = await callMCPTool("linear", "get_issue", {
       issue_id: validated.issueId, // Map camelCase → snake_case
-      expand: validated.includeComments ? ['comments'] : [],
+      expand: validated.includeComments ? ["comments"] : [],
     });
 
     // Validate response
     if (!raw.id || !raw.title) {
-      throw new Error('MCP response missing required fields');
+      throw new Error("MCP response missing required fields");
     }
 
     // Filter (token reduction: 2347 → 450 tokens = 81%)
     return {
       id: raw.id,
       title: raw.title,
-      status: raw.state?.name ?? 'Unknown',
+      status: raw.state?.name ?? "Unknown",
       priority: raw.priority ?? 4,
       assignee: raw.assignee?.name,
     };
@@ -648,8 +657,8 @@ async function execute(input: unknown): Promise<FilteredResult> {
 
 // 4. Export
 export const getIssue = {
-  name: 'linear.get_issue',
-  description: 'Get a single Linear issue by ID',
+  name: "linear.get_issue",
+  description: "Get a single Linear issue by ID",
   inputSchema: InputSchema,
   execute,
 };
@@ -669,14 +678,14 @@ const InputSchema = z.object({
 });
 
 // MCP call with pagination
-const raw = await callMCPTool('service', 'list_items', {
+const raw = await callMCPTool("service", "list_items", {
   limit: validated.limit,
   offset: validated.offset,
 });
 
 // Return paginated result
 return {
-  items: raw.items.map(item => ({
+  items: raw.items.map((item) => ({
     id: item.id,
     name: item.name,
   })),
@@ -695,14 +704,14 @@ const InputSchema = z.object({
 });
 
 // MCP call with search
-const raw = await callMCPTool('service', 'search', {
+const raw = await callMCPTool("service", "search", {
   q: validated.query,
   filters: validated.filters,
 });
 
 // Return search results (limited to reduce tokens)
 return {
-  results: raw.results.slice(0, 10).map(item => ({
+  results: raw.results.slice(0, 10).map((item) => ({
     id: item.id,
     title: item.title,
   })),
@@ -719,13 +728,13 @@ const InputSchema = z.object({
 });
 
 // MCP call with batch
-const raw = await callMCPTool('service', 'get_multiple', {
+const raw = await callMCPTool("service", "get_multiple", {
   ids: validated.ids,
 });
 
 // Return batch results
 return {
-  items: raw.items.map(item => ({
+  items: raw.items.map((item) => ({
     id: item.id,
     status: item.status,
   })),
@@ -741,6 +750,7 @@ return {
 **Cause**: Import path incorrect or module not built.
 
 **Fix**:
+
 ```bash
 cd .claude/tools/{service}
 npx tsc
@@ -757,6 +767,7 @@ npx tsc
 **Cause**: Missing optional chaining.
 
 **Fix**: Use `?.` for nested optional fields:
+
 ```typescript
 raw.nested.field → raw.nested?.field
 ```
@@ -766,6 +777,7 @@ raw.nested.field → raw.nested?.field
 **Cause**: Untested branches or error paths.
 
 **Fix**:
+
 1. Run coverage report to see uncovered lines
 2. Add tests for missing branches
 3. Add tests for error paths
@@ -774,11 +786,11 @@ raw.nested.field → raw.nested?.field
 
 ## Anti-Patterns Summary
 
-| Anti-Pattern | Why It's Bad | Fix |
-|--------------|-------------|-----|
-| Return raw response | No token reduction | Filter to essential fields |
-| Hardcode service name | Breaks on rename | Use constant |
-| Swallow errors | Hard to debug | Re-throw with context |
-| Ignore discovery | Wrong implementation | Follow discovery exactly |
-| Skip optional chaining | Runtime errors | Use `?.` for optional |
-| Arbitrary test values | Tests don't validate | Use values from discovery |
+| Anti-Pattern           | Why It's Bad         | Fix                        |
+| ---------------------- | -------------------- | -------------------------- |
+| Return raw response    | No token reduction   | Filter to essential fields |
+| Hardcode service name  | Breaks on rename     | Use constant               |
+| Swallow errors         | Hard to debug        | Re-throw with context      |
+| Ignore discovery       | Wrong implementation | Follow discovery exactly   |
+| Skip optional chaining | Runtime errors       | Use `?.` for optional      |
+| Arbitrary test values  | Tests don't validate | Use values from discovery  |

@@ -11,6 +11,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 ## When to Use
 
 Use this skill when:
+
 - Integrating Jira Cloud as a third-party issue tracking system
 - Syncing Chariot security findings to Jira issues
 - Implementing bidirectional updates between Chariot and Jira
@@ -48,24 +49,24 @@ CHARIOT_WEBHOOK_URL=https://api.chariot.example.com/webhooks/jira
 
 ### Authentication Methods
 
-| Method | Use Case | Security | Setup Complexity |
-|--------|----------|----------|------------------|
-| API Token | Automated scripts, CI/CD | Medium | Low |
-| OAuth 2.0 | User-facing integrations | High | Medium |
-| Personal Access Token | Development/testing | Low | Very Low |
+| Method                | Use Case                 | Security | Setup Complexity |
+| --------------------- | ------------------------ | -------- | ---------------- |
+| API Token             | Automated scripts, CI/CD | Medium   | Low              |
+| OAuth 2.0             | User-facing integrations | High     | Medium           |
+| Personal Access Token | Development/testing      | Low      | Very Low         |
 
 **Recommendation**: Use OAuth 2.0 for production, API tokens for automation.
 
 ## Quick Reference
 
-| Operation | Endpoint | Method | Notes |
-|-----------|----------|--------|-------|
-| Create Issue | `/rest/api/3/issue` | POST | Requires project key, issue type |
-| Update Issue | `/rest/api/3/issue/{issueKey}` | PUT | Use for status updates |
-| Get Issue | `/rest/api/3/issue/{issueKey}` | GET | Returns full issue details |
-| Search Issues | `/rest/api/3/search` | POST | Use JQL for filtering |
-| Add Comment | `/rest/api/3/issue/{issueKey}/comment` | POST | Link back to Chariot findings |
-| Create Webhook | `/rest/api/3/webhook` | POST | Requires admin permissions |
+| Operation      | Endpoint                               | Method | Notes                            |
+| -------------- | -------------------------------------- | ------ | -------------------------------- |
+| Create Issue   | `/rest/api/3/issue`                    | POST   | Requires project key, issue type |
+| Update Issue   | `/rest/api/3/issue/{issueKey}`         | PUT    | Use for status updates           |
+| Get Issue      | `/rest/api/3/issue/{issueKey}`         | GET    | Returns full issue details       |
+| Search Issues  | `/rest/api/3/search`                   | POST   | Use JQL for filtering            |
+| Add Comment    | `/rest/api/3/issue/{issueKey}/comment` | POST   | Link back to Chariot findings    |
+| Create Webhook | `/rest/api/3/webhook`                  | POST   | Requires admin permissions       |
 
 ## Implementation
 
@@ -288,13 +289,13 @@ func (c *Client) CreateWebhook(webhookURL, secret string) error {
 
 ## Error Handling
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| 401 Unauthorized | Invalid API token or expired credentials | Regenerate API token, check email |
-| 404 Not Found | Invalid project key or issue key | Verify project exists and is accessible |
-| 400 Bad Request | Invalid field values or missing required fields | Check Jira field configuration |
-| 429 Rate Limit | Too many API calls | Implement exponential backoff, batch operations |
-| 403 Forbidden | Insufficient permissions | Grant user/app appropriate Jira permissions |
+| Error            | Cause                                           | Solution                                        |
+| ---------------- | ----------------------------------------------- | ----------------------------------------------- |
+| 401 Unauthorized | Invalid API token or expired credentials        | Regenerate API token, check email               |
+| 404 Not Found    | Invalid project key or issue key                | Verify project exists and is accessible         |
+| 400 Bad Request  | Invalid field values or missing required fields | Check Jira field configuration                  |
+| 429 Rate Limit   | Too many API calls                              | Implement exponential backoff, batch operations |
+| 403 Forbidden    | Insufficient permissions                        | Grant user/app appropriate Jira permissions     |
 
 ### Rate Limiting Strategy
 

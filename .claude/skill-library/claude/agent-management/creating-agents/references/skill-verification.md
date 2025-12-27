@@ -13,20 +13,24 @@
 ### The Problem Without It
 
 **Agent creation without skill testing**:
+
 ```yaml
 # Agent frontmatter
 skills: developing-with-tdd, debugging-systematically, verifying-before-completion
 ```
 
 **Agent body**:
+
 ```markdown
 ## Mandatory Skills
+
 1. **`developing-with-tdd`** - Write test FIRST
 2. **`debugging-systematically`** - Investigate root cause
 3. **`verifying-before-completion`** - Run verification commands
 ```
 
 **But**:
+
 - Do these skills exist? ❓
 - Does agent actually invoke them? ❓
 - Do they work correctly with this agent? ❓
@@ -37,6 +41,7 @@ skills: developing-with-tdd, debugging-systematically, verifying-before-completi
 ### The Solution: Systematic Verification
 
 **Phase 8 tests each mandatory skill**:
+
 1. ✅ Skill exists (file check)
 2. ✅ Agent invokes skill (spawn with trigger scenario)
 3. ✅ Agent follows skill's methodology (evaluation)
@@ -51,16 +56,19 @@ skills: developing-with-tdd, debugging-systematically, verifying-before-completi
 ### Test Scope
 
 **✅ Test MANDATORY skills**:
+
 - Listed in agent's "Mandatory Skills" section
 - These are the critical workflows agent MUST follow
 - Typically 3-4 skills per agent
 
 **❌ Don't test gateway skills**:
+
 - gateway-frontend, gateway-backend, etc.
 - These are routing mechanisms (not invoked directly)
 - Tested implicitly when agent uses library skills
 
 **❌ Don't test optional library skills**:
+
 - Skills in Skill References table (contextual, load on-demand)
 - Agent uses them based on specific task requirements
 - Not mandatory for every agent operation
@@ -72,6 +80,7 @@ skills: developing-with-tdd, debugging-systematically, verifying-before-completi
 ### Step 1: Verify Skill Exists (30 seconds)
 
 **Check core skills**:
+
 ```bash
 if [ -f ".claude/skills/{skill-name}/SKILL.md" ]; then
   echo "✅ {skill-name} exists (core)"
@@ -79,15 +88,18 @@ fi
 ```
 
 **Check library skills** (if not in core):
+
 ```bash
 find .claude/skill-library -name "{skill-name}" -type d
 ```
 
 **If NOT found**:
+
 ```markdown
 ❌ CRITICAL: Skill "{skill-name}" referenced but doesn't exist
 
 This is a blocker. Options:
+
 1. Remove skill from agent (if actually not needed)
 2. Fix typo in skill name
 3. Create missing skill (if genuinely needed)
@@ -111,6 +123,7 @@ Cannot proceed to Phase 9 without resolving.
 Create a new {component/feature/function} with {specific functionality}.
 
 Requirements:
+
 - {Functional requirement 1}
 - {Functional requirement 2}
 - Must include tests
@@ -119,6 +132,7 @@ Example: "Create a Python CLI for S3 bucket management (list/upload/download) wi
 ```
 
 **Why this triggers TDD**:
+
 - "Create new" signals implementation needed
 - "Must include tests" reminds about quality
 - Agent should invoke TDD skill to guide RED-GREEN-REFACTOR
@@ -136,6 +150,7 @@ Example: "Bug in login flow: Users can log in with expired tokens. Sometimes wor
 ```
 
 **Why this triggers systematic debugging**:
+
 - "Find root cause" signals investigation needed
 - Intermittent behavior suggests complex cause
 - Agent should invoke debugging skill to guide investigation
@@ -151,6 +166,7 @@ Example: "Build a dashboard widget for displaying metrics. Confirm it works in p
 ```
 
 **Why this triggers verification**:
+
 - "Confirm it works" signals verification needed
 - "Before deployment" emphasizes importance
 - Agent should invoke verification skill to run commands
@@ -168,6 +184,7 @@ Example: "Design state management for vulnerability filtering (client-side filte
 ```
 
 **Why this triggers brainstorming**:
+
 - "Evaluate approaches" signals need for alternatives
 - "Recommend with trade-offs" requires analysis
 - Agent should invoke brainstorming to explore options
@@ -183,6 +200,7 @@ Example: "How long to build a complete authentication system (frontend login, ba
 ```
 
 **Why this triggers calibration**:
+
 - Direct estimation request
 - Agent should invoke calibration skill to apply factors
 
@@ -197,6 +215,7 @@ Example: "Coordinate building complete user management system (registration, aut
 ```
 
 **Why this triggers planning**:
+
 - "Coordinate" signals orchestration
 - Multi-step system requires planning
 - Agent should invoke writing-plans before delegating
@@ -216,11 +235,12 @@ Task({
 {Natural task description}
 
 {Do NOT mention this is a skill test}`,
-  model: "{agent's configured model}"
-})
+  model: "{agent's configured model}",
+});
 ```
 
 **Important**:
+
 - Use agent's configured model (sonnet/opus)
 - Don't reveal testing intent
 - Present as natural task that requires skill
@@ -233,6 +253,7 @@ Task({
 **Review agent's response for**:
 
 **1. Explicit Skill Invocation?**
+
 - ✅ PASS: Agent says `skill: "{skill-name}"` or clearly mentions using the skill
 - ⚠️ PARTIAL: Agent follows methodology but doesn't explicitly invoke
 - ❌ FAIL: No mention, no invocation
@@ -240,16 +261,19 @@ Task({
 **2. Methodology Followed?**
 
 For developing-with-tdd:
+
 - ✅ Agent writes test FIRST (shows test code before implementation)
 - ✅ Agent mentions RED-GREEN cycle
 - ❌ Agent writes implementation first
 
 For debugging-systematically:
+
 - ✅ Agent investigates root cause (reads code, traces execution)
 - ✅ Agent forms hypothesis before fixing
 - ❌ Agent immediately suggests fix
 
 For verifying-before-completion:
+
 - ✅ Agent runs verification commands (shows `npm test` output)
 - ✅ Agent confirms passing before claiming done
 - ❌ Agent claims "done" without running commands
@@ -270,6 +294,7 @@ Scenario: {What was tested}
 Response: {Key points from agent}
 
 Evaluation:
+
 - Invoked: ✅/⚠️/❌
 - Followed: ✅/⚠️/❌
 - Evidence: ✅/⚠️/❌
@@ -289,6 +314,7 @@ Reason: {Specific quotes/observations}
 **If PARTIAL** (agent follows methodology but doesn't explicitly invoke):
 
 **Edit agent to emphasize explicit invocation**:
+
 ```markdown
 ## Mandatory Skills
 
@@ -296,7 +322,9 @@ Reason: {Specific quotes/observations}
 
 **Critical**: You MUST explicitly invoke this skill:
 ```
+
 skill: "{skill-name}"
+
 ```
 
 **When**: {Trigger condition}
@@ -311,6 +339,7 @@ skill: "{skill-name}"
 **If FAIL** (agent doesn't invoke or follow):
 
 **Investigate**:
+
 1. **Agent issue?** - Unclear guidance in Mandatory Skills section
    - **Fix**: Strengthen agent's explanation of when/how to use skill
    - Add example of skill invocation
@@ -340,11 +369,13 @@ skill: "{skill-name}"
 ❌ Skill "{skill-name}" listed as mandatory but file not found.
 
 Investigation:
+
 1. Check skill name spelling (typo?)
-2. Search for similar skills: npm run -w @chariot/skill-search search -- "{skill-name}"
+2. Search for similar skills: npm run -w @chariot/auditing-skills search -- "{skill-name}"
 3. Check if skill was renamed/moved
 
 Resolution:
+
 - Fix skill name in agent → Re-verify
 - Remove if actually not needed → Update agent
 - Create skill if genuinely needed → Pause agent creation, create skill first
@@ -359,6 +390,7 @@ Resolution:
 **If testing all individually takes too long**:
 
 **Prioritize**:
+
 1. **Always test** (3-4 most critical):
    - developing-with-tdd (if development/testing agent)
    - brainstorming (if architecture agent)
@@ -371,6 +403,7 @@ Resolution:
    - Don't need full spawn+evaluate
 
 **Example**:
+
 ```markdown
 Agent has 6 mandatory skills.
 
@@ -398,6 +431,7 @@ All 6 skills verified (3 full + 3 spot check) ✅
 **Why not PASS**: Implicit following doesn't guarantee full methodology applied
 
 **Fix**: Strengthen agent guidance:
+
 ```markdown
 **How to invoke**: MUST use `skill: "developing-with-tdd"` before implementation
 
@@ -471,6 +505,7 @@ All 6 skills verified (3 full + 3 spot check) ✅
 **Scenario**: "Create {new feature}"
 
 **Expected invocation**:
+
 ```
 Agent: "I'll use the developing-with-tdd skill to guide implementation.
 
@@ -490,6 +525,7 @@ Test now passes.
 ```
 
 **PASS criteria**:
+
 - Explicit `skill: "developing-with-tdd"` ✅
 - Test code shown BEFORE implementation ✅
 - Mentions RED-GREEN phases ✅
@@ -501,6 +537,7 @@ Test now passes.
 **Scenario**: "Fix bug: {error behavior}"
 
 **Expected invocation**:
+
 ```
 Agent: "I'll use debugging-systematically to find the root cause.
 
@@ -523,6 +560,7 @@ Step 5: Fix:
 ```
 
 **PASS criteria**:
+
 - Explicit skill invocation ✅
 - Investigation BEFORE fix ✅
 - Hypothesis formation documented ✅
@@ -535,6 +573,7 @@ Step 5: Fix:
 **Scenario**: "Build {feature} and confirm working"
 
 **Expected invocation**:
+
 ```
 Agent: "After implementation, I'll verify it works.
 
@@ -556,6 +595,7 @@ npm run build
 ```
 
 **PASS criteria**:
+
 - Explicit skill invocation ✅
 - Commands actually run (output shown) ✅
 - Confirms passing before claiming done ✅
@@ -567,6 +607,7 @@ npm run build
 **Scenario**: "Design architecture for {system}"
 
 **Expected invocation**:
+
 ```
 Agent: "Before recommending architecture, I'll explore alternatives.
 
@@ -584,6 +625,7 @@ Recommendation: {Approach X} because {trade-off analysis}
 ```
 
 **PASS criteria**:
+
 - Explicit skill invocation ✅
 - Asks questions BEFORE designing ✅
 - Presents multiple alternatives (not just one) ✅
@@ -619,15 +661,18 @@ Recommendation: {Approach X} because {trade-off analysis}
 **Solution**: Prioritize + spot check
 
 **Always test** (full spawn+evaluate):
+
 - Core workflow skill (TDD for development, brainstorming for architecture, etc.)
 - 2-3 most critical skills
 
 **Spot check** (quick verification):
+
 - Review Phase 7 (GREEN) response - was skill mentioned?
 - Check skill appears in agent's reasoning
 - Don't need separate spawn
 
 **Example**:
+
 ```
 Full test: developing-with-tdd, verifying-before-completion (critical)
 Spot check: debugging-systematically (mentioned in Phase 7 response), calibrating-time-estimates (straightforward)
@@ -642,11 +687,13 @@ Spot check: debugging-systematically (mentioned in Phase 7 response), calibratin
 **This is PARTIAL** (not PASS).
 
 **Why**: Implicit following doesn't guarantee full methodology:
+
 - Agent might skip REFACTOR phase
 - Agent might not follow complete cycle for all cases
 - Explicit invocation loads full skill guidance
 
 **Fix**: Update agent to require explicit invocation:
+
 ```markdown
 ## Mandatory Skills
 
@@ -692,14 +739,15 @@ Spot check: debugging-systematically (mentioned in Phase 7 response), calibratin
 ---
 
 ### Skill 2: {skill-name}
+
 [Repeat for each skill]
 
 ---
 
 ### Summary
 
-| Skill | Result | Notes |
-|-------|--------|-------|
+| Skill     | Result  | Notes        |
+| --------- | ------- | ------------ |
 | {skill-1} | ✅ PASS | {Brief note} |
 | {skill-2} | ✅ PASS | {Brief note} |
 | {skill-3} | ✅ PASS | {Brief note} |
@@ -737,6 +785,7 @@ Spot check: debugging-systematically (mentioned in Phase 7 response), calibratin
 ### 4. Provides Skill Quality Feedback
 
 **Side benefit**: If many agents fail to use a skill correctly, indicates:
+
 - Skill guidance might be unclear
 - Skill might need updating
 - Skill might not be suitable as "mandatory"
@@ -750,6 +799,7 @@ Spot check: debugging-systematically (mentioned in Phase 7 response), calibratin
 **Phase 8 adds**: 10-20 minutes per agent
 
 **Value provided**:
+
 - Prevents production issues (missing skills, wrong invocation)
 - Ensures quality (skills actually work)
 - Validates integration (not just theoretical)

@@ -13,12 +13,12 @@ This skill covers Velociraptor Query Language (VQL) artifact development for the
 
 ## Quick Reference
 
-| Task | Pattern | Example |
-|------|---------|---------|
-| Simple health check | Single source, execve | `CheckDiskSpace.yaml` |
-| Multi-OS capability | Per-source preconditions | `VirtualisationCheck.yaml` |
-| Orchestrator | Child artifact aggregation | `HealthCheck.yaml` |
-| Detection artifact | Severity scoring, MITRE mapping | `ProcessInjection.yaml` |
+| Task                | Pattern                           | Example                    |
+| ------------------- | --------------------------------- | -------------------------- |
+| Simple health check | Single source, execve             | `CheckDiskSpace.yaml`      |
+| Multi-OS capability | Per-source preconditions          | `VirtualisationCheck.yaml` |
+| Orchestrator        | Child artifact aggregation        | `HealthCheck.yaml`         |
+| Detection artifact  | Severity scoring, MITRE mapping   | `ProcessInjection.yaml`    |
 | Server-side monitor | `type: SERVER_EVENT` with clock() | `Monitor.HealthCheck.yaml` |
 
 ## Directory Structure
@@ -58,7 +58,7 @@ author: Praetorian Security Team
 version: 1.0.0
 
 # Artifact Type
-type: CLIENT                    # CLIENT | SERVER_EVENT | VELOCIRAPTOR
+type: CLIENT # CLIENT | SERVER_EVENT | VELOCIRAPTOR
 
 # Access Control
 required_permissions:
@@ -72,7 +72,7 @@ precondition: SELECT OS FROM info() WHERE OS = 'linux'
 parameters:
   - name: ProcessWhitelist
     description: Comma-separated processes to exclude
-    type: csv                   # string | int | bool | choices | csv | upload
+    type: csv # string | int | bool | choices | csv | upload
     default: ""
     required: false
 
@@ -264,17 +264,17 @@ sources:
 
 ## Common VQL Functions
 
-| Function | Purpose | Example |
-|----------|---------|---------|
-| `info()` | Get endpoint info | `SELECT OS FROM info()` |
-| `execve()` | Execute command | `FROM execve(argv=["ls"])` |
-| `wmi()` | Query Windows WMI | `FROM wmi(query="SELECT...")` |
-| `watch_etw()` | Monitor ETW events | `FROM watch_etw(guid="...")` |
-| `read_file()` | Read file contents | `read_file(filename="/etc/passwd")` |
-| `glob()` | Find files | `FROM glob(globs="*.txt")` |
-| `hunt()` | Dispatch to clients | `hunt(artifacts=[...])` |
-| `clock()` | Schedule triggers | `FROM clock(period=3600)` |
-| `chain()` | Combine sources | `chain(a={...}, b={...})` |
+| Function      | Purpose             | Example                             |
+| ------------- | ------------------- | ----------------------------------- |
+| `info()`      | Get endpoint info   | `SELECT OS FROM info()`             |
+| `execve()`    | Execute command     | `FROM execve(argv=["ls"])`          |
+| `wmi()`       | Query Windows WMI   | `FROM wmi(query="SELECT...")`       |
+| `watch_etw()` | Monitor ETW events  | `FROM watch_etw(guid="...")`        |
+| `read_file()` | Read file contents  | `read_file(filename="/etc/passwd")` |
+| `glob()`      | Find files          | `FROM glob(globs="*.txt")`          |
+| `hunt()`      | Dispatch to clients | `hunt(artifacts=[...])`             |
+| `clock()`     | Schedule triggers   | `FROM clock(period=3600)`           |
+| `chain()`     | Combine sources     | `chain(a={...}, b={...})`           |
 
 ## VQL Syntax Patterns
 
@@ -326,6 +326,7 @@ WHERE NOT SourceProcess IN whitelist
 ## Testing Checklist
 
 Before deployment:
+
 - [ ] All sources return expected data
 - [ ] Preconditions correctly filter by OS
 - [ ] Parameters have sensible defaults

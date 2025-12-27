@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+build/
+dist/
+**/build/
+**/dist/
+
+# Coverage
+coverage/
+**/coverage/
+
+# Submodule binaries and vendor
+**/vendor/
+**/bin/
+
+# Git
+.git/
+**/.git/
+
+# Archived files
+.archived/
+**/.archived/
+
+# Lock files
+package-lock.json
+**/package-lock.json
+
+# Large data files
+*.log
+*.sqlite
+*.db
+
+# AI research (often contains large external codebases with conflicting configs)
+modules/ai-research
+
+# Submodule README files (formatted by their own prettier configs)
+modules/*/README.md
+modules/*/ui/README.md

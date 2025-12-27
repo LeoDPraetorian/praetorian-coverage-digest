@@ -10,8 +10,9 @@
  * All other audit checks moved to instruction-based checklist in creating-agents Phase 8.
  *
  * Usage:
- *   npm run audit-critical -- <agent-name>
- *   npm run audit-critical  (checks all agents)
+ *   npm run audit-critical -- <agent-name>           Check specific agent
+ *   npm run audit-critical -- <agent-name> --skills  Check agent + show skill recommendations
+ *   npm run audit-critical                           Check all agents
  *
  * Exit codes:
  *   0 - All checks passed
@@ -23,6 +24,11 @@ import { readFileSync, readdirSync, statSync } from 'fs';
 import { basename, join } from 'path';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
+import {
+  extractAgentMetadata,
+  getSkillRecommendations,
+  formatSkillRecommendationTable,
+} from './lib/skill-recommender.js';
 
 /**
  * Issue types that critical audit checks for
@@ -53,12 +59,24 @@ interface AuditResult {
   passed: boolean;
   agentsChecked: number;
   issuesFound: CriticalIssue[];
+  agentPath?: string; // Path to audited agent (for skill recommendations)
 }
 
 /**
  * Find project root using git
  */
 function getRepoRoot(): string {
+  // Try superproject first (for submodule detection)
+  try {
+    const superRoot = execSync('git rev-parse --show-superproject-working-tree', {
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'ignore'],
+    }).trim();
+    if (superRoot) return superRoot;
+  } catch {
+    // Not in submodule
+  }
+
   return execSync('git rev-parse --show-toplevel', { encoding: 'utf-8' }).trim();
 }
 
@@ -75,6 +93,8 @@ function findAgentFiles(dir: string, pattern?: string): string[] {
       const fullPath = join(dir, entry.name);
 
       if (entry.isDirectory()) {
+        // Skip hidden directories
+        if (entry.name.startsWith('.')) continue;
         // Recurse into subdirectories
         results.push(...findAgentFiles(fullPath, pattern));
       } else if (entry.isFile() && entry.name.endsWith('.md')) {
@@ -280,6 +300,50 @@ function formatIssue(issue: CriticalIssue): void {
 }
 
 /**
+ * Show skill recommendations for an agent
+ */
+function showSkillRecommendations(agentPath: string): void {
+  console.log(chalk.blue.bold('\n📊 Skill Recommendations\n'));
+  console.log(chalk.gray('Which skills should this agent incorporate?\n'));
+
+  const agentMetadata = extractAgentMetadata(agentPath);
+  if (!agentMetadata) {
+    console.log(chalk.yellow('  Could not extract agent metadata.\n'));
+    return;
+  }
+
+  const recommendations = getSkillRecommendations(agentMetadata);
+
+  if (recommendations.high.length === 0 && recommendations.medium.length === 0) {
+    console.log(chalk.yellow('  No strong skill matches found.'));
+    console.log(chalk.gray('  This agent may already have comprehensive skill coverage.\n'));
+
+    if (recommendations.alreadyHas.length > 0) {
+      console.log(chalk.gray(`  Already references ${recommendations.alreadyHas.length} skill(s):`));
+      recommendations.alreadyHas.slice(0, 5).forEach(s => {
+        console.log(chalk.gray(`    • ${s}`));
+      });
+      if (recommendations.alreadyHas.length > 5) {
+        console.log(chalk.gray(`    ... and ${recommendations.alreadyHas.length - 5} more`));
+      }
+      console.log();
+    }
+    return;
+  }
+
+  // Show only HIGH and MEDIUM matches
+  const relevantMatches = [...recommendations.high, ...recommendations.medium];
+  console.log(formatSkillRecommendationTable(relevantMatches));
+
+  // Summary
+  console.log(chalk.bold('Summary:'));
+  console.log(chalk.green(`  HIGH confidence: ${recommendations.high.length} skill(s)`));
+  console.log(chalk.yellow(`  MEDIUM confidence: ${recommendations.medium.length} skill(s)`));
+  console.log(chalk.gray(`  LOW confidence: ${recommendations.low.length} skill(s) (not shown)`));
+  console.log(chalk.gray(`  Already referenced: ${recommendations.alreadyHas.length} skill(s)\n`));
+}
+
+/**
  * Main audit function
  */
 async function auditCritical(agentPattern?: string): Promise<AuditResult> {
@@ -317,6 +381,7 @@ async function auditCritical(agentPattern?: string): Promise<AuditResult> {
       passed: true,
       agentsChecked: agentFiles.length,
       issuesFound: [],
+      agentPath: agentFiles.length === 1 ? agentFiles[0] : undefined,
     };
   }
 
@@ -346,7 +411,22 @@ async function auditCritical(agentPattern?: string): Promise<AuditResult> {
     passed: false,
     agentsChecked: agentFiles.length,
     issuesFound: allIssues,
+    agentPath: agentFiles.length === 1 ? agentFiles[0] : undefined,
   };
+}
+
+/**
+ * Parse CLI arguments
+ */
+function parseArgs(args: string[]): { agentName?: string; showSkills: boolean; showHelp: boolean } {
+  const showHelp = args.includes('--help') || args.includes('-h');
+  const showSkills = args.includes('--skills');
+
+  // Filter out flags to get agent name
+  const nonFlags = args.filter(a => !a.startsWith('-'));
+  const agentName = nonFlags[0];
+
+  return { agentName, showSkills, showHelp };
 }
 
 /**
@@ -354,21 +434,27 @@ async function auditCritical(agentPattern?: string): Promise<AuditResult> {
  */
 async function main() {
   const args = process.argv.slice(2);
+  const { agentName, showSkills, showHelp } = parseArgs(args);
 
   // Help
-  if (args.includes('--help') || args.includes('-h')) {
+  if (showHelp) {
     console.log(`
 ${chalk.cyan('audit-critical')} - Critical agent validation
 
 ${chalk.bold('Usage:')}
-  npm run audit-critical -- <agent-name>    Check specific agent
-  npm run audit-critical                    Check all agents
-  npm run audit-critical -- --help          Show this help
+  npm run audit-critical -- <agent-name>             Check specific agent
+  npm run audit-critical -- <agent-name> --skills    Check agent + skill recommendations
+  npm run audit-critical                             Check all agents
+  npm run audit-critical -- --help                   Show this help
 
 ${chalk.bold('Checks:')}
   1. Block scalar detection (| or > in description)
   2. Missing/empty description
   3. Name field matches filename
+
+${chalk.bold('Options:')}
+  --skills    Show recommended skills for the agent (like auditing-skills --agents)
+  --help, -h  Show this help
 
 ${chalk.bold('Exit codes:')}
   0 - All checks passed
@@ -377,14 +463,22 @@ ${chalk.bold('Exit codes:')}
 
 ${chalk.bold('Examples:')}
   npm run audit-critical -- frontend-developer
+  npm run audit-critical -- frontend-developer --skills
   npm run audit-critical
 `);
     process.exit(0);
   }
 
   // Run audit
-  const agentName = args[0];
   const result = await auditCritical(agentName);
+
+  // Show skill recommendations if requested and single agent
+  if (showSkills && result.agentPath) {
+    showSkillRecommendations(result.agentPath);
+  } else if (showSkills && !agentName) {
+    console.log(chalk.yellow('\n⚠️  --skills requires a specific agent name'));
+    console.log(chalk.gray('  Example: npm run audit-critical -- frontend-developer --skills\n'));
+  }
 
   process.exit(result.passed ? 0 : 1);
 }

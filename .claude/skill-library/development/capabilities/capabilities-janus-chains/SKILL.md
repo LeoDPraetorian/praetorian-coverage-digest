@@ -13,13 +13,13 @@ This skill covers Janus framework chain development for orchestrating security t
 
 ## Quick Reference
 
-| Pattern | Use Case | Example |
-|---------|----------|---------|
-| Sequential Chain | Linear workflow | Scan → Parse → Store |
-| Parallel MultiChain | Independent tasks | Scan multiple targets |
-| Conditional Chain | Branching logic | If vulnerable → exploit |
-| Aggregation Chain | Combine results | Merge scanner outputs |
-| Recovery Chain | Error handling | Retry on failure |
+| Pattern             | Use Case          | Example                 |
+| ------------------- | ----------------- | ----------------------- |
+| Sequential Chain    | Linear workflow   | Scan → Parse → Store    |
+| Parallel MultiChain | Independent tasks | Scan multiple targets   |
+| Conditional Chain   | Branching logic   | If vulnerable → exploit |
+| Aggregation Chain   | Combine results   | Merge scanner outputs   |
+| Recovery Chain      | Error handling    | Retry on failure        |
 
 ## Architecture Overview
 

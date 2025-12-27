@@ -10,14 +10,14 @@ HackerOne webhooks enable real-time synchronization between HackerOne and Chario
 
 HackerOne sends the following event types:
 
-| Event Type | Trigger | Chariot Action |
-|------------|---------|----------------|
-| `report_created` | New vulnerability submitted | Create Risk entity |
-| `report_state_change` | Report triaged/resolved/closed | Update Risk status |
-| `report_severity_change` | Severity rating updated | Update Risk priority |
-| `report_activity` | Comment/action added | Create activity log |
-| `bounty_awarded` | Bounty paid to researcher | Update Risk metadata |
-| `program_disabled` | Program temporarily disabled | Pause sync |
+| Event Type               | Trigger                        | Chariot Action       |
+| ------------------------ | ------------------------------ | -------------------- |
+| `report_created`         | New vulnerability submitted    | Create Risk entity   |
+| `report_state_change`    | Report triaged/resolved/closed | Update Risk status   |
+| `report_severity_change` | Severity rating updated        | Update Risk priority |
+| `report_activity`        | Comment/action added           | Create activity log  |
+| `bounty_awarded`         | Bounty paid to researcher      | Update Risk metadata |
+| `program_disabled`       | Program temporarily disabled   | Pause sync           |
 
 ## Webhook Payload Structure
 
@@ -286,6 +286,7 @@ func RegisterWebhook(ctx context.Context, client *Client, webhookURL, secret str
 ### Retry Strategy
 
 HackerOne retries failed webhooks with exponential backoff:
+
 - 1st retry: 1 minute
 - 2nd retry: 5 minutes
 - 3rd retry: 30 minutes

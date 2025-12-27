@@ -1,0 +1,37 @@
+## [Date: 2024-12-24] - Initial Creation
+
+### Created
+
+- Skill created via creating-skills workflow
+- RED failure documented: Reviewer agents lack consolidated React 19 conventions, leading to inconsistent code reviews
+- Category: development/frontend/patterns
+- Type: Process/Pattern (code review methodology)
+
+### Content Structure
+
+**SKILL.md (473 lines)**:
+- Quick Reference table (BLOCK/REQUEST CHANGE/VERIFY PRESENT categories)
+- Prohibited Patterns (React.FC, forwardRef, useEffect setState, Zustand without selectors, data fetching in useEffect)
+- Warning Patterns (useMemo/useCallback/React.memo without justification)
+- Required Patterns (function declarations, TanStack Query, Zustand selectors, key prop)
+- Reviewer Checklist
+
+**References**:
+- `anti-patterns.md` - Complete "You Might Not Need an Effect" patterns extracted from using-modern-react-patterns skill
+- `prohibited-patterns.md` - Detailed rationale for React.FC, forwardRef, and unnecessary memoization prohibitions
+- `required-patterns.md` - Comprehensive examples of all required patterns with complete code samples
+- `reviewer-checklist.md` - Copyable checklist template with fast-fail search commands and approval criteria
+
+### Source Attribution
+
+Content consolidated from:
+- `.claude/skill-library/development/frontend/patterns/using-modern-react-patterns/SKILL.md` (lines 143-335)
+- React 19 official documentation
+- React team recommendations
+- Chariot platform conventions
+
+### Purpose
+
+**For**: Frontend reviewer agents (frontend-reviewer, code-reviewer)
+**Goal**: Single source of truth for React 19 pattern enforcement during code review
+**Impact**: Consistent code reviews, reduced React anti-patterns, better enforcement of platform conventions

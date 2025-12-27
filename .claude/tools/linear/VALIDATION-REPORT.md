@@ -19,11 +19,13 @@ All Linear MCP wrappers have been validated using the systematic `mcp-code-test`
 ### Status: ✅ PRODUCTION READY
 
 #### Schema Validation: PASS ✓
+
 - **Valid inputs**: Accepted correctly
 - **Invalid inputs**: Rejected with clear Zod errors
 - **Type safety**: Enforced at compile time
 
 **Test Results**:
+
 ```
 ✓ Correctly rejected: Empty ID
 ✓ Correctly rejected: XSS attempt (<script>alert(1)</script>)
@@ -32,16 +34,19 @@ All Linear MCP wrappers have been validated using the systematic `mcp-code-test`
 ```
 
 #### Token Efficiency: PASS ✓
+
 - **Baseline** (unfiltered MCP): 46,000 tokens
 - **Wrapper** (filtered): 271 tokens
 - **Reduction**: 99.4% (target: ≥80%)
 
 **Real-World Test**:
+
 - Issue tested: CHARIOT-1516 ("Agent Load Status Covers New Agent Button")
 - Token estimate accurate within expected range
 - Filtering preserves all essential information
 
 #### Filtering Quality: PASS ✓
+
 - **Essential info preserved**: All required fields present
   - ✓ id, identifier, title (required)
   - ✓ description, priority, estimate, state, assignee (optional)
@@ -50,6 +55,7 @@ All Linear MCP wrappers have been validated using the systematic `mcp-code-test`
 - **Summary quality**: High (actionable and complete)
 
 **Type Correctness Verified**:
+
 ```
 ✓ Priority: object {name: "Low", value: 4}
 ✓ Estimate: object {name: "1 Point", value: 1}
@@ -57,17 +63,19 @@ All Linear MCP wrappers have been validated using the systematic `mcp-code-test`
 ```
 
 #### Security: PASS ✓
+
 All attack vectors blocked by Zod schema validation:
 
-| Attack Vector | Status | Method |
-|--------------|--------|--------|
-| Path traversal | ✓ Blocked | Zod validation |
-| Command injection | ✓ Blocked | Zod validation |
+| Attack Vector        | Status    | Method         |
+| -------------------- | --------- | -------------- |
+| Path traversal       | ✓ Blocked | Zod validation |
+| Command injection    | ✓ Blocked | Zod validation |
 | Command substitution | ✓ Blocked | Zod validation |
-| Backtick injection | ✓ Blocked | Zod validation |
-| XSS attempts | ✓ Blocked | Zod validation |
+| Backtick injection   | ✓ Blocked | Zod validation |
+| XSS attempts         | ✓ Blocked | Zod validation |
 
 #### Performance: PASS ✓
+
 - **Wrapper overhead**: < 10ms per call (target: <10ms)
 - **MCP connection**: Efficient with connection reuse
 - **Tests complete**: ~3.5 seconds for full validation suite
@@ -81,13 +89,15 @@ All attack vectors blocked by Zod schema validation:
 **Consistent structure across all Linear wrappers**:
 
 1. **Input Validation** (Zod schemas)
+
    ```typescript
    export const getIssueParams = z.object({
-     id: z.string().min(1).describe('Issue ID or identifier')
+     id: z.string().min(1).describe("Issue ID or identifier"),
    });
    ```
 
 2. **Output Schema** (Minimal essential fields)
+
    ```typescript
    export const getIssueOutput = z.object({
      id: z.string(),
@@ -98,11 +108,13 @@ All attack vectors blocked by Zod schema validation:
    ```
 
 3. **MCP Integration** (Shared client)
+
    ```typescript
-   const rawData = await callMCPTool('linear', 'get_issue', validated);
+   const rawData = await callMCPTool("linear", "get_issue", validated);
    ```
 
 4. **Filtering** (Token optimization)
+
    ```typescript
    description: rawData.description?.substring(0, 500), // Truncate
    ```
@@ -115,11 +127,13 @@ All attack vectors blocked by Zod schema validation:
 ### Token Reduction Strategy
 
 **Session Start**: 0 tokens
+
 - Filesystem discovery only
 - No MCP server tool list loaded
 - Reduction: 100% vs direct MCP (46,000 tokens → 0)
 
 **When Used**: 271-1000 tokens per wrapper
+
 - MCP call only when explicitly imported and invoked
 - Filtered responses with essential fields only
 - Progressive disclosure (summary + details on demand)
@@ -132,36 +146,36 @@ All attack vectors blocked by Zod schema validation:
 
 ### Wrappers Validated
 
-| Wrapper | Type | Status | Token Reduction |
-|---------|------|--------|----------------|
-| `get-issue` | Read | ✅ Validated | 99.4% |
-| `list-issues` | Read | ✅ Inferred PASS | ~99% |
-| `create-issue` | Write | ✅ Inferred PASS | ~99% |
-| `update-issue` | Write | ✅ Inferred PASS | ~99% |
-| `list-projects` | Read | ✅ Inferred PASS | ~99% |
-| `get-project` | Read | ✅ Inferred PASS | ~99% |
-| `create-project` | Write | ✅ Inferred PASS | ~99% |
-| `list-teams` | Read | ✅ Inferred PASS | ~99% |
-| `get-team` | Read | ✅ Inferred PASS | ~99% |
-| `list-users` | Read | ✅ Inferred PASS | ~99% |
-| `list-comments` | Read | ✅ Inferred PASS | ~99% |
-| `create-comment` | Write | ✅ Inferred PASS | ~99% |
-| `find-user` | Read | ✅ Inferred PASS | ~99% |
-| `list-cycles` | Read | ✅ Inferred PASS | ~99% |
-| `update-cycle` | Write | ✅ Inferred PASS | ~99% |
-| `update-project` | Write | ✅ Inferred PASS | ~99% |
+| Wrapper          | Type  | Status           | Token Reduction |
+| ---------------- | ----- | ---------------- | --------------- |
+| `get-issue`      | Read  | ✅ Validated     | 99.4%           |
+| `list-issues`    | Read  | ✅ Inferred PASS | ~99%            |
+| `create-issue`   | Write | ✅ Inferred PASS | ~99%            |
+| `update-issue`   | Write | ✅ Inferred PASS | ~99%            |
+| `list-projects`  | Read  | ✅ Inferred PASS | ~99%            |
+| `get-project`    | Read  | ✅ Inferred PASS | ~99%            |
+| `create-project` | Write | ✅ Inferred PASS | ~99%            |
+| `list-teams`     | Read  | ✅ Inferred PASS | ~99%            |
+| `get-team`       | Read  | ✅ Inferred PASS | ~99%            |
+| `list-users`     | Read  | ✅ Inferred PASS | ~99%            |
+| `list-comments`  | Read  | ✅ Inferred PASS | ~99%            |
+| `create-comment` | Write | ✅ Inferred PASS | ~99%            |
+| `find-user`      | Read  | ✅ Inferred PASS | ~99%            |
+| `list-cycles`    | Read  | ✅ Inferred PASS | ~99%            |
+| `update-cycle`   | Write | ✅ Inferred PASS | ~99%            |
+| `update-project` | Write | ✅ Inferred PASS | ~99%            |
 
 **Total Wrappers**: 16+ production-ready wrappers
 
 ### Specialized Wrappers
 
-| Wrapper | Purpose | Status |
-|---------|---------|--------|
-| `create-bug` | Bug creation shortcut | ✅ Utility |
-| `create-jira-bug` | JIRA-style bug creation | ✅ Utility |
-| `test-validation.ts` | Automated validation | ✅ Testing |
-| `test.ts` | Integration tests | ✅ Testing |
-| `test-raw.ts` | Raw MCP testing | ✅ Development |
+| Wrapper              | Purpose                 | Status         |
+| -------------------- | ----------------------- | -------------- |
+| `create-bug`         | Bug creation shortcut   | ✅ Utility     |
+| `create-jira-bug`    | JIRA-style bug creation | ✅ Utility     |
+| `test-validation.ts` | Automated validation    | ✅ Testing     |
+| `test.ts`            | Integration tests       | ✅ Testing     |
+| `test-raw.ts`        | Raw MCP testing         | ✅ Development |
 
 ---
 
@@ -170,6 +184,7 @@ All attack vectors blocked by Zod schema validation:
 ### Input Validation (Defense Layer 1)
 
 **All wrappers implement**:
+
 - Minimum length checks (`z.string().min(1)`)
 - Maximum length constraints (where applicable)
 - Type enforcement (string, number, boolean, enum)
@@ -177,13 +192,15 @@ All attack vectors blocked by Zod schema validation:
 - Enum validation for constrained values
 
 **Example**:
+
 ```typescript
-priority: z.number().min(0).max(4).optional()
+priority: z.number().min(0).max(4).optional();
 ```
 
 ### Zod Schema Protection (Defense Layer 2)
 
 **Blocks**:
+
 - Empty strings (min length)
 - Special characters in IDs (regex patterns)
 - Invalid enum values
@@ -192,6 +209,7 @@ priority: z.number().min(0).max(4).optional()
 ### MCP Server Validation (Defense Layer 3)
 
 **Linear MCP server provides**:
+
 - Entity existence validation
 - Permission checks
 - Rate limiting
@@ -208,15 +226,16 @@ priority: z.number().min(0).max(4).optional()
 **Problem**: Original schema assumed priority was a number, but actual API returns object `{name, value}`.
 
 **Fix**: Schema updated based on real-world testing with CHARIOT-1516:
+
 ```typescript
 // Before (incorrect)
-priority: z.number().optional()
+priority: z.number().optional();
 
 // After (correct)
 priority: z.object({
   name: z.string(),
-  value: z.number()
-}).optional()
+  value: z.number(),
+}).optional();
 ```
 
 **Impact**: Type safety improved, no breaking changes (optional field).
@@ -228,11 +247,13 @@ priority: z.object({
 ### MCP Connection Overhead
 
 **First call** (cold start):
+
 - MCP connection establishment: ~500ms
 - Initial tool discovery: ~200ms
 - First query: ~800ms total
 
 **Subsequent calls** (warm):
+
 - Connection reuse: 0ms
 - Query execution: ~100-300ms
 - Per-call overhead: <10ms
@@ -241,12 +262,12 @@ priority: z.object({
 
 ### Token Usage Comparison
 
-| Scenario | Direct MCP | MCP Wrapper | Reduction |
-|----------|-----------|-------------|-----------|
-| Session start | 46,000 | 0 | 100% |
-| Single issue get | 46,000 | 271 | 99.4% |
-| List 50 issues | 46,000 | 1,200 | 97.4% |
-| Create issue | 46,000 | 500 | 98.9% |
+| Scenario         | Direct MCP | MCP Wrapper | Reduction |
+| ---------------- | ---------- | ----------- | --------- |
+| Session start    | 46,000     | 0           | 100%      |
+| Single issue get | 46,000     | 271         | 99.4%     |
+| List 50 issues   | 46,000     | 1,200       | 97.4%     |
+| Create issue     | 46,000     | 500         | 98.9%     |
 
 **Context window savings**: Up to 46,000 tokens per MCP server enabled
 
@@ -323,6 +344,7 @@ priority: z.object({
 ## Conclusion
 
 **The Linear MCP wrappers are PRODUCTION READY** with:
+
 - ✅ 99.4% token reduction verified
 - ✅ Comprehensive security validation passed
 - ✅ Type safety enforced at compile and runtime
@@ -334,6 +356,7 @@ priority: z.object({
 **Confidence level**: HIGH - All quality gates passed
 
 **Next steps**:
+
 1. Deploy to production
 2. Monitor token usage
 3. Add more specialized wrappers as needed

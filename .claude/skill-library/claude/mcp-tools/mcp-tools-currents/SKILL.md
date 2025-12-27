@@ -24,11 +24,13 @@ Enable granular agent access control for currents operations.
 ## Available Tools (Auto-discovered: 8 wrappers)
 
 ### get-projects
+
 - **Purpose:** MCP wrapper for get-projects
 - **Import:** `import { getProjects } from './.claude/tools/currents/get-projects.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-run-details
+
 - **Purpose:** Get detailed information about a specific test run (status, test counts, duration)
 - **Required parameter:** `runId` (string) - The run identifier
 - **Import:** `import { getRunDetails } from './.claude/tools/currents/get-run-details.ts'`
@@ -36,21 +38,25 @@ Enable granular agent access control for currents operations.
 - **Use when:** You have a run ID and want to see its overall statistics
 
 ### get-runs
+
 - **Purpose:** MCP wrapper for get-runs
 - **Import:** `import { getRuns } from './.claude/tools/currents/get-runs.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-spec-files-performance
+
 - **Purpose:** MCP wrapper for get-spec-files-performance
 - **Import:** `import { getSpecFilesPerformance } from './.claude/tools/currents/get-spec-files-performance.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-spec-instance
+
 - **Purpose:** MCP wrapper for get-spec-instance
 - **Import:** `import { getSpecInstance } from './.claude/tools/currents/get-spec-instance.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-test-results
+
 - **Purpose:** Get test execution results for a specific test signature (for debugging failed tests)
 - **Required parameter:** `signature` (string) - Test identifier from get-tests-signatures
 - **Optional parameters:** `status`, `authors`, `branches`, `tags`, `cursor`, `limit`
@@ -59,32 +65,34 @@ Enable granular agent access control for currents operations.
 - **Use when:** You have a test signature and want to see its execution history
 
 ### get-tests-performance
+
 - **Purpose:** MCP wrapper for get-tests-performance
 - **Import:** `import { getTestsPerformance } from './.claude/tools/currents/get-tests-performance.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-tests-signatures
+
 - **Purpose:** MCP wrapper for get-tests-signatures
 - **Import:** `import { getTestsSignatures } from './.claude/tools/currents/get-tests-signatures.ts'`
 - **Token cost:** ~unknown tokens
-
 
 ## Tool Mapping Guide
 
 **CRITICAL:** Choose the correct tool for your use case:
 
-| Your Goal | Tool to Use | Required Parameter | Example Value |
-|-----------|-------------|-------------------|---------------|
-| Get all projects | `get-projects` | none | - |
-| Get details for run X | `get-run-details` | `runId` | `"run-abc123"` |
-| Get results for test Y | `get-test-results` | `signature` | `"spec-file.ts:test-name"` |
-| Get latest runs | `get-runs` | `projectId` | `"proj-456"` |
-| Get test signatures | `get-tests-signatures` | `projectId` | `"proj-456"` |
-| Get test performance | `get-tests-performance` | `projectId` | `"proj-456"` |
-| Get spec performance | `get-spec-files-performance` | `projectId` | `"proj-456"` |
-| Get spec instance | `get-spec-instance` | `instanceId` | `"inst-789"` |
+| Your Goal              | Tool to Use                  | Required Parameter | Example Value              |
+| ---------------------- | ---------------------------- | ------------------ | -------------------------- |
+| Get all projects       | `get-projects`               | none               | -                          |
+| Get details for run X  | `get-run-details`            | `runId`            | `"run-abc123"`             |
+| Get results for test Y | `get-test-results`           | `signature`        | `"spec-file.ts:test-name"` |
+| Get latest runs        | `get-runs`                   | `projectId`        | `"proj-456"`               |
+| Get test signatures    | `get-tests-signatures`       | `projectId`        | `"proj-456"`               |
+| Get test performance   | `get-tests-performance`      | `projectId`        | `"proj-456"`               |
+| Get spec performance   | `get-spec-files-performance` | `projectId`        | `"proj-456"`               |
+| Get spec instance      | `get-spec-instance`          | `instanceId`       | `"inst-789"`               |
 
 **Common confusion:**
+
 - ❌ WRONG: "Get test results for run X" → `get-test-results` with `runId`
 - ✅ CORRECT: "Get test results for run X" → `get-run-details` with `runId`
 - ✅ CORRECT: "Get results for test Y" → `get-test-results` with `signature`

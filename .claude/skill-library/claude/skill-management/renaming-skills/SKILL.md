@@ -15,6 +15,7 @@ allowed-tools: Read, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion
 ## What This Skill Does
 
 Safely renames skills by:
+
 1. ✅ Validating old skill exists (core or library)
 2. ✅ Validating new name available (no conflicts)
 3. ✅ Updating frontmatter name field
@@ -35,6 +36,7 @@ Safely renames skills by:
 - Consolidating similar skills
 
 **NOT for:**
+
 - Changing skill behavior (use `updating-skills`)
 - Creating new skills (use `creating-skills`)
 - Moving skills between core ↔ library (use `migrating-skills`)
@@ -43,23 +45,43 @@ Safely renames skills by:
 
 ## Quick Reference - 7-Step Safe Rename
 
-| Step | Action | Tool | Verification |
-|------|--------|------|--------------|
-| 1 | Validate source exists | Bash, Read | Directory exists, valid skill |
-| 2 | Validate target available | Bash | No conflicts |
-| 3 | Update frontmatter | Edit | Name field updated |
-| 4 | Move directory | Bash | New dir exists, old gone |
-| 5 | Find references | Grep | List all matches |
-| 6 | Update references | Edit | All updated |
-| 7 | Verify integrity | Grep | Zero matches for old name |
+| Step | Action                    | Tool       | Verification                  |
+| ---- | ------------------------- | ---------- | ----------------------------- |
+| 1    | Validate source exists    | Bash, Read | Directory exists, valid skill |
+| 2    | Validate target available | Bash       | No conflicts                  |
+| 3    | Update frontmatter        | Edit       | Name field updated            |
+| 4    | Move directory            | Bash       | New dir exists, old gone      |
+| 5    | Find references           | Grep       | List all matches              |
+| 6    | Update references         | Edit       | All updated                   |
+| 7    | Verify integrity          | Grep       | Zero matches for old name     |
+
+---
+
+## Step 0: Navigate to Repository Root (MANDATORY)
+
+**Execute BEFORE any rename operation:**
+
+```bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+```
+
+**See:** [Repository Root Navigation](references/patterns/repo-root-detection.md)
+
+**⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
+
+**Cannot proceed without navigating to repo root** ✅
 
 ---
 
 ## Complete Workflow
 
+> **You MUST use TodoWrite before starting** to track all 9 steps of this workflow. Steps get skipped without tracking.
+
 Copy this checklist and track with TodoWrite:
 
-```
+```markdown
 Rename Progress:
 - [ ] Step 1: Validate source skill exists
 - [ ] Step 2: Validate target name available
@@ -79,16 +101,19 @@ Rename Progress:
 ### Step 1: Validate Source Exists
 
 **Check skill exists in core:**
+
 ```bash
 ls .claude/skills/<old-skill-name>
 ```
 
 **Check skill exists in library:**
+
 ```bash
 find .claude/skill-library -name "<old-skill-name>" -type d
 ```
 
 **Read to validate:**
+
 ```bash
 Read .claude/skills/<old-skill-name>/SKILL.md
 # OR
@@ -96,6 +121,7 @@ Read .claude/skill-library/{category}/<old-skill-name>/SKILL.md
 ```
 
 **Validation checks:**
+
 - [ ] Directory exists
 - [ ] Has SKILL.md file
 - [ ] Has frontmatter (between `---` markers)
@@ -103,7 +129,8 @@ Read .claude/skill-library/{category}/<old-skill-name>/SKILL.md
 - [ ] Name field matches directory name (or note mismatch to fix)
 
 **If validation fails:**
-```
+
+```text
 Error: "Skill '<old-skill-name>' not found or invalid"
 → Stop. Verify skill name and location.
 ```
@@ -113,11 +140,13 @@ Error: "Skill '<old-skill-name>' not found or invalid"
 ### Step 2: Validate Target Available
 
 **Check core doesn't have target:**
+
 ```bash
 ls .claude/skills/<new-skill-name> 2>/dev/null
 ```
 
 **Check library doesn't have target:**
+
 ```bash
 find .claude/skill-library -name "<new-skill-name>" -type d
 ```
@@ -125,7 +154,8 @@ find .claude/skill-library -name "<new-skill-name>" -type d
 **Both should return empty/error** (good - name available)
 
 **If target exists:**
-```
+
+```text
 Error: "Skill '<new-skill-name>' already exists"
 → Stop. Choose different name or delete existing skill first.
 ```
@@ -136,7 +166,7 @@ Error: "Skill '<new-skill-name>' already exists"
 
 **Use AskUserQuestion to show impact:**
 
-```
+```text
 Question: Rename skill '<old-skill-name>' to '<new-skill-name>'?
 
 This will update:
@@ -155,6 +185,7 @@ Options:
 ```
 
 **If user selects "Show me what will change":**
+
 - Run Step 5 (find references) but don't apply
 - Display all files that would be modified
 - Ask again with "Yes/No" options only
@@ -167,11 +198,13 @@ Options:
 ### Step 4: Update Frontmatter
 
 **Read current SKILL.md:**
+
 ```bash
 Read {skill-path}/SKILL.md
 ```
 
 **Update name field:**
+
 ```typescript
 Edit {
   file_path: "{skill-path}/SKILL.md",
@@ -181,6 +214,7 @@ Edit {
 ```
 
 **Verify update:**
+
 ```bash
 grep "^name:" {skill-path}/SKILL.md
 # Should show: name: <new-skill-name>
@@ -191,17 +225,20 @@ grep "^name:" {skill-path}/SKILL.md
 ### Step 5: Move Directory
 
 **Core skill:**
+
 ```bash
 mv .claude/skills/<old-skill-name> .claude/skills/<new-skill-name>
 ```
 
 **Library skill:**
+
 ```bash
 mv .claude/skill-library/{category}/<old-skill-name> \
    .claude/skill-library/{category}/<new-skill-name>
 ```
 
 **Verify move:**
+
 ```bash
 # Old should NOT exist
 ls {old-path}  # Should error
@@ -217,6 +254,7 @@ ls {new-path}  # Should succeed
 **Search strategy:** Find all references to old skill name
 
 **In gateways:**
+
 ```bash
 Grep {
   pattern: "<old-skill-name>",
@@ -226,6 +264,7 @@ Grep {
 ```
 
 **In commands:**
+
 ```bash
 Grep {
   pattern: "<old-skill-name>",
@@ -235,6 +274,7 @@ Grep {
 ```
 
 **In other skills (core):**
+
 ```bash
 Grep {
   pattern: "<old-skill-name>",
@@ -244,6 +284,7 @@ Grep {
 ```
 
 **In other skills (library):**
+
 ```bash
 Grep {
   pattern: "<old-skill-name>",
@@ -253,7 +294,8 @@ Grep {
 ```
 
 **Compile list:**
-```
+
+```text
 Files with references:
 - .claude/skills/gateway-claude/SKILL.md
 - .claude/commands/skill-manager.md
@@ -268,6 +310,7 @@ Files with references:
 For each file found, update references:
 
 **Pattern 1: Skill invocation**
+
 ```typescript
 Edit {
   file_path: "{file}",
@@ -277,6 +320,7 @@ Edit {
 ```
 
 **Pattern 2: File path references**
+
 ```typescript
 Edit {
   file_path: "{file}",
@@ -293,6 +337,7 @@ Edit {
 ```
 
 **Pattern 3: Natural language references**
+
 ```typescript
 Edit {
   file_path: "{file}",
@@ -308,6 +353,7 @@ Edit {
 ```
 
 **Pattern 4: Frontmatter skills list**
+
 ```typescript
 Edit {
   file_path: "{file}",
@@ -317,7 +363,8 @@ Edit {
 ```
 
 **Track updates:**
-```
+
+```text
 Updated references:
 ✅ .claude/skills/gateway-claude/SKILL.md (2 occurrences)
 ✅ .claude/commands/skill-manager.md (1 occurrence)
@@ -341,7 +388,8 @@ Grep {
 **Expected result:** Zero matches (empty output)
 
 **If matches found:**
-```
+
+```text
 ⚠️ Warning: References still exist:
 - {file1}
 - {file2}
@@ -353,7 +401,8 @@ Review these files manually. May be:
 ```
 
 **Ask user:**
-```
+
+```text
 Question: Found {count} files still mentioning old name. Review needed?
 
 Options:
@@ -368,7 +417,7 @@ Options:
 
 **Summary output:**
 
-```
+```text
 ✅ Skill renamed successfully
 
 Old name: <old-skill-name>
@@ -403,6 +452,7 @@ The skill is ready to use with its new name.
 **Why:** Skill names must use kebab-case for consistency
 
 **Fix:**
+
 1. Rename directory
 2. Update frontmatter
 3. Update all references
@@ -416,6 +466,7 @@ The skill is ready to use with its new name.
 **Why:** Name too generic, add domain prefix
 
 **Fix:**
+
 1. Rename with domain prefix
 2. Update description for clarity
 3. Update references
@@ -427,6 +478,7 @@ The skill is ready to use with its new name.
 **After:** `skill-audit` (keep one, delete other)
 
 **Process:**
+
 1. Identify which to keep
 2. Merge unique content from deleted skill
 3. Delete redundant skill directory
@@ -439,6 +491,7 @@ The skill is ready to use with its new name.
 **If rename fails mid-operation:**
 
 ### If failed at Step 4 (frontmatter update):
+
 ```bash
 # Revert frontmatter
 Edit {
@@ -449,12 +502,14 @@ Edit {
 ```
 
 ### If failed at Step 5 (directory move):
+
 ```bash
 # Move back
 mv {new-path} {old-path}
 ```
 
 ### If failed at Step 7 (reference updates):
+
 ```bash
 # Revert each updated file
 Edit {
@@ -468,6 +523,7 @@ mv {new-path} {old-path}
 ```
 
 **Always verify rollback:**
+
 ```bash
 # Check old name exists again
 ls {old-path}

@@ -11,6 +11,7 @@ allowed-tools: AskUserQuestion, Read
 Use this skill **for every development task** to ensure changes stay strictly within the requested scope.
 
 **Symptoms that trigger this skill:**
+
 - User requests a specific change or fix
 - You're about to implement a feature
 - You notice opportunities for "helpful" improvements
@@ -27,37 +28,41 @@ If the user didn't explicitly ask for it → ASK before doing it
 ```
 
 **The Test**: Can you point to the exact words in the user's request that ask for this change?
+
 - ✅ YES → Proceed
 - ❌ NO → Use AskUserQuestion tool before proceeding
 
 ### Common Violations (What NOT to Do)
 
-| Violation | Example | What to Do Instead |
-|-----------|---------|-------------------|
-| **Adding features** | User asks to fix a bug → You also add error logging | Ask: "Should I also add error logging?" |
+| Violation                     | Example                                                        | What to Do Instead                             |
+| ----------------------------- | -------------------------------------------------------------- | ---------------------------------------------- |
+| **Adding features**           | User asks to fix a bug → You also add error logging            | Ask: "Should I also add error logging?"        |
 | **Refactoring adjacent code** | User asks to update one function → You refactor the whole file | Ask: "Should I refactor the surrounding code?" |
-| **Adding validation** | User asks for form field → You add comprehensive validation | Ask: "What validation rules do you want?" |
-| **Creating abstractions** | User asks for one implementation → You create reusable utility | Ask: "Should I make this reusable?" |
-| **Documentation** | User asks for code → You add extensive comments | Ask: "Should I add documentation?" |
-| **Testing** | User asks for feature → You write comprehensive tests | Ask: "Should I write tests for this?" |
-| **Error handling** | User asks for happy path → You add try-catch everywhere | Ask: "What error handling do you want?" |
-| **Optimization** | User asks for implementation → You optimize for performance | Ask: "Should I optimize this?" |
+| **Adding validation**         | User asks for form field → You add comprehensive validation    | Ask: "What validation rules do you want?"      |
+| **Creating abstractions**     | User asks for one implementation → You create reusable utility | Ask: "Should I make this reusable?"            |
+| **Documentation**             | User asks for code → You add extensive comments                | Ask: "Should I add documentation?"             |
+| **Testing**                   | User asks for feature → You write comprehensive tests          | Ask: "Should I write tests for this?"          |
+| **Error handling**            | User asks for happy path → You add try-catch everywhere        | Ask: "What error handling do you want?"        |
+| **Optimization**              | User asks for implementation → You optimize for performance    | Ask: "Should I optimize this?"                 |
 
 ## Table of Contents
 
 This skill is organized into detailed reference documents:
 
 ### Core Methodology
+
 - **[The YAGNI Decision Tree](references/decision-tree.md)** - Step-by-step workflow for every change
 - **[Scope Boundaries](references/scope-boundaries.md)** - What's in scope vs out of scope
 - **[Asking Questions Pattern](references/asking-questions.md)** - How to ask effective scope questions
 
 ### Common Scenarios
+
 - **[Bug Fix Scenarios](references/bug-fix-scenarios.md)** - Staying focused when fixing bugs
 - **[Feature Implementation](references/feature-implementation.md)** - Building exactly what's requested
 - **[Code Review Changes](references/code-review.md)** - Handling review feedback in scope
 
 ### Anti-Patterns
+
 - **[Rationalization Traps](references/rationalization-traps.md)** - Common justifications to avoid
 - **[The "While I'm Here" Fallacy](references/while-im-here.md)** - Why adjacent changes are dangerous
 
@@ -68,6 +73,7 @@ For every development task, follow this sequence:
 ### 1. Parse the Request
 
 **Extract ONLY what was explicitly requested:**
+
 - Read the user's message word-by-word
 - List the specific changes requested
 - Note what was NOT mentioned
@@ -76,11 +82,11 @@ For every development task, follow this sequence:
 
 **Before implementing, classify potential work:**
 
-| Category | Definition | Action |
-|----------|------------|--------|
-| **In Scope** | Explicitly requested by user | ✅ Implement without asking |
-| **Unclear** | Implied but not explicit | ⚠️ Ask for clarification |
-| **Out of Scope** | Not mentioned at all | ❌ Do NOT implement unless approved |
+| Category         | Definition                   | Action                              |
+| ---------------- | ---------------------------- | ----------------------------------- |
+| **In Scope**     | Explicitly requested by user | ✅ Implement without asking         |
+| **Unclear**      | Implied but not explicit     | ⚠️ Ask for clarification            |
+| **Out of Scope** | Not mentioned at all         | ❌ Do NOT implement unless approved |
 
 ### 3. Question Out-of-Scope Changes
 
@@ -101,6 +107,7 @@ See [Asking Questions Pattern](references/asking-questions.md) for detailed exam
 ### 4. Implement In-Scope Changes Only
 
 **Strict implementation rules:**
+
 - Write ONLY the code needed for requested changes
 - Use existing patterns (don't "improve" them)
 - Don't add "defensive" code unless requested
@@ -110,6 +117,7 @@ See [Asking Questions Pattern](references/asking-questions.md) for detailed exam
 ### 5. Report What Was Done
 
 **When complete, report EXACTLY what was implemented:**
+
 - List changes made (should match request 1:1)
 - Note anything deliberately NOT done (opportunities you skipped)
 - Ask if user wants to address skipped opportunities
@@ -174,6 +182,7 @@ Types of improvements that require asking:
 See [Rationalization Traps](references/rationalization-traps.md) for complete list.
 
 **Quick examples:**
+
 - "It's just a small change" → NO, ask first
 - "It'll save time later" → NO, ask first
 - "It's a best practice" → NO, ask first
@@ -266,6 +275,7 @@ See [The "While I'm Here" Fallacy](references/while-im-here.md) for detailed ana
 ## Examples
 
 See [examples/](examples/) for real scenarios:
+
 - [Bug Fix with Adjacent Issues](examples/bug-fix-with-temptations.md)
 - [Feature Request with Implied Requirements](examples/feature-implied-requirements.md)
 - [Refactoring Request Boundaries](examples/refactoring-boundaries.md)

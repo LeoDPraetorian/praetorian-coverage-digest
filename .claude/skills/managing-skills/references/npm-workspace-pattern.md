@@ -12,16 +12,19 @@ TypeScript projects (package.json, tsconfig.json, src/, dist/) belong in `script
 ## Why Skills and Tools Have Different Structures
 
 **Tools (flat structure):**
+
 ```
 tools/context7/
 ├── package.json      ← Code IS the artifact
 ├── *.ts files        ← Pure implementation
 ```
+
 - Tools exist ONLY to wrap MCP servers
 - No documentation structure needed
 - Code IS the primary artifact
 
 **Skills (nested structure):**
+
 ```
 skills/claude-skill-search/
 ├── SKILL.md          ← Documentation IS the artifact
@@ -31,6 +34,7 @@ skills/claude-skill-search/
     ├── package.json
     └── src/
 ```
+
 - Skills are **documentation-first**
 - SKILL.md is the PRIMARY artifact (always required)
 - Scripts are SECONDARY (optional, for automation)
@@ -166,6 +170,7 @@ claude-skill-audit/scripts/node_modules/
 ```
 
 **Key config:**
+
 - `"workspaces"` includes library skill script directories, NOT core skills
 - CLI commands delegate to library skill packages (@chariot/auditing-skills, etc.)
 - Core skills (in `.claude/skills/`) are instruction-based with NO scripts
@@ -173,6 +178,7 @@ claude-skill-audit/scripts/node_modules/
 ### Step 2: Structure Individual Skills
 
 **For simple bash skills:**
+
 ```
 skill-name/
 ├── SKILL.md
@@ -181,6 +187,7 @@ skill-name/
 ```
 
 **For TypeScript skills:**
+
 ```
 skill-name/
 ├── SKILL.md
@@ -193,6 +200,7 @@ skill-name/
 ```
 
 **scripts/.gitignore for TypeScript:**
+
 ```gitignore
 # Build output (node_modules hoisted to .claude/)
 dist/
@@ -227,6 +235,7 @@ dist/
 ```
 
 **Important:**
+
 - NO `devDependencies` needed - tsx, typescript, vitest come from root
 - NO `"workspaces"` field - only in root package.json
 - Only list runtime dependencies the skill actually uses
@@ -238,6 +247,7 @@ dist/
 **MANDATORY**: All bash commands MUST use git-based repo-root detection.
 
 **Problem**: Commands like `cd .claude/skills/...` ONLY work from the repository root. They break when:
+
 - Working from a submodule directory (e.g., `modules/chariot/`)
 - Working from any nested directory (e.g., `.claude/skills/some-skill/`)
 - Different working directory contexts
@@ -251,6 +261,7 @@ cd "$REPO_ROOT/.claude/skills/skill-name/scripts" && npm run dev
 ```
 
 **Why this works:**
+
 - `--show-superproject-working-tree`: Returns super-repo root when in a submodule
 - `--show-toplevel`: Returns repo root for standalone repos
 - `||` fallback: Uses whichever succeeds
@@ -282,7 +293,7 @@ cd "$REPO_ROOT/.claude/skills/claude-skill-search/scripts" && npm run dev -- sea
 
 # Or use workspace command (also from any directory)
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && npm run dev --workspace @chariot/skill-search -- search "query"
+cd "$REPO_ROOT/.claude" && npm run dev --workspace @chariot/auditing-skills -- search "query"
 ```
 
 ### Running Tests
@@ -318,6 +329,7 @@ Dependency gets hoisted to root if version matches other skills.
 ### Version Conflicts
 
 If skills need different versions:
+
 ```
 .claude/skills/
 ├── node_modules/
@@ -336,12 +348,14 @@ npm handles this automatically.
 **Common misconception:** "Each skill's package.json means duplicate packages installed."
 
 **Reality:** package.json files are just **metadata** declaring dependencies. npm workspaces:
+
 1. Read all workspace package.json files
 2. Install ALL packages to root `.claude/node_modules/`
 3. Dedupe identical versions (installed once, shared by all)
 4. Only isolate packages with version conflicts
 
 **Proof with `npm ls`:**
+
 ```bash
 $ npm ls commander
 ├─┬ @chariot/agent-audit-alignment
@@ -350,7 +364,7 @@ $ npm ls commander
 │ └── commander@12.1.0           # Different version → isolated
 ├─┬ @chariot/skill-audit
 │ └── commander@11.1.0 deduped   # Same version → SHARED
-└─┬ @chariot/skill-search
+└─┬ @chariot/auditing-skills
   └── commander@11.1.0 deduped   # Same version → SHARED
 ```
 
@@ -359,11 +373,13 @@ $ npm ls commander
 ### Shared Dependencies (Hoisting)
 
 **Before (separate packages):**
+
 - claude-skill-search: 307 packages, 40 MB
 - claude-skill-audit: 295 packages, 38 MB
 - **Total: 602 packages, 78 MB**
 
 **After (workspace):**
+
 - Shared node_modules: 320 packages, 42 MB
 - Skill-specific: ~10 packages per skill
 - **Total: ~340 packages, 45 MB**
@@ -385,6 +401,7 @@ All skills use same versions of shared packages unless explicitly different.
 ### Migrating Existing TypeScript Skills
 
 **Current structure:**
+
 ```
 skill-name/
 ├── SKILL.md
@@ -403,6 +420,7 @@ skill-name/
 6. Run workspace install from .claude/skills/
 
 **Commands:**
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
 cd "$REPO_ROOT/.claude/skills/skill-name"
@@ -425,12 +443,14 @@ cd "$REPO_ROOT/.claude" && npm install
 ### At Skill Root ✅
 
 **ONLY these:**
+
 - SKILL.md (required file)
 - Directories: .local/, references/, examples/, templates/, scripts/
 
 ### In scripts/ Subdirectory ✅
 
 **TypeScript projects:**
+
 - package.json
 - package-lock.json (committed for reproducibility)
 - tsconfig.json
@@ -439,6 +459,7 @@ cd "$REPO_ROOT/.claude" && npm install
 - .gitignore (excludes dist/)
 
 **Simple scripts:**
+
 - helper.sh
 - validate.py
 - generate.js
@@ -471,6 +492,7 @@ skill-name/
 ```
 
 **Usage in SKILL.md (Claude Code execution syntax):**
+
 ```bash
 # The ! prefix tells Claude Code to execute this command
 !REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel) && cd "$REPO_ROOT/.claude/skills/skill-name/scripts" && npm run command -- "args"
@@ -510,6 +532,7 @@ No package.json needed - just executable scripts.
 **Cause:** Dependencies not hoisted properly
 
 **Solution:**
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
 cd "$REPO_ROOT/.claude" && rm -rf node_modules skills/*/scripts/node_modules && npm install
@@ -520,6 +543,7 @@ cd "$REPO_ROOT/.claude" && rm -rf node_modules skills/*/scripts/node_modules && 
 **Cause:** Workspace not configured in root package.json
 
 **Solution:** Verify `.claude/package.json` has:
+
 ```json
 {
   "workspaces": ["skills/*/scripts"]
@@ -529,6 +553,7 @@ cd "$REPO_ROOT/.claude" && rm -rf node_modules skills/*/scripts/node_modules && 
 ### Issue: Different TypeScript versions needed
 
 npm workspaces handle this - install specific version in that skill:
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
 cd "$REPO_ROOT/.claude" && npm install typescript@5.0.0 --workspace @chariot/skill-name
@@ -559,9 +584,9 @@ cd "$REPO_ROOT/.claude" && npm install typescript@5.0.0 --workspace @chariot/ski
 **All TypeScript skills MUST use this function to find the repository root:**
 
 ```typescript
-import { execSync } from 'child_process';
-import { existsSync } from 'fs';
-import { join, dirname } from 'path';
+import { execSync } from "child_process";
+import { existsSync } from "fs";
+import { join, dirname } from "path";
 
 /**
  * Find repository root using git
@@ -572,8 +597,8 @@ function findRepoRoot(): string {
   try {
     // MANDATORY: Handle submodules with --show-superproject-working-tree
     const gitRoot = execSync(
-      'git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel',
-      { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'ignore'] }
+      "git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel",
+      { encoding: "utf-8", stdio: ["pipe", "pipe", "ignore"] }
     ).trim();
     if (gitRoot) return gitRoot;
   } catch {}
@@ -581,39 +606,39 @@ function findRepoRoot(): string {
   // Fallback: search upward for .claude directory
   let current = process.cwd();
   while (current !== dirname(current)) {
-    if (existsSync(join(current, '.claude'))) {
+    if (existsSync(join(current, ".claude"))) {
       return current;
     }
     current = dirname(current);
   }
-  throw new Error('Could not find project root');
+  throw new Error("Could not find project root");
 }
 
 // Usage in your code
 const repoRoot = findRepoRoot();
-const skillsDir = join(repoRoot, '.claude/skills');
-const agentsDir = join(repoRoot, '.claude/agents');
+const skillsDir = join(repoRoot, ".claude/skills");
+const agentsDir = join(repoRoot, ".claude/agents");
 ```
 
 ### Why This Matters
 
 **❌ WRONG approaches that will break:**
+
 ```typescript
 // WRONG: Hardcoded relative paths
-const skillsDir = join(process.cwd(), '../../');
+const skillsDir = join(process.cwd(), "../../");
 
 // WRONG: Incomplete traversal (only goes up 3 levels)
-const repoRoot = join(__dirname, '../../..');
+const repoRoot = join(__dirname, "../../..");
 
 // WRONG: Assumes specific cwd
-const repoRoot = cwd.includes('.claude/skills')
-  ? join(cwd, '../../..')
-  : cwd;
+const repoRoot = cwd.includes(".claude/skills") ? join(cwd, "../../..") : cwd;
 ```
 
 **Common bug:** Going up 3 levels from `scripts/` lands at `.claude`, not repo root, causing doubled paths like `.claude/.claude/agents`.
 
 **✅ CORRECT: Use git as single source of truth**
+
 - Works from any directory
 - No manual path counting
 - Robust across environments
@@ -626,16 +651,16 @@ When creating a new TypeScript skill, **USE THE SHARED UTILITY** (recommended):
 ```typescript
 #!/usr/bin/env tsx
 
-import { join } from 'path';
-import { findProjectRoot } from '../../../lib/find-project-root.js';
+import { join } from "path";
+import { findProjectRoot } from "../../../lib/find-project-root.js";
 
 // Auto-detects project root from ANY directory (handles submodules!)
 const PROJECT_ROOT = findProjectRoot();
 
 // Now you can safely build paths
-const SKILLS_DIR = join(PROJECT_ROOT, '.claude/skills');
-const AGENTS_DIR = join(PROJECT_ROOT, '.claude/agents');
-const TOOLS_DIR = join(PROJECT_ROOT, '.claude/tools');
+const SKILLS_DIR = join(PROJECT_ROOT, ".claude/skills");
+const AGENTS_DIR = join(PROJECT_ROOT, ".claude/agents");
+const TOOLS_DIR = join(PROJECT_ROOT, ".claude/tools");
 ```
 
 **Or include the pattern directly** (if shared utility unavailable):
@@ -643,9 +668,9 @@ const TOOLS_DIR = join(PROJECT_ROOT, '.claude/tools');
 ```typescript
 #!/usr/bin/env tsx
 
-import { execSync } from 'child_process';
-import { existsSync } from 'fs';
-import { join, dirname } from 'path';
+import { execSync } from "child_process";
+import { existsSync } from "fs";
+import { join, dirname } from "path";
 
 /**
  * Find project root using git + filesystem fallback
@@ -655,8 +680,8 @@ function findProjectRoot(): string {
   try {
     // For submodules: get super-repo root, else get repo root
     const gitRoot = execSync(
-      'git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel',
-      { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'ignore'] }
+      "git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel",
+      { encoding: "utf-8", stdio: ["pipe", "pipe", "ignore"] }
     ).trim();
     if (gitRoot) return gitRoot;
   } catch {}
@@ -664,21 +689,22 @@ function findProjectRoot(): string {
   // Fallback: search upward for .claude directory
   let current = process.cwd();
   while (current !== dirname(current)) {
-    if (existsSync(join(current, '.claude'))) {
+    if (existsSync(join(current, ".claude"))) {
       return current;
     }
     current = dirname(current);
   }
-  throw new Error('Could not find project root');
+  throw new Error("Could not find project root");
 }
 
 // Now you can safely build paths
 const PROJECT_ROOT = findProjectRoot();
-const SKILLS_DIR = join(PROJECT_ROOT, '.claude/skills');
-const AGENTS_DIR = join(PROJECT_ROOT, '.claude/agents');
+const SKILLS_DIR = join(PROJECT_ROOT, ".claude/skills");
+const AGENTS_DIR = join(PROJECT_ROOT, ".claude/agents");
 ```
 
 **Why this matters:**
+
 - ✅ Works from ANY directory (project root, submodules, .claude/, scripts/)
 - ✅ Handles submodules correctly (super-repo root)
 - ✅ Robust fallback (filesystem search)
@@ -687,6 +713,7 @@ const AGENTS_DIR = join(PROJECT_ROOT, '.claude/agents');
 ## Summary
 
 **Unified workspace at `.claude/` =**
+
 - ✅ Single `npm install` for tools AND skills
 - ✅ Shared devDependencies (tsx, typescript, vitest)
 - ✅ No devDependencies in skill package.json files
@@ -696,6 +723,7 @@ const AGENTS_DIR = join(PROJECT_ROOT, '.claude/agents');
 - ✅ Robust path resolution with `findProjectRoot()`
 
 **Commands to remember (use from ANY directory):**
+
 ```bash
 # MANDATORY: Always use repo-root detection
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)

@@ -11,6 +11,7 @@ Use the executing-plans skill exactly as written
 ## Example Usage
 
 **Example 1: Execute small plan (5 tasks)**
+
 ```
 > /plan-execute
 
@@ -22,6 +23,7 @@ Use the executing-plans skill exactly as written
 ```
 
 **Example 2: Large plan with checkpoints (20 tasks)**
+
 ```
 > /plan-execute
 
@@ -41,6 +43,7 @@ Use the executing-plans skill exactly as written
 ```
 
 **Example 3: Plan with failures requiring fixes**
+
 ```
 > /plan-execute
 

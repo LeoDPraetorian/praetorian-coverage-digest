@@ -312,6 +312,12 @@
       "deprecatedDate": "2025-12-19",
       "reason": "Renamed to avoid namespace collision with /mcp-manager command (same name caused skill resolution instead of command)",
       "migrationNotes": "Use: skill: \"managing-mcp-wrappers\" - command /mcp-manager remains unchanged"
+    },
+    "frontend-zustand-state-management": {
+      "replacedBy": "using-zustand-state-management",
+      "deprecatedDate": "2025-12-25",
+      "reason": "Renamed to follow gerund (-ing) naming convention for consistency with other using-* skills",
+      "migrationNotes": "Use: Read('.claude/skill-library/development/frontend/state/using-zustand-state-management/SKILL.md')"
     }
   },
 

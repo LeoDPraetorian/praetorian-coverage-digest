@@ -9,6 +9,7 @@ npx tsx .claude/tools/context7/index.ts
 ```
 
 **Expected output:**
+
 ```
 Testing context7 MCP wrappers...
 
@@ -31,11 +32,13 @@ All tests passed! ✓
 ## Token Savings (Demonstrated)
 
 **Without progressive loading:**
+
 - Tools loaded at startup: 600 tokens
 - Full documentation: ~5,000 tokens
 - **Total: ~5,600 tokens per query**
 
 **With progressive loading:**
+
 - Tools loaded on-demand: 0 tokens startup
 - Filtered documentation: ~200 tokens
 - **Total: ~200 tokens per query**
@@ -55,6 +58,7 @@ All tests passed! ✓
 **Status: Mock MCP Calls**
 
 The wrappers currently use mock implementations instead of actual context7 MCP client calls. This demonstrates:
+
 - Structure and pattern ✓
 - Validation and type safety ✓
 - Filtering for token reduction ✓
@@ -73,33 +77,36 @@ The wrappers currently use mock implementations instead of actual context7 MCP c
 ## Usage
 
 ### Run Tests
+
 ```bash
 npx tsx .claude/tools/context7/index.ts
 ```
 
 ### Import in Code
+
 ```typescript
-import { resolveLibraryId, getLibraryDocs } from './.claude/tools/context7';
+import { resolveLibraryId, getLibraryDocs } from "./.claude/tools/context7";
 
 // Use with type safety
 const library = await resolveLibraryId.execute({
-  name: 'react',
-  ecosystem: 'npm'
+  name: "react",
+  ecosystem: "npm",
 });
 
 const docs = await getLibraryDocs.execute({
-  libraryId: library.id
+  libraryId: library.id,
 });
 
 console.log(docs.estimatedTokens); // 200 vs 5,000
 ```
 
 ### Agent-Generated Orchestration
+
 ```typescript
 // Agent writes code that uses wrappers
-import { resolveLibraryId, getLibraryDocs } from '.claude/tools/context7';
+import { resolveLibraryId, getLibraryDocs } from ".claude/tools/context7";
 
-const libraries = ['react', 'vue', 'angular'];
+const libraries = ["react", "vue", "angular"];
 const results = [];
 
 for (const lib of libraries) {
@@ -119,17 +126,17 @@ Replace mock implementation in `resolve-library-id.ts` line 49-57:
 
 ```typescript
 // Current (mock):
-const mockResult = { id: '...', name: '...' };
+const mockResult = { id: "...", name: "..." };
 
 // Replace with actual MCP client:
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 
-const client = new Client({ name: 'context7-wrapper', version: '1.0.0' }, {});
+const client = new Client({ name: "context7-wrapper", version: "1.0.0" }, {});
 await client.connect(transport);
 
 const result = await client.callTool({
-  name: 'resolve-library-id',
-  arguments: validated
+  name: "resolve-library-id",
+  arguments: validated,
 });
 
 const actualResult = JSON.parse(result.content[0].text);
@@ -140,6 +147,7 @@ Same for `get-library-docs.ts`.
 ## Validation Demonstrated
 
 The wrapper correctly validates:
+
 - ✓ Empty library names (rejected)
 - ✓ Invalid characters (rejected)
 - ✓ Invalid version formats (rejected)
@@ -147,6 +155,7 @@ The wrapper correctly validates:
 - ✓ Missing required fields (rejected)
 
 Try it:
+
 ```bash
 npx tsx -e "
 import { resolveLibraryId } from './.claude/tools/context7/resolve-library-id';

@@ -22,11 +22,13 @@ Enable granular agent access control for nebula operations.
 ## Available Tools (Auto-discovered: 5 wrappers)
 
 ### access-key-to-account-id
+
 - **Purpose:** MCP wrapper for access-key-to-account-id
 - **Import:** `import { accessKeyToAccountId } from './.claude/tools/nebula/access-key-to-account-id.ts'`
 - **Token cost:** ~unknown tokens
 
 **Returns:**
+
 ```typescript
 interface AccessKeyToAccountIdOutput {
   access_key_id?: string;
@@ -39,11 +41,13 @@ interface AccessKeyToAccountIdOutput {
 ```
 
 ### apollo
+
 - **Purpose:** MCP wrapper for apollo
 - **Import:** `import { apollo } from './.claude/tools/nebula/apollo.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
+
 ```typescript
 interface ApolloInput {
   profile: string;
@@ -51,6 +55,7 @@ interface ApolloInput {
 ```
 
 **Returns:**
+
 ```typescript
 interface ApolloOutput {
   graph?: object;
@@ -60,11 +65,13 @@ interface ApolloOutput {
 ```
 
 ### public-resources
+
 - **Purpose:** MCP wrapper for public-resources
 - **Import:** `import { publicResources } from './.claude/tools/nebula/public-resources.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
+
 ```typescript
 interface PublicResourcesInput {
   profile: string;
@@ -72,6 +79,7 @@ interface PublicResourcesInput {
 ```
 
 **Returns:**
+
 ```typescript
 interface PublicResourcesOutput {
   resources?: array;
@@ -83,11 +91,13 @@ interface PublicResourcesOutput {
 ```
 
 ### summary
+
 - **Purpose:** MCP wrapper for summary
 - **Import:** `import { summary } from './.claude/tools/nebula/summary.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
+
 ```typescript
 interface SummaryInput {
   profile: string;
@@ -95,6 +105,7 @@ interface SummaryInput {
 ```
 
 **Returns:**
+
 ```typescript
 interface SummaryOutput {
   account_id?: string;
@@ -105,11 +116,13 @@ interface SummaryOutput {
 ```
 
 ### whoami
+
 - **Purpose:** MCP wrapper for whoami
 - **Import:** `import { whoami } from './.claude/tools/nebula/whoami.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
+
 ```typescript
 interface WhoamiInput {
   action: string;
@@ -117,6 +130,7 @@ interface WhoamiInput {
 ```
 
 **Returns:**
+
 ```typescript
 interface WhoamiOutput {
   identity?: object;
@@ -125,12 +139,12 @@ interface WhoamiOutput {
 }
 ```
 
-
 ## Quick Examples
 
 See mcp-tools-registry for complete Bash + tsx execution patterns.
 
 **Inline execution:**
+
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
 npx tsx -e "(async () => {

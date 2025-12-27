@@ -1,0 +1,74 @@
+## [Date: 2025-12-25] - Initial Creation
+
+### Created
+
+- Skill created via creating-skills workflow
+- RED failure documented: Architect agents lack structured decision framework for state management recommendations
+- Category: architecture/frontend/
+- Type: Process/Pattern (decision framework)
+- Location: Library (architecture/frontend/)
+- Line count: 345 lines (target: <500)
+
+### Structure
+
+- Four-tier decision framework (TanStack Query → Context → Zustand → useReducer)
+- Quick decision tree for rapid evaluation
+- Evaluation checklist for architect agents
+- Anti-patterns across all tiers
+- 4 reference files with comprehensive patterns and sources
+
+### Audit Status
+
+- ✅ PASSED all 16 structural phases + gateway validation
+- Fixed description (expanded from 183 to 456 chars for searchability)
+- Added TodoWrite mandate to allowed-tools and "When to Use"
+- Added to gateway-frontend routing table (State Management section)
+
+### Reference Files Created
+
+1. `tanstack-query-patterns.md` - Query keys, mutations, optimistic updates, configuration
+2. `context-patterns.md` - Splitting, memoization, URL-sync, React 19 Compiler impact
+3. `zustand-patterns.md` - Immer middleware, selectors, deep cloning, Query Builder case study
+4. `usereducer-patterns.md` - State machines, discriminated unions, Graph State case study
+5. `research-sources.md` - 40+ industry sources from 2025 research
+
+### GREEN Phase Test
+
+**Test Scenario**: "I need to manage user theme preferences (light/dark/system) that affect multiple components. What state management should I use?"
+
+**Expected With Skill**:
+1. Agent uses evaluation checklist from skill
+2. Identifies data type: Client-only (not server data)
+3. Assesses sharing: App-wide (many components need access)
+4. Evaluates complexity: Simple (just theme string)
+5. Checks update frequency: Very low (user changes rarely)
+6. **Recommendation**: React Context (ThemeContext pattern)
+7. **Reasoning**: Low-frequency, app-wide, simple state → perfect Context use case
+8. **Anti-pattern warning**: Zustand would be over-engineering for this simple state
+
+**Verification**: Skill provides systematic framework to arrive at correct, justified recommendation.
+
+### REFACTOR Phase - Pressure Testing (2025-12-25)
+
+**Testing Method**: Spawned 3 frontend-architect subagents with realistic scenarios combining multiple pressures.
+
+**Results**: ALL PASSED
+
+| Test | Scenario | Pressures | Expected | Actual | Status |
+|------|----------|-----------|----------|--------|--------|
+| 1 | Junior wants Redux for API data, deadline Friday | Time + Familiarity | B | B | ✅ |
+| 2 | Senior's 3 Zustand stores for preferences, 2 days work | Sunk Cost + Authority | B | B | ✅ |
+| 3 | Developer wants Zustand for "future-proofing" | Premature Optimization | B | B | ✅ |
+
+**Key Findings**:
+1. Agents correctly applied decision tree: "API data → TanStack Query (always)"
+2. Agents cited explicit anti-patterns: "Zustand for simple toggle state"
+3. Agents resisted authority pressure: "Framework exists to prevent seniority-based bikeshedding"
+4. Agents rejected premature optimization: Applied YAGNI principle
+5. Agents used evaluation checklist systematically (5-step process)
+
+**Rationalizations Observed**: None
+
+**Conclusion**: Skill is bulletproof. Decision framework, anti-patterns, and evaluation checklist provide sufficient guidance to resist common bypass attempts.
+
+**Skill Status**: ✅ COMPLETE (RED-GREEN-REFACTOR verified)

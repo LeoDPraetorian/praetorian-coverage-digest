@@ -11,11 +11,13 @@
 ### Decision Criteria
 
 **Include gateway skill if**:
+
 - Agent works in specific domain (frontend, backend, testing, security)
 - Agent needs access to domain-specific patterns
 - Agent delegates to specialized library skills
 
 **Don't include gateway if**:
+
 - Agent is domain-agnostic
 - Agent uses only process skills (brainstorming, TDD, etc.)
 - Agent is pure orchestrator (uses plan/execute skills instead)
@@ -26,30 +28,30 @@
 
 ### By Domain
 
-| Domain | Gateway Skill | When to Use |
-|--------|--------------|-------------|
-| **Frontend** | `gateway-frontend` | React, TypeScript, UI components, state management |
-| **Backend** | `gateway-backend` | Go, APIs, infrastructure, databases |
-| **Testing** | `gateway-testing` | Test frameworks, patterns, E2E/unit/integration |
-| **Security** | `gateway-security` | Auth, secrets, cryptography, OWASP |
-| **MCP Tools** | `gateway-mcp-tools` | Linear, Praetorian CLI, Context7 wrappers |
-| **Integrations** | `gateway-integrations` | Third-party API patterns |
+| Domain           | Gateway Skill          | When to Use                                        |
+| ---------------- | ---------------------- | -------------------------------------------------- |
+| **Frontend**     | `gateway-frontend`     | React, TypeScript, UI components, state management |
+| **Backend**      | `gateway-backend`      | Go, APIs, infrastructure, databases                |
+| **Testing**      | `gateway-testing`      | Test frameworks, patterns, E2E/unit/integration    |
+| **Security**     | `gateway-security`     | Auth, secrets, cryptography, OWASP                 |
+| **MCP Tools**    | `gateway-mcp-tools`    | Linear, Praetorian CLI, Context7 wrappers          |
+| **Integrations** | `gateway-integrations` | Third-party API patterns                           |
 
 ### By Agent Type
 
-| Agent Type | Typical Gateway |
-|------------|----------------|
-| architecture (backend) | gateway-backend |
-| architecture (frontend) | gateway-frontend |
-| architecture (security) | gateway-security |
-| development (backend) | gateway-backend |
-| development (frontend) | gateway-frontend |
-| testing (any) | gateway-testing |
-| quality (domain-specific) | gateway-{domain} |
-| analysis (security) | gateway-security |
-| research | (none typically) |
-| orchestrator | (none - uses plan/execute skills) |
-| mcp-tools | gateway-mcp-tools (mandatory) |
+| Agent Type                | Typical Gateway                   |
+| ------------------------- | --------------------------------- |
+| architecture (backend)    | gateway-backend                   |
+| architecture (frontend)   | gateway-frontend                  |
+| architecture (security)   | gateway-security                  |
+| development (backend)     | gateway-backend                   |
+| development (frontend)    | gateway-frontend                  |
+| testing (any)             | gateway-testing                   |
+| quality (domain-specific) | gateway-{domain}                  |
+| analysis (security)       | gateway-security                  |
+| research                  | (none typically)                  |
+| orchestrator              | (none - uses plan/execute skills) |
+| mcp-tools                 | gateway-mcp-tools (mandatory)     |
 
 ---
 
@@ -58,14 +60,17 @@
 ### Frontmatter: Gateway Skills Only
 
 **In skills field, include ONLY**:
+
 - Gateway skills (`gateway-frontend`, `gateway-backend`, etc.)
 - Core process skills (`brainstorming`, `developing-with-tdd`, etc.)
 
 **Do NOT include**:
+
 - Library skill paths (those go in body Skill References table)
 - Library skill names directly
 
 **Example**:
+
 ```yaml
 # ✅ CORRECT - gateway in frontmatter
 skills: developing-with-tdd, gateway-frontend, verifying-before-completion
@@ -92,19 +97,21 @@ skills: frontend-tanstack-query
 
 ### Common Skill Routing
 
-| Task | Skill to Read |
-|------|---------------|
-| Data fetching | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md` |
-| Global state | `.claude/skill-library/development/frontend/state/frontend-zustand-state-management/SKILL.md` |
-| Performance | `.claude/skill-library/development/frontend/patterns/frontend-performance-optimization/SKILL.md` |
+| Task          | Skill to Read                                                                                    |
+| ------------- | ------------------------------------------------------------------------------------------------ |
+| Data fetching | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`                    |
+| Global state  | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md`    |
+| Performance   | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md` |
 
 **Workflow**:
+
 1. Identify task domain
 2. Read relevant skill from table
 3. Follow loaded skill's instructions
 ```
 
 **Why table is useful**:
+
 - Quick reference for common tasks
 - Direct paths (no searching)
 - Progressive disclosure (load when needed)
@@ -118,6 +125,7 @@ skills: frontend-tanstack-query
 **For each agent type/domain, list 5-10 common tasks**:
 
 **Example for frontend-developer**:
+
 - Data fetching (TanStack Query)
 - Global state management (Zustand)
 - Form handling (React Hook Form + Zod)
@@ -141,12 +149,13 @@ Find routing table, extract paths for common tasks.
 **Gateway skills list available library skills with full paths**.
 
 **Example from gateway-frontend**:
+
 ```markdown
-| Skill | Path |
-|-------|------|
-| frontend-tanstack | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md` |
-| frontend-zustand-state-management | `.claude/skill-library/development/frontend/state/frontend-zustand-state-management/SKILL.md` |
-| frontend-react-hook-form-zod | `.claude/skill-library/development/frontend/frontend-react-hook-form-zod/SKILL.md` |
+| Skill                             | Path                                                                                          |
+| --------------------------------- | --------------------------------------------------------------------------------------------- |
+| frontend-tanstack                 | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`                 |
+| using-zustand-state-management | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md` |
+| implementing-react-hook-form-zod      | `.claude/skill-library/development/frontend/implementing-react-hook-form-zod/SKILL.md`            |
 ```
 
 ---
@@ -154,19 +163,21 @@ Find routing table, extract paths for common tasks.
 ### Step 3: Create Table in Agent Body
 
 **Format**:
+
 ```markdown
-| Task | Skill to Read |
-|------|---------------|
+| Task               | Skill to Read            |
+| ------------------ | ------------------------ |
 | {Task description} | {Full path from gateway} |
 ```
 
 **Example**:
+
 ```markdown
-| Task | Skill to Read |
-|------|---------------|
-| Data fetching | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md` |
-| Global state | `.claude/skill-library/development/frontend/state/frontend-zustand-state-management/SKILL.md` |
-| Forms | `.claude/skill-library/development/frontend/frontend-react-hook-form-zod/SKILL.md` |
+| Task          | Skill to Read                                                                                 |
+| ------------- | --------------------------------------------------------------------------------------------- |
+| Data fetching | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`                 |
+| Global state  | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md` |
+| Forms         | `.claude/skill-library/development/frontend/implementing-react-hook-form-zod/SKILL.md`            |
 ```
 
 ---
@@ -176,12 +187,14 @@ Find routing table, extract paths for common tasks.
 ### Process Skills (Frontmatter)
 
 **Characteristics**:
+
 - Methodology/workflow guidance
 - Apply across domains
 - Located in `.claude/skills/` (core)
 - Auto-load via frontmatter `skills` field
 
 **Examples**:
+
 - `brainstorming` - Explore alternatives
 - `developing-with-tdd` - RED-GREEN-REFACTOR
 - `debugging-systematically` - Root cause investigation
@@ -190,6 +203,7 @@ Find routing table, extract paths for common tasks.
 - `executing-plans` - Plan execution
 
 **Usage in agent**:
+
 ```yaml
 skills: brainstorming, developing-with-tdd, verifying-before-completion
 ```
@@ -201,6 +215,7 @@ Agent invokes these skills directly (they auto-load).
 ### Gateway Skills (Frontmatter + Body Table)
 
 **Characteristics**:
+
 - Domain-specific pattern libraries
 - Route to library skills
 - Progressive disclosure (load on-demand)
@@ -208,11 +223,13 @@ Agent invokes these skills directly (they auto-load).
 - Body: Table with library skill paths
 
 **Examples**:
+
 - `gateway-frontend` → routes to 20 frontend library skills
 - `gateway-backend` → routes to 16 backend library skills
 - `gateway-testing` → routes to 14 testing library skills
 
 **Usage in agent**:
+
 ```yaml
 # Frontmatter
 skills: gateway-frontend, developing-with-tdd
@@ -225,11 +242,50 @@ skills: gateway-frontend, developing-with-tdd
 ```
 
 **Workflow**:
+
 1. Agent sees `gateway-frontend` in frontmatter
 2. Agent reads gateway to find available skills
 3. Agent identifies task domain
 4. Agent reads specific library skill from table
 5. Agent follows library skill's instructions
+
+---
+
+## Body Content → Skill Mapping
+
+**Purpose**: Match agent functionality descriptions to appropriate process skills.
+
+**When agents describe what they do, include matching process skills:**
+
+| Body Trigger Pattern           | Skill to Include              | When Mentioned                                      |
+| ------------------------------ | ----------------------------- | --------------------------------------------------- |
+| "brainstorm", "explore ideas"  | `brainstorming`               | Agent explores alternatives or refines ideas        |
+| "debug", "investigate issues"  | `debugging-systematically`    | Agent troubleshoots or finds root causes            |
+| "TDD", "test-driven", "tests"  | `developing-with-tdd`         | Agent implements with tests-first workflow          |
+| "plan", "break down tasks"     | `writing-plans`               | Agent creates implementation plans                  |
+| "parallel", "concurrent"       | `dispatching-parallel-agents` | Agent spawns multiple agents concurrently           |
+| "security review", "threats"   | `gateway-security`            | Agent performs security analysis                    |
+| "todo", "track progress"       | `using-todowrite`             | Agent manages multi-step workflows                  |
+| "refactor", "eliminate dupes"  | `adhering-to-dry`             | Agent reduces code duplication                      |
+| "scope", "requirements only"   | `adhering-to-yagni`           | Agent maintains strict scope discipline             |
+| "state management", "React"    | `gateway-frontend`            | Agent works with frontend state patterns            |
+| "API", "backend services"      | `gateway-backend`             | Agent develops backend services                     |
+| "verify", "validation"         | `verifying-before-completion` | Agent performs final checks before completion       |
+
+**Examples**:
+
+```markdown
+# Agent that "debugs frontend issues"
+skills: debugging-systematically, gateway-frontend
+
+# Agent that "implements features with TDD"
+skills: developing-with-tdd, gateway-backend
+
+# Agent that "orchestrates parallel tasks"
+skills: dispatching-parallel-agents, using-todowrite, writing-plans
+```
+
+**Why this matters**: Skills should reflect what the agent actually does, not just its domain. An agent that "systematically debugs Go services" needs both `debugging-systematically` and `gateway-backend`.
 
 ---
 
@@ -248,6 +304,7 @@ skills: developing-with-tdd, brainstorming, gateway-frontend, debugging-systemat
 ```
 
 **To alphabetize**:
+
 1. List all skills
 2. Sort case-insensitively
 3. Join with `, `
@@ -271,6 +328,7 @@ skills: developing-with-tdd, brainstorming, gateway-frontend, debugging-systemat
 - [ ] All paths are full paths (`.claude/skill-library/...`)
 - [ ] Paths match gateway's routing table
 - [ ] Workflow instructions provided (how to use table)
+- [ ] Skills match body content triggers (see Body Content → Skill Mapping)
 
 ---
 

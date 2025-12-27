@@ -5,6 +5,7 @@
 ## Step 1: Load Phase 3 Context
 
 Load threat model summary and risk matrix:
+
 ```bash
 # Read Phase 3 summary
 cat .claude/.threat-model/{session}/phase-3/summary.md
@@ -18,11 +19,13 @@ cat .claude/.threat-model/{session}/phase-3/risk-matrix.json
 ## Step 2: Map Threats to Code Locations
 
 For EACH threat in threat-model.json, identify:
+
 1. **Affected files** - Which source files contain the vulnerability?
 2. **Specific lines** - What functions/methods need review?
 3. **Focus areas** - What to look for during review?
 
 **Use data from Phase 1 architecture**:
+
 ```bash
 # Reference Phase 1 entry points for code locations
 cat .claude/.threat-model/{session}/phase-1/entry-points.json
@@ -250,6 +253,7 @@ Create `test-priorities.json` consolidating all tests by priority:
 Create `summary.md` (<2000 tokens) as execution roadmap:
 
 **Template**:
+
 ```markdown
 # Phase 4 Summary: Security Test Plan
 
@@ -266,12 +270,12 @@ Create `summary.md` (<2000 tokens) as execution roadmap:
 
 ## Priority Breakdown
 
-| Priority | Tests | Effort | Timeline |
-|----------|-------|--------|----------|
-| P0 (Critical) | 12 | 20 hrs | Sprint 0 |
-| P1 (High) | 18 | 30 hrs | Sprint 1 |
-| P2 (Medium) | 10 | 20 hrs | Sprint 2-3 |
-| P3 (Low) | 5 | 10 hrs | Backlog |
+| Priority      | Tests | Effort | Timeline   |
+| ------------- | ----- | ------ | ---------- |
+| P0 (Critical) | 12    | 20 hrs | Sprint 0   |
+| P1 (High)     | 18    | 30 hrs | Sprint 1   |
+| P2 (Medium)   | 10    | 20 hrs | Sprint 2-3 |
+| P3 (Low)      | 5     | 10 hrs | Backlog    |
 
 ## Immediate Actions (P0)
 

@@ -4,23 +4,27 @@ Complete reference for all compliance validation phases.
 
 ## Overview
 
-The audit validates skills against structural, semantic, and operational requirements across multiple phases (currently 16, with 14-15 reserved). Some phases are auto-fixable, others require manual intervention. See [Adding New Phases](#adding-new-phases) for the checklist when extending.
+The audit validates skills against structural, semantic, and operational requirements across 21 phases. Some phases are auto-fixable, others require manual intervention. See [Adding New Phases](#adding-new-phases) for the checklist when extending.
 
 **After structural audit completes, Claude performs semantic review.** See [Post-Audit Semantic Review](#post-audit-semantic-review).
 
 ## Phase Categories
 
 ### Auto-Fixable (Deterministic)
-Phases 2, 4, 5, 6, 7, 10, 12, 16 - can be automatically fixed
+
+Phases 2, 4, 5, 6, 7, 10, 12, 14a-c, 16, 18 - can be automatically fixed
 
 ### Semantic (Deferred)
-Phases 1, 3, 9, 13 - require human judgment
+
+Phases 1, 3, 9, 13, 15, 17, 21 - require human judgment
 
 ### Specialized CLI
+
 Phases 8, 11 - use dedicated validation tools
 
-### Reserved
-Phases 14-15 - reserved for future structural validation
+### Gateway-Specific
+
+Phases 17-20 - only apply to gateway-\* skills
 
 ## Phase Reference
 
@@ -29,12 +33,14 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** Frontmatter description follows conventions
 
 **Requirements:**
+
 - Starts with "Use when"
 - Clear, actionable trigger
 - Specific context
 - No marketing language
 
 **Examples:**
+
 - ✅ "Use when creating React components with TypeScript"
 - ✅ "Use when debugging production issues systematically"
 - ❌ "Amazing tool for React development"
@@ -51,11 +57,13 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** Frontmatter lists appropriate tools for skill type
 
 **Requirements:**
+
 - Tool-wrapper skills: Only wrapped tool + TodoWrite
 - Reasoning skills: Read, Grep, Glob, Bash, TodoWrite minimum
 - Hybrid skills: Appropriate mix
 
 **Auto-fix:**
+
 - Adds missing baseline tools
 - Removes inappropriate tools
 - Sorts alphabetically
@@ -69,6 +77,7 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** SKILL.md length matches skill type
 
 **Requirements:**
+
 - < 300 lines: Simple reasoning or tool-wrapper
 - 300-500 lines: Complex reasoning or hybrid
 - > 500 lines: Should be split or moved to references/
@@ -84,11 +93,13 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** All internal links resolve
 
 **Requirements:**
+
 - Markdown links to existing files
 - Relative paths from SKILL.md
 - No 404s
 
 **Auto-fix:**
+
 - Removes links to missing files
 - Fixes relative path errors
 - Updates moved file references
@@ -102,11 +113,13 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** Required directories exist
 
 **Requirements:**
+
 - references/ (for progressive disclosure)
 - examples/ (for complete workflows)
 - templates/ (for reusable patterns)
 
 **Auto-fix:**
+
 - Creates missing directories
 - Warns if empty but doesn't fail
 
@@ -119,12 +132,14 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** scripts/ directory follows conventions
 
 **Requirements:**
+
 - package.json with @chariot/skill-name
 - tsconfig.json for TypeScript
 - src/ for implementation
 - No build artifacts in git
 
 **Auto-fix:**
+
 - Creates package.json from template
 - Adds tsconfig.json
 - Creates src/ directory
@@ -139,11 +154,13 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** Runtime outputs use .local/ directory pattern
 
 **Requirements:**
+
 - Skills teach patterns, don't generate files
 - Generated content goes to /tmp
 - No persistent output in skill directories
 
 **Auto-fix:**
+
 - Removes output/ directories
 - Updates instructions to use /tmp
 
@@ -156,21 +173,25 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** TypeScript project structure, compilation, and test execution
 
 **Structure Checks:**
+
 - package.json in scripts/ subdirectory (not skill root)
-- scripts/.gitignore exists with dist/, *.log exclusions
+- scripts/.gitignore exists with dist/, \*.log exclusions
 - scripts/tsconfig.json exists
 - scripts/src/ directory exists
 - Git-based path resolution (no hardcoded relative paths)
 
 **Compilation Checks:**
+
 - Runs `tsc --noEmit` to verify zero TypeScript errors
 - Reports error count and first few error messages on failure
 
 **Vitest Configuration:**
+
 - tsconfig.json must have `"types": ["vitest/globals", "node"]`
 - Required for describe/test/expect globals without imports
 
 **Test Execution (100% Pass Required):**
+
 - Runs `npm run test:unit` (or `npm test` if no test:unit script)
 - CRITICAL failure if any tests fail
 - Reports failure count and first few failure messages
@@ -187,6 +208,7 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** Inline bash replaced with TypeScript CLIs
 
 **Requirements:**
+
 - No heredocs with 50+ lines of bash
 - Complex logic in TypeScript, not bash
 - Orchestration only in skill instructions
@@ -202,11 +224,13 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** No references to archived skills
 
 **Requirements:**
+
 - No mentions of deprecated skills
 - Update to replacement skills
 - Check deprecation registry
 
 **Auto-fix:**
+
 - Replaces deprecated skill names
 - Updates to current replacements
 
@@ -219,6 +243,7 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** Commands work across environments
 
 **Requirements:**
+
 - Repo-root detection (findProjectRoot)
 - No hardcoded paths
 - Cross-platform compatibility
@@ -236,12 +261,14 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** CLIs return proper exit codes
 
 **Requirements:**
+
 - process.exit(0) on success
 - process.exit(1) on failure
 - No silent failures
 - Error messages to stderr
 
 **Auto-fix:**
+
 - Adds missing exit codes
 - Ensures error logging
 
@@ -254,6 +281,7 @@ Phases 14-15 - reserved for future structural validation
 **Validates:** No persistent state in skill files
 
 **Requirements:**
+
 - Configuration via npm workspaces
 - State in /tmp or project files
 - No SQLite/JSON files in skill dirs
@@ -265,9 +293,52 @@ Phases 14-15 - reserved for future structural validation
 
 ---
 
-### Phases 14-15: Reserved
+### Phase 14: Visual/Style ✅ Auto-fixable
 
-Reserved for future structural validation phases. Skipped in current implementation.
+**Contains sub-phases 14a, 14b, 14c that run together when using `--phase 14`.**
+
+#### Phase 14a: Table Formatting
+
+**Validates:** Markdown tables follow consistent formatting
+
+**Requirements:**
+
+- Consistent column alignment
+- Proper header separators
+- No broken table structures
+
+#### Phase 14b: Code Block Quality
+
+**Validates:** Code blocks have language identifiers
+
+**Requirements:**
+
+- All code blocks specify language (`typescript, `bash, etc.)
+- No bare ``` blocks without language
+
+#### Phase 14c: Header Hierarchy
+
+**Validates:** Headers follow proper nesting
+
+**Requirements:**
+
+- No skipped heading levels (h1 → h3 without h2)
+- Consistent structure throughout document
+
+**Auto-fix:** Formatting corrections applied automatically
+
+---
+
+### Phase 15: Orphan Detection ⚠️ Semantic
+
+**Validates:** Library skills are referenced by at least one gateway
+
+**Requirements:**
+
+- Library skills must be in a gateway routing table
+- No "orphan" skills that agents can't discover
+
+**Why deferred:** May require judgment on which gateway is appropriate
 
 ---
 
@@ -276,16 +347,19 @@ Reserved for future structural validation phases. Skipped in current implementat
 **Validates:** No Windows-style backslash paths in skills
 
 **Requirements:**
+
 - All paths use forward slashes (POSIX-style)
 - No `C:\path\to\file` patterns
 - No `.\relative\path` patterns
 - Cross-platform path compatibility
 
 **Auto-fix:**
+
 - Converts backslashes to forward slashes
 - Preserves path semantics
 
 **Why this matters:**
+
 - Skills may be authored on Windows but run on macOS/Linux
 - Backslash paths break on non-Windows systems
 - Forward slashes work universally
@@ -294,24 +368,101 @@ Reserved for future structural validation phases. Skipped in current implementat
 
 ---
 
+### Phase 17: Gateway Structure ⚠️ Semantic (Gateway-only)
+
+**Validates:** Gateway skills have required structure
+
+**Requirements:**
+
+- Two-tier explanation section present
+- Routing table section present
+- Usage instructions present
+
+**Applies to:** `gateway-*` skills only
+
+---
+
+### Phase 18: Routing Table Format ✅ Auto-fixable (Gateway-only)
+
+**Validates:** Gateway routing tables use correct format
+
+**Requirements:**
+
+- Full paths (`.claude/skill-library/.../SKILL.md`), not just skill names
+- Alphabetically sorted entries
+- Valid markdown table structure
+
+**Auto-fix:**
+
+- Expands skill names to full paths
+- Sorts entries alphabetically
+
+**Applies to:** `gateway-*` skills only
+
+---
+
+### Phase 19: Path Resolution ⚠️ Semantic (Gateway-only)
+
+**Validates:** All paths in routing table resolve to existing files
+
+**Requirements:**
+
+- Every path in routing table points to existing SKILL.md
+- No broken references to deleted/moved skills
+
+**Applies to:** `gateway-*` skills only
+
+---
+
+### Phase 20: Coverage Check ⚠️ Semantic (Gateway-only)
+
+**Validates:** Gateway covers all skills in its domain
+
+**Requirements:**
+
+- All library skills in gateway's category are listed
+- No gaps in coverage
+
+**Applies to:** `gateway-*` skills only
+
+---
+
+### Phase 21: Line Number References ⚠️ Semantic
+
+**Validates:** Code references use durable patterns
+
+**Requirements:**
+
+- Avoid hardcoded line numbers (`:123`)
+- Prefer function/class names for references
+- Line numbers become stale as code evolves
+
+**Why deferred:** Requires judgment on reference context
+
+---
+
 ## Running Audits
 
 ### Audit Single Skill
+
 ```bash
 npm run audit -- skill-name
 ```
 
 ### Audit All Skills
+
 ```bash
 npm run audit
 ```
 
 ### Audit Specific Phase
+
 ```bash
 npm run audit -- skill-name --phase 2
 ```
 
 ### Audit with Verbosity
+
 ```bash
 npm run audit -- skill-name --verbose
 ```
@@ -319,21 +470,25 @@ npm run audit -- skill-name --verbose
 ## Fixing Issues
 
 ### Auto-fix All Fixable Phases
+
 ```bash
 npm run fix -- skill-name
 ```
 
 ### Preview Fixes (Dry Run)
+
 ```bash
 npm run fix -- skill-name --dry-run
 ```
 
 ### Fix Specific Phase
+
 ```bash
 npm run fix -- skill-name --phase 2
 ```
 
 ### Fix All Skills
+
 ```bash
 npm run fix
 ```
@@ -341,30 +496,37 @@ npm run fix
 ## Interpreting Results
 
 ### ✅ PASS
+
 All requirements met, no action needed
 
 ### ⚠️ WARN
+
 Non-critical issue, consider fixing
 
 ### ❌ FAIL
+
 Critical issue, must fix before deployment
 
 ### 🔧 DEFERRED
+
 Semantic issue, requires manual review
 
 ## Compliance Levels
 
 ### Level 1: Deployable
+
 - All auto-fixable phases pass
 - No critical failures
 - Semantic issues documented
 
 ### Level 2: Production-Ready
+
 - All phases pass
 - No warnings
 - Full progressive disclosure
 
 ### Level 3: Best Practice
+
 - All phases pass
 - Comprehensive examples
 - Complete test coverage
@@ -372,15 +534,17 @@ Semantic issue, requires manual review
 
 ## Adding New Phases
 
-When adding a new audit phase (e.g., Phase 14), follow this checklist:
+When adding a new audit phase (e.g., Phase 22), follow this checklist:
 
 ### 1. Implementation (Required)
+
 - [ ] Create `scripts/src/lib/phases/phase{N}-{name}.ts`
 - [ ] Implement `validate(skill)` method returning `AuditIssue[]`
 - [ ] Implement `run(skillsDir, options?)` method for batch processing
 - [ ] Add unit tests in `scripts/src/lib/phases/__tests__/phase{N}-*.test.ts`
 
 ### 2. Registration (Required)
+
 - [ ] Import phase in `scripts/src/lib/audit-engine.ts`
 - [ ] Add to `runFull()` method's phase execution list
 - [ ] Add to `runFullForSingleSkill()` method
@@ -389,11 +553,13 @@ When adding a new audit phase (e.g., Phase 14), follow this checklist:
 - [ ] **Update `PHASE_COUNT` constant** (single source of truth for CLI validation)
 
 ### 3. Fix Support (If Auto-Fixable)
+
 - [ ] Register in `scripts/src/fix.ts` FIXERS array
 - [ ] Add `fixPhase{N}()` method in audit-engine.ts
 - [ ] Document auto-fix behavior
 
 ### 4. Documentation (Required)
+
 - [ ] Add section to this file (`references/audit-phases.md`)
 - [ ] Create detailed reference: `references/phase-{NN}-{name}.md`
 - [ ] Update SKILL.md table if phase count in description (now dynamic via PHASE_COUNT)
@@ -401,17 +567,21 @@ When adding a new audit phase (e.g., Phase 14), follow this checklist:
 ### Why PHASE_COUNT Matters
 
 The `PHASE_COUNT` constant in `audit-engine.ts` is the **single source of truth** for:
+
 - CLI validation (`--phase` argument range checking)
 - CLI help text (`Audit specific phase (1-N)`)
 - Error messages
 
-When you add Phase 14, update `PHASE_COUNT = 14` and all CLI validation automatically adjusts. No need to hunt for hardcoded "13" references.
+When you add Phase 22, update `PHASE_COUNT = 22` and all CLI validation automatically adjusts. No need to hunt for hardcoded references.
 
 ### Phase Numbering Convention
 
-- Phases 1-9: Core structural validation
-- Phases 10-13: Advanced/specialized validation
-- New phases: Append sequentially (14, 15, etc.)
+- Phases 1-13: Core structural validation
+- Phase 14: Visual/style validation (sub-phases 14a, 14b, 14c)
+- Phases 15-16: Additional structural validation
+- Phases 17-20: Gateway-specific validation
+- Phase 21: Line number references
+- New phases: Append sequentially (22, 23, etc.)
 
 Never renumber existing phases - this breaks historical audit references and documentation.
 
@@ -419,9 +589,10 @@ Never renumber existing phases - this breaks historical audit references and doc
 
 ## Post-Audit Semantic Review
 
-**After the structural audit (Phases 1-16) completes, Claude MUST perform semantic review.**
+**After the structural audit (Phases 1-21) completes, Claude MUST perform semantic review.**
 
 The structural audit catches what code can detect. But code cannot reason about:
+
 - Whether a skill is categorized correctly (frontend vs backend vs testing)
 - Whether gateway membership is correct
 - Whether the description effectively helps discovery
@@ -434,6 +605,7 @@ After reviewing structural audit output, Claude performs these checks:
 #### 1. Description Quality (CSO - Claude Search Optimization)
 
 **Ask yourself:**
+
 - Does the description include key trigger terms users would mention?
 - Is the complexity level appropriate for this skill?
 - Are there important keywords missing that would improve discovery?
@@ -445,6 +617,7 @@ After reviewing structural audit output, Claude performs these checks:
 #### 2. Skill Categorization
 
 **Ask yourself:**
+
 - Is this a frontend skill? (React, TypeScript, CSS, UI, components)
 - Is this a backend skill? (Go, AWS, API, Lambda, DynamoDB)
 - Is this a testing skill? (unit tests, e2e tests, Playwright, Vitest)
@@ -457,16 +630,17 @@ After reviewing structural audit output, Claude performs these checks:
 
 **Based on categorization, check gateway membership:**
 
-| Category | Gateway | Check Path |
-|----------|---------|------------|
-| Frontend | `gateway-frontend` | `.claude/skills/gateway-frontend/SKILL.md` |
-| Backend | `gateway-backend` | `.claude/skills/gateway-backend/SKILL.md` |
-| Testing | `gateway-testing` | `.claude/skills/gateway-testing/SKILL.md` |
-| Security | `gateway-security` | `.claude/skills/gateway-security/SKILL.md` |
-| MCP Tools | `gateway-mcp-tools` | `.claude/skills/gateway-mcp-tools/SKILL.md` |
+| Category     | Gateway                | Check Path                                     |
+| ------------ | ---------------------- | ---------------------------------------------- |
+| Frontend     | `gateway-frontend`     | `.claude/skills/gateway-frontend/SKILL.md`     |
+| Backend      | `gateway-backend`      | `.claude/skills/gateway-backend/SKILL.md`      |
+| Testing      | `gateway-testing`      | `.claude/skills/gateway-testing/SKILL.md`      |
+| Security     | `gateway-security`     | `.claude/skills/gateway-security/SKILL.md`     |
+| MCP Tools    | `gateway-mcp-tools`    | `.claude/skills/gateway-mcp-tools/SKILL.md`    |
 | Integrations | `gateway-integrations` | `.claude/skills/gateway-integrations/SKILL.md` |
 
 **Ask yourself:**
+
 - Should this skill be listed in a gateway?
 - Is it listed in the CORRECT gateway(s)?
 - Is it missing from a gateway it should be in?
@@ -476,6 +650,7 @@ After reviewing structural audit output, Claude performs these checks:
 #### 4. Tool Appropriateness
 
 **Ask yourself:**
+
 - Given the skill's PURPOSE, are the allowed-tools appropriate?
 - Should read-only analysis skills have Write/Edit tools?
 - Should Bash be scoped more narrowly? (e.g., `Bash(git:*)` instead of `Bash`)
@@ -486,6 +661,7 @@ After reviewing structural audit output, Claude performs these checks:
 #### 5. Content Density Assessment
 
 **For skills with word count warnings (>500 lines):**
+
 - Is the length justified by essential content density?
 - What sections could be extracted to references/?
 - Are there redundant examples or repetitive explanations?
@@ -499,29 +675,35 @@ After semantic review, report findings in this format:
 ## Semantic Review Findings
 
 ### Skill Categorization
+
 - **Current:** Not categorized
 - **Should be:** Frontend (lints TypeScript/React code)
 - **Action:** Add to gateway-frontend routing table
 
 ### Gateway Membership
+
 - **Missing from:** gateway-frontend
 - **Action:** Add skill path to gateway-frontend SKILL.md
 
 ### Description Quality
+
 - **Issue:** Missing key term "ESLint" in description
 - **Current:** "Use when linting code - smart file detection"
 - **Suggested:** "Use when linting TypeScript/JavaScript with ESLint - smart file detection, only lints modified files"
 
 ### Tool Appropriateness
+
 - ✅ Tools appropriate for skill purpose
 ```
 
 ### When to Skip Semantic Review
 
-Skip semantic review if:
+Skip semantic review ONLY if:
+
 - Running `--phase N` for a specific structural phase
-- All structural phases passed with zero warnings
-- Skill is a simple tool-wrapper with minimal content
+- Skill is a simple tool-wrapper with minimal content (<50 lines, single tool wrapper)
+
+**Note:** Semantic review is mandatory even when structural phases pass with zero warnings, as code cannot detect categorization, gateway membership, or tool appropriateness issues.
 
 ### Integration with Fix Command
 

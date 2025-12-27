@@ -18,10 +18,12 @@
 HackerOne API uses HTTP Basic Authentication with API credentials.
 
 **Credentials format:**
+
 - Username: API Identifier (found in HackerOne settings)
 - Password: API Token (generated in HackerOne settings)
 
 **Example:**
+
 ```bash
 curl -X GET "https://api.hackerone.com/v1/reports" \
   -u "YOUR_API_IDENTIFIER:YOUR_API_TOKEN" \
@@ -29,6 +31,7 @@ curl -X GET "https://api.hackerone.com/v1/reports" \
 ```
 
 **Go implementation:**
+
 ```go
 req.SetBasicAuth(apiIdentifier, apiToken)
 req.Header.Set("Accept", "application/json")
@@ -43,6 +46,7 @@ req.Header.Set("Accept", "application/json")
 **Endpoint:** `GET /v1/reports`
 
 **Parameters:**
+
 - `filter[state][]`: Filter by state (new, triaged, resolved, etc.)
 - `filter[program][]`: Filter by program handle
 - `page[size]`: Results per page (max 100)
@@ -50,12 +54,14 @@ req.Header.Set("Accept", "application/json")
 - `sort`: Sort order (created_at, -created_at for descending)
 
 **Example request:**
+
 ```bash
 curl "https://api.hackerone.com/v1/reports?filter[state][]=triaged&page[size]=25" \
   -u "API_ID:API_TOKEN"
 ```
 
 **Response structure:**
+
 ```json
 {
   "data": [
@@ -107,12 +113,14 @@ curl "https://api.hackerone.com/v1/reports?filter[state][]=triaged&page[size]=25
 **Endpoint:** `GET /v1/reports/{id}`
 
 **Example:**
+
 ```bash
 curl "https://api.hackerone.com/v1/reports/123456" \
   -u "API_ID:API_TOKEN"
 ```
 
 **Response includes:**
+
 - Full report details
 - All activities (comments, state changes)
 - Attachments
@@ -124,6 +132,7 @@ curl "https://api.hackerone.com/v1/reports/123456" \
 **Endpoint:** `POST /v1/reports/{id}/state_change`
 
 **Request body:**
+
 ```json
 {
   "data": {
@@ -137,6 +146,7 @@ curl "https://api.hackerone.com/v1/reports/123456" \
 ```
 
 **Valid states:**
+
 - `new` → `triaged`, `needs-more-info`, `not-applicable`, `spam`
 - `triaged` → `resolved`, `needs-more-info`, `informative`
 - `needs-more-info` → `triaged`
@@ -151,6 +161,7 @@ curl "https://api.hackerone.com/v1/reports/123456" \
 **Endpoint:** `GET /v1/programs`
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -184,11 +195,13 @@ Returns detailed program configuration, scope, bounty table.
 **Endpoint:** `POST /v1/reports/{report_id}/activities`
 
 **Activity types:**
+
 - `activity-comment`: Add comment to report
 - `activity-bounty-awarded`: Award bounty
 - `activity-swag-awarded`: Award swag
 
 **Example (add comment):**
+
 ```json
 {
   "data": {
@@ -208,11 +221,13 @@ Returns detailed program configuration, scope, bounty table.
 HackerOne uses cursor-based pagination with JSON:API format.
 
 **Pattern:**
+
 ```
 GET /v1/reports?page[size]=25&page[number]=1
 ```
 
 **Response links:**
+
 ```json
 {
   "links": {
@@ -226,6 +241,7 @@ GET /v1/reports?page[size]=25&page[number]=1
 ```
 
 **Go implementation:**
+
 ```go
 func (c *Client) ListAllReports(ctx context.Context) ([]*Report, error) {
     var allReports []*Report
@@ -255,10 +271,12 @@ func (c *Client) ListAllReports(ctx context.Context) ([]*Report, error) {
 ## Rate Limiting
 
 **Limits:**
+
 - 1,000 requests per hour (per API token)
 - 10 requests per second burst
 
 **Headers in response:**
+
 ```
 X-RateLimit-Limit: 1000
 X-RateLimit-Remaining: 950
@@ -266,6 +284,7 @@ X-RateLimit-Reset: 1642080000
 ```
 
 **429 Response:**
+
 ```json
 {
   "errors": [
@@ -279,6 +298,7 @@ X-RateLimit-Reset: 1642080000
 ```
 
 **Handling strategy:**
+
 ```go
 func (c *Client) handleRateLimit(resp *http.Response) error {
     if resp.StatusCode != 429 {
@@ -322,6 +342,7 @@ All errors follow JSON:API format:
 ```
 
 **Common error codes:**
+
 - `400`: Bad Request (invalid parameters)
 - `401`: Unauthorized (invalid credentials)
 - `403`: Forbidden (insufficient permissions)

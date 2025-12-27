@@ -1,5 +1,34 @@
 # Changelog - deleting-skills
 
+## [Date: 2025-12-27] - Add Automated Gateway Sync Phase
+
+### Changed
+- Added Phase 6: Gateway Sync - Automatically detect and remove broken gateway paths using syncing-gateways skill
+- Renamed former Phase 6 (Cleanup) to Phase 7 (Cleanup Non-Gateway References)
+- Renamed former Phase 7 (Verify) to Phase 8 (Verify)
+- Updated Quick Reference table to show 8 phases (total time: 18 minutes)
+- Updated Success Criteria to reflect 9 items (added gateway sync checkpoint)
+- Phase 7 now explicitly handles ONLY non-gateway references (commands and skills)
+- Mirrors migrating-skills Step 4 pattern: directory deletion → gateway sync → manual cleanup
+
+### Added
+- Phase 6.1: Read syncing-gateways skill
+- Phase 6.2: Execute gateway sync (detect, validate, report, fix)
+- Phase 6.3: Verify gateway cleanup
+- Note in Phase 7 explaining gateway references already cleaned
+
+### Progressive Disclosure
+- Extracted "Common Mistakes" and "Rationalization to Avoid" to references/common-mistakes.md
+- Line count: 497 lines (within <500 limit)
+
+### Rationale
+- Gateway references follow predictable patterns, enabling automated cleanup
+- Reduces manual cleanup steps and human error
+- Consistent with migration workflow pattern
+- Manual cleanup still required for non-gateway references (commands, skills)
+
+---
+
 ## [Date: 2025-12-16] - Initial Creation
 
 ### Created

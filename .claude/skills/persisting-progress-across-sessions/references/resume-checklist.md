@@ -24,6 +24,7 @@ cat .claude/progress/<domain>-<feature>.md
 ```
 
 **Extract:**
+
 - Current status
 - Last completed phase
 - Current phase (if in progress)
@@ -31,11 +32,11 @@ cat .claude/progress/<domain>-<feature>.md
 
 ### Step 2: Check Status
 
-| Status | Action |
-|--------|--------|
-| `in_progress` | Continue from current phase |
-| `blocked` | Review blocker, resolve or escalate |
-| `complete` | Should have been archived - verify completion |
+| Status        | Action                                        |
+| ------------- | --------------------------------------------- |
+| `in_progress` | Continue from current phase                   |
+| `blocked`     | Review blocker, resolve or escalate           |
+| `complete`    | Should have been archived - verify completion |
 
 ### Step 3: Review Context for Resume
 
@@ -62,11 +63,13 @@ cat .claude/progress/<domain>-<feature>.md
 ### Step 4: Review Agent Outputs
 
 For each completed agent:
+
 - What did they produce?
 - Any recommendations for follow-up?
 - Any warnings or concerns?
 
 For in-progress agent (if any):
+
 - What was started?
 - Where did it stop?
 - Any partial output?
@@ -94,6 +97,7 @@ Based on progress file, creating TodoWrite items:
 ### Step 7: Resume Work
 
 1. **Announce resumption** to user:
+
    ```
    Resuming orchestration: <Feature Name>
    Status: <current status>

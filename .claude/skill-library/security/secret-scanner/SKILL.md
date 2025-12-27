@@ -19,26 +19,30 @@ Prevent accidental secret exposure in your codebase.
 ## What I Detect
 
 ### API Keys & Tokens
+
 - AWS access keys (AKIA...)
-- Stripe API keys (sk_live_..., pk_live_...)
-- GitHub tokens (ghp_...)
+- Stripe API keys (sk*live*..., pk*live*...)
+- GitHub tokens (ghp\_...)
 - Google API keys
 - OAuth tokens
 - JWT secrets
 
 ### Database Credentials
+
 - Database connection strings
 - MySQL/PostgreSQL passwords
 - MongoDB connection URIs
 - Redis passwords
 
 ### Private Keys
+
 - SSH private keys
 - RSA/DSA keys
 - PGP/GPG keys
 - SSL certificates
 
 ### Authentication Secrets
+
 - Password variables
 - Auth tokens
 - Session secrets
@@ -47,6 +51,7 @@ Prevent accidental secret exposure in your codebase.
 ## Alert Examples
 
 ### API Key Detection
+
 ```javascript
 // You type:
 const apiKey = 'sk_live_1234567890abcdef';
@@ -60,6 +65,7 @@ const apiKey = 'sk_live_1234567890abcdef';
 ```
 
 ### AWS Credentials
+
 ```python
 # You type:
 aws_access_key = "AKIAIOSFODNN7EXAMPLE"
@@ -73,6 +79,7 @@ aws_access_key = "AKIAIOSFODNN7EXAMPLE"
 ```
 
 ### Database Password
+
 ```yaml
 # You type in docker-compose.yml:
 environment:
@@ -91,17 +98,20 @@ environment:
 ### Pattern Types
 
 **High Confidence:**
+
 - Known API key formats (Stripe, AWS, etc.)
 - Private key headers
 - JWT tokens
 - Connection strings with credentials
 
 **Medium Confidence:**
+
 - Variables named "password", "secret", "key"
 - Base64 encoded strings in sensitive contexts
 - Long random strings in assignments
 
 **Low Confidence (Flagged for Review):**
+
 - Generic secret patterns
 - Potential credentials in comments
 
@@ -137,6 +147,7 @@ I check if sensitive files are in .gitignore:
 ## False Positive Handling
 
 ### Example Files
+
 ```javascript
 // I understand these are examples:
 // Example: const apiKey = 'your_api_key_here';
@@ -144,14 +155,17 @@ I check if sensitive files are in .gitignore:
 ```
 
 ### Test Files
+
 ```javascript
 // Test fixtures are OK (but flagged for review):
-const mockApiKey = 'sk_test_1234567890abcdef';  // ✅ Test key
+const mockApiKey = "sk_test_1234567890abcdef"; // ✅ Test key
 ```
 
 ### Documentation
+
 ```markdown
 <!-- Documentation examples are flagged but low priority -->
+
 Set your API key: `export API_KEY=your_key_here`
 ```
 
@@ -161,6 +175,7 @@ Set your API key: `export API_KEY=your_key_here`
 **security-auditor:** Code vulnerability patterns
 
 ### Together
+
 ```
 secret-scanner: Finds hardcoded API key
 security-auditor: Finds how the key is used insecurely
@@ -173,22 +188,22 @@ Combined: Complete security picture
 
 ```javascript
 // Before:
-const apiKey = 'sk_live_abc123';
+const apiKey = "sk_live_abc123";
 
 // After:
 const apiKey = process.env.API_KEY;
 
 // .env file (add to .gitignore):
-API_KEY=sk_live_abc123
+API_KEY = sk_live_abc123;
 ```
 
 ### Use Secret Management
 
 ```javascript
 // AWS Secrets Manager
-const AWS = require('aws-sdk');
+const AWS = require("aws-sdk");
 const secrets = new AWS.SecretsManager();
-const secret = await secrets.getSecretValue({ SecretId: 'myApiKey' }).promise();
+const secret = await secrets.getSecretValue({ SecretId: "myApiKey" }).promise();
 ```
 
 ### Configuration Files

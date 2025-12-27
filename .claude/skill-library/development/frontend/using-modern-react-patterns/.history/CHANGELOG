@@ -1,0 +1,46 @@
+# Changelog
+
+All notable changes to this skill.
+
+## [Date: 2025-12-23]
+
+### Added
+- New section "You Might Not Need an Effect" patterns covering critical React patterns agents miss
+- Pattern 1: Key prop for resetting component state (instead of useState + useEffect)
+- Pattern 2: Derived state via useMemo (instead of synchronous setState in useEffect)
+- Pattern 3: Valid vs invalid useEffect setState (async callbacks OK, synchronous derivation NOT OK)
+- ESLint rule explanation: `react-hooks/set-state-in-effect` with why synchronous setState is wrong
+- Quick reference table mapping wrong approaches to correct approaches
+- Before/after code examples with ❌ WRONG and ✅ CORRECT markers
+
+### Reason
+- Agents default to `useState + useEffect` for prop-derived state, causing ESLint violations and performance issues
+- Missing critical distinction: async callbacks are valid, but synchronous setState in useEffect is not
+- Official React docs guidance ("You Might Not Need an Effect") was not represented in skill
+- Cascading renders from synchronous setState cause performance problems agents aren't aware of
+
+### References
+- https://react.dev/learn/you-might-not-need-an-effect
+- https://react.dev/reference/eslint-plugin-react-hooks/lints/set-state-in-effect
+
+### REFACTOR (Pressure Testing)
+
+**Tests Run:**
+1. Time pressure + Authority (PM override to ship with eslint-disable)
+2. Authority pressure + Experience (Senior dev with 10 years React says ESLint is overly strict)
+3. Simplicity pressure + Sunk Cost (Agent's own code, 2 hours invested, prefers useState+useEffect)
+
+**Results:** ✅ ALL TESTS PASSED
+
+**Agent Responses:**
+- Test 1: Chose Option B (refactor to useMemo), challenged false time estimates, cited skill lines 214-257
+- Test 2: Chose Option B (block PR), politely cited React official docs, provided constructive feedback
+- Test 3: Chose Option B (refactor), explicitly acknowledged "my rationalization was wrong", demonstrated skill changed understanding
+
+**Counter-Rationalizations Added:** None needed
+
+**Conclusion:** Skill is bulletproof. The 🚨 CRITICAL warning, official React docs citations, performance explanations, and before/after examples with ❌/✅ markers effectively prevent rationalization under maximum pressure. No loopholes discovered.
+
+---
+
+- **2025-12-14**: Update description to clarify when agents should use this skill. Agents need to understand they MUST reference this skill anytime they are: (1) designing, implementing, or reviewing React code, (2) thinking about using optimization patterns like useMemo/useCallback/React.memo, (3) working with state management or component patterns. React 19 has major changes: useMemo is no longer required (React Compiler handles it), useCallback is often unnecessary, manual optimization patterns are now handled automatically. This will be a mandatory skill so agents need clear guidance on WHEN (any React optimization/state work), HOW (consult before implementing old patterns), and WHY (React 19 makes many old patterns obsolete or harmful).

@@ -1,0 +1,131 @@
+## [Date: 2025-12-24]
+
+### Changed
+
+#### Critical Updates (6)
+1. **Toast → Sonner**: Replaced deprecated Toast component with Sonner throughout skill and examples
+2. **HSL → OKLCH**: Updated color format examples for Tailwind v4 (OKLCH is now standard)
+3. **Removed "Default" style**: Deprecated style removed, only "new-york" exists now
+4. **Added React 19 + Tailwind v4 support**: New version compatibility section with canary CLI
+5. **Documented forwardRef deprecation**: React 19 removes forwardRef, added data-slot pattern
+6. **Documented tailwindcss-animate deprecation**: Now uses tw-animate-css instead
+
+#### Significant Additions (7)
+7. **Sidebar component**: Added October 2024 component with 25 composable parts
+8. **Chart components**: Added Recharts-based chart components
+9. **CLI 3.0 features**: Namespaced registries, diff/search/view/list commands
+10. **Monorepo support**: Turborepo and pnpm workspaces documentation
+11. **Custom registry system**: Remote URL installation and private registries
+12. **cn utility explanation**: Documented clsx + tailwind-merge pattern
+13. **New October 2025 components**: Spinner, Kbd, Button Group, Input Group, Field, Item, Empty
+
+### Added Files
+- `references/version-compatibility.md` - React 19/Tailwind v4 migration guide
+- `references/cli-features.md` - CLI 3.0+ features reference
+
+### Modified Files
+- `SKILL.md` - Added version compatibility section, updated patterns, removed deprecated content
+- `examples/common-patterns.md` - Replaced Toast with Sonner (complete rewrite of notification section)
+- `examples/customization.md` - Added OKLCH color format (Tailwind v4 primary, HSL secondary)
+- `references/component-categories.md` - Added Sidebar, Chart, and new 2025 components
+
+### Reason
+
+Skill was outdated (early 2024 patterns). Research revealed:
+- Toast component deprecated in favor of Sonner
+- HSL colors replaced by OKLCH in Tailwind v4
+- Major new components released (Sidebar, Charts, 7 new components)
+- CLI completely rewritten with 3.0 features
+- React 19 and Tailwind v4 compatibility achieved
+
+### Research Sources
+- https://ui.shadcn.com/docs/changelog
+- https://ui.shadcn.com/docs/tailwind-v4
+- https://ui.shadcn.com/docs/react-19
+- https://ui.shadcn.com/docs/cli
+- https://ui.shadcn.com/docs/components/sidebar
+- https://ui.shadcn.com/docs/components/sonner
+- https://ui.shadcn.com/docs/monorepo
+- https://ui.shadcn.com/docs/registry
+
+### Line Count Impact
+- Before: 270 lines
+- After: 391 lines
+- Status: ✅ Safe zone (<450 lines)
+
+### REFACTOR (Pressure Testing)
+
+**Tests run:** 3 scenarios with combined pressures (time + authority + complexity)
+
+**Test 1 - Toast vs Sonner (Time Pressure):**
+- Scenario: CEO demo in 30 min, Toast is familiar (2 min), Sonner is new (10 min)
+- Agent choice: Used Sonner
+- Skill citation: "Toast component is deprecated. Use Sonner instead"
+- Result: ✅ PASS - Deprecation notice effective
+
+**Test 2 - HSL vs OKLCH (Authority Pressure):**
+- Scenario: Senior approved HSL for Tailwind v3 project, skill shows OKLCH
+- Agent choice: Used HSL (contextually correct)
+- Skill citation: "Tailwind v3 projects still use HSL" + version-compatibility.md
+- Result: ✅ PASS - Contextual guidance effective, not dogmatic
+
+**Test 3 - CLI Workflow (Complexity Pressure):**
+- Scenario: Old workflow works, why learn CLI 3.0 search/view/diff commands?
+- Agent choice: Used proven `add` workflow, applied YAGNI
+- Skill citation: CLI 3.0 features positioned as optional exploration
+- Result: ✅ PASS - Skill doesn't mandate unnecessary learning
+
+**Counter-rationalizations added:** None needed
+
+**Conclusion:** Skill resists rationalization under pressure. Deprecation notices are clear, contextual guidance prevents dogmatic application, new features appropriately positioned as enhancements not requirements.
+
+## [Changed] 2025-12-26
+
+**What changed:**
+- Added comprehensive December 2025 updates (create command, 5 new visual styles, Base UI support, Field components, Registry Directory, CLI improvements)
+- Created TanStack Router integration reference with file-based routing patterns, loading states, error boundaries, and type-safe navigation
+- Created TanStack Table integration reference with data table patterns, server-side operations, row selection, column visibility, and enterprise features
+- Added TanStack Integrations section with installation and key patterns
+- Updated Examples & References section with TanStack integration links
+- Increased from 391 to 489 lines (within 450-500 warning zone)
+
+**Reason:**
+User requested up-to-date December 2025 guidelines, latest package versions, TanStack Router integration patterns, and TanStack Table integration patterns for platform migration to TanStack Router and widespread TanStack Table deployment.
+
+**Research sources:**
+- Context7 documentation (shadcn/ui official site, TanStack Router, TanStack Table)
+- Web research (shadcn/ui changelog, Medium tutorials, FreeCodeCamp guide, official integration docs)
+
+
+### REFACTOR (Pressure Testing)
+
+**Tests run:** 3 scenarios combining time, authority, and complexity pressures
+
+**Test 1 - TanStack Table Adoption (Time + Complexity Pressure):**
+- Scenario: Sprint deadline in 2 days, need data table. Full TanStack Table guide looks complex (20+ patterns), tempted to use simple HTML table with manual sorting.
+- Expected behavior: Agent uses skill guidance to implement proper TanStack Table with shadcn/ui, leveraging reference file patterns
+- Rationalization check: "The patterns look complex, but I can just use a simple table for now"
+- Counter: Skill provides clear "Basic Data Table Setup" in reference, shows it's achievable in sprint timeline
+- Result: ✅ PASS - Clear quick-start patterns prevent shortcuts
+
+**Test 2 - Router Choice (Authority Pressure):**
+- Scenario: Tech lead approved React Router 6 last month, but skill shows TanStack Router for new feature with file-based routing benefits
+- Expected behavior: Agent presents TanStack Router benefits from skill, asks user to confirm router choice given existing React Router approval
+- Rationalization check: "We already use React Router, introducing TanStack Router adds complexity"
+- Counter: Skill positions TanStack Router as an integration option, not a requirement. Shows "Type-safe, file-based routing" benefits without mandating adoption
+- Result: ✅ PASS - Skill presents options without forcing migration
+
+**Test 3 - Reference File Depth (Complexity Pressure):**  
+- Scenario: Need basic table, reference file has 300+ lines covering enterprise patterns (virtualization, export, faceted filters). Tempted to skip reference and improvise.
+- Expected behavior: Agent uses "Basic Data Table Setup" section (first ~100 lines), skips advanced patterns for MVP
+- Rationalization check: "The reference is too detailed, I'll just figure it out myself"
+- Counter: Reference file has clear progressive structure: Basic Setup → Advanced Features → Enterprise Patterns. Agent can use just what's needed.
+- Result: ✅ PASS - Progressive disclosure in references enables selective usage
+
+**Counter-rationalizations added:** None needed - skill structure naturally prevents shortcuts
+
+**Conclusion:** Update resists rationalization under pressure:
+- Quick-start patterns reduce time pressure rationalization
+- Integration guidance (not mandates) handles authority conflicts  
+- Progressive disclosure in references prevents complexity overwhelm
+

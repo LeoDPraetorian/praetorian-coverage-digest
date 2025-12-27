@@ -11,6 +11,7 @@
 ### Why Complete List?
 
 **TodoWrite replaces the entire list** on each call. It does NOT:
+
 - ❌ Merge with previous list
 - ❌ Apply deltas/diffs
 - ❌ Update specific items by ID
@@ -83,23 +84,25 @@
 ### Scenario 1: Mark Task Complete
 
 **Before:**
+
 ```json
 {
   "todos": [
-    {"content": "Analyze code", "status": "in_progress"},
-    {"content": "Write tests", "status": "pending"},
-    {"content": "Deploy", "status": "pending"}
+    { "content": "Analyze code", "status": "in_progress" },
+    { "content": "Write tests", "status": "pending" },
+    { "content": "Deploy", "status": "pending" }
   ]
 }
 ```
 
 **After:**
+
 ```json
 {
   "todos": [
-    {"content": "Analyze code", "status": "completed"},  // Changed
-    {"content": "Write tests", "status": "in_progress"},  // Changed
-    {"content": "Deploy", "status": "pending"}  // Unchanged, but included
+    { "content": "Analyze code", "status": "completed" }, // Changed
+    { "content": "Write tests", "status": "in_progress" }, // Changed
+    { "content": "Deploy", "status": "pending" } // Unchanged, but included
   ]
 }
 ```
@@ -109,22 +112,24 @@
 ### Scenario 2: Add New Task
 
 **Before:**
+
 ```json
 {
   "todos": [
-    {"content": "Implement feature", "status": "completed"},
-    {"content": "Write tests", "status": "in_progress"}
+    { "content": "Implement feature", "status": "completed" },
+    { "content": "Write tests", "status": "in_progress" }
   ]
 }
 ```
 
 **After (discovered need for docs):**
+
 ```json
 {
   "todos": [
-    {"content": "Implement feature", "status": "completed"},  // Keep completed
-    {"content": "Write tests", "status": "in_progress"},  // Keep in_progress
-    {"content": "Update documentation", "status": "pending"}  // NEW task
+    { "content": "Implement feature", "status": "completed" }, // Keep completed
+    { "content": "Write tests", "status": "in_progress" }, // Keep in_progress
+    { "content": "Update documentation", "status": "pending" } // NEW task
   ]
 }
 ```
@@ -134,24 +139,26 @@
 ### Scenario 3: Remove Task
 
 **Before:**
+
 ```json
 {
   "todos": [
-    {"content": "Update auth", "status": "completed"},
-    {"content": "Write tests", "status": "pending"},
-    {"content": "Update README", "status": "pending"},
-    {"content": "Update API docs", "status": "pending"}  // Duplicate
+    { "content": "Update auth", "status": "completed" },
+    { "content": "Write tests", "status": "pending" },
+    { "content": "Update README", "status": "pending" },
+    { "content": "Update API docs", "status": "pending" } // Duplicate
   ]
 }
 ```
 
 **After (combine doc tasks):**
+
 ```json
 {
   "todos": [
-    {"content": "Update auth", "status": "completed"},
-    {"content": "Write tests", "status": "in_progress"},
-    {"content": "Update documentation (README + API)", "status": "pending"}  // Combined
+    { "content": "Update auth", "status": "completed" },
+    { "content": "Write tests", "status": "in_progress" },
+    { "content": "Update documentation (README + API)", "status": "pending" } // Combined
   ]
 }
 ```
@@ -161,23 +168,25 @@
 ### Scenario 4: Reorder Tasks
 
 **Before:**
+
 ```json
 {
   "todos": [
-    {"content": "Feature A", "status": "pending"},
-    {"content": "Feature B", "status": "pending"},
-    {"content": "Feature C", "status": "pending"}
+    { "content": "Feature A", "status": "pending" },
+    { "content": "Feature B", "status": "pending" },
+    { "content": "Feature C", "status": "pending" }
   ]
 }
 ```
 
 **After (priority changed):**
+
 ```json
 {
   "todos": [
-    {"content": "Feature C", "status": "in_progress", "priority": "high"},  // Moved up
-    {"content": "Feature A", "status": "pending"},
-    {"content": "Feature B", "status": "pending"}
+    { "content": "Feature C", "status": "in_progress", "priority": "high" }, // Moved up
+    { "content": "Feature A", "status": "pending" },
+    { "content": "Feature B", "status": "pending" }
   ]
 }
 ```
@@ -188,13 +197,13 @@
 
 ### When to Update TodoWrite
 
-| Trigger | Update Reason |
-|---------|---------------|
+| Trigger               | Update Reason                      |
+| --------------------- | ---------------------------------- |
 | Mark task in_progress | Starting work (before actual work) |
-| Mark task completed | Finished work (immediately after) |
-| Discover new task | Scope changed, add to list |
-| Remove task | Task no longer relevant |
-| Reorder tasks | Priority changed |
+| Mark task completed   | Finished work (immediately after)  |
+| Discover new task     | Scope changed, add to list         |
+| Remove task           | Task no longer relevant            |
+| Reorder tasks         | Priority changed                   |
 | Task takes >5 minutes | Periodic progress check (optional) |
 
 ### Minimum Update Frequency
@@ -229,10 +238,10 @@ Long task lifecycle:
 // After completing tasks 1 and 2, starting task 3
 {
   "todos": [
-    {"content": "Task 1", "status": "completed"},  // Changed
-    {"content": "Task 2", "status": "completed"},  // Changed
-    {"content": "Task 3", "status": "in_progress"},  // Changed
-    {"content": "Task 4", "status": "pending"}
+    { "content": "Task 1", "status": "completed" }, // Changed
+    { "content": "Task 2", "status": "completed" }, // Changed
+    { "content": "Task 3", "status": "in_progress" }, // Changed
+    { "content": "Task 4", "status": "pending" }
   ]
 }
 ```
@@ -311,6 +320,7 @@ Long task lifecycle:
 ```
 
 **Benefits:**
+
 - ✅ Cleaner display
 - ✅ Focus on remaining work
 - ✅ Keep history visible
@@ -322,24 +332,24 @@ Long task lifecycle:
 ### Anti-Pattern 1: Delta Updates
 
 **❌ WRONG:**
+
 ```json
 // "Just update task 2's status"
 {
-  "todos": [
-    {"content": "Task 2", "status": "completed"}
-  ]
+  "todos": [{ "content": "Task 2", "status": "completed" }]
 }
 // Other tasks disappear!
 ```
 
 **✅ CORRECT:**
+
 ```json
 // Provide complete list with all tasks
 {
   "todos": [
-    {"content": "Task 1", "status": "completed"},
-    {"content": "Task 2", "status": "completed"},  // Updated
-    {"content": "Task 3", "status": "pending"}
+    { "content": "Task 1", "status": "completed" },
+    { "content": "Task 2", "status": "completed" }, // Updated
+    { "content": "Task 3", "status": "pending" }
   ]
 }
 ```
@@ -347,25 +357,27 @@ Long task lifecycle:
 ### Anti-Pattern 2: Forgetting Completed Tasks
 
 **❌ WRONG:**
+
 ```json
 // Only include pending/in_progress tasks
 {
   "todos": [
-    {"content": "Current task", "status": "in_progress"},
-    {"content": "Next task", "status": "pending"}
+    { "content": "Current task", "status": "in_progress" },
+    { "content": "Next task", "status": "pending" }
   ]
 }
 // Lost progress history!
 ```
 
 **✅ CORRECT:**
+
 ```json
 // Keep completed tasks to show progress
 {
   "todos": [
-    {"content": "Previous task", "status": "completed"},
-    {"content": "Current task", "status": "in_progress"},
-    {"content": "Next task", "status": "pending"}
+    { "content": "Previous task", "status": "completed" },
+    { "content": "Current task", "status": "in_progress" },
+    { "content": "Next task", "status": "pending" }
   ]
 }
 ```
@@ -373,6 +385,7 @@ Long task lifecycle:
 ### Anti-Pattern 3: No Updates Until End
 
 **❌ WRONG:**
+
 ```
 1. Create initial TodoWrite (all pending)
 2. Work silently for 20 minutes
@@ -380,6 +393,7 @@ Long task lifecycle:
 ```
 
 **✅ CORRECT:**
+
 ```
 1. Create initial TodoWrite (all pending)
 2. Mark task 1 in_progress → work → mark completed
@@ -397,12 +411,12 @@ Long task lifecycle:
 // Main agent's TodoWrite
 {
   "todos": [
-    {"content": "Spawn backend-developer agent", "status": "completed"},
-    {"content": "Backend agent: Implement API", "status": "completed"},  // Sub-agent done
-    {"content": "Spawn frontend-developer agent", "status": "completed"},
-    {"content": "Frontend agent: Build UI", "status": "in_progress"},  // Sub-agent working
-    {"content": "Integration testing", "status": "pending"},
-    {"content": "Deploy", "status": "pending"}
+    { "content": "Spawn backend-developer agent", "status": "completed" },
+    { "content": "Backend agent: Implement API", "status": "completed" }, // Sub-agent done
+    { "content": "Spawn frontend-developer agent", "status": "completed" },
+    { "content": "Frontend agent: Build UI", "status": "in_progress" }, // Sub-agent working
+    { "content": "Integration testing", "status": "pending" },
+    { "content": "Deploy", "status": "pending" }
   ]
 }
 ```
@@ -416,13 +430,13 @@ Long task lifecycle:
 ```json
 {
   "todos": [
-    {"content": "Generate code", "status": "completed"},
-    {"content": "Validation attempt 1", "status": "completed"},  // Failed
-    {"content": "Fix errors (round 1)", "status": "completed"},
-    {"content": "Validation attempt 2", "status": "completed"},  // Failed again
-    {"content": "Fix remaining errors (round 2)", "status": "in_progress"},
-    {"content": "Final validation", "status": "pending"},
-    {"content": "Deploy if valid", "status": "pending"}
+    { "content": "Generate code", "status": "completed" },
+    { "content": "Validation attempt 1", "status": "completed" }, // Failed
+    { "content": "Fix errors (round 1)", "status": "completed" },
+    { "content": "Validation attempt 2", "status": "completed" }, // Failed again
+    { "content": "Fix remaining errors (round 2)", "status": "in_progress" },
+    { "content": "Final validation", "status": "pending" },
+    { "content": "Deploy if valid", "status": "pending" }
   ]
 }
 ```

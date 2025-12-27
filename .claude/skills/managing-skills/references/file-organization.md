@@ -14,6 +14,7 @@ Complete guide to organizing skill files using progressive disclosure.
 - .local/: Temporal artifacts (git-ignored) - **NOT for agent consumption**
 
 **Critical distinction:**
+
 - `references/` = Evergreen documentation that teaches agents how to use the skill
 - `.local/` = Temporal artifacts from skill creation/validation (TDD logs, test results, backups)
 
@@ -22,31 +23,38 @@ Complete guide to organizing skill files using progressive disclosure.
 ### references/ - Detailed Documentation
 
 **Use for:**
+
 - API references (>100 lines)
 - Comprehensive guides
 - Field listings and schemas
 - Advanced patterns
 - Troubleshooting guides
 - Best practices collections
+- **External documentation links** (20+ links for library skills)
 
 **Examples:**
+
 - `references/api-schema.md` - Complete API field reference
 - `references/advanced-patterns.md` - Complex usage patterns
 - `references/troubleshooting.md` - Common issues and solutions
 - `references/best-practices.md` - Collected wisdom
+- `references/links-to-official-docs.md` - External documentation links (library skills)
 
 **Structure:**
+
 ```
 references/
 ├── core-concepts.md        # Fundamental concepts
 ├── api-reference.md        # Complete API/schema
 ├── advanced-patterns.md    # Complex usage
-└── troubleshooting.md      # Problem solving
+├── troubleshooting.md      # Problem solving
+└── links-to-official-docs.md # External docs (library skills, 20+ links)
 ```
 
 ### examples/ - Real-World Demonstrations
 
 **Use for:**
+
 - Complete working examples
 - Before/after comparisons
 - Good vs bad demonstrations
@@ -55,12 +63,14 @@ references/
 - Success stories
 
 **Examples:**
+
 - `examples/good-skill-example.md` - Model to follow
 - `examples/bad-skill-example.md` - Mistakes to avoid
 - `examples/migration-case-study.md` - Real migration
 - `examples/before-after.md` - Transformation demo
 
 **Structure:**
+
 ```
 examples/
 ├── good-example.md         # What to do
@@ -72,6 +82,7 @@ examples/
 ### templates/ - Starter Files
 
 **Use for:**
+
 - Copy-paste templates
 - Boilerplate code
 - Configuration starters
@@ -79,12 +90,14 @@ examples/
 - Quick-start files
 
 **Examples:**
+
 - `templates/SKILL-template.md` - Basic skill structure
 - `templates/frontmatter-template.yaml` - YAML frontmatter
 - `templates/marketplace.json` - Marketplace starter
 - `templates/config-template.json` - Configuration starter
 
 **Structure:**
+
 ```
 templates/
 ├── basic-template.md       # Simple starter
@@ -95,6 +108,7 @@ templates/
 ### scripts/ - Executable Utilities
 
 **Use for:**
+
 - Helper scripts (bash, python, etc.)
 - Validation utilities
 - Code generators
@@ -102,11 +116,13 @@ templates/
 - Test helpers
 
 **Examples:**
+
 - `scripts/validate.sh` - Validation script
 - `scripts/generate.py` - Code generator
 - `scripts/helper.sh` - Utility functions
 
 **Structure:**
+
 ```
 scripts/
 ├── validate.sh             # Validation
@@ -117,6 +133,7 @@ scripts/
 ### .local/ - Temporal Artifacts (NOT for agents)
 
 **Use for:**
+
 - TDD phase documentation (RED/GREEN/REFACTOR logs)
 - Pressure test scenarios and results
 - Baseline failure captures
@@ -127,17 +144,20 @@ scripts/
 - Any generated/temporal content
 
 **NOT for:**
+
 - Documentation agents should read (use references/)
 - Examples agents should learn from (use examples/)
 - Anything that teaches skill usage
 
 **Why this matters:**
 TDD artifacts document HOW the skill was validated, not HOW to use the skill. Putting them in `references/` causes:
+
 - Token bloat (agents load validation logs when trying to use skill)
 - Confusion (old test scenarios reference outdated skill names/paths)
 - Progressive disclosure violation (agents load content they don't need)
 
 **Examples:**
+
 - `.local/tdd-validation.md` - RED/GREEN/REFACTOR phase log
 - `.local/pressure-test-results.md` - Pressure testing output
 - `.local/baseline-failures.md` - Captured baseline failures
@@ -145,6 +165,7 @@ TDD artifacts document HOW the skill was validated, not HOW to use the skill. Pu
 - `.local/CHANGELOG.md` - Version history
 
 **Structure:**
+
 ```
 .local/
 ├── .gitignore              # Ignore all except CHANGELOG.md
@@ -156,6 +177,7 @@ TDD artifacts document HOW the skill was validated, not HOW to use the skill. Pu
 ```
 
 **Standard .gitignore:**
+
 ```gitignore
 # All temporal artifacts ignored
 *
@@ -174,6 +196,7 @@ TDD artifacts document HOW the skill was validated, not HOW to use the skill. Pu
 Note: Tool-wrapper skills have lower targets (200-600 words). See phase3-word-count.ts for all thresholds.
 
 **Typical sections (~1,500 words):**
+
 - Overview: ~200 words
 - When to use: ~200 words
 - Core workflow: ~600 words
@@ -188,6 +211,7 @@ Note: Tool-wrapper skills have lower targets (200-600 words). See phase3-word-co
 **No limit** - can be as long as needed
 
 **Typical sizes:**
+
 - API reference: 1,000-3,000 words
 - Advanced patterns: 800-1,500 words
 - Troubleshooting: 500-1,000 words
@@ -196,6 +220,7 @@ Note: Tool-wrapper skills have lower targets (200-600 words). See phase3-word-co
 ### examples/ Files
 
 **Typical sizes:**
+
 - Simple example: 200-500 words
 - Case study: 1,000-2,000 words
 - Migration example: 1,500-3,000 words
@@ -205,6 +230,7 @@ Note: Tool-wrapper skills have lower targets (200-600 words). See phase3-word-co
 **Minimal** - just the template with comments
 
 **Typical sizes:**
+
 - Simple template: 50-100 lines
 - Advanced template: 100-200 lines
 
@@ -234,6 +260,75 @@ Use [templates/starter.md](templates/starter.md) as starting point.
 For advanced patterns, see [advanced-patterns.md](advanced-patterns.md).
 ```
 
+## External Documentation Links Pattern
+
+**For library skills that wrap external tools/libraries/frameworks.**
+
+### When to Use links-to-official-docs.md
+
+Create `references/links-to-official-docs.md` when a skill has **20+ external documentation links**.
+
+**Applies to:**
+
+- npm packages (React, TanStack Query, Zod, React Hook Form)
+- External APIs (GitHub, Linear, Jira, Stripe)
+- Third-party services (Chromatic, Playwright, Sentry)
+- Framework documentation (Next.js, Vite, Tailwind)
+
+### Organization Decision Tree
+
+| Link Count     | Location                               | Example                            |
+| -------------- | -------------------------------------- | ---------------------------------- |
+| **5-10 links** | `SKILL.md` (brief list at end)         | `using-modern-react-patterns`      |
+| **20+ links**  | `references/links-to-official-docs.md` | `implementing-react-hook-form-zod` |
+
+**Brief list in SKILL.md:**
+
+```markdown
+## Related Resources
+
+### Official Documentation
+
+- **React 19 Release**: https://react.dev/blog/2024/12/05/react-19
+- **useActionState**: https://react.dev/reference/react/useActionState
+- **useOptimistic**: https://react.dev/reference/react/useOptimistic
+```
+
+**Comprehensive file structure:**
+
+```markdown
+# Links to Official Documentation
+
+## {Library Name}
+
+### Core Documentation
+
+- **Main Site**: https://...
+- **API Reference**: https://...
+
+### Advanced Usage
+
+- **Feature 1**: https://...
+
+## Related Tools
+
+### {Related Library}
+
+- **Documentation**: https://...
+
+## Community Resources
+
+- **GitHub**: https://github.com/...
+- **Discord**: https://discord.gg/...
+```
+
+### Pattern Documentation
+
+**Complete guidance:**
+
+- Creating skills: `.claude/skill-library/claude/skill-management/creating-skills/references/skill-templates.md` (External Documentation Links Pattern section)
+- Auditing skills: `.claude/skill-library/claude/skill-management/auditing-skills/references/library-skill-patterns.md`
+
 ## Extraction Decision Tree
 
 ```
@@ -256,9 +351,14 @@ Is it copy-paste boilerplate?
 Is it an executable tool?
 ├─ Yes → Extract to scripts/[name].sh
 └─ No → Keep as code example
+
+Is it external documentation links for library skill?
+├─ Yes, 5-10 links → Keep brief list in SKILL.md (## Related Resources section)
+└─ Yes, 20+ links → Extract to references/links-to-official-docs.md
 ```
 
 **TDD artifacts decision:**
+
 ```
 Does the file document skill VALIDATION (how it was tested)?
 ├─ Yes → .local/ (temporal, not for agents)
@@ -272,6 +372,7 @@ Does the file document skill VALIDATION (how it was tested)?
 ### Step 1: Identify Content to Extract
 
 Read current SKILL.md and identify:
+
 - Sections >200 words
 - Complete examples
 - Templates/boilerplate
@@ -286,6 +387,7 @@ mkdir -p skill-name/{references,examples,templates,scripts}
 ### Step 3: Extract Content
 
 For each identified section:
+
 1. Create new file in appropriate directory
 2. Move content to new file
 3. Replace with link in SKILL.md
@@ -293,6 +395,7 @@ For each identified section:
 ### Step 4: Update Links
 
 Update any file references:
+
 ```markdown
 Before: See anthropic-best-practices.md
 After: See [references/anthropic-best-practices.md](references/anthropic-best-practices.md)
@@ -310,12 +413,14 @@ wc -w SKILL.md
 ### Pattern 1: API-Heavy Skill
 
 **SKILL.md:**
+
 - Overview
 - Quick reference table
 - Common operations
 - Link to API reference
 
 **references/api-reference.md:**
+
 - Complete field listing
 - All parameters
 - Return values
@@ -324,12 +429,14 @@ wc -w SKILL.md
 ### Pattern 2: Technique Skill
 
 **SKILL.md:**
+
 - Core technique
 - When to use
 - Quick workflow
 - Common mistakes
 
 **examples/:**
+
 - good-usage.md (correct application)
 - bad-usage.md (common mistakes)
 - real-world.md (actual case)
@@ -337,21 +444,25 @@ wc -w SKILL.md
 ### Pattern 3: Configuration Skill
 
 **SKILL.md:**
+
 - Overview
 - Basic configuration
 - Common settings
 
 **references/:**
+
 - all-options.md (complete reference)
 - advanced-config.md (complex setups)
 
 **templates/:**
+
 - basic-config.json
 - advanced-config.json
 
 ## Best Practices
 
 **Do:**
+
 - ✅ Keep SKILL.md lean and workflow-focused
 - ✅ Group related references together
 - ✅ Provide working examples (not just theory)
@@ -361,6 +472,7 @@ wc -w SKILL.md
 - ✅ Keep .local/ git-ignored (except CHANGELOG.md)
 
 **Don't:**
+
 - ❌ Put everything in SKILL.md
 - ❌ Create directories with only 1 file
 - ❌ Use generic file names (file1.md, helper.md)

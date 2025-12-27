@@ -5,12 +5,14 @@ How to effectively explore the codebase before writing Linear tickets.
 ## Why Research First?
 
 **Without research:**
+
 - ❌ Generic tickets with no technical context
 - ❌ Miss existing patterns/components to reuse
 - ❌ Overlook integration points
 - ❌ Underestimate/overestimate complexity
 
 **With research:**
+
 - ✅ Tickets grounded in actual codebase
 - ✅ Leverage existing patterns
 - ✅ Accurate dependency identification
@@ -27,6 +29,7 @@ How to effectively explore the codebase before writing Linear tickets.
 Before diving into code, clarify the ask:
 
 **Questions to answer:**
+
 - What problem are we solving?
 - Who are the users/stakeholders?
 - What's the expected timeline?
@@ -38,16 +41,19 @@ Before diving into code, clarify the ask:
 Use the Explore agent for high-level understanding:
 
 ```typescript
-Task("Explore notification patterns in codebase",
-     `Find:
+Task(
+  "Explore notification patterns in codebase",
+  `Find:
       - Existing notification implementations
       - WebSocket usage patterns
       - Message queue integrations
       - Related frontend components`,
-     "Explore")
+  "Explore"
+);
 ```
 
 **What Explore finds:**
+
 - File locations for relevant code
 - Existing patterns and conventions
 - Integration points
@@ -58,6 +64,7 @@ Task("Explore notification patterns in codebase",
 After Explore gives you locations, use Grep for specific patterns:
 
 **Search for APIs:**
+
 ```bash
 # Find API endpoints
 grep -r "api/notifications" modules/chariot/backend/
@@ -67,6 +74,7 @@ grep -r "NotificationHandler" modules/chariot/backend/
 ```
 
 **Search for components:**
+
 ```bash
 # Find React components
 grep -r "Notification" modules/chariot/ui/src/components/
@@ -76,6 +84,7 @@ grep -r "useNotification" modules/chariot/ui/src/hooks/
 ```
 
 **Search for data models:**
+
 ```bash
 # Find type definitions
 grep -r "interface Notification" modules/
@@ -89,12 +98,13 @@ grep -r "Notification" modules/tabularium/
 Once you've identified relevant files, read them:
 
 ```typescript
-Read("modules/chariot/backend/pkg/handler/handlers/notification/notification.go")
-Read("modules/chariot/ui/src/components/Notification/NotificationToast.tsx")
-Read("modules/tabularium/pkg/model/model/notification.go")
+Read("modules/chariot/backend/pkg/handler/handlers/notification/notification.go");
+Read("modules/chariot/ui/src/components/Notification/NotificationToast.tsx");
+Read("modules/tabularium/pkg/model/model/notification.go");
 ```
 
 **What to look for:**
+
 - Existing patterns (how similar features are implemented)
 - Naming conventions
 - Architecture patterns (repository pattern, hooks, etc.)
@@ -105,6 +115,7 @@ Read("modules/tabularium/pkg/model/model/notification.go")
 Create a mental model of the stack:
 
 **Frontend:**
+
 ```
 ui/src/sections/notifications/
 ├── components/
@@ -119,6 +130,7 @@ ui/src/sections/notifications/
 ```
 
 **Backend:**
+
 ```
 backend/pkg/
 ├── handler/handlers/notification/
@@ -131,6 +143,7 @@ backend/pkg/
 ```
 
 **Infrastructure:**
+
 ```
 AWS Resources:
 - API Gateway WebSocket API
@@ -147,6 +160,7 @@ Map how new code will connect to existing systems:
 **Example: Real-Time Notifications**
 
 **Integrations needed:**
+
 1. **Frontend → Backend WebSocket**
    - Existing: No WebSocket client
    - New: Create `useWebSocket` hook
@@ -172,12 +186,14 @@ By end of research, you should have:
 ### 1. Component Inventory
 
 **What exists:**
+
 - [ ] Frontend components to reuse
 - [ ] Backend services to integrate with
 - [ ] Database schemas to extend
 - [ ] Infrastructure resources to leverage
 
 **What's needed:**
+
 - [ ] New components to build
 - [ ] New APIs to create
 - [ ] New infrastructure to provision
@@ -195,6 +211,7 @@ New Feature Dependencies:
 ### 3. Pattern Documentation
 
 **Patterns to follow:**
+
 - API handler pattern: `handler → service → repository`
 - React hooks pattern: `useX` for data fetching
 - State management: Zustand stores in `state/`
@@ -234,6 +251,7 @@ New Feature Dependencies:
 **Goal**: Understand how similar features are built
 
 **Approach:**
+
 1. Find analogous features (e.g., if building notifications, look at alerts or messages)
 2. Study their architecture end-to-end
 3. Identify reusable patterns
@@ -244,6 +262,7 @@ New Feature Dependencies:
 **Goal**: Understand integration points and contracts
 
 **Approach:**
+
 1. Find where existing system exposes APIs
 2. Check authentication/authorization requirements
 3. Understand data formats (JSON schemas, etc.)
@@ -254,6 +273,7 @@ New Feature Dependencies:
 **Goal**: Understand existing AWS resources and patterns
 
 **Approach:**
+
 1. Check CloudFormation/SAM templates
 2. Identify existing Lambda functions
 3. Note naming conventions

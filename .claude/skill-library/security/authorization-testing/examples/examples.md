@@ -3,6 +3,7 @@
 This file contains comprehensive examples of authorization vulnerability testing, organized by vulnerability category.
 
 ## Table of Contents
+
 1. [Horizontal Escalation (IDOR)](#horizontal-escalation-idor)
 2. [Vertical Privilege Escalation](#vertical-privilege-escalation)
 3. [Missing Authorization](#missing-authorization)
@@ -22,6 +23,7 @@ This file contains comprehensive examples of authorization vulnerability testing
 **Scenario**: User management API with sequential numeric IDs
 
 **Vulnerability**:
+
 ```python
 # api/users.py - VULNERABLE
 @app.route('/api/users/<int:user_id>')
@@ -31,11 +33,13 @@ def get_user(user_id):
 ```
 
 **Test**:
+
 1. User1 (ID: 123) authenticates and gets token
 2. User1 accesses `/api/users/123` → 200 OK (authorized)
 3. User1 accesses `/api/users/456` (User2's ID) → 200 OK (IDOR!)
 
 **Evidence**:
+
 ```json
 {
   "status": "VALIDATED",
@@ -60,6 +64,7 @@ def get_user(user_id):
 **Scenario**: Document management system using UUIDs
 
 **Vulnerability**:
+
 ```python
 # api/documents.py - VULNERABLE
 @app.route('/api/documents/<uuid:doc_id>')
@@ -69,12 +74,14 @@ def get_document(doc_id):
 ```
 
 **Test**:
+
 1. User1 creates document → Gets UUID: `abc-def-123`
 2. User2 creates document → Gets UUID: `xyz-pqr-789`
 3. User1 accesses `/api/documents/abc-def-123` → 200 OK
 4. User1 accesses `/api/documents/xyz-pqr-789` → 200 OK (IDOR!)
 
 **Evidence**:
+
 ```json
 {
   "status": "VALIDATED",
@@ -99,18 +106,20 @@ def get_document(doc_id):
 **Scenario**: Team management with nested resources
 
 **Vulnerability**:
+
 ```python
 # api/teams.py - VULNERABLE
 @app.route('/api/teams/<int:team_id>/members/<int:member_id>')
 def get_team_member(team_id, member_id):
     member = TeamMember.query.filter_by(
-        team_id=team_id, 
+        team_id=team_id,
         id=member_id
     ).first()
     return jsonify(member.to_dict())  # No team membership check!
 ```
 
 **Test**:
+
 1. User1 belongs to Team 1
 2. User1 accesses `/api/teams/1/members/5` (their own) → 200 OK
 3. User1 accesses `/api/teams/2/members/10` (Team 2 member) → 200 OK (IDOR!)
@@ -120,6 +129,7 @@ def get_team_member(team_id, member_id):
 **Scenario**: Profile update API missing ownership check
 
 **Vulnerability**:
+
 ```python
 # api/profiles.py - VULNERABLE
 @app.route('/api/profile/<int:user_id>/update', methods=['POST'])
@@ -133,11 +143,13 @@ def update_profile(user_id):
 ```
 
 **Test**:
+
 1. User2 (ID: 456) authenticates
 2. User2 POSTs to `/api/profile/1/update` with malicious data
 3. Result: 200 OK, User1 (admin) profile modified
 
 **Evidence**:
+
 ```json
 {
   "status": "VALIDATED",
@@ -166,6 +178,7 @@ def update_profile(user_id):
 **Scenario**: User can escalate own privileges via role update endpoint
 
 **Vulnerability**:
+
 ```python
 # api/users.py - VULNERABLE
 @app.route('/update_role', methods=['POST'])
@@ -173,20 +186,22 @@ def update_profile(user_id):
 def update_role():
     user_id = request.json.get('user_id')
     new_role = request.json.get('role')
-    
+
     user = User.query.get(user_id)
     user.role = new_role  # No authorization check!
     db.session.commit()
-    
+
     return jsonify({"success": True})
 ```
 
 **Test**:
+
 1. Regular user (ID: 123, role: user) authenticates
 2. User POSTs to `/update_role` with `{"user_id": 123, "role": "admin"}`
 3. Result: 200 OK, user's role changed to admin
 
 **Evidence**:
+
 ```json
 {
   "status": "VALIDATED",
@@ -211,6 +226,7 @@ def update_role():
 **Scenario**: Admin dashboard accessible to non-admin users
 
 **Vulnerability**:
+
 ```python
 # api/admin.py - VULNERABLE
 @app.route('/admin/dashboard')
@@ -221,11 +237,13 @@ def admin_dashboard():
 ```
 
 **Test**:
+
 1. Regular user authenticates
 2. User GETs `/admin/dashboard`
 3. Result: 200 OK, admin panel HTML returned with sensitive data
 
 **Evidence**:
+
 ```json
 {
   "status": "VALIDATED",
@@ -252,6 +270,7 @@ def admin_dashboard():
 **Scenario**: Admin API endpoint has no authorization check at all
 
 **Vulnerability**:
+
 ```python
 # api/admin.py - VULNERABLE
 @app.route('/api/admin/users')
@@ -261,10 +280,12 @@ def get_all_users():  # No @login_required, no role check!
 ```
 
 **Test**:
+
 1. Unauthenticated request to `/api/admin/users`
 2. Result: 200 OK, full user list with emails, phone numbers
 
 **Evidence**:
+
 ```json
 {
   "status": "VALIDATED",
@@ -288,6 +309,7 @@ def get_all_users():  # No @login_required, no role check!
 **Scenario**: Admin settings page accessible by directly navigating to URL
 
 **Vulnerability**:
+
 ```python
 # routes/admin.py - VULNERABLE
 @app.route('/admin/settings')
@@ -297,11 +319,13 @@ def admin_settings():
 ```
 
 **Test**:
+
 1. Regular user authenticates
 2. User directly navigates to `/admin/settings` (bypassing normal navigation)
 3. Result: 200 OK, admin settings page displayed
 
 **Evidence**:
+
 ```json
 {
   "status": "VALIDATED",
@@ -325,6 +349,7 @@ def admin_settings():
 **Scenario**: API with proper authorization
 
 **Secure Implementation**:
+
 ```python
 # api/users.py - SECURE
 @app.route('/api/users/<int:user_id>')
@@ -332,12 +357,13 @@ def admin_settings():
 def get_user(user_id):
     if current_user.id != user_id and not current_user.is_admin:
         abort(403, "Not authorized")
-    
+
     user = User.query.get(user_id)
     return jsonify(user.to_dict())
 ```
 
 **Test Result**:
+
 ```json
 {
   "status": "FALSE_POSITIVE",
@@ -362,6 +388,7 @@ def get_user(user_id):
 **Scenario**: Endpoint requires complex multi-step authentication
 
 **Test Result**:
+
 ```json
 {
   "status": "UNVALIDATED",
@@ -377,6 +404,7 @@ def get_user(user_id):
 **Scenario**: Document API with inconsistent authorization - read succeeds but write/delete are protected
 
 **Vulnerability**:
+
 ```python
 # api/documents.py - PARTIALLY VULNERABLE
 @app.route('/api/documents/<int:doc_id>', methods=['GET'])
@@ -398,6 +426,7 @@ def delete_document(doc_id):
 ```
 
 **Test**:
+
 1. User1 (owns doc 123) authenticates
 2. User1 creates baseline: `GET /api/documents/123` → 200 OK
 3. User1 tests User2's document (doc 456):
@@ -406,6 +435,7 @@ def delete_document(doc_id):
    - `DELETE /api/documents/456` → 403 Forbidden (delete protected)
 
 **Evidence**:
+
 ```json
 {
   "status": "PARTIAL",
@@ -446,12 +476,14 @@ def delete_document(doc_id):
 ```
 
 **Classification Rationale**:
+
 - **Not VALIDATED**: Write and delete operations are properly secured
 - **Not FALSE_POSITIVE**: Read operation has IDOR vulnerability
 - **PARTIAL**: Mixed results - some operations bypass authorization, others don't
 - **Manual Review Needed**: Security team must assess whether read-only IDOR poses acceptable risk
 
 **Real-World Impact**:
+
 - Attacker can read sensitive documents (information disclosure)
 - Cannot modify or delete documents (tampering prevented)
 - Risk depends on document sensitivity and business context
@@ -463,6 +495,7 @@ def delete_document(doc_id):
 ### Authorization Bypass Patterns to Test
 
 ### Pattern 1: Direct Object Reference
+
 ```
 GET /api/users/{id}
 GET /api/documents/{id}
@@ -470,18 +503,21 @@ GET /api/orders/{id}
 ```
 
 ### Pattern 2: Nested Resources
+
 ```
 GET /api/users/{user_id}/documents/{doc_id}
 GET /api/teams/{team_id}/members/{member_id}
 ```
 
 ### Pattern 3: Batch Operations
+
 ```
 POST /api/users/bulk-update
 Body: {"user_ids": [123, 456, 789]}
 ```
 
 ### Pattern 4: Query Parameters
+
 ```
 GET /api/profile?user_id=123
 GET /api/export?document_id=456
@@ -492,6 +528,7 @@ GET /api/export?document_id=456
 ## Test Account Setup
 
 **Minimal Setup**:
+
 ```json
 {
   "regular_users": [
@@ -510,6 +547,7 @@ GET /api/export?document_id=456
 ```
 
 **Advanced Setup** (with resources):
+
 ```json
 {
   "regular_users": [

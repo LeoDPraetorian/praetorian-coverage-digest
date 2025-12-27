@@ -1,0 +1,43 @@
+## [2025-12-26] - Added Security Review Skill
+
+### Changed
+- Added `securing-react-implementations` skill to Tier 3 trigger table
+- Updated Security bullet in CORE REVIEW AREAS to reference security patterns (XSS, auth, input validation)
+- Enhanced Chariot Security subsection to explicitly mention XSS prevention and auth/authz patterns
+
+### Reason
+- Agent was missing security review guidance for React code
+- Need to provide reviewers with comprehensive security patterns for XSS prevention, authentication issues, authorization flaws, and input validation
+
+### Verification
+- GREEN: PASSED
+- Compliance: Pending
+- Re-audit: Pending
+
+### Changed - 2025-12-27
+
+**What changed**: Added 7 skills identified by find-skills operation for comprehensive React/TypeScript review capabilities
+
+**Changes**:
+1. Added `adhering-to-dry` to frontmatter skills: field
+2. Added `enforcing-react-19-conventions` to Tier 1 (95% relevance - systematic React 19 review checklist)
+3. Added `code-review-checklist` to Tier 2 (80% relevance - systematic review workflow)
+4. Added 4 Tier 3 skills to review trigger table:
+   - `chariot-brand-guidelines` (70% relevance - theme class enforcement)
+   - `implementing-react-hook-form-zod` (75% relevance - form validation patterns)
+   - `using-shadcn-ui` (65% relevance - shadcn/ui component patterns)
+   - `adhering-to-uiux-laws` (85% relevance - UX laws for interface review)
+
+**Why**: find-skills semantic analysis identified gaps in agent's skill coverage for React 19 conventions, code review workflow, UX principles, form validation, brand guidelines, and UI component libraries
+
+**Impact**: Agent now has comprehensive skill coverage for frontend code review including:
+- DRY refactoring guidance
+- React 19 prohibited/warning/required patterns
+- Systematic security and quality checklists
+- Cognitive psychology laws for UX review
+- Form validation best practices
+- Chariot brand color/theme enforcement
+- shadcn/ui usage verification
+
+**Testing**: Verified GREEN - all 7 skills integrated into appropriate tiers
+

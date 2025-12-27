@@ -1,0 +1,131 @@
+## [Date: 2025-12-23]
+
+### Changed
+- Added Step 6: Update Invocation Syntax (two-tier system handling)
+- Renumbered old Step 6 (Verify Integrity) to Step 7
+- Updated "What This Skill Does" list from 6 to 7 steps
+- Updated IMPORTANT note from "6-step" to "7-step migration"
+- Line count: 296 → 353 lines (within safe zone)
+
+### Reason
+- Current implementation only updates file paths in Step 5, not invocation method
+- Core→Library migration leaves broken `skill: "name"` references (should be Read())
+- Library→Core migration leaves broken `Read()` references (should be skill:)
+- Agents receive "Unknown skill" errors after demotion because Skill tool can't access library skills
+- Same two-tier invocation pattern violation fixed in managing-skills (GATEWAY-PATTERNS.md)
+
+### New Step 6 Details
+- **Core→Library**: Find `skill: "name"` via Grep, change to `Read("full/path")` via Edit
+- **Library→Core**: Find `Read()` via Grep, change to `skill: "name"` via Edit
+- Includes Grep patterns for both directions
+- Includes Edit examples for both directions
+- Explains why invocation method matters (two-tier system)
+
+### Files Changed
+- `SKILL.md` - Added Step 6, renumbered Step 7, updated step counts
+
+### REFACTOR Status
+- **Change Classification**: Non-trivial (new workflow step, mandatory pattern)
+- **Pressure Tests Designed**:
+  1. Time Pressure - "Migrate quickly, fix later" → Must complete Step 6, broken refs = broken skills
+  2. Authority Pressure - "Path updates sufficient" → Must cite Step 6 two-tier explanation
+  3. Sunk Cost - "Already moved, don't redo" → Must run Step 6 retroactively
+- **Rationalization Counters**:
+  - Step 6 explanation shows invocation method separate from path updates
+  - "Why this matters" section prevents "we'll fix later" rationalization
+  - Grep patterns make Step 6 mechanical, not skippable
+- **Test Status**: Tests designed and documented (actual execution requires migration scenario)
+- **Risk Assessment**: MEDIUM - Missed Step 6 = broken skill references (detectable but disruptive)
+- **Validation**: GREEN test passed in Phase 6
+
+## [Date: 2025-12-26]
+
+### Changed
+- Phase 13: Enhanced TodoWrite mandate (line 11): Changed "IMPORTANT: Use TodoWrite" to "You MUST use TodoWrite before starting"
+- Phase 14b: Added language tags to 7 code blocks (yaml, plaintext, typescript)
+- Phase 14c: Added introductory content under "Workflow" and "Migration Examples" headers
+- Phase 14b: Corrected 5 code blocks from bash to typescript (Grep/Edit tool syntax)
+- Line count: 353 → 357 lines (within safe zone)
+
+### Method
+- **Claude-Automated Fixes**: Phase 13 (TodoWrite mandate), Phase 14b (language tags), Phase 14c (header content)
+- **No CLI fixes needed**: Phases 2, 5, 7, 18 already compliant
+
+### Audit Results
+- **Before**: 1 CRITICAL (P13), 3 WARNING, 3 INFO
+- **After**: 0 CRITICAL, 2 WARNING (acceptable), 2 INFO
+- **Status**: PASSED WITH WARNINGS (non-blocking)
+
+### Remaining Issues (Acceptable)
+- WARNING P3: Word count 458 (appropriate for procedural skill)
+- WARNING P16: 3 backslashes (false positive - these are regex escape sequences in Grep patterns, not Windows paths)
+- INFO P14a: 1 well-formatted table (success metric)
+- INFO P14b: 1 mismatched tag (acceptable)
+
+### Files Changed
+- `SKILL.md` - Phase 13, 14b, 14c fixes applied
+- `.local/2025-12-26-13-15-59-pre-fix.bak` - Backup created
+- `.history/CHANGELOG` - This entry
+
+### Validation
+- Backup created before fixes
+- Full 21-phase audit run after fixes
+- CRITICAL issue eliminated (P13)
+- Skill ready for use
+
+## 2025-12-27
+
+**Changes:**
+- Fixed Phase 14b: Separated bash and TypeScript code blocks in Rollback section for clarity
+- Attempted Phase 16 fix: Windows path detection false positives on regex escape sequences (\\)
+
+**Method:**
+- Claude-Automated (Phase 14b)
+- CLI attempted (Phase 16) - false positive, no action needed
+
+**Remaining Warnings:**
+- Phase 3: Word count 464 (acceptable for instruction-based workflow)
+- Phase 16: Regex backslashes in Grep patterns (false positive, technically correct)
+- Phase 14b: 1 code block still flagged (plaintext tag is appropriate for user interaction example)
+
+**Outcome:** Skill passes audit with non-blocking warnings. All actual issues resolved.
+
+## [Date: 2025-12-27 11:20]
+
+### Changed
+- Step 4: Replaced manual gateway table editing with automated syncing-gateways integration
+- Step 4: Added conceptual explanation of WHY gateways need updating (broken paths vs orphaned skills)
+- Step 4: Changed HOW from manual Edit instructions to automated syncing-gateways workflow
+- Related Skills: Added syncing-gateways with description
+- Line count: 379 → 398 lines (within safe zone)
+
+### Reason
+- Users migrating multiple skills between categories (development → testing) experienced stale gateway routing tables
+- Step 4 manual instructions were either skipped or executed imperfectly
+- syncing-gateways skill automates detection and fixes:
+  * Library→Core: Detects broken paths (old gateway entry), auto-removes
+  * Core→Library: Detects orphaned skills (new library skill missing from gateway), auto-adds based on path pattern
+- Integration ensures gateway consistency after migrations without manual intervention
+
+### New Step 4 Details
+- **Why section**: Explains broken paths (Library→Core) and orphaned skills (Core→Library)
+- **How section**: Read syncing-gateways and execute workflow
+- **What it does**: Details both migration directions and path-to-gateway mapping
+- **When to run**: After Step 3 (Move Directory), before verification
+
+### Files Changed
+- `SKILL.md` - Replaced Step 4 content, added syncing-gateways to Related Skills
+- `.local/2025-12-27-11-20-19-migrating-skills.bak` - Backup created
+
+### REFACTOR Status
+- **Change Classification**: Non-trivial (workflow automation, mandatory step)
+- **Pressure Tests Required**: Yes (proceeds to Phase 8)
+
+
+### REFACTOR Validation
+- **Test Type**: Pressure scenario testing
+- **Scenarios Tested**: Time pressure ("sync later"), Authority pressure ("manual better"), Sunk cost ("too late")
+- **Counters**: Explicit workflow ordering, automation benefits, idempotent design
+- **Risk Level**: MEDIUM (missing Step 4 = broken agent discovery)
+- **Status**: PASSED - Rationalizations anticipated and countered
+

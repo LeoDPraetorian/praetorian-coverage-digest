@@ -26,18 +26,19 @@ Phase 0 provides business context that transforms threat modeling from generic t
 ```
 
 **Load on-demand**:
+
 - `compliance-requirements.json` - If mapping threats to regulatory violations
 
 ---
 
 ## Section 1: How Business Context Drives Threat Modeling
 
-| Phase 0 Input | Impact on Threat Modeling | Example |
-|---------------|---------------------------|---------|
-| **Threat Actors** | Apply only relevant profiles (not generic) | If threat_actors = ransomware groups, apply ransomware tactics (encryption, exfiltration, backup destruction), skip nation-state APT tactics |
-| **Business Impact** | Use actual financial data in risk scoring | If business_impact.data_breach = "$365M", use in PASTA risk calculation (not generic "high") |
-| **Crown Jewels** | Prioritize threats targeting most valuable assets | If crown_jewels = ["payment_card_data"], prioritize spoofing/tampering threats to payment flows over DoS on marketing site |
-| **Compliance** | Map threats to regulatory violations | If compliance = HIPAA, identify threats causing §164.312 violations |
+| Phase 0 Input       | Impact on Threat Modeling                         | Example                                                                                                                                      |
+| ------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Threat Actors**   | Apply only relevant profiles (not generic)        | If threat_actors = ransomware groups, apply ransomware tactics (encryption, exfiltration, backup destruction), skip nation-state APT tactics |
+| **Business Impact** | Use actual financial data in risk scoring         | If business_impact.data_breach = "$365M", use in PASTA risk calculation (not generic "high")                                                 |
+| **Crown Jewels**    | Prioritize threats targeting most valuable assets | If crown_jewels = ["payment_card_data"], prioritize spoofing/tampering threats to payment flows over DoS on marketing site                   |
+| **Compliance**      | Map threats to regulatory violations              | If compliance = HIPAA, identify threats causing §164.312 violations                                                                          |
 
 ---
 
@@ -55,6 +56,7 @@ cat ../phase-0/threat-actors.json
 ```
 
 **Example threat-actors.json**:
+
 ```json
 {
   "threat_actors": [
@@ -82,29 +84,30 @@ cat ../phase-0/threat-actors.json
 
 **Component: Payment Processor**
 
-| STRIDE Category | Threat | Relevant? | Rationale |
-|-----------------|--------|-----------|-----------|
-| **Spoofing** | Payment transaction spoofing | ✅ HIGH | Financially motivated attackers target payment fraud |
-| **Tampering** | Transaction amount modification | ✅ HIGH | Financial gain motivation |
-| **Repudiation** | Fraudulent transaction denial | ✅ MEDIUM | Less common but possible |
-| **Info Disclosure** | Card data theft | ✅ VERY HIGH | Primary target for financial cybercriminals |
-| **DoS** | Ransomware encryption | ✅ HIGH | Ransomware is common tactic |
-| **Elevation of Privilege** | Admin access for card data | ✅ MEDIUM | Both external and insider threat |
+| STRIDE Category            | Threat                          | Relevant?    | Rationale                                            |
+| -------------------------- | ------------------------------- | ------------ | ---------------------------------------------------- |
+| **Spoofing**               | Payment transaction spoofing    | ✅ HIGH      | Financially motivated attackers target payment fraud |
+| **Tampering**              | Transaction amount modification | ✅ HIGH      | Financial gain motivation                            |
+| **Repudiation**            | Fraudulent transaction denial   | ✅ MEDIUM    | Less common but possible                             |
+| **Info Disclosure**        | Card data theft                 | ✅ VERY HIGH | Primary target for financial cybercriminals          |
+| **DoS**                    | Ransomware encryption           | ✅ HIGH      | Ransomware is common tactic                          |
+| **Elevation of Privilege** | Admin access for card data      | ✅ MEDIUM    | Both external and insider threat                     |
 
 **Component: Marketing Blog**
 
-| STRIDE Category | Threat | Relevant? | Rationale |
-|-----------------|--------|-----------|-----------|
-| **Spoofing** | Blog author impersonation | ⚠️ LOW | Not financially motivated target |
-| **Tampering** | Blog content defacement | ⚠️ LOW | Doesn't align with financial motivation |
-| **Info Disclosure** | Marketing data exposure | ❌ SKIP | No financial value per Phase 0 |
-| **DoS** | Blog downtime | ⚠️ LOW | Not primary target for financial actors |
+| STRIDE Category     | Threat                    | Relevant? | Rationale                               |
+| ------------------- | ------------------------- | --------- | --------------------------------------- |
+| **Spoofing**        | Blog author impersonation | ⚠️ LOW    | Not financially motivated target        |
+| **Tampering**       | Blog content defacement   | ⚠️ LOW    | Doesn't align with financial motivation |
+| **Info Disclosure** | Marketing data exposure   | ❌ SKIP   | No financial value per Phase 0          |
+| **DoS**             | Blog downtime             | ⚠️ LOW    | Not primary target for financial actors |
 
 **Key Insight**: If Phase 0 doesn't identify "hacktivists" or "nation-state APTs", don't apply their threat patterns. Focus on threats relevant to identified actors.
 
 #### 2.3 Document Rationale
 
 **For each threat**, document:
+
 ```json
 {
   "threat_id": "THR-001",
@@ -127,6 +130,7 @@ cat ../phase-0/threat-actors.json
 ### PASTA Stage 7 - Business Impact Scoring
 
 **Traditional approach (WRONG)**:
+
 ```
 Risk = Generic Impact × Likelihood
 Impact = "High" (subjective guess)
@@ -134,6 +138,7 @@ Result = Not actionable for business
 ```
 
 **PASTA approach with Phase 0 (CORRECT)**:
+
 ```
 Risk = Actual Business Impact × Likelihood
 Impact = $365M breach cost (from Phase 0)
@@ -148,6 +153,7 @@ cat ../phase-0/business-impact.json
 ```
 
 **Example business-impact.json**:
+
 ```json
 {
   "scenarios": [
@@ -229,6 +235,7 @@ Risk Score = Business Impact (from Phase 0) × Likelihood (from analysis)
 ```
 
 **Example Calculation**:
+
 ```
 Threat: SQL injection in payment processor
 Business Impact: 4 (Critical) - $365M breach cost from Phase 0
@@ -249,15 +256,18 @@ Risk Score: 1 × 2 = 2 (LOW)
 
 **Replace Step 7 scoring logic** with:
 
-```markdown
+````markdown
 ### Step 7: Score Risks (Using Phase 0 Business Impact)
 
 **Load business impact scenarios from Phase 0**:
+
 ```bash
 cat ../phase-0/business-impact.json
 ```
+````
 
 **For each threat**:
+
 1. Match threat to business impact scenario from Phase 0
 2. Use business_impact_score (1-4) as Impact value
 3. Assess Likelihood (1-3) based on control gaps from Phase 2
@@ -265,12 +275,14 @@ cat ../phase-0/business-impact.json
 5. Document actual financial data in threat record
 
 **Example**:
+
 - Threat: Card data theft via SQL injection
 - Matching scenario: "data_breach_1M_card_records" (from Phase 0)
 - Business Impact: 4 (Critical) - $365M total cost
 - Likelihood: 3 (High) - no input validation found
 - Risk Score: 12 (CRITICAL)
 - Priority: Immediate action required
+
 ```
 
 ---
@@ -280,6 +292,7 @@ cat ../phase-0/business-impact.json
 ### Priority Calculation Formula
 
 ```
+
 Final Priority Score = Base Risk Score + Crown Jewel Bonus + Compliance Bonus
 
 Base Risk Score = Business Impact × Likelihood (1-12)
@@ -287,19 +300,21 @@ Crown Jewel Bonus = +2 if threat targets crown jewel from Phase 0
 Compliance Bonus = +1 if threat causes regulatory violation from Phase 0
 
 Priority Levels:
-  CRITICAL (13+): Immediate action, blocks deployment
-  HIGH (9-12):    Current sprint
-  MEDIUM (5-8):   Next sprint
-  LOW (1-4):      Backlog
-```
+CRITICAL (13+): Immediate action, blocks deployment
+HIGH (9-12): Current sprint
+MEDIUM (5-8): Next sprint
+LOW (1-4): Backlog
+
+````
 
 ### 4.1 Load Crown Jewels from Phase 0
 
 ```bash
 cat ../phase-0/data-classification.json
-```
+````
 
 **Example data-classification.json**:
+
 ```json
 {
   "crown_jewels": [
@@ -322,6 +337,7 @@ cat ../phase-0/data-classification.json
 ### 4.2 Apply Crown Jewel Weighting
 
 **Example 1: Crown Jewel Threat**
+
 ```
 Threat: SQL injection in payment processor
 Base risk: High Impact (3) × High Likelihood (3) = 9
@@ -331,6 +347,7 @@ Final priority: 12 → CRITICAL (originally HIGH)
 ```
 
 **Example 2: Non-Crown Jewel Threat**
+
 ```
 Threat: XSS in marketing blog
 Base risk: Low Impact (1) × Medium Likelihood (2) = 2
@@ -344,10 +361,10 @@ Final priority: 2 → LOW (stays LOW)
 ```typescript
 interface ThreatPriority {
   threat_id: string;
-  base_risk_score: number;        // 1-12 (Impact × Likelihood)
-  crown_jewel_bonus: number;      // +2 if targets crown jewel, else 0
-  compliance_bonus: number;       // +1 if compliance violation, else 0
-  final_priority_score: number;   // Sum of above
+  base_risk_score: number; // 1-12 (Impact × Likelihood)
+  crown_jewel_bonus: number; // +2 if targets crown jewel, else 0
+  compliance_bonus: number; // +1 if compliance violation, else 0
+  final_priority_score: number; // Sum of above
   priority_level: "critical" | "high" | "medium" | "low";
 }
 ```
@@ -408,6 +425,7 @@ interface ThreatPriority {
 ## Top Threats (Risk-Scored with Business Impact)
 
 ### 1. THR-001: SQL Injection in Payment Processor (Priority: 15 - CRITICAL)
+
 - **Business Impact**: 4 (Critical) - $365M breach cost (from Phase 0)
 - **Likelihood**: 3 (High) - No parameterized queries found
 - **Base Risk**: 12
@@ -418,6 +436,7 @@ interface ThreatPriority {
 - **Control Gaps**: No parameterized queries, no WAF
 
 ### 2. THR-007: Credential Stuffing on Auth Endpoints (Priority: 12 - CRITICAL)
+
 - **Business Impact**: 3 (High) - Enables lateral movement
 - **Likelihood**: 3 (High) - No rate limiting found
 - **Base Risk**: 9
@@ -438,10 +457,12 @@ interface ThreatPriority {
 ## Recommendations for Phase 4
 
 **Priority 1 (CRITICAL)**: Test crown jewel protection
+
 1. SQL injection testing on payment endpoints (THR-001: $365M risk)
 2. Authentication bypass testing (THR-007: lateral movement)
 
 **Priority 2 (HIGH)**: Validate business impact scenarios
+
 1. Data breach response procedures
 2. Incident cost estimation accuracy
 ```
@@ -449,9 +470,10 @@ interface ThreatPriority {
 ### 5.3 File Checklist
 
 **Verify all Phase 3 outputs include business context**:
+
 - [ ] threat-model.json - All threats have business_context section
 - [ ] summary.md - Business context foundation included
-- [ ] abuse-cases/*.json - Crown jewel targeting documented
+- [ ] abuse-cases/\*.json - Crown jewel targeting documented
 - [ ] risk-matrix.json - Actual financial data in risk calculations
 - [ ] dfd-threats.json - Threat actor profiles referenced
 

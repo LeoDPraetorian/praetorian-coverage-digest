@@ -1,3 +1,174 @@
+## [2025-12-27] - Add Optional Research Integration
+
+### Added
+- **Research Integration (Optional)** section - Between Step 3 (Backup) and Step 4 (Edit)
+- AskUserQuestion pattern to ask user if they want to invoke researching-skills
+- Clear guidance on when to suggest research vs skip research
+- Read() invocation path for researching-skills with what it provides
+
+### Changed
+- Added Step 3.5 to workflow (Research - Optional)
+- Updated Related Skills to include researching-skills
+- Line count: 99 → 155 lines (still well under 500 limit)
+
+### Reason
+- **RED failure**: No research guidance when updating library/framework skills (TanStack Query, Zustand, etc.)
+- Updates often based on outdated knowledge (agent training data 12+ months old)
+- Inconsistent with creating-skills (which mandates researching-skills in Phase 6)
+- Phantom context7 feature documented in operations.md (`--refresh-context7`) that doesn't exist
+
+### Technical Details
+- Optional, not mandatory (unlike creating-skills where research is required)
+- User-driven via AskUserQuestion (respects user judgment)
+- Same skill, same patterns (leverages researching-skills exactly like creating-skills)
+- Position: Between backup (protect file) and edit (make changes)
+
+### Files Changed
+- `SKILL.md` - Added Research Integration section (~56 lines)
+- Fixed code block language tag (typescript) for compliance
+
+### Method
+- Used TDD workflow: RED (document gap) → GREEN (add section) → Audit (verify compliance)
+- Backup: `.local/2025-12-27-*-pre-research-integration.bak`
+
+---
+
+## [2025-12-27] - ULTRA-LEAN: Reduce to <100 lines, most aggressive extraction
+
+### Changed
+- **Line count** - Reduced from 533 to 99 lines (81% reduction - most aggressive)
+- **Structure** - Quick Reference table + 7-step workflow (briefest possible)
+- **How to Use** - One-liners for each step, details in references
+- **All phase details** - Extracted to update-workflow.md
+
+### Moved to References
+- Phase 1-7 detailed procedures → references/update-workflow.md
+- Size check decision tree → references/update-workflow.md
+- Extraction workflows → references/update-workflow.md
+- REFACTOR rules → Already in references/patterns/refactor-rules.md
+- Inline vs extract examples → references/update-workflow.md
+
+### Kept in SKILL.md
+- Quick Reference table (7 phases)
+- When to Use (3 bullets)
+- How to Use (7 one-line steps)
+- Success Criteria (8 checkboxes)
+- Reference links
+
+### Reason
+- **Worst offender**: 533 lines was 444% over target
+- **Ultra-aggressive extraction**: Needed to achieve <120 target
+- **Pattern established**: Follows fixing/auditing/creating lean model
+- **Self-hosting**: updating-skills describes the workflow it just went through
+
+### Impact
+- Leanest sub-skill at 99 lines (below 100!)
+- All workflow details preserved in references
+- Extremely scannable - phases visible at a glance
+- Demonstrates the extraction strategy it teaches
+
+---
+
+## [Date: 2025-12-27] - Add Table Formatting Reference
+
+### Added
+- Table formatting reminder in Phase 4b after inline edit section
+- Reference to centralized `managing-skills/references/table-formatting.md`
+
+### Reason
+- **RED failure**: No reminder to format tables after skill edits
+- Skills updated with table changes would fail Phase 14g audit
+- Centralized table formatting requirements now available
+
+### Technical Details
+- One-line addition after Phase 4b.2 (Apply Minimal Edit)
+- References centralized requirements for Prettier-based formatting
+- Command: `npx prettier --write` on edited markdown files
+
+### Files Changed
+- `SKILL.md` - Added formatting reminder at line 373
+
+### Method
+- Used `updating-skills` TDD workflow
+- Backup: `.local/2024-12-27-updating-skills.bak`
+- Line count: 531 → 533 (over limit, needs extraction in future update)
+
+---
+
+## [Date: 2025-12-25] - Add REFACTOR Rules Cross-Reference
+
+### Changed
+
+- Phase 8: Replaced detailed REFACTOR rules (lines 488-497) with concise summary
+- Added cross-reference link to `../creating-skills/references/refactor-rules.md`
+- Retained link to existing `references/refactor-phase.md` for workflow details
+
+### Reason
+
+- creating-skills and updating-skills had inconsistent REFACTOR documentation
+- Phase 8 contained partial rules inline but no reference to comprehensive documentation
+- Agents missed the detailed rationale and decision tree in refactor-rules.md
+- Fixed by condensing to 3-line summary + cross-reference link
+
+### Technical Details
+
+- Replaced 10 lines (488-497) with 6 lines (summary + 2 links)
+- Net reduction: 4 lines (525 → 521 lines)
+- Cross-reference uses relative path: `../creating-skills/references/refactor-rules.md`
+- Summary captures key distinction: "mandatory for non-trivial, optional for cosmetic-only"
+
+### Impact
+
+- Unified REFACTOR documentation between creating and updating workflows
+- Agents now have access to complete rationale via cross-reference
+- Reduced line count (moves toward 500-line compliance)
+- Single source of truth established in refactor-rules.md
+
+### REFACTOR Assessment
+
+**Change type:** Documentation consolidation (replaced inline with cross-reference)
+**Rules changed:** No - summary accurately reflects existing rules
+**Validation changed:** No - same REFACTOR triggers apply
+**Rationalization warnings:** No new warnings added
+
+**Classification:** Cosmetic-adjacent (documentation improvement)
+**REFACTOR decision:** Optional per Phase 8 rules
+
+**Risk assessment:** LOW - Cross-reference improves discoverability without changing requirements
+
+---
+
+## [Date: 2025-12-23]
+
+### Changed
+- Added Phase 2.4: Gateway Update Detection
+- Created `references/gateway-updates.md` with comprehensive gateway workflows
+- Added gateway-specific logic for add/remove/reorganize operations
+- Integrated gateway audit phases (18-19) into update workflow
+
+### Reason
+- Skill had "Gateway Check" (Phase 7.3) for when library skills change, but didn't handle updating gateways directly
+- When users say "add frontend-new-skill to gateway-frontend", updating-skills workflow didn't recognize this as special case
+- Gateway updates require skill existence verification, path resolution, table format enforcement, and specific audit phases
+- Fixed by adding gateway detection in Phase 2.4 and extracting complete workflows to reference document
+
+### Impact
+- Gateway updates now follow structured workflow (verify → resolve path → format table → audit)
+- Path format rules enforced (NEVER skill names without full paths, ALWAYS table format)
+- Gateway-specific audit phases (18-19) integrated into verification
+- Reference document provides troubleshooting and advanced bulk operations
+
+### REFACTOR
+- Pressure scenarios evaluated: Time, Authority, Sunk Cost
+- Counters identified:
+  * Phase 2.4 detection → mandates gateway workflows
+  * "NEVER" rules in reference doc → explicit format enforcement
+  * Audit phases 18-19 → fails with broken format, blocks completion
+- Assessment: Sufficient safeguards against rationalization
+- Status: ✅ PASSED
+
+---
+
 ## [Date: 2025-12-13]
 
 ### Changed
@@ -21,3 +192,24 @@
 - Hard limit at 500 lines with script that exits on failure
 - Extraction workflow (4a) is now equal to inline workflow (4b), not an exception
 - Cannot skip size check - it's a TodoWrite checkpoint
+
+## [Fixed] - 2025-12-27
+
+### Issues Fixed
+1. Phase 8: Added "vitest/globals" to tsconfig.json compilerOptions.types
+2. Phase 8: Added "*.log" to scripts/.gitignore
+
+### Remaining Issues
+1. Phase 8: CRITICAL - Git path resolution false positive
+   - TypeScript files use findProjectRoot() from shared library (.claude/lib/find-project-root.js)
+   - Shared library DOES use git (lines 75-93: git rev-parse --show-superproject-working-tree/--show-toplevel)
+   - Audit script doesn't detect indirect git usage via imports
+   - Actual behavior: Git-based path resolution works correctly
+   - Action needed: Update audit script to detect shared library usage
+
+2. Phase 14b: WARNING - 9 of 23 code blocks missing language tags (cosmetic)
+3. Phase 14b: WARNING - 1 code block exceeds 120 chars (cosmetic)
+
+### Method
+- Manual fixes (Edit tool) for tsconfig.json and .gitignore
+- Verified shared library provides git-based path resolution

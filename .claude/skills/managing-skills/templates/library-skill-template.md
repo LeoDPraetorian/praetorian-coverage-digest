@@ -1,6 +1,6 @@
 ---
-name: {{name}}
-description: {{description}}
+name: { { name } }
+description: { { description } }
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 skill-type: library
 ---
@@ -9,8 +9,8 @@ skill-type: library
 
 ## Version & Dependencies
 
-| Package | Version | Docs Source |
-|---------|---------|-------------|
+| Package         | Version     | Docs Source         |
+| --------------- | ----------- | ------------------- |
 | {{libraryName}} | {{version}} | context7 ({{date}}) |
 
 ## Overview
@@ -20,7 +20,8 @@ skill-type: library
 ## API Quick Reference
 
 | Function | Purpose | Example |
-|----------|---------|---------|
+| -------- | ------- | ------- |
+
 {{#each apiFunctions}}
 | `{{name}}` | {{description}} | `{{example}}` |
 {{/each}}
@@ -30,6 +31,7 @@ See [references/api-reference.md](references/api-reference.md) for full API docu
 ## When to Use
 
 Use this skill when:
+
 - Working with {{libraryName}}
 - Implementing {{libraryName}} patterns in Chariot
 - Troubleshooting {{libraryName}} issues
@@ -39,7 +41,9 @@ Use this skill when:
 See [references/patterns.md](references/patterns.md) for detailed patterns.
 
 {{#each patterns}}
+
 ### {{name}}
+
 {{description}}
 {{/each}}
 

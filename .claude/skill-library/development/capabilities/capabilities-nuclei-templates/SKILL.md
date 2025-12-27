@@ -13,14 +13,14 @@ This skill covers Nuclei template creation for vulnerability detection in the Ch
 
 ## Quick Reference
 
-| Protocol | Use Case | Example |
-|----------|----------|---------|
-| `http` | Web vulnerabilities, APIs | CVEs, credential stuffing, exposed panels |
-| `dns` | DNS reconnaissance | SOA detection, zone transfers |
-| `tcp` | Network protocols | Redis, SSH, databases |
-| `ssl` | TLS/SSL analysis | Weak ciphers, certificate issues |
-| `file` | File-based analysis | Keys, secrets, malware signatures |
-| `javascript` | JS-specific checks | Node.js vulnerabilities |
+| Protocol     | Use Case                  | Example                                   |
+| ------------ | ------------------------- | ----------------------------------------- |
+| `http`       | Web vulnerabilities, APIs | CVEs, credential stuffing, exposed panels |
+| `dns`        | DNS reconnaissance        | SOA detection, zone transfers             |
+| `tcp`        | Network protocols         | Redis, SSH, databases                     |
+| `ssl`        | TLS/SSL analysis          | Weak ciphers, certificate issues          |
+| `file`       | File-based analysis       | Keys, secrets, malware signatures         |
+| `javascript` | JS-specific checks        | Node.js vulnerabilities                   |
 
 ## Directory Structure
 
@@ -103,13 +103,13 @@ http:
 
 ## Severity Classification
 
-| Severity | CVSS Range | Use Cases |
-|----------|-----------|-----------|
-| **critical** | 9.0-10.0 | RCE, full system compromise, credential theft |
-| **high** | 7.0-8.9 | Significant data breach risk, auth bypass |
-| **medium** | 4.0-6.9 | Notable security impact, limited exposure |
-| **low** | 0.1-3.9 | Minor risk, information disclosure |
-| **info** | N/A | Fingerprinting, no direct security risk |
+| Severity     | CVSS Range | Use Cases                                     |
+| ------------ | ---------- | --------------------------------------------- |
+| **critical** | 9.0-10.0   | RCE, full system compromise, credential theft |
+| **high**     | 7.0-8.9    | Significant data breach risk, auth bypass     |
+| **medium**   | 4.0-6.9    | Notable security impact, limited exposure     |
+| **low**      | 0.1-3.9    | Minor risk, information disclosure            |
+| **info**     | N/A        | Fingerprinting, no direct security risk       |
 
 ## Matcher Types
 
@@ -117,12 +117,12 @@ http:
 
 ```yaml
 - type: word
-  part: body              # body, header, all
+  part: body # body, header, all
   words:
     - "admin"
     - "dashboard"
-  condition: or           # or, and
-  negative: false         # true for negative match
+  condition: or # or, and
+  negative: false # true for negative match
 ```
 
 ### Regex Matcher
@@ -150,8 +150,8 @@ http:
 - type: dsl
   dsl:
     - 'contains(header, "Set-Cookie")'
-    - 'status_code == 200'
-    - 'len(body) > 1000'
+    - "status_code == 200"
+    - "len(body) > 1000"
   condition: and
 ```
 
@@ -160,7 +160,7 @@ http:
 ```yaml
 - type: binary
   binary:
-    - "504B0304"  # ZIP header (hex)
+    - "504B0304" # ZIP header (hex)
 ```
 
 ### XPath Matcher (HTML/XML)
@@ -191,7 +191,7 @@ extractors:
   - type: xpath
     name: csrf_token
     attribute: value
-    internal: true          # Use in subsequent requests
+    internal: true # Use in subsequent requests
     xpath:
       - //input[@name='csrf']/@value
 ```
@@ -202,8 +202,8 @@ extractors:
 extractors:
   - type: json
     json:
-      - '.data.apiKey'
-      - '.auth.token'
+      - ".data.apiKey"
+      - ".auth.token"
 ```
 
 ### DSL Extractor
@@ -257,14 +257,14 @@ http:
         name: 2fa-required
         dsl:
           - 'contains(location, "two-factor")'
-          - 'status_code == 302'
+          - "status_code == 302"
         condition: and
 
       - type: dsl
         name: login-success
         dsl:
           - 'contains(tolower(header), "logged_in=yes")'
-          - 'status_code == 302'
+          - "status_code == 302"
         condition: and
 ```
 
@@ -402,21 +402,21 @@ metadata:
 
 ### Case Review Tags
 
-| Tag | Meaning |
-|-----|---------|
-| `case-reviewed` | Validated by Praetorian - safe for production |
+| Tag             | Meaning                                             |
+| --------------- | --------------------------------------------------- |
+| `case-reviewed` | Validated by Praetorian - safe for production       |
 | `case-excluded` | Known issues/limitations - may have false positives |
-| `case-pending` | Under review - not yet validated |
+| `case-pending`  | Under review - not yet validated                    |
 
 ### Optimization Hints
 
 ```yaml
 metadata:
-  max-request: 2              # Limit requests
-  verified: true              # Verification status
-  shodan-query: title:"H2O"   # Shodan dork for discovery
+  max-request: 2 # Limit requests
+  verified: true # Verification status
+  shodan-query: title:"H2O" # Shodan dork for discovery
 
-stop-at-first-match: true     # Stop after first successful match
+stop-at-first-match: true # Stop after first successful match
 ```
 
 ## Testing Templates
@@ -450,6 +450,7 @@ nuclei -u target.com -config profiles/cves.yml
 ## Template Checklist
 
 Before submitting:
+
 - [ ] `id` is unique and descriptive
 - [ ] `info` section complete (name, author, severity, description)
 - [ ] `references` include CVE/advisory links
@@ -462,12 +463,12 @@ Before submitting:
 
 ## Common Issues
 
-| Issue | Solution |
-|-------|----------|
-| False positives | Add more specific matchers, use `negative` |
-| Timeout errors | Reduce `max-request`, add `stop-at-first-match` |
-| Missing results | Check `matchers-condition` (and vs or) |
-| CSRF failures | Use extractors with `internal: true` |
+| Issue           | Solution                                        |
+| --------------- | ----------------------------------------------- |
+| False positives | Add more specific matchers, use `negative`      |
+| Timeout errors  | Reduce `max-request`, add `stop-at-first-match` |
+| Missing results | Check `matchers-condition` (and vs or)          |
+| CSRF failures   | Use extractors with `internal: true`            |
 
 ## References
 

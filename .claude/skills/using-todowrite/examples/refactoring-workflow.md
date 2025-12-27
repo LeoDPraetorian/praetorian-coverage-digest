@@ -5,9 +5,10 @@
 **User request:** "Refactor the authentication system to use JWT instead of sessions"
 
 **Complexity analysis:**
+
 - ≥3 steps? YES (5+ distinct phases)
 - ≥5 phases? YES
-- >10 minutes? YES (estimated 45 minutes)
+- > 10 minutes? YES (estimated 45 minutes)
 - Context drift risk? YES (multiple files, design decisions)
 - User visibility? YES (critical system, user wants updates)
 
@@ -22,16 +23,52 @@
 ```json
 {
   "todos": [
-    {"content": "Analyze current session-based auth implementation", "status": "pending", "activeForm": "Analyzing current session-based auth implementation"},
-    {"content": "Research JWT best practices and security", "status": "pending", "activeForm": "Researching JWT best practices and security"},
-    {"content": "Design new JWT architecture", "status": "pending", "activeForm": "Designing new JWT architecture"},
-    {"content": "Implement JWT middleware", "status": "pending", "activeForm": "Implementing JWT middleware"},
-    {"content": "Update route handlers for JWT", "status": "pending", "activeForm": "Updating route handlers for JWT"},
-    {"content": "Write unit tests for JWT auth", "status": "pending", "activeForm": "Writing unit tests for JWT auth"},
-    {"content": "Write integration tests", "status": "pending", "activeForm": "Writing integration tests"},
-    {"content": "Update authentication documentation", "status": "pending", "activeForm": "Updating authentication documentation"},
-    {"content": "Remove old session code", "status": "pending", "activeForm": "Removing old session code"},
-    {"content": "Deploy and verify", "status": "pending", "activeForm": "Deploying and verifying"}
+    {
+      "content": "Analyze current session-based auth implementation",
+      "status": "pending",
+      "activeForm": "Analyzing current session-based auth implementation"
+    },
+    {
+      "content": "Research JWT best practices and security",
+      "status": "pending",
+      "activeForm": "Researching JWT best practices and security"
+    },
+    {
+      "content": "Design new JWT architecture",
+      "status": "pending",
+      "activeForm": "Designing new JWT architecture"
+    },
+    {
+      "content": "Implement JWT middleware",
+      "status": "pending",
+      "activeForm": "Implementing JWT middleware"
+    },
+    {
+      "content": "Update route handlers for JWT",
+      "status": "pending",
+      "activeForm": "Updating route handlers for JWT"
+    },
+    {
+      "content": "Write unit tests for JWT auth",
+      "status": "pending",
+      "activeForm": "Writing unit tests for JWT auth"
+    },
+    {
+      "content": "Write integration tests",
+      "status": "pending",
+      "activeForm": "Writing integration tests"
+    },
+    {
+      "content": "Update authentication documentation",
+      "status": "pending",
+      "activeForm": "Updating authentication documentation"
+    },
+    {
+      "content": "Remove old session code",
+      "status": "pending",
+      "activeForm": "Removing old session code"
+    },
+    { "content": "Deploy and verify", "status": "pending", "activeForm": "Deploying and verifying" }
   ]
 }
 ```
@@ -45,16 +82,52 @@
 ```json
 {
   "todos": [
-    {"content": "Analyze current session-based auth implementation", "status": "in_progress", "activeForm": "Analyzing current session-based auth implementation"},
-    {"content": "Research JWT best practices and security", "status": "pending", "activeForm": "Researching JWT best practices and security"},
-    {"content": "Design new JWT architecture", "status": "pending", "activeForm": "Designing new JWT architecture"},
-    {"content": "Implement JWT middleware", "status": "pending", "activeForm": "Implementing JWT middleware"},
-    {"content": "Update route handlers for JWT", "status": "pending", "activeForm": "Updating route handlers for JWT"},
-    {"content": "Write unit tests for JWT auth", "status": "pending", "activeForm": "Writing unit tests for JWT auth"},
-    {"content": "Write integration tests", "status": "pending", "activeForm": "Writing integration tests"},
-    {"content": "Update authentication documentation", "status": "pending", "activeForm": "Updating authentication documentation"},
-    {"content": "Remove old session code", "status": "pending", "activeForm": "Removing old session code"},
-    {"content": "Deploy and verify", "status": "pending", "activeForm": "Deploying and verifying"}
+    {
+      "content": "Analyze current session-based auth implementation",
+      "status": "in_progress",
+      "activeForm": "Analyzing current session-based auth implementation"
+    },
+    {
+      "content": "Research JWT best practices and security",
+      "status": "pending",
+      "activeForm": "Researching JWT best practices and security"
+    },
+    {
+      "content": "Design new JWT architecture",
+      "status": "pending",
+      "activeForm": "Designing new JWT architecture"
+    },
+    {
+      "content": "Implement JWT middleware",
+      "status": "pending",
+      "activeForm": "Implementing JWT middleware"
+    },
+    {
+      "content": "Update route handlers for JWT",
+      "status": "pending",
+      "activeForm": "Updating route handlers for JWT"
+    },
+    {
+      "content": "Write unit tests for JWT auth",
+      "status": "pending",
+      "activeForm": "Writing unit tests for JWT auth"
+    },
+    {
+      "content": "Write integration tests",
+      "status": "pending",
+      "activeForm": "Writing integration tests"
+    },
+    {
+      "content": "Update authentication documentation",
+      "status": "pending",
+      "activeForm": "Updating authentication documentation"
+    },
+    {
+      "content": "Remove old session code",
+      "status": "pending",
+      "activeForm": "Removing old session code"
+    },
+    { "content": "Deploy and verify", "status": "pending", "activeForm": "Deploying and verifying" }
   ]
 }
 ```
@@ -70,16 +143,52 @@
 ```json
 {
   "todos": [
-    {"content": "Analyze current session-based auth implementation", "status": "completed", "activeForm": "Analyzing current session-based auth implementation"},
-    {"content": "Research JWT best practices and security", "status": "in_progress", "activeForm": "Researching JWT best practices and security"},
-    {"content": "Design new JWT architecture", "status": "pending", "activeForm": "Designing new JWT architecture"},
-    {"content": "Implement JWT middleware", "status": "pending", "activeForm": "Implementing JWT middleware"},
-    {"content": "Update route handlers for JWT", "status": "pending", "activeForm": "Updating route handlers for JWT"},
-    {"content": "Write unit tests for JWT auth", "status": "pending", "activeForm": "Writing unit tests for JWT auth"},
-    {"content": "Write integration tests", "status": "pending", "activeForm": "Writing integration tests"},
-    {"content": "Update authentication documentation", "status": "pending", "activeForm": "Updating authentication documentation"},
-    {"content": "Remove old session code", "status": "pending", "activeForm": "Removing old session code"},
-    {"content": "Deploy and verify", "status": "pending", "activeForm": "Deploying and verifying"}
+    {
+      "content": "Analyze current session-based auth implementation",
+      "status": "completed",
+      "activeForm": "Analyzing current session-based auth implementation"
+    },
+    {
+      "content": "Research JWT best practices and security",
+      "status": "in_progress",
+      "activeForm": "Researching JWT best practices and security"
+    },
+    {
+      "content": "Design new JWT architecture",
+      "status": "pending",
+      "activeForm": "Designing new JWT architecture"
+    },
+    {
+      "content": "Implement JWT middleware",
+      "status": "pending",
+      "activeForm": "Implementing JWT middleware"
+    },
+    {
+      "content": "Update route handlers for JWT",
+      "status": "pending",
+      "activeForm": "Updating route handlers for JWT"
+    },
+    {
+      "content": "Write unit tests for JWT auth",
+      "status": "pending",
+      "activeForm": "Writing unit tests for JWT auth"
+    },
+    {
+      "content": "Write integration tests",
+      "status": "pending",
+      "activeForm": "Writing integration tests"
+    },
+    {
+      "content": "Update authentication documentation",
+      "status": "pending",
+      "activeForm": "Updating authentication documentation"
+    },
+    {
+      "content": "Remove old session code",
+      "status": "pending",
+      "activeForm": "Removing old session code"
+    },
+    { "content": "Deploy and verify", "status": "pending", "activeForm": "Deploying and verifying" }
   ]
 }
 ```
@@ -89,6 +198,7 @@
 ### Step 4: Continue Through Tasks (0:08 - 0:40)
 
 **Repeat pattern for each task:**
+
 1. Mark in_progress
 2. Do work
 3. Mark completed immediately
@@ -98,16 +208,52 @@
 ```json
 {
   "todos": [
-    {"content": "Analyze current session-based auth implementation", "status": "completed", "activeForm": "Analyzing current session-based auth implementation"},
-    {"content": "Research JWT best practices and security", "status": "completed", "activeForm": "Researching JWT best practices and security"},
-    {"content": "Design new JWT architecture", "status": "completed", "activeForm": "Designing new JWT architecture"},
-    {"content": "Implement JWT middleware", "status": "completed", "activeForm": "Implementing JWT middleware"},
-    {"content": "Update route handlers for JWT", "status": "in_progress", "activeForm": "Updating route handlers for JWT"},
-    {"content": "Write unit tests for JWT auth", "status": "pending", "activeForm": "Writing unit tests for JWT auth"},
-    {"content": "Write integration tests", "status": "pending", "activeForm": "Writing integration tests"},
-    {"content": "Update authentication documentation", "status": "pending", "activeForm": "Updating authentication documentation"},
-    {"content": "Remove old session code", "status": "pending", "activeForm": "Removing old session code"},
-    {"content": "Deploy and verify", "status": "pending", "activeForm": "Deploying and verifying"}
+    {
+      "content": "Analyze current session-based auth implementation",
+      "status": "completed",
+      "activeForm": "Analyzing current session-based auth implementation"
+    },
+    {
+      "content": "Research JWT best practices and security",
+      "status": "completed",
+      "activeForm": "Researching JWT best practices and security"
+    },
+    {
+      "content": "Design new JWT architecture",
+      "status": "completed",
+      "activeForm": "Designing new JWT architecture"
+    },
+    {
+      "content": "Implement JWT middleware",
+      "status": "completed",
+      "activeForm": "Implementing JWT middleware"
+    },
+    {
+      "content": "Update route handlers for JWT",
+      "status": "in_progress",
+      "activeForm": "Updating route handlers for JWT"
+    },
+    {
+      "content": "Write unit tests for JWT auth",
+      "status": "pending",
+      "activeForm": "Writing unit tests for JWT auth"
+    },
+    {
+      "content": "Write integration tests",
+      "status": "pending",
+      "activeForm": "Writing integration tests"
+    },
+    {
+      "content": "Update authentication documentation",
+      "status": "pending",
+      "activeForm": "Updating authentication documentation"
+    },
+    {
+      "content": "Remove old session code",
+      "status": "pending",
+      "activeForm": "Removing old session code"
+    },
+    { "content": "Deploy and verify", "status": "pending", "activeForm": "Deploying and verifying" }
   ]
 }
 ```
@@ -123,17 +269,57 @@
 ```json
 {
   "todos": [
-    {"content": "Analyze current session-based auth implementation", "status": "completed", "activeForm": "Analyzing current session-based auth implementation"},
-    {"content": "Research JWT best practices and security", "status": "completed", "activeForm": "Researching JWT best practices and security"},
-    {"content": "Design new JWT architecture", "status": "completed", "activeForm": "Designing new JWT architecture"},
-    {"content": "Implement JWT middleware", "status": "completed", "activeForm": "Implementing JWT middleware"},
-    {"content": "Update route handlers for JWT", "status": "completed", "activeForm": "Updating route handlers for JWT"},
-    {"content": "Write unit tests for JWT auth", "status": "in_progress", "activeForm": "Writing unit tests for JWT auth"},
-    {"content": "Implement refresh token logic", "status": "pending", "activeForm": "Implementing refresh token logic"},
-    {"content": "Write integration tests", "status": "pending", "activeForm": "Writing integration tests"},
-    {"content": "Update authentication documentation", "status": "pending", "activeForm": "Updating authentication documentation"},
-    {"content": "Remove old session code", "status": "pending", "activeForm": "Removing old session code"},
-    {"content": "Deploy and verify", "status": "pending", "activeForm": "Deploying and verifying"}
+    {
+      "content": "Analyze current session-based auth implementation",
+      "status": "completed",
+      "activeForm": "Analyzing current session-based auth implementation"
+    },
+    {
+      "content": "Research JWT best practices and security",
+      "status": "completed",
+      "activeForm": "Researching JWT best practices and security"
+    },
+    {
+      "content": "Design new JWT architecture",
+      "status": "completed",
+      "activeForm": "Designing new JWT architecture"
+    },
+    {
+      "content": "Implement JWT middleware",
+      "status": "completed",
+      "activeForm": "Implementing JWT middleware"
+    },
+    {
+      "content": "Update route handlers for JWT",
+      "status": "completed",
+      "activeForm": "Updating route handlers for JWT"
+    },
+    {
+      "content": "Write unit tests for JWT auth",
+      "status": "in_progress",
+      "activeForm": "Writing unit tests for JWT auth"
+    },
+    {
+      "content": "Implement refresh token logic",
+      "status": "pending",
+      "activeForm": "Implementing refresh token logic"
+    },
+    {
+      "content": "Write integration tests",
+      "status": "pending",
+      "activeForm": "Writing integration tests"
+    },
+    {
+      "content": "Update authentication documentation",
+      "status": "pending",
+      "activeForm": "Updating authentication documentation"
+    },
+    {
+      "content": "Remove old session code",
+      "status": "pending",
+      "activeForm": "Removing old session code"
+    },
+    { "content": "Deploy and verify", "status": "pending", "activeForm": "Deploying and verifying" }
   ]
 }
 ```
@@ -147,17 +333,61 @@
 ```json
 {
   "todos": [
-    {"content": "Analyze current session-based auth implementation", "status": "completed", "activeForm": "Analyzing current session-based auth implementation"},
-    {"content": "Research JWT best practices and security", "status": "completed", "activeForm": "Researching JWT best practices and security"},
-    {"content": "Design new JWT architecture", "status": "completed", "activeForm": "Designing new JWT architecture"},
-    {"content": "Implement JWT middleware", "status": "completed", "activeForm": "Implementing JWT middleware"},
-    {"content": "Update route handlers for JWT", "status": "completed", "activeForm": "Updating route handlers for JWT"},
-    {"content": "Write unit tests for JWT auth", "status": "completed", "activeForm": "Writing unit tests for JWT auth"},
-    {"content": "Implement refresh token logic", "status": "completed", "activeForm": "Implementing refresh token logic"},
-    {"content": "Write integration tests", "status": "completed", "activeForm": "Writing integration tests"},
-    {"content": "Update authentication documentation", "status": "completed", "activeForm": "Updating authentication documentation"},
-    {"content": "Remove old session code", "status": "completed", "activeForm": "Removing old session code"},
-    {"content": "Deploy and verify", "status": "in_progress", "activeForm": "Deploying and verifying"}
+    {
+      "content": "Analyze current session-based auth implementation",
+      "status": "completed",
+      "activeForm": "Analyzing current session-based auth implementation"
+    },
+    {
+      "content": "Research JWT best practices and security",
+      "status": "completed",
+      "activeForm": "Researching JWT best practices and security"
+    },
+    {
+      "content": "Design new JWT architecture",
+      "status": "completed",
+      "activeForm": "Designing new JWT architecture"
+    },
+    {
+      "content": "Implement JWT middleware",
+      "status": "completed",
+      "activeForm": "Implementing JWT middleware"
+    },
+    {
+      "content": "Update route handlers for JWT",
+      "status": "completed",
+      "activeForm": "Updating route handlers for JWT"
+    },
+    {
+      "content": "Write unit tests for JWT auth",
+      "status": "completed",
+      "activeForm": "Writing unit tests for JWT auth"
+    },
+    {
+      "content": "Implement refresh token logic",
+      "status": "completed",
+      "activeForm": "Implementing refresh token logic"
+    },
+    {
+      "content": "Write integration tests",
+      "status": "completed",
+      "activeForm": "Writing integration tests"
+    },
+    {
+      "content": "Update authentication documentation",
+      "status": "completed",
+      "activeForm": "Updating authentication documentation"
+    },
+    {
+      "content": "Remove old session code",
+      "status": "completed",
+      "activeForm": "Removing old session code"
+    },
+    {
+      "content": "Deploy and verify",
+      "status": "in_progress",
+      "activeForm": "Deploying and verifying"
+    }
   ]
 }
 ```
@@ -171,17 +401,61 @@
 ```json
 {
   "todos": [
-    {"content": "Analyze current session-based auth implementation", "status": "completed", "activeForm": "Analyzing current session-based auth implementation"},
-    {"content": "Research JWT best practices and security", "status": "completed", "activeForm": "Researching JWT best practices and security"},
-    {"content": "Design new JWT architecture", "status": "completed", "activeForm": "Designing new JWT architecture"},
-    {"content": "Implement JWT middleware", "status": "completed", "activeForm": "Implementing JWT middleware"},
-    {"content": "Update route handlers for JWT", "status": "completed", "activeForm": "Updating route handlers for JWT"},
-    {"content": "Write unit tests for JWT auth", "status": "completed", "activeForm": "Writing unit tests for JWT auth"},
-    {"content": "Implement refresh token logic", "status": "completed", "activeForm": "Implementing refresh token logic"},
-    {"content": "Write integration tests", "status": "completed", "activeForm": "Writing integration tests"},
-    {"content": "Update authentication documentation", "status": "completed", "activeForm": "Updating authentication documentation"},
-    {"content": "Remove old session code", "status": "completed", "activeForm": "Removing old session code"},
-    {"content": "Deploy and verify", "status": "completed", "activeForm": "Deploying and verifying"}
+    {
+      "content": "Analyze current session-based auth implementation",
+      "status": "completed",
+      "activeForm": "Analyzing current session-based auth implementation"
+    },
+    {
+      "content": "Research JWT best practices and security",
+      "status": "completed",
+      "activeForm": "Researching JWT best practices and security"
+    },
+    {
+      "content": "Design new JWT architecture",
+      "status": "completed",
+      "activeForm": "Designing new JWT architecture"
+    },
+    {
+      "content": "Implement JWT middleware",
+      "status": "completed",
+      "activeForm": "Implementing JWT middleware"
+    },
+    {
+      "content": "Update route handlers for JWT",
+      "status": "completed",
+      "activeForm": "Updating route handlers for JWT"
+    },
+    {
+      "content": "Write unit tests for JWT auth",
+      "status": "completed",
+      "activeForm": "Writing unit tests for JWT auth"
+    },
+    {
+      "content": "Implement refresh token logic",
+      "status": "completed",
+      "activeForm": "Implementing refresh token logic"
+    },
+    {
+      "content": "Write integration tests",
+      "status": "completed",
+      "activeForm": "Writing integration tests"
+    },
+    {
+      "content": "Update authentication documentation",
+      "status": "completed",
+      "activeForm": "Updating authentication documentation"
+    },
+    {
+      "content": "Remove old session code",
+      "status": "completed",
+      "activeForm": "Removing old session code"
+    },
+    {
+      "content": "Deploy and verify",
+      "status": "completed",
+      "activeForm": "Deploying and verifying"
+    }
   ]
 }
 ```

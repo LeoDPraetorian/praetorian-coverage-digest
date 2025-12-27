@@ -1,0 +1,27 @@
+# Changelog
+
+All notable changes to this skill will be documented in this file.
+
+## [1.0.0] - 2025-12-27
+
+### Initial Creation
+
+**RED Phase Documentation:**
+- Gap: Claude/agents don't know @praetorian-chariot/ui is being decommissioned
+- Failure: Agents import from deprecated library instead of local components
+- Failure: Agents don't know migration workflow (recursive dependencies, reference updates)
+
+**Skill Type:** Process/Pattern
+**Category:** development/frontend
+**Location:** Library (.claude/skill-library/)
+
+### Added
+- Component source selection decision tree
+- 4-phase migration workflow (discover, migrate, update refs, verify)
+- Import transformation rules
+- Target directory mapping
+- User interaction prompts for migration decisions
+- Edge case handling (existing local, circular deps, type exports)
+- Reference files:
+  - `references/import-transforms.md` - Detailed import rules
+  - `references/migration-example.md` - Full Tag component walkthrough

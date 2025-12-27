@@ -11,6 +11,7 @@ allowed-tools: Read, Write, Grep, Glob, Bash, TodoWrite
 ## When to Use
 
 Use this skill when:
+
 - Performing Phase 2 of threat modeling (security controls analysis)
 - Analyzing security mechanisms after codebase mapping (Phase 1)
 - Need to map controls to STRIDE threat categories
@@ -28,6 +29,7 @@ Use this skill when:
 ### What Phase 0 Provides
 
 Phase 0 (Business Context Discovery) produces:
+
 - **Compliance requirements** (SOC2, PCI-DSS, HIPAA, GDPR) → Validate specific regulatory controls
 - **Regulatory gaps** → Document which requirements are not met
 - **Compliance status** → Track progress toward compliance (requirements met/gaps)
@@ -38,6 +40,7 @@ Phase 0 (Business Context Discovery) produces:
 ### Required Files
 
 **Load before control analysis**:
+
 - `../phase-0/summary.md` - Quick compliance overview
 - `../phase-0/compliance-requirements.json` - Specific regulatory requirements to validate
 
@@ -46,6 +49,7 @@ Phase 0 (Business Context Discovery) produces:
 ### For Complete Phase 0 Integration Details
 
 **See [references/phase-0-compliance-integration.md](references/phase-0-compliance-integration.md)** for:
+
 - Compliance validation workflow (load requirements, map to control categories, validate, generate status)
 - `control-gaps.json` schema with `compliance_requirement` field
 - Summary generation with compliance evaluation section
@@ -59,12 +63,14 @@ Phase 0 (Business Context Discovery) produces:
 ### This is Formal Threat Modeling, Not a Quick Security Review
 
 **If you're under time pressure:**
+
 - ✅ Reduce SCOPE (analyze fewer control categories)
 - ✅ Request deadline extension
 - ✅ Communicate you need X hours for proper methodology
 - ❌ Skip categories or produce ad-hoc output structure
 
 **Why structured artifacts are non-negotiable:**
+
 - Phase 3 (threat modeling) requires specific JSON files per control category
 - STRIDE threat mapping depends on consistent control categorization
 - Phase 4 (test planning) prioritizes based on control gaps
@@ -73,6 +79,7 @@ Phase 0 (Business Context Discovery) produces:
 ### Output Schema is Non-Negotiable
 
 **MUST produce these exact files (per architecture spec):**
+
 ```
 phase-2/
 ├── authentication.json
@@ -90,6 +97,7 @@ phase-2/
 ```
 
 **NOT acceptable alternatives:**
+
 - ❌ "security-controls-inventory.json" (wrong name)
 - ❌ "stride-control-mapping.json" (not in spec)
 - ❌ "consolidated-controls.json" (Phase 3 can't find it)
@@ -97,12 +105,14 @@ phase-2/
 ### Expertise Does Not Replace Methodology
 
 **Common rationalizations to avoid:**
+
 - ❌ "I can see the auth is Cognito, no need to document"
 - ❌ "Quick grep for validation patterns is sufficient"
 - ❌ "Single JSON file is cleaner than 12 files"
 - ❌ "I'll note gaps inline instead of separate file"
 
 **Reality:**
+
 - Documenting controls creates audit trail
 - Systematic detection catches edge cases
 - Separate files enable parallel analysis
@@ -114,6 +124,7 @@ phase-2/
 The 12-file output structure is NOT arbitrary preference. It is MANDATORY for Phase 3 automation.
 
 **FACT**: The `threat-modeling-orchestrator` skill (`.claude/skills/threat-modeling-orchestrator/`) loads these files by exact name:
+
 ```
 Phase 3 loads: authentication.json, authorization.json, input-validation.json, etc.
 Phase 3 CANNOT load: security-controls-inventory.json, stride-control-mapping.json
@@ -125,41 +136,50 @@ If you produce wrong file names, Phase 3 orchestrator fails. This is not opinion
 **Common rationalizations to reject:**
 
 ❌ **"The work is substantively complete, just wrong structure"**
+
 - Reality: Phase 3 orchestrator cannot load your files → Phase 3 fails → Threat model incomplete
 - This isn't about quality - it's about interface contract
 
 ❌ **"7 files contain same information as 12 files"**
+
 - Reality: Information is useless if consumer can't find it
 - Phase 3 does `Read authentication.json` - file must exist with that exact name
 
 ❌ **"I'll restructure tomorrow when fresh"**
+
 - Reality: "Tomorrow" means Phase 2 incomplete tonight → Phase 3 blocked → Workflow stops
 - Reality: Restructuring takes 2-3 minutes for AI (not 1-2 hours) - exhaustion is irrelevant
 
 ❌ **"Skills are guidance, not law - adapt to context"**
+
 - Reality: Interface contracts ARE law - Phase 3 expects specific inputs
 - Reality: This skill IS the contract between Phase 2 and Phase 3
 - Adapting = breaking the contract = blocking downstream work
 
 ❌ **"YAGNI - no tooling exists for this format"**
+
 - Reality: The tooling IS Phase 3's orchestrator - already written, already expects these files
 - Reality: You're not building for hypothetical future - you're building for next phase TODAY
 
 ❌ **"Single consolidated file is cleaner/better organized"**
+
 - Reality: "Better" is irrelevant - what matters is "compatible with Phase 3"
 - Reality: Separate files enable parallel agent work on different categories
 - Reality: You don't get to redesign interfaces mid-workflow
 
 ❌ **"Keep both formats / Convert later"**
+
 - Reality: Maintaining duplicate state violates DRY and creates sync bugs
 - Reality: "Convert later" = technical debt when conversion takes 2-3 minutes now
 
 **The ONLY acceptable responses:**
+
 1. ✅ Delete wrong format, create correct format (takes 2-3 minutes for AI)
 2. ✅ Reduce scope (map fewer categories, but use correct schema)
 3. ✅ Stop entirely and communicate "Phase 2 incomplete" (don't ship wrong format)
 
 **NOT acceptable:**
+
 - ❌ Ship wrong format and claim it's "substantively equivalent"
 - ❌ Ship wrong format and defer fixing to "tomorrow"
 - ❌ Ship both formats (duplicate state)
@@ -171,18 +191,18 @@ If you produce wrong file names, Phase 3 orchestrator fails. This is not opinion
 
 ## Quick Reference
 
-| Step | Purpose | Output |
-|------|---------|--------|
-| 1. Load Phase 1 Artifacts | Get architecture context | Phase 1 summary loaded |
-| 2. Authentication Controls | Map auth mechanisms | `authentication.json` |
-| 3. Authorization Controls | Map authz patterns | `authorization.json` |
-| 4. Input Validation | Map validation patterns | `input-validation.json` |
-| 5. Output Encoding | Map output security | `output-encoding.json` |
-| 6. Cryptography | Map encryption/hashing | `cryptography.json` |
-| 7. Secrets Management | Map secret handling | `secrets-management.json` |
-| 8. Supporting Controls | Logging, rate limiting, CORS, deps | 4 JSON files |
-| 9. Gap Analysis | Identify missing controls | `control-gaps.json` |
-| 10. Summary | Compress for handoff | `summary.md` (<2000 tokens) |
+| Step                       | Purpose                            | Output                      |
+| -------------------------- | ---------------------------------- | --------------------------- |
+| 1. Load Phase 1 Artifacts  | Get architecture context           | Phase 1 summary loaded      |
+| 2. Authentication Controls | Map auth mechanisms                | `authentication.json`       |
+| 3. Authorization Controls  | Map authz patterns                 | `authorization.json`        |
+| 4. Input Validation        | Map validation patterns            | `input-validation.json`     |
+| 5. Output Encoding         | Map output security                | `output-encoding.json`      |
+| 6. Cryptography            | Map encryption/hashing             | `cryptography.json`         |
+| 7. Secrets Management      | Map secret handling                | `secrets-management.json`   |
+| 8. Supporting Controls     | Logging, rate limiting, CORS, deps | 4 JSON files                |
+| 9. Gap Analysis            | Identify missing controls          | `control-gaps.json`         |
+| 10. Summary                | Compress for handoff               | `summary.md` (<2000 tokens) |
 
 ---
 
@@ -193,12 +213,14 @@ If you produce wrong file names, Phase 3 orchestrator fails. This is not opinion
 **Goal**: Get architecture context before mapping controls.
 
 **Required inputs from Phase 1:**
+
 - `summary.md` - Technology stack, components overview
 - `components/*.json` - Per-component analysis
 - `entry-points.json` - Attack surface (where controls must exist)
 - `trust-boundaries.json` - Where security transitions occur
 
 **Load command:**
+
 ```bash
 cat {session}/phase-1/summary.md
 ls {session}/phase-1/components/
@@ -211,6 +233,7 @@ ls {session}/phase-1/components/
 **STRIDE Defense**: Spoofing
 
 **What to find:**
+
 - Identity providers (Cognito, Auth0, Okta, custom)
 - Token types (JWT, session cookies, API keys)
 - MFA implementation
@@ -218,6 +241,7 @@ ls {session}/phase-1/components/
 - Session management
 
 **Detection patterns:**
+
 ```bash
 # Find auth-related code
 grep -rn "cognito\|jwt\|session\|token\|auth\|login\|logout" {scope}
@@ -234,6 +258,7 @@ grep -rn "mfa\|totp\|otp\|2fa" {scope}
 **STRIDE Defense**: Elevation of Privilege
 
 **What to find:**
+
 - Role definitions (RBAC, ABAC)
 - Permission checks
 - Policy enforcement points
@@ -241,6 +266,7 @@ grep -rn "mfa\|totp\|otp\|2fa" {scope}
 - Admin/user separation
 
 **Detection patterns:**
+
 ```bash
 # Find authz-related code
 grep -rn "role\|permission\|policy\|rbac\|abac" {scope}
@@ -257,6 +283,7 @@ grep -rn "tenant\|account.id\|user.id" {scope}
 **STRIDE Defense**: Tampering
 
 **What to find:**
+
 - Schema validation (Zod, Joi, JSON Schema)
 - Input sanitization
 - Type checking
@@ -264,6 +291,7 @@ grep -rn "tenant\|account.id\|user.id" {scope}
 - SQL/NoSQL injection prevention
 
 **Detection patterns:**
+
 ```bash
 # Find validation patterns
 grep -rn "validate\|sanitize\|escape\|schema" {scope}
@@ -280,6 +308,7 @@ grep -rn "parameterized\|prepared.statement\|bind" {scope}
 **STRIDE Defense**: Information Disclosure (XSS prevention)
 
 **What to find:**
+
 - HTML encoding
 - URL encoding
 - JSON escaping
@@ -287,6 +316,7 @@ grep -rn "parameterized\|prepared.statement\|bind" {scope}
 - CSP implementation
 
 **Detection patterns:**
+
 ```bash
 # Find encoding patterns
 grep -rn "encode\|escape\|sanitize" {scope}
@@ -303,6 +333,7 @@ grep -rn "Content-Type\|Content-Security-Policy" {scope}
 **STRIDE Defense**: Information Disclosure
 
 **What to find:**
+
 - Encryption at rest (AES, KMS)
 - Encryption in transit (TLS)
 - Hashing (bcrypt, SHA-256)
@@ -310,6 +341,7 @@ grep -rn "Content-Type\|Content-Security-Policy" {scope}
 - Certificate handling
 
 **Detection patterns:**
+
 ```bash
 # Find crypto patterns
 grep -rn "encrypt\|decrypt\|hash\|bcrypt\|argon" {scope}
@@ -326,12 +358,14 @@ grep -rn "tls\|ssl\|certificate\|https" {scope}
 **STRIDE Defense**: Information Disclosure
 
 **What to find:**
+
 - Secret storage (SSM, Vault, env vars)
 - Credential rotation
 - API key management
 - Connection string handling
 
 **Detection patterns:**
+
 ```bash
 # Find secrets patterns
 grep -rn "SSM\|Parameter.Store\|Vault\|secret" {scope}
@@ -348,29 +382,37 @@ grep -rn "\.env\|process\.env\|os\.Getenv" {scope}
 Map remaining control categories:
 
 **8a. Logging & Audit (STRIDE: Repudiation)**
+
 ```bash
 grep -rn "log\.\|logger\|audit\|CloudWatch" {scope}
 ```
+
 **Output**: `logging-audit.json`
 
 **8b. Rate Limiting (STRIDE: Denial of Service)**
+
 ```bash
 grep -rn "rate.limit\|throttle\|circuit.breaker" {scope}
 ```
+
 **Output**: `rate-limiting.json`
 
 **8c. CORS/CSP (Browser Security)**
+
 ```bash
 grep -rn "CORS\|cors\|Access-Control\|CSP\|Content-Security" {scope}
 ```
+
 **Output**: `cors-csp.json`
 
 **8d. Dependency Security**
+
 ```bash
 # Check for security scanning config
 ls {scope}/**/dependabot.yml {scope}/**/renovate.json 2>/dev/null
 grep -rn "npm.audit\|snyk\|trivy" {scope}
 ```
+
 **Output**: `dependency-security.json`
 
 ---
@@ -380,11 +422,13 @@ grep -rn "npm.audit\|snyk\|trivy" {scope}
 **Goal**: Identify missing or weak controls.
 
 **Gap categories:**
+
 1. **Missing** - Control doesn't exist
 2. **Partial** - Control exists but incomplete
 3. **Unverified** - Control exists but effectiveness unknown
 
 **For each control category, ask:**
+
 - Does every entry point have this control?
 - Does every trust boundary enforce this?
 - Are there exceptions or bypasses?
@@ -398,33 +442,40 @@ grep -rn "npm.audit\|snyk\|trivy" {scope}
 **Goal**: Compress findings for Phase 3 handoff (<2000 tokens).
 
 **Template:**
+
 ```markdown
 # Phase 2: Security Controls Summary
 
 ## Controls Inventory
+
 - Authentication: {count} mechanisms identified
 - Authorization: {count} policies found
 - Input Validation: {coverage}%
 - [continue for each category]
 
 ## Control Gaps ({total count})
+
 - Critical: {count}
 - High: {count}
 - Medium: {count}
 
 ## Top 5 Gaps
+
 1. {gap-1}: {brief description}
 2. {gap-2}: {brief description}
-...
+   ...
 
 ## STRIDE Coverage
-| Category | Defense | Status |
-|----------|---------|--------|
-| Spoofing | Authentication | {status} |
+
+| Category  | Defense          | Status   |
+| --------- | ---------------- | -------- |
+| Spoofing  | Authentication   | {status} |
 | Tampering | Input Validation | {status} |
+
 ...
 
 ## Recommended Phase 3 Focus
+
 1. {area-1}
 2. {area-2}
 ```
@@ -437,20 +488,20 @@ grep -rn "npm.audit\|snyk\|trivy" {scope}
 
 All outputs go to: `.claude/.threat-model/{session}/phase-2/`
 
-| File | STRIDE Defense | Consumer |
-|------|----------------|----------|
-| `authentication.json` | Spoofing | Phase 3 threat scenarios |
-| `authorization.json` | Elevation of Privilege | Phase 3 threat scenarios |
-| `input-validation.json` | Tampering | Phase 3 threat scenarios |
-| `output-encoding.json` | Information Disclosure | Phase 3 threat scenarios |
-| `cryptography.json` | Information Disclosure | Phase 3 threat scenarios |
-| `secrets-management.json` | Information Disclosure | Phase 3 threat scenarios |
-| `logging-audit.json` | Repudiation | Phase 3 threat scenarios |
-| `rate-limiting.json` | Denial of Service | Phase 3 threat scenarios |
-| `cors-csp.json` | Browser Security | Phase 3 (frontend only) |
-| `dependency-security.json` | Supply Chain | Phase 3 threat scenarios |
-| `control-gaps.json` | All | Phase 4 test planning |
-| `summary.md` | - | Orchestrator handoff |
+| File                       | STRIDE Defense         | Consumer                 |
+| -------------------------- | ---------------------- | ------------------------ |
+| `authentication.json`      | Spoofing               | Phase 3 threat scenarios |
+| `authorization.json`       | Elevation of Privilege | Phase 3 threat scenarios |
+| `input-validation.json`    | Tampering              | Phase 3 threat scenarios |
+| `output-encoding.json`     | Information Disclosure | Phase 3 threat scenarios |
+| `cryptography.json`        | Information Disclosure | Phase 3 threat scenarios |
+| `secrets-management.json`  | Information Disclosure | Phase 3 threat scenarios |
+| `logging-audit.json`       | Repudiation            | Phase 3 threat scenarios |
+| `rate-limiting.json`       | Denial of Service      | Phase 3 threat scenarios |
+| `cors-csp.json`            | Browser Security       | Phase 3 (frontend only)  |
+| `dependency-security.json` | Supply Chain           | Phase 3 threat scenarios |
+| `control-gaps.json`        | All                    | Phase 4 test planning    |
+| `summary.md`               | -                      | Orchestrator handoff     |
 
 See [references/output-schemas.md](references/output-schemas.md) for JSON schemas.
 

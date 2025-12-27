@@ -15,25 +15,27 @@ Complete reference for the Burp Enterprise GraphQL API used by Chariot integrati
 ### Site Management
 
 #### `site_tree`
+
 Returns complete folder/site hierarchy for navigation and site lookup.
 
 ```graphql
 query GetSiteTree {
-    site_tree {
-        sites {
-            id
-            parent_id
-            name
-        }
-        folders {
-            id
-            name
-        }
+  site_tree {
+    sites {
+      id
+      parent_id
+      name
     }
+    folders {
+      id
+      name
+    }
+  }
 }
 ```
 
 **Response Type:**
+
 ```go
 type Tree struct {
     SiteTree struct {
@@ -55,15 +57,16 @@ type Tree struct {
 ---
 
 #### `site(id: ID!)`
+
 Retrieves detailed site configuration including API definitions.
 
 ```graphql
 query GetSiteApiDefinitions($site_id: ID!) {
-    site(id: $site_id) {
-        api_definitions {
-            id
-        }
+  site(id: $site_id) {
+    api_definitions {
+      id
     }
+  }
 }
 ```
 
@@ -74,18 +77,20 @@ query GetSiteApiDefinitions($site_id: ID!) {
 ### Scan Configuration
 
 #### `scan_configurations`
+
 Lists available scan configurations (security test profiles).
 
 ```graphql
 query GetScanConfigurations {
-    scan_configurations {
-        id
-        name
-    }
+  scan_configurations {
+    id
+    name
+  }
 }
 ```
 
 **Response Type:**
+
 ```go
 type ScanConfigurations struct {
     ScanConfigurations []ScanConfiguration `json:"scan_configurations"`
@@ -100,6 +105,7 @@ type ScanConfiguration struct {
 **Usage:** Validate config IDs before creating schedules.
 
 **Common Configs:**
+
 - `PRAETORIAN_BALANCED_CONFIG = "d8b8e107-ff32-42d8-94c5-ffe4b9800fda"` (default)
 
 ---
@@ -107,23 +113,25 @@ type ScanConfiguration struct {
 ### Scan Monitoring
 
 #### `scan(id: ID!)`
+
 Retrieves individual scan status and metadata.
 
 ```graphql
 query GetScanSummary($scanId: ID!) {
-    scan(id: $scanId) {
-        id
-        scan_target {
-            id
-            name
-        }
-        end_time
-        status
+  scan(id: $scanId) {
+    id
+    scan_target {
+      id
+      name
     }
+    end_time
+    status
+  }
 }
 ```
 
 **Response Type:**
+
 ```go
 type ScanSummary struct {
     ID         string `json:"id"`
@@ -137,6 +145,7 @@ type ScanSummary struct {
 ```
 
 **Status Values:**
+
 - `"queued"` - Waiting for agent
 - `"running"` - Actively scanning
 - `"succeeded"` - Completed successfully
@@ -148,28 +157,31 @@ type ScanSummary struct {
 ---
 
 #### `scans`
+
 Lists scans with filtering and pagination.
 
 ```graphql
 query ListScans($offset: Int!, $limit: Int!) {
-    scans(offset: $offset, limit: $limit, sort_column: end, sort_order: desc) {
-        id
-        scan_target {
-            id
-            name
-        }
-        end_time
-        status
+  scans(offset: $offset, limit: $limit, sort_column: end, sort_order: desc) {
+    id
+    scan_target {
+      id
+      name
     }
+    end_time
+    status
+  }
 }
 ```
 
 **Filters (optional):**
+
 - `schedule_item_id: ID!` - Filter by schedule
 - `site_id: ID!` - Filter by site
 - `status: [ScanStatus!]` - Filter by status
 
 **Pagination:**
+
 - `offset: Int!` - Skip N results
 - `limit: Int!` - Return max N results
 - `sort_column: ScanSortColumn!` - Sort field (`start`, `end`, etc.)
@@ -182,17 +194,18 @@ query ListScans($offset: Int!, $limit: Int!) {
 ### Result Retrieval
 
 #### `scan.issues`
+
 Returns vulnerability findings for a scan.
 
 ```graphql
 query GetScanIssues($scanId: ID!) {
-    scan(id: $scanId) {
-        issues {
-            serial_number
-            severity
-            confidence
-        }
+  scan(id: $scanId) {
+    issues {
+      serial_number
+      severity
+      confidence
     }
+  }
 }
 ```
 
@@ -201,43 +214,45 @@ query GetScanIssues($scanId: ID!) {
 ---
 
 #### `issue(scan_id: ID!, serial_number: ID!)`
+
 Retrieves detailed information for a specific finding.
 
 ```graphql
 query GetIssue($scanId: ID!, $serialNumber: ID!) {
-    issue(scan_id: $scanId, serial_number: $serialNumber) {
-        issue_type {
-            name
-            references_html
-            description_html
-            remediation_html
-        }
-        serial_number
-        confidence
-        severity
-        path
-        origin
-        remediation_html
-        description_html
-        evidence {
-            title
-            description_html
-            request_segments {
-                data_html
-                highlight_html
-                snip_length
-            }
-            response_segments {
-                data_html
-                highlight_html
-                snip_length
-            }
-        }
+  issue(scan_id: $scanId, serial_number: $serialNumber) {
+    issue_type {
+      name
+      references_html
+      description_html
+      remediation_html
     }
+    serial_number
+    confidence
+    severity
+    path
+    origin
+    remediation_html
+    description_html
+    evidence {
+      title
+      description_html
+      request_segments {
+        data_html
+        highlight_html
+        snip_length
+      }
+      response_segments {
+        data_html
+        highlight_html
+        snip_length
+      }
+    }
+  }
 }
 ```
 
 **Response Type:**
+
 ```go
 type Issue struct {
     IssueType struct {
@@ -262,34 +277,36 @@ type Issue struct {
 ---
 
 #### `scan.scanned_items`
+
 Returns all URLs/endpoints discovered during scan.
 
 ```graphql
 query GetScannedItems($scanId: ID!) {
-    scan(id: $scanId) {
-        scanned_items {
-            ... on AuditItem {
-                id
-                host
-                path
-                method
-                __typename
-            }
-            ... on CrawlItem {
-                id
-                host
-                path
-                status
-                __typename
-            }
-        }
+  scan(id: $scanId) {
+    scanned_items {
+      ... on AuditItem {
+        id
+        host
+        path
+        method
+        __typename
+      }
+      ... on CrawlItem {
+        id
+        host
+        path
+        status
+        __typename
+      }
     }
+  }
 }
 ```
 
 **Union Type:** `ScannedItem` = `AuditItem | CrawlItem`
 
 **Response Type:**
+
 ```go
 type ScannedItem struct {
     AuditItem *AuditItem `json:",omitempty"`
@@ -319,20 +336,22 @@ type CrawlItem struct {
 ### Folder Management
 
 #### `create_folder`
+
 Creates a new organizational folder.
 
 ```graphql
 mutation CreateFolder($name: String!) {
-    create_folder(input: {name: $name, parent_id: "0"}) {
-        folder {
-            id
-            name
-        }
+  create_folder(input: { name: $name, parent_id: "0" }) {
+    folder {
+      id
+      name
     }
+  }
 }
 ```
 
 **Input:**
+
 - `name: String!` - Folder display name
 - `parent_id: String!` - Parent folder ID (`"0"` = root)
 
@@ -343,21 +362,23 @@ mutation CreateFolder($name: String!) {
 ### Site Management
 
 #### `create_site`
+
 Creates a new scan target with configuration.
 
 ```graphql
 mutation CreateSite($input: CreateSiteInput!) {
-    create_site(input: $input) {
-        site {
-            id
-            name
-            parent_id
-        }
+  create_site(input: $input) {
+    site {
+      id
+      name
+      parent_id
     }
+  }
 }
 ```
 
 **Input Type:**
+
 ```go
 input := map[string]any{
     "name":      siteName,
@@ -409,26 +430,26 @@ input := map[string]any{
 ### Schedule Management
 
 #### `create_schedule_item`
+
 Creates a scan schedule (one-time or recurring).
 
 ```graphql
 mutation CreateScheduleItem($siteId: ID!, $configId: ID!) {
-    create_schedule_item(input: {
-        site_ids: [$siteId],
-        scan_configuration_ids: [$configId]
-    }) {
-        schedule_item {
-            id
-        }
+  create_schedule_item(input: { site_ids: [$siteId], scan_configuration_ids: [$configId] }) {
+    schedule_item {
+      id
     }
+  }
 }
 ```
 
 **Input:**
+
 - `site_ids: [ID!]!` - List of sites to scan (usually one)
 - `scan_configuration_ids: [ID!]!` - Scan configs to apply
 
 **For recurring schedules, add:**
+
 ```go
 input := map[string]any{
     "site_ids":                 []string{siteID},
@@ -441,19 +462,21 @@ input := map[string]any{
 ```
 
 **Usage:**
+
 - `CreateOnDemandSiteSchedule()` - immediate one-time scan
 - `CreateDailySiteSchedule()` - recurring midnight scan
 
 ---
 
 #### `cancel_scan`
+
 Stops a running scan.
 
 ```graphql
 mutation CancelScan($scanId: ID!) {
-    cancel_scan(input: { id: $scanId }) {
-        id
-    }
+  cancel_scan(input: { id: $scanId }) {
+    id
+  }
 }
 ```
 
@@ -464,20 +487,22 @@ mutation CancelScan($scanId: ID!) {
 ### Tag Management
 
 #### `create_tag`
+
 Creates a new tag and returns its ID for use in `add_tags_to_nodes`.
 
 ```graphql
 mutation CreateTag($name: String!, $color: TagColor!) {
-    create_tag(input: {name: $name, color: $color}) {
-        tag {
-            id
-            name
-        }
+  create_tag(input: { name: $name, color: $color }) {
+    tag {
+      id
+      name
     }
+  }
 }
 ```
 
 **Input:**
+
 - `name: String!` - Human-readable tag name (e.g., "user@example.com")
 - `color: TagColor!` - Tag color (use `DARK_BLUE`)
 
@@ -488,23 +513,26 @@ mutation CreateTag($name: String!, $color: TagColor!) {
 ---
 
 #### `add_tags_to_nodes`
+
 Adds existing tags (by ID) to folders or sites.
 
 ```graphql
 mutation AddTagsToNodes($node_ids: [ID!]!, $tag_ids: [ID!]!) {
-    add_tags_to_nodes(input: {node_ids: $node_ids, tag_ids: $tag_ids}) {
-        successful
-    }
+  add_tags_to_nodes(input: { node_ids: $node_ids, tag_ids: $tag_ids }) {
+    successful
+  }
 }
 ```
 
 **Input:**
+
 - `node_ids: [ID!]!` - List of folder/site IDs to tag
 - `tag_ids: [ID!]!` - List of tag IDs (from `create_tag`)
 
 **CRITICAL:** Must use tag IDs (not tag names). Create tags first with `create_tag`.
 
 **Usage:**
+
 ```go
 // Step 1: Create tag
 tagID, _ := client.CreateTag("user@example.com")
@@ -518,54 +546,55 @@ client.AddTagsToFolder(folderID, []string{tagID})
 ### API Definition Management
 
 #### `parse_api_definition`
+
 Parses API specification (OpenAPI, SOAP) for endpoint extraction.
 
 ```graphql
 query ParseApiDefinition($api_definition_contents: String) {
-    parse_api_definition(api_definition_contents: $api_definition_contents) {
-        ... on ParsedOpenApiDefinition {
-            endpoints {
-                id
-                host
-                path
-                method
-                content_type
-                __typename
-            }
-            authentication_schemes {
-                ... on ApiBasicAuthenticationWithoutCredentials {
-                    type
-                    label
-                    __typename
-                }
-                ... on ApiKeyAuthenticationWithoutCredentials {
-                    type
-                    label
-                    api_key_destination
-                    parameter_name
-                    __typename
-                }
-                ... on ApiBearerTokenAuthenticationWithoutCredentials {
-                    type
-                    label
-                    __typename
-                }
-                __typename
-            }
-            __typename
+  parse_api_definition(api_definition_contents: $api_definition_contents) {
+    ... on ParsedOpenApiDefinition {
+      endpoints {
+        id
+        host
+        path
+        method
+        content_type
+        __typename
+      }
+      authentication_schemes {
+        ... on ApiBasicAuthenticationWithoutCredentials {
+          type
+          label
+          __typename
         }
-        ... on ParsedSoapDefinition {
-            endpoints {
-                id
-                host
-                path
-                name
-                content_type
-                __typename
-            }
-            __typename
+        ... on ApiKeyAuthenticationWithoutCredentials {
+          type
+          label
+          api_key_destination
+          parameter_name
+          __typename
         }
+        ... on ApiBearerTokenAuthenticationWithoutCredentials {
+          type
+          label
+          __typename
+        }
+        __typename
+      }
+      __typename
     }
+    ... on ParsedSoapDefinition {
+      endpoints {
+        id
+        host
+        path
+        name
+        content_type
+        __typename
+      }
+      __typename
+    }
+  }
 }
 ```
 
@@ -580,31 +609,33 @@ query ParseApiDefinition($api_definition_contents: String) {
 ### Async API Definition Fetching
 
 #### `fetch_and_parse_api_definition_url`
+
 Fetches and parses API specification from URL (async via WebSocket).
 
 ```graphql
 subscription FetchAndParseApiDefinitionUrl($input: FetchAndParseApiDefinitionUrlInput!) {
-    fetch_and_parse_api_definition_url(input: $input) {
-        message
-        status_code
-        parsed_api_definition {
-            ... on ParsedOpenApiDefinition {
-                endpoints {
-                    id
-                    host
-                    path
-                    method
-                    content_type
-                    __typename
-                }
-                __typename
-            }
+  fetch_and_parse_api_definition_url(input: $input) {
+    message
+    status_code
+    parsed_api_definition {
+      ... on ParsedOpenApiDefinition {
+        endpoints {
+          id
+          host
+          path
+          method
+          content_type
+          __typename
         }
+        __typename
+      }
     }
+  }
 }
 ```
 
 **Input:**
+
 ```go
 inputMap := map[string]any{
     "url":                defURL,
@@ -736,6 +767,7 @@ result, err := graphql.Graphql[ResponseType](
 ```
 
 **Error Handling:**
+
 ```go
 if err != nil {
     return nil, fmt.Errorf("failed to {operation}: %w", err)
@@ -747,6 +779,7 @@ if result.Field.ID == "" {
 ```
 
 **Header Pattern:**
+
 ```go
 func (c *BurpEnterpriseClient) headers() []string {
     return []string{
@@ -763,11 +796,13 @@ func (c *BurpEnterpriseClient) headers() []string {
 **Current Version:** GraphQL v1 (as of 2024)
 
 **Breaking Changes to Watch:**
+
 - Field name changes (e.g., `site_tree` → `siteTree`)
 - Type renames (e.g., `ParsedOpenApiDefinition` → `OpenApiDefinition`)
 - Union type modifications
 
 **Compatibility Strategy:**
+
 - All GraphQL queries embedded in client code
 - Update all queries simultaneously when schema changes
 - Mock transport in `burp_client_test.go` catches breakages early

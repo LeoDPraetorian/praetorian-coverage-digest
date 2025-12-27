@@ -1,7 +1,7 @@
 ---
 name: cloud-lambda-vs-ec2-decisions
 description: Use when adding new backend features to Chariot and deciding between Lambda functions and EC2 compute - includes Chariot-specific patterns, actual code examples with file paths, CloudFormation templates, and architectural decisions from the Chariot codebase
-allowed-tools: 'Read, Write, Bash'
+allowed-tools: "Read, Write, Bash"
 ---
 
 # Chariot Backend: Lambda vs EC2 Decision Guide
@@ -128,6 +128,7 @@ func main() {
 ```
 
 **CloudFormation:**
+
 ```yaml
 GenericAPIFunction:
   Type: AWS::Serverless::Function
@@ -135,10 +136,11 @@ GenericAPIFunction:
     CodeUri: cmd/api/generic
     Handler: bootstrap
     MemorySize: 2048
-    Timeout: 30  # Inherited from Globals
+    Timeout: 30 # Inherited from Globals
 ```
 
 **Why Lambda:**
+
 - Fast execution (< 5 seconds for most endpoints)
 - Stateless operations
 - Auto-scaling for concurrent requests
@@ -180,6 +182,7 @@ func main() {
 ```
 
 **CloudFormation:**
+
 ```yaml
 ResultsListenerFunction:
   Type: AWS::Serverless::Function
@@ -195,6 +198,7 @@ ResultsListenerFunction:
 ```
 
 **Why Lambda:**
+
 - Native Kinesis integration
 - Automatic batching and scaling
 - Parallel shard processing
@@ -250,13 +254,14 @@ func main() {
 ```
 
 **CloudFormation:**
+
 ```yaml
 JobsCronFunction:
   Type: AWS::Serverless::Function
   Properties:
     CodeUri: cmd/cron/jobs
     Handler: bootstrap
-    Timeout: 90  # Job cleanup completes quickly
+    Timeout: 90 # Job cleanup completes quickly
     Events:
       Hourly:
         Type: Schedule
@@ -265,6 +270,7 @@ JobsCronFunction:
 ```
 
 **Why Lambda:**
+
 - Scheduled execution via CloudWatch Events
 - Predictable short duration (< 90s)
 - Only runs when scheduled (cost-effective)
@@ -312,18 +318,20 @@ func main() {
 ```
 
 **CloudFormation:**
+
 ```yaml
 AccessBrokerFunction:
   Type: AWS::Serverless::Function
   Properties:
     CodeUri: cmd/async/access_broker
     Handler: bootstrap
-    Timeout: 60  # AWS STS operations
+    Timeout: 60 # AWS STS operations
     Policies:
       - AWSSecretsManagerGetSecretValuePolicy
 ```
 
 **Why Lambda:**
+
 - Security isolation (credentials never on EC2)
 - Synchronous invocation from workers
 - Fast execution (< 5 seconds)
@@ -355,24 +363,26 @@ func handler(ctx context.Context, payload cron.Payload) error {
 ```
 
 **CloudFormation:**
+
 ```yaml
 ThreatCronFunction:
   Type: AWS::Serverless::Function
   Properties:
     CodeUri: cmd/cron/threats
     Handler: bootstrap
-    Timeout: 900          # 15 minutes
-    MemorySize: 4096      # 4GB RAM
+    Timeout: 900 # 15 minutes
+    MemorySize: 4096 # 4GB RAM
     EphemeralStorage:
-      Size: 10240         # 10GB storage
+      Size: 10240 # 10GB storage
     Events:
       Daily:
         Type: Schedule
         Properties:
-          Schedule: cron(27 0 * * ? *)  # Daily at 12:27 AM UTC
+          Schedule: cron(27 0 * * ? *) # Daily at 12:27 AM UTC
 ```
 
 **Why Lambda:**
+
 - Runs once daily (cost-effective)
 - Dataset fits in memory
 - Completes within 15 minutes
@@ -460,15 +470,16 @@ func process(ctx context.Context, service *sqs.Client, queue string) (int, bool)
 ```
 
 **CloudFormation:**
+
 ```yaml
 ComputeAutoScalingGroup:
   Type: AWS::AutoScaling::AutoScalingGroup
   Properties:
-    MinSize: 0              # ✅ Scale to zero when idle
+    MinSize: 0 # ✅ Scale to zero when idle
     MaxSize: 50
     MixedInstancesPolicy:
       InstancesDistribution:
-        OnDemandPercentageAboveBaseCapacity: 0  # 100% spot instances
+        OnDemandPercentageAboveBaseCapacity: 0 # 100% spot instances
         SpotAllocationStrategy: price-capacity-optimized
     LaunchTemplate:
       LaunchTemplateData:
@@ -492,16 +503,17 @@ ComputeScaleUpPolicy:
   Type: AWS::AutoScaling::ScalingPolicy
   Properties:
     StepAdjustments:
-      - MetricIntervalUpperBound: 10   # < 10 messages: scale down
+      - MetricIntervalUpperBound: 10 # < 10 messages: scale down
         ScalingAdjustment: -1
       - MetricIntervalLowerBound: 10
-        MetricIntervalUpperBound: 50   # 10-50 messages: scale up moderately
+        MetricIntervalUpperBound: 50 # 10-50 messages: scale up moderately
         ScalingAdjustment: 2
-      - MetricIntervalLowerBound: 50   # > 50 messages: scale up aggressively
+      - MetricIntervalLowerBound: 50 # > 50 messages: scale up aggressively
         ScalingAdjustment: 5
 ```
 
 **Why EC2:**
+
 - Long execution times (hours for some scans)
 - Docker workloads (nmap, nuclei, burp)
 - Network tools requiring raw sockets
@@ -510,6 +522,7 @@ ComputeScaleUpPolicy:
 - Self-termination when idle
 
 **Key Chariot Patterns:**
+
 - 3-queue priority system (synchronous > priority > standard)
 - Spot interruption detection and job re-queuing
 - Scale 0→N based on SQS metrics
@@ -539,6 +552,7 @@ Workers poll in order: Synchronous → Priority → Standard
 ```
 
 **Environment Variables:**
+
 ```bash
 # Standard pool
 CHARIOT_QUEUE_SYNCHRONOUS=chariot-queue-sync
@@ -563,13 +577,15 @@ CHARIOT_QUEUE_STATIC_STANDARD=chariot-queue-static-standard
 **Issue:** `template.yml:1203` sets `MemorySize: 2048` without justification.
 
 **Current:**
+
 ```yaml
 GenericAPIFunction:
   Properties:
-    MemorySize: 2048  # 16x the global default
+    MemorySize: 2048 # 16x the global default
 ```
 
 **Recommendation:**
+
 - Profile actual memory usage with CloudWatch
 - Most API operations use < 512MB
 - Consider reducing to 512MB or 1024MB
@@ -582,6 +598,7 @@ GenericAPIFunction:
 **Issue:** Timeout values vary without documented rationale.
 
 **Current State:**
+
 - GenericAPIFunction: 30s (global default)
 - AccessBrokerFunction: 60s (AWS STS)
 - JobsCronFunction: 90s (job cleanup)
@@ -589,10 +606,11 @@ GenericAPIFunction:
 
 **Recommendation:**
 Add comments in `template.yml` explaining timeout decisions:
+
 ```yaml
 AccessBrokerFunction:
   Properties:
-    Timeout: 60  # AWS STS assume-role operations can take 30-45s
+    Timeout: 60 # AWS STS assume-role operations can take 30-45s
 ```
 
 ---
@@ -602,6 +620,7 @@ AccessBrokerFunction:
 **Issue:** `template.yml:2412-2494` doesn't specify spot/on-demand mix for static IP pool.
 
 **Current:**
+
 ```yaml
 StaticIPAutoScalingGroup:
   Properties:
@@ -612,12 +631,13 @@ StaticIPAutoScalingGroup:
 
 **Recommendation:**
 Explicitly configure spot strategy or document why on-demand is required:
+
 ```yaml
 StaticIPAutoScalingGroup:
   Properties:
     MixedInstancesPolicy:
       InstancesDistribution:
-        OnDemandPercentageAboveBaseCapacity: 20  # Some on-demand for reliability
+        OnDemandPercentageAboveBaseCapacity: 20 # Some on-demand for reliability
         SpotAllocationStrategy: price-capacity-optimized
 ```
 
@@ -625,15 +645,15 @@ StaticIPAutoScalingGroup:
 
 ## Quick Reference: Chariot Compute Decisions
 
-| Use Case | Compute | Example | File Path |
-|----------|---------|---------|-----------|
-| **API Endpoint** | Lambda | All REST operations | `cmd/api/generic/main.go` |
-| **Event Listener** | Lambda | Kinesis results | `cmd/listeners/results/main.go` |
-| **Scheduled Task** | Lambda | Job cleanup, threats | `cmd/cron/jobs/job.go` |
-| **Credential Broker** | Lambda | AWS/GCP/Azure creds | `cmd/async/access_broker/main.go` |
-| **Security Scanner** | EC2 | nmap, nuclei, burp | `cmd/listeners/compute/worker/` |
-| **Long-Running Scan** | EC2 | Multi-hour assessments | (same worker) |
-| **Docker Workload** | EC2 | Custom containers | (same worker) |
+| Use Case              | Compute | Example                | File Path                         |
+| --------------------- | ------- | ---------------------- | --------------------------------- |
+| **API Endpoint**      | Lambda  | All REST operations    | `cmd/api/generic/main.go`         |
+| **Event Listener**    | Lambda  | Kinesis results        | `cmd/listeners/results/main.go`   |
+| **Scheduled Task**    | Lambda  | Job cleanup, threats   | `cmd/cron/jobs/job.go`            |
+| **Credential Broker** | Lambda  | AWS/GCP/Azure creds    | `cmd/async/access_broker/main.go` |
+| **Security Scanner**  | EC2     | nmap, nuclei, burp     | `cmd/listeners/compute/worker/`   |
+| **Long-Running Scan** | EC2     | Multi-hour assessments | (same worker)                     |
+| **Docker Workload**   | EC2     | Custom containers      | (same worker)                     |
 
 ---
 
@@ -672,18 +692,19 @@ StaticIPAutoScalingGroup:
 
 1. **Create function** in `cmd/cron/{name}/`
 2. **Add to CloudFormation:**
+
 ```yaml
 MyNewCronFunction:
   Type: AWS::Serverless::Function
   Properties:
     CodeUri: cmd/cron/my-task
     Handler: bootstrap
-    Timeout: 90  # Based on expected execution time
+    Timeout: 90 # Based on expected execution time
     Events:
       Schedule:
         Type: Schedule
         Properties:
-          Schedule: rate(1 hour)  # or cron expression
+          Schedule: rate(1 hour) # or cron expression
 ```
 
 **Reference:** `cmd/cron/jobs/job.go` for cron handler patterns.

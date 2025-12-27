@@ -46,6 +46,7 @@
 **Purpose:** Current state of the task.
 
 **Valid values:**
+
 - `"pending"` - Not started yet
 - `"in_progress"` - Currently working on
 - `"completed"` - Finished
@@ -78,6 +79,7 @@
 ```
 
 **Why both?**
+
 - `content`: Task list display (shows all tasks)
 - `activeForm`: Progress indicator (shows what's happening now)
 
@@ -86,11 +88,13 @@
 **Purpose:** Task importance for ordering and focus.
 
 **Valid values:**
+
 - `"high"` - Critical path, blocking other tasks
 - `"medium"` - Important but not blocking (default)
 - `"low"` - Nice-to-have, can defer
 
 **When to use:**
+
 - Most tasks: Omit (defaults to medium)
 - Critical path: Mark as "high"
 - Optional improvements: Mark as "low"
@@ -128,22 +132,24 @@ pending ──────→ in_progress ──────→ completed
 ```
 
 **Allowed:**
+
 - `pending` → `in_progress` (start work)
 - `in_progress` → `completed` (finish work)
 - `pending` → `completed` (skip if no longer relevant)
 
 **Not allowed:**
+
 - ❌ `completed` → `pending` (don't reopen, create new task)
 - ❌ `completed` → `in_progress` (don't reopen, create new task)
 - ❌ `in_progress` → `pending` (don't revert, mark completed or create new task)
 
 ### State Timing Rules
 
-| State | When to Set | Tool Call Timing |
-|-------|-------------|------------------|
-| `pending` | Task planning | Initialize TodoWrite |
-| `in_progress` | **BEFORE starting work** | Update TodoWrite → THEN start work |
-| `completed` | **IMMEDIATELY after finishing** | Finish work → Update TodoWrite |
+| State         | When to Set                     | Tool Call Timing                   |
+| ------------- | ------------------------------- | ---------------------------------- |
+| `pending`     | Task planning                   | Initialize TodoWrite               |
+| `in_progress` | **BEFORE starting work**        | Update TodoWrite → THEN start work |
+| `completed`   | **IMMEDIATELY after finishing** | Finish work → Update TodoWrite     |
 
 **Critical:** Update status BEFORE and AFTER work, not during.
 
@@ -262,12 +268,12 @@ pending ──────→ in_progress ──────→ completed
 
 ### Granularity Rule of Thumb
 
-| Task Duration | Granularity | Example |
-|---------------|-------------|---------|
-| < 5 minutes | Too granular | "Open file", "Read code" |
-| 5-15 minutes | ✅ Ideal | "Implement middleware", "Write tests" |
-| 15-30 minutes | Acceptable | "Refactor authentication" |
-| > 30 minutes | Too coarse | "Build entire feature" |
+| Task Duration | Granularity  | Example                               |
+| ------------- | ------------ | ------------------------------------- |
+| < 5 minutes   | Too granular | "Open file", "Read code"              |
+| 5-15 minutes  | ✅ Ideal     | "Implement middleware", "Write tests" |
+| 15-30 minutes | Acceptable   | "Refactor authentication"             |
+| > 30 minutes  | Too coarse   | "Build entire feature"                |
 
 **Recommendation:** Aim for 5-15 minute tasks. Break larger tasks into sub-tasks.
 
@@ -280,12 +286,12 @@ pending ──────→ in_progress ──────→ completed
 ```json
 {
   "todos": [
-    {"content": "1. Analyze requirements", "status": "completed"},
-    {"content": "2. Design architecture", "status": "completed"},
-    {"content": "3. Implement core logic", "status": "in_progress"},
-    {"content": "4. Add error handling", "status": "pending"},
-    {"content": "5. Write tests", "status": "pending"},
-    {"content": "6. Document changes", "status": "pending"}
+    { "content": "1. Analyze requirements", "status": "completed" },
+    { "content": "2. Design architecture", "status": "completed" },
+    { "content": "3. Implement core logic", "status": "in_progress" },
+    { "content": "4. Add error handling", "status": "pending" },
+    { "content": "5. Write tests", "status": "pending" },
+    { "content": "6. Document changes", "status": "pending" }
   ]
 }
 ```
@@ -299,10 +305,10 @@ pending ──────→ in_progress ──────→ completed
 ```json
 {
   "todos": [
-    {"content": "Fix production bug", "status": "in_progress", "priority": "high"},
-    {"content": "Deploy hotfix", "status": "pending", "priority": "high"},
-    {"content": "Add feature", "status": "pending", "priority": "medium"},
-    {"content": "Refactor code", "status": "pending", "priority": "low"}
+    { "content": "Fix production bug", "status": "in_progress", "priority": "high" },
+    { "content": "Deploy hotfix", "status": "pending", "priority": "high" },
+    { "content": "Add feature", "status": "pending", "priority": "medium" },
+    { "content": "Refactor code", "status": "pending", "priority": "low" }
   ]
 }
 ```
@@ -316,10 +322,10 @@ pending ──────→ in_progress ──────→ completed
 ```json
 {
   "todos": [
-    {"content": "Backend: Implement API", "status": "in_progress"},
-    {"content": "Frontend: Build UI", "status": "in_progress"},
-    {"content": "Database: Create migrations", "status": "in_progress"},
-    {"content": "Integration: Test end-to-end", "status": "pending"}
+    { "content": "Backend: Implement API", "status": "in_progress" },
+    { "content": "Frontend: Build UI", "status": "in_progress" },
+    { "content": "Database: Create migrations", "status": "in_progress" },
+    { "content": "Integration: Test end-to-end", "status": "pending" }
   ]
 }
 ```

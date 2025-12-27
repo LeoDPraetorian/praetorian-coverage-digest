@@ -12,6 +12,7 @@
 **User confusion**: "Did the audit fail to run, or did it find issues?"
 
 **Exit code standard**:
+
 - 0: Completed successfully (may or may not have found issues)
 - 1: Violations found (tool ran, found problems)
 - 2: Tool error (tool couldn't run)
@@ -23,20 +24,22 @@
 ### CRITICAL Issues
 
 **1. Catch Block Uses exit(1)**
+
 ```typescript
 try {
   runAudit();
 } catch (error) {
-  console.error('Audit failed');
-  process.exit(1);  // ❌ Should be exit(2) - this is tool error!
+  console.error("Audit failed");
+  process.exit(1); // ❌ Should be exit(2) - this is tool error!
 }
 ```
 
 **2. Invalid Argument Uses exit(1)**
+
 ```typescript
 if (invalidPhase) {
-  console.error('Invalid phase');
-  process.exit(1);  // ❌ Should be exit(2) - tool error!
+  console.error("Invalid phase");
+  process.exit(1); // ❌ Should be exit(2) - tool error!
 }
 ```
 
@@ -51,6 +54,7 @@ if (invalidPhase) {
 3. Keep violation results: `exit(1)` for found issues
 
 **Implementation:**
+
 ```typescript
 // Pattern detection and replacement
 /catch.*{[\s\S]*?process\.exit\(1\)/
@@ -60,6 +64,7 @@ if (invalidPhase) {
 ## The Standard Pattern
 
 **For tool errors (can't run):**
+
 ```typescript
 } catch (error) {
   console.error(chalk.red.bold('\n⚠️ Tool Error - Audit could not run\n'));
@@ -70,18 +75,20 @@ if (invalidPhase) {
 ```
 
 **For validation results (found violations):**
+
 ```typescript
 if (results.criticalCount > 0) {
-  console.log(chalk.red.bold('❌ Found Issues\n'));
+  console.log(chalk.red.bold("❌ Found Issues\n"));
   console.log(`CRITICAL: ${results.criticalCount}`);
-  process.exit(1);  // ✓ Violations found
+  process.exit(1); // ✓ Violations found
 }
 ```
 
 **For successful completion:**
+
 ```typescript
-console.log(chalk.green.bold('✅ Validation Passed\n'));
-process.exit(0);  // ✓ Completed, no issues
+console.log(chalk.green.bold("✅ Validation Passed\n"));
+process.exit(0); // ✓ Completed, no issues
 ```
 
 ## Examples
@@ -89,44 +96,48 @@ process.exit(0);  // ✓ Completed, no issues
 ### Example 1: Fix Catch Block
 
 **Before:**
+
 ```typescript
 try {
   const results = await auditor.run();
   if (results.violations > 0) process.exit(1);
 } catch (error) {
-  console.error('❌ Audit Failed');
-  process.exit(1);  // ❌ Wrong - same as violations!
+  console.error("❌ Audit Failed");
+  process.exit(1); // ❌ Wrong - same as violations!
 }
 ```
 
 **After:**
+
 ```typescript
 try {
   const results = await auditor.run();
-  if (results.violations > 0) process.exit(1);  // ✓ Violations
+  if (results.violations > 0) process.exit(1); // ✓ Violations
 } catch (error) {
-  console.error('⚠️ Tool Error - Audit could not run');
-  console.error('This is a tool failure, not a skill violation.');
-  process.exit(2);  // ✓ Tool error
+  console.error("⚠️ Tool Error - Audit could not run");
+  console.error("This is a tool failure, not a skill violation.");
+  process.exit(2); // ✓ Tool error
 }
 ```
 
 ### Example 2: Invalid Arguments
 
 **Before:**
+
 ```typescript
 if (!validPhase(phase)) {
   console.error(`Invalid phase: ${phase}`);
-  process.exit(1);  // ❌ Wrong - tool error, not violation
+  process.exit(1); // ❌ Wrong - tool error, not violation
 }
 ```
 
 **After:**
+
 ```typescript
 if (!validPhase(phase)) {
-  console.error('⚠️ Tool Error - Invalid argument');
+  console.error("⚠️ Tool Error - Invalid argument");
   console.error(`Invalid phase: ${phase}. Use 1-12 or all`);
-  process.exit(2);  // ✓ Tool error
+  process.exit(2); // ✓ Tool error
 }
 ```
 
@@ -148,7 +159,7 @@ Is this a catch block or error handler?
 
 ```typescript
 // BOTH completed successfully - use exit(0)
-console.log('✅ Validation Passed - No issues found');
+console.log("✅ Validation Passed - No issues found");
 process.exit(0);
 ```
 
@@ -156,7 +167,7 @@ process.exit(0);
 
 ```typescript
 // Validation RAN successfully, but found problems - use exit(1)
-console.log('❌ Validation Found Issues');
+console.log("❌ Validation Found Issues");
 console.log(`Found ${violations.length} violations`);
 process.exit(1);
 ```
@@ -166,9 +177,9 @@ process.exit(1);
 ```typescript
 // Depends on policy:
 if (criticalOnly && results.criticalCount === 0) {
-  process.exit(0);  // Treat warnings as success
+  process.exit(0); // Treat warnings as success
 } else if (results.warningCount > 0) {
-  process.exit(1);  // Treat warnings as violations
+  process.exit(1); // Treat warnings as violations
 }
 ```
 
@@ -177,6 +188,7 @@ if (criticalOnly && results.criticalCount === 0) {
 **Audit existing CLI tool:**
 
 1. Find all `process.exit(1)` calls:
+
    ```bash
    grep -n "process.exit(1)" src/**/*.ts
    ```
@@ -211,8 +223,8 @@ echo "Exit: $?"  # Should be 1
 
 ## Quick Reference
 
-| Scenario | Exit Code | Message Pattern |
-|----------|-----------|-----------------|
-| Tool error (can't run) | 2 | ⚠️ Tool Error - X could not run |
-| Violations found | 1 | ❌ Found Issues |
-| Completed, no issues | 0 | ✅ Validation Passed |
+| Scenario               | Exit Code | Message Pattern                 |
+| ---------------------- | --------- | ------------------------------- |
+| Tool error (can't run) | 2         | ⚠️ Tool Error - X could not run |
+| Violations found       | 1         | ❌ Found Issues                 |
+| Completed, no issues   | 0         | ✅ Validation Passed            |

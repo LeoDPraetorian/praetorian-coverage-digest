@@ -6,24 +6,24 @@
 
 ```typescript
 interface CodeReviewPlan {
-  generatedAt: string;           // ISO timestamp
+  generatedAt: string; // ISO timestamp
   totalTargets: number;
-  estimatedEffort: string;       // e.g., "40 hours"
+  estimatedEffort: string; // e.g., "40 hours"
 
-  critical: CodeReviewTarget[];  // Risk 9-12
-  high: CodeReviewTarget[];      // Risk 6-8
-  medium: CodeReviewTarget[];    // Risk 3-5
-  low: CodeReviewTarget[];       // Risk 1-2
+  critical: CodeReviewTarget[]; // Risk 9-12
+  high: CodeReviewTarget[]; // Risk 6-8
+  medium: CodeReviewTarget[]; // Risk 3-5
+  low: CodeReviewTarget[]; // Risk 1-2
 }
 
 interface CodeReviewTarget {
-  file: string;                  // Absolute or relative path
-  lines?: string;                // e.g., "45-120"
-  focusAreas: string[];          // What to look for
-  relatedThreats: string[];      // THREAT-xxx IDs
-  riskScore: number;             // From Phase 3
-  estimatedTime: string;         // e.g., "2 hours"
-  reviewChecklist: string[];     // Specific questions to answer
+  file: string; // Absolute or relative path
+  lines?: string; // e.g., "45-120"
+  focusAreas: string[]; // What to look for
+  relatedThreats: string[]; // THREAT-xxx IDs
+  riskScore: number; // From Phase 3
+  estimatedTime: string; // e.g., "2 hours"
+  reviewChecklist: string[]; // Specific questions to answer
 }
 ```
 
@@ -32,32 +32,33 @@ interface CodeReviewTarget {
 ```typescript
 interface SASTRecommendations {
   generatedAt: string;
-  toolSuggestions: string[];     // e.g., ["semgrep", "codeql"]
+  toolSuggestions: string[]; // e.g., ["semgrep", "codeql"]
 
   rulesets: {
-    [category: string]: {        // e.g., "injection", "authentication"
+    [category: string]: {
+      // e.g., "injection", "authentication"
       priority: "critical" | "high" | "medium" | "low";
-      rules: string[];           // e.g., ["semgrep:go.lang.security.*"]
+      rules: string[]; // e.g., ["semgrep:go.lang.security.*"]
       customPatterns: CustomPattern[];
     };
   };
 
   focusAreas: FocusArea[];
-  excludePaths: string[];        // e.g., ["vendor/", "test/"]
+  excludePaths: string[]; // e.g., ["vendor/", "test/"]
 }
 
 interface CustomPattern {
   name: string;
-  pattern: string;               // Regex or semgrep pattern
+  pattern: string; // Regex or semgrep pattern
   message: string;
   languages: string[];
   severity: "critical" | "high" | "medium" | "low";
 }
 
 interface FocusArea {
-  category: string;              // e.g., "Injection"
+  category: string; // e.g., "Injection"
   relatedThreats: string[];
-  paths: string[];               // Glob patterns
+  paths: string[]; // Glob patterns
   expectedFindings: number;
 }
 ```
@@ -67,12 +68,12 @@ interface FocusArea {
 ```typescript
 interface DASTRecommendations {
   generatedAt: string;
-  toolSuggestions: string[];     // e.g., ["nuclei", "burp", "zap"]
+  toolSuggestions: string[]; // e.g., ["nuclei", "burp", "zap"]
 
   endpoints: EndpointTarget[];
 
   authentication: {
-    type: string;                // e.g., "JWT", "Cookie", "API Key"
+    type: string; // e.g., "JWT", "Cookie", "API Key"
     tokenHeader?: string;
     testAccounts: string[];
   };
@@ -89,7 +90,7 @@ interface EndpointTarget {
   priority: "critical" | "high" | "medium" | "low";
   relatedThreats: string[];
   testScenarios: string[];
-  payloads?: string[];           // Payload file references
+  payloads?: string[]; // Payload file references
   expectedBehavior: string;
   authentication: boolean;
 }
@@ -100,11 +101,11 @@ interface EndpointTarget {
 ```typescript
 interface SCARecommendations {
   generatedAt: string;
-  toolSuggestions: string[];     // e.g., ["trivy", "snyk"]
+  toolSuggestions: string[]; // e.g., ["trivy", "snyk"]
 
   prioritizedDependencies: DependencyRecommendation[];
 
-  scanPaths: string[];           // e.g., ["go.mod", "package.json"]
+  scanPaths: string[]; // e.g., ["go.mod", "package.json"]
   excludeDevDependencies: boolean;
   minimumSeverity: "critical" | "high" | "medium" | "low";
 }
@@ -113,7 +114,7 @@ interface DependencyRecommendation {
   package: string;
   currentVersion: string;
   recommendedVersion: string;
-  vulnerability?: string;        // CVE ID
+  vulnerability?: string; // CVE ID
   severity: "critical" | "high" | "medium" | "low";
   relatedThreats: string[];
   upgradeRisk: "low" | "medium" | "high";
@@ -133,19 +134,19 @@ interface ManualTestCases {
 }
 
 interface TestCase {
-  id: string;                    // e.g., "TC-001"
+  id: string; // e.g., "TC-001"
   name: string;
-  relatedThreat: string;         // THREAT-xxx
-  relatedAbuseCase?: string;     // ABUSE-xxx
+  relatedThreat: string; // THREAT-xxx
+  relatedAbuseCase?: string; // ABUSE-xxx
   priority: "P0" | "P1" | "P2" | "P3";
-  category: string;              // e.g., "Authorization"
+  category: string; // e.g., "Authorization"
 
   objective: string;
   preconditions: string[];
 
   steps: TestStep[];
 
-  evidence: string[];            // What to capture
+  evidence: string[]; // What to capture
   passCriteria: string;
   failureCriteria: string;
   estimatedTime: string;
@@ -155,7 +156,7 @@ interface TestStep {
   step: number;
   action: string;
   expectedResult: string;
-  payload?: object;              // If applicable
+  payload?: object; // If applicable
 }
 ```
 
@@ -177,15 +178,15 @@ interface TestPriorities {
 
 interface PrioritySummary {
   count: number;
-  effort: string;                // e.g., "20 hours"
-  timeline: string;              // e.g., "Sprint 0"
+  effort: string; // e.g., "20 hours"
+  timeline: string; // e.g., "Sprint 0"
 }
 
 interface PrioritizedTest {
-  id: string;                    // Test ID or reference
+  id: string; // Test ID or reference
   priority: "P0" | "P1" | "P2" | "P3";
   type: "manual" | "automated" | "sast" | "dast" | "sca";
-  threat: string;                // THREAT-xxx
+  threat: string; // THREAT-xxx
   riskScore: number;
   effort: string;
 }
@@ -209,12 +210,12 @@ interface PrioritizedTest {
 
 ## Priority Breakdown
 
-| Priority | Tests | Effort | Timeline |
-|----------|-------|--------|----------|
-| P0 | N | X hrs | Sprint 0 |
-| P1 | N | X hrs | Sprint 1 |
-| P2 | N | X hrs | Sprint 2-3 |
-| P3 | N | X hrs | Backlog |
+| Priority | Tests | Effort | Timeline   |
+| -------- | ----- | ------ | ---------- |
+| P0       | N     | X hrs  | Sprint 0   |
+| P1       | N     | X hrs  | Sprint 1   |
+| P2       | N     | X hrs  | Sprint 2-3 |
+| P3       | N     | X hrs  | Backlog    |
 
 ## Immediate Actions (P0)
 

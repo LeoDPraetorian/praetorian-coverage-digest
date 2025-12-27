@@ -128,32 +128,15 @@ export class Phase7OutputDirectory {
     const tddArtifacts = await this.findTddArtifactsInReferences(skill.directory);
 
     if (tddArtifacts.length > 0) {
+      // Build context with all TDD artifact filenames
+      const context = tddArtifacts.map(file => `references/${path.basename(file)}`);
+
       issues.push({
         severity: 'WARNING',
         message: `${tddArtifacts.length} TDD artifact(s) in references/ (should be in .local/)`,
+        recommendation: 'Move to .local/ - TDD artifacts document HOW skill was validated, not HOW to use it. Reduces token bloat when agents load references/',
+        context,
         autoFixable: false, // Requires manual review to ensure not breaking links
-      });
-
-      // List each misplaced TDD file
-      for (const file of tddArtifacts) {
-        const filename = path.basename(file);
-        issues.push({
-          severity: 'WARNING',
-          message: `  → references/${filename} (TDD validation artifact)`,
-          autoFixable: false,
-        });
-      }
-
-      // Add guidance
-      issues.push({
-        severity: 'INFO',
-        message: '  TDD artifacts document HOW skill was validated, not HOW to use it',
-        autoFixable: false,
-      });
-      issues.push({
-        severity: 'INFO',
-        message: '  Move to .local/ to reduce token bloat when agents load references/',
-        autoFixable: false,
       });
     }
 
@@ -198,24 +181,19 @@ export class Phase7OutputDirectory {
     const looseFiles = await this.findLooseRuntimeFiles(skill.directory);
 
     if (looseFiles.length > 0) {
+      // Build context with all loose filenames
+      const context = looseFiles.map(file => path.basename(file));
+
       issues.push({
         severity: 'INFO',
         message: `${looseFiles.length} runtime file(s) at root (consider moving to .local/)`,
+        recommendation: 'Move runtime artifacts to .local/ to keep skill root clean',
+        context,
         autoFixable: true,
         fix: async () => {
           await this.moveToLocal(skill.directory, looseFiles);
         },
       });
-
-      // List each loose file
-      for (const file of looseFiles) {
-        const filename = path.basename(file);
-        issues.push({
-          severity: 'INFO',
-          message: `  → ${filename}`,
-          autoFixable: false,
-        });
-      }
     }
 
     return issues;

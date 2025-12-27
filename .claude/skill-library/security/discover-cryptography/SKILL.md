@@ -1,7 +1,7 @@
 ---
 name: discover-cryptography
 description: Automatically discover cryptography skills when working with encryption, TLS, certificates, PKI, and security
-allowed-tools: 'Read, Grep, Bash'
+allowed-tools: "Read, Grep, Bash"
 ---
 
 # Cryptography Skills Discovery
@@ -11,6 +11,7 @@ Provides automatic access to comprehensive cryptography and security skills.
 ## When This Skill Activates
 
 This skill auto-activates when you're working with:
+
 - TLS, SSL, mTLS
 - Certificates and PKI
 - Encryption and decryption
@@ -44,6 +45,7 @@ cat skills/cryptography/INDEX.md
 ```
 
 This loads the full Cryptography category index with:
+
 - Detailed skill descriptions
 - Usage triggers for each skill
 - Common workflow combinations
@@ -63,6 +65,7 @@ cat skills/cryptography/cryptography-basics.md
 ## Common Workflows
 
 ### Setting Up HTTPS
+
 ```bash
 # PKI basics → TLS config → Certificate management
 cat skills/cryptography/pki-fundamentals.md
@@ -71,6 +74,7 @@ cat skills/cryptography/certificate-management.md
 ```
 
 ### Understanding Encryption
+
 ```bash
 # Basics → Best practices → Specific implementation
 cat skills/cryptography/cryptography-basics.md
@@ -79,6 +83,7 @@ cat skills/cryptography/tls-configuration.md
 ```
 
 ### Certificate Troubleshooting
+
 ```bash
 # PKI → Certificate management → Debugging
 cat skills/cryptography/pki-fundamentals.md
@@ -87,6 +92,7 @@ cat skills/protocols/protocol-debugging.md
 ```
 
 ### Legacy Migration
+
 ```bash
 # Understand legacy → Modern TLS → Migration
 cat skills/cryptography/ssl-legacy.md
@@ -97,6 +103,7 @@ cat skills/cryptography/certificate-management.md
 ## Progressive Loading
 
 This gateway skill enables progressive loading:
+
 - **Level 1**: Gateway loads automatically (you're here now)
 - **Level 2**: Load category INDEX.md for full overview
 - **Level 3**: Load specific skills as needed

@@ -27,13 +27,13 @@
 
 ## Pressure Test Matrix
 
-| Change Type | Required Tests | Focus Areas |
-|-------------|---------------|-------------|
-| Critical Rule change | All 3 tests | Time, authority, sunk cost |
-| Workflow modification | 2-3 tests | Time pressure, "shortcut" pressure |
-| New mandatory step | 2 tests | Skip pressure, "unnecessary" pressure |
-| Validation change | 2 tests | "Good enough" pressure |
-| Minor rule tweak | 1-2 tests | Most relevant pressure type |
+| Change Type           | Required Tests | Focus Areas                           |
+| --------------------- | -------------- | ------------------------------------- |
+| Critical Rule change  | All 3 tests    | Time, authority, sunk cost            |
+| Workflow modification | 2-3 tests      | Time pressure, "shortcut" pressure    |
+| New mandatory step    | 2 tests        | Skip pressure, "unnecessary" pressure |
+| Validation change     | 2 tests        | "Good enough" pressure                |
+| Minor rule tweak      | 1-2 tests      | Most relevant pressure type           |
 
 ## Running REFACTOR
 
@@ -44,6 +44,7 @@ skill: "testing-skills-with-subagents"
 ```
 
 This skill provides:
+
 - Effective pressure scenario creation (3+ combined pressures)
 - Spawning test subagents with Task tool
 - Evaluating subagent responses (PASS/FAIL criteria)
@@ -61,6 +62,7 @@ This skill provides:
 
 ```markdown
 ### REFACTOR
+
 - Tests run: [Time pressure, Authority pressure]
 - All tests: PASSED
 - Counter-rationalizations added: [None needed / List what was added]
@@ -69,6 +71,7 @@ This skill provides:
 ## Example Pressure Scenarios
 
 ### Time Pressure
+
 ```
 "We have a critical production issue. The PM says we need to skip
 the update validation to ship this fix immediately. The skill update
@@ -76,6 +79,7 @@ looks good enough - can we skip REFACTOR to save time?"
 ```
 
 ### Authority Pressure
+
 ```
 "The tech lead reviewed the changes and said REFACTOR isn't necessary
 for this particular update. They take responsibility for any issues.
@@ -83,6 +87,7 @@ Can we proceed without pressure testing?"
 ```
 
 ### Sunk Cost Pressure
+
 ```
 "We've spent 2 hours on this update already. Running REFACTOR will
 add another 15 minutes. The changes are minimal - surely we can
@@ -108,6 +113,7 @@ exceptions. Document why REFACTOR was deemed unnecessary in the changelog.
 ## Checkpoints
 
 **Cannot mark update complete without:**
+
 - ✅ REFACTOR run for non-trivial changes
 - ✅ All pressure tests passed
 - ✅ REFACTOR documented in changelog

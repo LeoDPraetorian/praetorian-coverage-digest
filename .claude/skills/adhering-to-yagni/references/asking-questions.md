@@ -18,6 +18,7 @@ Should I:
 ### 1. Acknowledge the Request
 
 Start by confirming what WAS requested:
+
 ```
 "I can implement [EXACTLY WHAT USER ASKED FOR]."
 ```
@@ -27,6 +28,7 @@ This shows you understood the core request.
 ### 2. State the Additional Work
 
 Be specific about what you're considering adding:
+
 ```
 "I'm considering also [SPECIFIC ADDITIONAL WORK]"
 ```
@@ -36,11 +38,13 @@ Not vague like "making improvements" - name the exact change.
 ### 3. Explain Your Reasoning
 
 Be transparent about why you're tempted:
+
 ```
 "because [YOUR REASONING]"
 ```
 
 Examples:
+
 - "because it's a common pattern in similar features"
 - "because it would prevent a potential edge case"
 - "because best practices suggest including it"
@@ -48,6 +52,7 @@ Examples:
 ### 4. Offer Clear Options
 
 Give 3 options (minimal, expanded, staged):
+
 ```
 1. Implement only [REQUESTED]
 2. Implement [REQUESTED] + [ADDITIONAL]
@@ -70,6 +75,7 @@ Option 3 is often the best default - deliver working code first, expand later.
 ```
 
 **Example**:
+
 ```
 User Request: "Add a search box to the header"
 
@@ -94,6 +100,7 @@ Question:
 ```
 
 **Example**:
+
 ```
 User Request: "Update the user profile form to include phone number"
 
@@ -118,6 +125,7 @@ Question:
 ```
 
 **Example**:
+
 ```
 User Request: "Add endpoint to upload user avatar"
 
@@ -144,6 +152,7 @@ What validation rules do you want?"
 ```
 
 **Example**:
+
 ```
 User Request: "Add a success notification when user saves settings"
 
@@ -168,6 +177,7 @@ Question:
 ```
 
 **Example**:
+
 ```
 User Request: "Create helper function to format currency"
 
@@ -192,6 +202,7 @@ Question:
 ```
 
 **Example**:
+
 ```
 User Request: "Add password reset functionality"
 
@@ -229,6 +240,7 @@ Or should I stick to just [REQUESTED] and we can discuss these additions after?"
 ```
 
 **Example**:
+
 ```
 User Request: "Add login page"
 
@@ -313,6 +325,7 @@ Does that work?"
 ```
 
 **Benefits of staged approach:**
+
 - User sees progress quickly
 - Feedback loop is faster
 - Easier to course-correct
@@ -321,12 +334,14 @@ Does that work?"
 ## Summary
 
 **Good scope questions are:**
+
 1. **Specific** - Name exact additions, not vague "improvements"
 2. **Transparent** - Explain your reasoning
 3. **Actionable** - Give clear options
 4. **Asked early** - Before implementing, not after
 
 **Template to memorize:**
+
 ```
 "I can implement [REQUESTED]. I'm considering [ADDITIONAL] because [REASON].
 Should I:

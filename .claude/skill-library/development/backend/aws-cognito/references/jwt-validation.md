@@ -15,6 +15,7 @@ Complete implementation guide for validating Cognito JWT tokens in Go.
 **Every API request MUST validate the JWT token.** Skipping validation is a critical security vulnerability.
 
 **What can go wrong without validation:**
+
 - ❌ Expired tokens accepted (replay attacks)
 - ❌ Forged tokens accepted (impersonation)
 - ❌ Tokens from other User Pools accepted
@@ -264,23 +265,25 @@ func fetchJWKSet(url string) (jwk.Set, error) {
 
 ### Cache Strategy
 
-| Scenario | TTL | Rationale |
-|----------|-----|-----------|
-| Normal operation | 6 hours | Balance between latency and freshness |
-| Key not found | Force refresh | Key rotation may have occurred |
-| Validation fails | Force refresh | JWK Set may be stale |
-| First request | Fetch immediately | Populate cache |
+| Scenario         | TTL               | Rationale                             |
+| ---------------- | ----------------- | ------------------------------------- |
+| Normal operation | 6 hours           | Balance between latency and freshness |
+| Key not found    | Force refresh     | Key rotation may have occurred        |
+| Validation fails | Force refresh     | JWK Set may be stale                  |
+| First request    | Fetch immediately | Populate cache                        |
 
 ## Debugging Token Issues
 
 ### Issue 1: "signature is invalid"
 
 **Possible causes:**
+
 1. JWK Set is stale (key rotated)
 2. Token was modified/tampered
 3. Using wrong User Pool ID
 
 **Debug steps:**
+
 ```bash
 # 1. Check token header
 echo "eyJraWQ..." | cut -d. -f1 | base64 -d
@@ -298,11 +301,13 @@ curl https://cognito-idp.us-east-1.amazonaws.com/us-east-1_ABC123/.well-known/jw
 ### Issue 2: "token has expired"
 
 **Possible causes:**
+
 1. Token actually expired (check `exp` claim)
 2. System clock skew
 3. Token not refreshed before expiration
 
 **Debug steps:**
+
 ```bash
 # 1. Decode token and check exp
 echo "eyJraWQ..." | cut -d. -f2 | base64 -d | jq '.exp'
@@ -316,11 +321,13 @@ date +%s
 ### Issue 3: "issuer mismatch"
 
 **Possible causes:**
+
 1. Wrong User Pool ID in validation
 2. Token from different environment (dev vs prod)
 3. Region mismatch
 
 **Debug steps:**
+
 ```bash
 # 1. Check token issuer
 echo "eyJraWQ..." | cut -d. -f2 | base64 -d | jq '.iss'

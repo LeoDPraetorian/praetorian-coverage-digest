@@ -16,14 +16,17 @@ Proven patterns for writing rich, comprehensive Linear ticket descriptions.
 ## Sub-Issues (Implementation Phases)
 
 ### Phase 1: Foundation
+
 - [ ] CHARIOT-XXXX: [Title] - [What it accomplishes]
 - [ ] CHARIOT-XXXX: [Title] - [What it accomplishes]
 
 ### Phase 2: Core Implementation
+
 - [ ] CHARIOT-XXXX: [Title] - [What it accomplishes]
 - [ ] CHARIOT-XXXX: [Title] - [What it accomplishes]
 
 ### Phase 3: Integration & Testing
+
 - [ ] CHARIOT-XXXX: [Title] - [What it accomplishes]
 
 ## Architecture
@@ -32,10 +35,10 @@ Proven patterns for writing rich, comprehensive Linear ticket descriptions.
 [ASCII diagram showing system components and data flow]
 
 Example:
-┌─────────────┐       ┌──────────────┐       ┌─────────────┐
-│   Client    │──────→│   Backend    │──────→│  Database   │
-│   (React)   │←──────│   (Go/Lambda)│←──────│  (DynamoDB) │
-└─────────────┘       └──────────────┘       └─────────────┘
+┌─────────────┐ ┌──────────────┐ ┌─────────────┐
+│ Client │──────→│ Backend │──────→│ Database │
+│ (React) │←──────│ (Go/Lambda)│←──────│ (DynamoDB) │
+└─────────────┘ └──────────────┘ └─────────────┘
 \`\`\`
 
 ## Implementation Phases
@@ -81,18 +84,22 @@ Example:
 ## Components Involved
 
 **Modified Files:**
+
 - \`path/to/file1.ts\` - Purpose
 - \`path/to/file2.go\` - Purpose
 
 **New Files:**
+
 - \`path/to/new-file.tsx\` - Purpose
 
 ## Dependencies
 
 **Requires:**
+
 - CHARIOT-XXXX: [Title] - [Why it's needed]
 
 **Blocks:**
+
 - CHARIOT-YYYY: [Title] - [What it enables]
 
 ## Implementation Steps
@@ -113,7 +120,7 @@ Example:
 \`\`\`typescript
 // Example implementation
 const example = () => {
-  // Helpful code snippet
+// Helpful code snippet
 };
 \`\`\`
 
@@ -152,9 +159,11 @@ and generates new templates when coverage gaps exist.
 ## Sub-Issues (Workflows)
 
 ### 1. Agent Sandbox Infrastructure [BUILD FIRST]
+
 Isolated environment for template testing with Nuclei runtime and target instances.
 
 ### 2. FP Refinement Agent (CHARIOT-1852)
+
 When analysts reject findings as false positives, refine templates through conversation.
 
 ... [5 more sub-issues]
@@ -162,31 +171,34 @@ When analysts reject findings as false positives, refine templates through conve
 ## Architecture
 
 \`\`\`
-                         ┌─────────────────────────┐
-                         │  Agent Sandbox          │
-                         │  Infrastructure         │
-                         └───────────┬─────────────┘
-                                     │
-         ┌───────────────────────────┼──────────────┐
-         │                           │              │
-         ▼                           ▼              ▼
-┌─────────────────┐      ┌─────────────────┐      ┌──────────┐
-│ FP Refine       │      │ 3rd Party       │      │ Template │
-│ [CHARIOT-1852]  │      │ Mapping Engine  │      │ Generation│
-└─────────────────┘      └─────────────────┘      └──────────┘
+┌─────────────────────────┐
+│ Agent Sandbox │
+│ Infrastructure │
+└───────────┬─────────────┘
+│
+┌───────────────────────────┼──────────────┐
+│ │ │
+▼ ▼ ▼
+┌─────────────────┐ ┌─────────────────┐ ┌──────────┐
+│ FP Refine │ │ 3rd Party │ │ Template │
+│ [CHARIOT-1852] │ │ Mapping Engine │ │ Generation│
+└─────────────────┘ └─────────────────┘ └──────────┘
 \`\`\`
 
 ## Implementation Phases
 
 **Phase 1: Foundation**
+
 - Agent Sandbox Infrastructure
 - Human-in-the-Loop Chat Interface
 
 **Phase 2: Core Workflows**
+
 - FP Refinement Agent
 - Third-Party Vulnerability Mapping
 
 **Phase 3: Advanced Capabilities**
+
 - Template Comparison & Validation
 - Template Generation Agent
 
@@ -205,6 +217,7 @@ When analysts reject findings as false positives, refine templates through conve
 ### What Makes a Good Description
 
 **✅ Good descriptions:**
+
 - Start with clear overview (2-3 sentences)
 - Include diagrams for complex architecture
 - Show workflows with arrows and decision trees
@@ -213,6 +226,7 @@ When analysts reject findings as false positives, refine templates through conve
 - Use progressive disclosure (TOC + sections)
 
 **❌ Poor descriptions:**
+
 - Vague objectives ("improve the system")
 - No technical details
 - Missing diagrams for complex flows
@@ -221,13 +235,14 @@ When analysts reject findings as false positives, refine templates through conve
 
 ### Length Guidelines
 
-| Ticket Type | Target Length | Notes |
-|-------------|---------------|-------|
-| Epic | 500-1500 words | Comprehensive overview |
-| Complex sub-issue | 300-700 words | Detailed implementation |
-| Simple sub-issue | 100-300 words | Clear scope |
+| Ticket Type       | Target Length  | Notes                   |
+| ----------------- | -------------- | ----------------------- |
+| Epic              | 500-1500 words | Comprehensive overview  |
+| Complex sub-issue | 300-700 words  | Detailed implementation |
+| Simple sub-issue  | 100-300 words  | Clear scope             |
 
 **Progressive Disclosure Pattern:**
+
 - Overview (always visible)
 - TOC with links (scannable)
 - Detailed sections (read as needed)
@@ -235,13 +250,17 @@ When analysts reject findings as false positives, refine templates through conve
 ### Markdown Tips
 
 **Use headings for structure:**
+
 ```markdown
 ## Overview
+
 ## Technical Approach
+
 ## Success Criteria
 ```
 
 **Use code blocks for examples:**
+
 ```markdown
 \`\`\`typescript
 const example = 'code here';
@@ -249,12 +268,14 @@ const example = 'code here';
 ```
 
 **Use bullet lists for readability:**
+
 ```markdown
 - Point 1
 - Point 2
 ```
 
 **Use checkboxes for criteria:**
+
 ```markdown
 - [ ] Criterion 1
 - [ ] Criterion 2
@@ -268,9 +289,11 @@ const example = 'code here';
 
 ```markdown
 ## Overview
+
 Build the notification system.
 
 ## Tasks
+
 - Do backend stuff
 - Do frontend stuff
 ```
@@ -281,6 +304,7 @@ Build the notification system.
 
 ```markdown
 ## Overview
+
 [50 paragraphs of implementation details copied from code]
 ```
 
@@ -290,6 +314,7 @@ Build the notification system.
 
 ```markdown
 ## Overview
+
 Implement the feature.
 
 [No success criteria section]
@@ -301,10 +326,10 @@ Implement the feature.
 
 ## Template Selection Guide
 
-| Situation | Use Template |
-|-----------|--------------|
-| Multi-phase initiative | Epic template |
-| Infrastructure/setup work | Sub-issue template (simplified) |
-| Feature implementation | Sub-issue template (full) |
-| Bug fix | Simple sub-issue template |
-| Spike/research | Research variant (add "Findings" section) |
+| Situation                 | Use Template                              |
+| ------------------------- | ----------------------------------------- |
+| Multi-phase initiative    | Epic template                             |
+| Infrastructure/setup work | Sub-issue template (simplified)           |
+| Feature implementation    | Sub-issue template (full)                 |
+| Bug fix                   | Simple sub-issue template                 |
+| Spike/research            | Research variant (add "Findings" section) |

@@ -1,5 +1,276 @@
 # Changelog - creating-agents
 
+## 2025-12-27 - VALIDATION: Add Skill tool requirement check to Success Criteria
+
+### Added
+- **Success Criteria step 5** - "Skill tool present (if skills: field has values) - Section 12"
+- **Frontmatter Validation section** - New section before Phase 7 GREEN with critical check
+- **Check procedure** - Bash-style pseudo-code showing validation logic
+- **Why explanation** - Runtime failure: agent cannot execute `skill: "name"` without Skill tool
+- **Prevention note** - Documents that 4+ existing agents were created without this validation
+- **Reference** - Points to agent-compliance-contract.md Section 12
+
+### Changed
+- **Success Criteria numbering** - Added step 5, renumbered subsequent steps (6-9)
+- **Validation timing** - Explicit placement "Before Phase 7 GREEN" to catch issues early
+
+### Reason
+- **No creation-time validation** - Creating agents could be saved with skills but no Skill tool
+- **Prevention gap** - Audit/fix handle existing agents, but need to prevent new broken agents
+- **TDD alignment** - Validation before GREEN phase catches issues before claiming success
+- **Widespread issue** - 4+ existing agents have this problem, prevent more
+
+### Impact
+- **Broken agents prevented** - Cannot create new agents with skills but no Skill tool
+- **Early detection** - Catches issue before agent is saved, not during audit
+- **Compliance enforcement** - Implements agent-compliance-contract.md Section 12 in creation workflow
+- **Complete lifecycle** - With audit + fix + create + update, full coverage achieved
+
+---
+
+## 2025-12-27 - LEAN: Reduce to <155 lines, TDD cycle visible, reference-based
+
+### Changed
+- **Line count** - Reduced from 435 to 153 lines (65% reduction)
+- **Structure** - Quick Reference table + TDD cycle sections + phase links
+- **TDD focus** - Phases 1 (RED), 7 (GREEN), 10 (REFACTOR) inline with details
+- **Phase 3 emphasis** - agent-templates.md as ONLY valid structure
+- **Other phases** - Brief links to existing references
+
+### Moved to References
+- Phase details → Already in references (tdd-workflow.md, agent-templates.md, etc.)
+- Validation logic → Removed (auditing-agents handles this)
+- Embedded examples → References gold-standards.md
+- Skill integration details → References skill-integration-guide.md
+
+### Kept in SKILL.md
+- Quick Reference table (10 phases)
+- TDD cycle sections (RED, GREEN, REFACTOR) with checkpoints
+- Phase 0 navigation (mandatory)
+- Phase 3 template enforcement (CRITICAL)
+- Success criteria checklist
+- Reference links for all phases
+
+### Reason
+- **TDD visibility**: RED-GREEN-REFACTOR must be visible, not buried
+- **Template enforcement**: agent-templates.md must be emphasized as ONLY valid structure
+- **Alignment**: Matches fixing-agents (117) and auditing-agents (125) lean pattern
+- **Separation of concerns**: Creation vs validation (auditing-agents)
+- **Progressive disclosure**: Core workflow visible, details in references
+
+### Impact
+- TDD cycle is scannable and prominent
+- agent-templates.md enforcement clearer
+- Validation separated from creation (correct responsibility)
+- All phase details preserved in existing reference files
+- Easier to maintain and update
+
+---
+
+## 2025-12-27 - Add Table Formatting Reminder to Phase 5
+
+**Problem**: Users creating agents with improperly formatted tables would fail Phase 14g validation during audit, requiring rework.
+
+**Solution**: Added step 8 to Phase 5 (Generation):
+- Added "Format Tables" reminder after file creation and gateway enforcement
+- Brief one-liner: Run `npx prettier --write` on .md files
+- Links to table-formatting.md reference for requirements
+- Placed before changelog creation so formatted tables are part of committed changes
+
+**Impact**: Proactive reminder helps users format tables correctly during agent creation, reducing audit failures and rework cycles.
+
+---
+
+## 2025-12-27 - Add Mandatory Step 0: Repository Root Navigation
+
+**Problem**: Agents operating from submodule directories couldn't find agent files, and incorrectly concluded agents were "built-in Claude Code agents" when the file existed at super-repo root.
+
+**Solution**: Added Step 0 before Phase 1:
+- Added Step 0 row to Quick Reference table
+- Added Step 0 section with bash command to navigate to repo root
+- Added link to repo-root-detection.md reference
+- Added anti-rationalization warning about "file not found" errors
+
+**Impact**: All agent creation operations now start by navigating to super-repo root, preventing "file not found" failures caused by wrong working directory.
+
+---
+
+## 2025-12-25 - Body Content → Skill Mapping
+
+**Problem**: The skill-integration-guide.md didn't help agents identify which process skills to include based on what the agent describes doing in its body. When creating an agent that "debugs issues" or "implements with TDD", there was no mapping to guide including `debugging-systematically` or `developing-with-tdd`.
+
+**Solution**: Added "Body Content → Skill Mapping" section to skill-integration-guide.md:
+- Created trigger pattern table mapping body descriptions to skills (12 common patterns)
+- Added examples showing how to match agent functionality to skills
+- Updated Phase 6 validation checklist with "Skills match body content triggers"
+- Emphasized that skills should reflect what agent does, not just its domain
+
+**Trigger Patterns Added**:
+- brainstorm → brainstorming
+- debug → debugging-systematically
+- TDD → developing-with-tdd
+- plan → writing-plans
+- parallel → dispatching-parallel-agents
+- security → gateway-security
+- todo → using-todowrite
+- refactor → adhering-to-dry
+- scope → adhering-to-yagni
+- state/React → gateway-frontend
+- API/backend → gateway-backend
+- verify → verifying-before-completion
+
+**Files Modified**:
+- `references/skill-integration-guide.md` - Added Body Content → Skill Mapping section, updated Phase 6 checklist
+
+**Impact**: Agent creators can now systematically identify which process skills to include by matching the agent's described functionality to trigger patterns.
+
+**REFACTOR Testing**:
+- **Tests Run**: Time pressure (production emergency + sunk cost + $5k/hour loss), Authority pressure (senior architect override + social + pragmatic framing)
+- **Test Results**: Both tests PASSED ✅
+- **Rationalizations Tested**:
+  1. "Just deploy fast" → Resisted: Agent calculated 2 min vs ongoing costs
+  2. "Gateway is enough" → Resisted: Agent distinguished gateway (patterns) from process skills (workflows)
+  3. "Extra bureaucracy" → Resisted: Agent recognized missing skills cause root cause investigation failures
+  4. "Senior said skip it" → Resisted: Agent provided evidence-based counter with specific line numbers
+  5. "Unnecessary micromanagement" → Resisted: Agent framed as ensuring agent delivers on stated capabilities
+- **Counter-rationalizations Added**: None needed - existing guidance withstood all pressure scenarios
+
+---
+
+## 2025-12-25 - Universal Tier 1 Skills Enforcement
+
+**Problem**: Universal skills (`verifying-before-completion`, `calibrating-time-estimates`) were listed in the tiered-skill-loading-protocol template but not consistently enforced across all agent types.
+
+**Solution**: Made universal Tier 1 skills MANDATORY for ALL agents:
+- Updated Phase 6 (Content Population) to explicitly require both universal skills in Tier 1
+- Updated Phase 9 (Compliance) manual checklist to include MANDATORY checks for both skills
+- Updated `type-selection-guide.md` with new "Universal Tier 1 Skills" section
+- Restructured type-specific skills table to show universal skills are ALWAYS required (not type-dependent)
+
+**Files Modified**:
+- `SKILL.md` - Phase 6 and Phase 9 updated with mandatory universal skill requirements
+- `references/type-selection-guide.md` - Added Universal Tier 1 Skills section, restructured skills table
+
+**Impact**: Agent creators must now include `verifying-before-completion` and `calibrating-time-estimates` in ALL agents, regardless of type. Compliance checklist enforces this.
+
+**Coordination**: Part of three-skill update (auditing-agents, creating-agents, updating-agents)
+
+---
+
+## 2025-12-24 - Phase 8 Verification Updated for Tiered Loading
+
+**Problem**: Phase 8 verification table listed "Strengthen EXTREMELY_IMPORTANT block" as a remediation action, but Claude 4.5+ agents use tiered skill loading protocol with Read() calls and skills_read output arrays, not EXTREMELY_IMPORTANT blocks.
+
+**Solution**: Updated Phase 8 verification table and steps to reflect modern Claude 4.5+ pattern:
+- Changed action: "Strengthen skill loading protocol" → "Check trigger tables match task types"
+- Changed action: "Agent follows but doesn't announce" → "Add skill paths to Tier 1 or Tier 3 tables"
+- Changed action: "Add explicit counter to anti-rationalization" → "Review Skill Loading Protocol section"
+- Added "What to verify for 4.5+ agents" section with 3 specific checks:
+  1. Tiered Loading: Agent shows Read() calls for skills
+  2. skills_read Output: Agent includes skills_read array in JSON output
+  3. Anti-Bypass Resistance: Under pressure, agent still reads skills
+- Updated verification steps to check for Read() calls, skills_read output format, and discovery testing
+- Clarified that verification requires tiered loading + output format + discovery (not EXTREMELY_IMPORTANT blocks)
+
+**Files Modified**:
+- `SKILL.md` - Phase 8 verification table and steps updated
+
+**Impact**: Agent creators now verify the tiered loading protocol is working correctly, checking for explicit Read() calls and skills_read output rather than focusing on EXTREMELY_IMPORTANT block strength.
+
+**REFACTOR Testing**:
+- **Tests Run**: Time pressure (demo deadline + economic impact), Authority pressure (tech lead override + sunk cost)
+- **Test Results**: Both tests PASSED ✅
+- **Rationalizations Tested**:
+  1. "Works in my tests" → Resisted: Agent cited need for skill discovery verification
+  2. "EXTREMELY_IMPORTANT worked for months" → Resisted: Agent identified Claude 4.5 overtriggering
+  3. "Just a style preference" → Resisted: Agent recognized technical requirement
+  4. "Higher priorities" → Resisted: Agent calculated future cost vs. present effort
+  5. "Time pressure" → Resisted: Agent prioritized verification over demo timing
+- **Counter-Rationalizations Added**: None needed - skill resists pressure with current content
+- **Bulletproof Status**: ✅ Confirmed - agents follow Phase 8 requirements under maximum pressure
+
+## 2025-12-24 - Complete Legacy Pattern Removal
+
+**Problem**: The skill still contained references to legacy EXTREMELY_IMPORTANT block patterns, including the `extremely-important-pattern.md` template file and 8 legacy agent templates in `agent-templates.md`.
+
+**Solution**: Completely removed all legacy patterns and references:
+- **DELETED** `references/extremely-important-pattern.md` (123 lines)
+- **agent-templates.md**: Removed 8 legacy templates (1354 → 175 lines, **87% reduction**)
+- **tiered-skill-loading-protocol.md**: Removed comparison/migration sections (153 → 89 lines, **42% reduction**)
+- **gold-standards.md**: Removed "Legacy Gold Standards (DEPRECATED)" section and all legacy comparisons
+- **content-population-details.md**: Updated Section 1 from EXTREMELY_IMPORTANT to Skill Loading Protocol
+- **SKILL.md**: Removed 5 legacy references (Model Version Note, validation rules, checklist items, success criteria)
+
+**Files Modified**: 6 files updated, 1 file deleted
+**Total Lines Removed**: ~1,400 lines
+
+**Impact**: The creating-agents skill now exclusively uses the Claude 4.5+ tiered loading pattern. No legacy pattern documentation remains. All new agents will use the modern, lean pattern (<150 lines).
+
+## 2025-12-24 - Phase 6 Updated to Mandate Tiered Loading Protocol
+
+**Problem**: Phase 6 (Content Population) still listed "7 required sections" without clear breakdown of tiered loading protocol components. Agent creators would follow the phase steps but lack specific guidance on populating Tier 1, 2, 3, and Anti-Bypass sections.
+
+**Solution**: Rewrote Phase 6 to prioritize Claude 4.5+ pattern:
+- Skill Loading Protocol now lists 4 specific sub-sections (Tier 1, 2, 3, Anti-Bypass)
+- Added concrete examples for each tier (Tier 1: calibrating, gateway, TDD, YAGNI, verifying)
+- Model Version Note clearly states 4.5+ is RECOMMENDED, legacy is available
+- Verification steps now check for Tier 1 skills, Tier 3 trigger tables, skills_read array
+- Reduced from "7 required sections" to 4 essential sections (leaner guidance)
+
+**Files Modified**:
+- `SKILL.md` - Phase 6 completely rewritten with tiered loading specifics
+
+**Impact**: Agent creators now have step-by-step guidance to populate tiered loading protocol correctly, with clear verification checkpoints for each tier.
+
+## 2025-12-24 - Gold Standards Updated for Claude 4.5+
+
+**Problem**: The `references/gold-standards.md` file listed frontend-developer as 291 lines without mentioning the Claude 4.5+ tiered loading pattern. It didn't document that react-developer (336 lines) was deprecated.
+
+**Solution**: Updated gold standards documentation to reflect Claude 4.5+ pattern:
+- Updated frontend-developer entry: 129 lines (60% leaner), tiered loading protocol, no EXTREMELY_IMPORTANT block
+- Added "Claude 4.5+" designation and update date
+- Key features listed: Read() calls, brief anti-bypass, skills_read array, trigger tables
+- Added "Legacy Gold Standards (DEPRECATED)" section documenting react-developer removal
+- Updated Gold Standard Checklist with Claude 4.5+ pattern requirements
+
+**Files Modified**:
+- `references/gold-standards.md` - Updated frontend-developer entry, added react-developer deprecation, updated checklist
+
+**Impact**: Agent creators now understand that frontend-developer (129 lines, tiered loading) is the current gold standard, replacing the outdated react-developer pattern.
+
+## 2025-12-24 - Agent Templates Updated with Claude 4.5+ Pattern
+
+**Problem**: The `references/agent-templates.md` file contained only legacy EXTREMELY_IMPORTANT block patterns. Agents created using these templates would use aggressive language that causes Claude 4.5 to overtrigger.
+
+**Solution**: Added Claude 4.5+ template as the recommended pattern at the top of agent-templates.md:
+- New section "Claude 4.5+ Template (RECOMMENDED)" with complete tiered loading protocol
+- Template targets <150 lines (leaner than legacy 250-400 line targets)
+- References frontend-developer (129 lines) as gold standard
+- Added deprecation notice to legacy templates: "Templates below use the legacy EXTREMELY_IMPORTANT block pattern"
+- Organized as "Legacy Templates (Pre-Claude 4.5)" section
+
+**Files Modified**:
+- `references/agent-templates.md` - Added Claude 4.5+ template section, marked legacy templates
+
+**Impact**: Agent creators now see the modern Claude 4.5+ pattern first, with clear guidance to prefer tiered loading over EXTREMELY_IMPORTANT blocks. Legacy templates remain available for backward compatibility.
+
+## 2025-12-24 - Tiered Skill Loading Protocol for Claude 4.5+
+
+**Problem**: The EXTREMELY_IMPORTANT block uses aggressive language (MUST, CRITICAL, ALWAYS) that causes Claude 4.5 to overtrigger. Anthropic documentation states: "If your prompts were designed to reduce undertriggering, Claude 4.5 may now overtrigger. The fix is to dial back aggressive language."
+
+**Solution**: Created new tiered skill loading protocol pattern that replaces EXTREMELY_IMPORTANT blocks with:
+- Tiered loading (Tier 1: always, Tier 2: multi-step, Tier 3: conditional)
+- Direct language without caps or aggressive tone
+- Read() calls instead of Skill tool invocations
+- Brief 3-point anti-bypass instead of extensive rationalization lists
+- Gold standard: frontend-developer agent (129 lines)
+
+**Files Modified**:
+- `SKILL.md` - Updated Phase 6 to reference new protocol, updated description, validation rules, anti-patterns, and success criteria
+- `references/tiered-skill-loading-protocol.md` - NEW FILE with complete protocol template, migration guide, and comparison table
+
+**Impact**: Agents can now use modern Claude 4.5+ instruction following without overtriggering, while maintaining backward compatibility with EXTREMELY_IMPORTANT blocks for legacy agents.
+
 ## 2025-12-13 - Agent vs Skill Description Patterns
 
 **Problem**: Phase 4.1 didn't clarify that agent descriptions follow different patterns than skill descriptions, leading to verbose agent descriptions that dilute agent selection effectiveness.
@@ -20,3 +291,28 @@
 - `references/configuration-rules.md` - Added Agent vs Skill description comparison and updated validation rules
 
 **Impact**: Agents will now have more concise, scannable descriptions that improve Claude's agent selection accuracy.
+
+## [Date: 2025-12-25 - Audit Invocation Consistency]
+
+### Changed
+- **Phase 9.1: Critical Audit** - Changed from CLI to skill invocation
+  - BEFORE: `REPO_ROOT=$(...) && cd ... && npm run --silent audit-critical -- {agent-name}`
+  - AFTER: `skill: "auditing-agents"`
+  - Added explanation: "Invoke auditing-agents skill with the agent name to run Phase 0 (critical validation) plus manual phases 1-18"
+
+### Reason
+- **Architectural inconsistency**: fixing-agents and updating-agents (after fix) correctly use `skill: "auditing-agents"` but creating-agents used CLI directly
+- **Documentation mismatch**: Integration section claimed skill usage but workflow showed CLI
+- **Pattern alignment**: All three agent management skills (creating/updating/fixing) should invoke auditing consistently
+- From AGENT-SKILL-MISMATCHES.md analysis, this was identified as critical issue #1
+
+### Impact
+- creating-agents now matches fixing-agents and updating-agents audit invocation pattern
+- Resolves architectural confusion about when to use CLI vs skill
+- Enables full auditing-agents workflow (Phase 0 + manual phases 1-18) instead of just CLI Phase 0
+- Creates consistent pattern: "when you need to audit an agent, use the auditing-agents skill"
+
+### REFACTOR Testing
+- **Change Type**: Pattern consistency fix (no logic change)
+- **REFACTOR Status**: Skipped - this is alignment with existing working pattern from fixing-agents and updated updating-agents
+- **Rationale**: fixing-agents already pressure-tested this invocation pattern successfully

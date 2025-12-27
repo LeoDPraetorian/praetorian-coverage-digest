@@ -11,6 +11,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, AskUserQues
 ## When to Use
 
 Use this skill when:
+
 - Performing comprehensive threat modeling on a codebase
 - Need systematic STRIDE + PASTA + DFD analysis
 - Require structured outputs (Markdown, JSON, SARIF)
@@ -23,13 +24,13 @@ Use this skill when:
 
 ## Quick Reference
 
-| Phase | Purpose | Execution | Checkpoint |
-|-------|---------|-----------|------------|
-| 0. Business Context | Crown jewels, threat actors, compliance, business impact | Interactive skill | ⏸️ User approval |
-| 1. Codebase Mapping | Architecture, components, data flows | Parallel agents | ⏸️ User approval |
-| 2. Security Controls | Auth, authz, validation, crypto | Parallel agents | ⏸️ User approval |
-| 3. Threat Modeling | STRIDE + PASTA + DFD threats | Sequential skill | ⏸️ User approval |
-| 4. Test Planning | Prioritized security test plan | Sequential skill | ⏸️ User approval |
+| Phase                | Purpose                                                  | Execution         | Checkpoint       |
+| -------------------- | -------------------------------------------------------- | ----------------- | ---------------- |
+| 0. Business Context  | Crown jewels, threat actors, compliance, business impact | Interactive skill | ⏸️ User approval |
+| 1. Codebase Mapping  | Architecture, components, data flows                     | Parallel agents   | ⏸️ User approval |
+| 2. Security Controls | Auth, authz, validation, crypto                          | Parallel agents   | ⏸️ User approval |
+| 3. Threat Modeling   | STRIDE + PASTA + DFD threats                             | Sequential skill  | ⏸️ User approval |
+| 4. Test Planning     | Prioritized security test plan                           | Sequential skill  | ⏸️ User approval |
 
 ---
 
@@ -43,10 +44,12 @@ Use this skill when:
 ## Phase {N} Complete: {Phase Name}
 
 ### Key Findings:
+
 - [Finding 1]
 - [Finding 2]
 
 ### Questions for You:
+
 - Is this understanding correct?
 - Any areas I missed?
 
@@ -58,6 +61,7 @@ Use this skill when:
 ### Phase 0 Is Mandatory
 
 **Phase 0 (Business Context Discovery) MUST execute before Phase 1.** You cannot perform risk-based threat modeling without understanding:
+
 - **WHAT** you're protecting (crown jewels, sensitive data)
 - **WHY** it matters (business impact, compliance requirements)
 - **WHO** would attack (threat actor profiles)
@@ -67,6 +71,7 @@ Without business context, technical threat models produce "security theater" ins
 **Enforcement**: Phase 1 cannot proceed without Phase 0 approval checkpoint.
 
 **No exceptions:**
+
 - **Not even when**: Manager says skip it, client says skip it, user says "we already know"
 - **Not even when**: Time pressure, deadline, emergency, audit tomorrow
 - **Not even when**: Previous Phase 0 exists (for incremental: validate changes in 30-60 min, don't skip)
@@ -85,6 +90,7 @@ All artifacts go to: `.claude/.threat-model/{session}/`
 ### Scope Selection Is Required
 
 **Always ask user** to select scope before any analysis:
+
 1. **Full application** - Analyze entire codebase
 2. **Specific component(s)** - Focus on particular modules
 3. **Incremental** - Changes only (git diff based)
@@ -130,6 +136,7 @@ skill: "business-context-discovery"
 ```
 
 **The skill guides through**:
+
 1. Business Purpose Interview (20-30 min)
 2. Data Classification - Identify crown jewels (20-30 min)
 3. Threat Actor Profiling - Who would attack and why (15-20 min)
@@ -138,6 +145,7 @@ skill: "business-context-discovery"
 6. Security Objectives - Protection priorities (10-15 min)
 
 **Artifacts produced** (in `phase-0/`):
+
 - `business-objectives.json` - App purpose, users, value
 - `data-classification.json` - Crown jewels, PII/PHI/PCI
 - `threat-actors.json` - Who attacks, motivations, capabilities
@@ -149,6 +157,7 @@ skill: "business-context-discovery"
 **Checkpoint**: Present business context findings, ask for approval before Phase 1.
 
 **How this drives later phases**:
+
 - Phase 1: Focus mapping on crown jewel components
 - Phase 2: Evaluate controls against compliance requirements
 - Phase 3: Apply relevant threat actor profiles, use actual business impact for risk scoring
@@ -165,6 +174,7 @@ Task("codebase-mapper", "Analyze {component-path} for threat modeling", "codebas
 ```
 
 **Artifacts produced** (in `phase-1/`):
+
 - `manifest.json` - File inventory
 - `components/*.json` - Per-component analysis
 - `entry-points.json` - Attack surface
@@ -183,6 +193,7 @@ See [references/phase-1-workflow.md](references/phase-1-workflow.md) for detaile
 **Execution**: Spawn `security-controls-mapper` agents in parallel.
 
 **Artifacts produced** (in `phase-2/`):
+
 - `authentication.json` - Auth mechanisms
 - `authorization.json` - RBAC, ABAC, permissions
 - `input-validation.json` - Validation patterns
@@ -203,6 +214,7 @@ See [references/phase-2-workflow.md](references/phase-2-workflow.md) for detaile
 **Inputs**: Load Phase 1 + Phase 2 summaries and key artifacts.
 
 **Artifacts produced** (in `phase-3/`):
+
 - `threat-model.json` - Structured threat entries
 - `abuse-cases/*.json` - Per-category abuse scenarios
 - `attack-trees/*.md` - Attack path diagrams
@@ -222,6 +234,7 @@ See [references/phase-3-workflow.md](references/phase-3-workflow.md) for detaile
 **Inputs**: Load Phase 3 threat model and Phase 1 entry points.
 
 **Artifacts produced** (in `phase-4/`):
+
 - `code-review-plan.json` - Prioritized files
 - `sast-recommendations.json` - Static analysis focus
 - `dast-recommendations.json` - Dynamic testing targets
@@ -236,11 +249,11 @@ See [references/phase-4-workflow.md](references/phase-4-workflow.md) for detaile
 
 **Consolidate all phases** into final deliverables:
 
-| Format | File | Purpose |
-|--------|------|---------|
+| Format   | File                     | Purpose               |
+| -------- | ------------------------ | --------------------- |
 | Markdown | `threat-model-report.md` | Human-readable report |
-| JSON | `threat-model-data.json` | Machine-readable data |
-| SARIF | `threat-model.sarif` | IDE integration |
+| JSON     | `threat-model-data.json` | Machine-readable data |
+| SARIF    | `threat-model.sarif`     | IDE integration       |
 
 See [references/report-templates.md](references/report-templates.md) for output schemas.
 
@@ -264,8 +277,8 @@ Between each phase, write a handoff file:
     "userFeedback": ["..."]
   },
   "artifacts": [
-    {"name": "phase-0-summary", "path": "phase-0/summary.md", "loadWhen": "always"},
-    {"name": "entry-points.json", "path": "phase-1/entry-points.json", "loadWhen": "always"}
+    { "name": "phase-0-summary", "path": "phase-0/summary.md", "loadWhen": "always" },
+    { "name": "entry-points.json", "path": "phase-1/entry-points.json", "loadWhen": "always" }
   ],
   "nextPhaseGuidance": "Focus on authentication controls first"
 }
@@ -284,10 +297,12 @@ See [references/handoff-schema.md](references/handoff-schema.md) for complete sc
 Use these templates for human approval gates:
 
 ### After Phase 0
+
 ```markdown
 ## Phase 0 Complete: Business Context Discovery
 
 ### What I Found:
+
 - **Application**: {One-line business purpose}
 - **Crown Jewels**: {Top 3-5 most sensitive assets}
 - **Threat Actors**: {Relevant attacker profiles}
@@ -295,11 +310,13 @@ Use these templates for human approval gates:
 - **Compliance**: {Applicable regulations}
 
 ### Key Insights:
+
 - {Business-specific finding that shapes approach}
 - {Compliance requirement determining controls}
 - {Threat actor profile guiding threats}
 
 ### Questions for You:
+
 - Is this business understanding correct?
 - Any sensitive data I missed?
 - Any threat actors I should consider?
@@ -312,19 +329,23 @@ If approved, Phase 1 will focus on: {Components handling crown jewels}
 ```
 
 ### After Phase 1
+
 ```markdown
 ## Phase 1 Complete: Codebase Understanding
 
 ### What I Found:
+
 - {X} components identified
 - {Y} entry points (attack surface)
 - {Z} data flows mapped
 
 ### Key Architecture Points:
+
 1. {Summary point 1}
 2. {Summary point 2}
 
 ### Questions for You:
+
 - Is this architecture understanding correct?
 - Any components I missed?
 
@@ -379,8 +400,9 @@ Task("codebase-mapper", "Analyze infra: ./modules/devops")
 ```
 
 **When to parallelize**:
-- >5 distinct components
-- >10,000 files total
+
+- > 5 distinct components
+- > 10,000 files total
 - Multiple technology stacks
 
 **Always consolidate** parallel results before checkpoint.
@@ -389,12 +411,12 @@ Task("codebase-mapper", "Analyze infra: ./modules/devops")
 
 ## Error Handling
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| Agent timeout | Component too large | Split into smaller scopes |
-| Missing artifacts | Phase incomplete | Re-run phase before proceeding |
-| User rejects checkpoint | Findings incorrect | Go back, address feedback, re-checkpoint |
-| Skill not found | Missing dependency | Create required skill first |
+| Error                   | Cause               | Solution                                 |
+| ----------------------- | ------------------- | ---------------------------------------- |
+| Agent timeout           | Component too large | Split into smaller scopes                |
+| Missing artifacts       | Phase incomplete    | Re-run phase before proceeding           |
+| User rejects checkpoint | Findings incorrect  | Go back, address feedback, re-checkpoint |
+| Skill not found         | Missing dependency  | Create required skill first              |
 
 ---
 

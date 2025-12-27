@@ -4,13 +4,13 @@
 
 ## Overview of Key Regulations
 
-| Regulation | Jurisdiction | Applicability | Penalties | Audit Frequency |
-|------------|--------------|---------------|-----------|-----------------|
-| **SOC2** | US (global acceptance) | Service organizations | N/A (customer trust) | Annual |
-| **PCI-DSS** | Global | Card data handlers | $5K-$100K/month + card loss | Annual |
-| **HIPAA** | US | PHI handlers | Up to $1.5M/year | Ongoing HHS audits |
-| **GDPR** | EU | EU resident data | Up to €20M or 4% revenue | Ongoing DPA audits |
-| **CCPA** | California | CA resident data | Up to $7,500/violation | AG enforcement |
+| Regulation  | Jurisdiction           | Applicability         | Penalties                   | Audit Frequency    |
+| ----------- | ---------------------- | --------------------- | --------------------------- | ------------------ |
+| **SOC2**    | US (global acceptance) | Service organizations | N/A (customer trust)        | Annual             |
+| **PCI-DSS** | Global                 | Card data handlers    | $5K-$100K/month + card loss | Annual             |
+| **HIPAA**   | US                     | PHI handlers          | Up to $1.5M/year            | Ongoing HHS audits |
+| **GDPR**    | EU                     | EU resident data      | Up to €20M or 4% revenue    | Ongoing DPA audits |
+| **CCPA**    | California             | CA resident data      | Up to $7,500/violation      | AG enforcement     |
 
 ---
 
@@ -23,6 +23,7 @@
 **Governing Body**: AICPA (American Institute of CPAs)
 
 **Types**:
+
 - **Type I**: Controls designed appropriately at a point in time
 - **Type II**: Controls operating effectively over time (6-12 months)
 
@@ -33,31 +34,37 @@ SOC2 is based on 5 trust service criteria:
 #### 1. Security (CC - Common Criteria)
 
 **CC6.1** - Logical and Physical Access Controls
+
 - Identify and authenticate users
 - Consider segregation of duties
 - Restrict access to system resources
 
 **CC6.2** - System Operations
+
 - Manage system capacity
 - Monitor system operation
 - Manage system vulnerabilities
 
 **CC6.3** - Change Management
+
 - Authorize changes before implementation
 - Test changes
 - Track system changes
 
 **CC6.6** - Logical and Physical Security Measures
+
 - Restrict physical access
 - Protect against environmental threats
 - Configure infrastructure and software
 
 **CC6.7** - Backup and Recovery
+
 - Back up data and systems
 - Test recovery procedures
 - Manage encryption keys
 
 **CC6.8** - Business Continuity
+
 - Plan for business continuity and disaster recovery
 - Test business continuity plan
 
@@ -88,16 +95,16 @@ SOC2 is based on 5 trust service criteria:
 
 ### Required Security Controls
 
-| Control Area | Requirements | Evidence |
-|--------------|--------------|----------|
-| **Access Control** | MFA, least privilege, access reviews | Access logs, MFA config |
-| **Change Management** | Change approval, testing, rollback | Change tickets, test results |
-| **Encryption** | Data at rest and in transit | Encryption configs, TLS certs |
-| **Logging** | Centralized logging, log retention | Log aggregation config, retention policy |
-| **Vulnerability Management** | Regular scanning, patch management | Scan reports, patch schedules |
-| **Incident Response** | IR plan, incident tracking | IR runbooks, incident tickets |
-| **Vendor Management** | Third-party risk assessment | Vendor assessments, contracts |
-| **Employee Access** | Background checks, security training | Training records, HR policies |
+| Control Area                 | Requirements                         | Evidence                                 |
+| ---------------------------- | ------------------------------------ | ---------------------------------------- |
+| **Access Control**           | MFA, least privilege, access reviews | Access logs, MFA config                  |
+| **Change Management**        | Change approval, testing, rollback   | Change tickets, test results             |
+| **Encryption**               | Data at rest and in transit          | Encryption configs, TLS certs            |
+| **Logging**                  | Centralized logging, log retention   | Log aggregation config, retention policy |
+| **Vulnerability Management** | Regular scanning, patch management   | Scan reports, patch schedules            |
+| **Incident Response**        | IR plan, incident tracking           | IR runbooks, incident tickets            |
+| **Vendor Management**        | Third-party risk assessment          | Vendor assessments, contracts            |
+| **Employee Access**          | Background checks, security training | Training records, HR policies            |
 
 ### Audit Process
 
@@ -120,6 +127,7 @@ SOC2 is based on 5 trust service criteria:
 **Governing Body**: PCI Security Standards Council
 
 **Merchant Levels** (based on annual transaction volume):
+
 - Level 1: 6M+ transactions
 - Level 2: 1M-6M transactions
 - Level 3: 20K-1M e-commerce transactions
@@ -130,11 +138,13 @@ SOC2 is based on 5 trust service criteria:
 #### Build and Maintain a Secure Network
 
 **1. Install and maintain firewall configuration**
+
 - Document firewall rules
 - Restrict inbound/outbound traffic
 - Prohibit direct public access to cardholder data
 
 **2. Do not use vendor-supplied defaults**
+
 - Change default passwords
 - Remove unnecessary accounts
 - Disable unnecessary services
@@ -142,6 +152,7 @@ SOC2 is based on 5 trust service criteria:
 #### Protect Cardholder Data
 
 **3. Protect stored cardholder data**
+
 - Minimize data storage
 - Render PAN (Primary Account Number) unreadable:
   - Encryption
@@ -151,6 +162,7 @@ SOC2 is based on 5 trust service criteria:
 - Never store sensitive authentication data (CVV, PIN)
 
 **4. Encrypt transmission of cardholder data**
+
 - Strong cryptography (TLS 1.2+)
 - Never send PAN via unencrypted channels (email, SMS)
 - Verify certificates
@@ -158,11 +170,13 @@ SOC2 is based on 5 trust service criteria:
 #### Maintain a Vulnerability Management Program
 
 **5. Protect all systems from malware**
+
 - Anti-virus on all systems
 - Regular updates and scans
 - Audit logs
 
 **6. Develop and maintain secure systems and applications**
+
 - Patch management process
 - Secure development lifecycle
 - Change control procedures
@@ -171,16 +185,19 @@ SOC2 is based on 5 trust service criteria:
 #### Implement Strong Access Control Measures
 
 **7. Restrict access by business need-to-know**
+
 - Role-based access control (RBAC)
 - Least privilege principle
 - Default deny-all setting
 
 **8. Identify and authenticate access**
+
 - Unique ID for each user
 - Two-factor authentication for remote access
 - Two-factor for administrators
 
 **9. Restrict physical access to cardholder data**
+
 - Physical access controls
 - Badge systems
 - Video surveillance
@@ -189,12 +206,14 @@ SOC2 is based on 5 trust service criteria:
 #### Regularly Monitor and Test Networks
 
 **10. Track and monitor all access to network resources and cardholder data**
+
 - Audit trails for all access
 - Log aggregation
 - Daily log reviews
 - Time synchronization
 
 **11. Regularly test security systems and processes**
+
 - Vulnerability scans (quarterly, after significant changes)
 - Penetration testing (annually)
 - IDS/IPS monitoring
@@ -203,6 +222,7 @@ SOC2 is based on 5 trust service criteria:
 #### Maintain an Information Security Policy
 
 **12. Maintain policy addressing information security**
+
 - Annual risk assessment
 - Security awareness training
 - Incident response plan
@@ -210,12 +230,12 @@ SOC2 is based on 5 trust service criteria:
 
 ### Validation Methods
 
-| Level | Validation | Frequency |
-|-------|------------|-----------|
-| **Level 1** | On-site audit by QSA | Annual |
-| **Level 2** | Self-Assessment Questionnaire (SAQ) or QSA | Annual |
-| **Level 3** | SAQ | Annual |
-| **Level 4** | SAQ | Annual |
+| Level       | Validation                                 | Frequency |
+| ----------- | ------------------------------------------ | --------- |
+| **Level 1** | On-site audit by QSA                       | Annual    |
+| **Level 2** | Self-Assessment Questionnaire (SAQ) or QSA | Annual    |
+| **Level 3** | SAQ                                        | Annual    |
+| **Level 4** | SAQ                                        | Annual    |
 
 **All Levels**: Quarterly network scans by ASV (Approved Scanning Vendor)
 
@@ -237,6 +257,7 @@ SOC2 is based on 5 trust service criteria:
 **Governing Body**: HHS Office for Civil Rights (OCR)
 
 **Applicability**:
+
 - **Covered Entities**: Healthcare providers, health plans, clearinghouses
 - **Business Associates**: Vendors processing PHI on behalf of covered entities
 
@@ -245,53 +266,64 @@ SOC2 is based on 5 trust service criteria:
 #### Administrative Safeguards
 
 **§164.308(a)(1)** - Security Management Process
+
 - Risk analysis (annual)
 - Risk management
 - Sanction policy
 - Information system activity review
 
 **§164.308(a)(3)** - Workforce Security
+
 - Authorization and supervision
 - Workforce clearance procedure
 - Termination procedures
 
 **§164.308(a)(4)** - Information Access Management
+
 - Access authorization
 - Access establishment and modification
 
 **§164.308(a)(5)** - Security Awareness and Training
+
 - Security reminders
 - Protection from malicious software
 - Log-in monitoring
 - Password management
 
 **§164.308(a)(6)** - Security Incident Procedures
+
 - Incident response plan
 - Incident documentation and reporting
 
 **§164.308(a)(7)** - Contingency Plan
+
 - Data backup plan
 - Disaster recovery plan
 - Emergency mode operation plan
 
 **§164.308(a)(8)** - Business Associate Contracts
+
 - Written BAA required
 - BAA must require compliance
 
 #### Physical Safeguards
 
 **§164.310(a)(1)** - Facility Access Controls
+
 - Contingency operations
 - Facility security plan
 - Access control and validation procedures
 
 **§164.310(b)** - Workstation Use
+
 - Proper use of workstations
 
 **§164.310(c)** - Workstation Security
+
 - Physical safeguards for workstations
 
 **§164.310(d)** - Device and Media Controls
+
 - Disposal procedures
 - Media re-use procedures
 - Data backup and storage
@@ -299,21 +331,26 @@ SOC2 is based on 5 trust service criteria:
 #### Technical Safeguards
 
 **§164.312(a)(1)** - Access Control
+
 - Unique user identification (R)
 - Emergency access procedure (R)
 - Automatic logoff (A)
 - Encryption and decryption (A)
 
 **§164.312(b)** - Audit Controls (R)
+
 - Hardware, software, and procedural mechanisms to record and examine access
 
 **§164.312(c)** - Integrity (A)
+
 - Mechanism to authenticate PHI not altered or destroyed
 
 **§164.312(d)** - Person or Entity Authentication (R)
+
 - Verify identity before granting access
 
 **§164.312(e)** - Transmission Security (A)
+
 - Integrity controls
 - Encryption
 
@@ -324,6 +361,7 @@ SOC2 is based on 5 trust service criteria:
 **Breach Definition**: Unauthorized acquisition, access, use, or disclosure of PHI that compromises security or privacy
 
 **Notification Requirements**:
+
 1. **Individuals**: Within 60 days
 2. **HHS (OCR)**: Within 60 days
 3. **Media** (if ≥500 individuals in jurisdiction): Without unreasonable delay
@@ -331,12 +369,12 @@ SOC2 is based on 5 trust service criteria:
 
 ### Penalties
 
-| Violation Category | Per Violation | Annual Maximum |
-|--------------------|---------------|----------------|
-| Unknowing | $100-$50,000 | $1.5M |
-| Reasonable cause | $1,000-$50,000 | $1.5M |
-| Willful neglect (corrected) | $10,000-$50,000 | $1.5M |
-| Willful neglect (not corrected) | $50,000 | $1.5M |
+| Violation Category              | Per Violation   | Annual Maximum |
+| ------------------------------- | --------------- | -------------- |
+| Unknowing                       | $100-$50,000    | $1.5M          |
+| Reasonable cause                | $1,000-$50,000  | $1.5M          |
+| Willful neglect (corrected)     | $10,000-$50,000 | $1.5M          |
+| Willful neglect (not corrected) | $50,000         | $1.5M          |
 
 **Criminal penalties** (rare): Up to 10 years imprisonment + fines
 
@@ -364,26 +402,28 @@ SOC2 is based on 5 trust service criteria:
 
 ### Individual Rights
 
-| Right | Article | Description |
-|-------|---------|-------------|
-| **Right to be informed** | Art. 13-14 | Transparency about data processing |
-| **Right of access** | Art. 15 | Confirm processing, access to data |
-| **Right to rectification** | Art. 16 | Correct inaccurate data |
-| **Right to erasure** | Art. 17 | "Right to be forgotten" |
-| **Right to restrict processing** | Art. 18 | Limit how data is used |
-| **Right to data portability** | Art. 20 | Receive data in machine-readable format |
-| **Right to object** | Art. 21 | Object to processing |
-| **Rights related to automated decision-making** | Art. 22 | Not subject to solely automated decisions |
+| Right                                           | Article    | Description                               |
+| ----------------------------------------------- | ---------- | ----------------------------------------- |
+| **Right to be informed**                        | Art. 13-14 | Transparency about data processing        |
+| **Right of access**                             | Art. 15    | Confirm processing, access to data        |
+| **Right to rectification**                      | Art. 16    | Correct inaccurate data                   |
+| **Right to erasure**                            | Art. 17    | "Right to be forgotten"                   |
+| **Right to restrict processing**                | Art. 18    | Limit how data is used                    |
+| **Right to data portability**                   | Art. 20    | Receive data in machine-readable format   |
+| **Right to object**                             | Art. 21    | Object to processing                      |
+| **Rights related to automated decision-making** | Art. 22    | Not subject to solely automated decisions |
 
 ### Security Requirements (Article 32)
 
 **Appropriate technical and organizational measures**:
+
 - Pseudonymization and encryption
 - Ability to ensure confidentiality, integrity, availability, resilience
 - Ability to restore availability after incident
 - Regular testing and evaluation of effectiveness
 
 **Security measures should consider**:
+
 - State of the art
 - Costs of implementation
 - Nature, scope, context, and purposes of processing
@@ -392,10 +432,12 @@ SOC2 is based on 5 trust service criteria:
 ### Data Breach Notification (Articles 33-34)
 
 **Notification to DPA (Article 33)**:
+
 - **Timeline**: Within 72 hours of becoming aware
 - **Content**: Nature of breach, data subjects affected, consequences, measures taken
 
 **Notification to individuals (Article 34)**:
+
 - **When**: If breach likely to result in high risk to rights and freedoms
 - **Timeline**: Without undue delay
 - **Content**: Clear and plain language describing breach and measures
@@ -403,11 +445,13 @@ SOC2 is based on 5 trust service criteria:
 ### Data Protection Impact Assessment (DPIA)
 
 **Required when** (Article 35):
+
 - Systematic and extensive profiling
 - Large-scale processing of special category data
 - Systematic monitoring of publicly accessible areas
 
 **DPIA must include**:
+
 - Description of processing operations and purposes
 - Assessment of necessity and proportionality
 - Assessment of risks
@@ -416,6 +460,7 @@ SOC2 is based on 5 trust service criteria:
 ### Data Protection Officer (DPO)
 
 **Required when** (Article 37):
+
 - Public authority
 - Core activities involve large-scale systematic monitoring
 - Core activities involve large-scale processing of special categories or criminal data
@@ -423,11 +468,13 @@ SOC2 is based on 5 trust service criteria:
 ### Penalties (Article 83)
 
 **Tier 1** (up to €10M or 2% annual global turnover):
+
 - Processor obligations (Art. 28)
 - Data protection by design/default (Art. 25)
 - Security measures (Art. 32)
 
 **Tier 2** (up to €20M or 4% annual global turnover):
+
 - Basic principles (Art. 5)
 - Legal basis (Art. 6)
 - Individual rights (Art. 12-22)
@@ -444,31 +491,35 @@ SOC2 is based on 5 trust service criteria:
 **Governing Body**: California Attorney General
 
 **Applicability** (any of):
+
 - Gross annual revenue >$25M
 - Buy, receive, sell, or share personal information of 50K+ consumers, households, or devices
 - Derive 50%+ annual revenue from selling personal information
 
 ### Consumer Rights
 
-| Right | Description | Response Time |
-|-------|-------------|---------------|
-| **Right to know** | What data is collected, used, shared, sold | 45 days (extendable to 90) |
-| **Right to delete** | Request deletion of personal information | 45 days |
-| **Right to opt-out** | Opt-out of sale of personal information | Immediate |
-| **Right to non-discrimination** | No discrimination for exercising rights | Immediate |
+| Right                           | Description                                | Response Time              |
+| ------------------------------- | ------------------------------------------ | -------------------------- |
+| **Right to know**               | What data is collected, used, shared, sold | 45 days (extendable to 90) |
+| **Right to delete**             | Request deletion of personal information   | 45 days                    |
+| **Right to opt-out**            | Opt-out of sale of personal information    | Immediate                  |
+| **Right to non-discrimination** | No discrimination for exercising rights    | Immediate                  |
 
 ### Business Obligations
 
 **Disclosure Requirements**:
+
 - Privacy policy describing categories of data collected
 - Notice at collection describing purposes
 - "Do Not Sell My Personal Information" link (if selling data)
 
 **Verification**:
+
 - Verify identity of consumer making request
 - Match information provided by consumer to existing data
 
 **Service Providers**:
+
 - Contracts required prohibiting retention, use, or disclosure except for specific business purpose
 
 ### Security Requirements
@@ -476,6 +527,7 @@ SOC2 is based on 5 trust service criteria:
 **Reasonable security procedures and practices** appropriate to nature of personal information
 
 **Safe harbor**: If business implements and maintains reasonable security procedures and practices, not liable for breach if:
+
 - Unauthorized third party breaches
 - Information is encrypted
 
@@ -490,13 +542,13 @@ SOC2 is based on 5 trust service criteria:
 
 ### Control Framework Mapping
 
-| Compliance | Access Control | Encryption | Logging | Backups | Incident Response | Vendor Mgmt |
-|------------|----------------|------------|---------|---------|-------------------|-------------|
-| **SOC2** | ✅ CC6.1 | ✅ CC6.7 | ✅ CC7.2 | ✅ CC6.7 | ✅ CC7.3 | ✅ CC9.2 |
-| **PCI-DSS** | ✅ Req 7-8 | ✅ Req 3-4 | ✅ Req 10 | ✅ Req 9 | ✅ Req 12.10 | ✅ Req 12.8 |
-| **HIPAA** | ✅ §164.312(a) | ✅ §164.312(a)(2)(iv) | ✅ §164.312(b) | ✅ §164.308(a)(7) | ✅ §164.308(a)(6) | ✅ §164.308(b)(1) |
-| **GDPR** | ✅ Art. 32 | ✅ Art. 32(1)(a) | ✅ Art. 5(2) | ✅ Art. 32(1)(c) | ✅ Art. 33-34 | ✅ Art. 28 |
-| **CCPA** | ✅ Reasonable security | ✅ Safe harbor | ✅ Reasonable security | ✅ Reasonable security | ✅ Reasonable security | ✅ Service provider contracts |
+| Compliance  | Access Control         | Encryption            | Logging                | Backups                | Incident Response      | Vendor Mgmt                   |
+| ----------- | ---------------------- | --------------------- | ---------------------- | ---------------------- | ---------------------- | ----------------------------- |
+| **SOC2**    | ✅ CC6.1               | ✅ CC6.7              | ✅ CC7.2               | ✅ CC6.7               | ✅ CC7.3               | ✅ CC9.2                      |
+| **PCI-DSS** | ✅ Req 7-8             | ✅ Req 3-4            | ✅ Req 10              | ✅ Req 9               | ✅ Req 12.10           | ✅ Req 12.8                   |
+| **HIPAA**   | ✅ §164.312(a)         | ✅ §164.312(a)(2)(iv) | ✅ §164.312(b)         | ✅ §164.308(a)(7)      | ✅ §164.308(a)(6)      | ✅ §164.308(b)(1)             |
+| **GDPR**    | ✅ Art. 32             | ✅ Art. 32(1)(a)      | ✅ Art. 5(2)           | ✅ Art. 32(1)(c)       | ✅ Art. 33-34          | ✅ Art. 28                    |
+| **CCPA**    | ✅ Reasonable security | ✅ Safe harbor        | ✅ Reasonable security | ✅ Reasonable security | ✅ Reasonable security | ✅ Service provider contracts |
 
 ---
 
@@ -522,10 +574,7 @@ Use this structure for `compliance-requirements.json`:
         "Vendor risk assessments",
         "Incident response plan"
       ],
-      "gaps": [
-        "Formal vendor management program",
-        "Business continuity testing"
-      ]
+      "gaps": ["Formal vendor management program", "Business continuity testing"]
     },
     {
       "name": "PCI-DSS",

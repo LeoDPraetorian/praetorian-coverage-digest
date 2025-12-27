@@ -13,6 +13,7 @@ allowed-tools: Bash, Grep, Read, TodoWrite
 ## What This Skill Does
 
 Searches for skills by keyword across:
+
 - ✅ Core skills (`.claude/skills/`)
 - ✅ Library skills (`.claude/skill-library/`)
 - ✅ Fuzzy matching on name and description
@@ -28,6 +29,7 @@ Searches for skills by keyword across:
 - Locating skills for reference
 
 **NOT for:**
+
 - Listing all skills (use `listing-skills`)
 - Creating skills (use `creating-skills`)
 - Auditing skills (use `auditing-skills`)
@@ -37,6 +39,7 @@ Searches for skills by keyword across:
 ## Quick Search
 
 **Simple search:**
+
 ```bash
 Grep {
   pattern: "keyword",
@@ -49,10 +52,29 @@ Grep {
 ```
 
 **Enhanced search with scoring:**
+
 1. Name exact match: 100 points
 2. Name substring: 50 points
 3. Description match: 30 points
 4. Path match: 10 points
+
+---
+
+## Step 0: Navigate to Repository Root (MANDATORY)
+
+**Execute BEFORE any search operation:**
+
+```bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+```
+
+**See:** [Repository Root Navigation](references/patterns/repo-root-detection.md)
+
+**⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
+
+**Cannot proceed without navigating to repo root** ✅
 
 ---
 
@@ -106,6 +128,7 @@ Grep {
 ### Step 4: Score and Sort Results
 
 For each match:
+
 - Extract skill name from path
 - Read SKILL.md for description
 - Calculate score
@@ -134,8 +157,9 @@ Found {count} matches
 ## Example Searches
 
 **Search: "react"**
+
 ```
-[CORE] creating-skills (Score: 30)
+[LIB] creating-skills (Score: 30)
   Description mentions React in examples
 
 [LIB] frontend-tanstack-query (Score: 50)
@@ -146,10 +170,11 @@ Found {count} matches
 ```
 
 **Search: "test"**
+
 ```
 [CORE] testing-skills-with-subagents (Score: 100)
 [LIB] frontend-unit-test-engineer (Score: 50)
-[LIB] backend-unit-test-engineer (Score: 50)
+[LIB] backend-tester (Score: 50)
 ```
 
 ---
@@ -165,9 +190,8 @@ Found {count} matches
 The search command is owned by `auditing-skills`:
 
 ```bash
-cd .claude/skill-library/claude/skill-management/auditing-skills/scripts
-npm run search -- "<query>"
-
-# Or from .claude/ root
-cd .claude && npm run search -- "<query>"
+# From anywhere in the repo (uses backticks for Claude Code compatibility)
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT/.claude" && npm run search -- "<query>"
 ```

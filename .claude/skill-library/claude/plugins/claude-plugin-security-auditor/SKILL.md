@@ -7,9 +7,11 @@ allowed-tools: Read, Grep, Bash
 # Plugin Auditor
 
 ## Purpose
+
 Automatically audits Claude Code plugins for security vulnerabilities, best practice violations, CLAUDE.md compliance, and quality standards - optimized for claude-code-plugins repository requirements.
 
 ## Trigger Keywords
+
 - "audit plugin"
 - "security review" or "security audit"
 - "best practices check"
@@ -22,6 +24,7 @@ Automatically audits Claude Code plugins for security vulnerabilities, best prac
 ### 1. Security Audit
 
 **Critical Checks:**
+
 - ❌ No hardcoded secrets (passwords, API keys, tokens)
 - ❌ No AWS keys (AKIA...)
 - ❌ No private keys (BEGIN PRIVATE KEY)
@@ -31,6 +34,7 @@ Automatically audits Claude Code plugins for security vulnerabilities, best prac
 - ❌ No obfuscated code (base64 decode, hex encoding)
 
 **Security Patterns:**
+
 ```bash
 # Check for hardcoded secrets
 grep -r "password\s*=\s*['\"]" --exclude-dir=node_modules
@@ -51,6 +55,7 @@ grep -r "eval\s*\(" --exclude=README.md
 ### 2. Best Practices Audit
 
 **Plugin Structure:**
+
 - ✅ Proper directory hierarchy
 - ✅ Required files present
 - ✅ Semantic versioning (x.y.z)
@@ -60,6 +65,7 @@ grep -r "eval\s*\(" --exclude=README.md
 - ✅ At least 5 keywords
 
 **Code Quality:**
+
 - ✅ No TODO/FIXME without issue links
 - ✅ No console.log() in production code
 - ✅ No hardcoded paths (/home/, /Users/)
@@ -68,6 +74,7 @@ grep -r "eval\s*\(" --exclude=README.md
 - ✅ All scripts are executable
 
 **Documentation:**
+
 - ✅ README has installation section
 - ✅ README has usage examples
 - ✅ README has clear description
@@ -78,6 +85,7 @@ grep -r "eval\s*\(" --exclude=README.md
 ### 3. CLAUDE.md Compliance
 
 **Repository Standards:**
+
 - ✅ Follows plugin structure from CLAUDE.md
 - ✅ Uses correct marketplace slug
 - ✅ Proper category assignment
@@ -86,6 +94,7 @@ grep -r "eval\s*\(" --exclude=README.md
 - ✅ Version consistency
 
 **Skills Compliance (if applicable):**
+
 - ✅ SKILL.md has proper frontmatter
 - ✅ Description includes trigger keywords
 - ✅ allowed-tools specified (if restricted)
@@ -95,6 +104,7 @@ grep -r "eval\s*\(" --exclude=README.md
 ### 4. Marketplace Compliance
 
 **Catalog Requirements:**
+
 - ✅ Plugin listed in marketplace.extended.json
 - ✅ Source path matches actual location
 - ✅ Version matches plugin.json
@@ -105,6 +115,7 @@ grep -r "eval\s*\(" --exclude=README.md
 ### 5. Git Hygiene
 
 **Repository Practices:**
+
 - ✅ No large binary files
 - ✅ No node_modules/ committed
 - ✅ No .env files
@@ -115,16 +126,18 @@ grep -r "eval\s*\(" --exclude=README.md
 ### 6. MCP Plugin Audit (if applicable)
 
 **MCP-Specific Checks:**
+
 - ✅ Valid package.json with @modelcontextprotocol/sdk
 - ✅ TypeScript configured correctly
 - ✅ dist/ in .gitignore
-- ✅ Proper mcp/*.json configuration
+- ✅ Proper mcp/\*.json configuration
 - ✅ Build scripts present
 - ✅ No dependency vulnerabilities
 
 ### 7. Performance Audit
 
 **Efficiency Checks:**
+
 - ✅ No unnecessary file reads
 - ✅ Efficient glob patterns
 - ✅ No recursive loops
@@ -134,6 +147,7 @@ grep -r "eval\s*\(" --exclude=README.md
 ### 8. Accessibility & UX
 
 **User Experience:**
+
 - ✅ Clear error messages
 - ✅ Helpful command descriptions
 - ✅ Proper usage examples
@@ -145,6 +159,7 @@ grep -r "eval\s*\(" --exclude=README.md
 When activated, I will:
 
 1. **Security Scan**
+
    ```bash
    # Run security checks
    grep -r "password\|secret\|api_key" plugins/plugin-name/
@@ -155,6 +170,7 @@ When activated, I will:
    ```
 
 2. **Structure Validation**
+
    ```bash
    # Check required files
    test -f .claude-plugin/plugin.json
@@ -166,6 +182,7 @@ When activated, I will:
    ```
 
 3. **Best Practices Check**
+
    ```bash
    # Check for TODO/FIXME
    grep -r "TODO\|FIXME" --exclude=README.md
@@ -178,6 +195,7 @@ When activated, I will:
    ```
 
 4. **Compliance Verification**
+
    ```bash
    # Check marketplace entry
    jq '.plugins[] | select(.name == "plugin-name")' .claude-plugin/marketplace.extended.json
@@ -273,24 +291,28 @@ Plugin is production-ready with minor improvements needed.
 ## Severity Levels
 
 **Critical (🔴):**
+
 - Security vulnerabilities
 - Hardcoded secrets
 - Dangerous commands
 - Missing required files
 
 **High (🟠):**
+
 - Best practice violations
 - Missing documentation
 - Broken functionality
 - Schema violations
 
 **Medium (🟡):**
+
 - Code quality issues
 - Missing optional features
 - Performance concerns
 - UX improvements
 
 **Low (🟢):**
+
 - Style inconsistencies
 - Minor documentation gaps
 - Nice-to-have features
@@ -298,6 +320,7 @@ Plugin is production-ready with minor improvements needed.
 ## Auto-Fix Capabilities
 
 I can automatically fix:
+
 - ✅ Script permissions
 - ✅ JSON formatting
 - ✅ Markdown formatting
@@ -306,6 +329,7 @@ I can automatically fix:
 ## Repository-Specific Checks
 
 **For claude-code-plugins repo:**
+
 - Validates against CLAUDE.md standards
 - Checks marketplace integration
 - Verifies category structure
@@ -317,6 +341,7 @@ I can automatically fix:
 **User says:** "Audit the security-scanner plugin"
 
 **I automatically:**
+
 1. Run full security scan
 2. Check best practices
 3. Verify CLAUDE.md compliance
@@ -326,6 +351,7 @@ I can automatically fix:
 **User says:** "Is this plugin safe to publish?"
 
 **I automatically:**
+
 1. Security audit (critical)
 2. Marketplace compliance
 3. Quality score calculation
@@ -334,6 +360,7 @@ I can automatically fix:
 **User says:** "Quality review before featured status"
 
 **I automatically:**
+
 1. Full audit (all categories)
 2. Higher quality thresholds
 3. Featured plugin requirements

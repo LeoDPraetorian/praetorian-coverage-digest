@@ -9,31 +9,42 @@ Real examples of UI/UX law violations in Chariot and how to fix them.
 **Laws Violated:** Hick's Law, Miller's Law
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: 12 top-level items (exceeds 7±2 limit)
 const navigation = [
-  'Dashboard', 'Assets', 'Domains', 'IPs', 'Web Apps',
-  'Cloud Resources', 'Vulnerabilities', 'Scans', 'Reports',
-  'Integrations', 'Settings', 'Help'
+  "Dashboard",
+  "Assets",
+  "Domains",
+  "IPs",
+  "Web Apps",
+  "Cloud Resources",
+  "Vulnerabilities",
+  "Scans",
+  "Reports",
+  "Integrations",
+  "Settings",
+  "Help",
 ];
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: 6 top-level items with logical grouping
 const navigation = [
-  { label: 'Dashboard', href: '/dashboard' },
+  { label: "Dashboard", href: "/dashboard" },
   {
-    label: 'Assets',
-    submenu: ['All Assets', 'Domains', 'IPs', 'Web Apps', 'Cloud Resources']
+    label: "Assets",
+    submenu: ["All Assets", "Domains", "IPs", "Web Apps", "Cloud Resources"],
   },
-  { label: 'Vulnerabilities', href: '/vulnerabilities' },
-  { label: 'Scans', href: '/scans' },
-  { label: 'Reports', href: '/reports' },
+  { label: "Vulnerabilities", href: "/vulnerabilities" },
+  { label: "Scans", href: "/scans" },
+  { label: "Reports", href: "/reports" },
   {
-    label: 'More',
-    submenu: ['Integrations', 'Settings', 'Help']
-  }
+    label: "More",
+    submenu: ["Integrations", "Settings", "Help"],
+  },
 ];
 ```
 
@@ -46,6 +57,7 @@ const navigation = [
 **Laws Violated:** Miller's Law, Cognitive Load, Zeigarnik Effect
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: 18 fields on one page
 <form>
@@ -58,6 +70,7 @@ const navigation = [
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Multi-step form with progress
 <MultiStepForm steps={3} current={currentStep}>
@@ -94,6 +107,7 @@ const navigation = [
 **Laws Violated:** Error Prevention (Nielsen #5), Doherty Threshold
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: Validation only on submit
 <form onSubmit={handleSubmit}>
@@ -103,6 +117,7 @@ const navigation = [
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Real-time validation with immediate feedback
 <Input
@@ -130,6 +145,7 @@ const navigation = [
 **Laws Violated:** Fitts' Law
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: 28x28px button (below 44px minimum)
 <Button className="px-2 py-1 text-xs">
@@ -138,6 +154,7 @@ const navigation = [
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: 48x48px minimum (Material Design standard)
 <IconButton
@@ -154,15 +171,17 @@ const navigation = [
 **Laws Violated:** Doherty Threshold, System Status Visibility (Nielsen #1)
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: No feedback on click
 const handleDelete = async () => {
   await deleteAsset(id);
-  toast.success('Deleted');
+  toast.success("Deleted");
 };
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Immediate feedback + optimistic update
 const [isDeleting, setIsDeleting] = useState(false);
@@ -200,6 +219,7 @@ const handleDelete = async () => {
 **Laws Violated:** Miller's Law, Cognitive Load
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: 12 visible columns (exceeds 7 limit)
 <Table columns={[
@@ -210,6 +230,7 @@ const handleDelete = async () => {
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: 6 essential columns + details view
 <Table columns={[
@@ -238,6 +259,7 @@ const handleDelete = async () => {
 **Laws Violated:** Aesthetic & Minimalist Design (Nielsen #8), Cognitive Load
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: 10+ fields in card (information overload)
 <Card>
@@ -249,6 +271,7 @@ const handleDelete = async () => {
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: 3-4 key fields + details link
 <Card>
@@ -279,6 +302,7 @@ const handleDelete = async () => {
 **Laws Violated:** Doherty Threshold, System Status Visibility (Nielsen #1)
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: No loading feedback (users see blank screen)
 function AssetList() {
@@ -288,6 +312,7 @@ function AssetList() {
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Skeleton screen while loading
 function AssetList() {
@@ -313,6 +338,7 @@ function AssetList() {
 **Laws Violated:** Goal Gradient Effect, System Status Visibility
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: No progress indication for 30+ second operation
 const handleBulkScan = async () => {
@@ -323,6 +349,7 @@ const handleBulkScan = async () => {
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Real-time progress updates
 const [progress, setProgress] = useState(0);
@@ -361,6 +388,7 @@ const handleBulkScan = async () => {
 **Laws Violated:** Match System and Real World (Nielsen #2), Help Users Recover (Nielsen #9)
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: Technical jargon, no guidance
 <Alert variant="error">
@@ -369,6 +397,7 @@ const handleBulkScan = async () => {
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Plain language with action
 <Alert variant="error">
@@ -387,6 +416,7 @@ const handleBulkScan = async () => {
 **Laws Violated:** Error Prevention (Nielsen #5)
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: Allows destructive action without confirmation
 <Button onClick={deleteAccount} variant="destructive">
@@ -395,6 +425,7 @@ const handleBulkScan = async () => {
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Confirmation dialog prevents accidents
 <AlertDialog>
@@ -435,12 +466,14 @@ const handleBulkScan = async () => {
 **Laws Violated:** Fitts' Law
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: 32px buttons on mobile (below 48px guideline)
 <Button className="px-3 py-2">Action</Button>
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Responsive sizing (48px mobile, 40px desktop)
 <Button className="px-4 py-3 sm:px-3 sm:py-2 min-h-[48px] sm:min-h-[40px]">
@@ -453,6 +486,7 @@ const handleBulkScan = async () => {
 **Laws Violated:** Fitts' Law
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: Primary action at top of mobile screen
 <header className="fixed top-0">
@@ -461,6 +495,7 @@ const handleBulkScan = async () => {
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Floating action button in thumb zone
 <button
@@ -487,6 +522,7 @@ const handleBulkScan = async () => {
 **Laws Violated:** Gestalt: Proximity, Common Region
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: All fields have same spacing (no grouping)
 <form className="space-y-4">
@@ -498,6 +534,7 @@ const handleBulkScan = async () => {
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Visual grouping with spacing + regions
 <form className="space-y-8">
@@ -522,6 +559,7 @@ const handleBulkScan = async () => {
 **Laws Violated:** Von Restorff Effect
 
 **Example:**
+
 ```typescript
 // ❌ WRONG: Primary CTA looks like secondary button
 <div className="flex gap-2">
@@ -531,6 +569,7 @@ const handleBulkScan = async () => {
 ```
 
 **Fix:**
+
 ```typescript
 // ✅ CORRECT: Primary CTA visually distinct
 <div className="flex gap-2">

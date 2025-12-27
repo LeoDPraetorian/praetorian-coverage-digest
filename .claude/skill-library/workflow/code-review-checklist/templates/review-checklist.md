@@ -43,6 +43,7 @@ Copy this template for use in commit messages or review documentation.
 ### Domain-Specific Checks ✓
 
 **[Go/React/Database/etc]:**
+
 - [ ] [Domain-specific check 1]
 - [ ] [Domain-specific check 2]
 - [ ] [Domain-specific check 3]
@@ -66,11 +67,13 @@ Copy this template for use in commit messages or review documentation.
 **Emergency Context:** [Why emergency review vs. full review]
 
 **Focused Checks (5 minutes):**
+
 - Security implications: [What was checked]
 - Breaking changes: [What else could break]
 - Side effects: [What could go wrong]
 
 **Follow-up Plan:**
+
 - [ ] Comprehensive review scheduled for: [When]
 - [ ] Follow-up ticket created: [Ticket ID]
 - [ ] Specific areas needing deeper review: [List]

@@ -160,6 +160,7 @@ How many fields in the form?
 ### Color Application
 
 **Primary Action:**
+
 - Law: Von Restorff Effect
 - Implementation: Accent color, larger size, unique shape
 
@@ -174,21 +175,23 @@ How many fields in the form?
 ```
 
 **Status Communication:**
+
 - Law: Aesthetic-Usability Effect + Similarity
 - Implementation: Consistent color coding
 
 ```typescript
 const statusColors = {
-  success: 'bg-green-100 text-green-700',
-  warning: 'bg-yellow-100 text-yellow-700',
-  error: 'bg-red-100 text-red-700',
-  info: 'bg-blue-100 text-blue-700'
+  success: "bg-green-100 text-green-700",
+  warning: "bg-yellow-100 text-yellow-700",
+  error: "bg-red-100 text-red-700",
+  info: "bg-blue-100 text-blue-700",
 };
 ```
 
 ### Layout Hierarchy
 
 **Apply Gestalt principles:**
+
 1. **Proximity:** Group related elements (12-16px gaps within, 32-48px between)
 2. **Similarity:** Consistent styling for related actions
 3. **Common Region:** Cards/boxes for grouped content
@@ -224,13 +227,13 @@ const statusColors = {
 
 **Apply Doherty Threshold + Goal Gradient:**
 
-| Operation | Target | Implementation |
-|-----------|--------|----------------|
-| Button click | <100ms | Optimistic updates, `useOptimistic` |
-| Page navigation | <400ms | Prefetch, skeleton screens |
-| Form submission | <1s | Loading spinner, progress bar |
-| File upload | Variable | Progress bar with percentage |
-| Long operation (>3s) | N/A | Progress + time estimate |
+| Operation            | Target   | Implementation                      |
+| -------------------- | -------- | ----------------------------------- |
+| Button click         | <100ms   | Optimistic updates, `useOptimistic` |
+| Page navigation      | <400ms   | Prefetch, skeleton screens          |
+| Form submission      | <1s      | Loading spinner, progress bar       |
+| File upload          | Variable | Progress bar with percentage        |
+| Long operation (>3s) | N/A      | Progress + time estimate            |
 
 ### Implementation
 

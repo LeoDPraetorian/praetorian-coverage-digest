@@ -13,6 +13,7 @@ allowed-tools: Read, Write, Edit, TodoWrite, Glob, Grep
 From Anthropic's research on long-running agents: "External memory via 'scratchpad' files enables agents to maintain continuity across context windows and sessions."
 
 Progress persistence is NOT optional for complex orchestrations. Without it:
+
 - Context exhaustion loses all state
 - Session interruptions require restart from scratch
 - Multi-agent coordination context disappears
@@ -23,6 +24,7 @@ Progress persistence is NOT optional for complex orchestrations. Without it:
 **MUST use TodoWrite BEFORE starting any persistence workflow.**
 
 Progress file management involves multiple steps (check, create, update, cleanup). Without TodoWrite tracking:
+
 - Steps get skipped under time pressure
 - Cleanup is forgotten after completion
 - Resume protocol steps are missed
@@ -32,6 +34,7 @@ Progress file management involves multiple steps (check, create, update, cleanup
 ## When to Use Progress Files
 
 **Create progress files when:**
+
 - Task spans 3+ phases (architecture + implementation + testing)
 - Task may exceed context window (~100k tokens of work)
 - Task may be interrupted (long implementation, user breaks)
@@ -39,6 +42,7 @@ Progress file management involves multiple steps (check, create, update, cleanup
 - Orchestrator is coordinating sequential/parallel phases
 
 **Skip progress files when:**
+
 - Simple single-phase task
 - Task completes in one interaction
 - No agent coordination needed
@@ -46,13 +50,13 @@ Progress file management involves multiple steps (check, create, update, cleanup
 
 ## Quick Reference
 
-| Lifecycle Stage | Action | Location |
-|-----------------|--------|----------|
-| Start orchestration | Create progress file | `.claude/progress/<domain>-<feature>.md` |
-| After each phase | Update completed phases + agent outputs | Same file |
-| On blocker | Document blocker + context | Same file |
-| On completion | Mark complete, archive or delete | Move to `archived/` or delete |
-| On session resume | Read file, restore context, continue | From current phase |
+| Lifecycle Stage     | Action                                  | Location                                 |
+| ------------------- | --------------------------------------- | ---------------------------------------- |
+| Start orchestration | Create progress file                    | `.claude/progress/<domain>-<feature>.md` |
+| After each phase    | Update completed phases + agent outputs | Same file                                |
+| On blocker          | Document blocker + context              | Same file                                |
+| On completion       | Mark complete, archive or delete        | Move to `archived/` or delete            |
+| On session resume   | Read file, restore context, continue    | From current phase                       |
 
 ## Progress File Location
 
@@ -66,6 +70,7 @@ Examples:
 ```
 
 **Directory structure:**
+
 ```
 .claude/progress/
 ├── frontend-asset-filtering.md    # Active orchestrations
@@ -76,11 +81,13 @@ Examples:
 
 ## Progress File Structure
 
-```markdown
+````markdown
 # Orchestration: <Feature Name>
 
 ## Status: in_progress | complete | blocked
+
 ## Started: <ISO timestamp>
+
 ## Last Updated: <ISO timestamp>
 
 ## Overview
@@ -104,7 +111,7 @@ Brief description of what this orchestration is accomplishing.
 ## Current Phase
 
 - [ ] **Phase 3: Testing** - <what's in progress>
-  - Agent: backend-unit-test-engineer (in progress)
+  - Agent: backend-tester (in progress)
   - Started: <timestamp>
   - Notes: [any context]
 
@@ -120,20 +127,24 @@ Brief description of what this orchestration is accomplishing.
 Critical information needed to resume from current phase:
 
 ### Architecture Decisions
+
 - Pattern: [chosen pattern]
 - Database: [schema decisions]
 - API: [endpoint design]
 
 ### Key File Paths
+
 - Handler: pkg/handler/handlers/asset/create.go
 - Service: pkg/service/asset/service.go
 - Tests: pkg/handler/handlers/asset/create_test.go
 
 ### Dependencies
+
 - Depends on: [services/features]
 - Blocks: [downstream work]
 
 ### Blockers
+
 - None currently
 - OR: Waiting for [specific thing]
 
@@ -142,6 +153,7 @@ Critical information needed to resume from current phase:
 ## Agent Outputs
 
 ### <agent-name> (completed)
+
 ```json
 {
   "status": "complete",
@@ -149,8 +161,10 @@ Critical information needed to resume from current phase:
   "files_created": [...]
 }
 ```
+````
 
 ### <agent-name> (in_progress)
+
 ```json
 {
   "status": "in_progress",
@@ -163,6 +177,7 @@ Critical information needed to resume from current phase:
 ## Error Log
 
 ### <timestamp> - <Error Type>
+
 - Phase: [phase name]
 - Agent: [agent name]
 - Error: [description]
@@ -173,10 +188,12 @@ Critical information needed to resume from current phase:
 ## Notes
 
 Additional context for future sessions:
+
 - User preferences
 - Constraints discovered
 - Performance targets
-```
+
+````
 
 See [references/file-templates.md](references/file-templates.md) for minimal and detailed templates.
 
@@ -188,7 +205,7 @@ See [references/file-templates.md](references/file-templates.md) for minimal and
 
 ```bash
 ls .claude/progress/*.md 2>/dev/null
-```
+````
 
 **If progress file exists:**
 
@@ -227,6 +244,7 @@ ls .claude/progress/*.md 2>/dev/null
 ## Integration with TodoWrite
 
 Progress files complement TodoWrite:
+
 - **TodoWrite**: Real-time task tracking within session
 - **Progress file**: Cross-session persistence
 
@@ -260,20 +278,25 @@ For 3-4 phase orchestrations:
 # Orchestration: <Feature Name>
 
 ## Status: in_progress
+
 ## Last Updated: <timestamp>
 
 ## Completed
+
 - [x] Architecture - Tier 2 component pattern
 - [x] Implementation - AssetFilter.tsx created
 
 ## Current
+
 - [ ] Testing - Unit tests in progress
 
 ## Context
+
 - Component: src/sections/assets/components/AssetFilter.tsx
 - API: GET /my?resource=asset&status=...
 
 ## Agent Output (latest)
+
 {last agent's JSON output}
 ```
 
@@ -286,6 +309,7 @@ For 5+ phase orchestrations with multiple agents, use the full template from the
 ### Creation Triggers
 
 Create progress file when:
+
 - Starting orchestration with 3+ phases
 - User explicitly requests progress tracking
 - Task estimated to exceed context window
@@ -294,6 +318,7 @@ Create progress file when:
 ### Update Triggers
 
 Update progress file:
+
 - After each agent completes
 - When blockers encountered
 - When scope changes
@@ -303,11 +328,13 @@ Update progress file:
 ### Cleanup Triggers
 
 **Archive (keep for reference):**
+
 - Similar task may occur again
 - Contains valuable architecture decisions
 - User requests retention
 
 **Delete:**
+
 - Simple task with no reference value
 - Information captured elsewhere (PR, commit)
 - User requests deletion

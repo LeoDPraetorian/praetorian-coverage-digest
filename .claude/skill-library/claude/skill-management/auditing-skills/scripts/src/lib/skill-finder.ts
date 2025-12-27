@@ -44,6 +44,51 @@ export function findSkill(name: string): SkillInfo | null {
 }
 
 /**
+ * Calculate Levenshtein distance between two strings
+ */
+function levenshteinDistance(a: string, b: string): number {
+  const matrix: number[][] = [];
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+/**
+ * Find skills similar to the given name (for "did you mean?" suggestions)
+ */
+export function findSimilarSkills(name: string, maxSuggestions: number = 3): SkillInfo[] {
+  const allSkills = listAllSkills();
+  const scored = allSkills.map(skill => ({
+    skill,
+    distance: levenshteinDistance(name.toLowerCase(), skill.name.toLowerCase()),
+  }));
+
+  // Sort by distance and filter to reasonable matches (distance < 5)
+  return scored
+    .filter(s => s.distance < 5 && s.distance > 0)
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, maxSuggestions)
+    .map(s => s.skill);
+}
+
+/**
  * Recursively search library for skill by name
  */
 function findInLibrary(name: string, searchDir: string = LIBRARY_SKILLS_DIR): SkillInfo | null {

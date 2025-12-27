@@ -1,0 +1,28 @@
+# Changelog
+
+## [Date: 2025-12-23]
+
+### Added
+- New section "Code Structure Standards" after Overview section
+- Reference file `references/code-structure-standards.md` with detailed patterns:
+  - Import Order (Strict) - 4 groups with blank line separation
+  - File Length Limits (Hard) - Components <300, Functions <30, Hooks <50
+  - Component Internal Structure - Mandatory ordering of types, constants, hooks
+- Quick reference table in SKILL.md summarizing standards
+
+### Changed
+- SKILL.md updated from 419 to 439 lines (added 20 lines for summary section)
+- Content organized using progressive disclosure (detailed patterns in reference file)
+
+### Reason
+- Gap identified: Skill covered file/directory organization but lacked code-level structure standards
+- Developers needed guidance on import order, file length limits, and component internal structure
+- Adding inline would exceed 500 line hard limit (419 + 90 = ~509)
+- Solution: Extract detailed content to reference, keep concise summary in main skill
+
+### REFACTOR Phase
+- Verified discoverability: Section appears early with clear heading and table
+- Verified actionability: Hard limits stated explicitly with violation examples
+- Verified bypass resistance: "Hard limits" and "mandatory" language used
+- No significant bypass risks for content addition (vs rule modification)
+- Conclusion: PASSED

@@ -1,0 +1,21 @@
+{
+  "name": "chariot-development-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chariot Development Platform - Super-repository for unified development",
+  "scripts": {
+    "format:md": "prettier '**/*.md' --write --ignore-path .gitignore",
+    "format:md:check": "prettier '**/*.md' --check --ignore-path .gitignore",
+    "format:md:docs": "prettier 'docs/**/*.md' --write",
+    "format:md:claude": "prettier 'CLAUDE.md' '.claude/**/*.md' --write"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  },
+  "keywords": [
+    "chariot",
+    "security",
+    "attack-surface-management"
+  ],
+  "license": "MIT"
+}

@@ -11,23 +11,25 @@
 ## Analysis
 
 ### Explicit Request
+
 - Fix bug where search box doesn't clear on reset click
 
 ### Scope Boundaries
 
-| Change | In Scope? | Reasoning |
-|--------|-----------|-----------|
-| Clear search box on reset | ✅ Yes | Explicitly requested |
-| Clear filter dropdowns | ❌ No | Not mentioned |
-| Reset pagination | ❌ No | Not mentioned |
-| Add animation to clear | ❌ No | Not mentioned |
-| Refactor reset logic | ❌ No | Not mentioned |
-| Add tests for reset | ❌ No | Not mentioned |
-| Fix styling of reset button | ❌ No | Not mentioned |
+| Change                      | In Scope? | Reasoning            |
+| --------------------------- | --------- | -------------------- |
+| Clear search box on reset   | ✅ Yes    | Explicitly requested |
+| Clear filter dropdowns      | ❌ No     | Not mentioned        |
+| Reset pagination            | ❌ No     | Not mentioned        |
+| Add animation to clear      | ❌ No     | Not mentioned        |
+| Refactor reset logic        | ❌ No     | Not mentioned        |
+| Add tests for reset         | ❌ No     | Not mentioned        |
+| Fix styling of reset button | ❌ No     | Not mentioned        |
 
 ## Temptations (Rationalizations)
 
 ### Temptation 1: "Clear filters too"
+
 **Thought**: "The reset button should probably clear the filters as well, not just search."
 
 **Rationalization**: "It's called 'reset' so it should reset everything."
@@ -39,6 +41,7 @@
 ---
 
 ### Temptation 2: "Add smooth animation"
+
 **Thought**: "I'll add a fade-out animation when the search clears for better UX."
 
 **Rationalization**: "It's just CSS, adds polish."
@@ -50,6 +53,7 @@
 ---
 
 ### Temptation 3: "Refactor reset logic"
+
 **Thought**: "The reset handler is messy, I'll refactor it while I'm here."
 
 **Rationalization**: "Code quality matters, and I'm already in this file."
@@ -61,6 +65,7 @@
 ---
 
 ### Temptation 4: "Fix button styling"
+
 **Thought**: "The reset button styling is inconsistent with other buttons."
 
 **Rationalization**: "It's a quick fix, and it improves consistency."
@@ -89,7 +94,7 @@ const handleReset = () => {
 // Fixed code
 const handleReset = () => {
   setFilters({});
-  setSearchQuery(''); // FIX: Clear search box
+  setSearchQuery(""); // FIX: Clear search box
 };
 ```
 
@@ -131,7 +136,7 @@ Let me know if any of these should be addressed.
 // DON'T DO THIS - scope creep
 const handleReset = () => {
   // ✅ Requested: Clear search
-  setSearchQuery('');
+  setSearchQuery("");
 
   // ❌ NOT requested: Clear filters
   setFilters({});
@@ -144,11 +149,12 @@ const handleReset = () => {
   setTimeout(() => setClearAnimation(false), 300);
 
   // ❌ NOT requested: Track analytics
-  trackEvent('search_reset');
+  trackEvent("search_reset");
 };
 ```
 
 **Why this is wrong**:
+
 - 1 requested change became 5 changes
 - User asked for search fix, got behavior changes they didn't ask for
 - More code = more review time, more potential bugs
@@ -165,7 +171,7 @@ const handleReset = () => {
 
 // After (WRONG - refactored everything)
 const useResetHandler = () => {
-  const resetSearch = useCallback(() => setSearchQuery(''), []);
+  const resetSearch = useCallback(() => setSearchQuery(""), []);
   const resetFilters = useCallback(() => setFilters({}), []);
   const resetPagination = useCallback(() => setCurrentPage(1), []);
 
@@ -178,6 +184,7 @@ const useResetHandler = () => {
 ```
 
 **Why this is wrong**:
+
 - User asked to fix bug (search not clearing)
 - You refactored the entire reset system
 - Original bug fix is hidden in refactoring
@@ -186,12 +193,14 @@ const useResetHandler = () => {
 ## Correct Flow
 
 ### 1. Parse Request
+
 ```
 User wants: Search box to clear on reset button click
 User did NOT ask for: Anything else
 ```
 
 ### 2. Identify Changes
+
 ```
 In Scope:
 ✅ Clear search box on reset click
@@ -206,12 +215,14 @@ Out of Scope (require asking):
 ```
 
 ### 3. Implement Minimal Fix
+
 ```typescript
 // One line added
-setSearchQuery('');
+setSearchQuery("");
 ```
 
 ### 4. Report
+
 ```
 Fixed: Search box clears on reset
 Noticed: [List opportunities]
@@ -221,12 +232,14 @@ Question: Should any of these be addressed?
 ## Lessons
 
 ### ✅ Do This
+
 1. Fix exactly what was requested
 2. Note other opportunities
 3. Ask before expanding scope
 4. Keep fix minimal and focused
 
 ### ❌ Don't Do This
+
 1. Assume user wants more than they asked for
 2. "Improve" things while you're there
 3. Bundle multiple changes together
@@ -235,12 +248,14 @@ Question: Should any of these be addressed?
 ## The Payoff
 
 **With YAGNI discipline:**
+
 - User gets working fix quickly
 - One-line change, easy to review
 - No unexpected behavior changes
 - User can request additional work if desired
 
 **Without YAGNI discipline:**
+
 - User waits longer for complex change
 - Large PR, hard to review
 - Unexpected behavior (filters clearing, animations, etc.)

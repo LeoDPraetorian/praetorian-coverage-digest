@@ -9,12 +9,15 @@
 ## Initial Attempt: GREEN Fails
 
 ### RED Phase (completed)
+
 **Gap**: No agent for security analysis
 **Scenario**: "Analyze authentication flow for security vulnerabilities"
 **Failure**: Claude provides generic OWASP checklist, misses platform-specific issues
 
 ### Creation Phases (completed)
+
 Agent created successfully:
+
 - Type: analysis
 - Tools, skills, configuration correct
 - File: `.claude/agents/analysis/security-analysis-expert.md` (243 lines)
@@ -22,6 +25,7 @@ Agent created successfully:
 ### GREEN Test (FAILED)
 
 **Spawned agent**:
+
 ```
 Task({
   subagent_type: "security-analysis-expert",
@@ -30,14 +34,17 @@ Task({
 ```
 
 **Agent response**:
+
 > "I'll analyze for common vulnerabilities:
+>
 > - SQL injection: N/A (using DynamoDB)
 > - XSS: N/A (backend only)
 > - CSRF: Need to check token validation
-> ...
-> Generic OWASP checklist applied."
+>   ...
+>   Generic OWASP checklist applied."
 
 **Evaluation**: ❌ **FAIL**
+
 - Agent gave generic analysis (same as baseline without agent)
 - Missed Chariot-specific patterns (Cognito JWT validation)
 - Didn't use platform context (DynamoDB access patterns)
@@ -87,19 +94,22 @@ Task({
 **Edit agent file**:
 
 **Added to Skill References**:
+
 ```markdown
-| Task | Skill to Read |
-|------|---------------|
-| Cognito patterns | `.claude/skill-library/security/auth/chariot-cognito-patterns/SKILL.md` |
-| DynamoDB security | `.claude/skill-library/security/database/dynamodb-security/SKILL.md` |
-| API Gateway auth | `.claude/skill-library/security/api/api-gateway-security/SKILL.md` |
+| Task              | Skill to Read                                                           |
+| ----------------- | ----------------------------------------------------------------------- |
+| Cognito patterns  | `.claude/skill-library/security/auth/chariot-cognito-patterns/SKILL.md` |
+| DynamoDB security | `.claude/skill-library/security/database/dynamodb-security/SKILL.md`    |
+| API Gateway auth  | `.claude/skill-library/security/api/api-gateway-security/SKILL.md`      |
 ```
 
 **Added to Critical Rules**:
+
 ```markdown
 ### Chariot-Specific Security Checks
 
 For authentication flows, MUST check:
+
 - Cognito JWT validation (signature, expiration, claims)
 - DynamoDB IAM policies (least privilege)
 - API Gateway authorizer configuration
@@ -110,6 +120,7 @@ NOT generic OWASP checklist - platform-specific analysis required.
 ```
 
 **Added Security Analysis Methodology**:
+
 ```markdown
 ### Threat Modeling Process
 
@@ -127,6 +138,7 @@ NOT generic OWASP checklist - platform-specific analysis required.
 ## Re-Test: GREEN (Second Attempt)
 
 **Spawned agent again** (same RED scenario):
+
 ```
 Task({
   subagent_type: "security-analysis-expert",
@@ -135,6 +147,7 @@ Task({
 ```
 
 **Agent response** (after edits):
+
 > "I'll analyze Chariot's authentication flow using platform-specific security patterns.
 >
 > Reading Chariot security skills...
@@ -142,15 +155,14 @@ Task({
 > [Reads chariot-cognito-patterns skill]
 >
 > Analysis:
+>
 > 1. Cognito JWT validation:
 >    - ✅ Signature verified using AWS public keys
 >    - ✅ Expiration checked
 >    - ⚠️ Custom claims not validated (risk: claim injection)
->
 > 2. DynamoDB IAM policies:
 >    - ✅ Least privilege applied
 >    - ✅ Row-level security via conditions
->
 > 3. API Gateway authorization:
 >    - ⚠️ Authorizer caching set to 5 min (risk: revoked tokens cached)
 >
@@ -159,6 +171,7 @@ Task({
 > Recommendations: [specific fixes]"
 
 **Evaluation**: ✅ **PASS**
+
 - Used platform-specific skills (Cognito patterns)
 - Found Chariot-specific issues (claim injection, caching)
 - Not generic OWASP (addressed RED failure)
@@ -171,12 +184,14 @@ Task({
 ### 1. Analyze WHY It Failed
 
 **Ask**:
+
 - Did agent use expected tools/skills?
 - Did agent follow expected workflow?
 - Did agent avoid RED failures?
 - What's missing from agent that caused failure?
 
 **For our example**:
+
 - Missing: Chariot security context
 - Missing: Platform-specific skill references
 - Missing: Detailed methodology
@@ -185,12 +200,12 @@ Task({
 
 **Possible causes**:
 
-| If GREEN failed because... | Go back to... |
-|----------------------------|---------------|
-| Agent type wrong (architecture when need development) | Phase 3 (Type Selection) |
-| Missing tools (need Task but don't have it) | Phase 4 (Configuration) |
-| Template doesn't fit needs | Phase 5 (Generation - customize template more) |
-| **Missing content/rules/skills** | **Phase 6 (Content Population) ← Most common** |
+| If GREEN failed because...                            | Go back to...                                  |
+| ----------------------------------------------------- | ---------------------------------------------- |
+| Agent type wrong (architecture when need development) | Phase 3 (Type Selection)                       |
+| Missing tools (need Task but don't have it)           | Phase 4 (Configuration)                        |
+| Template doesn't fit needs                            | Phase 5 (Generation - customize template more) |
+| **Missing content/rules/skills**                      | **Phase 6 (Content Population) ← Most common** |
 
 **Our example**: Phase 6 (needed more content)
 
@@ -201,6 +216,7 @@ Task({
 **Do**: Add specific missing elements
 
 **Our changes**:
+
 - Added: 3 skill references
 - Added: Chariot security checks
 - Added: Threat modeling methodology
@@ -229,6 +245,7 @@ Task({
 **Problem**: 5+ iterations
 
 **If 3+ iterations**:
+
 - Reconsider agent type (maybe wrong type for task?)
 - Reconsider agent scope (maybe too broad or too narrow?)
 - Review RED scenario (maybe scenario doesn't match agent purpose?)
@@ -242,12 +259,15 @@ Task({
 ### Why Complex Agents Have More Loopholes
 
 **Simple agent** (python-developer):
+
 - 1 loophole: Sunk cost on argparse
 
 **Complex agent** (hierarchical-coordinator):
+
 - 3 loopholes: Skip planning, delegate to wrong agents, accept partial results
 
 **Why?**
+
 - More judgment calls in orchestration
 - More steps where shortcuts seem reasonable
 - More pressure types apply

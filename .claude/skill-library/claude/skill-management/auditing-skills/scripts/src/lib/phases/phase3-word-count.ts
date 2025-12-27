@@ -12,11 +12,11 @@ import type { SkillFile, Issue, PhaseResult, SkillType } from '../types.js';
 import { SkillParser } from '../utils/skill-parser.js';
 
 export class Phase3WordCount {
-  // Reasoning Skills (process-heavy, Claude is the engine)
-  static readonly REASONING_OPTIMAL_MIN = 1000;
-  static readonly REASONING_OPTIMAL_MAX = 2000;
-  static readonly REASONING_CRITICAL_MAX = 2500;
-  static readonly REASONING_WARNING_MIN = 800;
+  // Reasoning Skills (progressive disclosure: lean SKILL.md + references/)
+  static readonly REASONING_OPTIMAL_MIN = 200;
+  static readonly REASONING_OPTIMAL_MAX = 400;
+  static readonly REASONING_CRITICAL_MAX = 600;
+  static readonly REASONING_WARNING_MIN = 150;
 
   // Tool Wrapper Skills (CLI-driven, Claude just executes)
   static readonly TOOL_WRAPPER_OPTIMAL_MIN = 200;
@@ -67,43 +67,31 @@ export class Phase3WordCount {
 
   /**
    * Validate word count for a single skill
+   * Returns consolidated issues with recommendation and context embedded
    */
   static async validate(skill: SkillFile): Promise<Issue[]> {
     const issues: Issue[] = [];
     const { wordCount, skillType } = skill;
     const thresholds = this.getThresholds(skillType);
-
-    // Add INFO message about detected type
-    issues.push({
-      severity: 'INFO',
-      message: `Skill type: ${skillType} (${thresholds.optimalMin}-${thresholds.optimalMax} words optimal)`,
-      autoFixable: false,
-    });
+    const typeContext = `Skill type: ${skillType} (${thresholds.optimalMin}-${thresholds.optimalMax} words optimal)`;
 
     // Critical: Way too long (needs progressive disclosure)
     if (wordCount > thresholds.criticalMax) {
-      issues.push({
-        severity: 'CRITICAL',
-        message: `SKILL.md is ${wordCount} words (>${thresholds.criticalMax} limit for ${skillType} skills)`,
-        autoFixable: false,
-      });
-
       // Check if references/ directory exists
       const hasReferences = await this.directoryExists(
         path.join(skill.directory, 'references')
       );
 
+      const context = [typeContext];
       if (!hasReferences) {
-        issues.push({
-          severity: 'WARNING',
-          message: 'Oversized skill without references/ directory - needs progressive disclosure',
-          autoFixable: false,
-        });
+        context.push('No references/ directory exists - needs progressive disclosure');
       }
 
       issues.push({
-        severity: 'INFO',
-        message: 'Extract detailed sections to references/ directory',
+        severity: 'CRITICAL',
+        message: `SKILL.md is ${wordCount} words (>${thresholds.criticalMax} limit for ${skillType} skills)`,
+        recommendation: 'Extract detailed sections to references/ directory',
+        context,
         autoFixable: false,
       });
 
@@ -115,14 +103,10 @@ export class Phase3WordCount {
       issues.push({
         severity: 'WARNING',
         message: `SKILL.md is ${wordCount} words (target: ${thresholds.optimalMin}-${thresholds.optimalMax} for ${skillType} skills)`,
-        autoFixable: false,
-      });
-
-      issues.push({
-        severity: 'INFO',
-        message: skillType === 'tool-wrapper'
+        recommendation: skillType === 'tool-wrapper'
           ? 'Tool wrappers should be concise - logic belongs in scripts'
           : 'Consider extracting detailed content to references/',
+        context: [typeContext],
         autoFixable: false,
       });
 
@@ -134,29 +118,17 @@ export class Phase3WordCount {
       issues.push({
         severity: 'WARNING',
         message: `SKILL.md is ${wordCount} words (target: ${thresholds.optimalMin}-${thresholds.optimalMax} for ${skillType} skills)`,
-        autoFixable: false,
-      });
-
-      issues.push({
-        severity: 'INFO',
-        message: skillType === 'tool-wrapper'
+        recommendation: skillType === 'tool-wrapper'
           ? 'Add troubleshooting section for common CLI errors'
           : 'Add examples, troubleshooting, or reference documentation',
+        context: [typeContext],
         autoFixable: false,
       });
 
       return issues;
     }
 
-    // Info: Slightly outside optimal range
-    if (wordCount < thresholds.optimalMin || wordCount > thresholds.optimalMax) {
-      issues.push({
-        severity: 'INFO',
-        message: `Word count ${wordCount} (optimal for ${skillType}: ${thresholds.optimalMin}-${thresholds.optimalMax})`,
-        autoFixable: false,
-      });
-    }
-
+    // No issues - skill is in optimal range or close enough
     return issues;
   }
 

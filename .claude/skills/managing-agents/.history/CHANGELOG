@@ -1,3 +1,98 @@
+- **2025-12-27**: ANTI-PATTERN: Add Skill tool requirement to Common Anti-Patterns section
+
+### Added
+- **Anti-pattern entry** - "Agent has skills but no Skill tool" with reference to compliance contract Section 12
+- **Router documentation** - Brief one-liner directing users to detailed rules in agent-compliance-contract.md
+
+### Reason
+- **Completes update cycle** - All 5 files updated (compliance, audit, fix, create, update) + router docs
+- **User awareness** - Router-level visibility ensures users know this rule exists
+- **Brief reference** - Keeps router lean, detailed rules stay in compliance contract
+
+### Impact
+- **Discovery** - Users see anti-pattern when reading managing-agents skill
+- **Navigation** - Clear pointer to Section 12 for detailed rules
+- **Consistency** - Anti-pattern format matches existing entries
+
+---
+
+- **2025-12-27**: COMPLIANCE CONTRACT: Add Section 12 "Tool Requirements Based on Frontmatter" - Skill tool requirement rule
+
+### Added
+- **Section 12** - New compliance rule: "If skills: field has values → Skill tool MUST be in tools: list"
+- **Why Critical** - Core skills in frontmatter require Skill tool to invoke via `skill: "name"` syntax
+- **Gold Standard** - Reference to frontend-developer.md line 5 as correct pattern
+- **Examples** - CORRECT vs BROKEN patterns showing tools/skills relationship
+- **Impact Documentation** - Lists 4 currently broken agents (backend-architect, security-architect, backend-developer, backend-reviewer)
+- **Validation Reference** - Points to Phase 3 Tool Validation in auditing-agents workflow
+- **Quick Validation Checklist** - Added "Skill tool: Present when skills: field has values (Section 12)" at line 312
+
+### Changed
+- **Section numbering** - Previous "11. Anti-Patterns" becomes "11. Anti-Patterns" (section 12 inserted before it)
+- **Checklist order** - Skill tool check added after "Tools/skills: Alphabetized" for logical flow
+
+### Reason
+- **Audit Gap** - Phase 3 Tool Validation was NOT checking this requirement
+- **Widespread Impact** - 4+ agents currently broken (have skills but no Skill tool)
+- **Runtime Failure** - Without Skill tool, agents cannot execute `skill: "name"` invocations
+- **Gold Standard** - frontend-developer.md shows this is mandatory pattern
+
+### Impact
+- **Auditing** - Phase 3 must be updated to check this rule (auditing-agents/workflow-manual-checks.md)
+- **Fixing** - Fix procedures must handle missing Skill tool (fixing-agents/fix-procedures.md)
+- **Creating** - Validation must check Skill tool when skills present (creating-agents)
+- **Updating** - Post-edit validation must check Skill tool (updating-agents)
+- **Current Agents** - 4+ agents need Skill tool added to tools list
+
+---
+
+- **2025-12-27**: GATEWAY PATTERN: Reduce to <105 lines with decision tree and anti-patterns
+
+### Changed
+- **Line count** - Reduced from 215 to 103 lines (52% reduction)
+- **Structure** - Gateway-frontend pattern: Decision tree + Anti-patterns + Router table
+- **Decision tree** - ASCII tree showing "What do you need?" with operation routing
+- **Anti-patterns** - <EXTREMELY_IMPORTANT> section with ❌/✅ examples
+- **Troubleshooting** - 5 common issues with solutions
+- **Pure router** - Zero business logic, only delegation
+
+### Added
+- Quick Decision Guide with ASCII decision tree
+- <EXTREMELY_IMPORTANT> anti-patterns section (5 examples)
+- Troubleshooting section (5 common issues)
+- Router table (9 operations → library skills)
+
+### Removed
+- Verbose operation descriptions
+- Inline How Routing Works section (obvious from table)
+- Time estimates from quick reference (moved to router table)
+- Extensive explanations (references handle details)
+
+### Reason
+- **Gateway alignment**: Matches gateway-frontend pattern with decision tree
+- **Scannable**: Quick Decision Guide shows all paths at a glance
+- **Visual learning**: ❌/✅ examples teach correct invocation
+- **Troubleshooting**: Addresses 5 most common issues
+- **Pure router**: Emphasizes delegation, no embedded logic
+
+### Impact
+- Leanest router at 103 lines
+- Decision tree makes routing obvious
+- Anti-patterns prevent common mistakes
+- Troubleshooting reduces support questions
+- Pattern established for other routers
+
+---
+
+- **2025-12-27**: Add table-formatting.md cross-cutting reference. Added new "Cross-Cutting Concerns" subsection after Operations table with link to [Table formatting](references/table-formatting.md) - Prettier-based table validation that applies to creating-agents, updating-agents, auditing-agents, and fixing-agents. This helps users discover table formatting requirements when working with agent tables. Change prompted by need to improve discoverability of table formatting patterns that were previously only documented in individual operation skills.
+
+- **2025-12-25**: Update audit references to use "Phase 0" terminology. Updated SKILL.md Quick Reference table: Audit row Time column now says "30-60 sec (Phase 0)", Purpose column says "Structural/lint validation (Phase 0 automated, Phases 1-18 manual)". Updated audit-vs-test.md: renamed "Audit (Structural)" to "Phase 0 (Audit)", updated comparison table to clarify Phase 0 (automated via audit-critical.ts) vs Phases 1-18 (manual via LLM reasoning), updated analogy. Updated audit-workflow.md: Overview mentions Phase 0 followed by Phases 1-18, added separate sections for Phase 0 and Phases 1-18 checks, updated comparison table, updated time estimates. This aligns with auditing-agents skill update to use consistent "Phase 0" terminology throughout.
+
+- **2025-12-25**: Add Key Principle #9 for skills_read output (Phase 5.3). Added "skills_read Output - All agents must include skills_read array in JSON output for auditability" as 9th principle. Note: Output format in Claude 4.5+ Template section (line 539) already had skills_read from Phase 5.2, so only Key Principles update was needed. This COMPLETES AGENT-UPDATE-NEW-PROMPT.md migration plan - all 15 prompts now executed (100%). Claude 4.5+ pattern migration complete.
+
+- **2025-12-25**: Update "Lean Agent Pattern" section for Claude 4.5+ template (Phase 5.2). Replace "Required Sections" heading with "Claude 4.5+ Template (RECOMMENDED)" showing complete agent structure with Tiered Skill Loading Protocol (Tier 1/2/3), Anti-Bypass section, and skills_read array in output format. Update target from <300 lines to <150 lines for 4.5+. This completes AGENT-UPDATE-NEW-PROMPT.md Phase 5.2 (14/15 prompts now complete - only Phase 5.3 skills_read addition remaining).
+
+- **2025-12-24**: Update Gold Standard section for Claude 4.5+ pattern migration (Phase 5.1). Replace legacy gold standards (react-developer 336 lines, react-architect 248 lines) with single Claude 4.5+ gold standard: frontend-developer (129 lines) featuring Tiered Skill Loading Protocol pattern, Read() for skills instead of Skill tool, skills_read array in output, and 3-point Anti-Bypass instead of aggressive language. This aligns with AGENT-UPDATE-NEW-PROMPT.md migration plan where creating-agents completed Phase 1-2 migration (removed all EXTREMELY_IMPORTANT patterns) and auditing-agents completed Phase 4 migration (updated all references to check for Tiered Skill Loading Protocol).
 - **2025-12-13**: Update the 'Understanding Audit vs Test' section to clearly distinguish: AUDIT = structural/lint validation (file format, syntax, description, line count, required sections) - runs audit-critical.ts CLI + extended structural checks - fast 30-60 seconds. TEST = behavioral validation (does agent correctly invoke and follow skills under realistic pressure?) - uses testing-agent-skills which spawns actual agents with Task tool and evaluates skill integration - runs testing-skills-with-subagents pressure scenarios - slower 10-25 minutes per skill, potentially hours for full agent with all gateway skills. Add note that test.ts CLI is deprecated - it was doing structural checks that belong in audit. Remove references to test.ts as internal utility. The test operation should ONLY route to testing-agent-skills skill which does behavioral validation.
 - **2025-12-01**: Implement JSON-based interactive fix workflow (like skill-manager create)
 

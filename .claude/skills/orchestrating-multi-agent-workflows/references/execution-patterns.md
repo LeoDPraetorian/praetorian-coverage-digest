@@ -24,7 +24,7 @@ Phase 3: Implementation (depends on infrastructure)
     Output: Working handler code
 
 Phase 4: Unit Tests (depends on implementation)
-└─> backend-unit-test-engineer writes tests
+└─> backend-tester writes tests
     Input: Handler location, patterns used
     Output: Test file with coverage
 
@@ -35,6 +35,7 @@ Phase 5: Acceptance Tests (depends on implementation)
 ```
 
 **Key characteristics:**
+
 - Each phase waits for previous to complete
 - Context flows forward through phases
 - Errors caught early prevent wasted work downstream
@@ -63,23 +64,33 @@ Implementation ─────────┼─ frontend-integration-test-engin
 
 ```typescript
 // CORRECT: All three agents spawn in a single message
-Task("frontend-unit-test-engineer", `
+Task(
+  "frontend-unit-test-engineer",
+  `
   Create unit tests for AssetFilter component.
   Location: src/sections/assets/components/AssetFilter.tsx
   Cover: rendering, filter selection, loading states
-`)
-Task("frontend-integration-test-engineer", `
+`
+);
+Task(
+  "frontend-integration-test-engineer",
+  `
   Create MSW integration tests for asset filtering API.
   Endpoints: GET /my?resource=asset&status=...
   Cover: success responses, error handling, pagination
-`)
-Task("frontend-e2e-test-engineer", `
+`
+);
+Task(
+  "frontend-e2e-test-engineer",
+  `
   Create Playwright E2E tests for asset filtering workflow.
   User flow: Navigate to assets → Apply filters → Verify results
-`)
+`
+);
 ```
 
 **Key characteristics:**
+
 - All agents receive context simultaneously
 - Agents work in parallel (no waiting)
 - Results synthesized after all complete
@@ -134,13 +145,13 @@ Phase 4: Sequential
 
 ## Choosing the Right Pattern
 
-| Scenario | Pattern | Why |
-|----------|---------|-----|
-| New feature end-to-end | Hybrid | Architecture → Implementation sequential, Testing parallel |
-| Bug fix with tests | Sequential | Fix first, then verify |
-| Multiple test types needed | Parallel | Tests don't depend on each other |
-| Security + Quality review | Parallel | Independent assessments |
-| Refactoring with migration | Sequential | Each step depends on previous |
+| Scenario                   | Pattern    | Why                                                        |
+| -------------------------- | ---------- | ---------------------------------------------------------- |
+| New feature end-to-end     | Hybrid     | Architecture → Implementation sequential, Testing parallel |
+| Bug fix with tests         | Sequential | Fix first, then verify                                     |
+| Multiple test types needed | Parallel   | Tests don't depend on each other                           |
+| Security + Quality review  | Parallel   | Independent assessments                                    |
+| Refactoring with migration | Sequential | Each step depends on previous                              |
 
 ## Pattern Selection Flowchart
 
@@ -186,6 +197,7 @@ Agent 1 (unit tests) modified: src/components/Filter.tsx (added test IDs)
 Agent 2 (e2e tests) modified: src/components/Filter.tsx (different test IDs)
 
 Resolution options:
+
 1. Keep Agent 1's changes, re-run Agent 2 with new context
 2. Merge manually (inspect both changesets)
 3. Spawn integration agent to resolve
@@ -196,6 +208,7 @@ Resolution options:
 **User request:** "Implement job processing pipeline with retry logic and full test coverage"
 
 ### Phase 1: Architecture (sequential)
+
 ```
 Spawn: backend-architect
 Task: Design job processing with retry patterns
@@ -208,6 +221,7 @@ Result:
 ```
 
 ### Phase 2: Infrastructure (sequential)
+
 ```
 Spawn: aws-infrastructure-specialist
 Task: Create SQS queues and DLQ
@@ -220,6 +234,7 @@ Result:
 ```
 
 ### Phase 3: Implementation (sequential)
+
 ```
 Spawn: backend-developer
 Task: Implement job processor with retry
@@ -232,10 +247,11 @@ Result:
 ```
 
 ### Phase 4: Testing (PARALLEL)
+
 ```
 // Single message, all spawn together
-Task("backend-unit-test-engineer", "Unit tests for processor.go...")
-Task("backend-integration-test-engineer", "SQS integration tests...")
+Task("backend-tester", "Unit tests for processor.go...")
+Task("backend-tester", "SQS integration tests...")
 Task("acceptance-test-engineer", "E2E job workflow tests...")
 
 Results (collected after all complete):
@@ -245,6 +261,7 @@ Results (collected after all complete):
 ```
 
 ### Phase 5: Quality (sequential)
+
 ```
 Spawn: backend-reviewer
 Task: Review all implementation
@@ -254,11 +271,13 @@ Result: Approved, minor suggestions for logging
 ```
 
 **Total execution:**
+
 - Phases 1-3: Sequential (dependencies)
 - Phase 4: Parallel (3 agents concurrent)
 - Phase 5: Sequential (needs all test results)
 
 **Time comparison:**
+
 - Sequential all phases: ~45 minutes agent time
 - Hybrid with parallel testing: ~30 minutes agent time
 - Savings: ~33% from parallel test execution

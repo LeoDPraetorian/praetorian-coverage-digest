@@ -9,6 +9,7 @@
 ## What Makes an Agent "Gold Standard"
 
 **Criteria**:
+
 1. **Lean** - <300 lines (<400 if complex)
 2. **Complete** - All required sections present
 3. **Compliant** - Passes all audit phases
@@ -18,16 +19,30 @@
 
 ---
 
-## Gold Standard #1: frontend-developer
+## Gold Standard #1: frontend-developer (Claude 4.5+)
 
 **Location**: `.claude/agents/development/frontend-developer.md`
-**Size**: 291 lines
+**Size**: 129 lines
+**Pattern**: Tiered Skill Loading Protocol
 **Type**: development
 **Model**: opus
+
+### Why It's the NEW Gold Standard
+
+**Updated 2025-12-24**: frontend-developer uses the Claude 4.5+ tiered loading pattern. This is the template for ALL new agents.
+
+**Key Features**:
+- Tiered Skill Loading Protocol
+- Read() for all skills (not Skill tool)
+- Brief Anti-Bypass (3 points, no aggressive language)
+- skills_read array in output format
+- Trigger tables for workflow and technology-specific skills
+- Target size achieved (129 lines)
 
 ### Why It's Excellent
 
 **1. Perfect Frontmatter**:
+
 ```yaml
 name: frontend-developer
 description: "Use when developing React frontend - components, UI bugs, performance, API integration, TypeScript/React codebases.\n\n<example>...\n</example>\n\n<example>...\n</example>\n\n<example>...\n</example>"
@@ -40,6 +55,7 @@ color: green
 ```
 
 **Analysis**:
+
 - ✅ Description has 3 examples (comprehensive trigger coverage)
 - ✅ All 4 mandatory development skills (TDD, debugging, verifying, calibrating)
 - ✅ gateway-frontend for domain patterns
@@ -48,43 +64,52 @@ color: green
 - ✅ Opus model (React development needs strong reasoning)
 
 **2. Clear Skill Reference Table**:
+
 ```markdown
-| Task | Skill to Read |
-| ------------------------ | |
-| File organization | `.claude/skill-library/development/frontend/patterns/enforcing-information-architecture/SKILL.md` |
-| Data fetching | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md` |
+| Task              | Skill to Read                                                                                     |
+| ----------------- | ------------------------------------------------------------------------------------------------- |
+| File organization | `.claude/skill-library/architecture/frontend/enforcing-information-architecture/SKILL.md`         |
+| Data fetching     | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`                     |
+
 ...
 ```
 
 **Analysis**:
+
 - ✅ Maps 8 common tasks to specific skills
 - ✅ Full paths (no guessing)
 - ✅ Progressive disclosure (load when needed)
 
 **3. Platform-Specific Critical Rules**:
+
 ```markdown
 ### Import Order (Strict)
+
 // 1. React core
 // 2. Local UI components
 // 3. Platform utilities
 // 4. Types
 
 ### File Length Limits
+
 - Components: <300 lines
 - Functions: <30 lines
 - Hooks: <50 lines
 
 ### React 19 Optimization Philosophy
+
 Write clean code. Let React Compiler optimize.
 Manual optimization ONLY when truly needed.
 ```
 
 **Analysis**:
+
 - ✅ Specific to Chariot platform
 - ✅ Concrete limits (not vague)
 - ✅ Explains React 19 context
 
 **4. All Mandatory Skills Explained**:
+
 ```markdown
 ## Mandatory Skills (Must Use)
 
@@ -95,6 +120,7 @@ Manual optimization ONLY when truly needed.
 ```
 
 **Analysis**:
+
 - ✅ All 4 skills listed
 - ✅ Each has "when to use" guidance
 - ✅ Specific tools/commands mentioned (npm test, npm run build)
@@ -126,6 +152,7 @@ JSON with status, files_modified, verification, handoff.
 ### Why It's Excellent
 
 **1. Perfect Architecture Frontmatter**:
+
 ```yaml
 name: frontend-architect
 description: Use when making architectural decisions for React frontend applications - designing component hierarchies, file organization, state management strategies, performance architecture, or major refactoring decisions.\n\n<example>...\n</example>\n\n<example>...\n</example>\n\n<example>...\n</example>
@@ -138,6 +165,7 @@ model: opus
 ```
 
 **Analysis**:
+
 - ✅ permissionMode: plan (read-only during design)
 - ✅ brainstorming skill (MANDATORY for architects)
 - ✅ writing-plans (creates design docs)
@@ -146,12 +174,14 @@ model: opus
 - ✅ Color: blue (architecture)
 
 **2. Brainstorming Enforcement**:
+
 ```markdown
 ### Brainstorming Before Design
 
 **Before recommending ANY architecture**, use the `brainstorming` skill.
 
 **Critical steps**:
+
 1. Understand requirements FIRST
 2. Explore 2-3 alternative approaches
 3. Validate approach BEFORE detailed design
@@ -161,16 +191,19 @@ model: opus
 ```
 
 **Analysis**:
+
 - ✅ Makes brainstorming MANDATORY ("before ANY architecture")
 - ✅ Explains process (requirements → alternatives → validation)
 - ✅ Counters rationalization ("solution is obvious")
 - ✅ "Never" statement adds emphasis
 
 **3. Architecture Decision Framework**:
+
 ```markdown
 ### Complexity Tier Assessment
 
 Before recommending file organization, assess complexity:
+
 - Tier 1 (Simple): <10 files
 - Tier 2 (Medium): 10-30 files
 - Tier 3 (Complex): 30-80 files
@@ -180,12 +213,14 @@ Before recommending file organization, assess complexity:
 ```
 
 **Analysis**:
+
 - ✅ Concrete thresholds (not vague)
 - ✅ Tier-specific recommendations
 - ✅ Platform-specific (Chariot architecture pattern)
 
 **4. Trade-Off Documentation**:
 Output format includes:
+
 ```json
 "trade-offs": {
   "pros": [...],
@@ -195,6 +230,7 @@ Output format includes:
 ```
 
 **Analysis**:
+
 - ✅ Forces documentation of trade-offs
 - ✅ Requires considering alternatives
 - ✅ Output structured for review
@@ -219,24 +255,29 @@ Output format includes:
 ### Why It's Excellent (Key Highlights)
 
 **1. Concise but Complete**:
+
 - Only 228 lines (well under 300 limit)
 - All required sections present
 - No bloat or unnecessary content
 
 **2. Go-Specific Critical Rules**:
+
 ```markdown
 ### Error Handling
+
 - Always wrap errors with context
 - Use errors.Is() for type checking
 - Return errors, don't panic
 
 ### Concurrency
+
 - Use errgroup for concurrent operations
 - Always handle context cancellation
 - No naked goroutines (use structured concurrency)
 ```
 
 **Analysis**:
+
 - ✅ Language-specific best practices
 - ✅ Concrete patterns (errgroup, context)
 - ✅ Clear anti-patterns ("don't panic", "no naked goroutines")
@@ -257,6 +298,7 @@ Includes Lambda-specific guidance, DynamoDB patterns, S3 operations.
 ### 1. Multi-Example Descriptions
 
 All gold standards have **2-3 examples** in description:
+
 - Shows diverse use cases
 - Improves Claude's selection accuracy
 - Examples cover range of complexity
@@ -266,6 +308,7 @@ All gold standards have **2-3 examples** in description:
 ### 2. Skill References Table
 
 All include task → skill path mapping:
+
 - 5-10 common tasks
 - Direct paths (no searching needed)
 - Progressive disclosure pattern
@@ -275,6 +318,7 @@ All include task → skill path mapping:
 ### 3. Mandatory Skills Explained
 
 Not just listed, but explained:
+
 - **When** to use the skill
 - **What** it does
 - **How** to invoke it
@@ -284,6 +328,7 @@ Not just listed, but explained:
 ### 4. Platform-Specific Rules
 
 All include Chariot platform conventions:
+
 - File organization patterns
 - API integration methods
 - UI component guidelines
@@ -294,6 +339,7 @@ All include Chariot platform conventions:
 ### 5. Standardized Output
 
 All use JSON with:
+
 - status (complete/blocked/needs_review)
 - summary (1-2 sentences)
 - Type-specific field (architecture/verification/review/etc.)
@@ -336,12 +382,14 @@ All use JSON with:
 ### ❌ Don't: Block Scalar Descriptions
 
 **Bad**:
+
 ```yaml
 description: |
   Use when...
 ```
 
 **Good**:
+
 ```yaml
 description: Use when...\n\n<example>...
 ```
@@ -364,6 +412,7 @@ description: Use when...\n\n<example>...
 ### When Reviewing Existing Agent
 
 **Compare to gold standards**:
+
 - Same number of sections?
 - Similar level of detail?
 - Platform-specific rules included?
@@ -378,17 +427,21 @@ description: Use when...\n\n<example>...
 
 **An agent is gold standard quality when**:
 
-- [ ] Size: <300 lines (<400 for complex)
+### Claude 4.5+ Pattern (RECOMMENDED)
+- [ ] Size: <150 lines (leaner is better)
+- [ ] Pattern: Tiered Skill Loading Protocol
+- [ ] Skills: Read() calls for all skills (not Skill tool)
+- [ ] Anti-Bypass: 3 brief points (no aggressive language)
+- [ ] Output: skills_read array included
+- [ ] Trigger Tables: Workflow + Technology specific
+
+### Core Requirements (All Agents)
 - [ ] Description: 2-3 examples, <1024 chars, single-line
 - [ ] Frontmatter: All fields correct, alphabetized
 - [ ] Core Responsibilities: 3-5 clear items
-- [ ] Skill References: Table with 5-10 mappings
 - [ ] Critical Rules: Platform-specific, concrete
-- [ ] Mandatory Skills: All included and explained
-- [ ] Type-Specific Section: Domain patterns present
 - [ ] Output Format: JSON with handoff
 - [ ] Escalation Protocol: 2-3 clear conditions
-- [ ] Quality Checklist: 6-8 items
 
 **All checkboxes for production-ready agent** ✅
 

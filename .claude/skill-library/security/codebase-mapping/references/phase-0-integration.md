@@ -21,11 +21,13 @@ Without Phase 0 context, codebase mapping treats all components equally (securit
 ### Load at Start (Always)
 
 **`../phase-0/summary.md`** - Quick context overview (<2000 tokens)
+
 - Purpose: Fast orientation on business context
 - When: Read before Step 1 (Technology Detection)
 - Contains: Crown jewels, threat actors, compliance requirements (compressed)
 
 **`../phase-0/data-classification.json`** - Crown jewels for prioritization
+
 - Purpose: Identify which data types are most sensitive
 - When: Read before Step 2 (Component Identification)
 - Contains: Crown jewels list with sensitivity levels, regulatory requirements
@@ -33,6 +35,7 @@ Without Phase 0 context, codebase mapping treats all components equally (securit
 ### Load On-Demand
 
 **`../phase-0/compliance-requirements.json`** - If mapping compliance-relevant components
+
 - Purpose: Identify code paths that must meet specific regulations
 - When: Read during Step 2 if compliance context needed
 - Contains: Applicable regulations (SOC2, PCI-DSS, HIPAA, GDPR) with specific requirements
@@ -41,18 +44,20 @@ Without Phase 0 context, codebase mapping treats all components equally (securit
 
 ## How Phase 0 Drives Codebase Mapping
 
-| Phase 0 Input | Impact on Mapping | Example |
-|---------------|-------------------|---------|
-| **Crown Jewels** | Focus 60% effort on components handling crown jewels | If crown jewels = ["payment_card_data"], prioritize payment processor, tokenization, PCI vault components over marketing site |
-| **Compliance** | Identify compliance-relevant code paths | If compliance = HIPAA, identify PHI storage, access logging, encryption components for enhanced scrutiny |
-| **Threat Actors** | Map attack surface relevant to actor capabilities | If threat actors = ransomware, identify backup systems, encryption points, recovery mechanisms |
+| Phase 0 Input     | Impact on Mapping                                    | Example                                                                                                                       |
+| ----------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Crown Jewels**  | Focus 60% effort on components handling crown jewels | If crown jewels = ["payment_card_data"], prioritize payment processor, tokenization, PCI vault components over marketing site |
+| **Compliance**    | Identify compliance-relevant code paths              | If compliance = HIPAA, identify PHI storage, access logging, encryption components for enhanced scrutiny                      |
+| **Threat Actors** | Map attack surface relevant to actor capabilities    | If threat actors = ransomware, identify backup systems, encryption points, recovery mechanisms                                |
 
 ---
 
 ## Step 2 Enhancement: Prioritized Component Identification
 
 ### Before Phase 0 Integration (OLD)
+
 All components analyzed with equal priority:
+
 ```
 Component 1 (Marketing Site) → 25% effort
 Component 2 (Payment Processor) → 25% effort
@@ -61,6 +66,7 @@ Component 4 (Analytics) → 25% effort
 ```
 
 ### After Phase 0 Integration (NEW)
+
 Components prioritized by crown jewel handling:
 
 ```bash
@@ -72,18 +78,21 @@ echo "Prioritizing components handling: $CROWN_JEWELS"
 **Prioritization Strategy (60/30/10 split)**:
 
 **Tier 1 - Crown Jewel Handlers (60% effort)**:
+
 - Components that process, store, or transmit crown jewels
 - Search for keywords from crown jewels in file names and imports
 - Map complete data flows for sensitive data
 - Deep analysis of entry points handling crown jewels
 
 **Tier 2 - External Interfaces (30% effort)**:
+
 - APIs, webhooks, third-party integrations
 - Authentication and authorization boundaries
 - Data transformation and serialization points
 - Cross-component communication
 
 **Tier 3 - Supporting Infrastructure (10% effort)**:
+
 - Build systems, CI/CD pipelines
 - Internal utilities and helpers
 - Non-security-critical components
@@ -94,18 +103,21 @@ echo "Prioritizing components handling: $CROWN_JEWELS"
 **Scenario**: Phase 0 identifies crown jewels = `["payment_card_data", "user_credentials"]`
 
 **Tier 1 (60% effort)**:
+
 - Payment processor (handles payment_card_data)
 - Authentication service (handles user_credentials)
 - Credential storage/vault (handles user_credentials)
 - Payment tokenization service (handles payment_card_data)
 
 **Tier 2 (30% effort)**:
+
 - User API (external interface, touches user_credentials)
 - Admin panel (external interface, elevated privileges)
 - Webhook handlers (external data ingress)
 - Third-party payment gateway integration
 
 **Tier 3 (10% effort)**:
+
 - Email notification service (no crown jewels)
 - Analytics service (aggregated data only)
 - Logging infrastructure (no sensitive data)
@@ -118,22 +130,26 @@ echo "Prioritizing components handling: $CROWN_JEWELS"
 ### New Fields
 
 **`handles_crown_jewels`** (boolean):
+
 - `true` if component processes any crown jewel from Phase 0
 - `false` otherwise
 - Used to prioritize downstream Phase 2-4 analysis
 
 **`crown_jewels_handled`** (array of strings):
+
 - List of specific crown jewel data types this component handles
 - Must match `data_type` values from Phase 0 `data-classification.json`
 - Empty array if `handles_crown_jewels = false`
 
 **`business_criticality`** (enum):
+
 - `"critical"` - Handles crown jewels directly
 - `"high"` - External interface or authentication boundary
 - `"medium"` - Supporting services with indirect access
 - `"low"` - Non-security-critical infrastructure
 
 **`analysis_depth`** (enum):
+
 - `"deep"` - Full analysis (Tier 1 - 60% effort)
 - `"standard"` - Normal analysis (Tier 2 - 30% effort)
 - `"surface"` - High-level only (Tier 3 - 10% effort)
@@ -141,6 +157,7 @@ echo "Prioritizing components handling: $CROWN_JEWELS"
 ### Example Component JSON
 
 **Tier 1 Component** (handles crown jewels):
+
 ```json
 {
   "component": "payment-processor",
@@ -166,6 +183,7 @@ echo "Prioritizing components handling: $CROWN_JEWELS"
 ```
 
 **Tier 2 Component** (external interface):
+
 ```json
 {
   "component": "user-api",
@@ -191,6 +209,7 @@ echo "Prioritizing components handling: $CROWN_JEWELS"
 ```
 
 **Tier 3 Component** (supporting infrastructure):
+
 ```json
 {
   "component": "email-service",
@@ -228,25 +247,30 @@ Add this section at the top of `summary.md` to connect Phase 0 to Phase 1 findin
 ## Business Context (from Phase 0)
 
 **Crown Jewels Identified**:
+
 - `{crown_jewel_1}` - {sensitivity_level} - {regulatory_requirement}
 - `{crown_jewel_2}` - {sensitivity_level} - {regulatory_requirement}
 
 **Analysis Prioritization**:
+
 - **60% effort**: Components handling crown jewels ({list})
 - **30% effort**: External interfaces and auth boundaries ({list})
 - **10% effort**: Supporting infrastructure ({list})
 
 **Compliance Context**:
+
 - {regulation_1}: {brief_requirement}
 - {regulation_2}: {brief_requirement}
 
 **Threat Actor Focus** (from Phase 0):
+
 - Primary: {threat_actor_1} - {motivation}
 - Secondary: {threat_actor_2} - {motivation}
 
 ---
 
 ## Technology Stack
+
 ...
 ```
 
@@ -256,19 +280,23 @@ Add this section at the top of `summary.md` to connect Phase 0 to Phase 1 findin
 ## Business Context (from Phase 0)
 
 **Crown Jewels Identified**:
+
 - `payment_card_data` - Critical - PCI-DSS Requirement 3 (protect stored cardholder data)
 - `user_credentials` - High - NIST 800-63B (password storage and authentication)
 
 **Analysis Prioritization**:
+
 - **60% effort**: Payment processor, Authentication service, Credential vault (handle crown jewels)
 - **30% effort**: User API, Admin panel, Webhook handlers (external interfaces)
 - **10% effort**: Email service, Analytics, Logging infrastructure (supporting services)
 
 **Compliance Context**:
+
 - PCI-DSS Level 1: Requirement 3 (data protection), Requirement 6 (secure development), Requirement 10 (logging)
 - SOC2 Type II: CC6.1 (access controls), CC6.7 (encryption), CC7.2 (audit logging)
 
 **Threat Actor Focus** (from Phase 0):
+
 - Primary: Financially motivated cybercriminals - Card data theft for fraud/resale, credential stuffing
 - Secondary: Insider threats - Abuse privileged access to payment data
 ```
@@ -340,6 +368,7 @@ fi
 ### Test Scenario 1: With Crown Jewels
 
 **Setup**:
+
 ```json
 // phase-0/data-classification.json
 {
@@ -354,6 +383,7 @@ fi
 ```
 
 **Expected Behavior**:
+
 1. Payment processor identified as Tier 1 (60% effort)
 2. `handles_crown_jewels: true` in payment processor JSON
 3. Summary highlights payment components in "60% effort" section
@@ -364,6 +394,7 @@ fi
 **Setup**: Delete `phase-0/` directory
 
 **Expected Behavior**:
+
 1. Skill errors immediately: "Phase 0 not complete"
 2. Provides guidance to run `business-context-discovery` skill
 3. Does NOT proceed to technology detection
@@ -374,10 +405,12 @@ fi
 ## Related Sections in Main Skill
 
 This reference file is loaded from:
+
 - **Step 2: Component Identification** - Crown jewel prioritization logic
 - **Step 6: Summary Generation** - Business context reference section
 
 **Main skill includes**:
+
 - Brief overview of Phase 0 integration (3-5 sentences)
 - Link to this reference for detailed patterns
 - Error handling if Phase 0 missing

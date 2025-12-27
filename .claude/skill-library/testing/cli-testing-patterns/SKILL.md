@@ -57,6 +57,7 @@ Comprehensive testing strategies for CLI applications using industry-standard te
 ### Exit Code Testing Patterns
 
 **Standard Exit Codes:**
+
 - `0` - Success
 - `1` - General error
 - `2` - Misuse of command (invalid arguments)
@@ -65,6 +66,7 @@ Comprehensive testing strategies for CLI applications using industry-standard te
 - `128+N` - Fatal error signal N
 
 **Testing Strategy:**
+
 - Always test both success (0) and failure (non-zero) cases
 - Verify specific exit codes for different error conditions
 - Test argument validation returns appropriate codes
@@ -73,12 +75,14 @@ Comprehensive testing strategies for CLI applications using industry-standard te
 ### Output Validation Patterns
 
 **Content Testing:**
+
 - Check for presence of key text in output
 - Validate format (JSON, YAML, tables)
 - Test color/formatting codes (if applicable)
 - Verify error messages are user-friendly
 
 **Best Practices:**
+
 - Use `.toContain()` for flexible matching (Jest)
 - Use `in result.output` for Python tests
 - Test both positive and negative cases
@@ -89,16 +93,19 @@ Comprehensive testing strategies for CLI applications using industry-standard te
 Use these templates for CLI testing:
 
 ### Node.js/Jest Templates
+
 - `templates/jest-cli-test.ts` - Complete Jest test suite with execSync
 - `templates/jest-config-test.ts` - Configuration file testing
 - `templates/jest-integration-test.ts` - Multi-command integration tests
 
 ### Python/Pytest Templates
+
 - `templates/pytest-click-test.py` - Click.testing.CliRunner tests
 - `templates/pytest-fixtures.py` - Reusable pytest fixtures
 - `templates/pytest-integration-test.py` - Integration test patterns
 
 ### Test Utilities
+
 - `templates/test-helpers.ts` - Node.js test helper functions
 - `templates/test-helpers.py` - Python test helper functions
 
@@ -124,16 +131,19 @@ See complete examples in the `examples/` directory:
 ## Requirements
 
 **Node.js Testing:**
+
 - Jest 29.x or later
 - TypeScript support (ts-jest)
 - Node.js 16+
 
 **Python Testing:**
+
 - pytest 7.x or later
 - Click 8.x or later
 - Python 3.8+
 
 **Both:**
+
 - Test coverage reporting tools
 - CI/CD integration support
 - Mock/stub capabilities for external dependencies

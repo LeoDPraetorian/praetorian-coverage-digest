@@ -41,6 +41,7 @@ Follow established conventions:
 ```
 
 **Common conventions:**
+
 - Logo top-left (clicks to home)
 - Search icon = magnifying glass
 - Hamburger menu = navigation
@@ -50,6 +51,7 @@ Follow established conventions:
 ### When to Break Conventions
 
 Only when you have strong evidence:
+
 - A/B testing shows better results
 - Your users are domain experts (different conventions)
 - Innovation provides significant value
@@ -94,12 +96,14 @@ function ScanComplete() {
 ```
 
 **Peak moments in Chariot:**
+
 - Scan completes successfully
 - Vulnerability resolved
 - New asset discovered
 - Report generated
 
 **Positive endings:**
+
 - Thank you messages
 - Success confirmations
 - Clear next steps
@@ -133,6 +137,7 @@ const navigationItems = [
 ```
 
 **Chariot application:**
+
 - Primary CTA = leftmost button
 - Dangerous action = rightmost button
 - Less important actions = middle
@@ -176,6 +181,7 @@ function OnboardingFlow() {
 ```
 
 **Other applications:**
+
 - Profile completion percentage
 - Checklist with unchecked items
 - "2 steps remaining" messages
@@ -208,6 +214,7 @@ function OnboardingFlow() {
 ```
 
 **Techniques for isolation:**
+
 - Unique color (accent color)
 - Larger size
 - Different shape
@@ -215,6 +222,7 @@ function OnboardingFlow() {
 - Animation
 
 **When to apply:**
+
 - Primary call-to-action
 - Critical warnings
 - Special offers
@@ -256,6 +264,7 @@ function AssetImport({ totalAssets, importedAssets }) {
 ```
 
 **Applications:**
+
 - Multi-step forms with step indicators
 - File uploads with percentage
 - Profile completion scores
@@ -287,6 +296,7 @@ function AssetImport({ totalAssets, importedAssets }) {
 ```
 
 **Techniques:**
+
 - Display estimated time
 - Add countdown timers
 - Show "Just one step left!"
@@ -335,6 +345,7 @@ Invest in visual polish:
 ```
 
 **Polish elements:**
+
 - Subtle gradients
 - Smooth transitions
 - Consistent spacing

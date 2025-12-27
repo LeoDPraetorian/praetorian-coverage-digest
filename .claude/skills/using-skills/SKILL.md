@@ -38,7 +38,8 @@ Before responding to ANY user message, you MUST complete this checklist:
 Chariot has two skill locations:
 
 ### Core Skills → Skill Tool
-~25 high-frequency skills live in `.claude/skills/` (flat structure).
+
+~35 high-frequency skills live in `.claude/skills/` (flat structure).
 These ARE auto-discovered by Claude Code's Skill tool.
 
 ```
@@ -47,38 +48,40 @@ Example: skill: "developing-with-tdd"
 ```
 
 ### Library Skills → skill-search CLI + Read Tool
+
 ~120 specialized skills live in `.claude/skill-library/` (nested structure).
 These are NOT visible to the Skill tool. Use the skill-search CLI to discover them.
 
 ## Finding Skills (Core + Library)
 
 The skill-search CLI searches BOTH core skills and library skills, showing:
+
 - `[CORE]` skills → Use with Skill tool: `skill: "name"`
 - `[LIB]` skills → Use with Read tool: `Read path/to/SKILL.md`
 
 **Search command:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}" && cd "$REPO_ROOT/.claude" && npm run -w @chariot/skill-search search -- "QUERY"
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}" && cd "$REPO_ROOT/.claude" && npm run -w @chariot/auditing-skills search -- "QUERY"
 ```
 
 **Examples:**
 
 ```bash
 # Search for debugging skills
-npm run -w @chariot/skill-search search -- "debug"
+npm run -w @chariot/auditing-skills search -- "debug"
 
 # Search for React/frontend skills
-npm run -w @chariot/skill-search search -- "react testing"
+npm run -w @chariot/auditing-skills search -- "react testing"
 
 # List ALL skills (empty query)
-npm run -w @chariot/skill-search search -- ""
+npm run -w @chariot/auditing-skills search -- ""
 
 # Filter by domain
-npm run -w @chariot/skill-search search -- "testing" --domain frontend
+npm run -w @chariot/auditing-skills search -- "testing" --domain frontend
 
 # Limit results
-npm run -w @chariot/skill-search search -- "security" --limit 5
+npm run -w @chariot/auditing-skills search -- "security" --limit 5
 ```
 
 **Output shows access method:**
@@ -87,18 +90,45 @@ npm run -w @chariot/skill-search search -- "security" --limit 5
 [CORE] debugging-systematically (Score: 95)
    → skill: "debugging-systematically"
 
-[LIB] frontend-tanstack-query (Score: 87)
-   → Read: /path/to/.claude/skill-library/frontend/frontend-tanstack-query/SKILL.md
+[LIB] using-tanstack-query (Score: 87)
+   → Path: /Users/.../chariot-development-platform/.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md
 ```
 
 ## Using Search Results
 
 **For CORE skills** - Use the Skill tool:
+
 ```
 skill: "debugging-systematically"
 ```
 
-**For LIB skills** - Use the Read tool with the full path shown in output, then follow the skill.
+**For LIB skills** - Use the Read tool with the **absolute path** shown in search output.
+
+**CRITICAL - Path Resolution Rules:**
+
+1. **Read tool REQUIRES absolute paths** - Never use relative paths like `.claude/...` or `skill-library/...`
+
+2. **Use search output directly** - The search CLI outputs absolute paths. Copy and use them exactly:
+
+   ```
+   # Search output shows:
+   Path: /Users/you/chariot-development-platform/.claude/skill-library/.../SKILL.md
+
+   # Use that exact path with Read tool
+   Read("/Users/you/chariot-development-platform/.claude/skill-library/.../SKILL.md")
+   ```
+
+3. **If constructing paths manually**, get REPO_ROOT first:
+
+   ```bash
+   REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+   REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
+   echo "$REPO_ROOT/.claude/skill-library/path/to/SKILL.md"
+   ```
+
+   Then use the echoed path with Read tool.
+
+4. **Never guess paths** - If unsure, run the search command to get the correct absolute path.
 
 ## Common Rationalizations That Mean You're About To Fail
 
@@ -123,6 +153,7 @@ If a skill for your task exists, you must use it or you will fail at your task.
 If a skill has a checklist, YOU MUST create TodoWrite todos for EACH item.
 
 **Don't:**
+
 - Work through checklist mentally
 - Skip creating todos "to save time"
 - Batch multiple items into one todo
@@ -137,6 +168,7 @@ After you've read a skill with Read tool, announce you're using it:
 "I've read the [Skill Name] skill and I'm using it to [what you're doing]."
 
 **Examples:**
+
 - "I've read the Brainstorming skill and I'm using it to refine your idea into a design."
 - "I've read the Test-Driven Development skill and I'm using it to implement this feature."
 - "I've read the Systematic Debugging skill and I'm using it to find the root cause."
@@ -147,20 +179,21 @@ After you've read a skill with Read tool, announce you're using it:
 
 ```bash
 # User asks to fix a bug - search for relevant skills
-$ npm run -w @chariot/skill-search search -- "debug"
+$ npm run -w @chariot/auditing-skills search -- "debug"
 
 [CORE] debugging-systematically (Score: 95)
    Use when encountering any bug...
    → skill: "debugging-systematically"
 
-[LIB] debugging-strategies (Score: 87)
-   Master systematic debugging techniques...
-   → Read: /path/to/.claude/skill-library/debugging/debugging-strategies/SKILL.md
+[LIB] debugging-chrome-console (Score: 82)
+   Debug frontend issues via Chrome DevTools...
+   → Path: /Users/you/chariot-development-platform/.claude/skill-library/testing/frontend/debugging-chrome-console/SKILL.md
 ```
 
 Then either:
+
 - Use `skill: "debugging-systematically"` for the core skill, OR
-- Use `Read` tool with the full path for the library skill
+- Use `Read` tool with the **absolute path** shown for the library skill
 
 Finally, announce: "I've read the debugging-systematically skill and I'm using it to investigate this bug."
 
@@ -193,8 +226,9 @@ Your human partner's specific instructions describe WHAT to do, not HOW.
 ## Summary
 
 **Starting any task:**
+
 1. Ask: "Does a skill exist for this?"
-2. Search with: `npm run -w @chariot/skill-search search -- "query"`
+2. Search with: `npm run -w @chariot/auditing-skills search -- "query"`
 3. If relevant skill exists → Use Skill tool (core) or Read tool (library)
 4. Announce you're using it
 5. Follow what it says

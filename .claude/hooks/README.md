@@ -11,7 +11,7 @@ Control sound notifications for Claude Code agent completion events.
 ## Commands
 
 - `on` - Enable sound notifications
-- `off` - Disable sound notifications  
+- `off` - Disable sound notifications
 - `toggle` - Toggle sound on/off
 - `test` - Play test sound
 - `status` - Show current settings
@@ -66,6 +66,7 @@ This command works with Claude Code hooks to automatically play sounds when agen
 ## Sound File Formats
 
 Supports common audio formats:
+
 - `.wav` (recommended)
 - `.aiff` (macOS default)
 - `.mp3` (with mpv)

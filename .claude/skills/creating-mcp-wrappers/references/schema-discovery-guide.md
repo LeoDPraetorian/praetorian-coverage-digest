@@ -3,6 +3,7 @@
 ## Why Schema Discovery Matters
 
 MCP tools have dynamic schemas. You must explore them to:
+
 - Identify required vs optional fields
 - Understand response structures
 - Plan token reduction strategies
@@ -15,6 +16,7 @@ MCP tools have dynamic schemas. You must explore them to:
 ### Step 0: Determine MCP Package Name
 
 **Ask user**:
+
 ```
 What MCP service are you creating a wrapper for?
 
@@ -26,6 +28,7 @@ Examples:
 ```
 
 **Auto-detect package name**:
+
 ```bash
 # Most MCP servers follow convention:
 SERVICE="linear"
@@ -53,6 +56,7 @@ npm view ${MCP_PACKAGE} version 2>/dev/null || echo "Package not found"
 ### Step 1: Auto-Install and Start MCP Server
 
 **Installation** (automatic via npx):
+
 ```bash
 # npx auto-downloads on first run - no manual install needed
 npx -y @modelcontextprotocol/server-{service} --version
@@ -60,6 +64,7 @@ npx -y @modelcontextprotocol/server-{service} --version
 ```
 
 **Start server in background**:
+
 ```bash
 # Start MCP server, redirect logs, capture PID
 npx -y @modelcontextprotocol/server-{service} > /tmp/mcp-{service}.log 2>&1 &
@@ -73,6 +78,7 @@ sleep 2
 ```
 
 **Verify server is running**:
+
 ```bash
 # Check process exists
 if ps -p $MCP_PID > /dev/null; then
@@ -85,6 +91,7 @@ fi
 ```
 
 **Credential detection**:
+
 ```bash
 # Check if server logs show credential errors
 if grep -i "authentication\|credential\|api.*key" /tmp/mcp-{service}.log; then
@@ -102,18 +109,15 @@ fi
 ### Step 2: Connect Client
 
 ```javascript
-const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
-const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
+const { Client } = require("@modelcontextprotocol/sdk/client/index.js");
+const { StdioClientTransport } = require("@modelcontextprotocol/sdk/client/stdio.js");
 
 const transport = new StdioClientTransport({
-  command: 'npx',
-  args: ['-y', '@modelcontextprotocol/server-{service}']
+  command: "npx",
+  args: ["-y", "@modelcontextprotocol/server-{service}"],
 });
 
-const client = new Client(
-  { name: 'explorer', version: '1.0.0' },
-  { capabilities: {} }
-);
+const client = new Client({ name: "explorer", version: "1.0.0" }, { capabilities: {} });
 
 await client.connect(transport);
 ```
@@ -121,6 +125,7 @@ await client.connect(transport);
 ### Step 3: List Available Tools
 
 **Single tool mode**:
+
 ```javascript
 const tools = await client.listTools();
 console.log(JSON.stringify(tools, null, 2));
@@ -136,6 +141,7 @@ console.log(JSON.stringify(tools, null, 2));
 ```
 
 **Batch mode (ALL tools)**:
+
 ```javascript
 const tools = await client.listTools();
 
@@ -158,6 +164,7 @@ console.log(`\n✅ Batch complete: ${tools.tools.length} wrappers created`);
 ```
 
 **Batch mode workflow**:
+
 1. Start MCP server ONCE
 2. List ALL tools
 3. For EACH tool:
@@ -177,34 +184,39 @@ console.log(`\n✅ Batch complete: ${tools.tools.length} wrappers created`);
 ### Step 4: Call Tool with Test Inputs
 
 **Test Case 1: Happy Path**
+
 ```javascript
 const result = await client.callTool({
-  name: '{tool}',
-  arguments: { /* valid input */ }
+  name: "{tool}",
+  arguments: {
+    /* valid input */
+  },
 });
 
 console.log(JSON.stringify(result, null, 2));
-console.log('Token count:', JSON.stringify(result).length);
+console.log("Token count:", JSON.stringify(result).length);
 ```
 
 **Test Case 2: Edge Case**
+
 ```javascript
 const result = await client.callTool({
-  name: '{tool}',
-  arguments: { field: '' } // Empty string
+  name: "{tool}",
+  arguments: { field: "" }, // Empty string
 });
 // What happens? Error? Empty response?
 ```
 
 **Test Case 3: Error Case**
+
 ```javascript
 try {
   const result = await client.callTool({
-    name: '{tool}',
-    arguments: { field: 'INVALID' }
+    name: "{tool}",
+    arguments: { field: "INVALID" },
   });
 } catch (error) {
-  console.log('Error:', error.message);
+  console.log("Error:", error.message);
 }
 ```
 
@@ -212,13 +224,13 @@ try {
 
 For each response, document:
 
-| Aspect | What to Capture |
-|--------|----------------|
-| **Required fields** | Fields present in ALL responses |
-| **Optional fields** | Fields present in SOME responses |
-| **Nested structures** | Objects within objects |
-| **Array types** | Homogeneous or heterogeneous? |
-| **Token counts** | `JSON.stringify(response).length` |
+| Aspect                | What to Capture                   |
+| --------------------- | --------------------------------- |
+| **Required fields**   | Fields present in ALL responses   |
+| **Optional fields**   | Fields present in SOME responses  |
+| **Nested structures** | Objects within objects            |
+| **Array types**       | Homogeneous or heterogeneous?     |
+| **Token counts**      | `JSON.stringify(response).length` |
 
 ### Step 6: Plan Token Reduction
 
@@ -226,10 +238,12 @@ For each response, document:
 **Target response**: 500 tokens (80% reduction)
 
 **Strategy**:
+
 - **Include**: `id`, `title`, `status`, `assignee` (essential)
 - **Exclude**: `metadata`, `history`, `_internal` (verbose)
 
 **Verification**:
+
 - Calculate: `includedFields.length / totalFields.length`
 - Should be < 20% of fields for 80% token reduction
 
@@ -255,11 +269,13 @@ rm /tmp/mcp-{service}.log
 ```
 
 **Why cleanup matters**:
+
 - Frees system resources
 - Prevents orphaned processes
 - Ensures clean state for next exploration
 
 **Verification**:
+
 ```bash
 # Confirm process is gone
 ps -p $MCP_PID
@@ -314,6 +330,7 @@ echo "✅ Cleanup complete"
 ```
 
 **Usage in creating-mcp-wrappers skill**:
+
 - Claude runs these commands via Bash tool
 - Captures MCP_PID for cleanup
 - Handles errors automatically
@@ -326,16 +343,17 @@ echo "✅ Cleanup complete"
 ### Pattern 1: Pagination
 
 If MCP tool returns paginated results:
+
 ```javascript
 // Discover pagination params
 const page1 = await client.callTool({
-  name: 'list_issues',
-  arguments: { limit: 10, offset: 0 }
+  name: "list_issues",
+  arguments: { limit: 10, offset: 0 },
 });
 
 const page2 = await client.callTool({
-  name: 'list_issues',
-  arguments: { limit: 10, offset: 10 }
+  name: "list_issues",
+  arguments: { limit: 10, offset: 10 },
 });
 
 // Document: How does pagination work? Cursor? Offset?
@@ -344,17 +362,18 @@ const page2 = await client.callTool({
 ### Pattern 2: Optional Expansion
 
 If MCP tool has "expand" parameters:
+
 ```javascript
 // Minimal response
 const minimal = await client.callTool({
-  name: 'get_issue',
-  arguments: { issueId: 'ENG-1234' }
+  name: "get_issue",
+  arguments: { issueId: "ENG-1234" },
 });
 
 // Expanded response
 const expanded = await client.callTool({
-  name: 'get_issue',
-  arguments: { issueId: 'ENG-1234', expand: ['comments', 'history'] }
+  name: "get_issue",
+  arguments: { issueId: "ENG-1234", expand: ["comments", "history"] },
 });
 
 // Document: What fields are added by expansion?
@@ -366,7 +385,7 @@ const expanded = await client.callTool({
 
 Use this template for discovery docs:
 
-```markdown
+````markdown
 # {Tool} Schema Discovery
 
 **Date**: 2025-12-11
@@ -377,35 +396,41 @@ Use this template for discovery docs:
 ## Input Schema
 
 ### Required Parameters
-| Parameter | Type | Validation | Description | Example |
-|-----------|------|------------|-------------|---------|
-| issueId | string | min length 1 | Linear issue identifier | ENG-1234 |
+
+| Parameter | Type   | Validation   | Description             | Example  |
+| --------- | ------ | ------------ | ----------------------- | -------- |
+| issueId   | string | min length 1 | Linear issue identifier | ENG-1234 |
 
 ### Optional Parameters
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| includeComments | boolean | false | Include issue comments |
+
+| Parameter       | Type    | Default | Description            |
+| --------------- | ------- | ------- | ---------------------- |
+| includeComments | boolean | false   | Include issue comments |
 
 ## Output Schema
 
 ### Always Present
-| Field | Type | Description |
-|-------|------|-------------|
-| id | string | Unique identifier |
-| title | string | Issue title |
-| status | string | Current state |
+
+| Field  | Type   | Description       |
+| ------ | ------ | ----------------- |
+| id     | string | Unique identifier |
+| title  | string | Issue title       |
+| status | string | Current state     |
 
 ### Conditionally Present
-| Field | Type | Condition | Description |
-|-------|------|-----------|-------------|
-| assignee | string | If assigned | Assignee name |
-| comments | array | If includeComments=true | Issue comments |
+
+| Field    | Type   | Condition               | Description    |
+| -------- | ------ | ----------------------- | -------------- |
+| assignee | string | If assigned             | Assignee name  |
+| comments | array  | If includeComments=true | Issue comments |
 
 ## Test Cases
 
 ### Case 1: Happy Path
+
 **Input**: `{ issueId: "ENG-1234" }`
 **Output**:
+
 ```json
 {
   "id": "abc-123",
@@ -415,15 +440,19 @@ Use this template for discovery docs:
   "assignee": { "name": "Alice" }
 }
 ```
+````
+
 **Tokens**: ~2,347 tokens
 **Result**: Success
 
 ### Case 2: Edge Case (Empty String)
+
 **Input**: `{ issueId: "" }`
 **Output**: `{ error: "Invalid input" }`
 **Result**: Validation error
 
 ### Case 3: Invalid Input
+
 **Input**: `{ issueId: "NONEXISTENT" }`
 **Output**: `{ error: "Issue not found" }`
 **Result**: Not found error
@@ -435,6 +464,7 @@ Use this template for discovery docs:
 **Reduction**: 80%
 
 **Fields to Include** (essential for agents):
+
 - `id` - Unique identifier
 - `title` - Human-readable name
 - `status` - Current state
@@ -442,6 +472,7 @@ Use this template for discovery docs:
 - `assignee` - Owner (if present)
 
 **Fields to Exclude** (verbose, not needed):
+
 - `metadata` - Internal system data (500 tokens)
 - `history` - Full change log (1000 tokens)
 - `_internal` - Debug information (500 tokens)
@@ -452,14 +483,17 @@ Use this template for discovery docs:
 ## Security Considerations
 
 **Input Validation Required**:
+
 - Path traversal: Block `../` sequences
 - Command injection: Block shell metacharacters (`;`, `|`, `&`, etc.)
 - XSS: Sanitize string outputs
 
 **Response Sanitization Required**:
+
 - Remove internal identifiers
 - Redact sensitive fields (if any)
-```
+
+````
 
 ---
 
@@ -523,7 +557,7 @@ None discovered
 
 **Include**: id, title, status, priority, assignee
 **Exclude**: metadata (500t), history (1000t), _internal (500t), timestamps
-```
+````
 
 ---
 
@@ -534,11 +568,13 @@ None discovered
 **Symptoms**: Process starts but immediately exits
 
 **Check logs**:
+
 ```bash
 cat /tmp/mcp-{service}.log
 ```
 
 **Common causes**:
+
 1. **Missing credentials**: MCP requires API key/token
    - Solution: Configure credentials per service documentation
    - Linear: OAuth token in `~/.mcp-auth/linear.json`
@@ -555,6 +591,7 @@ cat /tmp/mcp-{service}.log
 **Symptoms**: Client can't connect to running server
 
 **Debug**:
+
 ```bash
 # Verify server is actually running
 ps -p $MCP_PID
@@ -574,6 +611,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | \
 **Symptoms**: Server starts, but tool doesn't exist
 
 **Check**:
+
 ```bash
 # List all available tools
 npx tsx -e "(async () => {
@@ -600,6 +638,7 @@ npx tsx -e "(async () => {
 **Symptoms**: MCP process won't die
 
 **Force kill**:
+
 ```bash
 kill -9 $MCP_PID
 
@@ -612,6 +651,7 @@ pkill -f "@modelcontextprotocol/server-{service}"
 **Symptoms**: Standard naming convention doesn't work
 
 **Ask user for exact package name**:
+
 ```
 What's the exact npm package name for this MCP server?
 
@@ -622,4 +662,7 @@ Examples:
 ```
 
 Then use provided name instead of auto-detected name.
+
+```
+
 ```

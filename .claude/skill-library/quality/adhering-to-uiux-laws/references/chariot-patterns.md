@@ -46,6 +46,7 @@ How UI/UX laws apply to Chariot's security platform interfaces.
 ```
 
 **Benefits:**
+
 - Common Region: Single card groups all related settings
 - Proximity: Tight spacing within card (16px), wide spacing between sections (56px)
 - Serial Position: Most important settings first
@@ -91,11 +92,13 @@ const handleCopy = async () => {
 ```
 
 **Why this works:**
+
 - Doherty Threshold: Green flash appears in 0ms (instant)
 - System Status: User immediately knows action succeeded
 - Aesthetic-Usability: Smooth color transition feels polished
 
 **Use cases:**
+
 - Webhook URLs
 - API keys
 - Scan headers
@@ -252,6 +255,7 @@ function AssetActions({ asset }) {
 ```
 
 **Why this works:**
+
 - Card: Low cognitive load for quick scanning (3-4 key facts)
 - Details: Full information when making decisions
 - Peak-End Rule: Clear actions at end of triage flow

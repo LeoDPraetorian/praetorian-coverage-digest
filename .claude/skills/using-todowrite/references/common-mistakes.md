@@ -17,6 +17,7 @@ Bad approach:
 ```
 
 **Why this is wrong:**
+
 - Only 2 steps (threshold is ≥3)
 - Takes <5 minutes total
 - No context drift risk
@@ -48,6 +49,7 @@ Bad approach:
 ```
 
 **Why this is wrong:**
+
 - No upfront planning (scope creep risk)
 - User doesn't see full scope immediately
 - Defeats accountability purpose
@@ -80,6 +82,7 @@ User experience: "Is Claude frozen? Been 19 minutes without update..."
 ```
 
 **Why this is wrong:**
+
 - No real-time visibility (user doesn't see progress)
 - User anxiety ("Is this working?")
 - Violates system prompt requirement
@@ -111,6 +114,7 @@ User sees: 5 minutes of work with no status update
 ```
 
 **Why this is wrong:**
+
 - User doesn't know what you're doing for first 5 minutes
 - Status lags behind reality
 - Defeats real-time visibility purpose
@@ -153,6 +157,7 @@ Result: Tasks 2 and 3 disappear! (TodoWrite replaces, doesn't merge)
 ```
 
 **Why this is wrong:**
+
 - TodoWrite replaces entire list, doesn't merge
 - Other tasks vanish
 - Loses track of remaining work
@@ -191,6 +196,7 @@ Bad state:
 ```
 
 **Why this is wrong:**
+
 - Can't focus on all 4 tasks simultaneously
 - User doesn't know what's actually being worked on
 - Suggests lack of prioritization
@@ -229,6 +235,7 @@ Bad task names:
 ```
 
 **Why this is wrong:**
+
 - User doesn't understand what's being done
 - Can't track meaningful progress
 - Hard to know when task is "complete"
@@ -262,6 +269,7 @@ Bad structure:
 ```
 
 **Why this is wrong:**
+
 - User sees generic progress indicator
 - Violates TodoWrite schema
 - May cause display issues
@@ -292,6 +300,7 @@ Bad activeForm:
 ```
 
 **Why this is wrong:**
+
 - activeForm should be present continuous tense
 - User sees awkward grammar ("Write tests" instead of "Writing tests")
 
@@ -322,6 +331,7 @@ Bad approach:
 ```
 
 **Why this is wrong:**
+
 - Clutters task list
 - User confused by obsolete tasks
 - Harder to see what's actually needed
@@ -359,6 +369,7 @@ Bad granularity:
 ```
 
 **Why this is wrong:**
+
 - 7 tasks for one operation (<1 minute each)
 - Too much TodoWrite overhead
 - User overwhelmed by task churn
@@ -392,6 +403,7 @@ Bad granularity:
 ```
 
 **Why this is wrong:**
+
 - Single task for multi-hour work
 - No progress visibility (stuck on "in_progress" for hours)
 - Can't track completion of sub-components
@@ -429,6 +441,7 @@ Result:
 ```
 
 **Why this is wrong:**
+
 - Violates complexity triggers (≥3 steps → use TodoWrite)
 - Risk forgetting tasks
 - No user visibility
@@ -475,6 +488,7 @@ Bad update:
 ```
 
 **Why this is wrong:**
+
 - User can't see progress (no history)
 - Looks like nothing was done
 - Loses accountability trail
@@ -498,23 +512,23 @@ Good update:
 
 ## Quick Reference: Mistake → Fix
 
-| Mistake | Fix |
-|---------|-----|
-| TodoWrite for <3 steps | Check complexity triggers first |
-| Tasks added incrementally | Initialize complete list upfront |
-| Batched completions | Update immediately after each task |
-| Mark in_progress after starting | Update status BEFORE starting work |
-| Partial updates | Always send complete todo list |
-| Multiple in_progress | Focus on one task (unless truly parallel) |
-| Vague descriptions | Use specific, actionable task names |
-| Missing activeForm | Always include present continuous form |
-| Wrong activeForm tense | Use verb + -ing |
-| Keep obsolete tasks | Omit from next update |
-| Too granular (<5 min tasks) | Group into 5-15 min chunks |
-| Too coarse (>30 min tasks) | Break into sub-tasks |
-| Skip for complex work | Use when triggers match |
-| Rationalize away | TodoWrite mandatory when criteria met |
-| Drop completed tasks | Keep to show progress history |
+| Mistake                         | Fix                                       |
+| ------------------------------- | ----------------------------------------- |
+| TodoWrite for <3 steps          | Check complexity triggers first           |
+| Tasks added incrementally       | Initialize complete list upfront          |
+| Batched completions             | Update immediately after each task        |
+| Mark in_progress after starting | Update status BEFORE starting work        |
+| Partial updates                 | Always send complete todo list            |
+| Multiple in_progress            | Focus on one task (unless truly parallel) |
+| Vague descriptions              | Use specific, actionable task names       |
+| Missing activeForm              | Always include present continuous form    |
+| Wrong activeForm tense          | Use verb + -ing                           |
+| Keep obsolete tasks             | Omit from next update                     |
+| Too granular (<5 min tasks)     | Group into 5-15 min chunks                |
+| Too coarse (>30 min tasks)      | Break into sub-tasks                      |
+| Skip for complex work           | Use when triggers match                   |
+| Rationalize away                | TodoWrite mandatory when criteria met     |
+| Drop completed tasks            | Keep to show progress history             |
 
 ## Related References
 

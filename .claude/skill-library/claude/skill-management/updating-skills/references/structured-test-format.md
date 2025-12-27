@@ -5,6 +5,7 @@
 ## When to Use
 
 Create structured tests for:
+
 - Critical skill updates affecting workflows
 - Fixes for reported bugs (regression prevention)
 - Changes to mandatory rules or checkpoints
@@ -13,6 +14,7 @@ Create structured tests for:
 ## File Location
 
 Create test files in the skill's `evaluations/` directory:
+
 ```
 {skill-path}/evaluations/test-case-{number}.json
 ```
@@ -36,19 +38,20 @@ Create test files in the skill's `evaluations/` directory:
 
 ## Field Descriptions
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `name` | Yes | Short, descriptive test name |
-| `created` | Yes | Date test was created (YYYY-MM-DD) |
-| `type` | Yes | Always `"update-regression"` for update tests |
-| `query` | Yes | The user request that triggered this update |
-| `before_behavior` | Yes | What the skill did wrong before |
-| `expected_behavior` | Yes | Array of expected behaviors after update |
-| `red_failure` | Yes | The specific failure from RED phase |
+| Field               | Required | Description                                   |
+| ------------------- | -------- | --------------------------------------------- |
+| `name`              | Yes      | Short, descriptive test name                  |
+| `created`           | Yes      | Date test was created (YYYY-MM-DD)            |
+| `type`              | Yes      | Always `"update-regression"` for update tests |
+| `query`             | Yes      | The user request that triggered this update   |
+| `before_behavior`   | Yes      | What the skill did wrong before               |
+| `expected_behavior` | Yes      | Array of expected behaviors after update      |
+| `red_failure`       | Yes      | The specific failure from RED phase           |
 
 ## Example Test Cases
 
 ### Rule Change Test
+
 ```json
 {
   "name": "REFACTOR skip detection",
@@ -66,6 +69,7 @@ Create test files in the skill's `evaluations/` directory:
 ```
 
 ### Workflow Change Test
+
 ```json
 {
   "name": "Backup creation mandatory",
@@ -83,6 +87,7 @@ Create test files in the skill's `evaluations/` directory:
 ```
 
 ### Content Update Test
+
 ```json
 {
   "name": "Progressive disclosure enforcement",
@@ -110,6 +115,7 @@ Create test files in the skill's `evaluations/` directory:
 ## Running Tests
 
 Currently, tests are run manually by:
+
 1. Loading the skill
 2. Presenting the `query` to Claude
 3. Verifying Claude exhibits all `expected_behavior`

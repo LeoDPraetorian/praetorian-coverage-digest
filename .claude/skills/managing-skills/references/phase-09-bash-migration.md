@@ -25,6 +25,7 @@
 ### WARNING Issues
 
 **1. Shell Scripts Detected**
+
 ```
 Shell (2): Not cross-platform (Windows incompatible)
   → scripts/validate.sh
@@ -32,12 +33,14 @@ Shell (2): Not cross-platform (Windows incompatible)
 ```
 
 **2. Python Scripts Detected**
+
 ```
 Python (1): No testing infrastructure (use vitest instead of pytest)
   → scripts/analyze.py
 ```
 
 **3. JavaScript Files Detected**
+
 ```
 JavaScript (3): Use TypeScript for type safety
   → scripts/helper.js
@@ -46,6 +49,7 @@ JavaScript (3): Use TypeScript for type safety
 ```
 
 **4. Other Scripting Languages**
+
 ```
 Ruby (1): No testing infrastructure
   → scripts/process.rb
@@ -62,6 +66,7 @@ PHP (1): No testing infrastructure
 ❌ **NOT auto-fixable** - requires migration planning
 
 **Why**: Translating scripts → TypeScript requires:
+
 - Understanding script purpose
 - Choosing appropriate libraries
 - Rewriting logic (not 1:1 translation)
@@ -71,20 +76,21 @@ PHP (1): No testing infrastructure
 
 ## Script Type Rationale
 
-| Language | Extensions | Issue | Migration Priority |
-|----------|------------|-------|-------------------|
-| Shell | .sh, .bash, .zsh, .fish | Not cross-platform | HIGH |
-| Python | .py | No vitest testing | HIGH |
-| JavaScript | .js, .mjs, .cjs | No type safety | MEDIUM |
-| Ruby | .rb | No testing infra | HIGH |
-| Perl | .pl, .pm | No testing infra | HIGH |
-| PHP | .php | No testing infra | HIGH |
+| Language   | Extensions              | Issue              | Migration Priority |
+| ---------- | ----------------------- | ------------------ | ------------------ |
+| Shell      | .sh, .bash, .zsh, .fish | Not cross-platform | HIGH               |
+| Python     | .py                     | No vitest testing  | HIGH               |
+| JavaScript | .js, .mjs, .cjs         | No type safety     | MEDIUM             |
+| Ruby       | .rb                     | No testing infra   | HIGH               |
+| Perl       | .pl, .pm                | No testing infra   | HIGH               |
+| PHP        | .php                    | No testing infra   | HIGH               |
 
 ## Examples
 
 ### Example 1: Python Script → TypeScript
 
 **Before (Python):**
+
 ```python
 #!/usr/bin/env python3
 import json
@@ -99,23 +105,25 @@ for item in data['skills']:
 ```
 
 **After (TypeScript):**
+
 ```typescript
-import { readFileSync } from 'fs';
+import { readFileSync } from "fs";
 
 interface SkillData {
   skills: Array<{ name: string; type: string }>;
 }
 
-const data: SkillData = JSON.parse(readFileSync(process.argv[2], 'utf-8'));
+const data: SkillData = JSON.parse(readFileSync(process.argv[2], "utf-8"));
 
 for (const item of data.skills) {
-  if (item.type === 'reasoning') {
+  if (item.type === "reasoning") {
     console.log(item.name);
   }
 }
 ```
 
 **Benefits:**
+
 - Type safety (SkillData interface)
 - Same testing framework (vitest)
 - IDE autocompletion
@@ -135,6 +143,7 @@ Shell migration effort - Complex (1): scripts/deploy.sh
 ```
 
 **Complexity criteria:**
+
 - Simple: <30 lines, no pipes
 - Moderate: 30-100 lines OR has pipes
 - Complex: >100 lines OR uses pipes + git + npm
@@ -142,6 +151,7 @@ Shell migration effort - Complex (1): scripts/deploy.sh
 ### Example 3: JavaScript → TypeScript
 
 **Before (JavaScript):**
+
 ```javascript
 // helper.js
 export function validateSkill(skill) {
@@ -150,6 +160,7 @@ export function validateSkill(skill) {
 ```
 
 **After (TypeScript):**
+
 ```typescript
 // helper.ts
 interface Skill {
@@ -165,6 +176,7 @@ export function validateSkill(skill: Skill): boolean {
 ## Migration Workflow
 
 1. **Identify scripts**:
+
    ```bash
    npm run audit -- <skill-name> --verbose | grep "Phase 9"
    ```
@@ -195,18 +207,22 @@ export function validateSkill(skill: Skill): boolean {
 **1. Build/CI Scripts**
 
 Some shell scripts may be required for CI/CD:
+
 ```bash
 # .github/scripts/deploy.sh - may need to stay as shell
 ```
+
 Consider wrapping in TypeScript CLI that calls shell when necessary.
 
 **2. One-liner Shell Commands**
 
 Very simple shell commands (<10 lines, no logic) can remain:
+
 ```bash
 #!/bin/bash
 npm run build && npm run test
 ```
+
 But still flagged as WARNING for awareness.
 
 **3. Generated JavaScript**
@@ -220,12 +236,12 @@ Compiled `.js` files in `dist/` are excluded (node_modules, .git, dist, .local s
 
 ## Quick Reference
 
-| Script Type | Severity | Reason |
-|-------------|----------|--------|
-| Shell (.sh) | ⚠️ WARNING | Not cross-platform |
-| Python (.py) | ⚠️ WARNING | No vitest testing |
-| JavaScript (.js) | ⚠️ WARNING | No type safety |
-| Ruby (.rb) | ⚠️ WARNING | No testing infra |
-| Perl (.pl) | ⚠️ WARNING | No testing infra |
-| PHP (.php) | ⚠️ WARNING | No testing infra |
-| TypeScript (.ts) | ✅ OK | Standard |
+| Script Type      | Severity   | Reason             |
+| ---------------- | ---------- | ------------------ |
+| Shell (.sh)      | ⚠️ WARNING | Not cross-platform |
+| Python (.py)     | ⚠️ WARNING | No vitest testing  |
+| JavaScript (.js) | ⚠️ WARNING | No type safety     |
+| Ruby (.rb)       | ⚠️ WARNING | No testing infra   |
+| Perl (.pl)       | ⚠️ WARNING | No testing infra   |
+| PHP (.php)       | ⚠️ WARNING | No testing infra   |
+| TypeScript (.ts) | ✅ OK      | Standard           |

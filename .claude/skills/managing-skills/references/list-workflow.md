@@ -9,11 +9,13 @@ List operation shows all available skills with location, type, and compliance st
 ## Basic List
 
 ### List All Skills
+
 ```bash
 npm run list
 ```
 
 Output:
+
 ```
 📋 Skills:
 
@@ -36,6 +38,7 @@ Location Distribution:
 ## Filter Options
 
 ### Filter by Location
+
 ```bash
 # Core skills only
 npm run list --location core
@@ -45,6 +48,7 @@ npm run list --location library
 ```
 
 ### Filter by Type
+
 ```bash
 # Tool-wrapper skills
 npm run list --type tool-wrapper
@@ -59,21 +63,26 @@ npm run list --type hybrid
 ## Output Details
 
 ### Location Badge
+
 - **CORE** - `.claude/skills/` (green)
 - **LIBRARY** - `.claude/skill-library/` (cyan)
 
 ### Skill Type
+
 Auto-detected from:
+
 - Frontmatter `allowed-tools`
 - Content structure
 - Script organization
 
 **Types:**
+
 - `tool-wrapper` - Wraps single tool/CLI
 - `reasoning` - Teaches patterns/methodologies
 - `hybrid` - Mix of both
 
 ### Compliance Status (Future)
+
 - ✅ PASS - All phases pass
 - ⚠️ WARN - Non-critical issues
 - ❌ FAIL - Critical issues
@@ -81,6 +90,7 @@ Auto-detected from:
 ## Use Cases
 
 ### Use Case 1: Discover Available Skills
+
 ```bash
 npm run list
 ```
@@ -88,6 +98,7 @@ npm run list
 See complete skill inventory.
 
 ### Use Case 2: Review Core Skills
+
 ```bash
 npm run list --location core
 ```
@@ -95,6 +106,7 @@ npm run list --location core
 Audit high-frequency skills.
 
 ### Use Case 3: Find Tool-Wrapper Skills
+
 ```bash
 npm run list --type tool-wrapper
 ```
@@ -102,6 +114,7 @@ npm run list --type tool-wrapper
 Identify CLIs and integrations.
 
 ### Use Case 4: Library Organization
+
 ```bash
 npm run list --location library
 ```
@@ -117,7 +130,9 @@ Review library categorization.
 ## Integration
 
 ### With Search
+
 List provides overview, search finds specific:
+
 ```bash
 # See all skills
 npm run list
@@ -127,7 +142,9 @@ npm run search -- "testing"
 ```
 
 ### With Audit
+
 List identifies skills, audit validates:
+
 ```bash
 # List all
 npm run list

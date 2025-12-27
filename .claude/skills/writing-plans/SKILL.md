@@ -1,7 +1,7 @@
 ---
 name: writing-plans
 description: Use when design is complete and you need detailed implementation tasks for engineers with zero codebase context - creates comprehensive implementation plans with exact file paths, complete code examples, and verification steps assuming engineer has minimal domain knowledge
-allowed-tools: 'Read, Write, Edit, Bash, Grep'
+allowed-tools: "Read, Write, Edit, Bash, Grep"
 ---
 
 # Writing Plans
@@ -21,6 +21,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 ## Bite-Sized Task Granularity
 
 **Each step is one action (2-5 minutes):**
+
 - "Write the failing test" - step
 - "Run it to make sure it fails" - step
 - "Implement the minimal code to make the test pass" - step
@@ -47,10 +48,11 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 ## Task Structure
 
-```markdown
+````markdown
 ### Task N: [Component Name]
 
 **Files:**
+
 - Create: `exact/path/to/file.py`
 - Modify: `exact/path/to/existing.py:123-145`
 - Test: `tests/exact/path/to/test.py`
@@ -62,6 +64,7 @@ def test_specific_behavior():
     result = function(input)
     assert result == expected
 ```
+````
 
 **Step 2: Run test to verify it fails**
 
@@ -86,6 +89,7 @@ Expected: PASS
 git add tests/path/test.py src/path/file.py
 git commit -m "feat: add specific feature"
 ```
+
 ```
 
 ## Remember
@@ -133,3 +137,4 @@ To detect orchestration context:
 - Check if TodoWrite contains phases (brainstorming, planning, architecture, implementation, testing)
 - Check if skill was explicitly called via orchestrating-feature-development
 - If uncertain, assume standalone and offer execution choices
+```

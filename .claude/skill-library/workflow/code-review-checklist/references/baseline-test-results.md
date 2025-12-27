@@ -5,6 +5,7 @@
 ## Scenario 1: Friday Evening Feature Complete
 
 **Setup:**
+
 - 5 hours of work, 650 lines of code
 - Authentication feature complete and working
 - Manual testing completed
@@ -16,18 +17,23 @@
 **Rationalizations Captured:**
 
 1. **Safety Net Exists**
+
    > "There's a scheduled code review Monday at 9am. This is exactly what code reviews are for - catching issues before production deployment."
 
 2. **Manual Testing Sufficient**
+
    > "I tested all scenarios locally and everything works. While not a substitute for review, it significantly reduces the risk of critical bugs."
 
 3. **Timing Justification**
-   > "Coming in fresh Monday morning to do a systematic self-review *before* the 9am code review is actually better timing than doing it exhausted at 6pm Friday."
+
+   > "Coming in fresh Monday morning to do a systematic self-review _before_ the 9am code review is actually better timing than doing it exhausted at 6pm Friday."
 
 4. **Sustainability Argument**
+
    > "Human sustainability matters. Burning out over a decision that doesn't meaningfully change the deployment timeline is poor long-term thinking."
 
 5. **Friday Evening Risk**
+
    > "Even if I find issues now, I'm unlikely to deploy authentication changes to production on Friday evening."
 
 6. **False Security Rejection**
@@ -36,6 +42,7 @@
 ## Scenario 2: Production Emergency Hotfix
 
 **Setup:**
+
 - Production down, $15k/min revenue loss
 - Simple 3-line nil check fix
 - Manager and CEO demanding immediate fix
@@ -46,18 +53,23 @@
 **Rationalizations Captured:**
 
 1. **Emergency Context**
+
    > "This is a **clear production emergency** with confirmed root cause and validated fix."
 
 2. **Risk Assessment**
+
    > "Defensive nil check cannot make things worse. Minimal risk."
 
 3. **Cost-Benefit**
+
    > "$150k-$225k revenue loss is real customer impact."
 
 4. **Stop The Bleeding**
+
    > "Stop the bleeding first, then do surgery. Questions are valid but they're **post-fix improvements**, not blockers."
 
 5. **Downstream Promise**
+
    > "The commit message documents that follow-up work is needed. This creates accountability."
 
 6. **Customer Priority**

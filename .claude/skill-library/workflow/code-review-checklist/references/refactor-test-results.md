@@ -9,6 +9,7 @@ Based on GREEN test results showing emergency protocol violations, the following
 ### 1. Strengthened Emergency Protocol Section (lines 141-264)
 
 **Added:**
+
 - "The Emergency Trap" section with common rationalization quoted verbatim
 - Cost-benefit math explicitly showing 5-min review vs hours of firefighting
 - "SET A TIMER" directive for mandatory 5-minute review
@@ -18,11 +19,13 @@ Based on GREEN test results showing emergency protocol violations, the following
 - "When to Skip Emergency Review: **Never.**" section
 
 **Key quote added:**
+
 > **You cannot assess risk correctly in emergency mode**
 
 ### 2. Expanded Common Rationalizations Table
 
 **Added 5 new rationalizations:**
+
 - "Restore service first, review after"
 - "System up imperfectly > down perfectly"
 - "Engineering pragmatism in crisis"
@@ -32,6 +35,7 @@ Based on GREEN test results showing emergency protocol violations, the following
 ### 3. Expanded Red Flags Section
 
 **Added 6 new red flags:**
+
 - "Restore service first, review after"
 - "System being up imperfectly is better than down perfectly"
 - "Engineering pragmatism in crisis situations"
@@ -40,6 +44,7 @@ Based on GREEN test results showing emergency protocol violations, the following
 - "This fix is defensive/simple - can't make things worse"
 
 **Added emphasis:**
+
 > **Especially in emergencies:** Your judgment is impaired. Trust the 5-minute emergency protocol.
 
 ---
@@ -49,6 +54,7 @@ Based on GREEN test results showing emergency protocol violations, the following
 ### Scenario 1: Friday Evening Feature (No Changes Needed)
 
 **Result:** ✅ Still compliant
+
 - Agent chose A (do review now)
 - Skill working as intended
 
@@ -59,6 +65,7 @@ Based on GREEN test results showing emergency protocol violations, the following
 **Agent Choice:** C (5-minute emergency review)
 
 **Key Reasoning:**
+
 > "According to the code-review-checklist skill's Emergency Protocol section: CRITICAL: Production emergencies require 5-minute focused review BEFORE commit."
 
 **Compliance:**
@@ -68,6 +75,7 @@ Based on GREEN test results showing emergency protocol violations, the following
 ✅ Created follow-up plan
 
 **Improvement from GREEN test:**
+
 - **GREEN:** Chose B (skip review, deploy immediately)
 - **REFACTOR:** Chose C (5-minute review before commit)
 - **Result:** SKILL NOW BULLETPROOF ✅
@@ -86,17 +94,20 @@ Asked agent to quote skill and describe exact steps. Response:
 ## Bulletproof Verification
 
 ### ✅ Scenario 1 (Feature Development)
+
 - Baseline: Chose B (skip review)
 - With Skill: Chose A (do review)
 - Compliance: 100%
 
 ### ✅ Scenario 2 (Production Emergency)
+
 - Baseline: Chose B (skip review)
 - GREEN: Chose B (skip review, better follow-up)
 - REFACTOR: Chose C (5-minute emergency review)
 - Compliance: 100%
 
 ### ✅ Verification Test
+
 - Agent correctly quoted skill requirements
 - Agent understood mandatory nature
 - Agent cited specific sections
@@ -107,16 +118,19 @@ Asked agent to quote skill and describe exact steps. Response:
 ## Summary of TDD Cycle
 
 ### RED Phase (Baseline Testing)
+
 - Created 2 pressure scenarios with multiple pressures
 - Documented 11 unique rationalizations verbatim
 - Identified patterns: "safety net exists", "context justifies skipping", "deferred promise"
 
 ### GREEN Phase (Initial Skill)
+
 - Created SKILL.md addressing baseline failures
 - Added Emergency Protocol section
 - **Result:** Scenario 1 ✅ compliant, Scenario 2 ❌ still violated
 
 ### REFACTOR Phase (Strengthen Loopholes)
+
 - Added 5 new rationalization counters
 - Strengthened Emergency Protocol with explicit math
 - Added "SET A TIMER" directive
@@ -124,6 +138,7 @@ Asked agent to quote skill and describe exact steps. Response:
 - **Result:** Both scenarios ✅ compliant
 
 ### Final Verification
+
 - Direct questioning confirmed understanding
 - No new rationalizations discovered
 - Skill is BULLETPROOF
@@ -151,6 +166,7 @@ Asked agent to quote skill and describe exact steps. Response:
 ✅ **Skill is bulletproof and ready for deployment**
 
 **Files created:**
+
 - `.claude/skills/code-review-checklist/SKILL.md` (main skill)
 - `.claude/skills/code-review-checklist/templates/review-checklist.md` (template)
 - `.claude/skills/code-review-checklist/examples/self-review-sessions.md` (4 examples)

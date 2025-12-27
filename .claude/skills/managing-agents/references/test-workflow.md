@@ -1,271 +1,113 @@
-# Agent Discovery Test Workflow
+# Agent Test Workflow
+
+**Behavioral validation - skill integration testing.**
+
+⚠️ **As of December 2024, agent testing uses instruction-based workflow for behavioral validation (NOT structural validation).**
+
+---
 
 ## Overview
 
-The test command validates that an agent is properly configured for Claude Code discovery. It runs 9 automated tests plus guidance for manual verification.
+Testing validates agent BEHAVIOR - does the agent correctly invoke and follow skills when spawned under realistic pressure? This is distinct from audit, which validates structure/syntax.
 
-## Quick Start
+**See:** [Audit vs Test Comparison](audit-vs-test.md) for full details on the distinction.
 
-```bash
-# Test an agent
-npm run --silent test -- react-developer
+## How to Test an Agent
 
-# Verbose output
-npm run --silent test -- react-developer --verbose
-
-# Test with skill auto-load
-npm run --silent test -- react-developer gateway-frontend
-```
-
-## Command Reference
-
-```bash
-npm run --silent test -- <name>
-npm run --silent test -- <name> <skill-name>
-npm run --silent test -- <name> --verbose
-```
-
-### Parameters
-
-| Parameter | Description |
-|-----------|-------------|
-| `name` | Agent name to test |
-| `skill` | Optional skill to verify in frontmatter |
-| `--verbose` | Show detailed output |
-
-## Test Suite
-
-### Test 1: Agent Exists
-
-Verifies the agent file exists in any category directory.
+**Route to the testing-agent-skills skill:**
 
 ```
-✔ Agent found: .claude/agents/development/react-developer.md
+Read: .claude/skill-library/claude/agent-management/testing-agent-skills/SKILL.md
 ```
 
-### Test 2: Agent Parses
+The `testing-agent-skills` skill provides the complete workflow.
 
-Verifies the agent can be parsed (frontmatter extraction).
+---
 
-```
-✔ Agent parsed successfully
-```
+## What the Workflow Provides
 
-### Test 3: Description Syntax (CRITICAL)
+### Behavioral Validation
 
-Verifies description is NOT a block scalar.
+- **Spawns agents** - Uses Task tool with trigger scenarios
+- **Skill invocation testing** - Verifies agent invokes mandatory skills
+- **Methodology compliance** - Checks if agent follows skill workflows (TDD, debugging, verification)
+- **PASS/FAIL/PARTIAL** - Reports with detailed reasoning
 
-```
-✔ Description is single-line (valid)
-```
+### Test Inputs
 
-**If this fails**: The agent is INVISIBLE to Claude. Fix immediately:
-```bash
-npm run --silent fix -- <agent> --apply phase1-description
-```
+- **Agent name** (required): e.g., `frontend-developer`
+- **Skill name** (optional): e.g., `developing-with-tdd`
+  - If omitted, tests ALL mandatory skills from agent's frontmatter
 
-### Test 4: Description Trigger
+---
 
-Verifies description starts with "Use when".
+## Example Usage
 
 ```
-✔ Description starts with "Use when"
+User: "Test if frontend-developer uses developing-with-tdd correctly"
+
+Agent workflow:
+1. Read testing-agent-skills skill
+2. Provide agent=frontend-developer, skill=developing-with-tdd
+3. Spawn frontend-developer with RED phase trigger scenario
+4. Evaluate: Did agent invoke developing-with-tdd?
+5. Evaluate: Did agent follow TDD workflow?
+6. Report: PASS/FAIL/PARTIAL with reasoning
 ```
 
-### Test 5: Has Examples
+---
 
-Verifies description contains `<example>` blocks.
+## Why Instruction-Based?
 
-```
-✔ Description contains examples
-```
+Testing requires complex capabilities:
 
-### Test 6: Line Count
+- **Spawning agents** - Task tool to create agent instances
+- **Scenario design** - Crafting realistic trigger situations
+- **Behavior evaluation** - Analyzing agent responses for skill compliance
+- **Multi-step workflows** - TodoWrite for tracking test phases
+- **Pressure scenarios** - Time/authority/sunk cost tests
 
-Verifies line count within limits:
-- Standard agents: <300 lines
-- Complex agents (architecture, orchestrator): <400 lines
+---
 
-```
-✔ Line count: 250/300
-```
+## Time Estimate
 
-### Test 7: Gateway Skill
+- **Single skill:** 10-25 minutes
+- **All mandatory skills:** Hours (depends on skill count)
 
-Verifies a gateway skill is in frontmatter.
+---
 
-```
-✔ Has gateway skill in frontmatter
-```
+## Test vs Audit
 
-### Test 8: Output Format
+| Aspect      | Test (Behavioral)     | Audit (Structural) |
+| ----------- | --------------------- | ------------------ |
+| **Purpose** | Behavioral validation | Lint validation    |
+| **Method**  | Spawns agents         | Static analysis    |
+| **Speed**   | 10-25 min per skill   | 30-60 seconds      |
+| **When**    | Before deployment     | Before commit      |
 
-Verifies "Output Format" section exists.
+**Use both:** Audit catches format issues fast. Test catches behavioral issues that only appear when agents execute under pressure.
 
-```
-✔ Has output format section
-```
+---
 
-### Test 9: Escalation Protocol
+## Prerequisites
 
-Verifies "Escalation Protocol" section exists.
+None - the testing-agent-skills skill handles all setup internally.
 
-```
-✔ Has escalation protocol
-```
+---
 
-### Test 10: Skill Auto-Load (Optional)
+## Documentation
 
-If a skill name is provided, verifies it's in frontmatter.
+**Full workflow details:**
+`.claude/skill-library/claude/agent-management/testing-agent-skills/SKILL.md`
 
-```bash
-npm run --silent test -- react-developer gateway-frontend
-# ✔ Skill "gateway-frontend" found in frontmatter
-```
+**Related references:**
 
-## Test Summary
+- [Audit vs Test](audit-vs-test.md) - Critical distinction
+- [Audit Workflow](audit-workflow.md) - Structural validation
+- [TDD Workflow](tdd-workflow.md) - What agents should follow
 
-```
-═══ Test Summary ═══
+---
 
-Total: 9 | Passed: 8 | Failed: 1
+## Historical Note: test.ts CLI (DEPRECATED)
 
-Details:
-  ✓ Agent exists: .claude/agents/development/react-developer.md
-  ✓ Agent parses: Name: react-developer, Category: development
-  ✓ Description syntax: Single-line description
-  ✓ Description trigger: Starts with "Use when"
-  ✓ Has examples: Contains <example> blocks
-  ✗ Line count: 335 lines exceeds 300 line limit
-  ✓ Gateway skill: skills: gateway-frontend
-  ✓ Output format: Contains "Output Format" section
-  ✓ Escalation protocol: Contains "Escalation Protocol" section
-```
-
-## Manual Discovery Test
-
-After automated tests pass, verify discovery manually:
-
-```
-═══ Manual Discovery Test ═══
-In a NEW Claude Code session, ask:
-  "What is the description for the react-developer agent? Quote it exactly."
-
-Expected: Full description text
-Failure: Claude says "|" or ">" or must read the file
-```
-
-### How to Perform Manual Test
-
-1. **Start a new Claude Code session** (important - metadata is cached)
-2. Ask: "What is the description for the `react-developer` agent? Quote it exactly."
-3. **Expected response**: Claude quotes the full description with examples
-4. **Failure indicators**:
-   - Claude says the description is `|` or `>`
-   - Claude has to read the file to get the description
-   - Claude says it doesn't know the agent
-
-## Critical vs Non-Critical Tests
-
-### Critical (Must Fix)
-
-- **Test 3: Description Syntax** - If this fails, agent is invisible
-- **Test 6: Line Count > 400** - Hard failure
-
-### Non-Critical (Should Fix)
-
-- Test 4: Description trigger
-- Test 5: Has examples
-- Test 7: Gateway skill
-- Test 8: Output format
-- Test 9: Escalation protocol
-
-## Exit Codes
-
-- `0`: All tests pass (or only non-critical failures)
-- `1`: Critical test failed (description syntax or >400 lines)
-
-## Example Test Session
-
-```bash
-# Run tests
-npm run --silent test -- react-developer
-
-# Output:
-# ═══ Discovery Tests ═══
-#
-# ✔ Agent found: /path/to/.claude/agents/development/react-developer.md
-# ✔ Agent parsed successfully
-# ✔ Description is single-line (valid)
-# ✔ Description starts with "Use when"
-# ✔ Description contains examples
-# ✖ Line count exceeds limit: 335/300
-# ✔ Has gateway skill in frontmatter
-# ✔ Has output format section
-# ✔ Has escalation protocol
-#
-# ═══ Test Summary ═══
-# Total: 9 | Passed: 8 | Failed: 1
-#
-# ═══ Manual Discovery Test ═══
-# In a NEW Claude Code session, ask:
-#   "What is the description for the react-developer agent? Quote it exactly."
-```
-
-## Fixing Test Failures
-
-### Description Syntax Failed
-
-```bash
-# Critical - fix immediately
-npm run --silent fix -- <agent> --apply phase1-description
-npm run --silent test -- <agent>
-```
-
-### Line Count Exceeded
-
-```bash
-# View suggestions
-npm run --silent fix -- <agent> --suggest
-
-# Extract patterns to skills (manual)
-# Then re-test
-npm run --silent test -- <agent>
-```
-
-### Missing Gateway Skill
-
-```bash
-npm run --silent fix -- <agent> --apply phase4-gateway
-npm run --silent test -- <agent>
-```
-
-### Missing Output Format
-
-```bash
-# Get template
-npm run --silent fix -- <agent> --suggest
-# Add manually
-npm run --silent test -- <agent>
-```
-
-## Batch Testing
-
-Test all agents in a category:
-
-```bash
-# List agents
-npm run --silent list -- --type development --quiet
-
-# Test each
-for agent in $(npm run --silent list -- --type development --quiet 2>/dev/null); do
-  echo "Testing $agent..."
-  npm run --silent test -- $agent --verbose
-done
-```
-
-## References
-
-- [Audit Phases](./audit-phases.md)
-- [Fix Workflow](./fix-workflow.md)
-- [Agent Architecture](../../../docs/AGENT-ARCHITECTURE.md)
+The `test.ts` CLI script was deprecated - it performed structural checks that now belong in audit. The `test` operation now ONLY provides behavioral validation via the testing-agent-skills skill.

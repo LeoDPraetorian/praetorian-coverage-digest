@@ -1,0 +1,193 @@
+## [Date: 2025-12-24] - Progressive Disclosure Refactoring
+
+### Changed
+- Reduced SKILL.md from 663 lines to 447 lines (216 lines removed, 33% reduction)
+- Condensed inline content while preserving all essential information
+- Streamlined sections: Core Concepts, Form Registration Patterns, Error Handling, Advanced Patterns
+- Enhanced progressive disclosure with better signposting to reference files
+- Updated description to be more concise (243 → 151 characters)
+
+### Reason
+- Phase 3 audit CRITICAL failure: SKILL.md exceeded 500-line hard limit by 163 lines (33% overage)
+- Skills over 500 lines suffer from attention degradation and reduced agent comprehension
+- Progressive disclosure pattern not being fully utilized despite having 9 reference files
+- Inline content was redundant with existing comprehensive reference documentation
+
+### What Was Streamlined
+- **Core Concepts**: Reduced useForm and Zod sections to essentials, referenced rhf-api-reference.md and zod-schemas-guide.md
+- **Form Registration Patterns**: Condensed three patterns to brief descriptions with reference links
+- **Error Handling**: Kept key examples, referenced error-handling.md for comprehensive guide
+- **Advanced Patterns**: Replaced inline examples with reference links to existing documentation
+- **Performance/Accessibility**: Reduced to key points, full guides in existing reference files
+
+### Structure After Refactoring
+- **SKILL.md**: 447 lines (safe zone, 53 lines under limit)
+- **Quick Start**: Preserved complete working example (critical for first-time users)
+- **References**: 9 comprehensive guides remain unchanged (55KB total content)
+- **Progressive disclosure**: Summary → Details pattern now consistently applied
+
+### Impact
+- Phase 3 compliance: ❌ CRITICAL → ✅ PASS (447 < 500 lines)
+- Readability: Improved - less scrolling, clearer structure
+- Completeness: Maintained - all content accessible via references
+- Maintainability: Enhanced - updates now target specific reference files
+
+### REFACTOR Status
+- Categorized as: **Cosmetic change** (restructuring existing content, no rule/workflow changes)
+- REFACTOR Phase 8: NOT REQUIRED per updating-skills workflow
+- Rationale: No validation rules, skip conditions, or mandatory steps modified
+- Content reorganized for compliance without changing semantic meaning
+
+---
+
+## [Date: 2025-12-24] - Add shadcn/ui Field Component Documentation
+
+### Added
+- **Field Component (Recommended)** section with full documentation of modern primitives pattern
+- Basic usage example with Controller integration
+- Field component anatomy (Field, FieldLabel, FieldDescription, FieldError)
+- FieldError Standard Schema support documentation (accepts errors object, array, or string)
+- Common patterns: Input, Textarea, Select, Checkbox with Field primitives
+- Nested objects and arrays patterns with Field
+- Migration guide from Form component to Field primitives
+- Before/after comparison showing reduced nesting and better composition
+
+### Changed
+- Marked Form/FormField/FormItem/FormControl pattern as **LEGACY** (⚠️)
+- Updated status from "Future" to "Production Ready" for Field component
+- Added table of contents with clear recommendations
+- Split Tips section into "For Field Component (Recommended)" and "For Form Component (Legacy)"
+- Updated official docs links with Field component first (recommended)
+
+### Reason
+- RED Failure: Documentation showed Form component without marking as legacy despite shadcn/ui stating "not actively developed"
+- Field component is now production ready with Standard Schema support (Zod, Yup, ArkType)
+- Modern pattern provides better composition, less nesting, and more flexibility
+- Developers need clear guidance on which pattern to use for new projects
+
+### Impact
+- shadcn-integration.md: 392 → 749 lines (+357 lines for comprehensive Field documentation)
+- SKILL.md: 663 lines (unchanged - reference file update only)
+- Developers now have complete guidance on modern shadcn/ui form patterns
+
+### REFACTOR
+- Tests run: None (documentation-only update)
+- Rationale: This update adds documentation with explicit legacy warnings and migration guides
+- No validation rules, skip conditions, or executable logic added
+- Pressure resistance built-in: Clear status markers (⚠️ LEGACY vs ✅ Recommended), before/after examples, migration guide
+- Future monitoring: If agents ignore legacy warnings, add explicit counters in next update
+
+---
+
+## [Date: 2025-12-24] - Expand Zod v4 Breaking Changes
+
+### Added
+- UUID validation strictness note: z.uuid() now RFC 9562/4122 compliant, z.guid() for permissive
+- Error parameter deprecation: 'message' → 'error' (message still works but deprecated)
+- Dropped parameters: invalid_type_error and required_error no longer available
+- Migration examples for each breaking change
+
+### Reason
+- RED Failure: Breaking changes section incomplete - missing critical v4 changes beyond string validators
+- Developers using z.uuid() would get unexpected validation failures without knowing about z.guid() alternative
+- Code using invalid_type_error/required_error would silently fail in v4
+- Migration path from v3 → v4 was unclear
+
+### Impact
+- zod-schemas-guide.md: Breaking changes section expanded from 1 → 3 subsections
+- Developers now have complete v4 migration guidance
+- SKILL.md line count: 663 (unchanged)
+
+---
+
+## [Date: 2025-12-24] - Add z.coerce Documentation
+
+### Added
+- Created `references/coercion-guide.md` - comprehensive guide for z.coerce type coercion
+- Added coercion section to `references/zod-schemas-guide.md` with summary and link
+- Documented z.coerce.number(), z.coerce.boolean(), z.coerce.date()
+- Covered critical empty string → 0 gotcha with z.coerce.number()
+- Provided 3 solutions: .pipe() pattern, transform to undefined, custom helper
+- Explained when NOT to use coercion (APIs, databases)
+- Compared z.coerce vs z.preprocess
+
+### Reason
+- RED Failure: Skill covers preprocess/transform but omits z.coerce - the modern, recommended approach for form input coercion
+- Developers would use complex preprocess when simple z.coerce is appropriate
+- Critical gotcha (empty strings become 0) causes false positives on required fields
+- z.coerce is less verbose, better tree-shakable, and purpose-built for form inputs
+
+### Impact
+- SKILL.md line count: 663 (unchanged - used extraction strategy)
+- New reference file: coercion-guide.md (154 lines)
+- Developers now have modern coercion patterns with gotcha warnings
+
+---
+
+## [Date: 2025-12-24] - Zod v4 Deprecation Update
+
+### Changed
+- Updated all code examples to use Zod v4 top-level validators:
+  - `z.string().email()` → `z.email()`
+  - `z.string().uuid()` → `z.uuid()`
+  - `z.string().url()` → `z.url()`
+- Added Zod v4 deprecation warning in SKILL.md after Zod Schema Basics section
+- Added comprehensive Zod v4 breaking changes section in references/zod-schemas-guide.md
+- Documented that `z.uuid()` is now RFC 9562/4122 strict; added `z.guid()` as permissive alternative
+
+### Reason
+- RED Failure: Skill teaching deprecated Zod v3 patterns while codebase uses zod ^4.1.12
+- Method-chaining pattern (`z.string().email()`) is deprecated and will be removed in next major version
+- Following current skill leads developers to write deprecated code that will break in future Zod releases
+
+### Impact
+- SKILL.md line count: 661 → 663 lines (+2 lines for deprecation note)
+- References updated with migration guidance
+- Developers now learn current Zod v4 conventions
+
+### REFACTOR
+- Tests run: Time + Habit pressure (agent "remembering" old syntax under time pressure)
+- All tests: PASSED - Agent followed updated skill guidance, used z.email() not z.string().email()
+- Counter-rationalizations added: None needed - deprecation note was sufficient
+
+---
+
+## [Date: 2025-12-24]
+
+### Changed
+- Added TodoWrite mandate after Quick Start header to enforce external step tracking
+- Added explicit reminder about 13+ concepts requiring tracking (form setup, schema validation, error handling, accessibility, server validation)
+
+### Reason
+- Phase 13 audit failure: Complex skill (13 sections, 1767 words) missing TodoWrite mandate
+- Without external tracking, agents skip critical implementation steps:
+  - Forgetting defaultValues → uncontrolled component warnings
+  - Skipping server-side validation → security vulnerabilities
+  - Missing ARIA attributes → accessibility failures
+  - Omitting error display → poor UX
+- TodoWrite mandate ensures agents externalize workflow tracking for all 13+ concepts
+
+### Technical Debt
+- SKILL.md is 661 lines (exceeds 500-line hard limit by 161 lines)
+- Recommendation: Extract Quick Start (123 lines), Core Concepts (96 lines), or Advanced Patterns (96 lines) to references/
+- Current structure uses progressive disclosure (8 reference files with 55KB detailed content)
+- Next update should prioritize content extraction
+
+---
+
+## [Date: 2025-12-24] - Phase 9 Fix
+
+### Changed
+- Deleted `scripts/check-versions.sh` (52-line bash script)
+- Removed empty `scripts/` directory
+- Added "Check Latest Versions" section to SKILL.md with inline npm command
+
+### Reason
+- Phase 9 audit warning: Shell script not cross-platform (Windows incompatible)
+- YAGNI: Script functionality (npm view) is trivially replaced by inline instructions
+- No code needed - instructions are simpler and cross-platform
+
+### Result
+- Phase 9: 6 issues → 0 issues ✅
+- Phase 7: 1 issue → 0 issues (.local/ created earlier)
+- Overall warnings: 5 → 3

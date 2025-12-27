@@ -9,6 +9,7 @@ Comprehensive validation rules for agent name format, existence checking, and du
 ### Validation Steps
 
 1. **Test name against regex pattern programmatically**:
+
    ```bash
    # Test if name matches pattern
    echo "{agent-name}" | grep -E '^[a-z][a-z0-9-]*$'
@@ -18,13 +19,13 @@ Comprehensive validation rules for agent name format, existence checking, and du
 
 ### Invalid Name Examples
 
-| Invalid Name | Violation | Why Invalid |
-|--------------|-----------|-------------|
-| `Python-Developer` | Capital letters | Pattern requires lowercase only (`^[a-z]...`) |
-| `python_developer` | Underscore | Pattern allows only hyphens as separators (`[a-z0-9-]`) |
-| `python developer` | Space | Pattern allows only letters, numbers, hyphens (no whitespace) |
-| `123-developer` | Starts with number | Pattern requires starting with letter (`^[a-z]`) |
-| `python-` | Ends with hyphen | Pattern allows hyphens only between words, not trailing |
+| Invalid Name       | Violation          | Why Invalid                                                   |
+| ------------------ | ------------------ | ------------------------------------------------------------- |
+| `Python-Developer` | Capital letters    | Pattern requires lowercase only (`^[a-z]...`)                 |
+| `python_developer` | Underscore         | Pattern allows only hyphens as separators (`[a-z0-9-]`)       |
+| `python developer` | Space              | Pattern allows only letters, numbers, hyphens (no whitespace) |
+| `123-developer`    | Starts with number | Pattern requires starting with letter (`^[a-z]`)              |
+| `python-`          | Ends with hyphen   | Pattern allows hyphens only between words, not trailing       |
 
 ### Valid Name Examples
 
@@ -86,9 +87,10 @@ Grep -n "description:" .claude/agents/**/*.md --output_mode content
 ### Calculate Overlap
 
 For each existing agent:
+
 1. Extract keywords from its description
 2. Count matching keywords with proposed agent
-3. Calculate: (matching_keywords / total_proposed_keywords) * 100
+3. Calculate: (matching_keywords / total_proposed_keywords) \* 100
 
 ### Warning Threshold
 
@@ -110,6 +112,7 @@ Similar agents found:
 ### User Confirmation
 
 **Ask User** via AskUserQuestion:
+
 ```
 Question: Similar agents exist with {overlap}% keyword overlap. Is this a duplicate?
 Header: Duplicate Check
@@ -122,14 +125,17 @@ Options:
 ### Response Handling
 
 **If "Yes - duplicate"**:
+
 - Stop creation workflow
 - Suggest: `skill: "updating-agents"` with {existing-agent-name}
 
 **If "Clarify"**:
+
 - Read and display full descriptions of similar agents
 - Re-prompt with duplicate check question
 
 **If "No - different focus"**:
+
 - Record confirmation in notes
 - Proceed to Phase 3
 

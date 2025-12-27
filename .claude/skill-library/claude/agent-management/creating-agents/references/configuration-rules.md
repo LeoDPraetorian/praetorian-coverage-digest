@@ -5,6 +5,7 @@ Detailed validation rules for description generation, tool selection, skill sele
 ## 4.1 Description Generation
 
 Ask (3 questions simultaneously):
+
 1. Trigger phrase ("Use when {developing/designing/testing/etc.}...")
 2. Key capabilities (2-3, multiSelect)
 3. Custom wording or generated?
@@ -17,15 +18,16 @@ Ask (3 questions simultaneously):
 
 **IMPORTANT**: Agent descriptions follow a DIFFERENT pattern than skill descriptions:
 
-| Aspect | Skills | Agents |
-|--------|--------|--------|
-| **Purpose** | Trigger for `skill-search` CLI discovery | Trigger for Claude's agent selection via Task tool |
-| **Style** | Can be longer, explanatory (process workflows) | Must be action-oriented summaries |
-| **Main Description** | No strict character limit | 80-150 chars before `\n\n<example>` |
-| **Total Limit** | No hard limit (progressive disclosure if >500 lines) | 1024 chars (hard limit) |
-| **Use When** | "Use when" triggers search by keyword matching | "Use when" triggers agent selection by task type |
+| Aspect               | Skills                                               | Agents                                             |
+| -------------------- | ---------------------------------------------------- | -------------------------------------------------- |
+| **Purpose**          | Trigger for `skill-search` CLI discovery             | Trigger for Claude's agent selection via Task tool |
+| **Style**            | Can be longer, explanatory (process workflows)       | Must be action-oriented summaries                  |
+| **Main Description** | No strict character limit                            | 80-150 chars before `\n\n<example>`                |
+| **Total Limit**      | No hard limit (progressive disclosure if >500 lines) | 1024 chars (hard limit)                            |
+| **Use When**         | "Use when" triggers search by keyword matching       | "Use when" triggers agent selection by task type   |
 
 **Why Agent Descriptions Must Be Concise**:
+
 - Agents are selected by Claude Code based on description matching task intent
 - Long descriptions dilute signal-to-noise ratio for agent selection
 - Main description (before examples) should be scannable in 2-3 seconds
@@ -34,6 +36,7 @@ Ask (3 questions simultaneously):
 **Examples**:
 
 ✅ **GOOD Agent Description** (89 chars before example):
+
 ```
 Use when developing React frontend - components, UI bugs, performance, API integration.
 
@@ -41,6 +44,7 @@ Use when developing React frontend - components, UI bugs, performance, API integ
 ```
 
 ❌ **BAD Agent Description** (verbose, skill-like):
+
 ```
 Use when developing React applications. This agent specializes in creating reusable components using modern React patterns including hooks, context, and state management. It handles UI bugs by systematically debugging component hierarchies and prop flows. For performance optimization, it implements memoization strategies, lazy loading patterns, and code splitting techniques. When integrating with APIs, it uses TanStack Query for data fetching, caching, and synchronization. The agent follows React 19 best practices and TypeScript strict mode guidelines.
 
@@ -48,6 +52,7 @@ Use when developing React applications. This agent specializes in creating reusa
 ```
 
 **Character Count Guidance for Agents**:
+
 - **Ideal**: 80-100 chars (trigger phrase)
 - **Acceptable**: 100-150 chars (approaching warning)
 - **Warning**: 150-200 chars (suggests over-explaining)
@@ -58,6 +63,7 @@ Use when developing React applications. This agent specializes in creating reusa
 After "Use when" prefix, **MUST validate the next word is an action verb**:
 
 **Valid action verbs** (ending in -ing):
+
 - developing
 - designing
 - testing
@@ -84,6 +90,7 @@ After "Use when" prefix, **MUST validate the next word is an action verb**:
 1. Extract first word after "Use when "
 2. Check if it ends in "-ing" and is in the action verb list
 3. If NOT an action verb:
+
    ```
    ❌ ERROR: Description must start with action verb
 
@@ -107,6 +114,7 @@ After "Use when" prefix, **MUST validate the next word is an action verb**:
 **Pattern**: `"Use when {action-verb}ing..."`
 
 **Examples**:
+
 - ✅ "Use when developing React components with TypeScript..."
 - ✅ "Use when testing API endpoints with integration tests..."
 - ✅ "Use when reviewing Go backend code for security issues..."
@@ -131,15 +139,18 @@ After description is generated/confirmed, **MUST validate length**:
 ### Validation Rules
 
 **Hard Limits**:
+
 - ✅ Total ≤ 1024 characters (MANDATORY - cannot proceed if exceeded)
 
 **Trigger Phrase Guidelines** (text before `\n\n<example>`):
+
 - ✅ **Ideal**: 80-100 chars - Concise, scannable, action-oriented
 - ✅ **Acceptable**: 100-150 chars - Still effective for agent selection
 - ⚠️ **Warning**: 150-200 chars - Approaching verbose territory
 - ❌ **Problem**: >200 chars - Dilutes signal for agent selection
 
 **Total Description Guidelines**:
+
 - ⚠️ Total > 800 characters (warning - consider shortening examples)
 
 ### Violation Handling
@@ -174,6 +185,7 @@ Trigger Phrase: "Use when developing React frontend - components, UI bugs, perfo
 ## 4.2 Tool Selection
 
 Show required tools for type, ask for additional:
+
 - Task (spawn agents)
 - Skill (invoke skills)
 - WebFetch/WebSearch (for research)
@@ -197,6 +209,7 @@ After collecting tools, **MUST validate alphabetical order**:
 ### Known Available Tools
 
 Complete list of valid tools:
+
 ```
 AskUserQuestion
 Bash
@@ -218,6 +231,7 @@ Write
 ### Tool Validation Steps
 
 1. **Check each tool against available tools list**:
+
    ```
    For each tool in selected tools:
      If tool NOT in available tools list:
@@ -225,6 +239,7 @@ Write
    ```
 
 2. **If invalid tools found**:
+
    ```
    ❌ ERROR: Invalid tool names detected
 
@@ -252,20 +267,21 @@ Write
 
 ### Required Tools by Agent Type
 
-| Agent Type | Required Tools | Rationale |
-|-----------|----------------|-----------|
-| architecture | Read, Glob, Grep | Must read codebase for design |
-| development | Read, Write, Edit | Must read and modify code |
-| testing | Read, Write, Bash | Must read code, write tests, run them |
-| quality | Read, Glob, Grep | Must read code for review |
-| analysis | Read, Glob, Grep | Must read code for analysis |
-| research | Read, WebFetch, WebSearch | Must fetch documentation |
-| orchestrator | Task, TodoWrite | Must spawn agents and track tasks |
-| mcp-tools | Read | Must read MCP tool schemas |
+| Agent Type   | Required Tools            | Rationale                             |
+| ------------ | ------------------------- | ------------------------------------- |
+| architecture | Read, Glob, Grep          | Must read codebase for design         |
+| development  | Read, Write, Edit         | Must read and modify code             |
+| testing      | Read, Write, Bash         | Must read code, write tests, run them |
+| quality      | Read, Glob, Grep          | Must read code for review             |
+| analysis     | Read, Glob, Grep          | Must read code for analysis           |
+| research     | Read, WebFetch, WebSearch | Must fetch documentation              |
+| orchestrator | Task, TodoWrite           | Must spawn agents and track tasks     |
+| mcp-tools    | Read                      | Must read MCP tool schemas            |
 
 ### Missing Required Tools
 
 **If required tools missing**:
+
 ```
 ⚠️ WARNING: Missing required tools for {agent-type} agent
 
@@ -279,6 +295,7 @@ Missing: {missing_tool1}, {missing_tool2}
 ```
 
 **Ask User** via AskUserQuestion:
+
 ```
 Question: Required tools missing for {agent-type}. Add them automatically?
 Header: Tool Requirements
@@ -300,6 +317,7 @@ Options:
 **Cannot proceed with invalid tool names** ✅
 
 **Why this matters**:
+
 - Prevents runtime errors from non-existent tools
 - Ensures agents have minimum required capabilities
 - Catches typos at creation time (vs failing at runtime)
@@ -337,6 +355,7 @@ Ask: "What type of agent is this?"
 - **Very Simple Tasks** → `haiku` (rare)
 
 **IMPORTANT**:
+
 - `model` controls MODEL selection, not context
 - Context is ALWAYS isolated for sub-agents (not configurable)
 - `inherit` means "use the same model as the main session"

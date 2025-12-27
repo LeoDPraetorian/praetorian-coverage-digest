@@ -1,0 +1,26 @@
+# Changelog - chariot-brand-guidelines
+
+## [Date: 2025-12-23]
+
+### Changed
+- Added new "Styling Rules" section after "Usage Guidelines"
+- Added "Theme Classes vs Hardcoded Colors" subsection with critical rule and examples
+- Added "Common Theme Class Mappings" table with 10 common theme class patterns
+
+### Reason
+- Skill previously only documented WHAT colors exist (color values)
+- Missing HOW to use them (theme classes vs hardcoded colors)
+- Without explicit guidance, developers were hardcoding colors like `bg-gray-900` instead of using theme classes like `bg-layer0`
+- Hardcoded colors break light/dark mode switching
+- New section provides explicit rules with correct/wrong examples and a quick reference table
+
+### Impact
+- Developers now have clear guidance on theme class usage
+- Prevents common anti-pattern of hardcoding Tailwind color utilities
+- Maintains consistency with Chariot's design system
+- File remains well within size limits (191 lines, under 350 threshold)
+
+### REFACTOR Phase
+- **Status**: Skipped (Not Required)
+- **Reason**: This is additive documentation of existing design system patterns, not a workflow change with execution logic that agents could bypass
+- **Change Type**: Content addition (guidance + examples), not rule changes or validation logic

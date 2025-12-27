@@ -60,27 +60,27 @@
   "priority": "P0",
   "category": "Injection",
   "objective": "Verify input sanitization prevents NoSQL injection",
-  "preconditions": [
-    "Valid authenticated session",
-    "Endpoint accepts filter parameters"
-  ],
+  "preconditions": ["Valid authenticated session", "Endpoint accepts filter parameters"],
   "steps": [
     {
       "step": 1,
       "action": "Send normal filter request",
-      "payload": {"filter": "name = test"},
+      "payload": { "filter": "name = test" },
       "expectedResult": "200 with filtered results"
     },
     {
       "step": 2,
       "action": "Send injection payload",
-      "payload": {"filter": "name = test OR 1=1"},
+      "payload": { "filter": "name = test OR 1=1" },
       "expectedResult": "400 Bad Request or sanitized query"
     },
     {
       "step": 3,
       "action": "Send DynamoDB-specific injection",
-      "payload": {"filter": "name = :val", "expressionValues": {":val": {"S": "test"}, ":bypass": {"S": "1"}}},
+      "payload": {
+        "filter": "name = :val",
+        "expressionValues": { ":val": { "S": "test" }, ":bypass": { "S": "1" } }
+      },
       "expectedResult": "Rejected or ignored extra attributes"
     }
   ],
@@ -100,10 +100,7 @@
   "priority": "P0",
   "category": "Authentication",
   "objective": "Verify rate limiting prevents recovery code brute force",
-  "preconditions": [
-    "Test account with MFA enabled",
-    "Valid primary credentials"
-  ],
+  "preconditions": ["Test account with MFA enabled", "Valid primary credentials"],
   "steps": [
     {
       "step": 1,
@@ -142,10 +139,7 @@
   "priority": "P0",
   "category": "Authorization",
   "objective": "Verify RBAC prevents role escalation",
-  "preconditions": [
-    "Test accounts: regular user, admin user",
-    "Valid tokens for both"
-  ],
+  "preconditions": ["Test accounts: regular user, admin user", "Valid tokens for both"],
   "steps": [
     {
       "step": 1,
@@ -179,10 +173,7 @@
   "priority": "P1",
   "category": "Injection",
   "objective": "Verify output encoding prevents XSS",
-  "preconditions": [
-    "Authenticated user session",
-    "Form or API accepting user text input"
-  ],
+  "preconditions": ["Authenticated user session", "Form or API accepting user text input"],
   "steps": [
     {
       "step": 1,
@@ -234,9 +225,9 @@ Example: TC-IDOR-003, TC-INJ-007, TC-AUTH-002
 
 ## Priority Mapping
 
-| Priority | Risk Score | Timeline | Example |
-|----------|------------|----------|---------|
-| P0 | 9-12 | Sprint 0 (immediate) | Authentication bypass, injection |
-| P1 | 6-8 | Sprint 1 | XSS, SSRF, privilege escalation |
-| P2 | 3-5 | Sprint 2-3 | Information disclosure, logging gaps |
-| P3 | 1-2 | Backlog | Low-impact issues, hardening |
+| Priority | Risk Score | Timeline             | Example                              |
+| -------- | ---------- | -------------------- | ------------------------------------ |
+| P0       | 9-12       | Sprint 0 (immediate) | Authentication bypass, injection     |
+| P1       | 6-8        | Sprint 1             | XSS, SSRF, privilege escalation      |
+| P2       | 3-5        | Sprint 2-3           | Information disclosure, logging gaps |
+| P3       | 1-2        | Backlog              | Low-impact issues, hardening         |

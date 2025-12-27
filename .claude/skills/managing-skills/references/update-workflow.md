@@ -11,11 +11,13 @@ Updates follow the same TDD discipline as creation: identify gap, prove it exist
 ### Step 1: Identify Gap
 
 **Questions to answer:**
+
 - What instruction is missing?
 - What mistake do agents make with current skill?
 - What specific behavior needs to change?
 
 **Document:**
+
 - Current behavior (what happens now)
 - Expected behavior (what should happen)
 - Gap (what's missing from skill)
@@ -30,6 +32,7 @@ Updates follow the same TDD discipline as creation: identify gap, prove it exist
 4. Capture exact failure (agent's rationalization, wrong behavior)
 
 **Example RED phase:**
+
 ```
 Scenario: Agent should create tests before implementation
 Current behavior: Agent implements first, then creates tests
@@ -39,6 +42,7 @@ Gap: Skill doesn't explicitly forbid implementation-first
 ### Step 3: Update Skill Minimally
 
 **Command:**
+
 ```bash
 # From .claude/ root (using workspace shortcut)
 cd .claude
@@ -50,16 +54,19 @@ npm run update -- skill-name "Brief description of change"
 ```
 
 **Make minimal change:**
+
 - Add specific instruction that closes gap
 - Don't refactor unrelated content
 - Don't add "nice to have" improvements
 - Focus on closing THIS gap only
 
 **Example update:**
+
 ```markdown
 ## Critical Rules
 
 **Cannot proceed without tests:**
+
 - Not even when "it's simple"
 - Not even when "we'll add them later"
 - Not even when time-pressed
@@ -69,12 +76,14 @@ npm run update -- skill-name "Brief description of change"
 ### Step 4: GREEN Phase - Verify Gap Closes
 
 **Re-test scenario:**
+
 1. Run same test WITH updated skill
 2. **MUST PASS** now
 3. Agent should follow new instruction
 4. Gap should be closed
 
 **If still fails:**
+
 - Instruction wasn't clear enough
 - Need more explicit counter
 - Need example showing correct behavior
@@ -88,6 +97,7 @@ npm run update -- skill-name "Brief description of change"
 3. No new failures introduced
 
 **Common regressions:**
+
 - New instruction conflicts with existing
 - Added complexity breaks simple cases
 - Explicit counter too broad
@@ -95,15 +105,17 @@ npm run update -- skill-name "Brief description of change"
 ### Step 6: Compliance Re-Audit
 
 **Automatic re-validation:**
+
 ```bash
 npm run audit -- skill-name
 ```
 
 **Verify:**
+
 - Word count still appropriate
 - No broken links introduced
 - File organization maintained
-- All 13 phases still pass
+- All 21 phases still pass
 
 **If audit shows word count warning (>500 lines), proceed to Step 7.**
 
@@ -121,12 +133,14 @@ npm run audit -- skill-name
 #### Detection
 
 **Audit will show word count warning:**
+
 ```
 Phase 3: Word Count
   WARNING: SKILL.md exceeds 500 lines (1880 lines)
 ```
 
 **Manual check:**
+
 ```bash
 wc -l SKILL.md  # Should be < 500 lines
 ```
@@ -140,6 +154,7 @@ Read: .claude/skills/managing-skills/references/progressive-disclosure.md
 ```
 
 This reference explains:
+
 - What to keep in SKILL.md (overview, quick reference, core workflow)
 - What to move to references/ (detailed explanations, advanced patterns)
 - What to move to examples/ (case studies, before/after)
@@ -155,6 +170,7 @@ mkdir -p references examples
 **Step 7.3: Split Content**
 
 **Keep in SKILL.md (~300-500 lines):**
+
 - Frontmatter (name, description, tags)
 - When to Use This Skill (symptoms, triggers)
 - Tech Stack Context (if applicable)
@@ -168,6 +184,7 @@ mkdir -p references examples
 - Related Skills
 
 **Move to references/ directory:**
+
 - Detailed explanations (>200 words per topic)
 - API references and schemas
 - Advanced patterns and techniques
@@ -177,6 +194,7 @@ mkdir -p references examples
 - Security considerations
 
 **Move to examples/ directory:**
+
 - Complete case studies
 - Good vs bad code comparisons
 - Real-world scenarios
@@ -188,6 +206,7 @@ mkdir -p references examples
 **Naming convention:** `<topic>.md` (e.g., `react-19-patterns.md`, `state-management.md`)
 
 **Structure for each reference:**
+
 ```markdown
 # Topic Name
 
@@ -215,6 +234,7 @@ Detailed content...
 **Step 7.5: Update SKILL.md with Links**
 
 **Add Table of Contents section:**
+
 ```markdown
 ## Table of Contents
 
@@ -232,6 +252,7 @@ This skill is organized into detailed reference documents. Read them as needed:
 ```
 
 **Link from workflows:**
+
 ```markdown
 ### Creating a New Feature
 
@@ -244,6 +265,7 @@ See [React 19 Patterns](references/react-19-patterns.md) for detailed component 
 **Step 7.6: Verify Structure**
 
 **Check file organization:**
+
 ```bash
 tree -L 2 <skill-directory>
 # Should show:
@@ -258,6 +280,7 @@ tree -L 2 <skill-directory>
 ```
 
 **Check line count:**
+
 ```bash
 wc -l SKILL.md        # Should be < 500 lines
 wc -l references/*.md # Can be any length
@@ -273,14 +296,16 @@ npm run audit -- skill-name
 
 #### Real-World Example
 
-**Case Study: frontend-architecture skill**
+**Case Study: designing-frontend-architecture skill**
 
 **Before restructuring:**
+
 - Single file: 1,880 lines
 - Audit warning: Word count exceeded
 - All content in one file (slow to load)
 
 **After restructuring:**
+
 - SKILL.md: 293 lines (84% reduction)
 - 7 reference files:
   - `react-19-patterns.md` (16KB)
@@ -292,9 +317,10 @@ npm run audit -- skill-name
   - `scalability.md` (1.3KB)
 - Audit: ✅ PASSED WITH WARNINGS (no critical issues)
 
-**Location:** `.claude/skill-library/development/frontend/frontend-architecture/`
+**Location:** `.claude/skill-library/development/frontend/designing-frontend-architecture/`
 
 **Structure:**
+
 ```markdown
 ## Table of Contents
 
@@ -315,6 +341,7 @@ npm run audit -- skill-name
 ✅ **Skip if SKILL.md < 500 lines** - File is already appropriately sized
 
 Common cases where skills stay small:
+
 - Simple tool wrappers (100-200 lines)
 - Focused process skills (200-300 lines)
 - Integration guides (150-250 lines)
@@ -328,6 +355,7 @@ Common cases where skills stay small:
 3. Sunk cost: "Already invested hours"
 
 **Update should still hold:**
+
 - Agent follows new instruction
 - No rationalization bypasses it
 - Explicit counter works
@@ -379,15 +407,18 @@ Common cases where skills stay small:
 ### Pattern 1: Adding Pressure Counter
 
 **Before:**
+
 ```markdown
 Run tests after implementation.
 ```
 
 **After:**
+
 ```markdown
 Run tests after implementation.
 
 **Cannot skip tests:**
+
 - Not even when time-pressed
 - Not even when "obvious"
 - Not even when "we'll add them later"
@@ -396,13 +427,16 @@ Run tests after implementation.
 ### Pattern 2: Adding Specificity
 
 **Before:**
+
 ```markdown
 Write clear commit messages.
 ```
 
 **After:**
+
 ```markdown
 Write clear commit messages:
+
 - What changed (not how)
 - Why (not what files)
 - Impact on behavior
@@ -411,11 +445,13 @@ Write clear commit messages:
 ### Pattern 3: Adding Example
 
 **Before:**
+
 ```markdown
 Use progressive disclosure.
 ```
 
 **After:**
+
 ```markdown
 Use progressive disclosure.
 
@@ -431,11 +467,12 @@ Use progressive disclosure.
 ✅ No regressions in existing tests
 ✅ Compliance audit still passes
 ✅ **Progressive disclosure applied (if SKILL.md was >500 lines)**
-  - SKILL.md reduced to <500 lines
-  - Detailed content moved to references/
-  - Table of contents added with links
-  - Re-audit passes without word count warnings
-✅ REFACTOR phase: Update holds under pressure
+
+- SKILL.md reduced to <500 lines
+- Detailed content moved to references/
+- Table of contents added with links
+- Re-audit passes without word count warnings
+  ✅ REFACTOR phase: Update holds under pressure
 
 ## Related
 

@@ -21,6 +21,7 @@ description: Use when developing React applications - components, UI bugs.
 ```
 
 **Algorithm:**
+
 1. Find description field in frontmatter
 2. Check if it uses `|` or `>`
 3. Read the multiline content after the block scalar
@@ -30,6 +31,7 @@ description: Use when developing React applications - components, UI bugs.
 5. Replace with single-line format using Edit tool
 
 **Example conversion:**
+
 ```yaml
 # Content after |:
   Use when developing React applications.
@@ -44,6 +46,7 @@ description: Use when developing React applications - components, UI bugs, perfo
 ```
 
 **Edge cases:**
+
 - Preserve `<example>` blocks with `\n` escapes
 - Preserve intent of paragraph breaks
 - Remove excessive whitespace
@@ -52,6 +55,7 @@ description: Use when developing React applications - components, UI bugs, perfo
 ### Detailed Conversion Algorithm
 
 **Input:**
+
 ```yaml
 description: |
   Use when developing React applications.
@@ -65,6 +69,7 @@ description: |
 ```
 
 **Steps:**
+
 1. Extract lines after `|`
 2. Identify paragraphs (separated by blank lines)
 3. Convert:
@@ -74,11 +79,13 @@ description: |
 4. Create single-line string
 
 **Output:**
+
 ```yaml
 description: Use when developing React applications - components, UI bugs, performance.\n\n<example>\nContext: Building dashboard\nuser: "Create metrics dashboard"\nassistant: "I'll use react-developer"\n</example>
 ```
 
 **Edge case - Folded scalar (>):**
+
 ```yaml
 description: >
   Use when developing React applications.
@@ -105,26 +112,30 @@ name: frontend-developer
 ```
 
 **Algorithm:**
+
 1. Extract filename (without `.md` extension)
 2. Read frontmatter name field
 3. If different, update frontmatter to match filename
 4. Use Edit tool to replace
 
 **Why update frontmatter (not rename file):**
+
 - Filename is the source of truth (used by file system)
 - Renaming file requires updating all references
 - Updating frontmatter is simpler and safer
 
 **Example:**
+
 ```typescript
 Edit({
   file_path: ".claude/agents/development/frontend-developer.md",
   old_string: "name: frontend-dev",
-  new_string: "name: frontend-developer"
-})
+  new_string: "name: frontend-developer",
+});
 ```
 
 **Why filename is authoritative:**
+
 - File system uses filename
 - Git tracks by filename
 - References use filename
@@ -137,6 +148,7 @@ Edit({
 **Detection:** Audit reports "Missing description field"
 
 **Current state:**
+
 ```yaml
 ---
 name: my-agent
@@ -146,12 +158,14 @@ tools: Read, Write
 ```
 
 **Workflow:**
+
 1. Analyze agent file to understand purpose
 2. Suggest description based on:
    - Agent name
    - Tools used
    - Body content (if any)
 3. AskUserQuestion for description:
+
    ```
    "The agent needs a description. Based on the file, I suggest:
 
@@ -159,23 +173,27 @@ tools: Read, Write
 
     Use this description, or provide your own?"
    ```
+
 4. Insert description field in frontmatter
 5. Use Edit tool to add
 
 **Example:**
+
 ```typescript
 // User provides: "Use when analyzing code complexity - metrics, reports, recommendations"
 
 Edit({
   file_path: ".claude/agents/analysis/my-agent.md",
   old_string: "---\nname: my-agent\ntools: Read, Write",
-  new_string: "---\nname: my-agent\ndescription: Use when analyzing code complexity - metrics, reports, recommendations.\ntools: Read, Write"
-})
+  new_string:
+    "---\nname: my-agent\ndescription: Use when analyzing code complexity - metrics, reports, recommendations.\ntools: Read, Write",
+});
 ```
 
 **Insertion point:** After `name:` field, before `tools:` or other fields
 
 **Field order (standard):**
+
 1. name
 2. description
 3. type (optional)
@@ -192,27 +210,30 @@ Edit({
 **Detection:** Audit reports "Empty description"
 
 **Current state:**
+
 ```yaml
 ---
 name: my-agent
-description:   # ← Field exists but empty
+description: # ← Field exists but empty
 tools: Read, Write
 ---
 ```
 
 **Workflow:** Same as Missing Description
+
 1. Suggest description based on context
 2. Get user input
 3. Update empty field with content
 4. Use Edit tool to replace
 
 **Example:**
+
 ```typescript
 Edit({
   file_path: ".claude/agents/development/my-agent.md",
   old_string: "description:",
-  new_string: "description: Use when developing backend APIs - Go, REST, DynamoDB."
-})
+  new_string: "description: Use when developing backend APIs - Go, REST, DynamoDB.",
+});
 ```
 
 **Simpler than missing:** Just replace empty value, field already exists.

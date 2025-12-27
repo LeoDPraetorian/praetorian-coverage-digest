@@ -1,0 +1,42 @@
+# Changelog - frontend-integration-test-engineer
+
+All notable changes to the frontend-integration-test-engineer agent.
+
+---
+
+## [2025-12-27] - Skill Integration Enhancement
+
+### Changed
+
+**Context**: Identified 8 missing skills that should be integrated into the agent based on semantic analysis of agent's responsibilities vs available skills.
+
+**Changes Made**:
+- Added 2 essential skills to Tier 1 (always-read):
+  - `using-tanstack-query` (95% relevance) - Essential for testing TanStack Query integrations
+  - `frontend-testing-patterns` (90% relevance) - Comprehensive Vitest + React Testing Library patterns
+
+- Added 6 skills to Tier 3 (task-triggered):
+  - `verifying-vitest-test-integrity` (85% relevance) - PR reviews and test quality validation
+  - `implementing-react-hook-form-zod` (75% relevance) - Form testing with validation patterns
+  - `vitest-prepush-testing` (70% relevance) - CI/CD pre-push hook configuration
+  - `api-testing-patterns` (65% relevance) - API contract testing for MSW mocks
+  - `using-eslint` (55% relevance) - Code quality linting for test files
+  - `performance-testing` (50% relevance) - Load testing patterns for integration tests
+
+**Rationale**:
+- Agent's primary responsibility is testing TanStack Query integrations, but `using-tanstack-query` skill was not integrated
+- `frontend-testing-patterns` provides foundational Vitest patterns that complement MSW-focused testing
+- Tier 3 additions fill gaps in PR review, form testing, CI/CD integration, contract testing, linting, and performance testing
+
+**Impact**:
+- Increased skill integration from 18 to 26 skills
+- Enhanced agent's capability to handle TanStack Query testing scenarios
+- Improved test quality through PR review and integrity checking patterns
+- Better CI/CD integration guidance for pre-push hooks
+- Expanded coverage for form testing, API contracts, and performance testing
+
+**Discovery Method**: Used `finding-skills-for-agents` skill with semantic reasoning to identify gaps
+
+**Testing**: Skills added via minimal edits to Tier 1 and Tier 3 sections, verified all 8 skills present in file
+
+---

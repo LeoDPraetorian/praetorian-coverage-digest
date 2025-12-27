@@ -1,0 +1,24 @@
+# Changelog
+
+## 2025-12-27 - Initial Creation
+
+**RED Phase Documentation:**
+- Gap identified: CLAUDE.md had stale hardcoded list of 45 allowedColumns (actual: 204 fields)
+- Developers lacked guidance on Query/Node/Relationship/Filter structure
+- No documentation on dynamic field validation
+- Frontend developers using useMy/useGraphQuery had no reference for constructing queries
+
+**Category:** development/frontend (Library skill)
+**Skill Type:** Library/Framework
+
+**Initial Structure:**
+- SKILL.md (331 lines) - Core reference with query structure, operators, patterns
+- references/filter-operators.md - All 13 operators with examples
+- references/query-patterns.md - 15 query patterns for common use cases
+- references/dynamic-field-validation.md - Field lookup strategies
+
+**Key Design Decisions:**
+- Emphasizes dynamic field validation (grep against source file)
+- Never hardcode field lists - they drift
+- Source of truth: modules/chariot/backend/pkg/query/allowed_columns.go
+- Targets frontend-developer agent using useMy/useGraphQuery hooks

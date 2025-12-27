@@ -5,6 +5,7 @@
 ## Overview
 
 Phase 3 identifies threats using integrated methodology:
+
 - **STRIDE** - Systematic threat categorization
 - **PASTA** - Risk-centric, business-aligned analysis
 - **DFD** - Data flow diagram threat mapping
@@ -12,6 +13,7 @@ Phase 3 identifies threats using integrated methodology:
 ## Execution Strategy
 
 **This phase runs sequentially** - requires holistic view of:
+
 - Phase 1 architecture and data flows
 - Phase 2 security controls and gaps
 
@@ -32,6 +34,7 @@ skill: "threat-modeling"
 ```
 
 The skill provides:
+
 - STRIDE analysis per component
 - PASTA attack simulation
 - DFD-based threat mapping
@@ -41,25 +44,25 @@ The skill provides:
 
 For each component from Phase 1:
 
-| Category | Question | Focus |
-|----------|----------|-------|
-| **S**poofing | Can attacker impersonate? | Authentication |
-| **T**ampering | Can attacker modify? | Input validation |
-| **R**epudiation | Can attacker deny actions? | Audit logging |
-| **I**nfo Disclosure | Can attacker access data? | Authorization |
-| **D**enial of Service | Can attacker disrupt? | Rate limiting |
-| **E**levation of Privilege | Can attacker escalate? | Authorization |
+| Category                   | Question                   | Focus            |
+| -------------------------- | -------------------------- | ---------------- |
+| **S**poofing               | Can attacker impersonate?  | Authentication   |
+| **T**ampering              | Can attacker modify?       | Input validation |
+| **R**epudiation            | Can attacker deny actions? | Audit logging    |
+| **I**nfo Disclosure        | Can attacker access data?  | Authorization    |
+| **D**enial of Service      | Can attacker disrupt?      | Rate limiting    |
+| **E**levation of Privilege | Can attacker escalate?     | Authorization    |
 
 ## Required Artifacts
 
-| Artifact | Description |
-|----------|-------------|
-| `threat-model.json` | Structured threat entries |
+| Artifact             | Description                  |
+| -------------------- | ---------------------------- |
+| `threat-model.json`  | Structured threat entries    |
 | `abuse-cases/*.json` | Per-category abuse scenarios |
-| `attack-trees/*.md` | Attack path diagrams |
-| `dfd-threats.json` | Threats mapped to data flows |
-| `risk-matrix.json` | Impact × Likelihood scoring |
-| `summary.md` | <2000 tokens with top risks |
+| `attack-trees/*.md`  | Attack path diagrams         |
+| `dfd-threats.json`   | Threats mapped to data flows |
+| `risk-matrix.json`   | Impact × Likelihood scoring  |
+| `summary.md`         | <2000 tokens with top risks  |
 
 ## Threat Entry Schema
 
@@ -109,6 +112,7 @@ Risk Matrix:
 ## Checkpoint Preparation
 
 Before presenting checkpoint, ensure:
+
 - [ ] All components analyzed with STRIDE
 - [ ] Abuse cases documented
 - [ ] Risk scores calculated

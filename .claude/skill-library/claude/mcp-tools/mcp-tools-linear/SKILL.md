@@ -23,16 +23,17 @@ Enable granular agent access control for linear operations.
 
 Linear uses **OAuth 2.0 via mcp-remote** - more secure than API keys:
 
-| Aspect | How It Works |
-|--------|--------------|
-| **Storage** | Tokens in `~/.mcp-auth/` (outside repo) |
-| **Lifetime** | 7-day tokens with automatic refresh |
-| **Scopes** | `read,write,issues:create,admin` |
-| **First-time** | Browser opens for explicit consent |
+| Aspect         | How It Works                            |
+| -------------- | --------------------------------------- |
+| **Storage**    | Tokens in `~/.mcp-auth/` (outside repo) |
+| **Lifetime**   | 7-day tokens with automatic refresh     |
+| **Scopes**     | `read,write,issues:create,admin`        |
+| **First-time** | Browser opens for explicit consent      |
 
 **First-time setup**: On first MCP call, browser opens for Linear OAuth authorization.
 
 **Re-authentication**: If tokens expire or you need to re-auth:
+
 ```bash
 rm -rf ~/.mcp-auth/mcp-remote-*/*linear*
 # Then run any Linear wrapper - will prompt for OAuth
@@ -43,104 +44,123 @@ rm -rf ~/.mcp-auth/mcp-remote-*/*linear*
 ## Available Tools (Auto-discovered: 19 wrappers)
 
 ### create-bug
+
 - **Purpose:** MCP wrapper for create-bug
 - **Import:** `import { createBug } from './.claude/tools/linear/create-bug.ts'`
 - **Token cost:** ~unknown tokens
 
 ### create-comment
+
 - **Purpose:** MCP wrapper for create-comment
 - **Import:** `import { createComment } from './.claude/tools/linear/create-comment.ts'`
 - **Token cost:** ~unknown tokens
 
 ### create-issue
+
 - **Purpose:** MCP wrapper for create-issue
 - **Import:** `import { createIssue } from './.claude/tools/linear/create-issue.ts'`
 - **Token cost:** ~unknown tokens
 
 ### create-jira-bug
+
 - **Purpose:** MCP wrapper for create-jira-bug
 - **Import:** `import { createJiraBug } from './.claude/tools/linear/create-jira-bug.ts'`
 - **Token cost:** ~unknown tokens
 
 ### create-project
+
 - **Purpose:** MCP wrapper for create-project
 - **Import:** `import { createProject } from './.claude/tools/linear/create-project.ts'`
 - **Token cost:** ~unknown tokens
 
 ### find-issue
+
 - **Purpose:** MCP wrapper for find-issue
 - **Import:** `import { findIssue } from './.claude/tools/linear/find-issue.ts'`
 - **Token cost:** ~unknown tokens
 
 ### find-user
+
 - **Purpose:** MCP wrapper for find-user
 - **Import:** `import { findUser } from './.claude/tools/linear/find-user.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-issue
+
 - **Purpose:** MCP wrapper for get-issue
 - **Import:** `import { getIssue } from './.claude/tools/linear/get-issue.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-project
+
 - **Purpose:** MCP wrapper for get-project
 - **Import:** `import { getProject } from './.claude/tools/linear/get-project.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-team
+
 - **Purpose:** MCP wrapper for get-team
 - **Import:** `import { getTeam } from './.claude/tools/linear/get-team.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-comments
+
 - **Purpose:** MCP wrapper for list-comments
 - **Import:** `import { listComments } from './.claude/tools/linear/list-comments.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-cycles
+
 - **Purpose:** MCP wrapper for list-cycles
 - **Import:** `import { listCycles } from './.claude/tools/linear/list-cycles.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-issues
+
 - **Purpose:** MCP wrapper for list-issues
 - **Import:** `import { listIssues } from './.claude/tools/linear/list-issues.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-projects
+
 - **Purpose:** MCP wrapper for list-projects
 - **Import:** `import { listProjects } from './.claude/tools/linear/list-projects.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-teams
+
 - **Purpose:** MCP wrapper for list-teams
 - **Import:** `import { listTeams } from './.claude/tools/linear/list-teams.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-users
+
 - **Purpose:** MCP wrapper for list-users
 - **Import:** `import { listUsers } from './.claude/tools/linear/list-users.ts'`
 - **Token cost:** ~unknown tokens
 
 ### update-cycle
+
 - **Purpose:** MCP wrapper for update-cycle
 - **Import:** `import { updateCycle } from './.claude/tools/linear/update-cycle.ts'`
 - **Token cost:** ~unknown tokens
 
 ### update-issue
+
 - **Purpose:** MCP wrapper for update-issue
 - **Import:** `import { updateIssue } from './.claude/tools/linear/update-issue.ts'`
 - **Token cost:** ~unknown tokens
 
 ### update-project
+
 - **Purpose:** MCP wrapper for update-project
 - **Import:** `import { updateProject } from './.claude/tools/linear/update-project.ts'`
 - **Token cost:** ~unknown tokens
 
-
 ## Common Operations with Parameters
 
 ### Create Issue
+
 ```bash
 npx tsx -e "(async () => {
   const { createIssue } = await import('./.claude/tools/linear/create-issue.ts');
@@ -154,6 +174,7 @@ npx tsx -e "(async () => {
 ```
 
 **Key parameters:**
+
 - `title` (required) - Issue title string
 - `description` (optional) - Markdown description
 - `team` (required) - **Team name like "Chariot"** OR team UUID
@@ -163,6 +184,7 @@ npx tsx -e "(async () => {
 - `labels` (optional) - Array of label names or IDs
 
 ### Get Issue
+
 ```bash
 npx tsx -e "(async () => {
   const { getIssue } = await import('./.claude/tools/linear/get-issue.ts');
@@ -174,6 +196,7 @@ npx tsx -e "(async () => {
 ```
 
 ### List Issues
+
 ```bash
 npx tsx -e "(async () => {
   const { listIssues } = await import('./.claude/tools/linear/list-issues.ts');
@@ -185,6 +208,7 @@ npx tsx -e "(async () => {
 ```
 
 ### Update Issue
+
 ```bash
 npx tsx -e "(async () => {
   const { updateIssue } = await import('./.claude/tools/linear/update-issue.ts');
@@ -203,6 +227,7 @@ npx tsx -e "(async () => {
 See mcp-tools-registry for complete Bash + tsx execution patterns.
 
 **Generic inline execution:**
+
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
 npx tsx -e "(async () => {

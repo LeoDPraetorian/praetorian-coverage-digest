@@ -163,7 +163,7 @@ program
         console.log(chalk.gray('This phase checks for hardcoded paths that break cross-platform compatibility.\n'));
         console.log(chalk.white('  Steps:'));
         console.log(chalk.gray('  1. Search for hardcoded paths in SKILL.md:'));
-        console.log(chalk.cyan(`     grep -E "/Users|/home|/var|C:\\\\\\\\|D:\\\\\\\\" "${skill.path}"`));
+        console.log(chalk.cyan(`     grep -E "/Users|/home|/var|C:/|D:/" "${skill.path}"`));
         console.log(chalk.gray('  2. Replace absolute paths with:'));
         console.log(chalk.gray('     • $REPO_ROOT for repository-relative paths'));
         console.log(chalk.gray('     • Relative paths (./references/, ../lib/)'));

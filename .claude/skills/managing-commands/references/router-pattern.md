@@ -20,38 +20,38 @@ The Router Pattern is a command design principle where commands parse arguments 
 
 ### Token Budget Economics
 
-| Aspect | Command | Skill |
-|--------|---------|-------|
-| When loaded | Every invocation | On-demand |
-| Context cost | Always paid | Only when used |
-| Ideal size | < 50 lines | Any size |
+| Aspect       | Command          | Skill          |
+| ------------ | ---------------- | -------------- |
+| When loaded  | Every invocation | On-demand      |
+| Context cost | Always paid      | Only when used |
+| Ideal size   | < 50 lines       | Any size       |
 
 **Math:** If a command is invoked 100 times but only 10 need the skill's logic, you've wasted 90 loads of that logic in context.
 
 ### Safety
 
-| Without Router Pattern | With Router Pattern |
-|------------------------|---------------------|
+| Without Router Pattern                  | With Router Pattern           |
+| --------------------------------------- | ----------------------------- |
 | LLM can "fix" failures with extra tools | LLM forced to report failures |
-| Hallucination possible | Hallucination prevented |
-| Unpredictable behavior | Deterministic behavior |
+| Hallucination possible                  | Hallucination prevented       |
+| Unpredictable behavior                  | Deterministic behavior        |
 
 **Physical restriction:** If allowed-tools only includes `Skill, AskUserQuestion`, the LLM literally cannot execute Bash commands to work around a failed skill call.
 
 ### Maintainability
 
-| Commands as Routers | Commands with Logic |
-|--------------------|---------------------|
-| Simple, predictable | Complex, error-prone |
-| Easy to test | Hard to test |
-| Clear separation | Tangled concerns |
+| Commands as Routers | Commands with Logic   |
+| ------------------- | --------------------- |
+| Simple, predictable | Complex, error-prone  |
+| Easy to test        | Hard to test          |
+| Clear separation    | Tangled concerns      |
 | One place to change | Many places to change |
 
 ## Router Pattern Template
 
 ```markdown
 ---
-description: Use when [trigger] - [keywords]  # < 120 chars
+description: Use when [trigger] - [keywords] # < 120 chars
 argument-hint: <subcommand> [args]
 allowed-tools: Skill, AskUserQuestion
 skills: backing-skill-name
@@ -67,6 +67,7 @@ skills: backing-skill-name
 Invoke the `backing-skill-name` skill.
 
 **Arguments:**
+
 - `operation`: $1 (Required)
 - `target`: $2 (Optional)
 
@@ -75,7 +76,7 @@ Invoke the `backing-skill-name` skill.
 ## Error Handling
 
 If $1 invalid:
-  Explain valid options.
+Explain valid options.
 ```
 
 ## Key Elements
@@ -94,10 +95,12 @@ allowed-tools: Skill, Bash, Read, AskUserQuestion
 
 ```markdown
 # Correct (imperative)
+
 Invoke the `my-skill` skill.
 Display the tool output verbatim.
 
 # Wrong (vague)
+
 Help the user with their request.
 You should assist by running the skill.
 ```
@@ -106,11 +109,14 @@ You should assist by running the skill.
 
 ```markdown
 # Correct (explicit)
+
 **Arguments:**
+
 - `operation`: $1 (Required)
 - `target`: $2 (Optional)
 
 # Wrong (implicit)
+
 Pass the arguments to the skill.
 ```
 
@@ -118,9 +124,11 @@ Pass the arguments to the skill.
 
 ```markdown
 # Correct
+
 **Output:** Display the tool output verbatim.
 
 # Wrong
+
 (no output directive, LLM may reformat)
 ```
 
@@ -147,13 +155,13 @@ Display the output.
 description: List files in directory
 allowed-tools: Glob
 ---
-
 Use Glob to find files matching the pattern.
 ```
 
 ### When No Skill Exists
 
 If there's no skill that implements the logic, you may need tools in the command. But consider:
+
 - Should a skill be created?
 - Is the logic simple enough for a command?
 - Will this command grow over time?
@@ -171,6 +179,7 @@ skills: my-skill
 ```
 
 **Fix:** Remove `Bash, Read`:
+
 ```yaml
 ---
 allowed-tools: Skill, AskUserQuestion
@@ -182,9 +191,12 @@ skills: my-skill
 
 ```markdown
 # VIOLATION: Business logic in command (60 lines)
+
 ---
+
 description: Process data
 allowed-tools: Bash, Read, Write
+
 ---
 
 1. Read the file
@@ -192,10 +204,11 @@ allowed-tools: Bash, Read, Write
 3. Transform the data
 4. Write output
 5. Validate result
-...
+   ...
 ```
 
 **Fix:** Move logic to a skill, command becomes router:
+
 ```markdown
 ---
 description: Process data
@@ -211,11 +224,13 @@ Invoke the `data-processor` skill.
 
 ```markdown
 # VIOLATION: Vague language
+
 Help the user by running the skill.
 Assist with their request.
 ```
 
 **Fix:** Imperative language:
+
 ```markdown
 Invoke the `my-skill` skill.
 Display the tool output verbatim.
@@ -226,6 +241,7 @@ Display the tool output verbatim.
 The `command-manager audit` operation includes Check 8: Router Pattern Compliance.
 
 **What it checks:**
+
 - Has `skills:` + extra tools? → CRITICAL (Tool Leakage)
 - Has vague instructions? → CRITICAL (Instruction Determinism)
 - Missing verbatim directive? → WARNING
@@ -233,6 +249,7 @@ The `command-manager audit` operation includes Check 8: Router Pattern Complianc
 - No explicit argument mapping? → WARNING
 
 **Auto-fixes available:**
+
 - Remove unnecessary tools
 - Add verbatim output directive
 - Add argument-hint

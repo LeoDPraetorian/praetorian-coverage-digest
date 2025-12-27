@@ -22,11 +22,13 @@ Enable granular agent access control for context7 operations.
 ## Available Tools (Auto-discovered: 2 wrappers)
 
 ### get-library-docs
+
 - **Purpose:** Wrapper for context7 get-library-docs tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
 - **Import:** `import { getLibraryDocs } from './.claude/tools/context7/get-library-docs.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
+
 ```typescript
 interface GetLibraryDocsInput {
   context7CompatibleLibraryID: string;
@@ -34,6 +36,7 @@ interface GetLibraryDocsInput {
 ```
 
 **Returns:**
+
 ```typescript
 interface GetLibraryDocsOutput {
   libraryName: string; // Library name derived from libraryId
@@ -49,11 +52,13 @@ interface GetLibraryDocsOutput {
 ```
 
 ### resolve-library-id
+
 - **Purpose:** Wrapper for context7 resolve-library-id tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
 - **Import:** `import { resolveLibraryId } from './.claude/tools/context7/resolve-library-id.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
+
 ```typescript
 interface ResolveLibraryIdInput {
   libraryName: string;
@@ -61,6 +66,7 @@ interface ResolveLibraryIdInput {
 ```
 
 **Returns:**
+
 ```typescript
 interface ResolveLibraryIdOutput {
   libraries: array;
@@ -72,12 +78,12 @@ interface ResolveLibraryIdOutput {
 }
 ```
 
-
 ## Quick Examples
 
 See mcp-tools-registry for complete Bash + tsx execution patterns.
 
 **Inline execution:**
+
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
 npx tsx -e "(async () => {

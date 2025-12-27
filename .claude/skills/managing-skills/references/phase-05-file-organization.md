@@ -12,6 +12,7 @@
 **Progressive disclosure**: Claude should load minimal content first, detailed content on-demand.
 
 **Orphaned files at root**:
+
 - Load immediately (not on-demand)
 - Waste tokens
 - Poor organization
@@ -22,6 +23,7 @@
 ### WARNING Issues
 
 **1. Markdown Files at Root**
+
 ```
 my-skill/
 ├── SKILL.md           # ✅ OK
@@ -31,6 +33,7 @@ my-skill/
 ```
 
 **2. Implementation Notes at Root**
+
 ```
 my-skill/
 ├── IMPLEMENTATION.md  # ❌ Delete or move to .local/
@@ -43,6 +46,7 @@ my-skill/
 ✅ **AUTO-FIXABLE** - can move files to appropriate directories
 
 **Fix logic:**
+
 ```typescript
 if (filename.includes('reference') || filename.includes('api'))
   → move to references/
@@ -62,6 +66,7 @@ if (filename.includes('implementation') || filename.includes('status'))
 ### Example 1: API Documentation at Root
 
 **Before:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -69,6 +74,7 @@ my-skill/
 ```
 
 **After:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -77,6 +83,7 @@ my-skill/
 ```
 
 **SKILL.md updated:**
+
 ```markdown
 See [API Schema](references/api-schema.md) for complete reference.
 ```
@@ -84,6 +91,7 @@ See [API Schema](references/api-schema.md) for complete reference.
 ### Example 2: Mixed Content
 
 **Before:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -94,6 +102,7 @@ my-skill/
 ```
 
 **After:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -112,12 +121,14 @@ my-skill/
 **1. CHANGELOG.md**
 
 Allowed at both locations:
+
 - Root: OK (legacy)
 - .local/: Preferred (new pattern)
 
 **2. README.md**
 
 Not standard for skills (delete):
+
 ```
 ❌ README.md, README-DEV.md, README-MVP.md
 ✅ Only SKILL.md at root
@@ -126,6 +137,7 @@ Not standard for skills (delete):
 **3. Script Files**
 
 Should be in scripts/:
+
 ```
 ❌ helper.sh at root
 ✅ scripts/helper.sh
@@ -141,6 +153,7 @@ Should be in scripts/:
 4. Verify progressive disclosure works
 
 **For ambiguous files:**
+
 ```bash
 # Grep SKILL.md to see if file is referenced
 grep "filename.md" SKILL.md
@@ -156,11 +169,11 @@ grep "filename.md" SKILL.md
 
 ## Quick Reference
 
-| File Type | Correct Location |
-|-----------|------------------|
-| Core docs | references/ |
-| Examples | examples/ |
-| Templates | templates/ |
-| Scripts | scripts/ |
-| Runtime output | .local/ |
+| File Type            | Correct Location  |
+| -------------------- | ----------------- |
+| Core docs            | references/       |
+| Examples             | examples/         |
+| Templates            | templates/        |
+| Scripts              | scripts/          |
+| Runtime output       | .local/           |
 | Implementation notes | .local/ or delete |

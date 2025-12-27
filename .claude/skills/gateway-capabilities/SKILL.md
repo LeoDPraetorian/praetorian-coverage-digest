@@ -6,11 +6,65 @@ allowed-tools: Read, Bash
 
 # Gateway: Capabilities Development
 
+## Understanding This Gateway
+
+**This is a gateway skill in Chariot's two-tier skill architecture.**
+
+The two-tier system organizes skills into:
+
+- **Core skills** (~25 skills in `.claude/skills/`) - High-frequency skills auto-discovered by Claude Code's Skill tool
+- **Library skills** (~120 skills in `.claude/skill-library/`) - Specialized skills loaded on-demand via Read tool
+
+**Gateways are routing indices, not implementation guides.** They exist in core to help you discover and load library skills.
+
+<IMPORTANT>
+**Library skills cannot be invoked with the Skill tool.** You MUST use the Read tool to load them.
+
+### Common Anti-Patterns
+
+```bash
+# ❌ WRONG: Trying to use Skill tool for library skills
+skill: "capabilities-vql-development"  # FAILS - library skills are NOT in Skill tool
+
+# ❌ WRONG: Guessing or shortening paths
+Read(".claude/skill-library/capabilities-vql-development/...")  # FAILS - missing nested folders
+
+# ❌ WRONG: Using skill name instead of full path
+Read("capabilities-vql-development")  # FAILS - must be full path
+
+# ❌ WRONG: Looking in core /skills/ instead of /skill-library/
+Read(".claude/skills/capabilities-vql-development/...")  # FAILS - library skills are NOT in /skills/
+```
+
+### Correct Patterns
+
+```bash
+# ✅ CORRECT: Use gateway to find skill, then Read with FULL path
+Read(".claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md")
+
+# ✅ CORRECT: Copy path exactly as shown in this gateway
+Read(".claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md")
+
+# ✅ CORRECT: Core skills (this gateway) use Skill tool
+skill: "gateway-capabilities"  # Core skills work with Skill tool
+```
+
+**Workflow:**
+
+1. Invoke this gateway: `skill: "gateway-capabilities"`
+2. Find the skill you need in the Quick Reference table below
+3. Copy the EXACT path shown (do not modify or shorten)
+4. Use Read tool with that path
+5. Follow the loaded skill's instructions
+
+</IMPORTANT>
+
 Single entry point for offensive security capability development within the Chariot platform. This gateway routes to specialized skills in `.claude/skill-library/development/capabilities/` for VQL development, scanner integration, and security tool orchestration.
 
 ## Overview
 
 This gateway provides access to skills for building offensive security capabilities:
+
 - **VQL Development**: Velociraptor Query Language artifacts and capabilities
 - **Scanner Integration**: Nuclei, Nmap, and custom security tool integration
 - **Tool Orchestration**: Janus framework chains and workflow automation
@@ -18,16 +72,17 @@ This gateway provides access to skills for building offensive security capabilit
 
 ## Quick Reference
 
-| Task | Skill to Load |
-|------|---------------|
-| VQL artifact development | `.claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md` |
-| Nuclei template creation | `.claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md` |
-| Scanner integration | `.claude/skill-library/development/capabilities/capabilities-scanner-integration/SKILL.md` |
-| Janus chain orchestration | `.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md` |
+| Task                      | Skill Path                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------------ |
+| VQL artifact development  | `.claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md`     |
+| Nuclei template creation  | `.claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md`    |
+| Scanner integration       | `.claude/skill-library/development/capabilities/capabilities-scanner-integration/SKILL.md` |
+| Janus chain orchestration | `.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md`        |
 
 ## When to Use
 
 Use this gateway when:
+
 - Developing new VQL artifacts for Aegis agents
 - Creating Nuclei templates for vulnerability scanning
 - Integrating security scanners (Nmap, Masscan, custom tools)
@@ -61,6 +116,7 @@ Read: .claude/skill-library/development/capabilities/capabilities-vql-developmen
 ### Step 3: Follow the Loaded Skill
 
 The loaded skill provides:
+
 - Detailed implementation patterns
 - Code examples and templates
 - Testing and validation workflows
@@ -69,9 +125,11 @@ The loaded skill provides:
 ## Available Capabilities Skills
 
 ### VQL Development
+
 **Path**: `.claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md`
 
 Covers:
+
 - VQL artifact structure and syntax
 - Aegis capability definitions
 - Testing VQL artifacts locally
@@ -80,9 +138,11 @@ Covers:
 - Error handling in VQL
 
 ### Nuclei Templates
+
 **Path**: `.claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md`
 
 Covers:
+
 - Nuclei template YAML syntax
 - Matchers and extractors
 - Template testing and validation
@@ -91,9 +151,11 @@ Covers:
 - False positive reduction strategies
 
 ### Scanner Integration
+
 **Path**: `.claude/skill-library/development/capabilities/capabilities-scanner-integration/SKILL.md`
 
 Covers:
+
 - Security tool integration patterns
 - Output parsing and normalization
 - Error handling and retries
@@ -102,9 +164,11 @@ Covers:
 - Credential management for scanners
 
 ### Janus Chain Orchestration
+
 **Path**: `.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md`
 
 Covers:
+
 - Janus framework workflow design
 - Chain composition and execution
 - State management between tools
@@ -151,12 +215,12 @@ Understanding how capabilities fit into the Chariot platform:
 
 ### Key Integration Points
 
-| Component | Purpose | Location |
-|-----------|---------|----------|
-| **Aegis Agents** | Execute VQL capabilities on targets | `modules/chariot-aegis-capabilities/` |
-| **Janus Framework** | Chain security tools into workflows | `modules/janus-framework/` |
-| **Nuclei Templates** | Define vulnerability detection rules | `modules/nuclei-templates/` |
-| **Tabularium** | Data schemas for capability results | `modules/tabularium/` |
+Capabilities integrate with these Chariot platform components:
+
+- **Aegis Agents** (`modules/chariot-aegis-capabilities/`) - Execute VQL capabilities on targets
+- **Janus Framework** (`modules/janus-framework/`) - Chain security tools into workflows
+- **Nuclei Templates** (`modules/nuclei-templates/`) - Define vulnerability detection rules
+- **Tabularium** (`modules/tabularium/`) - Data schemas for capability results
 
 ### Data Flow
 
@@ -209,6 +273,7 @@ When developing capabilities, always consider:
 ## Progressive Loading
 
 This gateway follows the progressive disclosure pattern:
+
 1. **Gateway loads fast** (<500 lines, minimal tokens)
 2. **Specific skills load on-demand** via Read tool
 3. **Detailed content loads only when needed**
@@ -220,15 +285,16 @@ This prevents attention degradation while maintaining full capability access.
 If you don't see a skill for your specific task, search the library:
 
 ```bash
-cd .claude && npm run -w @chariot/skill-search search -- "your-query"
+cd .claude && npm run -w @chariot/auditing-skills search -- "your-query"
 ```
 
 Example searches:
-- `npm run -w @chariot/skill-search search -- "vql"`
-- `npm run -w @chariot/skill-search search -- "nuclei"`
-- `npm run -w @chariot/skill-search search -- "janus"`
-- `npm run -w @chariot/skill-search search -- "scanner"`
-- `npm run -w @chariot/skill-search search -- "capability"`
+
+- `npm run -w @chariot/auditing-skills search -- "vql"`
+- `npm run -w @chariot/auditing-skills search -- "nuclei"`
+- `npm run -w @chariot/auditing-skills search -- "janus"`
+- `npm run -w @chariot/auditing-skills search -- "scanner"`
+- `npm run -w @chariot/auditing-skills search -- "capability"`
 
 ## References
 

@@ -11,12 +11,14 @@ Structured workflow for creating comprehensive Linear epics with well-organized 
 ## When to Use This Skill
 
 Use this skill when you need to:
+
 - Create a new feature initiative as a Linear epic with multiple sub-issues
 - Break down a large project into coordinated work items
 - Document complex technical work with proper context and visuals
 - Ensure all stakeholders understand dependencies and implementation phases
 
 **Symptoms that indicate you need this skill:**
+
 - User says "create an epic for..." or "write tickets for..."
 - Complex feature requiring multiple engineers or phases
 - Need to communicate technical architecture to non-technical stakeholders
@@ -40,16 +42,19 @@ You:
 This skill is organized into detailed reference documents:
 
 ### Core Workflow
+
 - **[Complete Workflow](references/workflow.md)** - Step-by-step process with validation loops
 - **[Research Phase](references/research-phase.md)** - How to explore codebase effectively
 - **[Breakdown Strategy](references/breakdown-strategy.md)** - Epic vs story decisions
 
 ### Documentation Standards
+
 - **[Description Templates](references/description-templates.md)** - Rich content patterns
 - **[Diagram Conventions](references/diagram-conventions.md)** - ASCII art for architecture
 - **[Dependency Management](references/dependency-management.md)** - Parent/child linking
 
 ### Technical Details
+
 - **[Linear API Patterns](references/linear-api-patterns.md)** - Wrapper usage, quirks, limitations
 
 ## Core Workflow (High-Level)
@@ -119,12 +124,14 @@ See [Linear API Patterns](references/linear-api-patterns.md) for implementation 
 ## Best Practices
 
 ### Research Phase
+
 - ✅ Spend 30-40% of time researching before writing tickets
 - ✅ Use Explore agent for broad codebase understanding
 - ✅ Grep for specific patterns, APIs, integration points
 - ❌ Don't start writing tickets without codebase context
 
 ### Breakdown Strategy
+
 - ✅ 1 epic + 4-8 sub-issues is ideal scope
 - ✅ Sub-issues should be independently testable
 - ✅ Mark dependencies explicitly
@@ -132,6 +139,7 @@ See [Linear API Patterns](references/linear-api-patterns.md) for implementation 
 - ❌ Don't make sub-issues depend on each other in complex chains
 
 ### Documentation Quality
+
 - ✅ Include ASCII diagrams for architecture
 - ✅ Show workflow with arrows and decision trees
 - ✅ Provide code examples where helpful
@@ -140,6 +148,7 @@ See [Linear API Patterns](references/linear-api-patterns.md) for implementation 
 - ❌ Don't write essays - use bullet points and structure
 
 ### Linear API Usage
+
 - ✅ Use `createIssue` wrapper, not direct MCP
 - ✅ Handle description sanitization (allow newlines, block control chars)
 - ✅ Set priority (2=High is standard)
@@ -156,6 +165,7 @@ See [Linear API Patterns](references/linear-api-patterns.md) for implementation 
 ### 2. Use TodoWrite for Progress Tracking
 
 Create todos for each phase:
+
 - [ ] Research codebase
 - [ ] Design breakdown
 - [ ] Write epic description
@@ -166,6 +176,7 @@ Create todos for each phase:
 ### 3. Progressive Disclosure in Descriptions
 
 Keep ticket descriptions scannable:
+
 - Overview section (1-2 paragraphs)
 - Table of contents with links
 - Detailed sections below
@@ -174,6 +185,7 @@ Keep ticket descriptions scannable:
 ### 4. Validate Before Creating
 
 Before calling Linear API:
+
 - ✅ Epic description complete?
 - ✅ All sub-issue descriptions written?
 - ✅ Dependencies mapped?
@@ -193,6 +205,7 @@ Epic: Real-Time Notification System (CHARIOT-1000)
 ```
 
 Each ticket includes:
+
 - Rich description with context
 - ASCII architecture diagrams
 - Implementation phases
@@ -206,6 +219,7 @@ Each ticket includes:
 **Problem**: Linear API rejects description with null bytes or other control chars
 
 **Solution**: The `validateNoControlCharsAllowWhitespace` validator in Linear wrapper allows newlines but blocks dangerous characters. If you still get errors:
+
 1. Check for non-printable characters in source text
 2. Remove emojis if present
 3. Verify markdown doesn't have hidden characters
@@ -217,6 +231,7 @@ See [Linear API Patterns](references/linear-api-patterns.md) for complete troubl
 **Problem**: Parent ID correct but sub-issue creation fails
 
 **Solution**:
+
 1. Verify parent ID from epic creation response
 2. Check sub-issue description length (Linear has limits)
 3. Create sub-issues one at a time to isolate failures
@@ -227,6 +242,7 @@ See [Linear API Patterns](references/linear-api-patterns.md) for complete troubl
 **Problem**: Breakdown has >10 sub-issues
 
 **Solution**: Split into multiple epics:
+
 - Epic 1: Foundation + Core
 - Epic 2: Integrations + Advanced Features
 

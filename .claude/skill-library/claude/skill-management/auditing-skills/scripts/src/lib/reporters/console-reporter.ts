@@ -37,7 +37,7 @@ export class ConsoleReporter {
     console.log('');
 
     // Phase results table
-    console.log(chalk.blue.bold('All 13 Phases:\n'));
+    console.log(chalk.blue.bold('All 21 Phases:\n'));
 
     const phaseNames: Record<number, string> = {
       1: 'Description Format',
@@ -53,6 +53,14 @@ export class ConsoleReporter {
       11: 'Command Examples',
       12: 'CLI Error Handling',
       13: 'State Externalization',
+      14: 'Visual/Style',
+      15: 'Orphan Detection',
+      16: 'Windows Paths',
+      17: 'Gateway Structure',
+      18: 'Routing Table Format',
+      19: 'Path Resolution',
+      20: 'Coverage Check',
+      21: 'Line Number References',
     };
 
     // Build table with cli-table3
@@ -66,7 +74,7 @@ export class ConsoleReporter {
       wordWrap: true,
     });
 
-    for (let phaseNum = 1; phaseNum <= 13; phaseNum++) {
+    for (let phaseNum = 1; phaseNum <= 21; phaseNum++) {
       const phase = result.phases.find(p => p.phaseName.includes(`Phase ${phaseNum}:`));
       const phaseName = phaseNames[phaseNum] || 'Unknown';
       const phaseLabel = `Phase ${phaseNum}: ${phaseName}`;
@@ -113,7 +121,7 @@ export class ConsoleReporter {
     output += `  ${chalk.red('🔴 CRITICAL')}: ${result.totalCritical || 0}\n`;
     output += `  ${chalk.yellow('⚠️ WARNING')}: ${result.totalWarnings || 0}\n`;
     output += `  ${chalk.blue('ℹ️ INFO')}: ${result.totalInfo || 0}\n\n`;
-    output += chalk.blue.bold('All 13 Phases:\n\n');
+    output += chalk.blue.bold('All 21 Phases:\n\n');
     output += tableOutput + '\n\n';
 
     // Quick actions

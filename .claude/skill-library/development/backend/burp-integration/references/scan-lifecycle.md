@@ -65,10 +65,12 @@ func (c *BurpEnterpriseClient) CreateOnDemandSiteSchedule(
 ```
 
 **Key Parameters:**
+
 - `agent_pool_id: "3"` - On-demand pool for immediate execution
 - No schedule/rrule - runs once immediately
 
 **Usage Pattern:**
+
 ```go
 // 1. Ensure site exists
 wa, _ := client.EnsureSite(wa)
@@ -136,11 +138,13 @@ func (c *BurpEnterpriseClient) CreateDailySiteSchedule(
 ```
 
 **Key Parameters:**
+
 - `agent_pool_id: "-1"` - Default pool
 - `initial_run_time` - First execution time (5 min buffer)
 - `rrule: "FREQ=DAILY;INTERVAL=1"` - Run every day at midnight UTC
 
 **Usage Pattern:**
+
 ```go
 // Only for seeds (continuous monitoring)
 if wa.IsSeed() {
@@ -171,6 +175,7 @@ for _, config := range configs.ScanConfigurations {
 ```
 
 **Configuration Validation:**
+
 ```go
 func (c *BurpEnterpriseClient) validateScanConfiguration(configID string) (bool, error) {
     configs, err := c.GetScanConfigurations()
@@ -237,6 +242,7 @@ func (c *BurpEnterpriseClient) GetScanFromScheduleItem(
 ```
 
 **Usage:**
+
 ```go
 // Fetch most recent scan for schedule
 scanResp, err := client.GetScanFromScheduleItem(scheduleID)
@@ -292,6 +298,7 @@ func (c *BurpEnterpriseClient) GetScanSummary(scanID string) (*ScanSummary, erro
 ```
 
 **Status Values:**
+
 - `"queued"` - Waiting for agent assignment
 - `"running"` - Actively scanning (crawl/audit phases)
 - `"succeeded"` - Completed successfully
@@ -363,6 +370,7 @@ func MonitorScanCompletion(
 ```
 
 **Polling Best Practices:**
+
 - ✅ Poll every 30 seconds (not faster)
 - ✅ Use context for cancellation
 - ✅ Set reasonable timeout (1-2 hours)
@@ -415,12 +423,14 @@ func (c *BurpEnterpriseClient) CancelScan(scanID string) error {
 ```
 
 **When to Cancel:**
+
 - User-initiated stop
 - Timeout exceeded
 - Capability teardown
 - Error recovery
 
 **Usage Pattern:**
+
 ```go
 // Cleanup pattern in capability
 defer func() {
@@ -581,11 +591,13 @@ func CreateScanWithRetry(
 ```
 
 **When to Retry:**
+
 - Network errors
 - Burp API rate limits
 - Temporary service unavailability
 
 **Don't Retry:**
+
 - Invalid configuration IDs
 - Authentication failures
 - Invalid site IDs
@@ -599,11 +611,13 @@ func CreateScanWithRetry(
 **Symptom:** Scan stuck in "queued" status for >30 minutes.
 
 **Possible Causes:**
+
 - No available agents in pool
 - Agent pool misconfiguration
 - Burp Enterprise agent offline
 
 **Solution:**
+
 ```go
 if summary.Status == burp.SCAN_QUEUED {
     queuedDuration := time.Since(startTime)
@@ -620,11 +634,13 @@ if summary.Status == burp.SCAN_QUEUED {
 **Symptom:** `summary.Status == burp.SCAN_FAILED`
 
 **Possible Causes:**
+
 - Network connectivity issues
 - Invalid site configuration
 - Agent crash
 
 **Solution:**
+
 1. Check scan event log (future feature)
 2. Verify site configuration
 3. Retry with backoff
@@ -636,11 +652,13 @@ if summary.Status == burp.SCAN_QUEUED {
 **Symptom:** `len(scanResp.Scans) == 0`
 
 **Possible Causes:**
+
 - Schedule not yet executed
 - Schedule item deleted
 - Query filters too restrictive
 
 **Solution:**
+
 ```go
 if len(scanResp.Scans) == 0 {
     // Wait for first execution
@@ -689,6 +707,7 @@ func CreateMultipleSchedules(
 ```
 
 **Benefits:**
+
 - Parallel creation reduces latency
 - errgroup handles errors elegantly
 

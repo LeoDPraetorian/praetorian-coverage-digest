@@ -20,12 +20,14 @@
 ### CRITICAL Issues
 
 **1. npm --prefix Without /scripts**
+
 ```bash
 npm run --prefix .claude/skills/my-skill audit
 # ❌ Missing /scripts - package.json not found
 ```
 
 **2. Hardcoded Paths**
+
 ```bash
 cd /Users/name/project/.claude/skills/...
 # ❌ Absolute paths break on other machines
@@ -34,12 +36,14 @@ cd /Users/name/project/.claude/skills/...
 ### WARNING Issues
 
 **1. cd Without REPO_ROOT**
+
 ```bash
 cd .claude/skills/my-skill && npm run dev
 # ❌ Assumes current directory is repo root
 ```
 
 **2. Relative Paths**
+
 ```bash
 ./scripts/helper.sh
 # ❌ Assumes running from skill directory
@@ -52,6 +56,7 @@ cd .claude/skills/my-skill && npm run dev
 **Delegates to**: claude-skill-audit-commands CLI
 
 **What it fixes:**
+
 - ✅ Adds REPO_ROOT detection to cd commands
 - ✅ Fixes npm --prefix to use cd pattern instead
 - ✅ Wraps commands with repo-root detection
@@ -67,6 +72,7 @@ cd "$REPO_ROOT/.claude/skills/skill-name/scripts" && npm run command
 ```
 
 **Why this works:**
+
 - `--show-superproject-working-tree`: Returns super-repo root when in submodule
 - Returns empty string (not error) when not in submodule
 - `${REPO_ROOT:-$(fallback)}`: Uses fallback if empty
@@ -78,11 +84,13 @@ cd "$REPO_ROOT/.claude/skills/skill-name/scripts" && npm run command
 ### Example 1: Fix cd Command
 
 **Before:**
+
 ```bash
 cd .claude/skills/my-skill/scripts && npm run audit
 ```
 
 **After:**
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
 cd "$REPO_ROOT/.claude/skills/my-skill/scripts" && npm run audit
@@ -91,12 +99,14 @@ cd "$REPO_ROOT/.claude/skills/my-skill/scripts" && npm run audit
 ### Example 2: Fix npm --prefix
 
 **Before:**
+
 ```bash
 npm run --prefix .claude/skills/my-skill search
 # Missing /scripts - package.json not in my-skill root
 ```
 
 **After:**
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
 cd "$REPO_ROOT/.claude/skills/my-skill/scripts" && npm run search
@@ -105,11 +115,13 @@ cd "$REPO_ROOT/.claude/skills/my-skill/scripts" && npm run search
 ### Example 3: Claude Code Execution
 
 **Before:**
+
 ```bash
 !cd .claude/skills/my-skill/scripts && npm run command
 ```
 
 **After:**
+
 ```bash
 !REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}" && cd "$REPO_ROOT/.claude/skills/my-skill/scripts" && npm run command
 ```
@@ -126,6 +138,7 @@ npm run dev
 ```
 
 **After:**
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
 cd "$REPO_ROOT/.claude/skills/my-skill"
@@ -136,12 +149,16 @@ npm run dev
 **2. Teaching Examples (Don't Fix)**
 
 Examples showing WRONG patterns intentionally:
-```markdown
+
+````markdown
 **❌ WRONG:**
+
 ```bash
 cd .claude/skills/...  # This is intentionally wrong for teaching
 ```
-```
+````
+
+````
 
 Don't auto-fix teaching examples.
 
@@ -158,7 +175,7 @@ npm run audit -- my-skill --phase 11
 
 # Fix with guidance
 npm run fix -- my-skill --phase 11
-```
+````
 
 **Manual pattern application:**
 
@@ -176,8 +193,8 @@ npm run fix -- my-skill --phase 11
 
 ## Quick Reference
 
-| Pattern | Fix | Specialized CLI |
-|---------|-----|-----------------|
-| cd .claude/... | ✅ Add REPO_ROOT | audit-commands |
-| npm --prefix | ✅ Convert to cd pattern | audit-commands |
-| Relative paths | ✅ Make absolute | audit-commands |
+| Pattern        | Fix                      | Specialized CLI |
+| -------------- | ------------------------ | --------------- |
+| cd .claude/... | ✅ Add REPO_ROOT         | audit-commands  |
+| npm --prefix   | ✅ Convert to cd pattern | audit-commands  |
+| Relative paths | ✅ Make absolute         | audit-commands  |

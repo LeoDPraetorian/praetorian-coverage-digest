@@ -15,12 +15,14 @@ allowed-tools: Read, Bash, Grep, Glob, Edit, AskUserQuestion, TodoWrite
 ## When to Use
 
 Use this skill when:
+
 - Removing a deprecated skill
 - Cleaning up unused skills
 - User says "delete the X skill"
 - Consolidating duplicate skills
 
 **NOT for:**
+
 - Renaming skills (use `renaming-skills` skill)
 - Temporarily disabling skills (comment out gateway reference)
 - Migrating skills (use `migrating-skills` skill)
@@ -29,17 +31,36 @@ Use this skill when:
 
 ## Quick Reference
 
-| Phase | Purpose | Time | Checkpoint |
-|-------|---------|------|------------|
-| **1. Validate** | Verify skill exists | 1 min | Skill found |
-| **2. Discover** | Find all references | 3 min | References documented |
-| **3. Analyze** | Show impact to user | 2 min | Impact clear |
-| **4. Confirm** | User approval before deletion | 1 min | Confirmed |
-| **5. Remove** | Delete skill directory | 1 min | Directory removed |
-| **6. Cleanup** | Remove references | 5 min | References cleaned |
-| **7. Verify** | Ensure no orphaned references | 2 min | Clean verified |
+| Phase              | Purpose                       | Time  | Checkpoint            |
+| ------------------ | ----------------------------- | ----- | --------------------- |
+| **1. Validate**    | Verify skill exists           | 1 min | Skill found           |
+| **2. Discover**    | Find all references           | 3 min | References documented |
+| **3. Analyze**     | Show impact to user           | 2 min | Impact clear          |
+| **4. Confirm**     | User approval before deletion | 1 min | Confirmed             |
+| **5. Remove**      | Delete skill directory        | 1 min | Directory removed     |
+| **6. Gateway**     | Sync gateway routing tables   | 3 min | Gateways synced       |
+| **7. Cleanup**     | Remove non-gateway references | 5 min | References cleaned    |
+| **8. Verify**      | Ensure no orphaned references | 2 min | Clean verified        |
 
-**Total**: 15 minutes
+**Total**: 18 minutes
+
+---
+
+## Step 0: Navigate to Repository Root (MANDATORY)
+
+**Execute BEFORE any delete operation:**
+
+```bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+```
+
+**See:** [Repository Root Navigation](references/patterns/repo-root-detection.md)
+
+**⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
+
+**Cannot proceed without navigating to repo root** ✅
 
 ---
 
@@ -83,6 +104,7 @@ grep -r "{skill-name}" .claude/skills/gateway-*/SKILL.md
 ```
 
 **Gateways to check:**
+
 - `gateway-frontend`
 - `gateway-backend`
 - `gateway-testing`
@@ -112,6 +134,7 @@ grep -r "{skill-name}" .claude/skill-library/*/SKILL.md
 ```
 
 **Skills reference related skills in:**
+
 - "Integration with Other Skills" sections
 - "Related Skills" sections
 - Workflow instructions ("use skill X before Y")
@@ -134,13 +157,16 @@ Create a structured list:
 ## References Found
 
 ### Gateways
+
 - `.claude/skills/gateway-testing/SKILL.md:45` - Routes to skill
 - `.claude/skills/gateway-frontend/SKILL.md:78` - Mentions in description
 
 ### Commands
+
 - `.claude/commands/skill-manager.md:23` - Routing table
 
 ### Skills
+
 - `.claude/skill-library/testing/test-infrastructure-discovery/SKILL.md:219` - Integration section
 - `.claude/skills/developing-with-tdd/SKILL.md:156` - Related skills
 
@@ -159,16 +185,20 @@ Use AskUserQuestion to show impact:
 Question: I found {X} references to {skill-name}. Deleting this skill will break:
 
 **Gateways:**
+
 - gateway-testing (routing table)
 
 **Commands:**
+
 - skill-manager (routing)
 
 **Skills:**
+
 - test-infrastructure-discovery (integration section)
 - developing-with-tdd (related skills)
 
 **Impact:**
+
 - Gateway routes will fail
 - skill-manager command will have broken reference
 - 2 skills will have outdated recommendations
@@ -176,6 +206,7 @@ Question: I found {X} references to {skill-name}. Deleting this skill will break
 Do you want to proceed with deletion?
 
 Options:
+
 - Yes - Delete skill and clean up all references
 - No - Cancel deletion
 - Show me the references first
@@ -199,10 +230,12 @@ Then re-ask the confirmation question.
 **Cannot proceed without explicit user confirmation** ✅
 
 If user confirms deletion:
+
 - Proceed to Phase 5
 - Document confirmation in output
 
 If user cancels:
+
 - Stop immediately
 - Report "Deletion cancelled, no changes made"
 - Exit skill
@@ -240,65 +273,96 @@ ls {skill-path} 2>&1
 
 ---
 
-## Phase 6: Cleanup References
+## Phase 6: Gateway Sync
 
-**For each reference found in Phase 2, remove or update it.**
+**Automatically detect and remove broken gateway paths using syncing-gateways skill.**
 
-### 6.1 Gateway References
+This phase mirrors the pattern from `migrating-skills` Step 4: after directory deletion, automatically sync gateway routing tables to remove broken references.
 
-**If skill is in routing table**: Remove the entire routing entry using Edit tool.
+### 6.1 Read syncing-gateways Skill
 
-**If skill is mentioned in description**: Update description to remove mention using Edit tool.
-
-**Example:**
-```markdown
-# Before
-- **test-infrastructure-discovery** - Discover test infrastructure
-- **deleted-skill-name** - Old functionality
-- **debugging-systematically** - Debug issues
-
-# After (remove line)
-- **test-infrastructure-discovery** - Discover test infrastructure
-- **debugging-systematically** - Debug issues
+```bash
+# Read the syncing-gateways skill to understand the workflow
+# Located at: .claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md
 ```
 
-### 6.2 Command References
+Use Read tool to load the `syncing-gateways` skill.
+
+### 6.2 Execute Gateway Sync
+
+Follow the `syncing-gateways` workflow to:
+
+1. **Detect** - Scan all gateway skills for references to deleted skill
+2. **Validate** - Check if referenced skills exist in core or library
+3. **Report** - Show which gateways have broken references
+4. **Fix** - Remove broken routing entries from gateway skills
+
+**Why automatic?** Gateways follow predictable routing table patterns. The `syncing-gateways` skill can detect and fix broken references automatically.
+
+### 6.3 Verify Gateway Cleanup
+
+After running `syncing-gateways`, verify no gateway references remain:
+
+```bash
+grep -r "{skill-name}" .claude/skills/gateway-*/SKILL.md
+# Should return no results
+```
+
+**If references found:** The `syncing-gateways` skill should have removed them. If not, investigate and clean manually.
+
+---
+
+## Phase 7: Cleanup Non-Gateway References
+
+**For each non-gateway reference found in Phase 2, remove or update it.**
+
+**Note:** Gateway references should already be cleaned by Phase 6 (Gateway Sync). This phase handles commands and skills only.
+
+### 7.1 Command References
 
 **If skill is in routing table**: Remove routing section using Edit tool.
 
 **Example:**
+
 ```markdown
 # Before
+
 | create | creating-skills |
 | delete | deleting-skills |
 | update | updating-skills |
 
 # After
+
 | create | creating-skills |
 | update | updating-skills |
 ```
 
-### 6.3 Skill References
+### 7.2 Skill References
 
 **For "Related Skills" sections**: Remove the skill from the list.
 
 **For "Integration" sections**: Remove or update the integration note.
 
 **Example:**
+
 ```markdown
 # Before
+
 **Related Skills:**
+
 - creating-skills
 - deleted-skill-name
 - updating-skills
 
 # After
+
 **Related Skills:**
+
 - creating-skills
 - updating-skills
 ```
 
-### 6.4 Track Cleanup Progress
+### 7.3 Track Cleanup Progress
 
 Use TodoWrite to track each reference cleanup:
 
@@ -313,9 +377,9 @@ Mark each complete as you clean it up.
 
 ---
 
-## Phase 7: Verification
+## Phase 8: Verification
 
-### 7.1 Re-Search for References
+### 8.1 Re-Search for References
 
 **Run the same searches from Phase 2** to verify no references remain:
 
@@ -327,7 +391,7 @@ grep -r "{skill-name}" .claude/skills/*/SKILL.md
 grep -r "{skill-name}" .claude/skill-library/*/*/SKILL.md
 ```
 
-### 7.2 Check for Partial Matches
+### 8.2 Check for Partial Matches
 
 Search for partial skill name matches (in case of hyphenation issues):
 
@@ -336,14 +400,14 @@ Search for partial skill name matches (in case of hyphenation issues):
 grep -r "{partial-skill-name}" .claude/
 ```
 
-### 7.3 Verify Directory Removed
+### 8.3 Verify Directory Removed
 
 ```bash
 find .claude -name "{skill-name}" -type d
 # Should return no results
 ```
 
-### 7.4 Final Report
+### 8.4 Final Report
 
 Present verification results:
 
@@ -351,16 +415,19 @@ Present verification results:
 ## Deletion Complete ✅
 
 **Skill Removed:**
+
 - Path: {skill-path}
 - Status: Directory deleted
 
 **References Cleaned:**
+
 - ✅ gateway-testing:45 - Removed routing entry
 - ✅ skill-manager.md:23 - Removed from command table
 - ✅ test-infrastructure-discovery:219 - Removed from integration section
 - ✅ developing-with-tdd:156 - Removed from related skills
 
 **Verification:**
+
 - ✅ No references found in grep search
 - ✅ No partial matches found
 - ✅ Directory no longer exists
@@ -380,48 +447,33 @@ Deletion complete when:
 3. ✅ Impact shown to user (Phase 3)
 4. ✅ User confirmed deletion (Phase 4)
 5. ✅ Directory removed (Phase 5)
-6. ✅ All references cleaned (Phase 6)
-7. ✅ No orphaned references remain (Phase 7)
-8. ✅ TodoWrite todos complete
+6. ✅ Gateway references synced and removed (Phase 6)
+7. ✅ Non-gateway references cleaned (Phase 7)
+8. ✅ No orphaned references remain (Phase 8)
+9. ✅ TodoWrite todos complete
 
 ---
 
-## Common Mistakes
+## Common Mistakes & Rationalizations
 
-| Mistake | Fix |
-|---------|-----|
-| Deleting without user confirmation | MUST get explicit confirmation (Phase 4) |
-| Incomplete reference search | Search gateways, commands, AND skills |
-| Forgetting partial name matches | Search for skill name fragments in verification |
-| Not verifying cleanup | Re-run searches to ensure no orphans |
-| Deleting wrong directory | Verify path contains `.claude/skill` |
-| Missing TodoWrite tracking | Use TodoWrite for all phases |
-
----
-
-## Rationalization to Avoid
-
-| Excuse | Reality |
-|--------|---------|
-| "No references, safe to delete" | Must verify with grep searches, not assumptions |
-| "Just delete the directory" | Must clean up references or they'll break |
-| "User knows the impact" | Must show references explicitly, not assume |
-| "Quick cleanup, skip verification" | Verification is mandatory - orphaned references break system |
-| "Skill is deprecated, references don't matter" | Deprecated skills still referenced until cleanup |
+**See:** [references/common-mistakes.md](references/common-mistakes.md)
 
 ---
 
 ## Integration with Other Skills
 
 **Before deleting:**
+
 - Check if skill should be **renamed** instead (`renaming-skills`)
 - Check if skill should be **migrated** instead (`migrating-skills`)
 
 **After deleting:**
-- Run `skill-manager audit` on updated gateway/command files
-- Verify no broken links with `skill-manager audit --all`
+
+- Run `npm run audit -- <gateway-name>` on updated gateway files
+- Verify no broken links with `npm run audit` (audits all skills)
 
 **Related:**
+
 - `renaming-skills` - Rename instead of delete
 - `migrating-skills` - Move location instead of delete
 - `auditing-skills` - Verify cleanup success
@@ -431,12 +483,14 @@ Deletion complete when:
 ## Safety Features
 
 **Cannot proceed without:**
+
 - ✅ User confirmation (Phase 4)
 - ✅ Path safety check (Phase 5.1)
 - ✅ Reference discovery (Phase 2)
 - ✅ Verification (Phase 7)
 
 **Irreversible operations:**
+
 - Directory deletion (Phase 5)
 - Reference cleanup (Phase 6)
 

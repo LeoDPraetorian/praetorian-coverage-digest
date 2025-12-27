@@ -5,6 +5,7 @@ Complete TDD-guarded workflow for updating existing MCP wrappers.
 ## Overview
 
 Updates to existing wrappers MUST follow TDD to prevent regressions:
+
 1. **Baseline**: Verify existing tests pass
 2. **RED**: Add tests for new behavior (must fail)
 3. **GREEN**: Implement changes (all tests pass)
@@ -28,23 +29,24 @@ cd .claude && npm run test:unit -- tools/{service}/{tool}.unit.test.ts
 
 ```typescript
 // Add to existing test file
-describe('New Feature', () => {
-  it('should handle new field', async () => {
+describe("New Feature", () => {
+  it("should handle new field", async () => {
     const response = {
-      id: '123',
-      newField: 'value'  // New field being added
+      id: "123",
+      newField: "value", // New field being added
     };
-    const result = await wrapper({ id: '123' });
-    expect(result.newField).toBe('value');
+    const result = await wrapper({ id: "123" });
+    expect(result.newField).toBe("value");
   });
 
-  it('should validate new input format', async () => {
+  it("should validate new input format", async () => {
     // Test new input handling
   });
 });
 ```
 
 **Verify RED Phase:**
+
 ```bash
 cd .claude && npm run test:unit -- tools/{service}/{tool}.unit.test.ts
 # Expected: NEW tests FAIL, OLD tests PASS
@@ -68,6 +70,7 @@ Document new field requirements/optionality.
 **Purpose:** Make minimum changes to pass new tests.
 
 Changes to make:
+
 1. Update Zod schemas for new fields
 2. Add token reduction for new data
 3. Update response formatting
@@ -78,18 +81,19 @@ Changes to make:
 export const OutputSchema = z.object({
   id: z.string(),
   name: z.string(),
-  newField: z.string().optional(),  // Added
+  newField: z.string().optional(), // Added
 });
 
 // Update filtering
 const filtered = {
   id: rawData.id,
   name: rawData.name,
-  newField: rawData.newField,  // Added
+  newField: rawData.newField, // Added
 };
 ```
 
 **Verify GREEN Phase:**
+
 ```bash
 cd .claude && npm run test:unit -- tools/{service}/{tool}.unit.test.ts
 # Expected: ALL tests PASS (old AND new)
@@ -174,7 +178,7 @@ npm run test:unit -- {wrapper}
 ```typescript
 // DON'T: Update schema without tests
 export const OutputSchema = z.object({
-  newField: z.string(),  // Added without tests
+  newField: z.string(), // Added without tests
 });
 
 // DO: Write tests FIRST, then implement

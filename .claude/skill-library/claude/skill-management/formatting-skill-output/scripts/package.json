@@ -1,0 +1,51 @@
+{
+  "name": "@chariot/formatting-skill-output",
+  "version": "1.0.0",
+  "description": "Deterministic table formatter for skill management output",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./lib/schemas": {
+      "types": "./dist/lib/schemas.d.ts",
+      "import": "./dist/lib/schemas.js",
+      "default": "./dist/lib/schemas.js"
+    },
+    "./lib/table-formatter": {
+      "types": "./dist/lib/table-formatter.d.ts",
+      "import": "./dist/lib/table-formatter.js",
+      "default": "./dist/lib/table-formatter.js"
+    },
+    "./lib/utils": {
+      "types": "./dist/lib/utils.d.ts",
+      "import": "./dist/lib/utils.js",
+      "default": "./dist/lib/utils.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "format": "tsx src/format.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run"
+  },
+  "keywords": [
+    "skill-management",
+    "formatting",
+    "deterministic",
+    "table"
+  ],
+  "author": "Chariot",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}

@@ -1,7 +1,7 @@
 ---
 name: integration-step-validator
 description: Use when implementing or reviewing Chariot integrations to validate workflow steps are completed correctly - checks frontend Integration card format and enum registration, backend stub structure with credential validation and Name() function, test coverage with unit and integration tests, Invoke implementation with error handling and tabularium mapping, VMFilter integration, CheckAffiliation implementation - prevents incomplete integrations from reaching production
-allowed-tools: 'Read, Bash, WebFetch'
+allowed-tools: "Read, Bash, WebFetch"
 ---
 
 # Integration Step Validator
@@ -33,6 +33,7 @@ Chariot integrations follow a 7-step workflow. Each step has specific validation
 **Purpose:** UI component for integration configuration
 
 **Required Elements:**
+
 - [ ] Integration card component in `ui/src/sections/settings/integrations/`
 - [ ] Follows standardized card structure (header, description, form, actions)
 - [ ] Enum constant defined in `ui/src/types/integrations.ts`
@@ -44,6 +45,7 @@ Chariot integrations follow a 7-step workflow. Each step has specific validation
 - [ ] Success/failure toast notifications
 
 **Validation:**
+
 ```bash
 # Check enum registration
 grep -r "YOUR_INTEGRATION" ui/src/types/integrations.ts
@@ -56,6 +58,7 @@ grep "YourIntegrationCard" ui/src/sections/settings/integrations/index.tsx
 ```
 
 **Common Mistakes:**
+
 - ❌ Enum defined but not exported
 - ❌ Card component exists but not imported in index
 - ❌ Missing form validation (allows invalid data)
@@ -67,6 +70,7 @@ grep "YourIntegrationCard" ui/src/sections/settings/integrations/index.tsx
 **Purpose:** Capability implementation scaffold
 
 **Required Elements:**
+
 - [ ] Struct definition implementing Capability interface
 - [ ] `Name()` function returning capability name
 - [ ] `Description()` function with clear explanation
@@ -77,6 +81,7 @@ grep "YourIntegrationCard" ui/src/sections/settings/integrations/index.tsx
 - [ ] Enum constant in backend capability registry
 
 **Validation:**
+
 ```bash
 # Check struct implements Capability interface
 grep -A 10 "type YourIntegration struct" backend/pkg/capabilities/
@@ -89,6 +94,7 @@ grep -A 5 "func NewYourIntegration" backend/pkg/capabilities/your_integration.go
 ```
 
 **Common Mistakes:**
+
 - ❌ Name() returns empty string
 - ❌ Constructor doesn't validate required dependencies
 - ❌ Credential struct missing validation tags
@@ -100,6 +106,7 @@ grep -A 5 "func NewYourIntegration" backend/pkg/capabilities/your_integration.go
 **Purpose:** Secure authentication handling
 
 **Required Elements:**
+
 - [ ] Credential struct with proper field types
 - [ ] Validation tags on all required fields (`validate:"required"`)
 - [ ] Credential broker integration for secure storage
@@ -110,6 +117,7 @@ grep -A 5 "func NewYourIntegration" backend/pkg/capabilities/your_integration.go
 - [ ] Test mode credentials separate from production
 
 **Validation:**
+
 ```bash
 # Check credential struct has validation
 grep -A 10 "type.*Credential struct" backend/pkg/capabilities/your_integration.go | grep validate
@@ -122,6 +130,7 @@ grep "credentialBroker" backend/pkg/capabilities/your_integration.go
 ```
 
 **Common Mistakes:**
+
 - ❌ Credentials hardcoded in source
 - ❌ No validation on credential fields
 - ❌ Credentials logged in error messages
@@ -135,6 +144,7 @@ grep "credentialBroker" backend/pkg/capabilities/your_integration.go
 **Required Elements:**
 
 **Unit Tests:**
+
 - [ ] Test file with `_test.go` suffix
 - [ ] Constructor tests (valid/invalid inputs)
 - [ ] Name() function test
@@ -144,6 +154,7 @@ grep "credentialBroker" backend/pkg/capabilities/your_integration.go
 - [ ] Error path testing
 
 **Integration Tests:**
+
 - [ ] Real API call tests (with test credentials)
 - [ ] Error handling tests (network failures, auth failures)
 - [ ] Pagination testing (if applicable)
@@ -152,6 +163,7 @@ grep "credentialBroker" backend/pkg/capabilities/your_integration.go
 - [ ] Idempotency tests (if mutations)
 
 **Validation:**
+
 ```bash
 # Check unit tests exist
 ls backend/pkg/capabilities/your_integration_test.go
@@ -164,6 +176,7 @@ grep -A 5 "tests := \\[\\]struct" backend/pkg/capabilities/your_integration_test
 ```
 
 **Common Mistakes:**
+
 - ❌ Only happy path tested
 - ❌ No error handling tests
 - ❌ Tests use production credentials
@@ -176,6 +189,7 @@ grep -A 5 "tests := \\[\\]struct" backend/pkg/capabilities/your_integration_test
 **Purpose:** Core capability execution logic
 
 **Required Elements:**
+
 - [ ] `Invoke()` method signature matches interface
 - [ ] Context propagation for cancellation
 - [ ] Input validation before API calls
@@ -188,6 +202,7 @@ grep -A 5 "tests := \\[\\]struct" backend/pkg/capabilities/your_integration_test
 - [ ] Graceful degradation on partial failures
 
 **Validation:**
+
 ```bash
 # Check Invoke signature
 grep -A 2 "func.*Invoke.*context.Context" backend/pkg/capabilities/your_integration.go
@@ -203,6 +218,7 @@ grep "log\\.Info\\|log\\.Error" backend/pkg/capabilities/your_integration.go
 ```
 
 **Common Mistakes:**
+
 - ❌ Invoke() doesn't respect context cancellation
 - ❌ Errors returned without context (hard to debug)
 - ❌ No logging (black box in production)
@@ -215,6 +231,7 @@ grep "log\\.Info\\|log\\.Error" backend/pkg/capabilities/your_integration.go
 **Purpose:** Virtual machine asset enrichment
 
 **Required Elements (if integration discovers VMs):**
+
 - [ ] VMFilter interface implementation
 - [ ] `FilterVM()` method for VM identification
 - [ ] VM metadata extraction (OS, version, cloud provider)
@@ -223,6 +240,7 @@ grep "log\\.Info\\|log\\.Error" backend/pkg/capabilities/your_integration.go
 - [ ] Deduplication logic for same VM from multiple sources
 
 **Validation:**
+
 ```bash
 # Check VMFilter implementation
 grep -A 5 "FilterVM" backend/pkg/capabilities/your_integration.go
@@ -232,6 +250,7 @@ grep -E "(OperatingSystem|CloudProvider|InstanceType)" backend/pkg/capabilities/
 ```
 
 **Common Mistakes:**
+
 - ❌ VM filtering too broad (false positives)
 - ❌ Missing critical VM metadata
 - ❌ No deduplication (duplicate VMs)
@@ -242,6 +261,7 @@ grep -E "(OperatingSystem|CloudProvider|InstanceType)" backend/pkg/capabilities/
 **Purpose:** Entity ownership and account association
 
 **Required Elements:**
+
 - [ ] `CheckAffiliation()` method implementation
 - [ ] Account ID validation
 - [ ] Entity ownership verification
@@ -251,6 +271,7 @@ grep -E "(OperatingSystem|CloudProvider|InstanceType)" backend/pkg/capabilities/
 - [ ] Error handling for unauthorized access
 
 **Validation:**
+
 ```bash
 # Check CheckAffiliation exists
 grep -A 10 "CheckAffiliation" backend/pkg/capabilities/your_integration.go
@@ -263,6 +284,7 @@ grep -E "(Unauthorized|Forbidden)" backend/pkg/capabilities/your_integration.go
 ```
 
 **Common Mistakes:**
+
 - ❌ No affiliation check (security vulnerability)
 - ❌ Affiliation check bypassable
 - ❌ No logging of unauthorized attempts
@@ -273,6 +295,7 @@ grep -E "(Unauthorized|Forbidden)" backend/pkg/capabilities/your_integration.go
 Use this checklist for every integration implementation:
 
 ### Frontend (Step 1)
+
 - [ ] Integration card component created
 - [ ] Enum defined and registered
 - [ ] Form validation implemented
@@ -281,6 +304,7 @@ Use this checklist for every integration implementation:
 - [ ] Icon imported and displayed
 
 ### Backend (Steps 2-7)
+
 - [ ] Struct implements Capability interface
 - [ ] Name() function returns correct string
 - [ ] Constructor validates dependencies
@@ -295,6 +319,7 @@ Use this checklist for every integration implementation:
 - [ ] CheckAffiliation enforces multi-tenancy
 
 ### Documentation
+
 - [ ] README documents integration purpose
 - [ ] Configuration examples provided
 - [ ] Credential setup instructions clear
@@ -302,6 +327,7 @@ Use this checklist for every integration implementation:
 - [ ] Known limitations listed
 
 ### Deployment
+
 - [ ] CloudFormation template updated
 - [ ] Environment variables documented
 - [ ] Credential rotation tested
@@ -317,6 +343,7 @@ Use the validation script to check implementation completeness:
 ```
 
 **Script checks:**
+
 1. Frontend enum registration
 2. Backend struct existence
 3. Name() function presence
@@ -335,16 +362,17 @@ Use the validation script to check implementation completeness:
 **Cause:** Enum defined but not added to type mapping
 
 **Fix:**
+
 ```typescript
 // ui/src/types/integrations.ts
 export enum IntegrationType {
   // ...
-  YOUR_INTEGRATION = 'your-integration', // ✅ Add here
+  YOUR_INTEGRATION = "your-integration", // ✅ Add here
 }
 
 // ui/src/types/integrations.ts (mapping)
 export const INTEGRATION_TYPE_MAP = {
-  [IntegrationType.YOUR_INTEGRATION]: 'Your Integration', // ✅ Add here
+  [IntegrationType.YOUR_INTEGRATION]: "Your Integration", // ✅ Add here
 };
 ```
 
@@ -355,6 +383,7 @@ export const INTEGRATION_TYPE_MAP = {
 **Cause:** No validation in constructor or Invoke()
 
 **Fix:**
+
 ```go
 func NewYourIntegration(creds Credential) (*YourIntegration, error) {
   if creds.APIKey == "" {
@@ -375,6 +404,7 @@ func NewYourIntegration(creds Credential) (*YourIntegration, error) {
 **Cause:** Invoke() doesn't create Asset/Attribute/Risk entities
 
 **Fix:**
+
 ```go
 func (c *YourIntegration) Invoke(ctx context.Context) error {
   data, err := c.fetchData(ctx)
@@ -406,6 +436,7 @@ func (c *YourIntegration) Invoke(ctx context.Context) error {
 **Cause:** Errors returned without wrapping or context
 
 **Fix:**
+
 ```go
 // ❌ BAD: No context
 if err != nil {
@@ -425,6 +456,7 @@ if err != nil {
 **Cause:** Only manual testing, no automated tests
 
 **Fix:**
+
 ```go
 // backend/pkg/capabilities/your_integration_test.go
 func TestYourIntegration_Invoke(t *testing.T) {
@@ -461,6 +493,7 @@ func TestYourIntegration_Invoke(t *testing.T) {
 When reviewing integration PRs, verify:
 
 **Code Quality:**
+
 - [ ] No hardcoded credentials
 - [ ] Errors wrapped with context
 - [ ] Logging comprehensive
@@ -468,6 +501,7 @@ When reviewing integration PRs, verify:
 - [ ] Variable names descriptive
 
 **Security:**
+
 - [ ] Credentials from broker
 - [ ] CheckAffiliation enforced
 - [ ] No sensitive data in logs
@@ -475,6 +509,7 @@ When reviewing integration PRs, verify:
 - [ ] SQL injection prevention (if DB queries)
 
 **Performance:**
+
 - [ ] Rate limit handling implemented
 - [ ] Pagination used for large datasets
 - [ ] Connection pooling configured
@@ -482,6 +517,7 @@ When reviewing integration PRs, verify:
 - [ ] Circuit breaker for external calls
 
 **Testing:**
+
 - [ ] Unit tests pass locally
 - [ ] Integration tests pass with test credentials
 - [ ] Edge cases covered
@@ -489,6 +525,7 @@ When reviewing integration PRs, verify:
 - [ ] No flaky tests
 
 **Documentation:**
+
 - [ ] README updated
 - [ ] Configuration examples provided
 - [ ] Known issues documented
@@ -504,6 +541,7 @@ When reviewing integration PRs, verify:
 → Review checklist above
 
 **Minimum viable integration:**
+
 1. Frontend card with enum
 2. Backend stub with Name()
 3. Credential validation
@@ -513,6 +551,7 @@ When reviewing integration PRs, verify:
 7. CheckAffiliation (if multi-tenant)
 
 **Time estimate:**
+
 - Frontend card: 2-4 hours
 - Backend stub: 1-2 hours
 - Tests: 2-4 hours
@@ -531,13 +570,14 @@ The systematic validation prevents incomplete integrations and catches issues be
 - **`scripts/generate-integration.sh <name>`** - Scaffold generator that creates directory structure and starter files from templates for new integrations
 
 **Usage:**
+
 ```bash
 # Generate integration scaffold
 ./scripts/generate-integration.sh github
 
 # Outputs:
 # - backend/pkg/capabilities/github.go
-# - backend/pkg/capabilities/github_test.go  
+# - backend/pkg/capabilities/github_test.go
 # - ui/src/sections/settings/integrations/GithubCard.tsx
 ```
 
@@ -549,11 +589,13 @@ The systematic validation prevents incomplete integrations and catches issues be
 ### Time Savings
 
 **Without enhancements:**
+
 - Manual setup: 2-4 hours
 - Copy-paste errors common
 - Missing test patterns
 
 **With enhancements:**
+
 - Generator scaffold: 2 minutes
 - Template customization: 30-45 minutes
 - **Total savings: 70-85% reduction**

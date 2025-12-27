@@ -19,17 +19,20 @@ Data Flow Diagrams (DFDs) are a foundational technique for threat modeling. They
 **Definition**: Actors outside the system boundary that interact with the system.
 
 **Examples**:
+
 - Users (authenticated, anonymous, admin)
 - External APIs (payment gateways, OAuth providers)
 - Third-party services (email, SMS, analytics)
 - Other internal systems
 
 **Security Relevance**:
+
 - All input from external entities is **untrusted by default**
 - Authentication required before trust can be established
 - Input validation must happen at system boundary
 
 **Detection in Code**:
+
 ```bash
 # Look for request handlers, API clients, webhook receivers
 grep -rn "http\.Request\|req\.body\|request\.json\|ctx\.Request" {scope}
@@ -40,18 +43,21 @@ grep -rn "http\.Request\|req\.body\|request\.json\|ctx\.Request" {scope}
 **Definition**: Components that transform, process, or route data.
 
 **Examples**:
+
 - API handlers
 - Business logic services
 - Data transformation functions
 - Authentication/authorization middleware
 
 **Security Relevance**:
+
 - Processes should validate all inputs
 - Processes should sanitize outputs
 - Errors should be handled securely (no stack traces to users)
 - Logging should not contain sensitive data
 
 **Detection in Code**:
+
 ```bash
 # Functions that transform data
 grep -rn "func.*\(.*\).*error\|async function\|def .*\(.*\):" {scope}
@@ -62,6 +68,7 @@ grep -rn "func.*\(.*\).*error\|async function\|def .*\(.*\):" {scope}
 **Definition**: Persistent storage where data is kept at rest.
 
 **Examples**:
+
 - Databases (SQL, NoSQL)
 - File systems
 - Object storage (S3)
@@ -69,12 +76,14 @@ grep -rn "func.*\(.*\).*error\|async function\|def .*\(.*\):" {scope}
 - Message queues
 
 **Security Relevance**:
+
 - Encryption at rest
 - Access control (IAM, connection strings)
 - Query parameterization (prevent injection)
 - Backup and recovery security
 
 **Detection in Code**:
+
 ```bash
 # Database connections and operations
 grep -rn "sql\.Open\|mongoose\.connect\|DynamoDBClient\|RedisClient" {scope}
@@ -93,11 +102,13 @@ grep -rn "sql\.Open\|mongoose\.connect\|DynamoDBClient\|RedisClient" {scope}
 | System → User | Data leakage, XSS |
 
 **Security Relevance**:
+
 - Encryption in transit (TLS)
 - Data minimization (only send what's needed)
 - Sensitive data masking in logs
 
 **Detection in Code**:
+
 ```bash
 # Data movement patterns
 grep -rn "\.send\|\.write\|\.emit\|return.*json\|res\.json" {scope}
@@ -109,15 +120,16 @@ grep -rn "\.send\|\.write\|\.emit\|return.*json\|res\.json" {scope}
 
 **Common Boundaries**:
 
-| Boundary | Trust Change |
-|----------|--------------|
-| Internet → DMZ | Untrusted → Semi-trusted |
-| DMZ → Internal | Semi-trusted → Trusted |
-| User → Admin | Limited → Elevated |
-| Service → Service | Cross-service trust |
-| Application → Database | Code → Data |
+| Boundary               | Trust Change             |
+| ---------------------- | ------------------------ |
+| Internet → DMZ         | Untrusted → Semi-trusted |
+| DMZ → Internal         | Semi-trusted → Trusted   |
+| User → Admin           | Limited → Elevated       |
+| Service → Service      | Cross-service trust      |
+| Application → Database | Code → Data              |
 
 **Security Relevance**:
+
 - Security controls MUST exist at trust boundaries
 - Data crossing boundaries must be validated
 - Authentication/authorization at each boundary
@@ -138,6 +150,7 @@ grep -rn "\.send\|\.write\|\.emit\|return.*json\|res\.json" {scope}
 ```
 
 **What to capture**:
+
 - All external actors
 - High-level data flows
 - System boundary
@@ -160,6 +173,7 @@ grep -rn "\.send\|\.write\|\.emit\|return.*json\|res\.json" {scope}
 ```
 
 **What to capture**:
+
 - Major components (frontend, backend, databases)
 - Data flows between components
 - Trust boundaries between components
@@ -187,6 +201,7 @@ Backend Component:
 ```
 
 **What to capture**:
+
 - Internal processes within component
 - Data transformations
 - Internal trust boundaries
@@ -198,29 +213,34 @@ Backend Component:
 For each DFD element, ask:
 
 ### External Entities
+
 - [ ] Is authentication required?
 - [ ] What trust level does this entity have?
 - [ ] Can this entity be spoofed?
 
 ### Processes
+
 - [ ] Does it validate all inputs?
 - [ ] Does it sanitize outputs?
 - [ ] Does it handle errors securely?
 - [ ] Does it log appropriately (not too much, not too little)?
 
 ### Data Stores
+
 - [ ] Is data encrypted at rest?
 - [ ] Are connections authenticated?
 - [ ] Are queries parameterized?
 - [ ] Is access logged?
 
 ### Data Flows
+
 - [ ] Is data encrypted in transit?
 - [ ] Is data minimized (only necessary fields)?
 - [ ] Are sensitive fields masked in logs?
 - [ ] Is the connection authenticated?
 
 ### Trust Boundaries
+
 - [ ] Is there authentication at this boundary?
 - [ ] Is there authorization at this boundary?
 - [ ] Is input validation performed?
@@ -232,13 +252,13 @@ For each DFD element, ask:
 
 DFD elements map to STRIDE threats:
 
-| DFD Element | Primary STRIDE Threats |
-|-------------|----------------------|
-| External Entity | **S**poofing |
-| Process | **T**ampering, **I**nformation Disclosure, **D**oS |
-| Data Store | **T**ampering, **I**nformation Disclosure, **R**epudiation |
-| Data Flow | **T**ampering, **I**nformation Disclosure, **D**oS |
-| Trust Boundary | **E**levation of Privilege |
+| DFD Element     | Primary STRIDE Threats                                     |
+| --------------- | ---------------------------------------------------------- |
+| External Entity | **S**poofing                                               |
+| Process         | **T**ampering, **I**nformation Disclosure, **D**oS         |
+| Data Store      | **T**ampering, **I**nformation Disclosure, **R**epudiation |
+| Data Flow       | **T**ampering, **I**nformation Disclosure, **D**oS         |
+| Trust Boundary  | **E**levation of Privilege                                 |
 
 ---
 

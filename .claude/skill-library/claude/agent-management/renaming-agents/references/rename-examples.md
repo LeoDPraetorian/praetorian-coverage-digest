@@ -249,6 +249,7 @@ skill: "renaming-agents"
 ### Used with Other Skills
 
 **After auditing (if name needs fixing):**
+
 ```
 Audit → Name mismatch detected
   ↓
@@ -258,6 +259,7 @@ B. Rename file (use renaming-agents)
 ```
 
 **During consolidation:**
+
 ```
 1. Create new consolidated agent (creating-agents)
 2. Rename old agents with prefix (renaming-agents)

@@ -30,9 +30,38 @@ export type IssueSeverity = 'CRITICAL' | 'WARNING' | 'INFO';
 export interface Issue {
   severity: IssueSeverity;
   message: string;
+  /** What to do about this issue (displayed in Recommendation column) */
+  recommendation?: string;
+  /** Additional context/details (displayed as sub-items or collapsed) */
+  context?: string[];
   line?: number;
   fix?: () => Promise<void>;
   autoFixable?: boolean;
+}
+
+/**
+ * Structured issue for table formatting
+ * Separates issue description from recommendation for clean table display
+ */
+export interface StructuredIssue {
+  phase: string;           // "Phase 1: Description Format"
+  phaseNumber: number;     // 1 (for sorting)
+  severity: IssueSeverity; // CRITICAL | WARNING | INFO
+  issue: string;           // Short description
+  recommendation: string;  // What to do about it
+  details?: string;        // Additional context (optional)
+}
+
+/**
+ * Agent recommendation for skill usage
+ * Used by Phase 15 (Orphan Detection) to suggest which agents should use a skill
+ */
+export interface AgentRecommendation {
+  agent: string;              // Agent name (e.g., "frontend-developer")
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  score: number;              // 0-100 match score
+  matchReasons: string[];     // Reasons for the match
+  recommendation: string;     // What to do (e.g., "Add to gateway-frontend")
 }
 
 export interface SkillAuditResult {
@@ -62,6 +91,8 @@ export interface PhaseResult {
   issuesFound: number;
   issuesFixed: number;
   details: string[];
+  /** Raw Issue objects for table formatting (preserves recommendation/context) */
+  rawIssues?: Issue[];
 }
 
 export interface ProgressMetrics {

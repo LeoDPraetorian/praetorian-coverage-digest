@@ -7,31 +7,31 @@ Advanced testing patterns for CLI applications including mocking, fixtures, and 
 ### 1. Async Command Testing
 
 ```typescript
-import { spawn } from 'child_process';
+import { spawn } from "child_process";
 
 async function runCLIAsync(args: string[]): Promise<CLIResult> {
   return new Promise((resolve) => {
-    const child = spawn(CLI_PATH, args, { stdio: 'pipe' });
+    const child = spawn(CLI_PATH, args, { stdio: "pipe" });
 
-    let stdout = '';
-    let stderr = '';
+    let stdout = "";
+    let stderr = "";
 
-    child.stdout?.on('data', (data) => {
+    child.stdout?.on("data", (data) => {
       stdout += data.toString();
     });
 
-    child.stderr?.on('data', (data) => {
+    child.stderr?.on("data", (data) => {
       stderr += data.toString();
     });
 
-    child.on('close', (code) => {
+    child.on("close", (code) => {
       resolve({ stdout, stderr, code: code || 0 });
     });
   });
 }
 
-test('should handle long-running command', async () => {
-  const result = await runCLIAsync(['deploy', 'production']);
+test("should handle long-running command", async () => {
+  const result = await runCLIAsync(["deploy", "production"]);
   expect(result.code).toBe(0);
 }, 30000); // 30 second timeout
 ```
@@ -39,25 +39,25 @@ test('should handle long-running command', async () => {
 ### 2. Environment Variable Mocking
 
 ```typescript
-describe('environment configuration', () => {
+describe("environment configuration", () => {
   const originalEnv = { ...process.env };
 
   afterEach(() => {
     process.env = { ...originalEnv };
   });
 
-  test('should use API key from environment', () => {
-    process.env.API_KEY = 'test_key_123';
-    const { stdout, code } = runCLI('status');
+  test("should use API key from environment", () => {
+    process.env.API_KEY = "test_key_123";
+    const { stdout, code } = runCLI("status");
     expect(code).toBe(0);
-    expect(stdout).toContain('Authenticated');
+    expect(stdout).toContain("Authenticated");
   });
 
-  test('should fail without API key', () => {
+  test("should fail without API key", () => {
     delete process.env.API_KEY;
-    const { stderr, code } = runCLI('status');
+    const { stderr, code } = runCLI("status");
     expect(code).toBe(1);
-    expect(stderr).toContain('API key not found');
+    expect(stderr).toContain("API key not found");
   });
 });
 ```
@@ -65,29 +65,29 @@ describe('environment configuration', () => {
 ### 3. File System Fixtures
 
 ```typescript
-import fs from 'fs';
-import os from 'os';
+import fs from "fs";
+import os from "os";
 
-describe('config file handling', () => {
+describe("config file handling", () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-test-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "cli-test-"));
   });
 
   afterEach(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test('should create config file', () => {
-    const configFile = path.join(tempDir, '.config');
+  test("should create config file", () => {
+    const configFile = path.join(tempDir, ".config");
     const result = runCLI(`init --config ${configFile}`);
 
     expect(result.code).toBe(0);
     expect(fs.existsSync(configFile)).toBe(true);
 
-    const config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
-    expect(config).toHaveProperty('api_key');
+    const config = JSON.parse(fs.readFileSync(configFile, "utf8"));
+    expect(config).toHaveProperty("api_key");
   });
 });
 ```
@@ -95,32 +95,32 @@ describe('config file handling', () => {
 ### 4. Mocking External APIs
 
 ```typescript
-import nock from 'nock';
+import nock from "nock";
 
-describe('API interaction', () => {
+describe("API interaction", () => {
   beforeEach(() => {
     nock.cleanAll();
   });
 
-  test('should fetch deployment status', () => {
-    nock('https://api.example.com')
-      .get('/deployments/123')
-      .reply(200, { status: 'success', environment: 'production' });
+  test("should fetch deployment status", () => {
+    nock("https://api.example.com")
+      .get("/deployments/123")
+      .reply(200, { status: "success", environment: "production" });
 
-    const { stdout, code } = runCLI('status --deployment 123');
+    const { stdout, code } = runCLI("status --deployment 123");
     expect(code).toBe(0);
-    expect(stdout).toContain('success');
-    expect(stdout).toContain('production');
+    expect(stdout).toContain("success");
+    expect(stdout).toContain("production");
   });
 
-  test('should handle API errors', () => {
-    nock('https://api.example.com')
-      .get('/deployments/123')
-      .reply(500, { error: 'Internal Server Error' });
+  test("should handle API errors", () => {
+    nock("https://api.example.com")
+      .get("/deployments/123")
+      .reply(500, { error: "Internal Server Error" });
 
-    const { stderr, code } = runCLI('status --deployment 123');
+    const { stderr, code } = runCLI("status --deployment 123");
     expect(code).toBe(1);
-    expect(stderr).toContain('API error');
+    expect(stderr).toContain("API error");
   });
 });
 ```
@@ -130,13 +130,13 @@ describe('API interaction', () => {
 ```typescript
 // test-fixtures.ts
 export const createTestFixtures = () => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-test-'));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "cli-test-"));
 
   // Create sample project structure
-  fs.mkdirSync(path.join(tempDir, 'src'));
+  fs.mkdirSync(path.join(tempDir, "src"));
   fs.writeFileSync(
-    path.join(tempDir, 'package.json'),
-    JSON.stringify({ name: 'test-project', version: '1.0.0' })
+    path.join(tempDir, "package.json"),
+    JSON.stringify({ name: "test-project", version: "1.0.0" })
   );
 
   return {
@@ -146,13 +146,13 @@ export const createTestFixtures = () => {
 };
 
 // Usage in tests
-test('should build project', () => {
+test("should build project", () => {
   const fixtures = createTestFixtures();
 
   try {
     const result = runCLI(`build --cwd ${fixtures.tempDir}`);
     expect(result.code).toBe(0);
-    expect(fs.existsSync(path.join(fixtures.tempDir, 'dist'))).toBe(true);
+    expect(fs.existsSync(path.join(fixtures.tempDir, "dist"))).toBe(true);
   } finally {
     fixtures.cleanup();
   }
@@ -162,13 +162,13 @@ test('should build project', () => {
 ### 6. Snapshot Testing
 
 ```typescript
-test('help output matches snapshot', () => {
-  const { stdout } = runCLI('--help');
+test("help output matches snapshot", () => {
+  const { stdout } = runCLI("--help");
   expect(stdout).toMatchSnapshot();
 });
 
-test('version format matches snapshot', () => {
-  const { stdout } = runCLI('--version');
+test("version format matches snapshot", () => {
+  const { stdout } = runCLI("--version");
   expect(stdout).toMatchSnapshot();
 });
 ```
@@ -177,10 +177,10 @@ test('version format matches snapshot', () => {
 
 ```typescript
 describe.each([
-  ['development', 'dev.example.com'],
-  ['staging', 'staging.example.com'],
-  ['production', 'api.example.com'],
-])('deploy to %s', (environment, expectedUrl) => {
+  ["development", "dev.example.com"],
+  ["staging", "staging.example.com"],
+  ["production", "api.example.com"],
+])("deploy to %s", (environment, expectedUrl) => {
   test(`should deploy to ${environment}`, () => {
     const { stdout, code } = runCLI(`deploy ${environment}`);
     expect(code).toBe(0);
@@ -192,23 +192,23 @@ describe.each([
 ### 8. Interactive Command Testing
 
 ```typescript
-import { Readable, Writable } from 'stream';
+import { Readable, Writable } from "stream";
 
-test('should handle interactive prompts', (done) => {
-  const child = spawn(CLI_PATH, ['init'], { stdio: 'pipe' });
+test("should handle interactive prompts", (done) => {
+  const child = spawn(CLI_PATH, ["init"], { stdio: "pipe" });
 
-  const inputs = ['my-project', 'John Doe', 'john@example.com'];
+  const inputs = ["my-project", "John Doe", "john@example.com"];
   let inputIndex = 0;
 
-  child.stdout?.on('data', (data) => {
+  child.stdout?.on("data", (data) => {
     const output = data.toString();
-    if (output.includes('?') && inputIndex < inputs.length) {
-      child.stdin?.write(inputs[inputIndex] + '\n');
+    if (output.includes("?") && inputIndex < inputs.length) {
+      child.stdin?.write(inputs[inputIndex] + "\n");
       inputIndex++;
     }
   });
 
-  child.on('close', (code) => {
+  child.on("close", (code) => {
     expect(code).toBe(0);
     done();
   });
@@ -219,19 +219,19 @@ test('should handle interactive prompts', (done) => {
 
 ```typescript
 // Ensure all CLI commands are tested
-describe('CLI command coverage', () => {
-  const commands = ['init', 'build', 'deploy', 'status', 'config'];
+describe("CLI command coverage", () => {
+  const commands = ["init", "build", "deploy", "status", "config"];
 
   commands.forEach((command) => {
     test(`${command} command exists`, () => {
-      const { stdout } = runCLI('--help');
+      const { stdout } = runCLI("--help");
       expect(stdout).toContain(command);
     });
 
     test(`${command} has help text`, () => {
       const { stdout, code } = runCLI(`${command} --help`);
       expect(code).toBe(0);
-      expect(stdout).toContain('Usage:');
+      expect(stdout).toContain("Usage:");
     });
   });
 });
@@ -240,9 +240,9 @@ describe('CLI command coverage', () => {
 ### 10. Performance Testing
 
 ```typescript
-test('command executes within time limit', () => {
+test("command executes within time limit", () => {
   const startTime = Date.now();
-  const { code } = runCLI('status');
+  const { code } = runCLI("status");
   const duration = Date.now() - startTime;
 
   expect(code).toBe(0);

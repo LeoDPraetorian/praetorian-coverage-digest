@@ -5,6 +5,7 @@ Create comprehensive tests by spawning test engineer agents with implementation 
 ## Purpose
 
 Verify feature correctness through automated testing by:
+
 - Writing unit tests for business logic
 - Creating E2E tests for user workflows
 - Achieving target code coverage
@@ -16,11 +17,11 @@ Verify feature correctness through automated testing by:
 
 Based on implementation:
 
-| Implementation Type | Test Engineers | Parallelization |
-|--------------------|----------------|-----------------|
-| Frontend only | frontend-unit-test-engineer, frontend-e2e-test-engineer | ✅ Parallel |
-| Backend only | backend-unit-test-engineer, acceptance-test-engineer | ✅ Parallel |
-| Full-stack | All four test engineers | ✅ All parallel |
+| Implementation Type | Test Engineers                                          | Parallelization |
+| ------------------- | ------------------------------------------------------- | --------------- |
+| Frontend only       | frontend-unit-test-engineer, frontend-e2e-test-engineer | ✅ Parallel     |
+| Backend only        | backend-tester, acceptance-test-engineer                | ✅ Parallel     |
+| Full-stack          | All four test engineers                                 | ✅ All parallel |
 
 **All test types can run in parallel** - they don't depend on each other.
 
@@ -103,7 +104,7 @@ Return JSON with status and verification.
 
 ```
 Task(
-  subagent_type: "backend-unit-test-engineer",
+  subagent_type: "backend-tester",
   description: "Unit tests for {feature-name}",
   prompt: "Write Go unit tests for this feature:
 
@@ -163,7 +164,7 @@ Return JSON with status and verification.
 # All test types run simultaneously
 unit_tests = Task(subagent_type: "frontend-unit-test-engineer", ...)
 e2e_tests = Task(subagent_type: "frontend-e2e-test-engineer", ...)
-backend_unit = Task(subagent_type: "backend-unit-test-engineer", ...)
+backend_unit = Task(subagent_type: "backend-tester", ...)
 acceptance = Task(subagent_type: "acceptance-test-engineer", ...)
 
 # Wait for all to complete
@@ -172,12 +173,14 @@ acceptance = Task(subagent_type: "acceptance-test-engineer", ...)
 ### Step 4: Validate Test Output
 
 Check that each test engineer returned:
+
 - ✅ `status: "complete"`
 - ✅ `verification.tests_passed: true`
 - ✅ Coverage met (if unit tests)
 - ✅ Test files created
 
 If any tests failing:
+
 1. Read `verification.command_output` for errors
 2. Create issue context with failures
 3. Determine if implementation bug or test issue
@@ -207,10 +210,7 @@ make acceptance-test
   "phases": {
     "testing": {
       "status": "complete",
-      "agents_used": [
-        "frontend-unit-test-engineer",
-        "frontend-e2e-test-engineer"
-      ],
+      "agents_used": ["frontend-unit-test-engineer", "frontend-e2e-test-engineer"],
       "test_files": ["list", "of", "test", "paths"],
       "verification": {
         "unit_tests_passed": true,
@@ -237,6 +237,7 @@ TodoWrite: Remove all todos (feature complete)
 ## Exit Criteria
 
 ✅ Feature is complete when:
+
 - All test engineers returned `status: "complete"`
 - All tests passing
 - Coverage target met (≥80% for unit tests)
@@ -245,6 +246,7 @@ TodoWrite: Remove all todos (feature complete)
 - TodoWrite cleared
 
 ❌ Do NOT mark complete if:
+
 - Any tests failing
 - Coverage below target
 - Missing test scenarios from plan
@@ -253,24 +255,26 @@ TodoWrite: Remove all todos (feature complete)
 ## Test Type Decision Matrix
 
 | Feature Characteristic | Unit | Integration | E2E | Acceptance |
-|------------------------|------|-------------|-----|------------|
-| Business logic | ✅ | | | |
-| User workflows | | | ✅ | |
-| API endpoints | | | | ✅ |
-| Component rendering | ✅ | | | |
-| State management | ✅ | | | |
-| Form validation | ✅ | | ✅ | |
-| Data fetching | | ✅ | | |
-| Error handling | ✅ | | ✅ | ✅ |
+| ---------------------- | ---- | ----------- | --- | ---------- |
+| Business logic         | ✅   |             |     |            |
+| User workflows         |      |             | ✅  |            |
+| API endpoints          |      |             |     | ✅         |
+| Component rendering    | ✅   |             |     |            |
+| State management       | ✅   |             |     |            |
+| Form validation        | ✅   |             | ✅  |            |
+| Data fetching          |      | ✅          |     |            |
+| Error handling         | ✅   |             | ✅  | ✅         |
 
 ## Common Issues
 
 ### "Tests are flaky (pass/fail intermittently)"
 
 **Solution**:
+
 1. Identify flaky tests in output
 2. Common causes: timing issues, async problems, test isolation
 3. Re-spawn test engineer with:
+
    ```
    These tests are flaky: {test names}
 
@@ -283,9 +287,11 @@ TodoWrite: Remove all todos (feature complete)
 ### "Coverage is below target"
 
 **Solution**:
+
 1. Run coverage report: `npm test -- --coverage`
 2. Identify uncovered lines
 3. Re-spawn test engineer with:
+
    ```
    Current coverage: {percent}%
    Target: 80%
@@ -299,6 +305,7 @@ TodoWrite: Remove all todos (feature complete)
 ### "E2E tests too slow"
 
 **Solution**: Review test patterns:
+
 - ✅ Use page object model (reusable selectors)
 - ✅ Run tests in parallel
 - ❌ Don't test same workflow multiple times
@@ -307,6 +314,7 @@ TodoWrite: Remove all todos (feature complete)
 ### "Should I write tests for error cases?"
 
 **Answer**: Yes. Error handling is critical:
+
 - Unit tests: Test all error branches
 - E2E tests: Test user-facing errors (404, network failures)
 - Acceptance tests: Test API error responses

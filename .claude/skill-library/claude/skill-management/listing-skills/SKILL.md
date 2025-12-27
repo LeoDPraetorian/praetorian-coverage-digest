@@ -13,6 +13,7 @@ allowed-tools: Bash, Glob, Read, TodoWrite
 ## What This Skill Does
 
 Lists all skills with:
+
 - ✅ Location (core vs library)
 - ✅ Category (for library skills)
 - ✅ Status (compliant vs has issues)
@@ -29,6 +30,7 @@ Lists all skills with:
 - Auditing skill coverage
 
 **NOT for:**
+
 - Searching for specific skills (use `searching-skills`)
 - Auditing individual skills (use `auditing-skills`)
 
@@ -37,17 +39,37 @@ Lists all skills with:
 ## Quick List
 
 **List core skills:**
+
 ```bash
 ls .claude/skills/
 ```
 
 **List library skills:**
+
 ```bash
 find .claude/skill-library -name "SKILL.md" -type f | \
   sed 's|.claude/skill-library/||' | \
   sed 's|/SKILL.md||' | \
   sort
 ```
+
+---
+
+## Step 0: Navigate to Repository Root (MANDATORY)
+
+**Execute BEFORE any list operation:**
+
+```bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+```
+
+**See:** [Repository Root Navigation](references/patterns/repo-root-detection.md)
+
+**⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
+
+**Cannot proceed without navigating to repo root** ✅
 
 ---
 
@@ -64,6 +86,7 @@ Read .claude/skills/{skill-name}/SKILL.md | head -10
 ```
 
 **Extract:**
+
 - Skill name
 - Description
 - Line count (`wc -l`)
@@ -76,12 +99,14 @@ find .claude/skill-library -name "SKILL.md" | sort
 ```
 
 **Group by category:**
+
 - Parse path to extract category
 - Group skills under category headers
 
 ### Step 3: Check Status (Optional)
 
 For each skill, check if it has issues:
+
 ```bash
 # Quick validation
 - Has frontmatter?
@@ -90,6 +115,7 @@ For each skill, check if it has issues:
 ```
 
 Mark as:
+
 - ✅ Compliant
 - ⚠️ Has warnings
 - ❌ Has errors
@@ -171,21 +197,25 @@ Options:
 ## Summary Statistics
 
 **Count by location:**
+
 - Core: {count}
 - Library: {count}
 
 **Count by category:**
+
 - claude/: {count}
 - development/: {count}
 - testing/: {count}
 - operations/: {count}
 
 **Status breakdown:**
+
 - ✅ Compliant: {count}
 - ⚠️ Warnings: {count}
 - ❌ Errors: {count}
 
 **Line count stats:**
+
 - Average: {avg} lines
 - Under 300: {count}
 - 300-400: {count}

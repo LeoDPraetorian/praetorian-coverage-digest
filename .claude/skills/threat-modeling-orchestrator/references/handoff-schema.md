@@ -5,6 +5,7 @@
 ## Purpose
 
 Handoffs compress phase findings for downstream context. Each handoff:
+
 - Summarizes key findings (<2000 tokens)
 - Lists artifacts with load priorities
 - Records user feedback from checkpoint
@@ -18,30 +19,30 @@ interface PhaseHandoff {
   sessionId: string;
   fromPhase: number;
   toPhase: number;
-  timestamp: string;  // ISO 8601
+  timestamp: string; // ISO 8601
 
   // Human checkpoint record
   checkpoint: {
-    status: 'approved' | 'approved_with_feedback' | 'revision_requested';
+    status: "approved" | "approved_with_feedback" | "revision_requested";
     userFeedback?: string;
     revisionNotes?: string[];
   };
 
   // Compressed summary (<2000 tokens)
   summary: {
-    keyFindings: string[];      // Top 5-10 findings
-    criticalRisks: string[];    // Items needing immediate attention
-    decisions: string[];        // Choices made during phase
-    assumptions: string[];      // Assumptions that should be validated
-    userFeedback: string[];     // Feedback from checkpoint
+    keyFindings: string[]; // Top 5-10 findings
+    criticalRisks: string[]; // Items needing immediate attention
+    decisions: string[]; // Choices made during phase
+    assumptions: string[]; // Assumptions that should be validated
+    userFeedback: string[]; // Feedback from checkpoint
   };
 
   // Artifact references
   artifacts: {
     name: string;
-    path: string;               // Relative to session directory
+    path: string; // Relative to session directory
     description: string;
-    loadWhen: 'always' | 'on-demand' | 'reference-only';
+    loadWhen: "always" | "on-demand" | "reference-only";
   }[];
 
   // Metrics
@@ -51,7 +52,7 @@ interface PhaseHandoff {
     threatsIdentified?: number;
     controlsFound?: number;
     tokensUsed: number;
-    timeSpent: number;          // Seconds
+    timeSpent: number; // Seconds
   };
 
   // Guidance for next phase
@@ -61,11 +62,11 @@ interface PhaseHandoff {
 
 ## Load Priority
 
-| Priority | When to Load | Example |
-|----------|--------------|---------|
-| `always` | Load into context at phase start | summary.md, key findings |
-| `on-demand` | Load when needed for specific analysis | component JSONs |
-| `reference-only` | Don't load, just reference for outputs | manifest.json |
+| Priority         | When to Load                           | Example                  |
+| ---------------- | -------------------------------------- | ------------------------ |
+| `always`         | Load into context at phase start       | summary.md, key findings |
+| `on-demand`      | Load when needed for specific analysis | component JSONs          |
+| `reference-only` | Don't load, just reference for outputs | manifest.json            |
 
 ## Example Handoff
 
@@ -90,15 +91,9 @@ interface PhaseHandoff {
       "Public endpoints with no apparent rate limiting",
       "External webhook integrations (GitHub, Slack)"
     ],
-    "decisions": [
-      "Focused on backend only per scope selection"
-    ],
-    "assumptions": [
-      "API Gateway handles some input validation"
-    ],
-    "userFeedback": [
-      "Also check webhook handlers"
-    ]
+    "decisions": ["Focused on backend only per scope selection"],
+    "assumptions": ["API Gateway handles some input validation"],
+    "userFeedback": ["Also check webhook handlers"]
   },
   "artifacts": [
     {

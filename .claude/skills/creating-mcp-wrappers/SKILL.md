@@ -12,16 +12,16 @@ allowed-tools: Read, Write, Bash, Grep, Glob, TodoWrite, AskUserQuestion
 
 ## Quick Reference
 
-| Phase | Handler | Tool | Verification |
-|-------|---------|------|--------------|
-| 1. Schema Discovery | Claude | Bash, Write | Discovery doc exists |
-| 2. Test Design | Claude | Write | Test file exists |
-| 3. RED Gate | CLI | verify-red | Tests fail ✅ |
-| 4. Wrapper Generation | CLI | generate-wrapper | Wrapper exists |
-| 5. Implementation | Claude | Edit | Code complete |
-| 6. GREEN Gate | CLI | verify-green | Tests pass ✅, ≥80% |
-| 7. Audit | CLI | audit | ≥10/11 phases ✅ |
-| 8. Service Skill | CLI | generate-skill | Skill updated |
+| Phase                 | Handler | Tool             | Verification         |
+| --------------------- | ------- | ---------------- | -------------------- |
+| 1. Schema Discovery   | Claude  | Bash, Write      | Discovery doc exists |
+| 2. Test Design        | Claude  | Write            | Test file exists     |
+| 3. RED Gate           | CLI     | verify-red       | Tests fail ✅        |
+| 4. Wrapper Generation | CLI     | generate-wrapper | Wrapper exists       |
+| 5. Implementation     | Claude  | Edit             | Code complete        |
+| 6. GREEN Gate         | CLI     | verify-green     | Tests pass ✅, ≥80%  |
+| 7. Audit              | CLI     | audit            | ≥10/11 phases ✅     |
+| 8. Service Skill      | CLI     | generate-skill   | Skill updated        |
 
 **Total Time**: ~20-30 minutes
 
@@ -30,42 +30,50 @@ allowed-tools: Read, Write, Bash, Grep, Glob, TodoWrite, AskUserQuestion
 ## Workflow Overview
 
 ### Step 1: Schema Discovery (Claude)
+
 Explore MCP tool interactively, document schema.
 **See**: [references/schema-discovery-guide.md](references/schema-discovery-guide.md)
 
 ### Step 2: Test Design (Claude)
+
 Generate test file with ≥18 tests across 6 categories.
 **See**: [references/test-design-patterns.md](references/test-design-patterns.md)
 
 ### Step 3: RED Gate (CLI - Mechanical)
+
 ```bash
 npm run verify-red -- {service}/{tool}
 # ✅ Must pass: tests exist, impl doesn't, tests fail
 ```
 
 ### Step 4: Wrapper Generation (CLI)
+
 ```bash
 npm run generate-wrapper -- {service}/{tool}
 # Blocks if RED didn't pass
 ```
 
 ### Step 5: Implementation (Claude)
+
 Implement wrapper from discovery docs.
 **See**: [references/implementation-guide.md](references/implementation-guide.md)
 
 ### Step 6: GREEN Gate (CLI - Mechanical)
+
 ```bash
 npm run verify-green -- {service}/{tool}
 # ✅ Must pass: tests pass, coverage ≥80%
 ```
 
 ### Step 7: Audit (CLI)
+
 ```bash
 npm run audit -- {service}/{tool}
 # ✅ Target: ≥10/11 phases
 ```
 
 ### Step 8: Service Skill Update (CLI)
+
 ```bash
 npm run generate-skill -- {service}
 # Updates mcp-tools-{service} skill
@@ -82,6 +90,7 @@ npm run generate-skill -- {service}
 **Mode Selection**:
 
 Ask user which tools to wrap:
+
 ```
 Which tools from {service} MCP should I wrap?
 
@@ -92,6 +101,7 @@ Options:
 ```
 
 **Tasks for Single Tool**:
+
 1. Ask user for service/tool names (AskUserQuestion)
 2. **Auto-install MCP**: `npx -y @modelcontextprotocol/server-{service}` (automatic)
 3. **Auto-start server**: Start in background, capture PID for cleanup
@@ -102,6 +112,7 @@ Options:
 8. **Cleanup**: Stop MCP server (kill PID)
 
 **Tasks for Batch Mode (All Tools)**:
+
 1. Ask user for service name only
 2. **Auto-install MCP**: Same as single tool
 3. **Auto-start server**: Same as single tool
@@ -115,12 +126,14 @@ Options:
 6. **Cleanup**: Stop MCP server after all tools processed
 
 **Automated setup**:
+
 - npx auto-downloads MCP on first run (no manual install)
 - Bash starts server in background
 - Connection test detects if credentials needed
 - Server stopped automatically after exploration
 
 **Key outputs** (per tool):
+
 - Input schema (required + optional fields)
 - Output schema (always present + conditional fields)
 - Token counts (original response size)
@@ -128,6 +141,7 @@ Options:
 - Security considerations
 
 **Batch mode benefits**:
+
 - Single MCP server session for all tools (efficient)
 - Consistent exploration across all tools
 - Complete service coverage in one workflow
@@ -135,6 +149,7 @@ Options:
 **Detailed guide**: [references/schema-discovery-guide.md](references/schema-discovery-guide.md)
 
 **Verification (Single)**:
+
 - [ ] MCP server auto-started
 - [ ] Connection successful (or credential guidance provided)
 - [ ] Discovery doc exists
@@ -143,6 +158,7 @@ Options:
 - [ ] MCP server stopped after exploration
 
 **Verification (Batch)**:
+
 - [ ] MCP server auto-started once
 - [ ] All tools enumerated from `tools/list`
 - [ ] Discovery doc exists for EACH tool
@@ -157,11 +173,13 @@ Options:
 **Goal**: Generate test file with cases based on discovered schema.
 
 **Tasks**:
+
 1. Read discovery docs
 2. Design tests across 6 categories (≥18 total)
 3. Write test file at `.claude/tools/{service}/{tool}.unit.test.ts`
 
 **Test categories** (minimum tests):
+
 - Input Validation (≥3)
 - MCP Integration (≥2)
 - Response Filtering (≥2)
@@ -172,6 +190,7 @@ Options:
 **Detailed guide**: [references/test-design-patterns.md](references/test-design-patterns.md)
 
 **Verification**:
+
 - [ ] Test file exists
 - [ ] ≥18 tests across 6 categories
 - [ ] Tests reference discovery findings
@@ -183,12 +202,14 @@ Options:
 **Goal**: Mechanical verification that TDD is being followed.
 
 **CLI Command**:
+
 ```bash
 cd .claude/skills/managing-mcp-wrappers/scripts
 npm run verify-red -- {service}/{tool}
 ```
 
 **Mechanical checks**:
+
 1. Test file exists ✓
 2. Implementation does NOT exist ✓
 3. Tests FAIL when run ✓
@@ -196,6 +217,7 @@ npm run verify-red -- {service}/{tool}
 **Cannot proceed without this passing.**
 
 **Verification**:
+
 - [ ] Command exits with code 0
 - [ ] Output shows "✅ RED PHASE VALIDATED"
 
@@ -206,6 +228,7 @@ npm run verify-red -- {service}/{tool}
 **Goal**: Generate wrapper scaffold from template.
 
 **CLI Command**:
+
 ```bash
 npm run generate-wrapper -- {service}/{tool}
 ```
@@ -213,6 +236,7 @@ npm run generate-wrapper -- {service}/{tool}
 **Blocks if RED gate didn't pass.**
 
 **Verification**:
+
 - [ ] Wrapper file created
 - [ ] Contains template scaffold
 
@@ -223,6 +247,7 @@ npm run generate-wrapper -- {service}/{tool}
 **Goal**: Implement wrapper to make tests pass.
 
 **Tasks**:
+
 1. Read discovery docs
 2. Implement InputSchema (Zod from discovery)
 3. Implement FilteredResult (token reduction from discovery)
@@ -232,6 +257,7 @@ npm run generate-wrapper -- {service}/{tool}
 **Detailed guide**: [references/implementation-guide.md](references/implementation-guide.md)
 
 **Verification**:
+
 - [ ] All sections implemented
 - [ ] Implementation matches discovery
 
@@ -242,17 +268,20 @@ npm run generate-wrapper -- {service}/{tool}
 **Goal**: Mechanical verification that tests pass with coverage.
 
 **CLI Command**:
+
 ```bash
 npm run verify-green -- {service}/{tool}
 ```
 
 **Mechanical checks**:
+
 1. Tests PASS ✓
 2. Coverage ≥80% ✓
 
 **Cannot proceed without this passing.**
 
 **Verification**:
+
 - [ ] Command exits with code 0
 - [ ] Coverage ≥80% reported
 
@@ -263,6 +292,7 @@ npm run verify-green -- {service}/{tool}
 **Goal**: Validate 11 structural compliance phases.
 
 **CLI Command**:
+
 ```bash
 npm run audit -- {service}/{tool}
 ```
@@ -270,6 +300,7 @@ npm run audit -- {service}/{tool}
 **Target**: ≥10/11 phases pass (Phase 7 integration tests optional)
 
 **Verification**:
+
 - [ ] ≥10/11 phases pass
 
 ---
@@ -279,6 +310,7 @@ npm run audit -- {service}/{tool}
 **Goal**: Update service skill with new wrapper documentation.
 
 **CLI Command**:
+
 ```bash
 npm run generate-skill -- {service}
 ```
@@ -286,6 +318,7 @@ npm run generate-skill -- {service}
 **Automatically extracts schemas and updates skill.**
 
 **Verification**:
+
 - [ ] Service skill updated
 - [ ] New wrapper documented
 
@@ -296,6 +329,7 @@ npm run generate-skill -- {service}
 **When to use**: User wants to wrap ALL tools from a service
 
 **Workflow**:
+
 1. Start MCP server ONCE
 2. Call `tools/list` to enumerate all tools
 3. **For EACH tool** in the list:
@@ -310,11 +344,13 @@ npm run generate-skill -- {service}
 5. Stop MCP server ONCE
 
 **Efficiency**:
+
 - One MCP start/stop for N tools
 - Parallel-ready (could process tools concurrently)
 - Single service skill generation at end
 
 **Example**:
+
 ```
 User: /mcp-manager create zen
 Skill: Which tools to wrap?
@@ -353,6 +389,7 @@ npm run verify-green -- {service}/{tool}
 **In batch mode**: Run gates for EACH tool (cannot skip any)
 
 **Not acceptable**:
+
 - ❌ Claiming gate passed without running command
 - ❌ Skipping gates due to time pressure
 - ❌ Generating wrapper before RED passes
@@ -365,6 +402,7 @@ npm run verify-green -- {service}/{tool}
 You MUST complete schema discovery before writing tests.
 
 **Required**:
+
 - [ ] ≥3 test cases explored
 - [ ] Token counts measured
 - [ ] Discovery doc written
@@ -374,6 +412,7 @@ You MUST complete schema discovery before writing tests.
 ### Tests Before Implementation
 
 The TDD cycle is enforced by CLI:
+
 1. Write tests (Phase 2)
 2. verify-red MUST pass (Phase 3)
 3. Then and only then generate wrapper (Phase 4)
@@ -383,6 +422,7 @@ The TDD cycle is enforced by CLI:
 ### TodoWrite Tracking
 
 Create todos for all 8 phases at start:
+
 ```
 - Phase 1: Schema Discovery (IN_PROGRESS)
 - Phase 2: Test Design (PENDING)
@@ -401,7 +441,9 @@ Mark each complete after verification passes.
 ## Detailed Guides
 
 ### Schema Discovery
+
 **See**: [references/schema-discovery-guide.md](references/schema-discovery-guide.md)
+
 - MCP connection patterns
 - Test case design (happy path, edge, error)
 - Response analysis techniques
@@ -409,7 +451,9 @@ Mark each complete after verification passes.
 - Documentation templates
 
 ### Test Design
+
 **See**: [references/test-design-patterns.md](references/test-design-patterns.md)
+
 - 6 test categories with examples
 - 18+ minimum test requirements
 - Coverage targets per category
@@ -417,7 +461,9 @@ Mark each complete after verification passes.
 - Anti-patterns to avoid
 
 ### Implementation
+
 **See**: [references/implementation-guide.md](references/implementation-guide.md)
+
 - Complete implementation example
 - InputSchema patterns
 - Response filtering techniques
@@ -425,7 +471,9 @@ Mark each complete after verification passes.
 - Common patterns and anti-patterns
 
 ### Complete Example
+
 **See**: [examples/linear-get-issue.md](examples/linear-get-issue.md)
+
 - End-to-end walkthrough
 - All 8 phases with actual commands
 - Expected outputs
@@ -436,11 +484,13 @@ Mark each complete after verification passes.
 ## Prerequisites
 
 **MCP server available**:
+
 ```bash
 npx -y @modelcontextprotocol/server-{service} --version
 ```
 
 **MCP manager CLI setup** (one-time):
+
 ```bash
 cd .claude/skills/managing-mcp-wrappers/scripts
 npm install
@@ -453,30 +503,36 @@ npm install
 ### verify-red fails
 
 **"Tests are passing"**:
+
 - Tests too generic or implementation exists
 - Delete wrapper file, make tests more specific
 
 **"Test file not found"**:
+
 - Test file not created yet
 - Run Phase 2 (Test Design)
 
 ### verify-green fails
 
 **"Tests failing"**:
+
 - Implementation incomplete or incorrect
 - Review test errors, fix implementation
 
 **"Coverage <80%"**:
+
 - Not enough tests or branches
 - Add tests for uncovered code paths
 
 ### Audit fails
 
 **"Schema discovery docs missing"**:
+
 - Phase 1 incomplete
 - Create discovery doc
 
 **"Coverage below 80%"**:
+
 - Phase 6 (GREEN gate) should have caught this
 - Add more tests
 

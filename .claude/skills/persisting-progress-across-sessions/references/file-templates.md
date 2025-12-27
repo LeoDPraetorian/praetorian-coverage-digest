@@ -6,28 +6,34 @@ Ready-to-use templates for different orchestration complexities.
 
 Use for simple orchestrations with clear linear flow.
 
-```markdown
+````markdown
 # Orchestration: <Feature Name>
 
 ## Status: in_progress
+
 ## Last Updated: <ISO timestamp>
 
 ## Completed
+
 - [x] <Phase 1> - <brief result>
 - [x] <Phase 2> - <brief result>
 
 ## Current
+
 - [ ] <Phase 3> - <what's happening>
 
 ## Pending
+
 - [ ] <Phase 4>
 
 ## Context
+
 - Key file: <path>
 - API: <endpoint>
 - Pattern: <chosen approach>
 
 ## Latest Agent Output
+
 ```json
 {
   "status": "complete",
@@ -35,7 +41,9 @@ Use for simple orchestrations with clear linear flow.
   "files_created": [...]
 }
 ```
-```
+````
+
+````
 
 ### Example: Component Implementation
 
@@ -70,8 +78,9 @@ Use for simple orchestrations with clear linear flow.
     "src/sections/assets/hooks/useAssetFilters.ts"
   ]
 }
-```
-```
+````
+
+````
 
 ## Full Template (5+ Phases)
 
@@ -172,9 +181,10 @@ Use for complex orchestrations with multiple agents and coordination needs.
   ],
   "next_steps": ["<recommended follow-up>"]
 }
-```
+````
 
 ### <agent-name> (Phase 2 - completed)
+
 ```json
 {
   "status": "complete",
@@ -185,6 +195,7 @@ Use for complex orchestrations with multiple agents and coordination needs.
 ```
 
 ### <agent-name> (Phase 3 - in_progress)
+
 ```json
 {
   "status": "in_progress",
@@ -199,6 +210,7 @@ Use for complex orchestrations with multiple agents and coordination needs.
 ## Error Log
 
 ### <timestamp> - <Error Category>
+
 - **Phase**: <which phase>
 - **Agent**: <which agent>
 - **Error**: <exact error message or description>
@@ -211,21 +223,26 @@ Use for complex orchestrations with multiple agents and coordination needs.
 ## Notes
 
 ### User Preferences
+
 - <Any stated preferences about implementation>
 - <Style/pattern preferences>
 
 ### Constraints Discovered
+
 - <Technical limitations found during implementation>
 - <Business rules learned>
 
 ### Performance Targets
+
 - <Response time requirements>
 - <Scale requirements>
 
 ### Future Improvements
+
 - <Ideas for follow-up work>
 - <Technical debt to address>
-```
+
+````
 
 ### Example: Backend API Implementation
 
@@ -262,7 +279,7 @@ Implement a job processing pipeline with retry logic, dead-letter queue handling
 ## Current Phase
 
 - [ ] **Phase 4: Testing** - Unit and integration tests
-  - Agent: backend-unit-test-engineer (in progress)
+  - Agent: backend-tester (in progress)
   - Started: 2024-01-15T14:45:00Z
   - Progress: 8/15 tests complete
   - Notes: Mock setup for DynamoDB took longer than expected
@@ -322,9 +339,10 @@ Implement a job processing pipeline with retry logic, dead-letter queue handling
     "dlq_retention": "14 days"
   }
 }
-```
+````
 
 ### backend-developer (Phase 3 - completed)
+
 ```json
 {
   "status": "complete",
@@ -338,7 +356,8 @@ Implement a job processing pipeline with retry logic, dead-letter queue handling
 }
 ```
 
-### backend-unit-test-engineer (Phase 4 - in_progress)
+### backend-tester (Phase 4 - in_progress)
+
 ```json
 {
   "status": "in_progress",
@@ -353,6 +372,7 @@ Implement a job processing pipeline with retry logic, dead-letter queue handling
 ## Error Log
 
 ### 2024-01-15T11:30:00Z - Infrastructure Deployment
+
 - **Phase**: Infrastructure
 - **Agent**: aws-infrastructure-specialist
 - **Error**: CloudFormation stack creation failed - IAM role missing
@@ -365,16 +385,20 @@ Implement a job processing pipeline with retry logic, dead-letter queue handling
 ## Notes
 
 ### User Preferences
+
 - Prefers detailed logging over minimal output
 - Wants comprehensive error messages for debugging
 
 ### Constraints Discovered
+
 - SQS message visibility timeout must be longer than expected processing time
 - DynamoDB strongly consistent reads needed for job status checks
 
 ### Performance Targets
+
 - Job processing: <30 seconds per job
 - Throughput: 100 jobs/minute sustained
+
 ```
 
 ## Choosing a Template
@@ -388,3 +412,4 @@ Implement a job processing pipeline with retry logic, dead-letter queue handling
 | Major refactoring | Full | 5-10 | 4-8 |
 
 **Rule of thumb**: If you need to track architecture decisions, dependencies, or coordinate 4+ agents, use the full template.
+```

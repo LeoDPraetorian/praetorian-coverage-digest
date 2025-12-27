@@ -32,6 +32,7 @@ Good approach:
 ```
 
 **Why this matters:**
+
 - **Accountability** - User sees full scope upfront
 - **No scope creep** - Can't silently add work without updating todos
 - **Better estimates** - Planning forces thinking through all steps
@@ -62,6 +63,7 @@ Good timing:
 ```
 
 **Why this matters:**
+
 - **Real-time visibility** - User knows what you're doing NOW
 - **No gaps** - User doesn't wonder "Is Claude stuck?"
 - **State consistency** - TodoWrite always reflects current reality
@@ -92,6 +94,7 @@ Good approach:
 ```
 
 **Why this matters:**
+
 - **Incremental progress** - User sees progress in real-time, not batched
 - **Better user experience** - Confirms work is happening, not stuck
 - **Accurate state** - TodoWrite always reflects current reality
@@ -126,6 +129,7 @@ User experience: "I can see exactly what Claude is doing"
 ```
 
 **Why this matters:**
+
 - **User confidence** - Continuous updates confirm Claude is working
 - **Progress feedback** - User knows estimated completion time
 - **Intervention opportunity** - User can stop if wrong direction
@@ -142,14 +146,15 @@ User experience: "I can see exactly what Claude is doing"
 
 **What "VERY frequently" means:**
 
-| Workflow Type | TodoWrite Frequency |
-|---------------|---------------------|
-| Simple (≥3 steps) | Every task completion |
-| Medium (5-10 tasks) | Every 1-2 minutes |
-| Complex (10+ tasks) | Every task start/end + every 5 minutes |
-| Long-running (>30 min) | Every 2-3 minutes minimum |
+| Workflow Type          | TodoWrite Frequency                    |
+| ---------------------- | -------------------------------------- |
+| Simple (≥3 steps)      | Every task completion                  |
+| Medium (5-10 tasks)    | Every 1-2 minutes                      |
+| Complex (10+ tasks)    | Every task start/end + every 5 minutes |
+| Long-running (>30 min) | Every 2-3 minutes minimum              |
 
 **Benefits:**
+
 - **Prevents forgotten tasks** - External memory aid
 - **Maintains focus** - Clear current priority
 - **User visibility** - Continuous progress updates
@@ -159,11 +164,11 @@ User experience: "I can see exactly what Claude is doing"
 
 ### Update Frequency by Task Duration
 
-| Task Duration | Update Pattern |
-|---------------|----------------|
-| < 5 minutes | Mark in_progress → complete (2 updates) |
-| 5-15 minutes | Mark in_progress → periodic check → complete (2-3 updates) |
-| > 15 minutes | Mark in_progress → periodic checks every 5 min → complete (4+ updates) |
+| Task Duration | Update Pattern                                                         |
+| ------------- | ---------------------------------------------------------------------- |
+| < 5 minutes   | Mark in_progress → complete (2 updates)                                |
+| 5-15 minutes  | Mark in_progress → periodic check → complete (2-3 updates)             |
+| > 15 minutes  | Mark in_progress → periodic checks every 5 min → complete (4+ updates) |
 
 **Periodic check example:**
 
@@ -377,11 +382,11 @@ After (split into sub-tasks):
 ```json
 {
   "todos": [
-    {"content": "Phase 1: Generate code", "status": "completed"},
-    {"content": "Phase 2: Run validation", "status": "completed"},
-    {"content": "Phase 3: Fix validation errors", "status": "in_progress"},
-    {"content": "Phase 4: Re-run validation", "status": "pending"},
-    {"content": "Phase 5: Deploy if validation passes", "status": "pending"}
+    { "content": "Phase 1: Generate code", "status": "completed" },
+    { "content": "Phase 2: Run validation", "status": "completed" },
+    { "content": "Phase 3: Fix validation errors", "status": "in_progress" },
+    { "content": "Phase 4: Re-run validation", "status": "pending" },
+    { "content": "Phase 5: Deploy if validation passes", "status": "pending" }
   ]
 }
 ```
@@ -391,13 +396,13 @@ After (split into sub-tasks):
 ```json
 {
   "todos": [
-    {"content": "Phase 1: Generate code", "status": "completed"},
-    {"content": "Phase 2: Run validation (attempt 1)", "status": "completed"},
-    {"content": "Phase 3: Fix validation errors (round 1)", "status": "completed"},
-    {"content": "Phase 4: Re-run validation (attempt 2)", "status": "completed"},
-    {"content": "Phase 5: Fix remaining errors (round 2)", "status": "in_progress"},
-    {"content": "Phase 6: Final validation", "status": "pending"},
-    {"content": "Phase 7: Deploy if validation passes", "status": "pending"}
+    { "content": "Phase 1: Generate code", "status": "completed" },
+    { "content": "Phase 2: Run validation (attempt 1)", "status": "completed" },
+    { "content": "Phase 3: Fix validation errors (round 1)", "status": "completed" },
+    { "content": "Phase 4: Re-run validation (attempt 2)", "status": "completed" },
+    { "content": "Phase 5: Fix remaining errors (round 2)", "status": "in_progress" },
+    { "content": "Phase 6: Final validation", "status": "pending" },
+    { "content": "Phase 7: Deploy if validation passes", "status": "pending" }
   ]
 }
 ```
@@ -409,6 +414,7 @@ After (split into sub-tasks):
 ### Update Cost
 
 **TodoWrite is fast:**
+
 - Typical TodoWrite call: ~200-500 tokens
 - Doesn't slow down Claude significantly
 - User experience benefit >> token cost

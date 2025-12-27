@@ -9,6 +9,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ## When to Use This Skill
 
 Use this skill when:
+
 - Implementing authentication with AWS Cognito in Go
 - Adding authorization logic with Cognito User Pools
 - Working with Cognito JWT tokens and validation
@@ -17,6 +18,7 @@ Use this skill when:
 - Troubleshooting Cognito integration issues
 
 **Symptoms that indicate you need this skill:**
+
 - "How do I validate Cognito JWT tokens in Go?"
 - "What's the current Cognito SDK for Go?"
 - "How do I implement user signup with Cognito?"
@@ -56,21 +58,25 @@ client := cognitoidentityprovider.NewFromConfig(cfg)
 This skill is organized into detailed reference documents. Read them as needed:
 
 ### Core Concepts
+
 - **[Cognito Architecture](references/architecture.md)** - User Pools, Identity Pools, token types, auth flows
 - **[JWT Token Validation](references/jwt-validation.md)** - Verifying tokens, JWK sets, token claims
 - **[Auth Flows](references/auth-flows.md)** - USER_PASSWORD_AUTH, REFRESH_TOKEN_AUTH, custom auth
 
 ### API Reference
+
 - **[AWS SDK for Go v2](references/sdk-reference.md)** - Current Cognito API operations and types
 - **[User Operations](references/user-operations.md)** - Signup, login, password management, MFA
 - **[Admin Operations](references/admin-operations.md)** - Admin-level user management
 
 ### Chariot Integration
+
 - **[Chariot Auth Patterns](references/chariot-patterns.md)** - How Cognito integrates with Chariot platform
 - **[Middleware Implementation](references/middleware.md)** - Auth middleware patterns for Lambda handlers
 - **[Error Handling](references/error-handling.md)** - Cognito-specific error types and responses
 
 ### Advanced Topics
+
 - **[Custom Attributes](references/custom-attributes.md)** - User pool schema extensions
 - **[Lambda Triggers](references/lambda-triggers.md)** - Pre/post-authentication hooks
 - **[Migration Patterns](references/migration.md)** - Migrating users from other auth systems
@@ -84,6 +90,7 @@ User Request → Validate JWT Token → Extract Claims → Authorize Action
 ```
 
 **Steps:**
+
 1. Extract token from Authorization header
 2. Validate token signature using JWK Set (see [JWT Validation](references/jwt-validation.md))
 3. Verify token claims (exp, iss, token_use)
@@ -97,6 +104,7 @@ Sign Up → Confirm Email → Complete Profile → Login
 ```
 
 **Steps:**
+
 1. Call `SignUp` API with username/password
 2. Handle confirmation code delivery
 3. Verify with `ConfirmSignUp`
@@ -112,6 +120,7 @@ Access Token Expires → Use Refresh Token → Get New Access Token
 ```
 
 **Steps:**
+
 1. Detect 401/expired token
 2. Use `InitiateAuth` with REFRESH_TOKEN_AUTH
 3. Update stored tokens
@@ -219,6 +228,7 @@ See [Custom Attributes](references/custom-attributes.md) for schema design.
 **Symptom:** `signature is invalid` or `token has expired`
 
 **Solutions:**
+
 1. Verify JWK Set URL matches User Pool region
 2. Check system clock synchronization (NTP)
 3. Ensure token hasn't expired (check `exp` claim)
@@ -231,6 +241,7 @@ See [JWT Validation](references/jwt-validation.md) for debugging steps.
 **Symptom:** `TooManyRequestsException` or 429 errors
 
 **Solutions:**
+
 1. Implement exponential backoff with jitter
 2. Cache frequently accessed data (JWK Sets, user info)
 3. Use bulk operations where available
@@ -243,6 +254,7 @@ See [Error Handling](references/error-handling.md) for retry strategies.
 **Symptom:** Existing users can't login after Cognito migration
 
 **Solutions:**
+
 1. Use Lambda trigger for user migration
 2. Implement password migration flow
 3. Verify custom attribute mapping
@@ -273,17 +285,20 @@ See [SDK Reference](references/sdk-reference.md) for migration guide.
 ## Related Skills
 
 ### Backend Development
+
 - `gateway-backend` - Go backend patterns, AWS integration
 - `backend-api-design` - REST API design patterns
 - `backend-error-handling` - Error handling strategies
 
 ### Security
+
 - `gateway-security` - Security patterns and best practices
 - `security/auth-implementation-patterns` - Authentication patterns
 - `security/secrets-management` - Managing API keys and credentials
 
 ### Testing
-- `backend-unit-test-engineer` - Unit testing Go code
+
+- `backend-tester` - Unit testing Go code
 - `testing/api-testing-patterns` - API testing strategies
 
 ## Next Steps

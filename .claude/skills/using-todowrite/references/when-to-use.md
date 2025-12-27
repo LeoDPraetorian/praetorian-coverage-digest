@@ -35,11 +35,13 @@ Start: New user request received
 **Examples:**
 
 ✅ **Use TodoWrite:**
+
 - "Add authentication" → (1) Install dependencies, (2) Create middleware, (3) Update routes, (4) Write tests
 - "Refactor component" → (1) Analyze current code, (2) Extract functions, (3) Update tests, (4) Update docs
 - "Fix bug" → (1) Reproduce issue, (2) Identify root cause, (3) Implement fix, (4) Verify fix
 
 ❌ **Don't Use TodoWrite:**
+
 - "Read file and summarize" → (1) Read file, (2) Summarize content (2 steps)
 - "Fix typo" → (1) Find typo, (2) Correct it (2 steps)
 - "Run tests" → (1) Execute test command (1 step)
@@ -51,11 +53,13 @@ Start: New user request received
 **Examples:**
 
 ✅ **Use TodoWrite:**
+
 - TDD workflow → (1) Write test, (2) Run test (RED), (3) Write code, (4) Run test (GREEN), (5) Refactor
 - Deploy pipeline → (1) Build, (2) Test, (3) Package, (4) Upload, (5) Deploy, (6) Verify
 - Research task → (1) Search codebase, (2) Search docs, (3) Web search, (4) Synthesize, (5) Document
 
 ❌ **Don't Use TodoWrite:**
+
 - Simple deploy → (1) Build, (2) Deploy (2 phases)
 - Quick search → (1) Search, (2) Report (2 phases)
 
@@ -65,16 +69,17 @@ Start: New user request received
 
 **Estimation guidelines:**
 
-| Task Type | Typical Duration | Use TodoWrite? |
-|-----------|------------------|----------------|
-| Read single file | 1-2 min | ❌ No |
-| Write simple function | 3-5 min | ❌ No |
-| Refactor component | 15-20 min | ✅ Yes |
-| Add feature | 30-60 min | ✅ Yes |
-| Debug complex issue | 20-40 min | ✅ Yes |
-| Research + implement | 45-90 min | ✅ Yes |
+| Task Type             | Typical Duration | Use TodoWrite? |
+| --------------------- | ---------------- | -------------- |
+| Read single file      | 1-2 min          | ❌ No          |
+| Write simple function | 3-5 min          | ❌ No          |
+| Refactor component    | 15-20 min        | ✅ Yes         |
+| Add feature           | 30-60 min        | ✅ Yes         |
+| Debug complex issue   | 20-40 min        | ✅ Yes         |
+| Research + implement  | 45-90 min        | ✅ Yes         |
 
 **Why 10 minutes?**
+
 - User attention span: After 10 minutes without updates, users wonder if Claude is stuck
 - Context drift: Longer tasks risk losing track of earlier decisions
 - Accountability: Longer tasks benefit from structured planning
@@ -86,6 +91,7 @@ Start: New user request received
 **Indicators of context drift risk:**
 
 ✅ **High risk (use TodoWrite):**
+
 - **Multiple file modifications** - Touch 3+ files across different directories
 - **Iterative processing** - Loop through items with state carried between iterations
 - **Decision dependencies** - Later steps depend on decisions made in earlier steps
@@ -93,6 +99,7 @@ Start: New user request received
 - **Multi-tool workflows** - Switch between Read, Write, Edit, Bash multiple times
 
 ❌ **Low risk (TodoWrite optional):**
+
 - **Single file operation** - All changes in one file
 - **Independent steps** - Each step is self-contained
 - **Quick operations** - Complete in single focused burst
@@ -119,6 +126,7 @@ Low Risk (Skip TodoWrite):
 **When users need visibility:**
 
 ✅ **High visibility needs (use TodoWrite):**
+
 - **Long-running tasks** - >10 minutes without updates creates anxiety
 - **Expensive operations** - Builds, deploys, large refactors (user wants confirmation it's working)
 - **Multi-phase workflows** - User needs to see progress through phases
@@ -126,6 +134,7 @@ Low Risk (Skip TodoWrite):
 - **Learning context** - User wants to understand the process, not just results
 
 ❌ **Low visibility needs (TodoWrite optional):**
+
 - **Quick queries** - "What does this function do?" (answer is sufficient)
 - **Simple reads** - "Show me the config" (read + display)
 - **Trivial changes** - "Fix this typo" (just do it)
@@ -170,12 +179,12 @@ Action:
 
 **Decision matrix:**
 
-| Factor | Points | Reasoning |
-|--------|--------|-----------|
-| Steps | +1 | 3 steps (meets threshold) |
-| Duration | 0 | ~5 minutes (below threshold) |
-| Context drift | 0 | Low risk (similar changes) |
-| Visibility | +1 | User wants confirmation of all 3 files |
+| Factor        | Points | Reasoning                              |
+| ------------- | ------ | -------------------------------------- |
+| Steps         | +1     | 3 steps (meets threshold)              |
+| Duration      | 0      | ~5 minutes (below threshold)           |
+| Context drift | 0      | Low risk (similar changes)             |
+| Visibility    | +1     | User wants confirmation of all 3 files |
 
 **Total: +2 points → Use TodoWrite**
 
@@ -188,6 +197,7 @@ Action:
 **Answer:** Still use TodoWrite if complexity triggers match.
 
 **Why:**
+
 - System prompt mandates TodoWrite for complex tasks
 - User request doesn't override system rules
 - TodoWrite protects against context drift (benefits Claude, not just user)
@@ -203,12 +213,12 @@ Action:
 ```json
 {
   "todos": [
-    {"content": "Phase 1: Setup environment", "status": "completed"},
-    {"content": "Phase 2: Implement feature - Step 1: Core logic", "status": "completed"},
-    {"content": "Phase 2: Implement feature - Step 2: Error handling", "status": "in_progress"},
-    {"content": "Phase 2: Implement feature - Step 3: Edge cases", "status": "pending"},
-    {"content": "Phase 3: Write tests", "status": "pending"},
-    {"content": "Phase 4: Documentation", "status": "pending"}
+    { "content": "Phase 1: Setup environment", "status": "completed" },
+    { "content": "Phase 2: Implement feature - Step 1: Core logic", "status": "completed" },
+    { "content": "Phase 2: Implement feature - Step 2: Error handling", "status": "in_progress" },
+    { "content": "Phase 2: Implement feature - Step 3: Edge cases", "status": "pending" },
+    { "content": "Phase 3: Write tests", "status": "pending" },
+    { "content": "Phase 4: Documentation", "status": "pending" }
   ]
 }
 ```
@@ -222,14 +232,15 @@ Action:
 **When using Task tool to spawn sub-agents:**
 
 ✅ **Main agent uses TodoWrite:**
+
 ```json
 {
   "todos": [
-    {"content": "Spawn backend-developer agent", "status": "completed"},
-    {"content": "Wait for backend agent completion", "status": "completed"},
-    {"content": "Spawn frontend-developer agent", "status": "in_progress"},
-    {"content": "Wait for frontend agent completion", "status": "pending"},
-    {"content": "Integration testing", "status": "pending"}
+    { "content": "Spawn backend-developer agent", "status": "completed" },
+    { "content": "Wait for backend agent completion", "status": "completed" },
+    { "content": "Spawn frontend-developer agent", "status": "in_progress" },
+    { "content": "Wait for frontend agent completion", "status": "pending" },
+    { "content": "Integration testing", "status": "pending" }
   ]
 }
 ```
@@ -243,13 +254,14 @@ Action:
 **When processing multiple items:**
 
 ✅ **Use TodoWrite for loop structure:**
+
 ```json
 {
   "todos": [
-    {"content": "Process items 1-10", "status": "completed"},
-    {"content": "Process items 11-20", "status": "in_progress"},
-    {"content": "Process items 21-30", "status": "pending"},
-    {"content": "Verify all items processed", "status": "pending"}
+    { "content": "Process items 1-10", "status": "completed" },
+    { "content": "Process items 11-20", "status": "in_progress" },
+    { "content": "Process items 21-30", "status": "pending" },
+    { "content": "Verify all items processed", "status": "pending" }
   ]
 }
 ```
@@ -263,13 +275,14 @@ Action:
 **When multiple tasks can run concurrently:**
 
 ✅ **All tasks can show as in_progress:**
+
 ```json
 {
   "todos": [
-    {"content": "Backend API changes", "status": "in_progress"},
-    {"content": "Frontend UI updates", "status": "in_progress"},
-    {"content": "Database migrations", "status": "in_progress"},
-    {"content": "Integration testing", "status": "pending"}
+    { "content": "Backend API changes", "status": "in_progress" },
+    { "content": "Frontend UI updates", "status": "in_progress" },
+    { "content": "Database migrations", "status": "in_progress" },
+    { "content": "Integration testing", "status": "pending" }
   ]
 }
 ```
@@ -280,14 +293,14 @@ Action:
 
 ## Summary Decision Table
 
-| Trigger | Weight | Threshold | Use TodoWrite? |
-|---------|--------|-----------|----------------|
-| ≥3 steps | High | 3+ steps | ✅ YES |
-| ≥5 phases | High | 5+ phases | ✅ YES |
-| >10 minutes | High | >10 min | ✅ YES |
-| Context drift | Medium | High risk | ✅ YES |
-| User visibility | Medium | High need | ✅ YES |
-| Borderline case | Low | Close call | ✅ YES (default) |
+| Trigger         | Weight | Threshold  | Use TodoWrite?   |
+| --------------- | ------ | ---------- | ---------------- |
+| ≥3 steps        | High   | 3+ steps   | ✅ YES           |
+| ≥5 phases       | High   | 5+ phases  | ✅ YES           |
+| >10 minutes     | High   | >10 min    | ✅ YES           |
+| Context drift   | Medium | High risk  | ✅ YES           |
+| User visibility | Medium | High need  | ✅ YES           |
+| Borderline case | Low    | Close call | ✅ YES (default) |
 
 **Override rule:** If ANY high-weight trigger is YES → Use TodoWrite (no debate).
 

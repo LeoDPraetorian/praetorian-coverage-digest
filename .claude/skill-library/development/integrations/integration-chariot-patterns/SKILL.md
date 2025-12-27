@@ -1,7 +1,7 @@
 ---
 name: integration-chariot-patterns
 description: Use when creating Chariot integrations with external APIs (AWS, GitHub, Qualys, CrowdStrike, etc.) - comprehensive reference covering integration architecture, VMFilter, CheckAffiliation, Tabularium models, 4 pagination strategies (token/page/cursor/SDK), errgroup concurrency patterns, batch processing, and anti-patterns to avoid. Includes code examples from 42 real integrations.
-allowed-tools: 'Read, Bash, WebFetch'
+allowed-tools: "Read, Bash, WebFetch"
 ---
 
 # Chariot Integration Development Patterns
@@ -11,10 +11,12 @@ Quick reference for building Chariot integrations with external security APIs.
 ## Integration Architecture Overview
 
 **Two Components Required**:
+
 1. **Frontend Card**: Settings UI in `modules/chariot/ui/src/hooks/useIntegration.tsx`
 2. **Backend Integration**: Go capability in `modules/chariot/backend/pkg/tasks/integrations/`
 
 **Naming Alignment (CRITICAL)**:
+
 ```typescript
 // Frontend: modules/chariot/ui/src/types.ts
 export enum Integration {
@@ -29,14 +31,14 @@ func (c *CrowdStrike) Name() string {
 
 ## File Location Quick Reference
 
-| Component | File Path | Purpose |
-|-----------|-----------|---------|
-| **Frontend Card** | `modules/chariot/ui/src/hooks/useIntegration.tsx` | User input fields, labels, validation |
-| **Frontend Type** | `modules/chariot/ui/src/types.ts` | Integration enum definition |
-| **Backend Integration** | `modules/chariot/backend/pkg/tasks/integrations/<service>/<service>.go` | Main capability logic |
-| **Backend Tests** | `modules/chariot/backend/pkg/tasks/integrations/<service>/<service>_test.go` | Unit tests |
-| **Tabularium Interface** | `modules/tabularium/pkg/model/model/capability.go` | Capability interface definition |
-| **Tabularium Models** | `modules/tabularium/pkg/model/model/` | Asset, Risk, CloudResource constructors |
+| Component                | File Path                                                                    | Purpose                                 |
+| ------------------------ | ---------------------------------------------------------------------------- | --------------------------------------- |
+| **Frontend Card**        | `modules/chariot/ui/src/hooks/useIntegration.tsx`                            | User input fields, labels, validation   |
+| **Frontend Type**        | `modules/chariot/ui/src/types.ts`                                            | Integration enum definition             |
+| **Backend Integration**  | `modules/chariot/backend/pkg/tasks/integrations/<service>/<service>.go`      | Main capability logic                   |
+| **Backend Tests**        | `modules/chariot/backend/pkg/tasks/integrations/<service>/<service>_test.go` | Unit tests                              |
+| **Tabularium Interface** | `modules/tabularium/pkg/model/model/capability.go`                           | Capability interface definition         |
+| **Tabularium Models**    | `modules/tabularium/pkg/model/model/`                                        | Asset, Risk, CloudResource constructors |
 
 ## CRITICAL Integration Requirements
 
@@ -58,6 +60,7 @@ func (c *CrowdStrike) Name() string {
    - Name MUST match backend `Name()` method
 
 **Verification Checklist** (complete BEFORE claiming done):
+
 - [ ] VMFilter initialized in constructor
 - [ ] VMFilter.Asset() called before emitting assets
 - [ ] VMFilter.Risk() called before emitting risks
@@ -181,6 +184,7 @@ task.Job.Send(&risk)
 ```
 
 **VMFilter Interface**:
+
 ```go
 type Filter interface {
     Asset(asset *Asset) bool
@@ -207,6 +211,7 @@ Is this cloud-managed (VM, bucket, function)?
 ### Code Examples with File Paths
 
 **Asset (Network)**: `modules/tabularium/pkg/model/model/asset.go`
+
 ```go
 // IP + DNS
 asset := model.NewAsset("web01.example.com", "192.0.2.1")
@@ -219,6 +224,7 @@ port := model.NewPort("tcp", 443, &asset)
 ```
 
 **CloudResource (AWS)**: `modules/tabularium/pkg/model/model/aws_resource.go`
+
 ```go
 awsResource, err := model.NewAWSResource(
     "arn:aws:s3:::my-bucket",           // ARN
@@ -231,6 +237,7 @@ awsResource, err := model.NewAWSResource(
 ```
 
 **WebApplication**: `modules/tabularium/pkg/model/model/web_application.go`
+
 ```go
 webapp := model.NewWebApplication(
     "https://api.example.com",  // Primary URL
@@ -239,6 +246,7 @@ webapp := model.NewWebApplication(
 ```
 
 **Risk**: `modules/tabularium/pkg/model/model/risk.go`
+
 ```go
 risk := model.NewRisk(
     &asset,             // Target (Asset, CloudResource, or WebApplication)
@@ -265,11 +273,13 @@ task.Job.Send(&proofFile)
 **Purpose**: Verify if asset belongs to this integration's scope.
 
 **Interface** (`modules/tabularium/pkg/model/model/capability.go:L50-52`):
+
 ```go
 CheckAffiliation(Asset) (bool, error)
 ```
 
 **Implementation Example** (from `crowdstrike.go`):
+
 ```go
 func (c *CrowdStrike) CheckAffiliation(asset model.Asset) (bool, error) {
     // Query CrowdStrike API to check if asset exists
@@ -302,23 +312,26 @@ modules/chariot/ui/public/icons/light/servicename.svg  ← Light mode logo
 ```
 
 **Logo Specifications**:
+
 - **Format**: SVG preferred (PNG acceptable)
 - **Naming**: Lowercase matching integration name (e.g., `stripe.svg`, `crowdstrike.svg`)
 - **Locations**: BOTH `icons/dark/` AND `icons/light/` directories (NOT `logos/`)
 - **Reference**: Logo field uses filename only, no path prefix
 
 **Code Example**:
+
 ```typescript
 export const AllIntegrations: Record<Integration, IntegrationMeta> = {
   servicename: {
     id: Integration.servicename,
-    name: 'ServiceName',
-    logo: 'servicename.svg',  // References icons/dark/ and icons/light/ automatically
+    name: "ServiceName",
+    logo: "servicename.svg", // References icons/dark/ and icons/light/ automatically
   },
 };
 ```
 
 **Theme Switching**: The UI automatically selects the appropriate logo based on current theme:
+
 - Dark mode → `icons/dark/servicename.svg`
 - Light mode → `icons/light/servicename.svg`
 
@@ -328,42 +341,42 @@ export const AllIntegrations: Record<Integration, IntegrationMeta> = {
 export const AllIntegrations: Record<Integration, IntegrationMeta> = {
   servicename: {
     id: Integration.servicename,
-    name: 'ServiceName',
-    description: 'Service description for Settings UI',
-    logo: 'servicename.svg',  // Filename only, no path prefix
+    name: "ServiceName",
+    description: "Service description for Settings UI",
+    logo: "servicename.svg", // Filename only, no path prefix
     inputs: [
       // Hidden username (webhook pattern)
       {
-        name: 'username',
+        name: "username",
         value: Integration.webhook,
         hidden: true,
       },
       // Hidden class value (MUST match backend Name())
       {
-        name: 'value',
-        value: 'servicename',  // ← MUST match backend
+        name: "value",
+        value: "servicename", // ← MUST match backend
         hidden: true,
       },
       // User-visible API URL input
       {
-        label: 'API URL',
-        value: '',
-        placeholder: 'https://api.service.com',
-        name: 'url',
+        label: "API URL",
+        value: "",
+        placeholder: "https://api.service.com",
+        name: "url",
         required: true,
         info: {
-          text: 'The base URL of your ServiceName instance',
+          text: "The base URL of your ServiceName instance",
         },
       },
       // API key/token input
       {
-        label: 'API Key',
-        value: '',
-        placeholder: 'sk_live_...',
-        name: 'token',
+        label: "API Key",
+        value: "",
+        placeholder: "sk_live_...",
+        name: "token",
         required: true,
         info: {
-          text: 'API key from ServiceName dashboard',
+          text: "API key from ServiceName dashboard",
         },
       },
     ],
@@ -376,6 +389,7 @@ export const AllIntegrations: Record<Integration, IntegrationMeta> = {
 ## Testing Patterns
 
 **Unit Test Structure** (`<service>_test.go`):
+
 ```go
 func TestServiceName_Match(t *testing.T) {
     tests := []struct {
@@ -411,18 +425,19 @@ func TestServiceName_Match(t *testing.T) {
 
 ## Common Integration Types
 
-| External Service | Attack Surface | Credential Type | Example |
-|-----------------|----------------|-----------------|---------|
-| **Cloud Providers** | `Cloud` | `AWS`, `Azure`, `GCP` | AWS Security Hub, Azure Security Center |
-| **Vulnerability Scanners** | `External` | `Token` | Qualys, Tenable, CrowdStrike |
-| **SCM Platforms** | `SCM` | `GitHub`, `OAuth` | GitHub, GitLab, Bitbucket |
-| **SIEM/SOAR** | `External` | `Token` | Splunk, Sentinel, Cortex |
+| External Service           | Attack Surface | Credential Type       | Example                                 |
+| -------------------------- | -------------- | --------------------- | --------------------------------------- |
+| **Cloud Providers**        | `Cloud`        | `AWS`, `Azure`, `GCP` | AWS Security Hub, Azure Security Center |
+| **Vulnerability Scanners** | `External`     | `Token`               | Qualys, Tenable, CrowdStrike            |
+| **SCM Platforms**          | `SCM`          | `GitHub`, `OAuth`     | GitHub, GitLab, Bitbucket               |
+| **SIEM/SOAR**              | `External`     | `Token`               | Splunk, Sentinel, Cortex                |
 
 ## Constraints and Requirements
 
 **MANDATORY Implementation (agents frequently forget)**:
 
 1. **VMFilter Initialization** (CRITICAL):
+
    ```go
    Filter: filter.NewVMFilter(job.Username)  // In struct initialization
 
@@ -452,14 +467,17 @@ func TestServiceName_Match(t *testing.T) {
    - Ensure `name: 'value'` input matches backend `Name()` method
 
 **File Organization**:
+
 - Keep backend integration files < 400 lines
 - Split large integrations: `<service>_client.go`, `<service>_types.go`, `<service>_transform.go`
 
 **Naming**:
+
 - Frontend enum name = Backend `Name()` = Integration class
 - Use lowercase for all three
 
 **Required Interface Methods**:
+
 - `Integration() bool` returning `true`
 - `ValidateCredentials() error`
 - `CheckAffiliation(Asset) (bool, error)` ← MANDATORY, frequently forgotten
@@ -471,11 +489,13 @@ func TestServiceName_Match(t *testing.T) {
 **Capability Interface**: `modules/tabularium/pkg/model/model/capability.go:L19-77`
 
 **Example Integrations**:
+
 - **CrowdStrike**: `modules/chariot/backend/pkg/tasks/integrations/crowdstrike/crowdstrike.go` - Complex with pagination, VMFilter, CheckAffiliation
 - **GitHub**: `modules/chariot/backend/pkg/tasks/integrations/github/` - OAuth flow, repository scanning
 - **Qualys**: `modules/chariot/backend/pkg/tasks/integrations/qualys/qualys.go` - File import, risk creation
 
 **Tabularium Models**:
+
 - **Asset**: `modules/tabularium/pkg/model/model/asset.go:L17-50`
 - **AWS**: `modules/tabularium/pkg/model/model/aws_resource.go:L29-59`
 - **Azure**: `modules/tabularium/pkg/model/model/azure_resource.go:L23-53`
@@ -546,6 +566,7 @@ func (task *Integration) fetchAll() error {
 ```
 
 **Qualys-Specific Pattern** (XML with Warning code):
+
 ```go
 // Qualys uses Warning.Code == "1980" to indicate more data
 resp, err := web.RequestXML[QualysResponse](client, "GET", target, nil, headers...)
@@ -723,12 +744,12 @@ func (task *Okta) fetchApps() ([]okta.Application, error) {
 
 ### Pagination Selection Guide
 
-| API Type | Pattern | Example |
-|----------|---------|---------|
-| Returns `next_url` in body | Token-based | Qualys, Xpanse |
-| Returns `page.total` count | Page-based | InsightVM, Nessus |
-| Returns `after` cursor | Cursor-based | CrowdStrike, MS Defender |
-| Official SDK available | SDK-based | GitHub, GitLab, Okta |
+| API Type                   | Pattern      | Example                  |
+| -------------------------- | ------------ | ------------------------ |
+| Returns `next_url` in body | Token-based  | Qualys, Xpanse           |
+| Returns `page.total` count | Page-based   | InsightVM, Nessus        |
+| Returns `after` cursor     | Cursor-based | CrowdStrike, MS Defender |
+| Official SDK available     | SDK-based    | GitHub, GitLab, Okta     |
 
 ## Concurrency with errgroup
 
@@ -830,13 +851,13 @@ func (task *Integration) processAllAssets(assets []Asset) error {
 
 ### Concurrency Limits by Integration Type
 
-| Integration Type | Recommended Limit | Rationale |
-|-----------------|-------------------|-----------|
-| **High-volume APIs** (CrowdStrike, Tenable) | 10 | API rate limits |
-| **Cloud Providers** (AWS, Azure, GCP) | 10-20 | Regional throttling |
-| **SCM Platforms** (GitHub, GitLab) | 10 | API rate limits |
-| **Identity Providers** (Okta) | 100 | Higher rate limits |
-| **File Processing** (Nessus Import) | 10 | I/O bound |
+| Integration Type                            | Recommended Limit | Rationale           |
+| ------------------------------------------- | ----------------- | ------------------- |
+| **High-volume APIs** (CrowdStrike, Tenable) | 10                | API rate limits     |
+| **Cloud Providers** (AWS, Azure, GCP)       | 10-20             | Regional throttling |
+| **SCM Platforms** (GitHub, GitLab)          | 10                | API rate limits     |
+| **Identity Providers** (Okta)               | 100               | Higher rate limits  |
+| **File Processing** (Nessus Import)         | 10                | I/O bound           |
 
 ### CRITICAL: Loop Variable Capture
 
@@ -1016,6 +1037,7 @@ if failCount > 0 {
 ```
 
 **File Size Guidelines:**
+
 - Integration files: < 400 lines
 - Split when > 400 lines into: `_client.go`, `_types.go`, `_transform.go`
 

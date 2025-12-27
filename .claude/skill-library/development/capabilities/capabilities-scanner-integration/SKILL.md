@@ -13,13 +13,13 @@ This skill covers security scanner integration within the Chariot platform. Scan
 
 ## Quick Reference
 
-| Scanner Type | Link Pattern | Output Format | Example |
-|--------------|--------------|---------------|---------|
-| Network (Nmap, Masscan) | `NetworkScannerLink` | XML/JSON | Port discovery, service detection |
-| Secret Detection (NoseyParker) | `SecretScannerLink` | JSON | Credential leaks, API keys |
-| Container (Docker, Trivy) | `ContainerScannerLink` | JSON | Image vulnerabilities |
-| Cloud (AWS, Azure, GCP) | `CloudControlLink` | JSON | Misconfigurations, compliance |
-| Web (Nuclei) | `WebScannerLink` | JSON | CVEs, exposed panels |
+| Scanner Type                   | Link Pattern           | Output Format | Example                           |
+| ------------------------------ | ---------------------- | ------------- | --------------------------------- |
+| Network (Nmap, Masscan)        | `NetworkScannerLink`   | XML/JSON      | Port discovery, service detection |
+| Secret Detection (NoseyParker) | `SecretScannerLink`    | JSON          | Credential leaks, API keys        |
+| Container (Docker, Trivy)      | `ContainerScannerLink` | JSON          | Image vulnerabilities             |
+| Cloud (AWS, Azure, GCP)        | `CloudControlLink`     | JSON          | Misconfigurations, compliance     |
+| Web (Nuclei)                   | `WebScannerLink`       | JSON          | CVEs, exposed panels              |
 
 ## Architecture Overview
 

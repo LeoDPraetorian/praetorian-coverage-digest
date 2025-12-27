@@ -40,22 +40,26 @@ sandbox-exec \
 Both configurations provide:
 
 ✅ **Filesystem isolation**
+
 - Read-only access to system files
 - Blocked: `~/.ssh`, `~/.aws`, `~/.config`, `/etc/passwd`
 - Allowed: `.claude/tools/` (read-only)
 - Allowed: `/tmp/` (read-write)
 
 ✅ **Network isolation**
+
 - Complete network blocking (`--unshare-net` / `deny network*`)
 - Prevents metadata service access
 - Prevents private network access
 
 ✅ **Process isolation**
+
 - Sandboxed processes only
 - Die with parent process
 - No privilege escalation
 
 ✅ **Resource limits**
+
 - Combine with `timeout` for execution limits
 - Combine with `ulimit` for memory limits
 
@@ -111,11 +115,13 @@ sandbox-exec -D WORKSPACE="$(pwd)/.claude/tools" \
 ### Allow Additional Paths
 
 **Linux (bubblewrap.conf):**
+
 ```bash
 --ro-bind /path/to/allow /path/to/allow
 ```
 
 **macOS (seatbelt.sb):**
+
 ```scheme
 (allow file-read*
   (subpath "/path/to/allow"))
@@ -129,16 +135,19 @@ sandbox-exec -D WORKSPACE="$(pwd)/.claude/tools" \
 ## Troubleshooting
 
 **Issue: "Permission denied"**
+
 - Check file ownership matches sandbox user
 - Verify directory exists and is readable
 - macOS: Ensure `$WORKSPACE` parameter is set
 
 **Issue: "Command not found: node"**
+
 - Verify Node.js is installed
 - Check Node.js path matches config
 - macOS: Update path in `(allow process-exec)` section
 
 **Issue: Sandbox blocking legitimate files**
+
 - Add path to allowlist in config
 - Check symbolic links (may be blocked)
 

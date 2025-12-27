@@ -1,0 +1,21 @@
+## [Date: 2025-12-25]
+
+### Changed
+- Added "ALWAYS use selectors" critical performance warning in Quick Start section
+- Added React Server Components (RSC) warning with 'use client' directive guidance
+- Added "Separating Actions from State" pattern to store-organization-patterns.md reference
+- Extracted Store Architecture Decision Tree to references/store-architecture-guide.md
+- Extracted Common Patterns to references/store-organization-patterns.md
+- Extracted Refactoring Large Stores section to references/store-organization-patterns.md
+- Extracted Slices Pattern implementation details to references/store-architecture-guide.md
+- Condensed Templates, References, Official Documentation, and Architecture Guidance sections
+- Added Related Skills section with cross-references to using-modern-react-patterns and designing-frontend-architecture
+- Reduced SKILL.md from 737 lines to 499 lines (under 500 line hard limit)
+
+### Reason
+- User requested absorption of Zustand patterns from designing-frontend-architecture
+- Missing critical performance guidance (selector usage)
+- Missing RSC warning for Next.js 13+ users
+- Missing "Separating Actions from State" organizational pattern
+- SKILL.md exceeded 500 line hard limit by 237 lines
+- Progressive disclosure required to maintain compliance while adding content

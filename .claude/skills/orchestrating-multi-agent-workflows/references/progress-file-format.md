@@ -17,11 +17,13 @@ Examples:
 
 ## File Structure
 
-```markdown
+````markdown
 # Orchestration: <Feature Name>
 
 ## Status: in_progress | complete | blocked
+
 ## Started: <ISO timestamp>
+
 ## Last Updated: <ISO timestamp>
 
 ## Overview
@@ -45,7 +47,7 @@ Brief description of what this orchestration is accomplishing.
 ## Current Phase
 
 - [ ] **Phase 3: Testing** - <what's in progress>
-  - Agent: backend-unit-test-engineer (in progress)
+  - Agent: backend-tester (in progress)
   - Started: <timestamp>
   - Notes: [any context]
 
@@ -61,25 +63,30 @@ Brief description of what this orchestration is accomplishing.
 Critical information needed to resume from current phase:
 
 ### Architecture Decisions
+
 - Pattern: Microservices with separate auth service
 - Database: DynamoDB single-table with GSI for user lookups
 - Queue: SQS with DLQ for async processing
 
 ### Key File Paths
+
 - Handler: pkg/handler/handlers/asset/create.go
 - Service: pkg/service/asset/service.go
 - Tests: pkg/handler/handlers/asset/create_test.go
 
 ### API Endpoints
+
 - POST /api/assets - Create asset
 - GET /api/assets/:id - Get asset
 - PUT /api/assets/:id - Update asset
 
 ### Dependencies
+
 - Depends on: AuthService (must be deployed first)
 - Blocks: Frontend integration
 
 ### Blockers
+
 - None currently
 - OR: Waiting for [specific thing]
 
@@ -88,6 +95,7 @@ Critical information needed to resume from current phase:
 ## Agent Outputs
 
 ### backend-architect (completed)
+
 ```json
 {
   "status": "complete",
@@ -99,21 +107,21 @@ Critical information needed to resume from current phase:
   }
 }
 ```
+````
 
 ### backend-developer (completed)
+
 ```json
 {
   "status": "complete",
   "summary": "Implemented CreateAsset handler with validation",
-  "files_created": [
-    "pkg/handler/handlers/asset/create.go",
-    "pkg/service/asset/service.go"
-  ],
+  "files_created": ["pkg/handler/handlers/asset/create.go", "pkg/service/asset/service.go"],
   "tests_passing": true
 }
 ```
 
-### backend-unit-test-engineer (in_progress)
+### backend-tester (in_progress)
+
 ```json
 {
   "status": "in_progress",
@@ -127,8 +135,9 @@ Critical information needed to resume from current phase:
 ## Error Log
 
 ### 2024-01-15T10:45:00Z - Test Failure
+
 - Phase: Testing
-- Agent: backend-unit-test-engineer
+- Agent: backend-tester
 - Error: Mock configuration incorrect for DynamoDB
 - Resolution: Updated mock setup, re-running tests
 
@@ -137,10 +146,12 @@ Critical information needed to resume from current phase:
 ## Notes
 
 Any additional context that would help future sessions:
+
 - User prefers detailed commit messages
 - Should use existing auth patterns from pkg/auth/
 - Performance target: <100ms response time
-```
+
+````
 
 ## Minimal Progress File
 
@@ -165,25 +176,31 @@ For simpler orchestrations, a minimal format:
 
 ## Agent Output (latest)
 {last agent's JSON output}
-```
+````
 
 ## Progress File Lifecycle
 
 ### Creation
+
 Create at orchestration start when:
+
 - Task spans 3+ phases
 - Task may exceed context window
 - Multiple agents will contribute
 
 ### Updates
+
 Update progress file:
+
 - After each agent completes
 - When blockers encountered
 - When scope changes
 - After resolving errors
 
 ### Cleanup
+
 After successful completion:
+
 - Update status to "complete"
 - Keep for reference (useful for similar tasks)
 - OR move to `.claude/progress/archived/`
@@ -201,15 +218,18 @@ When resuming:
 ## Integration with TodoWrite
 
 Progress files complement TodoWrite:
+
 - **TodoWrite**: Real-time task tracking within session
 - **Progress file**: Cross-session persistence
 
 At session start:
+
 1. Read progress file
 2. Create TodoWrite todos from pending phases
 3. Mark completed phases from progress file
 
 At phase completion:
+
 1. Mark TodoWrite todo complete
 2. Update progress file
 3. Capture agent output

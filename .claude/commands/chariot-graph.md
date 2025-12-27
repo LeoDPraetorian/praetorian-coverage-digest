@@ -11,6 +11,7 @@ allowed-tools: Bash, Read
 ## Natural Language Examples
 
 ### Asset Relationship Queries
+
 ```bash
 # All of these work:
 /chariot-graph find all assets connected to RISK-456
@@ -20,6 +21,7 @@ allowed-tools: Bash, Read
 ```
 
 ### Vulnerability Queries
+
 ```bash
 /chariot-graph show me all assets with vulnerabilities
 /chariot-graph find assets affected by critical risks
@@ -28,6 +30,7 @@ allowed-tools: Bash, Read
 ```
 
 ### Attack Path Queries
+
 ```bash
 /chariot-graph trace attack path from ASSET-123
 /chariot-graph show attack surface for example.com
@@ -35,6 +38,7 @@ allowed-tools: Bash, Read
 ```
 
 ### Status and Filter Queries
+
 ```bash
 /chariot-graph list all active assets
 /chariot-graph show me assets by status
@@ -43,6 +47,7 @@ allowed-tools: Bash, Read
 ```
 
 ### Complex Relationship Traversal
+
 ```bash
 /chariot-graph show me assets owned by ACCOUNT-789 with their vulnerabilities
 /chariot-graph find all DNS records connected to example.com
@@ -68,6 +73,7 @@ allowed-tools: Bash, Read
 When you invoke this command, I will:
 
 1. Read the Chariot graph MCP tools skill:
+
 ```bash
 Read: .claude/skill-library/claude/mcp-tools/mcp-tools-chariot/SKILL.md
 ```
@@ -92,12 +98,14 @@ Read: .claude/skill-library/claude/mcp-tools/mcp-tools-chariot/SKILL.md
 Based on the Chariot graph MCP (3 tools available):
 
 **Graph Queries:**
+
 - Query nodes by labels and filters
 - Traverse relationships between entities
 - Find connected assets and risks
 - Trace attack paths through the graph
 
 **Common Query Patterns:**
+
 - Assets with vulnerabilities
 - Risks by severity (CVSS, EPSS, KEV)
 - Attack surface mapping
@@ -105,11 +113,13 @@ Based on the Chariot graph MCP (3 tools available):
 - Integration connections
 
 **Available Node Labels:**
+
 - Asset, Risk, Account, Seed, Job
 - Integration, Capability, Attribute
 - (See CLAUDE.md for complete allowedColumns list)
 
 **Available Relationships:**
+
 - HAS_VULNERABILITY
 - BELONGS_TO
 - DISCOVERED_BY
@@ -125,6 +135,7 @@ The skill will show me the exact query structure to use!
 Uses the same credentials as `/chariot-api`:
 
 **Credentials**: `.env` environment variables
+
 - `PRAETORIAN_CLI_USERNAME`
 - `PRAETORIAN_CLI_PASSWORD`
 
@@ -147,6 +158,7 @@ Uses the same credentials as `/chariot-api`:
 ⚠️ **Graph queries MUST only use fields in `allowedColumns`** (see CLAUDE.md:195-210)
 
 **Common queryable fields:**
+
 - `key`, `name`, `status`, `dns`, `value`
 - `cvss`, `epss`, `kev`, `priority`
 - `class`, `type`, `source`, `origin`
@@ -161,6 +173,7 @@ If you request a field that's not in `allowedColumns`, I'll let you know and sug
 For developers or debugging, here's the underlying wrapper pattern:
 
 ### Graph Query (Direct Execution)
+
 ```bash
 npx tsx -e "(async () => {
   const { query } = await import('./.claude/tools/chariot/query.ts');

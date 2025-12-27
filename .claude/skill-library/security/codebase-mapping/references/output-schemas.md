@@ -129,11 +129,7 @@ Complete attack surface inventory.
         "function": "HandleLogin"
       },
       "riskLevel": "high",
-      "riskFactors": [
-        "Accepts credentials",
-        "No rate limiting detected",
-        "Creates session tokens"
-      ],
+      "riskFactors": ["Accepts credentials", "No rate limiting detected", "Creates session tokens"],
       "inputParameters": [
         { "name": "email", "type": "string", "source": "body" },
         { "name": "password", "type": "string", "source": "body" }
@@ -153,10 +149,7 @@ Complete attack surface inventory.
         "function": "HandleList"
       },
       "riskLevel": "medium",
-      "riskFactors": [
-        "Returns sensitive data",
-        "Query parameters for filtering"
-      ],
+      "riskFactors": ["Returns sensitive data", "Query parameters for filtering"],
       "inputParameters": [
         { "name": "filter", "type": "string", "source": "query" },
         { "name": "limit", "type": "integer", "source": "query" }
@@ -385,43 +378,50 @@ Compressed findings for handoff. **Must be <2000 tokens.**
 **Analyzed**: 2024-12-17T10:00:00Z
 
 ## Technology Stack
+
 - **Primary**: Go 1.21 (65%) + TypeScript (35%)
 - **Backend**: AWS Lambda + API Gateway + DynamoDB + Neo4j
 - **Frontend**: React 19 + Vite + TailwindCSS
 - **Infrastructure**: AWS (Serverless), Terraform
 
 ## Components (4)
-| Component | Type | Files | Entry Points |
-|-----------|------|-------|--------------|
-| backend-api | Backend | 150 | 30 HTTP endpoints |
-| frontend-ui | Frontend | 80 | React SPA |
-| infrastructure | IaC | 25 | N/A |
-| cli-tools | CLI | 15 | 3 commands |
+
+| Component      | Type     | Files | Entry Points      |
+| -------------- | -------- | ----- | ----------------- |
+| backend-api    | Backend  | 150   | 30 HTTP endpoints |
+| frontend-ui    | Frontend | 80    | React SPA         |
+| infrastructure | IaC      | 25    | N/A               |
+| cli-tools      | CLI      | 15    | 3 commands        |
 
 ## Attack Surface
+
 - **Total Entry Points**: 45
 - **High Risk**: 15 (auth endpoints, file uploads, admin functions)
 - **Medium Risk**: 20 (data queries, mutations)
 - **External Integrations**: 5 (GitHub, Okta, AWS services)
 
 ## Key Trust Boundaries
+
 1. **Internet → API Gateway**: TLS ✅, Rate Limiting ✅, WAF ❌
 2. **Anonymous → Authenticated**: JWT ✅, Session Mgmt ❌
 3. **Application → Database**: IAM ✅, Encryption ✅, Parameterization ✅
 4. **User → Admin**: RBAC ✅, Audit Logging ❌
 
 ## Security-Relevant Findings
+
 - [ ] WAF not configured on API Gateway
 - [ ] Session management relies solely on JWT (no server-side sessions)
 - [ ] Admin audit logging incomplete
 - [ ] 3 endpoints accept file uploads without content validation
 
 ## Recommended Focus Areas
+
 1. Authentication flow (login, token refresh, logout)
 2. File upload handling (3 endpoints)
 3. Admin privilege escalation paths
 4. External integration security (GitHub OAuth, Okta SAML)
 
 ---
-*Token count: ~450 tokens*
+
+_Token count: ~450 tokens_
 ```

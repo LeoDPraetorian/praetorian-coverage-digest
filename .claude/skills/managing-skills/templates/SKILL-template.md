@@ -12,13 +12,14 @@ allowed-tools: Read, Write, Bash
 
 ## Quick Reference
 
-| Pattern | Solution | Example |
-|---------|----------|---------|
+| Pattern     | Solution     | Example     |
+| ----------- | ------------ | ----------- |
 | [Pattern 1] | [Solution 1] | [Example 1] |
 
 ## When to Use
 
 Use this skill when:
+
 - [Scenario 1]
 - [Scenario 2]
 - [Scenario 3]

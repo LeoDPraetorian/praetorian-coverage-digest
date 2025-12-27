@@ -1,7 +1,7 @@
 ---
 name: test-infrastructure-discovery
 description: Use when writing any tests (unit, integration, E2E) before implementing test code - systematically discovers available test infrastructure (MSW, fixtures, test utilities, established patterns) to avoid recreating existing tools and ensure consistency with project patterns
-allowed-tools: 'Read, Bash, Grep, Glob'
+allowed-tools: "Read, Bash, Grep, Glob"
 ---
 
 # Test Infrastructure Discovery
@@ -11,6 +11,7 @@ allowed-tools: 'Read, Bash, Grep, Glob'
 **Before writing ANY test code, discover what infrastructure already exists.**
 
 Agents naturally jump to solutions without checking available tools, causing:
+
 - Recreating test infrastructure that already exists
 - Inconsistent patterns across test suites
 - Missing established test utilities and fixtures
@@ -21,12 +22,14 @@ Agents naturally jump to solutions without checking available tools, causing:
 ## When to Use
 
 **ALWAYS use this when:**
+
 - Writing any new tests (unit, integration, E2E)
 - Fixing failing tests
 - Refactoring test suites
 - Setting up test mocking or fixtures
 
 **Signs you skipped discovery:**
+
 - Proposing "create MSW setup" without checking if it exists
 - Writing custom test utilities when helpers already exist
 - Using different patterns than existing test files
@@ -51,6 +54,7 @@ grep -E "(vitest|jest|playwright|msw|@testing-library)" package.json
 ```
 
 **What this tells you:**
+
 - What test frameworks are configured
 - What mocking libraries are available
 - What testing utilities you can use
@@ -71,6 +75,7 @@ find . -name "*.test.ts" -o -name "*.test.tsx" -o -name "setup*.ts" -o -name "vi
 ```
 
 **What this tells you:**
+
 - Where test infrastructure lives
 - What patterns are established
 - What utilities are available
@@ -90,6 +95,7 @@ find . -path "*/__tests__/*" -name "*.test.ts*" | head -10
 ```
 
 **What this tells you:**
+
 - Established test patterns in the codebase
 - Custom render functions (e.g., renderWithProviders)
 - Fixture usage patterns
@@ -98,15 +104,18 @@ find . -path "*/__tests__/*" -name "*.test.ts*" | head -10
 ### 4. Check for Relevant Testing Skills
 
 **For React/frontend tests:**
+
 - react-testing skill: Comprehensive MSW and React Testing Library patterns
 - react-performance-optimization skill: Performance testing patterns
 - testing-anti-patterns skill: What to avoid
 
 **For backend tests:**
+
 - developing-with-tdd skill: TDD workflow
 - testing-anti-patterns skill: What to avoid
 
 **For all tests:**
+
 - debugging-systematically skill: When tests fail unexpectedly
 - verifying-before-completion skill: Before claiming tests pass
 
@@ -118,34 +127,38 @@ Create a quick inventory:
 ## Test Infrastructure Inventory
 
 **Installed:**
+
 - ✅ MSW 2.12.1
 - ✅ Vitest 2.1.8
 - ✅ React Testing Library 16.1.0
 
 **Existing Setup:**
+
 - ✅ src/test/mocks/server.ts (MSW configured)
 - ✅ src/test-utils.tsx (custom render functions)
 - ✅ src/fixtures/ (user and data fixtures)
 
 **Patterns Observed:**
+
 - Tests import from '@/test/mocks/server'
 - Custom renderWithProviders() wraps React Testing Library
 - Fixtures use user_tests.TEST_USER_1 pattern
 
 **Relevant Skills:**
+
 - react-testing (has MSW patterns)
 - testing-anti-patterns
 ```
 
 ## Quick Reference
 
-| Situation | Check First | Then Do |
-|-----------|-------------|---------|
-| React component test failing | package.json for MSW → src/test/mocks/ → react-testing skill | Use existing MSW handlers or add new ones |
-| Need to mock API | src/test/mocks/handlers.ts | Add handler to existing file, don't create new setup |
-| Writing integration test | Find similar **/\__tests__/*.integration.test.ts | Follow established patterns |
-| E2E test setup | src/fixtures/ → existing E2E tests | Use existing fixtures, match patterns |
-| Backend unit test | pkg/testutils/ → existing *_test.go files | Use testutils helpers, match patterns |
+| Situation                    | Check First                                                  | Then Do                                              |
+| ---------------------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
+| React component test failing | package.json for MSW → src/test/mocks/ → react-testing skill | Use existing MSW handlers or add new ones            |
+| Need to mock API             | src/test/mocks/handlers.ts                                   | Add handler to existing file, don't create new setup |
+| Writing integration test     | Find similar \*_/\_\_tests\_\_/_.integration.test.ts         | Follow established patterns                          |
+| E2E test setup               | src/fixtures/ → existing E2E tests                           | Use existing fixtures, match patterns                |
+| Backend unit test            | pkg/testutils/ → existing \*\_test.go files                  | Use testutils helpers, match patterns                |
 
 ## Common Mistakes
 
@@ -192,6 +205,7 @@ Agent: "I'll use vi.mock() for this API call..."
 ## Stop Signals
 
 **You're skipping discovery if you:**
+
 - Propose "creating" or "setting up" test infrastructure
 - Suggest "installing" test dependencies
 - Write test utilities without checking for existing ones
@@ -202,19 +216,20 @@ Agent: "I'll use vi.mock() for this API call..."
 
 ## Rationalizations to Avoid
 
-| Excuse | Reality |
-|--------|---------|
-| "I know best practices, I'll implement them" | Best practices vary by project. Discover what's established. |
-| "This is standard setup, I'll create it" | "Standard" doesn't mean "not already there." Check first. |
+| Excuse                                        | Reality                                                          |
+| --------------------------------------------- | ---------------------------------------------------------------- |
+| "I know best practices, I'll implement them"  | Best practices vary by project. Discover what's established.     |
+| "This is standard setup, I'll create it"      | "Standard" doesn't mean "not already there." Check first.        |
 | "Time pressure means jump straight to fixing" | 2 minutes of discovery saves 30 minutes of wrong implementation. |
-| "The solution is obvious" | The solution depends on available tools. Discover first. |
-| "I'll propose comprehensive solutions" | Comprehensive ≠ correct. Discover what exists, then propose. |
+| "The solution is obvious"                     | The solution depends on available tools. Discover first.         |
+| "I'll propose comprehensive solutions"        | Comprehensive ≠ correct. Discover what exists, then propose.     |
 
 ## Integration with Other Skills
 
 **BEFORE writing tests, use this skill to discover infrastructure.**
 
 **THEN use:**
+
 - **react-testing** - If React tests and MSW is available
 - **frontend-testing-patterns** - For contract verification with MSW handlers (verify real API contracts before mocking)
 - **developing-with-tdd** - For TDD workflow
@@ -226,12 +241,14 @@ Agent: "I'll use vi.mock() for this API call..."
 ## Real-World Impact
 
 **Without discovery:**
+
 - Proposed creating MSW setup that already existed (src/test/mocks/server.ts)
 - Suggested installing MSW already in package.json
 - Created test utilities that duplicated existing src/test-utils.tsx
 - Used different patterns than established codebase conventions
 
 **With discovery:**
+
 - Found MSW configured and ready to use
 - Discovered react-testing skill has comprehensive MSW patterns
 - Identified existing test fixtures in src/fixtures/

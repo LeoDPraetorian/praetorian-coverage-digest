@@ -26,12 +26,14 @@
 ### Creation Workflow
 
 1. **Check for backing skill:**
+
    ```bash
    ls .claude/skills/ | grep -i <name>
    ls .claude/skill-library/**/<name>/
    ```
 
 2. **Create command:**
+
    ```bash
    cd .claude/skill-library/claude/commands/command-manager/scripts
    npm run create -- <name> "Description"
@@ -44,27 +46,27 @@
 
 ### Template Selection
 
-| Condition | Template | Tools |
-|-----------|----------|-------|
-| Backing skill exists | Router | Skill, AskUserQuestion |
-| No skill, git operation | System | Bash(git:*) |
-| No skill, file operation | System | Glob, Read |
-| No skill, complex logic | **Create skill first** | - |
+| Condition                | Template               | Tools                  |
+| ------------------------ | ---------------------- | ---------------------- |
+| Backing skill exists     | Router                 | Skill, AskUserQuestion |
+| No skill, git operation  | System                 | Bash(git:\*)           |
+| No skill, file operation | System                 | Glob, Read             |
+| No skill, complex logic  | **Create skill first** | -                      |
 
 ## Phase 2: Audit
 
 ### 8-Check Protocol
 
-| Check | Name | Severity |
-|-------|------|----------|
-| 1 | Frontmatter Presence | CRITICAL |
-| 2 | Required Fields | CRITICAL |
-| 3 | Optional Recommended Fields | WARNING |
-| 4 | Argument Handling | WARNING |
-| 5 | Tool Permissions | WARNING |
-| 6 | Documentation Quality | WARNING |
-| 7 | Structure Best Practices | WARNING |
-| 8 | Router Pattern Compliance | CRITICAL |
+| Check | Name                        | Severity |
+| ----- | --------------------------- | -------- |
+| 1     | Frontmatter Presence        | CRITICAL |
+| 2     | Required Fields             | CRITICAL |
+| 3     | Optional Recommended Fields | WARNING  |
+| 4     | Argument Handling           | WARNING  |
+| 5     | Tool Permissions            | WARNING  |
+| 6     | Documentation Quality       | WARNING  |
+| 7     | Structure Best Practices    | WARNING  |
+| 8     | Router Pattern Compliance   | CRITICAL |
 
 ### Running Audit
 
@@ -78,22 +80,22 @@ npm run audit
 
 ### Interpreting Results
 
-| Status | Meaning | Action |
-|--------|---------|--------|
-| ✅ PASS | All checks pass | Deploy |
-| ⚠️ WARN | Warnings only | Should fix |
-| ❌ FAIL | Critical issues | Must fix |
+| Status  | Meaning         | Action     |
+| ------- | --------------- | ---------- |
+| ✅ PASS | All checks pass | Deploy     |
+| ⚠️ WARN | Warnings only   | Should fix |
+| ❌ FAIL | Critical issues | Must fix   |
 
 ## Phase 3: Fix
 
 ### Auto-Fixable Issues
 
-| Issue | Auto-Fix |
-|-------|----------|
-| Extra tools with skills | Remove tools |
-| Missing verbatim directive | Add directive |
-| Description > 120 chars | Trim description |
-| Missing argument-hint | Add from $1, $2 usage |
+| Issue                      | Auto-Fix              |
+| -------------------------- | --------------------- |
+| Extra tools with skills    | Remove tools          |
+| Missing verbatim directive | Add directive         |
+| Description > 120 chars    | Trim description      |
+| Missing argument-hint      | Add from $1, $2 usage |
 
 ### Running Fix
 
@@ -107,12 +109,12 @@ npm run fix -- my-command
 
 ### Manual Fixes Required
 
-| Issue | Manual Action |
-|-------|---------------|
-| Vague instructions | Rewrite with imperative language |
-| Logic leakage (>50 lines) | Move logic to skill |
-| Broad Bash permissions | Specify exact commands |
-| Mixed argument patterns | Choose one pattern |
+| Issue                     | Manual Action                    |
+| ------------------------- | -------------------------------- |
+| Vague instructions        | Rewrite with imperative language |
+| Logic leakage (>50 lines) | Move logic to skill              |
+| Broad Bash permissions    | Specify exact commands           |
+| Mixed argument patterns   | Choose one pattern               |
 
 ## Phase 4: Test
 
@@ -160,20 +162,20 @@ git commit -m "feat(commands): add <command-name> command"
 
 ### Periodic Review
 
-| Frequency | Action |
-|-----------|--------|
-| Weekly | Audit frequently-used commands |
-| Monthly | Audit all commands |
-| After standard changes | Re-audit all |
+| Frequency              | Action                         |
+| ---------------------- | ------------------------------ |
+| Weekly                 | Audit frequently-used commands |
+| Monthly                | Audit all commands             |
+| After standard changes | Re-audit all                   |
 
 ### Triggered Review
 
-| Event | Action |
-|-------|--------|
-| Command fails | Audit + fix |
-| Unexpected behavior | Audit + review |
-| Security concern | Audit + review tools |
-| Skill updated | Re-test delegation |
+| Event               | Action               |
+| ------------------- | -------------------- |
+| Command fails       | Audit + fix          |
+| Unexpected behavior | Audit + review       |
+| Security concern    | Audit + review tools |
+| Skill updated       | Re-test delegation   |
 
 ## Integration Points
 

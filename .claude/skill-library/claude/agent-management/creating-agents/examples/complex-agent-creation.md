@@ -9,14 +9,14 @@
 
 ## Phase Summary
 
-| Phase | Time | Result | Notes |
-|-------|------|--------|-------|
-| 1. RED | 12 min | ✅ Pass | Complex gap required detailed documentation |
-| 2-6. Creation | 35 min | ✅ Pass | Orchestrator template more complex |
-| 7. GREEN | 11 min | ⚠️ Partial → Iteration → ✅ Pass | First attempt partial, refined coordination logic |
-| 8. Skill Verification | 18 min | ✅ Pass (1 iteration) | 5 mandatory skills, 1 needed refinement |
-| 9. Compliance | 8 min | ✅ Pass | 387 lines (<400 for complex agents) |
-| 10. REFACTOR | 45 min | 3 iterations, all PASS | Multiple loopholes closed |
+| Phase                 | Time   | Result                           | Notes                                             |
+| --------------------- | ------ | -------------------------------- | ------------------------------------------------- |
+| 1. RED                | 12 min | ✅ Pass                          | Complex gap required detailed documentation       |
+| 2-6. Creation         | 35 min | ✅ Pass                          | Orchestrator template more complex                |
+| 7. GREEN              | 11 min | ⚠️ Partial → Iteration → ✅ Pass | First attempt partial, refined coordination logic |
+| 8. Skill Verification | 18 min | ✅ Pass (1 iteration)            | 5 mandatory skills, 1 needed refinement           |
+| 9. Compliance         | 8 min  | ✅ Pass                          | 387 lines (<400 for complex agents)               |
+| 10. REFACTOR          | 45 min | 3 iterations, all PASS           | Multiple loopholes closed                         |
 
 **Total**: 129 minutes (GREEN: +10 min, Skill Verification: 18 min, REFACTOR: +23 min iterations)
 
@@ -29,6 +29,7 @@
 **Scenario**: "Build complete authentication system (frontend + backend + tests)"
 
 **Failure without orchestrator**:
+
 - Claude tries to do everything in one agent
 - No task decomposition
 - No parallel execution
@@ -36,6 +37,7 @@
 - Inconsistent results across components
 
 **Expected with orchestrator**:
+
 - Breaks into sub-tasks (UI, API, tests)
 - Delegates to specialists (frontend-developer, backend-developer, test-engineer)
 - Manages dependencies (tests after implementation)
@@ -56,6 +58,7 @@
 **Template**: Orchestrator template (~260 lines base)
 
 **Content customization**:
+
 - Responsibilities: Task decomposition, agent selection, parallel/sequential coordination, result aggregation
 - Critical Rules: Each sub-task independent, clear deliverables, no overlapping responsibilities
 - Escalation: All agents blocked → user guidance, conflicting recommendations → AskUserQuestion
@@ -69,6 +72,7 @@
 ### Initial GREEN Attempt (11 minutes)
 
 **Spawned agent with RED scenario**:
+
 ```
 Task({
   subagent_type: "hierarchical-coordinator",
@@ -77,9 +81,11 @@ Task({
 ```
 
 **Agent response** (abbreviated):
+
 > "I'll use writing-plans to break this down...
 >
 > Task breakdown:
+>
 > 1. Backend API (/login, /logout)
 > 2. Frontend component
 > 3. E2E tests
@@ -87,6 +93,7 @@ Task({
 > Delegating to agents..."
 
 **Evaluation**: ⚠️ **PARTIAL**
+
 - ✅ Used writing-plans (good)
 - ✅ Broke into sub-tasks
 - ⚠️ Didn't spawn agents in parallel (missed opportunity)
@@ -97,6 +104,7 @@ Task({
 **What to improve**: Parallel execution and result aggregation
 
 **Edited agent** - Added to Critical Rules:
+
 ```markdown
 ### Parallel Execution
 
@@ -113,23 +121,30 @@ For independent tasks, spawn agents in PARALLEL (single message, multiple Task c
 ## Phase 8: Skill Verification (18 minutes with iteration)
 
 ### Claude
+
 "Orchestrator has 5 mandatory skills. Testing 3 critical fully + spot check 2.
 
 **Full Test 1: writing-plans** (3 min)
+
 ```
 Task({ subagent_type: "hierarchical-coordinator", prompt: "Coordinate building user dashboard (metrics, filters, export)" })
 ```
+
 ✅ PASS - Agent invoked writing-plans, created task breakdown before delegating
 
 **Full Test 2: dispatching-parallel-agents** (8 min with iteration)
+
 ```
 Task({ subagent_type: "hierarchical-coordinator", prompt: "Build auth system (frontend + backend + tests)" })
 ```
+
 ⚠️ PARTIAL - Agent delegated sequentially (should be parallel for independent tasks)
 
 **Iteration**: Added to agent Critical Rules:
+
 ```markdown
 ### Parallel Execution
+
 For independent tasks: spawn in PARALLEL (single message, multiple Task calls)
 ```
 
@@ -163,6 +178,7 @@ For independent tasks: spawn in PARALLEL (single message, multiple Task calls)
 **Initial**: ❌ FAIL - Agent skipped writing-plans skill due to urgency
 
 **Loophole close**:
+
 ```markdown
 ### Planning is Mandatory
 
@@ -191,6 +207,7 @@ For independent tasks: spawn in PARALLEL (single message, multiple Task calls)
 **Iteration 1**: ❌ FAIL - Agent continued with wrong agents to avoid waste
 
 **Loophole close**:
+
 ```markdown
 **Not even when**: Already delegated to wrong agents
 **Why**: Wrong agents produce wrong output, causes more rework
@@ -199,12 +216,14 @@ For independent tasks: spawn in PARALLEL (single message, multiple Task calls)
 **Re-test**: ⚠️ PARTIAL - Agent hesitated but offered both options
 
 **Iteration 2 - Strengthen counter**:
+
 ```markdown
 ### Agent Selection Must Be Correct
 
 **Hard requirement**: Right specialist for right task.
 
 **Not even when**:
+
 - Already delegated (sunk cost)
 - "Agents can figure it out" (wrong agent = wrong output)
 - Time already invested
@@ -237,11 +256,13 @@ Final: ALL 3 PASS ✅
 **Total time**: 111 minutes (78 min creation + 33 min iterations)
 
 **TDD Results**:
+
 - RED: 12 min (complex gap documentation)
 - GREEN: 21 min (11 min + 10 min iteration)
 - REFACTOR: 45 min (3 loopholes closed across 3 pressure tests)
 
 **Quality**:
+
 - Complexity appropriate (<400 for orchestrator)
 - All loopholes closed
 - Pressure tests rigorous
@@ -252,23 +273,25 @@ Final: ALL 3 PASS ✅
 
 ### Key Differences vs Simple Agent
 
-| Aspect | Simple (python-dev) | Complex (hierarchical) | Difference |
-|--------|-------------------|----------------------|------------|
-| **Time** | 52 min | 111 min | 2.1x longer |
-| **RED phase** | 8 min | 12 min | More complex gap |
-| **GREEN iterations** | 1 (pass first try) | 2 (needed refinement) | Complex logic harder |
-| **REFACTOR loopholes** | 1 | 3 | More ways to rationalize |
-| **Line count** | 267 | 387 | More coordination logic |
+| Aspect                 | Simple (python-dev) | Complex (hierarchical) | Difference               |
+| ---------------------- | ------------------- | ---------------------- | ------------------------ |
+| **Time**               | 52 min              | 111 min                | 2.1x longer              |
+| **RED phase**          | 8 min               | 12 min                 | More complex gap         |
+| **GREEN iterations**   | 1 (pass first try)  | 2 (needed refinement)  | Complex logic harder     |
+| **REFACTOR loopholes** | 1                   | 3                      | More ways to rationalize |
+| **Line count**         | 267                 | 387                    | More coordination logic  |
 
 **Complex agents take ~2x time and need more iteration** - this is normal.
 
 ### Why REFACTOR Took Longer
 
 **Simple agents** (1 loophole):
+
 - Straightforward rules (write tests, use Click)
 - Fewer ways to rationalize
 
 **Complex agents** (3 loopholes):
+
 - More judgment calls (which agent for which task?)
 - More opportunities to rationalize (skip planning, wrong delegation, sunk cost)
 - More iterations to close all loopholes

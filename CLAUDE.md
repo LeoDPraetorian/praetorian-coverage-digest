@@ -70,53 +70,6 @@ This hook **prevents accidental submodule commits** that cause PR conflicts. If 
 make install-git-hooks
 ```
 
-## Claude Code Setup (AI Development Assistant)
-
-**First-time setup for Claude Code users:**
-
-```bash
-# Display plugin installation commands
-make claude-setup
-
-# Then run the displayed commands in Claude Code:
-/plugin marketplace add obra/superpowers
-/plugin install superpowers
-/plugin marketplace add ./
-/plugin install chariot-development-platform
-
-# Restart Claude Code to load plugins
-```
-
-**What this provides:**
-- **Superpowers** (20 foundation skills): TDD, systematic debugging, verification protocols
-- **Chariot Skills** (63 platform skills): Agent creation, React patterns, architecture standards
-- **SessionStart Hook**: Automatic skill activation (80%+ vs 20% baseline)
-- **MANDATORY FIRST RESPONSE PROTOCOL**: Enforces skill usage before all tasks
-
-**Full documentation:** `docs/CLAUDE_CODE_SETUP.md`
-
-**Verification:** After restart, ask Claude "What skills are available?" - should see 80+ skills.
-
-## Skills Discovery & Usage
-
-This repository uses a **hybrid skill architecture** with 80+ skills organized in two tiers:
-
-### Finding Skills
-
-```bash
-# Search for skills across both core and library
-cd .claude && npm run -w @chariot/skill-search search -- "query"
-
-# Examples
-npm run -w @chariot/skill-search search -- "react testing"
-npm run -w @chariot/skill-search search -- "debugging"
-npm run -w @chariot/skill-search search -- ""  # List all skills
-```
-
-**Output shows access method:**
-- `[CORE]` skills → Use with Skill tool: `skill: "skill-name"`
-- `[LIB]` skills → Use with Read tool: Read the path shown
-
 ### Skill Architecture
 
 - **Core Skills** (~15): High-frequency skills in `.claude/skills/` - auto-discovered
@@ -329,49 +282,31 @@ make chariot
 
 **NEVER use**: `docker-compose up`, `npm start`, `go run` for full deployment
 
-## Claude Flow Integration
+### Bash Command Simplicity
 
-### SPARC Methodology Commands
+**Use simple, separate Bash commands instead of complex compound statements.**
+
+The Claude Code Bash tool has parsing edge cases with complex chains combining `;`, `&&`, `$()`, and `|`.
 
 ```bash
-# Core SPARC workflow
-npx claude-flow sparc run <mode> "<task>"      # Execute specific SPARC phase
-npx claude-flow sparc tdd "<feature>"          # Run complete TDD workflow
-npx claude-flow sparc batch <modes> "<task>"   # Parallel execution
-
-# Agent orchestration with Claude Code Task tool
-# Use Task tool to spawn agents concurrently:
-# Task("Backend Developer", "Build REST API...", "backend-dev")
-# Task("Frontend Developer", "Create React UI...", "frontend-developer")
-# Task("Test Engineer", "Write E2E tests...", "e2e-test-writer-fixer")
+# ❌ AVOID: Complex compound commands
+REPO_ROOT=$(...); VAR="..."; mkdir && TIMESTAMP=$(...) && ls | tail
 ```
 
-### Agent Architecture
+```bash
+# ✅ PREFERRED: Separate commands
+REPO_ROOT=$(git rev-parse --show-toplevel)
+```
 
-55 specialized agents organized across 8 categories:
+```bash
+mkdir -p /path/to/dir
+```
 
-| Category | Count | Examples |
-|----------|-------|----------|
-| `architecture` | 7 | go-architect, react-architect, security-architect |
-| `development` | 16 | react-developer, go-developer, typescript-developer |
-| `testing` | 8 | frontend-browser-test-engineer, backend-unit-test-engineer |
-| `quality` | 5 | go-code-reviewer, react-code-reviewer |
-| `analysis` | 6 | security-risk-assessor, complexity-assessor |
-| `research` | 3 | web-research-specialist, code-pattern-analyzer |
-| `orchestrator` | 8 | universal-coordinator, hierarchical-coordinator |
-| `mcp-tools` | 2 | praetorian-cli-expert, chromatic-test-engineer |
+```bash
+ls -la /path/to/dir
+```
 
-**Key Agents for Chariot Development:**
-- `security-architect` - Security platform design and threat modeling
-- `react-developer` - React/TypeScript with automatic E2E test generation
-- `go-developer` - Go backend development with concurrency patterns
-- `frontend-browser-test-engineer` - Comprehensive Playwright test automation
-- `backend-unit-test-engineer` - Go and Python test suites with security focus
-- `vql-developer` - Velociraptor security capability development
-
-**Agent Design Principle**: Lean prompts (<300 lines) that delegate detailed patterns to skills
-
-**Full architecture details:** `docs/AGENT-ARCHITECTURE.md`
+**Why:** Easier debugging, avoids parser edge cases, better progress visibility.
 
 ## Security Platform Context
 
@@ -435,26 +370,25 @@ Frontend changes automatically trigger E2E test generation:
 
 ### allowedColumns Field Validation
 
-When making queries to the Chariot graph database (Neo4j), **ALWAYS check the `allowedColumns` field** to verify which fields are available for querying. This field is defined in `./modules/chariot/backend/build/pkg/query/read.go:41-85` and contains the complete list of queryable fields.
+When making queries to the Chariot graph database (Neo4j), verify fields against the **source of truth**:
 
-**Critical Rule**: All graph queries MUST only use fields that are present in the `allowedColumns` map for filters. Using invalid field names will result in query validation errors.
+- **Source file**: `modules/chariot/backend/pkg/query/allowed_columns.go`
+- **Field count**: 200+ fields (grows with new entity types)
+- **Validation**: Invalid fields return error `"invalid filter column: {field}"`
 
-**Available Graph Query Fields** (as of current implementation):
-```go
-allowedColumns := map[string]bool{
-    "key", "identifier", "group", "dns", "name", "value", "status", 
-    "source", "origin", "created", "registrar", "registrant", "email", 
-    "country", "priority", "class", "type", "title", "visited", "updated", 
-    "vendor", "product", "version", "cpe", "surface", "asname", "asnumber", 
-    "cvss", "epss", "kev", "exploit", "private", "id", "writeupId", 
-    "category", "attackSurface", "capability", "cloudService", "cloudId", 
-    "cloudRoot", "cloudAccount", "plextracid", "beta"
-}
+**Critical Rule**: Before using a field in a graph query filter, read `allowed_columns.go` to verify it exists. Do NOT rely on hardcoded lists - they drift.
+
+**Skill Available**: Use the `constructing-graph-queries` library skill for:
+- Dynamic column validation
+- Query structure patterns
+- Common filter examples
+- Relationship traversal
+
+**Quick Field Lookup**:
+```bash
+# Check if a field is allowed
+grep -w "fieldname" modules/chariot/backend/pkg/query/allowed_columns.go
 ```
-
-**Graph Query Validation Process**:
-- **Filter Validation**: All filter fields in query nodes are checked against `allowedColumns`
-- **Runtime Validation**: Query builder validates all field references before execution
 
 **Example Valid Graph Query**:
 ```json

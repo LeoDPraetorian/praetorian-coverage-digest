@@ -1,5 +1,0 @@
-# Changelog
-
-All notable changes to this skill.
-
-- **2025-12-14**: Update description to clarify when agents should use this skill. Agents need to understand they MUST reference this skill anytime they are: (1) designing, implementing, or reviewing React code, (2) thinking about using optimization patterns like useMemo/useCallback/React.memo, (3) working with state management or component patterns. React 19 has major changes: useMemo is no longer required (React Compiler handles it), useCallback is often unnecessary, manual optimization patterns are now handled automatically. This will be a mandatory skill so agents need clear guidance on WHEN (any React optimization/state work), HOW (consult before implementing old patterns), and WHY (React 19 makes many old patterns obsolete or harmful).

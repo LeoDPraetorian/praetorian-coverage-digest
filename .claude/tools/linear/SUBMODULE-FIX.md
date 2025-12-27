@@ -36,8 +36,8 @@ Created a path resolver utility that detects the super-repository root using git
  */
 export function getSuperRepoRoot(): string {
   // Try to get super-project working tree (returns empty if not in submodule)
-  const superRepoRoot = execSync('git rev-parse --show-superproject-working-tree', {
-    encoding: 'utf-8'
+  const superRepoRoot = execSync("git rev-parse --show-superproject-working-tree", {
+    encoding: "utf-8",
   }).trim();
 
   if (superRepoRoot) {
@@ -46,8 +46,8 @@ export function getSuperRepoRoot(): string {
   }
 
   // Not in a submodule, get current repo root
-  const currentRepoRoot = execSync('git rev-parse --show-toplevel', {
-    encoding: 'utf-8'
+  const currentRepoRoot = execSync("git rev-parse --show-toplevel", {
+    encoding: "utf-8",
   }).trim();
 
   return currentRepoRoot;
@@ -63,6 +63,7 @@ export function resolveSuperRepoPath(...pathSegments: string[]): string {
 ```
 
 **Key features**:
+
 - Uses `git rev-parse --show-superproject-working-tree` to detect super-repo
 - Falls back to `git rev-parse --show-toplevel` for non-submodule repos
 - Caches result for performance
@@ -84,10 +85,10 @@ import { resolveSuperRepoPath } from './path-resolver';
 **3. Config Loader Update** (`.claude/tools/config/config-loader.ts`)
 
 ```typescript
-import { resolveSuperRepoPath } from './lib/path-resolver';
+import { resolveSuperRepoPath } from "./lib/path-resolver";
 
 export function getToolConfig<T = any>(toolName: string): T {
-  const configPath = resolveSuperRepoPath('.claude', 'tools', 'config', 'credentials.json');
+  const configPath = resolveSuperRepoPath(".claude", "tools", "config", "credentials.json");
   // ... rest of function
 }
 ```
@@ -104,6 +105,7 @@ npx tsx .claude/tools/config/lib/test-path-resolver.ts
 ```
 
 **Output**:
+
 ```
 📍 Test 1: Super-repo root detection
 ------------------------------------------------------------
@@ -129,6 +131,7 @@ npx tsx ../../.claude/tools/config/lib/test-path-resolver.ts
 ```
 
 **Output**:
+
 ```
 📍 Test 1: Super-repo root detection
 ------------------------------------------------------------
@@ -176,18 +179,23 @@ Wrapper Status:
 ## Benefits
 
 ### 1. **Seamless Submodule Development**
+
 Developers can work from any directory in the super-repository without path issues.
 
 ### 2. **No Configuration Required**
+
 The path resolver automatically detects the super-repo using git - zero configuration.
 
 ### 3. **Backward Compatible**
+
 Existing workflows from super-repo root continue to work unchanged.
 
 ### 4. **Graceful Degradation**
+
 If git is unavailable, falls back to filesystem traversal and `process.cwd()`.
 
 ### 5. **Performance**
+
 Result is cached after first call, avoiding repeated git executions.
 
 ---
@@ -197,16 +205,20 @@ Result is cached after first call, avoiding repeated git executions.
 ### Git Detection Strategy
 
 1. **Check if in submodule**:
+
    ```bash
    git rev-parse --show-superproject-working-tree
    ```
+
    - If returns path → in submodule, use that path
    - If returns empty → not in submodule, continue
 
 2. **Get current repo root**:
+
    ```bash
    git rev-parse --show-toplevel
    ```
+
    - Returns root of current git repository
 
 3. **Fallback (if git unavailable)**:
@@ -217,8 +229,9 @@ Result is cached after first call, avoiding repeated git executions.
 ### Example Resolution
 
 **From submodule** (`modules/chariot/`):
+
 ```typescript
-resolveSuperRepoPath('.claude', 'tools', 'linear', 'get-issue.ts')
+resolveSuperRepoPath(".claude", "tools", "linear", "get-issue.ts");
 
 // Process:
 // 1. git rev-parse --show-superproject-working-tree → '/Users/.../chariot-development-platform'
@@ -227,8 +240,9 @@ resolveSuperRepoPath('.claude', 'tools', 'linear', 'get-issue.ts')
 ```
 
 **From super-repo root**:
+
 ```typescript
-resolveSuperRepoPath('.claude', 'tools', 'linear', 'get-issue.ts')
+resolveSuperRepoPath(".claude", "tools", "linear", "get-issue.ts");
 
 // Process:
 // 1. git rev-parse --show-superproject-working-tree → ''
@@ -269,14 +283,14 @@ resolveSuperRepoPath('.claude', 'tools', 'linear', 'get-issue.ts')
 
 ```typescript
 // ❌ WRONG: Hardcoded or relative paths
-const configPath = './.claude/tools/config/credentials.json';
-const toolPath = './modules/chariot/backend/...';
+const configPath = "./.claude/tools/config/credentials.json";
+const toolPath = "./modules/chariot/backend/...";
 
 // ✅ CORRECT: Use path resolver
-import { resolveSuperRepoPath } from './../config/lib/path-resolver';
+import { resolveSuperRepoPath } from "./../config/lib/path-resolver";
 
-const configPath = resolveSuperRepoPath('.claude', 'tools', 'config', 'credentials.json');
-const toolPath = resolveSuperRepoPath('modules', 'chariot', 'backend', '...');
+const configPath = resolveSuperRepoPath(".claude", "tools", "config", "credentials.json");
+const toolPath = resolveSuperRepoPath("modules", "chariot", "backend", "...");
 ```
 
 ### For MCP Server Configurations
@@ -341,6 +355,7 @@ When adding new tools or MCP wrappers, verify they work from both locations:
 ### 1. **Automatic Path Resolution in More Tools**
 
 Apply path resolver pattern to:
+
 - Skill scripts that reference files
 - Hook scripts that need super-repo context
 - Custom commands that operate on multiple modules
@@ -356,6 +371,7 @@ export CHARIOT_ROOT=/Users/.../chariot-development-platform
 ### 3. **Performance Optimization**
 
 Consider caching strategy:
+
 - Write super-repo root to `.claude/.cache/repo-root`
 - Use cached value if exists, validate with git
 - Reduces git calls to near-zero

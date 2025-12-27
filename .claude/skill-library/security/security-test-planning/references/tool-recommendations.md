@@ -23,6 +23,7 @@ semgrep scan --config custom-rules/ .
 ```
 
 **Custom Rule Template**:
+
 ```yaml
 rules:
   - id: dynamodb-filter-injection
@@ -59,6 +60,7 @@ codeql query run queries/injection.ql --database=my-db
 ```
 
 **Recommended Query Suites**:
+
 - `codeql/go-queries:Security/CWE` - Go security issues
 - `codeql/javascript-queries:Security` - JS/TS issues
 - `codeql/python-queries:Security` - Python issues
@@ -110,6 +112,7 @@ nuclei -u https://target.com -t custom-templates/
 ```
 
 **Custom Template for IDOR**:
+
 ```yaml
 id: idor-asset-access
 info:
@@ -138,6 +141,7 @@ http:
 **Best for**: Manual testing, complex auth flows, detailed inspection
 
 **Configuration for Threat Model Testing**:
+
 1. Import target scope from DAST recommendations
 2. Configure authentication (Project Options → Sessions)
 3. Run active scan on priority endpoints
@@ -233,15 +237,15 @@ govulncheck ./...
 
 ## Tool Selection Matrix
 
-| Requirement | Recommended Tools |
-|-------------|-------------------|
-| Quick scan | semgrep, trivy |
-| Deep analysis | CodeQL, Burp Suite |
-| Custom rules | semgrep, Nuclei |
+| Requirement       | Recommended Tools   |
+| ----------------- | ------------------- |
+| Quick scan        | semgrep, trivy      |
+| Deep analysis     | CodeQL, Burp Suite  |
+| Custom rules      | semgrep, Nuclei     |
 | CI/CD integration | semgrep, trivy, ZAP |
-| Go-specific | gosec, govulncheck |
-| API testing | Nuclei, ZAP |
-| Manual testing | Burp Suite |
+| Go-specific       | gosec, govulncheck  |
+| API testing       | Nuclei, ZAP         |
+| Manual testing    | Burp Suite          |
 
 ## CI/CD Integration Examples
 
@@ -268,8 +272,8 @@ jobs:
       - name: Run Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          severity: 'HIGH,CRITICAL'
+          scan-type: "fs"
+          severity: "HIGH,CRITICAL"
 ```
 
 ### Pre-commit Hooks
@@ -281,7 +285,7 @@ repos:
     rev: v1.0.0
     hooks:
       - id: semgrep
-        args: ['--config', 'p/security-audit']
+        args: ["--config", "p/security-audit"]
 
   - repo: https://github.com/securego/gosec
     rev: v2.18.0
@@ -291,15 +295,16 @@ repos:
 
 ## Payload Libraries
 
-| Category | Source |
-|----------|--------|
-| SQL Injection | SecLists/Fuzzing/SQLi |
-| XSS | SecLists/Fuzzing/XSS |
-| NoSQL Injection | Custom DynamoDB/MongoDB payloads |
-| Path Traversal | SecLists/Fuzzing/LFI |
+| Category          | Source                             |
+| ----------------- | ---------------------------------- |
+| SQL Injection     | SecLists/Fuzzing/SQLi              |
+| XSS               | SecLists/Fuzzing/XSS               |
+| NoSQL Injection   | Custom DynamoDB/MongoDB payloads   |
+| Path Traversal    | SecLists/Fuzzing/LFI               |
 | Command Injection | SecLists/Fuzzing/command-injection |
 
 **SecLists Installation**:
+
 ```bash
 git clone https://github.com/danielmiessler/SecLists.git
 ```

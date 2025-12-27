@@ -1,0 +1,29 @@
+# frontend-developer Changelog
+
+## 2025-12-27
+
+### Changed
+- Added `enforcing-react-19-conventions` to Tier 1 (Always Read)
+  - Ensures React 19 code compliance on every task
+  - Provides systematic reviewer checklist, required patterns, and anti-patterns detection
+  - Line 31: Read call added to Tier 1 sequence
+- Added `using-shadcn-ui` to Tier 3 Technology Triggers table
+  - Trigger: "shadcn/ui components, Radix primitives"
+  - Enables agent to install and customize shadcn/ui components (critical for Chariot platform)
+  - Line 66: Trigger row added
+- Added `using-context-api` to Tier 3 Technology Triggers table
+  - Trigger: "Context API, global state, providers"
+  - Provides React 19.2+ Context patterns and decision framework for Context vs Zustand/Query
+  - Line 59: Trigger row added
+- **Rationale**: Added 3 skills identified through semantic skill-finding analysis (enforcing-react-19-conventions 95% relevance, using-shadcn-ui 90%, using-context-api 85%)
+
+## 2025-12-26
+
+### Changed
+- Added `securing-react-implementations` to Tier 3 Technology Triggers table
+  - Trigger: "Security, XSS prevention, input sanitize"
+  - Enables agent to load security patterns when working on frontend security concerns
+- Added `integrating-tanstack-components` to Tier 3 Technology Triggers table
+  - Trigger: "TanStack integration, component coordination"
+  - Enables agent to load integration patterns when coordinating TanStack components
+- Note: `enforcing-information-architecture` was already present in Tier 3 table (line 59)

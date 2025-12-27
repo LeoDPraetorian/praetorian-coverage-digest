@@ -28,6 +28,7 @@ What is the primary purpose?
 ### 1. architecture
 
 **When to use**:
+
 - Designing system architecture
 - Making architectural decisions (patterns, technologies, approaches)
 - Planning major refactoring
@@ -37,6 +38,7 @@ What is the primary purpose?
 **NOT for**: Implementation (use development), research (use research)
 
 **Configuration**:
+
 - **permissionMode**: `plan` (read-only during design phase)
 - **Model**: `opus` (needs strong reasoning)
 - **Tools**: Read, Grep, Glob, Bash, TodoWrite, WebFetch, WebSearch
@@ -44,6 +46,7 @@ What is the primary purpose?
 - **Color**: `blue`
 
 **Examples**:
+
 - frontend-architect: Component hierarchy design
 - backend-architect: API architecture decisions
 - security-architect: Security architecture planning
@@ -53,6 +56,7 @@ What is the primary purpose?
 ### 2. development
 
 **When to use**:
+
 - Implementing features
 - Writing code (React, Go, Python, etc.)
 - Fixing bugs
@@ -62,6 +66,7 @@ What is the primary purpose?
 **NOT for**: Design decisions (use architecture), testing (use testing)
 
 **Configuration**:
+
 - **permissionMode**: `default` (can modify files)
 - **Model**: `opus` or `sonnet` (sonnet for straightforward, opus for complex)
 - **Tools**: Read, Write, Edit, Bash, Grep, Glob, MultiEdit, TodoWrite
@@ -69,6 +74,7 @@ What is the primary purpose?
 - **Color**: `green`
 
 **Examples**:
+
 - frontend-developer: React/TypeScript implementation
 - backend-developer: Go services and APIs
 - python-developer: Python CLIs and Lambda functions
@@ -78,6 +84,7 @@ What is the primary purpose?
 ### 3. testing
 
 **When to use**:
+
 - Writing unit tests
 - Writing integration tests
 - Writing E2E tests
@@ -87,6 +94,7 @@ What is the primary purpose?
 **NOT for**: Implementation (use development), test planning (use architecture)
 
 **Configuration**:
+
 - **permissionMode**: `default` (writes test files)
 - **Model**: `sonnet` (testing is straightforward)
 - **Tools**: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
@@ -94,8 +102,9 @@ What is the primary purpose?
 - **Color**: `yellow`
 
 **Examples**:
+
 - frontend-browser-test-engineer: Playwright E2E tests
-- backend-unit-test-engineer: Go unit tests
+- backend-tester: Go unit tests
 - frontend-unit-test-engineer: Vitest + React Testing Library
 
 ---
@@ -103,6 +112,7 @@ What is the primary purpose?
 ### 4. quality
 
 **When to use**:
+
 - Code review
 - Auditing for compliance
 - Design review
@@ -112,6 +122,7 @@ What is the primary purpose?
 **NOT for**: Fixing issues (use development), testing (use testing)
 
 **Configuration**:
+
 - **permissionMode**: `default` (but shouldn't modify files - read-only by convention)
 - **Model**: `sonnet` (review is analytical)
 - **Tools**: Read, Grep, Glob, Bash, TodoWrite (NO Write/Edit - read-only)
@@ -119,6 +130,7 @@ What is the primary purpose?
 - **Color**: `purple`
 
 **Examples**:
+
 - frontend-reviewer: React code quality review
 - backend-reviewer: Go code quality review
 - uiux-designer: Design and accessibility review
@@ -128,6 +140,7 @@ What is the primary purpose?
 ### 5. analysis
 
 **When to use**:
+
 - Security analysis
 - Complexity assessment
 - Performance analysis
@@ -137,6 +150,7 @@ What is the primary purpose?
 **NOT for**: Implementation (use development), recommendations (analysis identifies, architecture recommends)
 
 **Configuration**:
+
 - **permissionMode**: `plan` (read-only analysis)
 - **Model**: `sonnet` or `opus` (opus for complex analysis)
 - **Tools**: Read, Grep, Glob, Bash, TodoWrite, WebFetch
@@ -144,6 +158,7 @@ What is the primary purpose?
 - **Color**: `orange`
 
 **Examples**:
+
 - backend-security-reviewer: Security vulnerability analysis
 - frontend-security-reviewer: XSS, auth, authorization analysis
 - complexity-assessor: Cyclomatic complexity assessment
@@ -153,6 +168,7 @@ What is the primary purpose?
 ### 6. research
 
 **When to use**:
+
 - Web research
 - Documentation lookup
 - Investigating best practices
@@ -162,6 +178,7 @@ What is the primary purpose?
 **NOT for**: Implementation (use development), design (use architecture)
 
 **Configuration**:
+
 - **permissionMode**: `plan` (read-only research)
 - **Model**: `sonnet` (research is information gathering)
 - **Tools**: Read, Grep, Glob, TodoWrite, WebFetch, WebSearch
@@ -169,6 +186,7 @@ What is the primary purpose?
 - **Color**: `cyan`
 
 **Examples**:
+
 - web-research-specialist: General web research
 - code-pattern-analyzer: Codebase pattern research
 - (Most research is handled by Explore agent - only create custom if specialized need)
@@ -178,6 +196,7 @@ What is the primary purpose?
 ### 7. orchestrator
 
 **When to use**:
+
 - Coordinating multiple agents
 - Complex multi-step workflows
 - Task decomposition and delegation
@@ -187,6 +206,7 @@ What is the primary purpose?
 **NOT for**: Direct implementation (delegate to development), simple tasks (use specific agent directly)
 
 **Configuration**:
+
 - **permissionMode**: `default` (can delegate with Task tool)
 - **Model**: `opus` (coordination needs strong reasoning)
 - **Tools**: Task, AskUserQuestion, Read, TodoWrite
@@ -194,6 +214,7 @@ What is the primary purpose?
 - **Color**: `magenta`
 
 **Examples**:
+
 - hierarchical-coordinator: Tree-based task delegation
 - universal-coordinator: General multi-agent orchestration
 - mesh-coordinator: Peer-to-peer agent coordination
@@ -203,6 +224,7 @@ What is the primary purpose?
 ### 8. mcp-tools
 
 **When to use**:
+
 - Specialized access to MCP tool wrappers
 - Service-specific expertise (Linear, GitHub, Praetorian CLI)
 - MCP workflow orchestration
@@ -211,6 +233,7 @@ What is the primary purpose?
 **NOT for**: General development (use development), unless service-specific
 
 **Configuration**:
+
 - **permissionMode**: `default` (executes MCP wrappers)
 - **Model**: `sonnet` (MCP usage is straightforward)
 - **Tools**: Bash (for npx tsx), Read, TodoWrite
@@ -218,6 +241,7 @@ What is the primary purpose?
 - **Color**: `teal`
 
 **Examples**:
+
 - praetorian-cli-expert: Chariot API operations
 - chromatic-test-engineer: Visual regression testing workflows
 - linear-expert: Linear issue management (hypothetical)
@@ -241,12 +265,14 @@ Example: Agent does research AND implementation
 ### "Agent type seems unclear"
 
 **Ask clarifying questions**:
+
 1. What is the main output? (Code? Design? Test? Report?)
 2. What tools does it primarily use? (Write/Edit? Read only? Task?)
 3. Does it modify files or just analyze?
 4. Is it making decisions or gathering information?
 
 **Answers determine type**:
+
 - Outputs code → development
 - Outputs design/decisions → architecture
 - Outputs tests → testing
@@ -261,11 +287,13 @@ Example: Agent does research AND implementation
 ### "Should this be plan or default permissionMode?"
 
 **Use `plan` for**:
+
 - architecture (design before implementation)
 - analysis (read-only assessment)
 - research (read-only information gathering)
 
 **Use `default` for**:
+
 - development (writes code)
 - testing (writes tests)
 - quality (reviews but convention is read-only)
@@ -281,11 +309,13 @@ Example: Agent does research AND implementation
 **Default**: `sonnet` (best balance)
 
 **Use `opus` for**:
+
 - architecture (complex reasoning about trade-offs)
 - orchestrator (complex coordination logic)
 - Complex development (if domain is highly specialized)
 
 **Use `haiku` for**:
+
 - Simple search/list operations (rare - most agents need reasoning)
 
 **Most agents**: `sonnet` or `opus`. Haiku is rare.
@@ -294,16 +324,16 @@ Example: Agent does research AND implementation
 
 ### "Which tools are required for each type?"
 
-| Type | Required Tools | Optional But Useful |
-|------|---------------|---------------------|
-| architecture | Read, Grep, Glob, Bash, TodoWrite | WebFetch, WebSearch |
-| development | Read, Write, Edit, Bash, TodoWrite | Grep, Glob, MultiEdit |
-| testing | Read, Write, Edit, Bash, TodoWrite | Grep, Glob |
-| quality | Read, Grep, Glob, Bash, TodoWrite | (NO Write/Edit) |
-| analysis | Read, Grep, Glob, Bash, TodoWrite | WebFetch |
-| research | Read, WebFetch, WebSearch, TodoWrite | Grep, Glob, Bash |
-| orchestrator | Task, AskUserQuestion, Read, TodoWrite | - |
-| mcp-tools | Bash, Read, TodoWrite | - |
+| Type         | Required Tools                         | Optional But Useful   |
+| ------------ | -------------------------------------- | --------------------- |
+| architecture | Read, Grep, Glob, Bash, TodoWrite      | WebFetch, WebSearch   |
+| development  | Read, Write, Edit, Bash, TodoWrite     | Grep, Glob, MultiEdit |
+| testing      | Read, Write, Edit, Bash, TodoWrite     | Grep, Glob            |
+| quality      | Read, Grep, Glob, Bash, TodoWrite      | (NO Write/Edit)       |
+| analysis     | Read, Grep, Glob, Bash, TodoWrite      | WebFetch              |
+| research     | Read, WebFetch, WebSearch, TodoWrite   | Grep, Glob, Bash      |
+| orchestrator | Task, AskUserQuestion, Read, TodoWrite | -                     |
+| mcp-tools    | Bash, Read, TodoWrite                  | -                     |
 
 **All types include TodoWrite** (tracking is universal).
 
@@ -311,33 +341,48 @@ Example: Agent does research AND implementation
 
 ### "Which gateway skill for each type?"
 
-| Type | Gateway Skill | When |
-|------|--------------|------|
-| architecture | gateway-backend OR gateway-frontend | Based on domain |
-| development | gateway-backend OR gateway-frontend | Based on language/domain |
-| testing | gateway-testing | Always |
-| quality | Domain-specific gateway | If reviewing specific domain |
-| analysis | gateway-security | If security analysis |
-| research | (none typically) | Unless domain-specific |
-| orchestrator | (none typically) | Uses plan/execute skills instead |
-| mcp-tools | gateway-mcp-tools | Always (mandatory) |
+| Type         | Gateway Skill                       | When                             |
+| ------------ | ----------------------------------- | -------------------------------- |
+| architecture | gateway-backend OR gateway-frontend | Based on domain                  |
+| development  | gateway-backend OR gateway-frontend | Based on language/domain         |
+| testing      | gateway-testing                     | Always                           |
+| quality      | Domain-specific gateway             | If reviewing specific domain     |
+| analysis     | gateway-security                    | If security analysis             |
+| research     | (none typically)                    | Unless domain-specific           |
+| orchestrator | (none typically)                    | Uses plan/execute skills instead |
+| mcp-tools    | gateway-mcp-tools                   | Always (mandatory)               |
 
 **Rule**: If agent works in specific domain (frontend, backend, security, testing) → include appropriate gateway.
 
 ---
 
-## Type-Specific Mandatory Skills
+## Universal Tier 1 Skills (MANDATORY for ALL agents)
 
-| Type | Always Include | Often Include | Rarely |
-|------|----------------|---------------|--------|
-| architecture | brainstorming, calibrating-time-estimates, verifying-before-completion | debugging-systematically, writing-plans | - |
-| development | developing-with-tdd, debugging-systematically, verifying-before-completion, calibrating-time-estimates | - | - |
-| testing | developing-with-tdd, verifying-before-completion | - | debugging-systematically |
-| quality | debugging-systematically, verifying-before-completion | - | - |
-| analysis | debugging-systematically | - | verifying-before-completion |
-| research | (none typically) | - | - |
-| orchestrator | writing-plans, executing-plans, dispatching-parallel-agents | - | verifying-before-completion |
-| mcp-tools | gateway-mcp-tools | - | - |
+**Every agent MUST include these two skills in frontmatter AND Tier 1:**
+
+| Skill | Purpose | Why Mandatory |
+|-------|---------|---------------|
+| `verifying-before-completion` | Final validation before claiming complete | Prevents incomplete work, forces verification |
+| `calibrating-time-estimates` | Prevent time estimation errors | AI estimates are 10-24x too high without calibration |
+
+**No exceptions.** These skills are required for ALL agent types.
+
+---
+
+## Type-Specific Additional Skills
+
+| Type         | Always Include (+ universal skills)                                        | Often Include                           | Rarely                   |
+| ------------ | -------------------------------------------------------------------------- | --------------------------------------- | ------------------------ |
+| architecture | brainstorming                                                              | debugging-systematically, writing-plans | -                        |
+| development  | developing-with-tdd, debugging-systematically                              | -                                       | -                        |
+| testing      | developing-with-tdd                                                        | -                                       | debugging-systematically |
+| quality      | debugging-systematically                                                   | -                                       | -                        |
+| analysis     | debugging-systematically                                                   | -                                       | -                        |
+| research     | -                                                                          | -                                       | -                        |
+| orchestrator | writing-plans, executing-plans, dispatching-parallel-agents                | -                                       | -                        |
+| mcp-tools    | gateway-mcp-tools                                                          | -                                       | -                        |
+
+**Note**: Every type above ALSO includes `verifying-before-completion` and `calibrating-time-estimates` from the universal requirements.
 
 **Note**: developing-with-tdd is for agents that WRITE code (development, testing). Not for read-only agents.
 

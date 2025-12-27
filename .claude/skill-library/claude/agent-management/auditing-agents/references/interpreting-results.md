@@ -82,6 +82,7 @@ Found 1 critical issue(s)
 ```
 
 **Action:**
+
 1. Read the error report carefully
 2. Note which agent(s) have issues
 3. Note the specific problems (line numbers provided)
@@ -97,6 +98,7 @@ Found 1 critical issue(s)
 ```
 
 **Causes:**
+
 - Agent name typo
 - Agent doesn't exist
 - Wrong directory (not in repo root)
@@ -104,4 +106,3 @@ Found 1 critical issue(s)
 **Action:** Verify agent exists and name is correct.
 
 ---
-

@@ -28,6 +28,7 @@
 **Purpose**: Comprehensive list of ALL identified threats with STRIDE categorization and risk scoring.
 
 **Schema**:
+
 ```typescript
 interface ThreatModel {
   sessionId: string;
@@ -58,8 +59,8 @@ interface ThreatModel {
 
 interface ThreatModelEntry {
   // Identification
-  id: string;                    // e.g., "THREAT-001"
-  component: string;             // From Phase 1 components
+  id: string; // e.g., "THREAT-001"
+  component: string; // From Phase 1 components
 
   // STRIDE categorization
   strideCategory:
@@ -71,27 +72,27 @@ interface ThreatModelEntry {
     | "ElevationOfPrivilege";
 
   // Threat details
-  threat: string;                // Specific threat description
-  threatActor: string;           // From PASTA: external attacker, insider, etc.
-  attackVector: string;          // How the attack is executed
-  attackTree?: string[];         // Attack path steps
+  threat: string; // Specific threat description
+  threatActor: string; // From PASTA: external attacker, insider, etc.
+  attackVector: string; // How the attack is executed
+  attackTree?: string[]; // Attack path steps
 
   // DFD context (from Phase 1)
-  affectedDataFlows: string[];   // Which data flows are vulnerable
-  trustBoundariesCrossed: string[];  // Which boundaries are violated
+  affectedDataFlows: string[]; // Which data flows are vulnerable
+  trustBoundariesCrossed: string[]; // Which boundaries are violated
 
   // Controls assessment (from Phase 2)
-  existingControls: string[];    // Controls in place
-  controlGaps: string[];         // Missing or weak controls
+  existingControls: string[]; // Controls in place
+  controlGaps: string[]; // Missing or weak controls
 
   // Risk scoring (PASTA Stage 7)
   businessImpact: "Critical" | "High" | "Medium" | "Low";
   likelihood: "High" | "Medium" | "Low";
-  riskScore: number;             // 1-12 (Impact × Likelihood)
+  riskScore: number; // 1-12 (Impact × Likelihood)
 
   // Remediation
   recommendedControls: string[];
-  testingGuidance: string[];     // For Phase 4
+  testingGuidance: string[]; // For Phase 4
 }
 ```
 
@@ -99,7 +100,7 @@ See full schema with examples in this file (output-schemas.md lines 30-120)
 
 ---
 
-## 2. abuse-cases/*.json - Abuse Case Scenarios
+## 2. abuse-cases/\*.json - Abuse Case Scenarios
 
 **Files**: authentication-abuse.json, authorization-abuse.json, data-abuse.json, api-abuse.json
 
@@ -107,7 +108,7 @@ Contains detailed attack scenarios for HIGH/CRITICAL threats showing step-by-ste
 
 ---
 
-## 3. attack-trees/*.md - Attack Path Visualizations
+## 3. attack-trees/\*.md - Attack Path Visualizations
 
 **Files**: credential-theft.md, data-exfiltration.md, privilege-escalation.md
 

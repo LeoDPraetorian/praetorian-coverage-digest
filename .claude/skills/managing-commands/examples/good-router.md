@@ -25,6 +25,7 @@ skills: command-manager
 **ACTION:** Invoke the `skill-manager` skill.
 
 **Arguments:**
+
 - `operation`: "create"
 - `skillName`: $2 (Required)
 - `description`: $3 (Optional)
@@ -36,6 +37,7 @@ skills: command-manager
 **ACTION:** Invoke the `skill-manager` skill.
 
 **Arguments:**
+
 - `operation`: "audit"
 - `skillName`: $2 (Optional - omit for bulk audit)
 
@@ -46,6 +48,7 @@ skills: command-manager
 **ACTION:** Invoke the `skill-manager` skill.
 
 **Arguments:**
+
 - `operation`: "fix"
 - `skillName`: $2 (Required)
 - `dryRun`: true if $3 contains "--dry-run"
@@ -57,6 +60,7 @@ skills: command-manager
 **ACTION:** Invoke the `skill-manager` skill.
 
 **Arguments:**
+
 - `operation`: "search"
 - `query`: $2 (Required)
 
@@ -67,6 +71,7 @@ skills: command-manager
 **ACTION:** Invoke the `skill-manager` skill.
 
 **Arguments:**
+
 - `operation`: "list"
 
 **Output:** Display the tool output verbatim.
@@ -74,37 +79,37 @@ skills: command-manager
 ## Error Handling
 
 If $1 invalid or missing:
-  Explain valid subcommands: new, update, audit, fix, search, list
-  Show usage: /skill-manager <subcommand> [args]
+Explain valid subcommands: new, update, audit, fix, search, list
+Show usage: /skill-manager <subcommand> [args]
 ```
 
 ## Why This Is Correct
 
 ### ✅ Frontmatter
 
-| Element | Status | Notes |
-|---------|--------|-------|
-| description | ✅ | Under 120 chars, clear |
-| argument-hint | ✅ | Documents all args |
-| allowed-tools | ✅ | Only Skill, AskUserQuestion |
-| skills | ✅ | Specifies backing skill |
+| Element       | Status | Notes                       |
+| ------------- | ------ | --------------------------- |
+| description   | ✅     | Under 120 chars, clear      |
+| argument-hint | ✅     | Documents all args          |
+| allowed-tools | ✅     | Only Skill, AskUserQuestion |
+| skills        | ✅     | Specifies backing skill     |
 
 ### ✅ Instructions
 
-| Element | Status | Notes |
-|---------|--------|-------|
-| Imperative language | ✅ | "Invoke the skill" |
-| Argument mapping | ✅ | Explicit $1 → operation |
-| Verbatim output | ✅ | Every action has directive |
-| Error handling | ✅ | Invalid input handled |
+| Element             | Status | Notes                      |
+| ------------------- | ------ | -------------------------- |
+| Imperative language | ✅     | "Invoke the skill"         |
+| Argument mapping    | ✅     | Explicit $1 → operation    |
+| Verbatim output     | ✅     | Every action has directive |
+| Error handling      | ✅     | Invalid input handled      |
 
 ### ✅ Structure
 
-| Element | Status | Notes |
-|---------|--------|-------|
-| Line count | ✅ | Under 50 lines |
-| Single responsibility | ✅ | Routes to one skill |
-| Clear sections | ✅ | Dispatch, Error Handling |
+| Element               | Status | Notes                    |
+| --------------------- | ------ | ------------------------ |
+| Line count            | ✅     | Under 50 lines           |
+| Single responsibility | ✅     | Routes to one skill      |
+| Clear sections        | ✅     | Dispatch, Error Handling |
 
 ## Audit Result
 

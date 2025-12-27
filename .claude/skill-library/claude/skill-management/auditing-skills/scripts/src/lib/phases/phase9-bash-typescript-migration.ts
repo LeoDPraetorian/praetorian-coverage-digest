@@ -175,33 +175,19 @@ export class Phase9BashTypeScriptMigration {
       byType[script.type].push({ path: script.path, reason: script.reason });
     }
 
-    // Main issue: Non-TypeScript scripts detected (WARNING level)
-    issues.push({
-      severity: 'WARNING',
-      message: `${scripts.length} non-TypeScript script(s) detected - migrate to TypeScript`,
-      autoFixable: false,
-    });
+    // Build context array with all script details
+    const context: string[] = [];
 
-    // List each script type with specific reason
+    // Add each type with its scripts
     for (const [type, typeScripts] of Object.entries(byType)) {
       const reason = typeScripts[0].reason;
-      issues.push({
-        severity: 'WARNING',
-        message: `  ${type} (${typeScripts.length}): ${reason}`,
-        autoFixable: false,
-      });
-
-      // List individual files
+      context.push(`${type} (${typeScripts.length}): ${reason}`);
       for (const script of typeScripts) {
-        issues.push({
-          severity: 'INFO',
-          message: `    → ${script.path}`,
-          autoFixable: false,
-        });
+        context.push(`  → ${script.path}`);
       }
     }
 
-    // For shell scripts, also analyze complexity
+    // For shell scripts, add complexity analysis
     const shellScripts = scripts.filter(s => s.type === 'Shell');
     if (shellScripts.length > 0) {
       const scriptAnalyses = await Promise.all(
@@ -217,39 +203,22 @@ export class Phase9BashTypeScriptMigration {
       const complexScripts = scriptAnalyses.filter(s => s.complexity === 'complex');
 
       if (simpleScripts.length > 0) {
-        issues.push({
-          severity: 'INFO',
-          message: `  Shell migration effort - Simple (${simpleScripts.length}): ${simpleScripts.map(s => s.script).join(', ')}`,
-          autoFixable: false,
-        });
+        context.push(`Migration effort - Simple (${simpleScripts.length}): ${simpleScripts.map(s => s.script).join(', ')}`);
       }
       if (moderateScripts.length > 0) {
-        issues.push({
-          severity: 'INFO',
-          message: `  Shell migration effort - Moderate (${moderateScripts.length}): ${moderateScripts.map(s => s.script).join(', ')}`,
-          autoFixable: false,
-        });
+        context.push(`Migration effort - Moderate (${moderateScripts.length}): ${moderateScripts.map(s => s.script).join(', ')}`);
       }
       if (complexScripts.length > 0) {
-        issues.push({
-          severity: 'INFO',
-          message: `  Shell migration effort - Complex (${complexScripts.length}): ${complexScripts.map(s => s.script).join(', ')}`,
-          autoFixable: false,
-        });
+        context.push(`Migration effort - Complex (${complexScripts.length}): ${complexScripts.map(s => s.script).join(', ')}`);
       }
     }
 
-    // Migration guide reference
+    // Single consolidated issue with all details in context
     issues.push({
-      severity: 'INFO',
-      message: 'Migration guide: See references/npm-workspace-pattern.md for TypeScript CLI setup',
-      autoFixable: false,
-    });
-
-    // Why TypeScript
-    issues.push({
-      severity: 'INFO',
-      message: 'Why TypeScript: Cross-platform, vitest testing infrastructure, type safety, consistent tooling',
+      severity: 'WARNING',
+      message: `${scripts.length} non-TypeScript script(s) detected - migrate to TypeScript`,
+      recommendation: 'See references/npm-workspace-pattern.md for TypeScript CLI setup. Benefits: cross-platform, vitest testing, type safety',
+      context,
       autoFixable: false,
     });
 

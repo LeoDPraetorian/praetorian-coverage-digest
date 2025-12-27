@@ -25,19 +25,16 @@ export class Phase4BrokenLinks {
     }
 
     if (brokenLinks.length > 0) {
+      // Build context with all broken links
+      const context = brokenLinks.map(link => `[${link.text}](${link.path})`);
+
       issues.push({
         severity: 'WARNING',
         message: `${brokenLinks.length} broken reference link(s)`,
+        recommendation: 'Fix broken links or remove references to non-existent files',
+        context,
         autoFixable: true,
       });
-
-      for (const link of brokenLinks) {
-        issues.push({
-          severity: 'INFO',
-          message: `Broken: [${link.text}](${link.path})`,
-          autoFixable: true,
-        });
-      }
     }
 
     return issues;

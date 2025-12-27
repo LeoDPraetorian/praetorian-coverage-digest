@@ -6,15 +6,15 @@ Comprehensive guide to testing CLI exit codes correctly.
 
 ### POSIX Standard Exit Codes
 
-| Code | Meaning | When to Use |
-|------|---------|-------------|
-| 0 | Success | Command completed successfully |
-| 1 | General Error | Catchall for general errors |
-| 2 | Misuse of Command | Invalid arguments or options |
-| 126 | Command Cannot Execute | Permission problem or not executable |
-| 127 | Command Not Found | Command not found in PATH |
-| 128+N | Fatal Error Signal N | Process terminated by signal N |
-| 130 | Ctrl+C Termination | Process terminated by SIGINT |
+| Code  | Meaning                | When to Use                          |
+| ----- | ---------------------- | ------------------------------------ |
+| 0     | Success                | Command completed successfully       |
+| 1     | General Error          | Catchall for general errors          |
+| 2     | Misuse of Command      | Invalid arguments or options         |
+| 126   | Command Cannot Execute | Permission problem or not executable |
+| 127   | Command Not Found      | Command not found in PATH            |
+| 128+N | Fatal Error Signal N   | Process terminated by signal N       |
+| 130   | Ctrl+C Termination     | Process terminated by SIGINT         |
 
 ### Custom Application Exit Codes
 
@@ -38,24 +38,24 @@ enum ExitCode {
 ### Basic Exit Code Testing
 
 ```typescript
-describe('Exit Code Tests', () => {
-  test('success returns 0', () => {
-    const { code } = runCLI('status');
+describe("Exit Code Tests", () => {
+  test("success returns 0", () => {
+    const { code } = runCLI("status");
     expect(code).toBe(0);
   });
 
-  test('general error returns 1', () => {
-    const { code } = runCLI('fail-command');
+  test("general error returns 1", () => {
+    const { code } = runCLI("fail-command");
     expect(code).toBe(1);
   });
 
-  test('invalid argument returns 2', () => {
-    const { code } = runCLI('deploy --invalid-env unknown');
+  test("invalid argument returns 2", () => {
+    const { code } = runCLI("deploy --invalid-env unknown");
     expect(code).toBe(2);
   });
 
-  test('command not found returns 127', () => {
-    const { code } = runCLI('nonexistent-command');
+  test("command not found returns 127", () => {
+    const { code } = runCLI("nonexistent-command");
     expect(code).toBe(127);
   });
 });
@@ -64,37 +64,37 @@ describe('Exit Code Tests', () => {
 ### Specific Error Conditions
 
 ```typescript
-describe('Specific Exit Codes', () => {
-  test('configuration error', () => {
-    const { code, stderr } = runCLI('deploy production');
+describe("Specific Exit Codes", () => {
+  test("configuration error", () => {
+    const { code, stderr } = runCLI("deploy production");
     expect(code).toBe(3); // CONFIG_ERROR
-    expect(stderr).toContain('configuration');
+    expect(stderr).toContain("configuration");
   });
 
-  test('network error', () => {
+  test("network error", () => {
     // Mock network failure
-    const { code, stderr } = runCLI('fetch --url https://unreachable.example.com');
+    const { code, stderr } = runCLI("fetch --url https://unreachable.example.com");
     expect(code).toBe(4); // NETWORK_ERROR
-    expect(stderr).toContain('network');
+    expect(stderr).toContain("network");
   });
 
-  test('authentication error', () => {
-    const { code, stderr } = runCLI('login --token invalid');
+  test("authentication error", () => {
+    const { code, stderr } = runCLI("login --token invalid");
     expect(code).toBe(5); // AUTH_ERROR
-    expect(stderr).toContain('authentication');
+    expect(stderr).toContain("authentication");
   });
 
-  test('resource not found', () => {
-    const { code, stderr } = runCLI('get resource-123');
+  test("resource not found", () => {
+    const { code, stderr } = runCLI("get resource-123");
     expect(code).toBe(6); // NOT_FOUND
-    expect(stderr).toContain('not found');
+    expect(stderr).toContain("not found");
   });
 
-  test('resource already exists', () => {
-    runCLI('create my-resource');
-    const { code, stderr } = runCLI('create my-resource');
+  test("resource already exists", () => {
+    runCLI("create my-resource");
+    const { code, stderr } = runCLI("create my-resource");
     expect(code).toBe(7); // ALREADY_EXISTS
-    expect(stderr).toContain('already exists');
+    expect(stderr).toContain("already exists");
   });
 });
 ```
@@ -102,16 +102,16 @@ describe('Specific Exit Codes', () => {
 ### Testing Exit Code Consistency
 
 ```typescript
-describe('Exit Code Consistency', () => {
+describe("Exit Code Consistency", () => {
   const errorScenarios = [
-    { args: 'deploy', expectedCode: 2, reason: 'missing required argument' },
-    { args: 'deploy --env invalid', expectedCode: 2, reason: 'invalid environment' },
-    { args: 'config get missing', expectedCode: 6, reason: 'config key not found' },
-    { args: 'unknown-cmd', expectedCode: 127, reason: 'command not found' },
+    { args: "deploy", expectedCode: 2, reason: "missing required argument" },
+    { args: "deploy --env invalid", expectedCode: 2, reason: "invalid environment" },
+    { args: "config get missing", expectedCode: 6, reason: "config key not found" },
+    { args: "unknown-cmd", expectedCode: 127, reason: "command not found" },
   ];
 
   test.each(errorScenarios)(
-    'should return exit code $expectedCode for $reason',
+    "should return exit code $expectedCode for $reason",
     ({ args, expectedCode }) => {
       const { code } = runCLI(args);
       expect(code).toBe(expectedCode);
@@ -227,8 +227,8 @@ class TestCustomExitCodes:
 ### Bash Script Exit Code Testing
 
 ```typescript
-describe('Script Exit Codes', () => {
-  test('should respect shell exit codes', () => {
+describe("Script Exit Codes", () => {
+  test("should respect shell exit codes", () => {
     // Test that CLI properly exits with script error codes
     const script = `
       #!/bin/bash
@@ -240,14 +240,14 @@ describe('Script Exit Codes', () => {
       echo "Deployment succeeded"
     `;
 
-    const { code, stdout } = execSync(script, { encoding: 'utf8' });
+    const { code, stdout } = execSync(script, { encoding: "utf8" });
     expect(code).toBe(0);
-    expect(stdout).toContain('Deployment succeeded');
+    expect(stdout).toContain("Deployment succeeded");
   });
 
-  test('should propagate errors in pipelines', () => {
+  test("should propagate errors in pipelines", () => {
     const { code } = execSync(`${CLI_PATH} invalid | tee output.log`, {
-      encoding: 'utf8',
+      encoding: "utf8",
     });
     expect(code).not.toBe(0);
   });
@@ -301,11 +301,11 @@ def handle_error(error: Exception) -> int:
 ### 3. Test Exit Codes with Error Messages
 
 ```typescript
-test('exit code matches error type', () => {
+test("exit code matches error type", () => {
   const errorCases = [
-    { args: 'deploy', expectedCode: 2, expectedMsg: 'missing required argument' },
-    { args: 'login --token bad', expectedCode: 5, expectedMsg: 'authentication failed' },
-    { args: 'get missing-id', expectedCode: 6, expectedMsg: 'not found' },
+    { args: "deploy", expectedCode: 2, expectedMsg: "missing required argument" },
+    { args: "login --token bad", expectedCode: 5, expectedMsg: "authentication failed" },
+    { args: "get missing-id", expectedCode: 6, expectedMsg: "not found" },
   ];
 
   errorCases.forEach(({ args, expectedCode, expectedMsg }) => {
@@ -337,13 +337,13 @@ def test_version_returns_success(runner):
 ```typescript
 // ❌ Wrong - using 0 for errors
 if (error) {
-  console.error('Error occurred');
+  console.error("Error occurred");
   process.exit(0); // Should be non-zero!
 }
 
 // ✅ Correct - using non-zero for errors
 if (error) {
-  console.error('Error occurred');
+  console.error("Error occurred");
   process.exit(1);
 }
 ```

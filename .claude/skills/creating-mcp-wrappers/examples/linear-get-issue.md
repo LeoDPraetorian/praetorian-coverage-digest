@@ -25,58 +25,57 @@ Create temporary exploration script:
 
 ```typescript
 // /tmp/explore-linear-get-issue.ts
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 
 const transport = new StdioClientTransport({
-  command: 'npx',
-  args: ['-y', '@modelcontextprotocol/server-linear']
+  command: "npx",
+  args: ["-y", "@modelcontextprotocol/server-linear"],
 });
 
-const client = new Client(
-  { name: 'explorer', version: '1.0.0' },
-  { capabilities: {} }
-);
+const client = new Client({ name: "explorer", version: "1.0.0" }, { capabilities: {} });
 
 await client.connect(transport);
 
 // Test Case 1: Happy path
 const result1 = await client.callTool({
-  name: 'get_issue',
-  arguments: { issueId: 'ENG-1234' }
+  name: "get_issue",
+  arguments: { issueId: "ENG-1234" },
 });
-console.log('Test 1 (Happy):', JSON.stringify(result1, null, 2));
-console.log('Tokens:', JSON.stringify(result1).length);
+console.log("Test 1 (Happy):", JSON.stringify(result1, null, 2));
+console.log("Tokens:", JSON.stringify(result1).length);
 
 // Test Case 2: Edge case (empty)
 try {
   const result2 = await client.callTool({
-    name: 'get_issue',
-    arguments: { issueId: '' }
+    name: "get_issue",
+    arguments: { issueId: "" },
   });
 } catch (error) {
-  console.log('Test 2 (Empty):', error.message);
+  console.log("Test 2 (Empty):", error.message);
 }
 
 // Test Case 3: Error case (invalid)
 try {
   const result3 = await client.callTool({
-    name: 'get_issue',
-    arguments: { issueId: 'INVALID-999' }
+    name: "get_issue",
+    arguments: { issueId: "INVALID-999" },
   });
 } catch (error) {
-  console.log('Test 3 (Invalid):', error.message);
+  console.log("Test 3 (Invalid):", error.message);
 }
 
 await client.close();
 ```
 
 Run exploration:
+
 ```bash
 npx tsx /tmp/explore-linear-get-issue.ts
 ```
 
 **Output**:
+
 ```
 Test 1 (Happy): {
   "id": "abc-123",
@@ -118,42 +117,49 @@ Created: `.claude/tools/linear/docs/get-issue-discovery.md`
 ## Input Schema
 
 ### Required Parameters
-| Parameter | Type | Validation | Description | Example |
-|-----------|------|------------|-------------|---------|
-| issueId | string | min 1 char | Linear issue ID | ENG-1234 |
+
+| Parameter | Type   | Validation | Description     | Example  |
+| --------- | ------ | ---------- | --------------- | -------- |
+| issueId   | string | min 1 char | Linear issue ID | ENG-1234 |
 
 ### Optional Parameters
+
 None discovered
 
 ## Output Schema
 
 ### Always Present
-| Field | Type | Description |
-|-------|------|-------------|
-| id | string | Issue UUID |
-| title | string | Issue title |
+
+| Field      | Type   | Description                      |
+| ---------- | ------ | -------------------------------- |
+| id         | string | Issue UUID                       |
+| title      | string | Issue title                      |
 | state.name | string | Status (In Progress, Done, etc.) |
-| priority | number | Priority 0-4 |
+| priority   | number | Priority 0-4                     |
 
 ### Conditionally Present
-| Field | Type | Condition | Description |
-|-------|------|-----------|-------------|
+
+| Field         | Type   | Condition   | Description           |
+| ------------- | ------ | ----------- | --------------------- |
 | assignee.name | string | If assigned | Assignee display name |
 
 ## Test Cases
 
 ### Case 1: Valid Issue
+
 **Input**: `{ issueId: "ENG-1234" }`
 **Output**: Full response with 15 fields (see JSON above)
 **Tokens**: 2,347
 **Result**: Success
 
 ### Case 2: Empty ID
+
 **Input**: `{ issueId: "" }`
 **Output**: Error: "Invalid issue ID"
 **Result**: Validation error
 
 ### Case 3: Non-existent Issue
+
 **Input**: `{ issueId: "INVALID-999" }`
 **Output**: Error: "Issue not found"
 **Result**: Not found error
@@ -165,6 +171,7 @@ None discovered
 **Reduction**: 81%
 
 **Fields to Include** (essential for agents):
+
 - `id` - Unique identifier
 - `title` - Human-readable issue name
 - `status` - Current state (from state.name)
@@ -172,6 +179,7 @@ None discovered
 - `assignee` - Owner if assigned (from assignee.name)
 
 **Fields to Exclude** (verbose, not needed):
+
 - `metadata` - Internal system data (~500 tokens)
 - `history` - Full change log (~1000 tokens)
 - `_internal` - Debug information (~500 tokens)
@@ -184,11 +192,13 @@ None discovered
 ## Security Considerations
 
 **Input Validation Required**:
+
 - Validate issueId format (alphanumeric + dash)
 - Block path traversal attempts
 - Block command injection attempts
 
 **Response Sanitization Required**:
+
 - None identified (public issue data)
 ```
 
@@ -205,6 +215,7 @@ cat .claude/tools/linear/docs/get-issue-discovery.md
 ```
 
 Key findings:
+
 - Required: issueId
 - Output: 5 essential fields
 - Token reduction: 81% (2347 → 450)
@@ -214,113 +225,125 @@ Key findings:
 Created: `.claude/tools/linear/get-issue.unit.test.ts`
 
 ```typescript
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getIssue } from './get-issue.js';
-import * as mcpClient from '../config/lib/mcp-client.js';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { getIssue } from "./get-issue.js";
+import * as mcpClient from "../config/lib/mcp-client.js";
 
-describe('getIssue', () => {
+describe("getIssue", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   // Category 1: Input Validation (3 tests)
-  describe('Input Validation', () => {
-    it('requires issueId field', async () => {
-      await expect(getIssue.execute({}))
-        .rejects.toThrow('Required');
+  describe("Input Validation", () => {
+    it("requires issueId field", async () => {
+      await expect(getIssue.execute({})).rejects.toThrow("Required");
     });
 
-    it('validates issueId is non-empty', async () => {
-      await expect(getIssue.execute({ issueId: '' }))
-        .rejects.toThrow('String must contain at least 1 character');
+    it("validates issueId is non-empty", async () => {
+      await expect(getIssue.execute({ issueId: "" })).rejects.toThrow(
+        "String must contain at least 1 character"
+      );
     });
 
-    it('validates issueId is string', async () => {
-      await expect(getIssue.execute({ issueId: 123 }))
-        .rejects.toThrow('Expected string');
+    it("validates issueId is string", async () => {
+      await expect(getIssue.execute({ issueId: 123 })).rejects.toThrow("Expected string");
     });
   });
 
   // Category 2: MCP Integration (2 tests)
-  describe('MCP Integration', () => {
-    it('calls MCP with correct tool name', async () => {
-      vi.spyOn(mcpClient, 'callMCPTool').mockResolvedValue({
-        id: 'abc-123',
-        title: 'Test',
-        state: { name: 'In Progress' },
+  describe("MCP Integration", () => {
+    it("calls MCP with correct tool name", async () => {
+      vi.spyOn(mcpClient, "callMCPTool").mockResolvedValue({
+        id: "abc-123",
+        title: "Test",
+        state: { name: "In Progress" },
         priority: 1,
       });
 
-      await getIssue.execute({ issueId: 'ENG-1234' });
+      await getIssue.execute({ issueId: "ENG-1234" });
 
-      expect(mcpClient.callMCPTool).toHaveBeenCalledWith(
-        'linear',
-        'get_issue',
-        { issue_id: 'ENG-1234' }
-      );
+      expect(mcpClient.callMCPTool).toHaveBeenCalledWith("linear", "get_issue", {
+        issue_id: "ENG-1234",
+      });
     });
 
-    it('maps issueId to issue_id parameter', async () => {
-      vi.spyOn(mcpClient, 'callMCPTool').mockResolvedValue({
-        id: 'abc', title: 'Test', state: { name: 'Done' }, priority: 1
+    it("maps issueId to issue_id parameter", async () => {
+      vi.spyOn(mcpClient, "callMCPTool").mockResolvedValue({
+        id: "abc",
+        title: "Test",
+        state: { name: "Done" },
+        priority: 1,
       });
 
-      await getIssue.execute({ issueId: 'TEST-1' });
+      await getIssue.execute({ issueId: "TEST-1" });
 
       expect(mcpClient.callMCPTool).toHaveBeenCalledWith(
-        'linear',
-        'get_issue',
-        expect.objectContaining({ issue_id: 'TEST-1' })
+        "linear",
+        "get_issue",
+        expect.objectContaining({ issue_id: "TEST-1" })
       );
     });
   });
 
   // Category 3: Response Filtering (2 tests)
-  describe('Response Filtering', () => {
-    it('includes only essential fields', async () => {
+  describe("Response Filtering", () => {
+    it("includes only essential fields", async () => {
       const mockResponse = {
-        id: 'abc-123',
-        title: 'Fix bug',
-        state: { name: 'In Progress', type: 'started', color: '#fff' },
+        id: "abc-123",
+        title: "Fix bug",
+        state: { name: "In Progress", type: "started", color: "#fff" },
         priority: 1,
-        assignee: { name: 'Alice', email: 'alice@test.com', avatar: 'url' },
-        metadata: { /* 500 tokens */ },
-        history: [ /* 1000 tokens */ ],
-        _internal: { /* 500 tokens */ },
+        assignee: { name: "Alice", email: "alice@test.com", avatar: "url" },
+        metadata: {
+          /* 500 tokens */
+        },
+        history: [
+          /* 1000 tokens */
+        ],
+        _internal: {
+          /* 500 tokens */
+        },
       };
 
-      vi.spyOn(mcpClient, 'callMCPTool').mockResolvedValue(mockResponse);
+      vi.spyOn(mcpClient, "callMCPTool").mockResolvedValue(mockResponse);
 
-      const result = await getIssue.execute({ issueId: 'ENG-1' });
+      const result = await getIssue.execute({ issueId: "ENG-1" });
 
       // Essential fields included
-      expect(result).toHaveProperty('id', 'abc-123');
-      expect(result).toHaveProperty('title', 'Fix bug');
-      expect(result).toHaveProperty('status', 'In Progress');
-      expect(result).toHaveProperty('priority', 1);
-      expect(result).toHaveProperty('assignee', 'Alice');
+      expect(result).toHaveProperty("id", "abc-123");
+      expect(result).toHaveProperty("title", "Fix bug");
+      expect(result).toHaveProperty("status", "In Progress");
+      expect(result).toHaveProperty("priority", 1);
+      expect(result).toHaveProperty("assignee", "Alice");
 
       // Verbose fields excluded
-      expect(result).not.toHaveProperty('metadata');
-      expect(result).not.toHaveProperty('history');
-      expect(result).not.toHaveProperty('_internal');
+      expect(result).not.toHaveProperty("metadata");
+      expect(result).not.toHaveProperty("history");
+      expect(result).not.toHaveProperty("_internal");
     });
 
-    it('reduces token count by ≥80% (2347 → 450)', async () => {
+    it("reduces token count by ≥80% (2347 → 450)", async () => {
       const mockResponse = {
-        id: 'abc-123',
-        title: 'Fix login bug that affects authentication',
-        state: { name: 'In Progress', type: 'started', color: '#fff' },
+        id: "abc-123",
+        title: "Fix login bug that affects authentication",
+        state: { name: "In Progress", type: "started", color: "#fff" },
         priority: 1,
-        assignee: { name: 'Alice', email: 'alice@example.com', avatar: 'https://...' },
-        metadata: { /* large object */ },
-        history: [ /* large array */ ],
-        _internal: { /* debug data */ },
+        assignee: { name: "Alice", email: "alice@example.com", avatar: "https://..." },
+        metadata: {
+          /* large object */
+        },
+        history: [
+          /* large array */
+        ],
+        _internal: {
+          /* debug data */
+        },
       };
 
-      vi.spyOn(mcpClient, 'callMCPTool').mockResolvedValue(mockResponse);
+      vi.spyOn(mcpClient, "callMCPTool").mockResolvedValue(mockResponse);
 
-      const result = await getIssue.execute({ issueId: 'ENG-1234' });
+      const result = await getIssue.execute({ issueId: "ENG-1234" });
       const tokenCount = JSON.stringify(result).length;
 
       // Discovery doc target: 450 tokens (81% reduction from 2347)
@@ -329,100 +352,113 @@ describe('getIssue', () => {
   });
 
   // Category 4: Security (4 tests)
-  describe('Security', () => {
-    it('blocks command injection in issueId', async () => {
-      await expect(getIssue.execute({
-        issueId: '; rm -rf /'
-      })).rejects.toThrow();
+  describe("Security", () => {
+    it("blocks command injection in issueId", async () => {
+      await expect(
+        getIssue.execute({
+          issueId: "; rm -rf /",
+        })
+      ).rejects.toThrow();
     });
 
-    it('blocks path traversal in issueId', async () => {
-      await expect(getIssue.execute({
-        issueId: '../../../etc/passwd'
-      })).rejects.toThrow();
+    it("blocks path traversal in issueId", async () => {
+      await expect(
+        getIssue.execute({
+          issueId: "../../../etc/passwd",
+        })
+      ).rejects.toThrow();
     });
 
-    it('blocks XSS in issueId', async () => {
-      await expect(getIssue.execute({
-        issueId: '<script>alert("xss")</script>'
-      })).rejects.toThrow();
+    it("blocks XSS in issueId", async () => {
+      await expect(
+        getIssue.execute({
+          issueId: '<script>alert("xss")</script>',
+        })
+      ).rejects.toThrow();
     });
 
-    it('blocks control characters in issueId', async () => {
-      await expect(getIssue.execute({
-        issueId: 'test\x00null'
-      })).rejects.toThrow();
+    it("blocks control characters in issueId", async () => {
+      await expect(
+        getIssue.execute({
+          issueId: "test\x00null",
+        })
+      ).rejects.toThrow();
     });
   });
 
   // Category 5: Edge Cases (4 tests)
-  describe('Edge Cases', () => {
-    it('handles very long issueId', async () => {
-      const longId = 'ENG-' + '1'.repeat(1000);
-      vi.spyOn(mcpClient, 'callMCPTool').mockResolvedValue({
-        id: 'abc', title: 'Test', state: { name: 'Done' }, priority: 1
+  describe("Edge Cases", () => {
+    it("handles very long issueId", async () => {
+      const longId = "ENG-" + "1".repeat(1000);
+      vi.spyOn(mcpClient, "callMCPTool").mockResolvedValue({
+        id: "abc",
+        title: "Test",
+        state: { name: "Done" },
+        priority: 1,
       });
 
       const result = await getIssue.execute({ issueId: longId });
       expect(result).toBeDefined();
     });
 
-    it('handles special characters in issueId', async () => {
-      vi.spyOn(mcpClient, 'callMCPTool').mockResolvedValue({
-        id: 'abc', title: 'Test', state: { name: 'Done' }, priority: 1
+    it("handles special characters in issueId", async () => {
+      vi.spyOn(mcpClient, "callMCPTool").mockResolvedValue({
+        id: "abc",
+        title: "Test",
+        state: { name: "Done" },
+        priority: 1,
       });
 
-      const result = await getIssue.execute({ issueId: 'ENG-123!@#' });
+      const result = await getIssue.execute({ issueId: "ENG-123!@#" });
       expect(result).toBeDefined();
     });
 
-    it('handles unicode in issueId', async () => {
-      vi.spyOn(mcpClient, 'callMCPTool').mockResolvedValue({
-        id: 'abc', title: 'Test', state: { name: 'Done' }, priority: 1
+    it("handles unicode in issueId", async () => {
+      vi.spyOn(mcpClient, "callMCPTool").mockResolvedValue({
+        id: "abc",
+        title: "Test",
+        state: { name: "Done" },
+        priority: 1,
       });
 
-      const result = await getIssue.execute({ issueId: 'ENG-你好' });
+      const result = await getIssue.execute({ issueId: "ENG-你好" });
       expect(result).toBeDefined();
     });
 
-    it('handles missing optional fields in response', async () => {
-      vi.spyOn(mcpClient, 'callMCPTool').mockResolvedValue({
-        id: 'abc',
-        title: 'Test',
-        state: { name: 'Done' },
+    it("handles missing optional fields in response", async () => {
+      vi.spyOn(mcpClient, "callMCPTool").mockResolvedValue({
+        id: "abc",
+        title: "Test",
+        state: { name: "Done" },
         priority: 1,
         // assignee missing
       });
 
-      const result = await getIssue.execute({ issueId: 'ENG-1' });
+      const result = await getIssue.execute({ issueId: "ENG-1" });
       expect(result.assignee).toBeUndefined();
     });
   });
 
   // Category 6: Error Handling (3 tests)
-  describe('Error Handling', () => {
-    it('handles MCP timeout', async () => {
-      vi.spyOn(mcpClient, 'callMCPTool')
-        .mockRejectedValue(new Error('Request timeout'));
+  describe("Error Handling", () => {
+    it("handles MCP timeout", async () => {
+      vi.spyOn(mcpClient, "callMCPTool").mockRejectedValue(new Error("Request timeout"));
 
-      await expect(getIssue.execute({ issueId: 'ENG-1' }))
-        .rejects.toThrow('timeout');
+      await expect(getIssue.execute({ issueId: "ENG-1" })).rejects.toThrow("timeout");
     });
 
-    it('handles MCP connection error', async () => {
-      vi.spyOn(mcpClient, 'callMCPTool')
-        .mockRejectedValue(new Error('Connection refused'));
+    it("handles MCP connection error", async () => {
+      vi.spyOn(mcpClient, "callMCPTool").mockRejectedValue(new Error("Connection refused"));
 
-      await expect(getIssue.execute({ issueId: 'ENG-1' }))
-        .rejects.toThrow('Connection');
+      await expect(getIssue.execute({ issueId: "ENG-1" })).rejects.toThrow("Connection");
     });
 
-    it('handles malformed MCP response', async () => {
-      vi.spyOn(mcpClient, 'callMCPTool')
-        .mockResolvedValue({ unexpected: 'format' });
+    it("handles malformed MCP response", async () => {
+      vi.spyOn(mcpClient, "callMCPTool").mockResolvedValue({ unexpected: "format" });
 
-      await expect(getIssue.execute({ issueId: 'ENG-1' }))
-        .rejects.toThrow('missing required fields');
+      await expect(getIssue.execute({ issueId: "ENG-1" })).rejects.toThrow(
+        "missing required fields"
+      );
     });
   });
 });
@@ -442,6 +478,7 @@ npm run verify-red -- linear/get-issue
 ```
 
 **Output**:
+
 ```
 🔴 RED PHASE: Validating tests exist and fail...
 
@@ -467,6 +504,7 @@ npm run generate-wrapper -- linear/get-issue
 ```
 
 **Output**:
+
 ```
 🔨 Generate Wrapper: linear/get-issue
 
@@ -499,11 +537,13 @@ npm run generate-wrapper -- linear/get-issue
 ## Phase 5: Implementation
 
 ### 5.1 Read Discovery Docs
+
 ```bash
 cat .claude/tools/linear/docs/get-issue-discovery.md
 ```
 
 Key points:
+
 - Required input: `issueId`
 - Include fields: `id`, `title`, `status` (from state.name), `priority`, `assignee` (from assignee.name)
 - Exclude fields: `metadata`, `history`, `_internal`, etc.
@@ -514,12 +554,12 @@ Key points:
 Edit `.claude/tools/linear/get-issue.ts`:
 
 ```typescript
-import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client.js';
+import { z } from "zod";
+import { callMCPTool } from "../config/lib/mcp-client.js";
 
 // 1. Input validation (from discovery)
 const InputSchema = z.object({
-  issueId: z.string().min(1).describe('Linear issue ID (e.g., ENG-1234)'),
+  issueId: z.string().min(1).describe("Linear issue ID (e.g., ENG-1234)"),
 });
 
 type Input = z.infer<typeof InputSchema>;
@@ -539,20 +579,20 @@ async function execute(input: unknown): Promise<FilteredResult> {
   const validated = InputSchema.parse(input);
 
   // Call MCP
-  const raw = await callMCPTool('linear', 'get_issue', {
+  const raw = await callMCPTool("linear", "get_issue", {
     issue_id: validated.issueId, // Map camelCase → snake_case
   });
 
   // Validate response has required fields
   if (!raw.id || !raw.title) {
-    throw new Error('MCP response missing required fields');
+    throw new Error("MCP response missing required fields");
   }
 
   // Filter (token reduction: 2347 → 450 tokens)
   return {
     id: raw.id,
     title: raw.title,
-    status: raw.state?.name ?? 'Unknown',
+    status: raw.state?.name ?? "Unknown",
     priority: raw.priority ?? 4,
     assignee: raw.assignee?.name,
   };
@@ -560,8 +600,8 @@ async function execute(input: unknown): Promise<FilteredResult> {
 
 // 4. Export
 export const getIssue = {
-  name: 'linear.get_issue',
-  description: 'Get a single Linear issue by ID',
+  name: "linear.get_issue",
+  description: "Get a single Linear issue by ID",
   inputSchema: InputSchema,
   execute,
 };
@@ -578,6 +618,7 @@ npm run verify-green -- linear/get-issue
 ```
 
 **Output**:
+
 ```
 🟢 GREEN PHASE: Validating implementation passes tests...
 
@@ -603,6 +644,7 @@ npm run audit -- linear/get-issue
 ```
 
 **Output**:
+
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 MCP Wrapper Audit: linear/get-issue
@@ -636,6 +678,7 @@ npm run generate-skill -- linear
 ```
 
 **Output**:
+
 ```
 📋 Generating service skill: linear
 
@@ -659,23 +702,27 @@ Exit code: 0
 ## Summary
 
 ### Artifacts Created
+
 1. `.claude/tools/linear/docs/get-issue-discovery.md` - Schema documentation
 2. `.claude/tools/linear/get-issue.unit.test.ts` - 18 tests
 3. `.claude/tools/linear/get-issue.ts` - Wrapper implementation
 4. `.claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md` - Updated
 
 ### CLI Gates Passed
+
 - ✅ verify-red (tests exist and fail)
 - ✅ verify-green (tests pass, coverage 87%)
 - ✅ audit (10/11 phases passed)
 
 ### Metrics
+
 - **Time**: ~20 minutes (vs ~45 minutes manual)
 - **Token Reduction**: 2,347 → 450 tokens (81%)
 - **Test Coverage**: 87% (exceeds 80% requirement)
 - **Test Count**: 18 tests across 6 categories
 
 ### Quality
+
 - Discovery doc complete with 3 test cases
 - Tests reference discovery findings
 - Implementation matches discovery schema

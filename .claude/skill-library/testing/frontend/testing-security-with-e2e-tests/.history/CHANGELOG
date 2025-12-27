@@ -1,0 +1,57 @@
+# Changelog: testing-security-with-e2e-tests
+
+## 2025-01-XX - Initial Creation
+
+**Type:** Process/Pattern
+**Category:** testing/frontend
+**Location:** Skill Library
+
+### RED Phase Documentation
+
+**Gap Identified:**
+Developers lack consolidated E2E security testing patterns for React frontends with Playwright. Without this skill, security tests are ad-hoc and miss critical scenarios like:
+- XSS prevention testing with injection attempts
+- Comprehensive authentication flow testing (session expiry, token refresh, MFA)
+- Authorization boundary testing (RBAC, privilege escalation)
+- CSRF protection validation
+- Input validation with malicious payload fixtures
+- Secure redirect handling
+- Security regression testing in CI/CD
+
+**Failure Behavior Without Skill:**
+When asked to "Write comprehensive E2E security tests for React authentication", Claude would:
+- Write basic login/logout tests only (no session expiry, token refresh, MFA)
+- Not include authorization boundary tests (privilege escalation attempts)
+- Not provide reusable security test fixtures for malicious payloads
+- Not integrate OWASP security testing methodologies
+- Not analyze existing Chariot E2E infrastructure for consistency
+- Miss XSS injection test patterns
+- Not test CSRF protection validation
+- Not provide secure redirect handling patterns
+
+**Search Verification:**
+Confirmed no existing skills cover frontend E2E security testing with Playwright (search: "security e2e playwright frontend" returned 0 results).
+
+### Skill Creation
+
+**Structure:**
+- SKILL.md: 265 lines (Process/Pattern template)
+- Progressive disclosure with 7 reference files
+- Examples directory for complete implementations
+
+**Key Sections:**
+1. Security Testing Fundamentals (OWASP integration)
+2. XSS Prevention Testing
+3. Authentication Flow Testing (with Page Object Model)
+4. Authorization Testing (RBAC, privilege escalation)
+5. CSRF Protection Testing
+6. Input Validation Testing (malicious payload fixtures)
+7. Secure Redirect Testing
+8. Security Regression Testing (CI/CD integration)
+9. Chariot E2E Infrastructure Integration
+
+**Next Steps:**
+- Phase 7: Research & populate reference files with researching-skills
+- Phase 8: Update gateway-testing routing table
+- Phase 9: GREEN verification (test skill with original scenario)
+- Phase 10: REFACTOR pressure testing with subagents

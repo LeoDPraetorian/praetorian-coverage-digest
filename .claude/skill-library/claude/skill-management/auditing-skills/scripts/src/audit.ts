@@ -6,8 +6,21 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { SkillAuditor, PHASE_COUNT } from './lib/audit-engine.js';
-import { findSkill, listAllSkills } from './lib/skill-finder.js';
+import { findSkill, listAllSkills, findSimilarSkills } from './lib/skill-finder.js';
 import { findProjectRoot, getAllSkillDirectories } from '../../../../../../lib/find-project-root.js';
+import { formatAgentDataForAnalysis, renderAgentTableWithScores, extractDomain } from './lib/agent-analyzer.js';
+import {
+  formatFindingsTable,
+  countFindings,
+  formatCompletionMessage,
+  type Finding,
+} from '@chariot/formatting-skill-output/lib/table-formatter';
+import {
+  validateSemanticFindings,
+  semanticFindingsToFindings,
+  type SemanticFindingsJson,
+} from '@chariot/formatting-skill-output/lib/schemas';
+import * as fs from 'fs';
 
 const PROJECT_ROOT = findProjectRoot();
 
@@ -18,8 +31,13 @@ program
   .description(`Run ${PHASE_COUNT}-phase compliance audit on skills`)
   .argument('[name]', 'Skill name (optional, omit to audit all)')
   .option('--phase <number>', `Audit specific phase (1-${PHASE_COUNT})`)
-  .option('--verbose', 'Verbose output')
-  .action(async (name?: string, options?: { phase?: string; verbose?: boolean }) => {
+  .option('--verbose', 'Verbose output', true)
+  .option('--quiet', 'Suppress progress messages (show only results)', true)
+  .option('--agents-data', 'Output skill + agent data as JSON for Claude to analyze (Phase 1 of two-phase)')
+  .option('--agents-render', 'Render agent recommendation table with scores (Phase 2 of two-phase)')
+  .option('--scores <string>', 'Comma-separated agent scores for --agents-render (e.g., "agent1:40,agent2:30")')
+  .option('--merge-semantic <path>', 'Merge semantic findings JSON file with structural findings and format combined table')
+  .action(async (name?: string, options?: { phase?: string; verbose?: boolean; quiet?: boolean; agentsData?: boolean; agentsRender?: boolean; scores?: string; mergeSemantic?: string }) => {
     try {
       console.log(chalk.blue('\n📋 Skill Manager - Audit\n'));
 
@@ -28,16 +46,126 @@ program
         const skill = findSkill(name);
         if (!skill) {
           console.error(chalk.red(`\n⚠️  Tool Error - Skill '${name}' not found`));
-          console.log(chalk.gray('  Use `npm run search -- "<query>"` to find skills'));
+
+          // Suggest similar skills
+          const similar = findSimilarSkills(name);
+          if (similar.length > 0) {
+            console.log(chalk.yellow('\n  Did you mean?'));
+            similar.forEach(s => {
+              console.log(chalk.cyan(`    → ${s.name}`));
+            });
+          }
+
+          console.log(chalk.gray('\n  Use `npm run search -- "<query>"` to find skills'));
           process.exit(2);
         }
 
-        console.log(chalk.gray(`Auditing skill: ${name}`));
-        console.log(chalk.gray(`Path: ${skill.path}\n`));
+        // Build skill metadata (used by agent flags, built early to allow early exit)
+        const skillMetadata = {
+          name: name,
+          path: skill.path,
+          description: skill.frontmatter?.description || '',
+          allowedTools: skill.frontmatter?.['allowed-tools']?.split(',').map((t: string) => t.trim()) || [],
+          domain: extractDomain(skill.path),
+        };
+
+        // Phase 1: Output JSON data for Claude to analyze (SKIP AUDIT)
+        if (options?.agentsData) {
+          console.log(chalk.blue.bold('📊 Agent Analysis Data (JSON)\n'));
+          console.log(formatAgentDataForAnalysis(skillMetadata));
+          return; // Exit - Claude will analyze and call --agents-render
+        }
+
+        // Phase 2: Render table with Claude-provided scores (SKIP AUDIT)
+        if (options?.agentsRender) {
+          if (!options?.scores) {
+            console.error(chalk.red('⚠️  Tool Error - --agents-render requires --scores argument'));
+            console.error(chalk.gray('  Example: --agents-render --scores="frontend-developer:40,backend-developer:0"'));
+            process.exit(2);
+          }
+          console.log(chalk.blue.bold('📊 Agent Recommendations\n'));
+          console.log(renderAgentTableWithScores(skillMetadata, options.scores));
+          return; // Exit after rendering table
+        }
+
+        // Merge semantic findings: Requires audit to run first
+        if (options?.mergeSemantic) {
+          if (!fs.existsSync(options.mergeSemantic)) {
+            console.error(chalk.red(`⚠️  Tool Error - Semantic findings file not found: ${options.mergeSemantic}`));
+            process.exit(2);
+          }
+
+          // Read and validate semantic findings JSON
+          const semanticJson = fs.readFileSync(options.mergeSemantic, 'utf-8');
+          let semanticData;
+          try {
+            semanticData = JSON.parse(semanticJson);
+          } catch (error) {
+            console.error(chalk.red('⚠️  Tool Error - Invalid JSON in semantic findings file'));
+            console.error(chalk.gray(`  ${error}`));
+            process.exit(2);
+          }
+
+          // Validate schema
+          let validatedData: SemanticFindingsJson;
+          try {
+            validatedData = validateSemanticFindings(semanticData);
+          } catch (error) {
+            console.error(chalk.red('⚠️  Tool Error - Semantic findings schema validation failed'));
+            console.error(chalk.gray(`  ${error}`));
+            process.exit(2);
+          }
+
+          // Run audit first to get structural findings
+          if (!options?.quiet) {
+            console.log(chalk.gray(`Auditing skill: ${name}`));
+            console.log(chalk.gray(`Path: ${skill.path}\n`));
+          }
+
+          const skillDir = skill.path.replace(`/${name}/SKILL.md`, '');
+          const auditor = new SkillAuditor(skillDir, options?.quiet ?? true);
+          const result = await auditor.runFullForSingleSkill(name);
+
+          // Convert structural findings to Finding[] format
+          const structuralFindings: Finding[] = [];
+          for (const phase of result.phases) {
+            // Use rawIssues if available, otherwise skip this phase
+            if (phase.rawIssues && Array.isArray(phase.rawIssues)) {
+              for (const issue of phase.rawIssues) {
+                structuralFindings.push({
+                  severity: issue.severity,
+                  phase: phase.phaseName,
+                  issue: issue.message,
+                  recommendation: issue.fix || 'See audit output for remediation steps'
+                });
+              }
+            }
+          }
+
+          // Convert semantic findings
+          const semanticFindings = semanticFindingsToFindings(validatedData);
+
+          // Merge findings
+          const allFindings = [...structuralFindings, ...semanticFindings];
+
+          // Format and display combined table
+          console.log(formatFindingsTable(allFindings));
+
+          // Display completion message
+          const counts = countFindings(allFindings);
+          console.log(formatCompletionMessage(counts));
+
+          return; // Exit after displaying combined findings
+        }
+
+        if (!options?.quiet) {
+          console.log(chalk.gray(`Auditing skill: ${name}`));
+          console.log(chalk.gray(`Path: ${skill.path}\n`));
+        }
 
         // Get the directory containing this skill
         const skillDir = skill.path.replace(`/${name}/SKILL.md`, '');
-        const auditor = new SkillAuditor(skillDir);
+        const auditor = new SkillAuditor(skillDir, options?.quiet ?? true);
 
         let result;
         if (options?.phase) {
@@ -56,9 +184,9 @@ program
 
         // Display results
         console.log(result.summary);
-        if (options?.verbose) {
-          console.log(result.details);
-        }
+
+        // Always show detailed table (verbose is default, but table shows regardless)
+        console.log(auditor.formatDetailedTable(result.phases));
 
         // Clear visual summary for audit result (not a tool error)
         console.log('');

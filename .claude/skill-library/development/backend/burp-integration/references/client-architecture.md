@@ -12,6 +12,7 @@ type BurpEnterpriseClient struct {
 ```
 
 **Key Design Principles:**
+
 - **Stateless operations** - No hidden state beyond caching
 - **Thin wrapper** - Business logic belongs in capabilities, not client
 - **Idempotent helpers** - Safe to call repeatedly
@@ -51,6 +52,7 @@ func NewBurpEnterpriseClientFromAWS(aws *cloud.AWS) (*BurpEnterpriseClient, erro
 ```
 
 **Credential Model:**
+
 ```go
 type BurpDastCredentials struct {
     Token   string `json:"token"`   // Bearer token
@@ -180,6 +182,7 @@ return result, nil
 ```
 
 **Critical Rules:**
+
 - ✅ Always use Go generics for type safety (`Graphql[T]()`)
 - ✅ Always use GraphQL variables (never string interpolation)
 - ✅ Always check for empty IDs in responses
@@ -222,12 +225,14 @@ func (c *BurpEnterpriseClient) Tree() (Tree, error) {
 **Cache Lifetime:** Entire client instance lifetime
 
 **Cache Invalidation:**
+
 ```go
 // Explicit invalidation after tree modifications
 c.tree = nil
 ```
 
 **When to Invalidate:**
+
 - After `CreateFolder()`
 - After `CreateSite()`
 - After `DeleteSite()`
@@ -256,6 +261,7 @@ burp/
 ```
 
 **Design Philosophy:**
+
 - **Functional grouping** - Related operations in same file
 - **Small files** - Burp.go is largest at ~550 lines
 - **No orchestration** - Client provides building blocks, not workflows
@@ -293,6 +299,7 @@ func (m *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) 
 ```
 
 **Mock Response Helper:**
+
 ```go
 func mockCreateFolderResponse(vars map[string]any) *http.Response {
     response := map[string]any{
@@ -315,6 +322,7 @@ func mockCreateFolderResponse(vars map[string]any) *http.Response {
 ```
 
 **Test Pattern:**
+
 ```go
 func TestCreateFolder(t *testing.T) {
     // Setup mock transport
@@ -337,6 +345,7 @@ func TestCreateFolder(t *testing.T) {
 **Coverage:** All GraphQL mutations have corresponding mock responses.
 
 **Benefits:**
+
 - ✅ Test without real Burp instance
 - ✅ Fast test execution
 - ✅ Deterministic responses
@@ -458,9 +467,11 @@ func (c *BurpEnterpriseClient) ListScansFromTime(beforeTime time.Time) (*ScanRes
 ### Caching Trade-offs
 
 **Cached:**
+
 - Site tree (expensive, changes rarely)
 
 **Not Cached:**
+
 - Scan summaries (changes frequently)
 - Issues (large datasets)
 - Scan configurations (small, validated once)
@@ -481,6 +492,7 @@ func (c *BurpEnterpriseClient) EnsureSite(wa model.WebApplication) (model.WebApp
 ```
 
 **Key Models:**
+
 - `model.WebApplication` - Site provisioning input/output
 - `model.Risk` - Converted from Burp issues
 - `model.Asset` - Converted from scanned items
@@ -523,6 +535,7 @@ result, err := graphql.Graphql[T](httpClient, url, query, variables, headers...)
    - Results → `issues.go` or `convert.go`
 
 2. **Follow GraphQL pattern:**
+
    ```go
    func (c *BurpEnterpriseClient) NewOperation(params) (*ResponseType, error) {
        query := `query/mutation string`
@@ -536,6 +549,7 @@ result, err := graphql.Graphql[T](httpClient, url, query, variables, headers...)
    ```
 
 3. **Add mock to test file:**
+
    ```go
    case strings.Contains(reqBody.Query, "NewOperation"):
        return mockNewOperationResponse(reqBody.Variables), nil

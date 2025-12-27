@@ -21,6 +21,7 @@
 **1. Missing .local/ Directory**
 
 Skill generates outputs but no .local/:
+
 ```
 my-skill/
 ├── SKILL.md
@@ -32,6 +33,7 @@ my-skill/
 **2. Missing .gitignore**
 
 .local/ exists but no .gitignore:
+
 ```
 my-skill/
 ├── SKILL.md
@@ -67,14 +69,16 @@ my-skill/
 
 **Detection patterns for TDD artifacts:**
 
-*Filename patterns (specific result indicators):*
+_Filename patterns (specific result indicators):_
+
 - `tdd-validation-*`, `tdd-results-*`, `tdd-test-*`
 - `baseline-failures`, `baseline-test-*`, `baseline-results`
 - `pressure-test-results-*`, `pressure-test-[0-9]+`
 - `green-phase-results`, `red-phase-results`, `red-phase-failures`
 - `quality-check-results`, `test-scenario-results`, `validation-results`
 
-*Content patterns (actual test output, not teaching):*
+_Content patterns (actual test output, not teaching):_
+
 - "Agent response (verbatim):" - captured agent transcripts
 - "Test run: YYYY-MM-DD" - dated test results
 - "| Status | PASS |" or "| Result | FAIL |" - tabular results
@@ -95,6 +99,7 @@ Only actual test output artifacts with verbatim transcripts or dated results are
 4. Preserve CHANGELOG.md as git-tracked exception
 
 **Standard .gitignore template:**
+
 ```gitignore
 # Runtime artifacts (git-ignored)
 audit-results-*.md
@@ -111,6 +116,7 @@ temp/
 ### Example 1: Add .local/ Structure
 
 **Before:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -119,6 +125,7 @@ my-skill/
 ```
 
 **After:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -132,6 +139,7 @@ my-skill/
 ### Example 2: Move Runtime Artifacts
 
 **Before:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -141,6 +149,7 @@ my-skill/
 ```
 
 **After:**
+
 ```
 my-skill/
 ├── SKILL.md
@@ -155,23 +164,27 @@ my-skill/
 ## .local/ Directory Contents
 
 **Git-tracked (exception):**
+
 - CHANGELOG.md - Version history
 
 **Git-ignored (standard):**
-- audit-results-*.md - Audit outputs
-- test-output-*.log - Test results
-- baseline-*.txt - Test baselines
+
+- audit-results-\*.md - Audit outputs
+- test-output-\*.log - Test results
+- baseline-\*.txt - Test baselines
 - temp/ - Temporary files
-- *.tmp - Temporary files
+- \*.tmp - Temporary files
 
 **TDD artifacts (should be here, NOT in references/):**
+
 - tdd-validation.md - RED/GREEN/REFACTOR phase documentation
 - baseline-failures.md - Captured baseline failures (RED phase)
 - green-phase-results.md - GREEN phase test results
-- pressure-test-*.md - Pressure test scenarios and results
+- pressure-test-\*.md - Pressure test scenarios and results
 - quality-checks.md - Quality validation results
 
 **Why TDD artifacts don't belong in references/:**
+
 - `references/` = Evergreen documentation agents read to LEARN the skill
 - `.local/` = Temporal artifacts documenting HOW the skill was VALIDATED
 - Putting TDD logs in `references/` causes token bloat and confuses agents
@@ -181,6 +194,7 @@ my-skill/
 **1. CHANGELOG.md Location**
 
 Two valid patterns:
+
 - Root: `SKILL.md` + `CHANGELOG.md` (legacy)
 - .local/: `CHANGELOG.md` only (new pattern)
 
@@ -189,6 +203,7 @@ Both OK, prefer .local/ for new skills.
 **2. Persistent Test Baselines**
 
 These belong in .local/ and ARE git-tracked if needed for regression testing:
+
 ```gitignore
 # Runtime outputs
 *.log
@@ -226,10 +241,10 @@ EOF
 
 ```typescript
 // Before
-const outputPath = join(skillDir, 'audit-results.md');
+const outputPath = join(skillDir, "audit-results.md");
 
 // After
-const outputPath = join(skillDir, '.local', 'audit-results.md');
+const outputPath = join(skillDir, ".local", "audit-results.md");
 ```
 
 ## Related Phases
@@ -239,15 +254,15 @@ const outputPath = join(skillDir, '.local', 'audit-results.md');
 
 ## Quick Reference
 
-| Pattern | Correct Location | Git Status |
-|---------|------------------|------------|
-| Audit results | .local/ | Ignored |
-| Test outputs | .local/ | Ignored |
-| Temp files | .local/temp/ | Ignored |
-| CHANGELOG.md | .local/ | Tracked |
-| Baselines | .local/ | Tracked (if needed) |
-| TDD validation logs | .local/ | Ignored |
-| Pressure test results | .local/ | Ignored |
-| RED/GREEN phase docs | .local/ | Ignored |
+| Pattern               | Correct Location | Git Status          |
+| --------------------- | ---------------- | ------------------- |
+| Audit results         | .local/          | Ignored             |
+| Test outputs          | .local/          | Ignored             |
+| Temp files            | .local/temp/     | Ignored             |
+| CHANGELOG.md          | .local/          | Tracked             |
+| Baselines             | .local/          | Tracked (if needed) |
+| TDD validation logs   | .local/          | Ignored             |
+| Pressure test results | .local/          | Ignored             |
+| RED/GREEN phase docs  | .local/          | Ignored             |
 
 **Common mistake:** TDD artifacts in `references/` - move to `.local/`

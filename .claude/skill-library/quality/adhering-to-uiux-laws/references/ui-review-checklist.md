@@ -13,18 +13,21 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 ## Navigation Review
 
 ### Hick's Law Compliance
+
 - [ ] Top-level navigation has ≤7 items
 - [ ] Dropdown menus have ≤7 visible options
 - [ ] Progressive disclosure used for advanced options
 - [ ] Related items grouped into categories
 
 ### Jakob's Law Compliance
+
 - [ ] Logo in top-left (links to home)
 - [ ] User menu in top-right
 - [ ] Standard icons used (hamburger, search, cart)
 - [ ] Familiar terminology ("Settings" not "Configuration")
 
 ### Serial Position Effect
+
 - [ ] Most important items at start or end of navigation
 - [ ] Less important items in middle
 
@@ -35,24 +38,28 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 ## Form Review
 
 ### Miller's Law Compliance
+
 - [ ] Single-page forms have ≤12 fields
 - [ ] Forms with 13+ fields use multi-step pattern
 - [ ] Fields grouped into 3-4 logical sections
 - [ ] Each section has ≤5-7 fields
 
 ### Cognitive Load
+
 - [ ] Smart defaults pre-filled when possible
 - [ ] Required fields clearly marked
 - [ ] Help text provided for complex fields
 - [ ] Validation messages are clear and actionable
 
 ### Goal Gradient Effect (Multi-Step Forms)
+
 - [ ] Progress indicator shows step X of Y
 - [ ] Motivational messaging based on completion
 - [ ] "Almost done!" messages near end
 - [ ] Steps have clear titles
 
 ### Error Prevention (Nielsen #5)
+
 - [ ] Inline validation with real-time feedback
 - [ ] Destructive actions require confirmation
 - [ ] Disabled states prevent invalid submissions
@@ -65,18 +72,21 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 ## Button & Interactive Element Review
 
 ### Fitts' Law Compliance
+
 - [ ] Touch targets ≥44x44px (mobile) or ≥32x32px (desktop)
 - [ ] Primary CTA is largest button on screen
 - [ ] Related actions positioned close together (< 24px gap)
 - [ ] Click area expanded beyond visual size (padding)
 
 ### Von Restorff Effect
+
 - [ ] Primary CTA uses distinct color (accent)
 - [ ] Primary CTA is visually isolated from other buttons
 - [ ] Dangerous actions use red/destructive styling
 - [ ] Only 1-2 buttons use accent color per screen
 
 ### Doherty Threshold
+
 - [ ] Button clicks provide feedback <100ms (visual state change)
 - [ ] Disabled buttons have clear disabled styling
 - [ ] Loading states shown for operations >400ms
@@ -89,22 +99,26 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 ## Visual Layout Review
 
 ### Gestalt: Proximity
+
 - [ ] Related elements grouped with tight spacing (12-16px)
 - [ ] Unrelated elements separated with wide spacing (32-48px)
 - [ ] Spacing ratio is 2-3x between vs within groups
 
 ### Gestalt: Similarity
+
 - [ ] Similar actions have consistent styling
 - [ ] Status indicators use consistent colors
 - [ ] Icon style consistent across app
 - [ ] Typography scale applied consistently
 
 ### Gestalt: Common Region
+
 - [ ] Cards/containers group related content
 - [ ] Background colors distinguish sections
 - [ ] Borders/shadows create clear boundaries
 
 ### Aesthetic-Usability Effect
+
 - [ ] Consistent spacing and alignment
 - [ ] Smooth transitions and animations
 - [ ] Quality typography (readable, scalable)
@@ -117,22 +131,26 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 ## Data Display Review
 
 ### Miller's Law (Tables)
+
 - [ ] Visible columns limited to 5-7
 - [ ] Additional columns accessible via customization
 - [ ] Most important columns at left and right (Serial Position)
 
 ### Miller's Law (Dashboards)
+
 - [ ] Default widgets limited to 6-8
 - [ ] Related widgets grouped visually
 - [ ] Custom dashboard layout available for power users
 
 ### Fitts' Law (Tables)
+
 - [ ] Action buttons ≥32x32px
 - [ ] Row hover state increases clickable area
 - [ ] Primary action always visible
 - [ ] Secondary actions in dropdown menu
 
 ### Cognitive Load
+
 - [ ] Essential information only in cards/rows
 - [ ] Metadata available in details view
 - [ ] Progressive disclosure for advanced data
@@ -145,12 +163,14 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 ## Performance Review
 
 ### Doherty Threshold Compliance
+
 - [ ] Page loads show skeleton/loading state immediately
 - [ ] Interactive elements respond <100ms
 - [ ] Data fetches show loading indicator <400ms
 - [ ] Long operations (>3s) show progress bar
 
 ### Goal Gradient Effect
+
 - [ ] Progress bars for multi-step processes
 - [ ] Percentage completion displayed
 - [ ] Estimated time remaining shown for long operations
@@ -163,12 +183,14 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 ## Mobile Optimization Review
 
 ### Fitts' Law (Mobile)
+
 - [ ] Touch targets ≥48x48px (Material Design standard)
 - [ ] Spacing between tappable elements ≥8px
 - [ ] Primary actions thumb-reachable (bottom 1/3 of screen)
 - [ ] Full-width buttons on small screens
 
 ### Responsive Layout
+
 - [ ] Navigation adapts to mobile (hamburger menu)
 - [ ] Forms stack vertically on mobile
 - [ ] Tables use responsive patterns (cards/horizontal scroll)
@@ -181,6 +203,7 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 ## Error Handling Review
 
 ### Nielsen #9: Error Recovery
+
 - [ ] Error messages in plain language (no codes)
 - [ ] Error messages explain what happened
 - [ ] Error messages suggest solutions
@@ -188,6 +211,7 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 - [ ] Retry functionality available when appropriate
 
 ### Error Prevention
+
 - [ ] Validation runs in real-time (as user types)
 - [ ] Validation messages appear immediately
 - [ ] Destructive actions require explicit confirmation
@@ -200,6 +224,7 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 ## Accessibility Review
 
 ### WCAG 2.1 AA Compliance
+
 - [ ] Color contrast ≥4.5:1 for text
 - [ ] Interactive elements have focus indicators
 - [ ] Form inputs have associated labels
@@ -208,6 +233,7 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 - [ ] Screen reader support tested
 
 ### Fitts' Law (Accessibility)
+
 - [ ] Click areas expanded for better targeting
 - [ ] Tooltips appear on both hover and focus
 - [ ] Skip links provided for keyboard navigation
@@ -220,11 +246,12 @@ Systematic validation workflow for applying UI/UX laws to Chariot interfaces.
 
 After reviewing all relevant sections:
 
-**Overall Score:** ___ / ___ items passed (___%)
+**Overall Score:** **_ / _** items passed (\_\_\_%)
 
 **Pass Threshold:** ≥85% for production release
 
 **Critical Failures:** (Must fix before release)
+
 - [ ] Touch targets below minimum size
 - [ ] Missing error messages
 - [ ] Accessibility violations
@@ -232,6 +259,7 @@ After reviewing all relevant sections:
 - [ ] No loading states for >400ms operations
 
 **Non-Critical Issues:** (Fix in next iteration)
+
 - Suboptimal spacing
 - Inconsistent styling
 - Missing tooltips
@@ -244,6 +272,7 @@ After reviewing all relevant sections:
 ### Phase 1: Pre-Implementation Review
 
 Use this checklist during design phase:
+
 1. Review designs in Figma
 2. Validate against relevant laws
 3. Document potential violations
@@ -252,6 +281,7 @@ Use this checklist during design phase:
 ### Phase 2: Implementation Review
 
 During development:
+
 1. Review code as components are built
 2. Test in browser (desktop + mobile)
 3. Validate interactive behaviors
@@ -260,6 +290,7 @@ During development:
 ### Phase 3: Pre-Merge Review
 
 Before creating PR:
+
 1. Complete full checklist
 2. Test all user flows
 3. Validate performance
@@ -268,6 +299,7 @@ Before creating PR:
 ### Phase 4: PR Review
 
 In pull request:
+
 1. Include checklist in PR description
 2. Note which sections apply
 3. Document any intentional violations

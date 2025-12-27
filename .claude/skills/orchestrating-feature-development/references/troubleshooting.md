@@ -7,6 +7,7 @@ Common issues and solutions when orchestrating feature development.
 **Symptom**: Session ended, need to resume feature development.
 
 **Solution**:
+
 1. Read progress file:
    ```bash
    cat .claude/features/{feature-id}/progress.json
@@ -25,20 +26,22 @@ Common issues and solutions when orchestrating feature development.
 **Symptom**: Agent returns `status: "blocked"` in handoff.
 
 **Solution**:
+
 1. Read `handoff.blockers` array for details
 2. Categorize blocker type:
 
-   | Type | Action |
-   |------|--------|
-   | `missing_dependency` | Implement dependency first, then retry |
-   | `unclear_requirement` | Use AskUserQuestion to clarify |
-   | `technical_limitation` | Revise architecture/plan |
-   | `external_service` | Wait for external team or mock temporarily |
+   | Type                   | Action                                     |
+   | ---------------------- | ------------------------------------------ |
+   | `missing_dependency`   | Implement dependency first, then retry     |
+   | `unclear_requirement`  | Use AskUserQuestion to clarify             |
+   | `technical_limitation` | Revise architecture/plan                   |
+   | `external_service`     | Wait for external team or mock temporarily |
 
 3. Update relevant artifact (plan.md or architecture.md)
 4. Re-spawn same agent with resolution context
 
 **Example**:
+
 ```
 Agent blocked: "Backend API endpoint not available"
 
@@ -55,6 +58,7 @@ Agent blocked: "Backend API endpoint not available"
 **Symptom**: `verification.build_success: false` in handoff.
 
 **Solution**:
+
 1. Capture full build error:
    ```bash
    npm run build 2>&1 | tee build-error.log
@@ -64,12 +68,14 @@ Agent blocked: "Backend API endpoint not available"
    - Import errors → Check file paths
    - Dependency errors → Run `npm install`
 3. Create issue context:
+
    ```
    Build failed with error:
    {error output}
 
    Fix the implementation to resolve this error.
    ```
+
 4. Re-spawn developer with error context
 
 ---
@@ -79,20 +85,22 @@ Agent blocked: "Backend API endpoint not available"
 **Symptom**: `verification.tests_passed: false` in handoff.
 
 **Solution**:
+
 1. Run tests and capture output:
    ```bash
    npm test 2>&1 | tee test-error.log
    ```
 2. Determine if issue is in implementation or tests:
 
-   | Failure Type | Action |
-   |--------------|--------|
-   | Logic bug | Return to implementation phase |
-   | Flaky test | Re-spawn test engineer with "fix flaky test" |
-   | Wrong assertion | Re-spawn test engineer with "fix assertion" |
-   | Missing test setup | Re-spawn test engineer with "add setup" |
+   | Failure Type       | Action                                       |
+   | ------------------ | -------------------------------------------- |
+   | Logic bug          | Return to implementation phase               |
+   | Flaky test         | Re-spawn test engineer with "fix flaky test" |
+   | Wrong assertion    | Re-spawn test engineer with "fix assertion"  |
+   | Missing test setup | Re-spawn test engineer with "add setup"      |
 
 3. If implementation bug:
+
    ```
    Tests failing due to implementation issue:
    {test output}
@@ -101,6 +109,7 @@ Agent blocked: "Backend API endpoint not available"
    ```
 
 4. If test bug:
+
    ```
    Tests have issues:
    {test output}
@@ -115,12 +124,14 @@ Agent blocked: "Backend API endpoint not available"
 **Symptom**: `verification.coverage_percent < 80` in handoff.
 
 **Solution**:
+
 1. Generate coverage report:
    ```bash
    npm test -- --coverage
    ```
 2. Identify uncovered lines/branches
 3. Re-spawn test engineer:
+
    ```
    Current coverage: {percent}%
    Target: 80%
@@ -138,7 +149,9 @@ Agent blocked: "Backend API endpoint not available"
 **Symptom**: Implementation doesn't follow architecture.md.
 
 **Solution**:
+
 1. Make architecture context more prominent:
+
    ```
    CRITICAL: Follow these architecture decisions:
    1. {decision 1}
@@ -148,6 +161,7 @@ Agent blocked: "Backend API endpoint not available"
 
    Any deviation requires user approval via AskUserQuestion.
    ```
+
 2. Re-spawn developer with emphasized constraints
 3. Verify output against architecture before accepting
 
@@ -159,13 +173,13 @@ Agent blocked: "Backend API endpoint not available"
 
 **Answer**: No. Even "simple" features benefit from systematic phases:
 
-| Phase | Minimum Time | Why Not Skip |
-|-------|--------------|--------------|
-| Brainstorming | 5-10 min | Catches edge cases, clarifies requirements |
-| Planning | 10-15 min | Identifies affected files, prevents scope creep |
-| Architecture | 10-15 min | Ensures consistency with existing patterns |
-| Implementation | Variable | The actual work |
-| Testing | 15-20 min | Prevents regressions, documents behavior |
+| Phase          | Minimum Time | Why Not Skip                                    |
+| -------------- | ------------ | ----------------------------------------------- |
+| Brainstorming  | 5-10 min     | Catches edge cases, clarifies requirements      |
+| Planning       | 10-15 min    | Identifies affected files, prevents scope creep |
+| Architecture   | 10-15 min    | Ensures consistency with existing patterns      |
+| Implementation | Variable     | The actual work                                 |
+| Testing        | 15-20 min    | Prevents regressions, documents behavior        |
 
 **Total overhead**: ~40-60 minutes for "simple" features
 **Value**: Prevents mid-implementation surprises, missed requirements, inconsistent code
@@ -179,6 +193,7 @@ Agent blocked: "Backend API endpoint not available"
 **Question**: "Should I spawn frontend and backend agents in parallel?"
 
 **Decision tree**:
+
 ```
 Can frontend work with mocked backend?
 ├─ Yes → Spawn in parallel
@@ -193,12 +208,14 @@ Can frontend work with mocked backend?
 ```
 
 **Indicators for sequential**:
+
 - Frontend depends on backend response structure
 - Real-time features (WebSocket, SSE)
 - Complex API contracts
 - Tight coupling between layers
 
 **Indicators for parallel**:
+
 - Frontend can use typed mocks
 - API contract already defined
 - Independent development possible
@@ -211,11 +228,13 @@ Can frontend work with mocked backend?
 **Symptom**: `files_modified` includes files not in plan.
 
 **Solution**:
+
 1. Review modified files:
    ```bash
    git diff {files from handoff}
    ```
 2. Use AskUserQuestion:
+
    ```
    Agent modified these unexpected files:
    {file list}
@@ -227,11 +246,13 @@ Can frontend work with mocked backend?
    - No, revert {specific files}
    - Let me review the diffs first
    ```
+
 3. If revert needed:
    ```bash
    git checkout HEAD -- {files to revert}
    ```
 4. Re-spawn agent with constraint:
+
    ```
    CRITICAL: Only modify files listed in plan.md.
 
@@ -245,7 +266,9 @@ Can frontend work with mocked backend?
 **Scenario**: User changes requirements during implementation phase.
 
 **Solution**:
+
 1. Assess impact:
+
    ```
    Current phase: {phase}
    Change requested: {description}
@@ -257,6 +280,7 @@ Can frontend work with mocked backend?
    ```
 
 2. Decision tree:
+
    ```
    Is architecture still valid?
    ├─ No → Return to Phase 3 (architecture)
@@ -291,7 +315,9 @@ Can frontend work with mocked backend?
 **Symptom**: Feature development exceeds expected timeline.
 
 **Solution**:
+
 1. Review progress file duration:
+
    ```json
    "metadata": {
      "total_duration_minutes": 180,
@@ -300,6 +326,7 @@ Can frontend work with mocked backend?
    ```
 
 2. Identify bottleneck phase:
+
    ```
    Brainstorming: 15 min (normal)
    Planning: 20 min (normal)
@@ -310,15 +337,16 @@ Can frontend work with mocked backend?
 
 3. Common causes by phase:
 
-   | Phase | Cause | Solution |
-   |-------|-------|----------|
-   | Brainstorming | Too many alternatives explored | Timebox to 15 minutes max |
-   | Planning | Overly detailed plan | Focus on key tasks only |
-   | Architecture | Over-engineering | Follow existing patterns |
-   | Implementation | Scope creep | Stick to plan.md tasks |
-   | Testing | Flaky tests | Fix flakiness before adding more |
+   | Phase          | Cause                          | Solution                         |
+   | -------------- | ------------------------------ | -------------------------------- |
+   | Brainstorming  | Too many alternatives explored | Timebox to 15 minutes max        |
+   | Planning       | Overly detailed plan           | Focus on key tasks only          |
+   | Architecture   | Over-engineering               | Follow existing patterns         |
+   | Implementation | Scope creep                    | Stick to plan.md tasks           |
+   | Testing        | Flaky tests                    | Fix flakiness before adding more |
 
 4. Use AskUserQuestion:
+
    ```
    Feature development at {duration} minutes (Phase: {current}).
 

@@ -13,6 +13,7 @@ allowed-tools: Bash, Read
 Chrome DevTools MCP **connects to a running Chrome instance**. You must start Chrome with remote debugging **before** using these tools:
 
 ### macOS:
+
 ```bash
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
   --remote-debugging-port=9222 \
@@ -20,11 +21,13 @@ Chrome DevTools MCP **connects to a running Chrome instance**. You must start Ch
 ```
 
 ### Linux:
+
 ```bash
 google-chrome --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-debug &
 ```
 
 ### Windows:
+
 ```bash
 "C:\Program Files\Google\Chrome\Application\chrome.exe" ^
   --remote-debugging-port=9222 ^
@@ -32,11 +35,13 @@ google-chrome --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-debug &
 ```
 
 **Why?** The MCP connects to Chrome via WebSocket at `localhost:9222`. Without this, you'll get:
+
 ```
 Error: Failed to fetch browser webSocket URL from http://localhost:9222/json/version
 ```
 
 **Verify it's running:**
+
 ```bash
 curl http://localhost:9222/json/version
 # Should return Chrome version info
@@ -47,6 +52,7 @@ curl http://localhost:9222/json/version
 ## Natural Language Examples
 
 ### Network Inspection
+
 ```bash
 # All of these work:
 /chrome show me the network requests
@@ -56,6 +62,7 @@ curl http://localhost:9222/json/version
 ```
 
 ### Page Navigation
+
 ```bash
 /chrome open a new page at https://example.com
 /chrome navigate to https://app.chariot.com
@@ -64,6 +71,7 @@ curl http://localhost:9222/json/version
 ```
 
 ### Debugging
+
 ```bash
 /chrome take a screenshot
 /chrome show console messages
@@ -72,6 +80,7 @@ curl http://localhost:9222/json/version
 ```
 
 ### Interaction
+
 ```bash
 /chrome click the submit button
 /chrome fill the email field with test@example.com
@@ -98,11 +107,13 @@ curl http://localhost:9222/json/version
 When you invoke this command, I will:
 
 1. Read the Chrome DevTools MCP tools skill:
+
 ```bash
 Read: .claude/skill-library/claude/mcp-tools/mcp-tools-chrome-devtools/SKILL.md
 ```
 
 2. Verify Chrome is running with remote debugging:
+
 ```bash
 curl -s http://localhost:9222/json/version || echo "ERROR: Chrome not running with debugging"
 ```
@@ -120,6 +131,7 @@ curl -s http://localhost:9222/json/version || echo "ERROR: Chrome not running wi
 Based on the Chrome DevTools MCP (26 tools available):
 
 **Page Management:**
+
 - Create new pages/tabs
 - Navigate to URLs
 - Close pages
@@ -128,6 +140,7 @@ Based on the Chrome DevTools MCP (26 tools available):
 - Resize viewport
 
 **Interaction:**
+
 - Click elements by UID
 - Fill forms and inputs
 - Press keys
@@ -136,28 +149,33 @@ Based on the Chrome DevTools MCP (26 tools available):
 - Handle dialogs (accept/dismiss)
 
 **Network Debugging:**
+
 - List network requests (fetch/xhr)
 - Get specific request details
 - Filter by resource type
 - Monitor API calls
 
 **Console Debugging:**
+
 - List console messages
 - Get specific console message
 - Filter by log level
 - Monitor errors/warnings
 
 **Performance:**
+
 - Start/stop performance trace
 - Analyze performance insights
 - CPU throttling emulation
 
 **Snapshots:**
+
 - Take screenshots (partial or full page)
 - Take DOM snapshots
 - Save to file
 
 **Advanced:**
+
 - Execute JavaScript on page
 - Upload files
 - Wait for elements/text
@@ -168,6 +186,7 @@ Based on the Chrome DevTools MCP (26 tools available):
 ## Common Workflows
 
 ### Inspect Network Requests
+
 ```bash
 /chrome list network requests
 
@@ -178,6 +197,7 @@ Based on the Chrome DevTools MCP (26 tools available):
 ```
 
 ### Debug UI Issue
+
 ```bash
 /chrome take full page screenshot and show console errors
 
@@ -188,6 +208,7 @@ Based on the Chrome DevTools MCP (26 tools available):
 ```
 
 ### Automate Form Filling
+
 ```bash
 /chrome navigate to https://example.com/login then fill email with test@example.com
 
@@ -212,14 +233,17 @@ Based on the Chrome DevTools MCP (26 tools available):
 ## Troubleshooting
 
 ### Error: "Failed to fetch browser webSocket URL"
+
 **Cause**: Chrome not running with remote debugging
 **Fix**: Run the setup command above
 
 ### Error: "No pages found"
+
 **Cause**: No tabs open in debug Chrome instance
 **Fix**: Open a tab in the Chrome instance you launched
 
 ### Tools are slow
+
 **Cause**: Chrome debug instance has many tabs
 **Fix**: Close unused tabs or restart Chrome
 
@@ -230,6 +254,7 @@ Based on the Chrome DevTools MCP (26 tools available):
 For developers or debugging, here are the underlying wrapper patterns:
 
 ### List Network Requests (Direct Execution)
+
 ```bash
 npx tsx -e "(async () => {
   const { listNetworkRequests } = await import('./.claude/tools/chrome-devtools/list-network-requests.ts');
@@ -242,6 +267,7 @@ npx tsx -e "(async () => {
 ```
 
 ### Take Screenshot (Direct Execution)
+
 ```bash
 npx tsx -e "(async () => {
   const { takeScreenshot } = await import('./.claude/tools/chrome-devtools/take-screenshot.ts');
@@ -254,6 +280,7 @@ npx tsx -e "(async () => {
 ```
 
 ### New Page (Direct Execution)
+
 ```bash
 npx tsx -e "(async () => {
   const { newPage } = await import('./.claude/tools/chrome-devtools/new-page.ts');

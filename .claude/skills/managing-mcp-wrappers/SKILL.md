@@ -14,37 +14,38 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 
 ### Create Workflow (Instruction-Driven)
 
-| Operation | Method | Time |
-|-----------|--------|------|
-| **Create** | Use `creating-mcp-wrappers` skill | 20-30 min |
-| Update | `npm run update -- <service> <tool>` | 10-20 min |
-| Audit | `npm run audit -- <service>/<tool>` | 2-5 min |
+| Operation  | Method                               | Time      |
+| ---------- | ------------------------------------ | --------- |
+| **Create** | Use `creating-mcp-wrappers` skill    | 20-30 min |
+| Update     | `npm run update -- <service> <tool>` | 10-20 min |
+| Audit      | `npm run audit -- <service>/<tool>`  | 2-5 min   |
 
 ### TDD Workflow (CLI Gates - Used by creating-mcp-wrappers)
 
-| Step | Command | What It Does |
-|------|---------|--------------|
-| 1. Verify RED | `npm run verify-red -- <service>/<tool>` | Confirms tests fail (mechanical) |
-| 2. Generate | `npm run generate-wrapper -- <service>/<tool>` | Creates wrapper (blocks if RED fails) |
-| 3. Verify GREEN | `npm run verify-green -- <service>/<tool>` | Confirms tests pass (≥80%) (mechanical) |
+| Step            | Command                                        | What It Does                            |
+| --------------- | ---------------------------------------------- | --------------------------------------- |
+| 1. Verify RED   | `npm run verify-red -- <service>/<tool>`       | Confirms tests fail (mechanical)        |
+| 2. Generate     | `npm run generate-wrapper -- <service>/<tool>` | Creates wrapper (blocks if RED fails)   |
+| 3. Verify GREEN | `npm run verify-green -- <service>/<tool>`     | Confirms tests pass (≥80%) (mechanical) |
 
 ### Other Operations
 
-| Operation      | Command                                        | Time      |
-| -------------- | ---------------------------------------------- | --------- |
-| Update         | `npm run update -- <service> <tool>`           | 10-20 min |
-| Audit          | `npm run audit -- <service>/<tool>`            | 2-5 min   |
-| Audit Service  | `npm run audit -- <service>`                   | 5-15 min  |
-| Audit All      | `npm run audit -- --all`                       | 5-30 min  |
-| Audit Phase    | `npm run audit -- <name> --phase N`            | 1-2 min   |
-| Fix            | `npm run fix -- <name> [--dry-run]`            | 5-15 min  |
-| Fix Phase      | `npm run fix -- <name> --phase N`              | 2-5 min   |
-| Test           | `npm run test -- <name> [--coverage]`          | 1-10 min  |
-| Generate Skill | `npm run generate-skill -- <service>`          | ~5 sec    |
+| Operation      | Command                               | Time      |
+| -------------- | ------------------------------------- | --------- |
+| Update         | `npm run update -- <service> <tool>`  | 10-20 min |
+| Audit          | `npm run audit -- <service>/<tool>`   | 2-5 min   |
+| Audit Service  | `npm run audit -- <service>`          | 5-15 min  |
+| Audit All      | `npm run audit -- --all`              | 5-30 min  |
+| Audit Phase    | `npm run audit -- <name> --phase N`   | 1-2 min   |
+| Fix            | `npm run fix -- <name> [--dry-run]`   | 5-15 min  |
+| Fix Phase      | `npm run fix -- <name> --phase N`     | 2-5 min   |
+| Test           | `npm run test -- <name> [--coverage]` | 1-10 min  |
+| Generate Skill | `npm run generate-skill -- <service>` | ~5 sec    |
 
 ## Prerequisites
 
 **Workspace setup:**
+
 ```bash
 # Navigate to workspace from any location
 cd "$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)/.claude/skills/managing-mcp-wrappers/scripts"
@@ -52,6 +53,7 @@ npm install
 ```
 
 **MCP Server Required:** This pattern requires functional MCP server
+
 ```bash
 npx -y @modelcontextprotocol/server-{mcp-name} --version
 ```
@@ -59,6 +61,7 @@ npx -y @modelcontextprotocol/server-{mcp-name} --version
 ## TDD Workflow (ENFORCED)
 
 ### 🔴 RED Phase (Tests First)
+
 ```bash
 npm run create -- <service> <tool>       # 1. Generate test file ONLY
 # Edit tests based on schema discovery
@@ -66,6 +69,7 @@ npm run verify-red -- <service>/<tool>   # 2. MUST FAIL (no implementation)
 ```
 
 ### 🟢 GREEN Phase (Minimal Implementation)
+
 ```bash
 npm run generate-wrapper -- <service>/<tool>  # 3. Generate wrapper (blocks if RED fails)
 # Implement wrapper to pass tests
@@ -73,6 +77,7 @@ npm run verify-green -- <service>/<tool>      # 4. MUST PASS with ≥80% coverag
 ```
 
 ### 🔵 REFACTOR Phase (Optimization)
+
 5. Add integration tests (optional, recommended)
 6. Optimize implementation (token reduction, security)
 7. Re-run `verify-green` (must stay green)
@@ -81,21 +86,22 @@ npm run verify-green -- <service>/<tool>      # 4. MUST PASS with ≥80% coverag
 
 ## The 11 Audit Phases
 
-| Phase | Name | Auto-Fix | TDD Integration |
-|-------|------|----------|-----------------|
-| 1 | Schema Discovery | ❌ Manual | Validates discovery docs exist |
-| 2 | Optional Fields | ✅ Yes | Tests verify .optional() usage |
-| 3 | Type Unions | ❌ Manual | Tests cover z.union() cases |
-| 4 | Nested Access Safety | ✅ Yes | Tests catch unsafe access |
-| 5 | Reference Validation | ❌ Manual | Deprecated tool detection |
-| 6 | **Unit Test Coverage** | ❌ Manual | **≥80% required** |
-| 7 | **Integration Tests** | ❌ Manual | **Recommended** |
-| 8 | **Test Quality** | ❌ Manual | **Pattern validation** |
-| 9 | **Security Validation** | ❌ Manual | **Dangerous pattern detection** |
-| 10 | **TypeScript Validation** | ❌ Manual | **CRITICAL if tsconfig.json missing**; type errors |
-| 11 | **Skill-Schema Synchronization** | ✅ Yes | **Service skill matches wrapper schemas** |
+| Phase | Name                             | Auto-Fix  | TDD Integration                                    |
+| ----- | -------------------------------- | --------- | -------------------------------------------------- |
+| 1     | Schema Discovery                 | ❌ Manual | Validates discovery docs exist                     |
+| 2     | Optional Fields                  | ✅ Yes    | Tests verify .optional() usage                     |
+| 3     | Type Unions                      | ❌ Manual | Tests cover z.union() cases                        |
+| 4     | Nested Access Safety             | ✅ Yes    | Tests catch unsafe access                          |
+| 5     | Reference Validation             | ❌ Manual | Deprecated tool detection                          |
+| 6     | **Unit Test Coverage**           | ❌ Manual | **≥80% required**                                  |
+| 7     | **Integration Tests**            | ❌ Manual | **Recommended**                                    |
+| 8     | **Test Quality**                 | ❌ Manual | **Pattern validation**                             |
+| 9     | **Security Validation**          | ❌ Manual | **Dangerous pattern detection**                    |
+| 10    | **TypeScript Validation**        | ❌ Manual | **CRITICAL if tsconfig.json missing**; type errors |
+| 11    | **Skill-Schema Synchronization** | ✅ Yes    | **Service skill matches wrapper schemas**          |
 
 > **STEPS vs PHASES Clarification:**
+>
 > - **Workflow STEPS** (1-4 or 1-7): Sequential CLI commands you execute (create, verify-red, generate-wrapper, verify-green)
 > - **Audit PHASES** (1-11): Compliance validation categories checked by `npm run audit`
 >
@@ -108,11 +114,13 @@ npm run verify-green -- <service>/<tool>      # 4. MUST PASS with ≥80% coverag
 **Wrapper creation is now instruction-driven via the `creating-mcp-wrappers` skill.**
 
 Use the skill:
+
 ```
 skill: "creating-mcp-wrappers"
 ```
 
 The `creating-mcp-wrappers` skill guides you through:
+
 1. **Schema Discovery** - Interactive MCP exploration with ≥3 test cases
 2. **Test Design** - Claude reasons about test cases (≥18 tests across 6 categories)
 3. **RED Gate** - CLI mechanical verification (`npm run verify-red`)
@@ -123,6 +131,7 @@ The `creating-mcp-wrappers` skill guides you through:
 8. **Service Skill** - CLI updates service skill (`npm run generate-skill`)
 
 **Why instruction-driven?**
+
 - Claude can explore MCP tools interactively (vs manual schema script)
 - Test cases are tailored to discovered schema (vs generic template)
 - Implementation is guided by schema analysis (vs "customize wrapper" instruction)
@@ -131,6 +140,7 @@ The `creating-mcp-wrappers` skill guides you through:
 **The CLI becomes the "guard rails" that the skill delegates to for enforcement.**
 
 **After creation, verify compliance:**
+
 ```bash
 npm run audit -- {service}/{tool}
 # Target: ≥10/11 phases pass
@@ -147,6 +157,7 @@ npm run update -- <service> <tool> --add-field <field>
 ```
 
 **Workflow:**
+
 1. **Update Tests** - Add tests for new behavior (RED)
 2. **Schema Discovery** - Test new field with 3+ cases
 3. **Update Implementation** - Modify wrapper (GREEN)
@@ -216,6 +227,7 @@ npm run test:coverage -- <service>/<tool>
 ```
 
 **Targets:**
+
 - Unit test coverage: ≥80%
 - Security testing: 12 scenarios automated
 - Response format: 3 formats tested
@@ -240,6 +252,7 @@ npm run generate-skill -- <service> --dry-run
 **Output:** `.claude/skill-library/claude/mcp-tools/mcp-tools-{service}/SKILL.md`
 
 **What it does:**
+
 - Scans `.claude/tools/{service}/` for wrapper files
 - Extracts metadata (name, export, purpose, tokens)
 - **Extracts Zod schemas (InputSchema, OutputSchema) and generates TypeScript interface documentation**
@@ -247,12 +260,14 @@ npm run generate-skill -- <service> --dry-run
 - Enables granular agent access control
 
 **When to run:**
+
 - After creating new wrappers (`verify-green` passes)
 - After adding tools to existing service
 - After updating wrapper metadata
 - **When Phase 11 audit detects schema mismatches** (run via fix command)
 
 **Why service-specific skills matter:**
+
 - Agent with `mcp-tools-linear`: Can access Linear tools
 - Agent without `mcp-tools-linear`: Cannot discover Linear tools
 - Principle of least privilege: Grant only needed service access
@@ -260,17 +275,20 @@ npm run generate-skill -- <service> --dry-run
 ## Progressive Disclosure
 
 **Quick Start (15 min):**
+
 - Create with TDD (RED-GREEN-REFACTOR)
 - Audit for compliance
 - Fix deterministic issues
 
 **Comprehensive (60 min):**
+
 - Full TDD cycle with integration tests
 - Performance benchmarks
 - Security validation
 - Coverage reporting
 
 **Deep Dives (references):**
+
 - [TDD methodology](references/new-workflow.md)
 - [Update workflow](references/update-workflow.md)
 - [10 audit phases](references/audit-workflow.md)
@@ -278,12 +296,14 @@ npm run generate-skill -- <service> --dry-run
 ## Example Wrappers
 
 **Existing implementations in `.claude/tools/`:**
+
 - `context7/` - Context7 documentation library wrappers
 - `praetorian-cli/` - Chariot API wrappers
 
 ## Migration from Old Skills
 
 This skill consolidates:
+
 - `mcp-code-write` → use `npm run create` or `npm run update`
 - `mcp-code-compliance` → use `npm run audit`
 - `mcp-code-audit` → use `npm run audit -- --all`
@@ -307,6 +327,7 @@ This skill consolidates:
 **The Problem:** Monolithic test files (e.g., `linear.unit.test.ts` containing all 15 Linear wrappers) break TDD tooling integration.
 
 **Impact:**
+
 - `verify-red`/`verify-green` can't target individual wrappers
 - Coverage reports are aggregated, hiding per-wrapper gaps
 - Debugging requires searching 1500+ line files
@@ -316,6 +337,7 @@ This skill consolidates:
 **The Solution:** One test file per wrapper (e.g., `get-issue.unit.test.ts`, `create-issue.unit.test.ts`).
 
 **Benefits:**
+
 - TDD commands work: `npm run verify-red -- linear/get-issue`
 - Per-wrapper coverage metrics: `npm run test:coverage -- linear/get-issue`
 - Faster test execution: Run only changed wrappers
@@ -333,6 +355,7 @@ This skill consolidates:
 When CLI commands fail, distinguish between:
 
 **Tool Errors (Technical Failures):**
+
 ```
 [Tool Error] ENOENT: File not found at .claude/tools/service/tool.ts
 [Tool Error] npm ERR! missing script: create
@@ -340,6 +363,7 @@ When CLI commands fail, distinguish between:
 ```
 
 **Violations (Policy/Standard Failures):**
+
 ```
 ❌ Coverage below 80% (current: 65%)
 ❌ RED phase not verified - run `npm run verify-red` first
@@ -347,11 +371,13 @@ When CLI commands fail, distinguish between:
 ```
 
 **Display format:**
+
 - Prefix all technical errors with `[Tool Error]`
 - Display violations as-is (already formatted by CLI)
 - Always suggest corrective action
 
 **Example Error Response:**
+
 ```
 [Tool Error] Command failed: npm run create -- context7 get-docs
 

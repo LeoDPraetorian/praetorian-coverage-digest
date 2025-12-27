@@ -134,6 +134,7 @@ Action: Report incomplete, provide manual steps
 If rename fails mid-way:
 
 1. **Check current state:**
+
    ```bash
    # Was file moved?
    ls .claude/agents/{category}/{old-name}.md
@@ -146,12 +147,13 @@ If rename fails mid-way:
 
 3. **If file was NOT moved but frontmatter changed:**
    - Revert frontmatter:
+
    ```typescript
    Edit({
      file_path: ".claude/agents/{category}/{old-name}.md",
      old_string: "name: new-name",
-     new_string: "name: old-name"
-   })
+     new_string: "name: old-name",
+   });
    ```
 
 4. **Complete cleanup:**

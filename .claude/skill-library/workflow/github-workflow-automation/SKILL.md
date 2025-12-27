@@ -260,7 +260,7 @@ permissions:
 ```yaml
 jobs:
   heavy-task:
-    runs-on: ubuntu-latest-4-cores  # More resources
+    runs-on: ubuntu-latest-4-cores # More resources
 ```
 
 ### Early Termination
@@ -457,7 +457,7 @@ name: Security Scan
 on:
   push:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   security:
@@ -521,6 +521,7 @@ jobs:
 ### Workflow Not Triggering
 
 **Check**:
+
 - Workflow file in `.github/workflows/`
 - Valid YAML syntax
 - Trigger conditions match event

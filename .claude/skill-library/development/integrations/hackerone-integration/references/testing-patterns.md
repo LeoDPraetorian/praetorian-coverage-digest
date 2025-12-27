@@ -5,6 +5,7 @@
 ## Overview
 
 Testing HackerOne integration requires multiple layers:
+
 1. **Unit tests** - API client methods, data mapping, webhook parsing
 2. **Integration tests** - Real HackerOne API calls (sandbox environment)
 3. **Webhook tests** - Mock webhook payloads and event handling
@@ -361,6 +362,7 @@ func TestE2E_ReportIngestion(t *testing.T) {
 ## Test Coverage Requirements
 
 Follow Chariot testing standards:
+
 - ✅ Unit test coverage: **≥ 80%**
 - ✅ Critical path coverage: **100%** (authentication, data mapping, webhook handling)
 - ✅ Error handling: Test all error paths

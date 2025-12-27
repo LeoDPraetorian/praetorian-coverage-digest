@@ -19,6 +19,7 @@ tree, _ := client.Tree() // Subsequent calls: cache hit
 ```
 
 Invalidate after tree modifications:
+
 ```go
 c.tree = nil
 ```

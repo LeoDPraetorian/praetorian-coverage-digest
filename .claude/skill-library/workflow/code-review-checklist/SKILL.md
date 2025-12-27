@@ -1,7 +1,7 @@
 ---
 name: code-review-checklist
 description: Use when about to commit code changes, before committing any code, when skipping self-review seems justified by time pressure or manual testing, or when production emergencies tempt bypassing review - provides systematic checklist for reviewing code changes before committing
-allowed-tools: 'Read, Write, Bash'
+allowed-tools: "Read, Write, Bash"
 ---
 
 # Code Review Checklist
@@ -17,6 +17,7 @@ This is NOT about external code review (pull requests, peer review). This is abo
 ## When to Use This Skill
 
 Use BEFORE committing any code changes:
+
 - Feature implementations (new or modified)
 - Bug fixes (including hotfixes)
 - Refactoring
@@ -32,6 +33,7 @@ NO COMMIT WITHOUT SELF-REVIEW
 ```
 
 **This means:**
+
 - Review BEFORE `git commit` (not before deploy, not before PR)
 - Every change, every time
 - No exceptions for "simple" changes
@@ -41,20 +43,20 @@ NO COMMIT WITHOUT SELF-REVIEW
 
 ## Common Rationalizations (All Invalid)
 
-| Rationalization | Reality |
-|----------------|---------|
-| "I already manually tested it" | Testing finds functional bugs. Review finds security flaws, edge cases, maintainability issues |
-| "Code review will catch it" | External review catches different things. You know context they don't |
-| "I'll review it later/Monday/after" | Later never happens. Review before commit, not before deploy |
-| "This is a simple 3-line change" | Simple changes hide the most critical bugs. Size ≠ risk |
-| "Production emergency - no time" | Emergency = MORE reason to review, not less. 5-min review prevents hours of additional firefighting |
-| "Low risk / defensive code" | You thought that before every production incident. Emergency mode impairs risk assessment |
-| "Time pressure / cost too high" | Review takes 5-15 minutes. Incidents cost hours/days. 5 min review vs 2 hour firefight |
-| "Restore service first, review after" | 5-minute review doesn't delay restoration. Broken fix delays MORE |
-| "System up imperfectly > down perfectly" | Unreviewed fix might make system down worse or longer |
-| "Engineering pragmatism in crisis" | True pragmatism = 5-min focused review, not blind deployment |
-| "Perfect is enemy of good" | 5-min focused review ≠ perfectionism. It's minimum due diligence |
-| "Critical System Recovery Principle" | Recovery = stop bleeding correctly with review, not blindly |
+| Rationalization                          | Reality                                                                                             |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| "I already manually tested it"           | Testing finds functional bugs. Review finds security flaws, edge cases, maintainability issues      |
+| "Code review will catch it"              | External review catches different things. You know context they don't                               |
+| "I'll review it later/Monday/after"      | Later never happens. Review before commit, not before deploy                                        |
+| "This is a simple 3-line change"         | Simple changes hide the most critical bugs. Size ≠ risk                                             |
+| "Production emergency - no time"         | Emergency = MORE reason to review, not less. 5-min review prevents hours of additional firefighting |
+| "Low risk / defensive code"              | You thought that before every production incident. Emergency mode impairs risk assessment           |
+| "Time pressure / cost too high"          | Review takes 5-15 minutes. Incidents cost hours/days. 5 min review vs 2 hour firefight              |
+| "Restore service first, review after"    | 5-minute review doesn't delay restoration. Broken fix delays MORE                                   |
+| "System up imperfectly > down perfectly" | Unreviewed fix might make system down worse or longer                                               |
+| "Engineering pragmatism in crisis"       | True pragmatism = 5-min focused review, not blind deployment                                        |
+| "Perfect is enemy of good"               | 5-min focused review ≠ perfectionism. It's minimum due diligence                                    |
+| "Critical System Recovery Principle"     | Recovery = stop bleeding correctly with review, not blindly                                         |
 
 ## Self-Review Checklist
 
@@ -93,17 +95,20 @@ Run through this systematically BEFORE `git commit`:
 ### Domain-Specific Checks
 
 **Go Backend:**
+
 - [ ] Context propagation correct?
 - [ ] Defer for cleanup present?
 - [ ] Interface usage appropriate?
 
 **React Frontend:**
+
 - [ ] Hooks rules followed?
 - [ ] State updates immutable?
 - [ ] Effect cleanup functions present?
 - [ ] Accessibility attributes present?
 
 **Database:**
+
 - [ ] Indexes on filter fields?
 - [ ] N+1 query avoided?
 - [ ] Transactions where needed?
@@ -123,6 +128,7 @@ Read EVERY line you changed. Line by line.
 ### 2. Think Like an Attacker
 
 For each change, ask:
+
 - "How would I exploit this?"
 - "What happens if input is malicious?"
 - "What if this fails at the worst possible time?"
@@ -130,6 +136,7 @@ For each change, ask:
 ### 3. Think Like a Maintainer
 
 For each change, ask:
+
 - "Will I understand this in 6 months?"
 - "Can someone else modify this safely?"
 - "Is this the simplest approach?"
@@ -137,6 +144,7 @@ For each change, ask:
 ### 4. Document Your Review
 
 Add to commit message:
+
 ```
 Self-review completed:
 - Security: [specific checks done]
@@ -151,15 +159,18 @@ Self-review completed:
 ### The Emergency Trap
 
 **Common rationalization:**
+
 > "Production is down, bleeding $15k/min. We need to restore service NOW. I'll review after."
 
 **Reality:**
+
 - 5-minute review = $75k cost
 - Unreviewed fix breaking more things = $150k+ additional downtime
 - **You cannot assess risk correctly in emergency mode**
 - Emergency pressure impairs judgment - that's EXACTLY when you need the checklist
 
 **The Math:**
+
 ```
 Time to review: 5 minutes = $75k
 Time to fix broken fix: 30+ minutes = $450k+
@@ -222,18 +233,19 @@ Post-incident comprehensive review scheduled: [timestamp]
 
 ### Emergency Rationalization Counters
 
-| Rationalization | Reality |
-|----------------|---------|
-| "Restore service first, review after" | 5 minutes doesn't delay restoration. Broken fix delays MORE |
-| "System being up imperfectly > down perfectly" | Unreviewed fix might make it down worse or longer |
-| "Engineering pragmatism in crisis" | Pragmatism = 5-min review before commit, not skipping it |
-| "Perfect is the enemy of good" | 5-min focused review ≠ perfectionism. It's minimum due diligence |
-| "Critical System Recovery Principle" | Recovery principle = stop the bleeding correctly, not blindly |
-| "This fix is low risk / defensive code" | You're in emergency mode. You CANNOT assess risk correctly. Use checklist. |
+| Rationalization                                | Reality                                                                    |
+| ---------------------------------------------- | -------------------------------------------------------------------------- |
+| "Restore service first, review after"          | 5 minutes doesn't delay restoration. Broken fix delays MORE                |
+| "System being up imperfectly > down perfectly" | Unreviewed fix might make it down worse or longer                          |
+| "Engineering pragmatism in crisis"             | Pragmatism = 5-min review before commit, not skipping it                   |
+| "Perfect is the enemy of good"                 | 5-min focused review ≠ perfectionism. It's minimum due diligence           |
+| "Critical System Recovery Principle"           | Recovery principle = stop the bleeding correctly, not blindly              |
+| "This fix is low risk / defensive code"        | You're in emergency mode. You CANNOT assess risk correctly. Use checklist. |
 
 ### The Pattern You'll See
 
 **Without emergency review:**
+
 1. Fix obvious bug in 2 minutes
 2. Deploy
 3. Works initially
@@ -242,6 +254,7 @@ Post-incident comprehensive review scheduled: [timestamp]
 6. Total time: 2 hours+ of firefighting
 
 **With 5-minute emergency review:**
+
 1. Fix obvious bug in 2 minutes
 2. **Review for 5 minutes - find side effect**
 3. **Fix side effect before deploying**
@@ -256,6 +269,7 @@ Post-incident comprehensive review scheduled: [timestamp]
 **Never.**
 
 Even in emergencies:
+
 - 5 minutes doesn't materially delay restoration
 - Prevents making the emergency worse
 - Prevents creating secondary emergencies
@@ -290,6 +304,7 @@ If you think any of these, you're about to violate the principle:
 ## What Self-Review Catches (That External Review Misses)
 
 **You know:**
+
 - Why you made specific choices
 - What alternatives you considered
 - Edge cases from testing
@@ -297,6 +312,7 @@ If you think any of these, you're about to violate the principle:
 - The commit message context
 
 **External reviewers don't know:**
+
 - Your full context and reasoning
 - All the scenarios you manually tested
 - Why certain patterns were chosen
@@ -309,6 +325,7 @@ If you think any of these, you're about to violate the principle:
 **Self-review takes:** 5-15 minutes typically
 
 **Self-review prevents:**
+
 - Security incidents (hours/days to fix)
 - Production bugs (hours to diagnose + fix)
 - Technical debt (weeks accumulating fixes)
@@ -358,6 +375,7 @@ Copy from [templates/review-checklist.md](templates/review-checklist.md) to use 
 ## Summary
 
 **Before every commit:**
+
 1. Run systematic self-review checklist
 2. Document what you checked
 3. Commit with self-review notes

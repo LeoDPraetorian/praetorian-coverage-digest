@@ -1,7 +1,7 @@
 ---
 name: performance-testing
 description: Test application performance, scalability, and resilience. Use when planning load testing, stress testing, or optimizing system performance.
-allowed-tools: 'Read, Bash, Grep, Glob'
+allowed-tools: "Read, Bash, Grep, Glob"
 ---
 
 # Performance Testing
@@ -15,17 +15,20 @@ Test performance like you test functionality: continuously, automatically, and w
 ## Why Performance Testing Matters
 
 ### User Impact
+
 - 100ms delay = 1% drop in conversions (Amazon)
 - 53% of mobile users abandon sites taking > 3 seconds (Google)
 - Slow = Broken (in users' eyes)
 
 ### Business Impact
+
 - Lost revenue from abandoned transactions
 - Increased infrastructure costs
 - Degraded user experience
 - Reputation damage
 
 ### Technical Impact
+
 - Scalability limits
 - Infrastructure bottlenecks
 - Hidden architectural problems
@@ -38,7 +41,8 @@ Test performance like you test functionality: continuously, automatically, and w
 
 **Goal**: Verify the system handles typical usage
 
-**Example**: 
+**Example**:
+
 - E-commerce site handling 1,000 concurrent users
 - API serving 10,000 requests/minute
 - Database processing 500 transactions/second
@@ -54,6 +58,7 @@ Test performance like you test functionality: continuously, automatically, and w
 **Goal**: Find breaking point, see how system fails
 
 **Example**:
+
 - Ramping up from 1,000 to 10,000 concurrent users
 - Pushing API until response time degrades
 - Filling database until queries slow
@@ -69,6 +74,7 @@ Test performance like you test functionality: continuously, automatically, and w
 **Goal**: Test auto-scaling, handling unexpected traffic
 
 **Example**:
+
 - Black Friday sale announcement
 - Viral social media post
 - Marketing campaign launch
@@ -84,6 +90,7 @@ Test performance like you test functionality: continuously, automatically, and w
 **Goal**: Find memory leaks, resource exhaustion, gradual degradation
 
 **Example**:
+
 - Run at normal load for 24-72 hours
 - Monitor memory, connections, file handles
 - Check for resource leaks
@@ -99,6 +106,7 @@ Test performance like you test functionality: continuously, automatically, and w
 **Goal**: Validate horizontal/vertical scaling
 
 **Example**:
+
 - Add servers, measure throughput improvement
 - Test auto-scaling triggers
 - Find scaling limits
@@ -113,6 +121,7 @@ Test performance like you test functionality: continuously, automatically, and w
 **Good**: "95th percentile response time < 200ms under 1,000 concurrent users"
 
 **Define SLOs (Service Level Objectives)**:
+
 - **Response Time**: 95th percentile < 200ms
 - **Throughput**: 10,000 requests/minute minimum
 - **Error Rate**: < 0.1% under load
@@ -121,6 +130,7 @@ Test performance like you test functionality: continuously, automatically, and w
 ### Identify Critical Paths
 
 Don't test everything equally. Focus on:
+
 - Revenue-generating flows (checkout, payment)
 - High-traffic pages (homepage, product pages)
 - Critical APIs (authentication, data access)
@@ -129,13 +139,15 @@ Don't test everything equally. Focus on:
 ### Realistic Scenarios
 
 **Bad**: Every user hits homepage repeatedly
-**Good**: 
+**Good**:
+
 - 40% browse products
 - 30% search
 - 20% view product details
 - 10% checkout
 
 Include:
+
 - Think time (users don't click instantly)
 - Varied data (different products, users, queries)
 - Realistic workflows (browse → search → add to cart → checkout)
@@ -145,12 +157,14 @@ Include:
 ### Test Environment
 
 **Ideal**: Production-like infrastructure
+
 - Same server specs
 - Same database size
 - Same network topology
 - Same third-party integrations (or mocks)
 
 **Reality**: Often scaled-down version
+
 - Document differences
 - Extrapolate results carefully
 - Validate with production monitoring
@@ -158,11 +172,13 @@ Include:
 ### Test Data
 
 **Requirements**:
+
 - Realistic volume (don't test with 100 users when you have 10M)
 - Varied data (avoid cache hits skewing results)
 - Production-like distribution (80/20 rule applies)
 
 **Example**:
+
 ```
 Products: 100,000 (matching production)
 Users: 50,000 test accounts
@@ -173,6 +189,7 @@ Search queries: Real query distribution
 ### Monitoring During Tests
 
 **Essential metrics**:
+
 - Response time (avg, 50th, 95th, 99th percentile)
 - Throughput (requests/second)
 - Error rate
@@ -181,6 +198,7 @@ Search queries: Real query distribution
 - Network latency
 
 **Tools**:
+
 - Application: New Relic, Datadog, Dynatrace
 - Infrastructure: Prometheus, Grafana
 - Database: Query analyzers, slow query logs
@@ -190,11 +208,13 @@ Search queries: Real query distribution
 ### 1. Database
 
 **Symptoms**:
+
 - Slow queries under load
 - Connection pool exhaustion
 - Lock contention
 
 **Solutions**:
+
 - Add indexes on filtered columns
 - Optimize N+1 queries
 - Increase connection pool size
@@ -204,6 +224,7 @@ Search queries: Real query distribution
 ### 2. N+1 Queries
 
 **Problem**:
+
 ```javascript
 // Load 100 orders
 const orders = await Order.findAll();
@@ -215,10 +236,11 @@ for (const order of orders) {
 ```
 
 **Fix**:
+
 ```javascript
 // Load orders with customers in one query
 const orders = await Order.findAll({
-  include: [Customer]
+  include: [Customer],
 });
 ```
 
@@ -228,7 +250,8 @@ const orders = await Order.findAll({
 
 **Example**: Sending email during checkout
 
-**Fix**: 
+**Fix**:
+
 - Use message queues (RabbitMQ, SQS)
 - Process asynchronously
 - Return response immediately
@@ -236,16 +259,19 @@ const orders = await Order.findAll({
 ### 4. Memory Leaks
 
 **Symptoms**:
+
 - Memory usage grows over time
 - Performance degrades gradually
 - Eventually crashes
 
 **Detection**:
+
 - Endurance testing
 - Memory profiling (heap dumps)
 - Monitor garbage collection
 
 **Common causes**:
+
 - Event listeners not cleaned up
 - Caches without eviction
 - Circular references
@@ -256,6 +282,7 @@ const orders = await Order.findAll({
 **Problem**: Recalculating same results repeatedly
 
 **Strategy**:
+
 - Cache expensive operations
 - Use CDN for static assets
 - Implement application-level caching (Redis)
@@ -268,6 +295,7 @@ const orders = await Order.findAll({
 **Problem**: Third-party APIs slow or unavailable
 
 **Solutions**:
+
 - Set aggressive timeouts
 - Implement circuit breakers
 - Cache responses when possible
@@ -278,16 +306,19 @@ const orders = await Order.findAll({
 ### Continuous Performance Testing
 
 **Approach 1: Smoke Tests**
+
 - Run small load test on every commit
 - 10 concurrent users for 1 minute
 - Catch major regressions quickly
 
 **Approach 2: Nightly Tests**
+
 - Full load test overnight
 - More comprehensive scenarios
 - Trend analysis over time
 
 **Approach 3: Pre-Production Gate**
+
 - Load test before production deploy
 - Automated pass/fail criteria
 - Block deployment if performance degrades
@@ -296,29 +327,29 @@ const orders = await Order.findAll({
 
 ```javascript
 // performance-test.js
-import http from 'k6/http';
-import { check, sleep } from 'k6';
+import http from "k6/http";
+import { check, sleep } from "k6";
 
 export const options = {
   stages: [
-    { duration: '1m', target: 50 },   // Ramp up
-    { duration: '3m', target: 50 },   // Stay at 50 users
-    { duration: '1m', target: 0 },    // Ramp down
+    { duration: "1m", target: 50 }, // Ramp up
+    { duration: "3m", target: 50 }, // Stay at 50 users
+    { duration: "1m", target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<200'],  // 95% of requests < 200ms
-    http_req_failed: ['rate<0.01'],    // < 1% failures
+    http_req_duration: ["p(95)<200"], // 95% of requests < 200ms
+    http_req_failed: ["rate<0.01"], // < 1% failures
   },
 };
 
 export default function () {
-  const res = http.get('https://api.example.com/products');
-  
+  const res = http.get("https://api.example.com/products");
+
   check(res, {
-    'status is 200': (r) => r.status === 200,
-    'response time < 200ms': (r) => r.timings.duration < 200,
+    "status is 200": (r) => r.status === 200,
+    "response time < 200ms": (r) => r.timings.duration < 200,
   });
-  
+
   sleep(1);
 }
 ```
@@ -336,12 +367,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Run k6 test
         uses: grafana/k6-action@v0.3.0
         with:
           filename: performance-test.js
-          
+
       - name: Upload results
         uses: actions/upload-artifact@v2
         with:
@@ -354,23 +385,27 @@ jobs:
 ### Key Metrics
 
 **Response Time Distribution**:
+
 - **Average**: Misleading (outliers skew it)
 - **Median (50th percentile)**: Typical user experience
 - **95th percentile**: "Slow but acceptable"
 - **99th percentile**: Worst user experience
 
 **Throughput**:
+
 - Requests/second sustained
 - How it changes with load
 - Where it plateaus (capacity)
 
 **Error Rate**:
+
 - Should stay flat as load increases
 - Spike indicates breaking point
 
 ### Interpreting Results
 
 **Good**:
+
 ```
 Load: 1,000 users
 Response time p95: 180ms
@@ -380,6 +415,7 @@ CPU: 65%, Memory: 70%
 ```
 
 **Problems**:
+
 ```
 Load: 1,000 users
 Response time p95: 3,500ms ❌ (too slow)
@@ -403,6 +439,7 @@ CPU: 95%, Memory: 90% ❌ (maxed out)
 **What**: Automated tests hitting production
 
 **Example**:
+
 - Every 5 minutes, test critical flows
 - Measure response time from multiple locations
 - Alert if degradation detected
@@ -414,6 +451,7 @@ CPU: 95%, Memory: 90% ❌ (maxed out)
 **What**: Measure actual user experience
 
 **Metrics**:
+
 - Page load time
 - Time to interactive
 - API response times
@@ -424,12 +462,14 @@ CPU: 95%, Memory: 90% ❌ (maxed out)
 ### Alerting
 
 **Set alerts on**:
+
 - p95 response time > threshold
 - Error rate > 1%
 - Throughput drops suddenly
 - Queue depth growing
 
 **Don't alert on**:
+
 - Average response time (too noisy)
 - Single slow request (outliers happen)
 
@@ -480,22 +520,27 @@ CPU: 95%, Memory: 90% ❌ (maxed out)
 ### Load Testing Tools
 
 **k6**: Modern, developer-friendly, JavaScript-based
+
 - Good for: CI/CD integration, API testing
 - Learning curve: Low
 
 **JMeter**: Mature, feature-rich, GUI-based
+
 - Good for: Complex scenarios, extensive protocols
 - Learning curve: Medium
 
 **Gatling**: Scala-based, great reporting
+
 - Good for: High load, detailed metrics
 - Learning curve: Medium
 
 **Artillery**: Node.js, simple YAML configs
+
 - Good for: Quick tests, simple scenarios
 - Learning curve: Very low
 
 **Locust**: Python-based, distributed testing
+
 - Good for: Custom user behavior, Python ecosystems
 - Learning curve: Low-Medium
 
@@ -520,17 +565,20 @@ CPU: 95%, Memory: 90% ❌ (maxed out)
 **Problem**: Checkout taking 5+ seconds under load
 
 **Investigation**:
+
 1. Load test: Reproduce issue
 2. Monitor: Database CPU at 95%
 3. Profile: Slow query on order creation
 4. Root cause: Missing index on `orders.user_id`
 
 **Fix**:
+
 ```sql
 CREATE INDEX idx_orders_user_id ON orders(user_id);
 ```
 
 **Result**:
+
 - Checkout time: 5s → 300ms
 - Database CPU: 95% → 40%
 - Throughput: 5x improvement
@@ -568,20 +616,21 @@ CREATE INDEX idx_orders_user_id ON orders(user_id);
 ### Automated Performance Testing
 
 **qe-performance-tester** orchestrates load testing:
+
 ```typescript
 // Agent runs comprehensive load test
 const perfTest = await agent.runLoadTest({
-  target: 'https://api.example.com',
+  target: "https://api.example.com",
   scenarios: {
-    checkout: { vus: 100, duration: '5m' },
-    search: { vus: 200, duration: '5m' },
-    browse: { vus: 500, duration: '5m' }
+    checkout: { vus: 100, duration: "5m" },
+    search: { vus: 200, duration: "5m" },
+    browse: { vus: 500, duration: "5m" },
   },
   thresholds: {
-    'http_req_duration': ['p(95)<200'],
-    'http_req_failed': ['rate<0.01'],
-    'http_reqs': ['rate>100']
-  }
+    http_req_duration: ["p(95)<200"],
+    http_req_failed: ["rate<0.01"],
+    http_reqs: ["rate>100"],
+  },
 });
 
 // Returns detailed performance report
@@ -591,10 +640,13 @@ const perfTest = await agent.runLoadTest({
 
 ```typescript
 // Agent identifies performance bottlenecks
-const analysis = await qe-performance-tester.analyzeBottlenecks({
-  testResults: perfTest,
-  metrics: ['cpu', 'memory', 'db_queries', 'network', 'cache_hits']
-});
+const analysis =
+  (await qe) -
+  performance -
+  tester.analyzeBottlenecks({
+    testResults: perfTest,
+    metrics: ["cpu", "memory", "db_queries", "network", "cache_hits"],
+  });
 
 // Returns:
 // {
@@ -609,29 +661,32 @@ const analysis = await qe-performance-tester.analyzeBottlenecks({
 
 ```typescript
 // Agent integrates performance testing in CI/CD
-const ciPerformance = await qe-performance-tester.ciIntegration({
-  mode: 'smoke',  // Quick test on every commit
-  duration: '1m',
-  vus: 10,
-  failOn: {
-    'p95_response_time': 300,  // ms
-    'error_rate': 0.01         // 1%
-  }
-});
+const ciPerformance =
+  (await qe) -
+  performance -
+  tester.ciIntegration({
+    mode: "smoke", // Quick test on every commit
+    duration: "1m",
+    vus: 10,
+    failOn: {
+      p95_response_time: 300, // ms
+      error_rate: 0.01, // 1%
+    },
+  });
 ```
 
 ### Fleet Coordination for Performance
 
 ```typescript
 const performanceFleet = await FleetManager.coordinate({
-  strategy: 'performance-testing',
+  strategy: "performance-testing",
   agents: [
-    'qe-performance-tester',       // Run load tests
-    'qe-quality-analyzer',         // Analyze results
-    'qe-production-intelligence',  // Compare to production
-    'qe-deployment-readiness'      // Go/no-go decision
+    "qe-performance-tester", // Run load tests
+    "qe-quality-analyzer", // Analyze results
+    "qe-production-intelligence", // Compare to production
+    "qe-deployment-readiness", // Go/no-go decision
   ],
-  topology: 'sequential'
+  topology: "sequential",
 });
 ```
 
@@ -640,10 +695,12 @@ const performanceFleet = await FleetManager.coordinate({
 ## Related Skills
 
 **Testing:**
+
 - [agentic-quality-engineering](../agentic-quality-engineering/) - Agent coordination
 - [api-testing-patterns](../api-testing-patterns/) - API performance testing
 
 **Quality:**
+
 - [quality-metrics](../quality-metrics/) - Performance metrics tracking
 - [risk-based-testing](../risk-based-testing/) - Performance risk assessment
 

@@ -1,5 +1,5 @@
 ---
-description: Agent management - create, update, audit, fix, rename, test, search, or list agents
+description: Agent management - create, update, audit, fix, rename, test, search, or list for agents
 argument-hint: <create|update|audit|fix|rename|test|search|list> [agent-name] [options]
 model: sonnet
 allowed-tools: Skill, AskUserQuestion
@@ -29,15 +29,15 @@ skills: managing-agents
 
 ## Quick Reference
 
-| Command                                          | Description               |
-| ------------------------------------------------ | ------------------------- |
-| `/agent-manager create <name> "<desc>" --type X` | Create agent with TDD     |
-| `/agent-manager update <name> "<changes>"`       | Update agent              |
-| `/agent-manager audit <name>`                    | Validate single agent     |
-| `/agent-manager audit --all`                     | Validate all agents       |
-| `/agent-manager fix <name> [--dry-run]`          | Fix issues                |
-| `/agent-manager fix <name> --suggest`            | Show fix suggestions      |
-| `/agent-manager rename <old> <new>`              | Rename agent              |
+| Command                                          | Description                      |
+| ------------------------------------------------ | -------------------------------- |
+| `/agent-manager create <name> "<desc>" --type X` | Create agent with TDD            |
+| `/agent-manager update <name> "<changes>"`       | Update agent                     |
+| `/agent-manager audit <name>`                    | Validate single agent            |
+| `/agent-manager audit --all`                     | Validate all agents              |
+| `/agent-manager fix <name> [--dry-run]`          | Fix issues                       |
+| `/agent-manager fix <name> --suggest`            | Show fix suggestions             |
+| `/agent-manager rename <old> <new>`              | Rename agent                     |
 | `/agent-manager test <agent> [skill]`            | Test agent behavioral validation |
-| `/agent-manager search "<keyword>"`              | Search agents             |
-| `/agent-manager list [--type <category>]`        | List agents               |
+| `/agent-manager search "<keyword>"`              | Search agents                    |
+| `/agent-manager list [--type <category>]`        | List agents                      |

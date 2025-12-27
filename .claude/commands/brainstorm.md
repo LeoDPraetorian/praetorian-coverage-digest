@@ -11,6 +11,7 @@ Use and follow the brainstorming skill exactly as written
 ## Example Usage
 
 **Example 1: Refining vague feature request**
+
 ```
 > /brainstorm "Make the dashboard better"
 
@@ -23,6 +24,7 @@ Use and follow the brainstorming skill exactly as written
 ```
 
 **Example 2: Exploring architectural alternatives**
+
 ```
 > /brainstorm "Add real-time updates to asset list"
 
@@ -34,6 +36,7 @@ Use and follow the brainstorming skill exactly as written
 ```
 
 **Example 3: Clarifying unclear requirements**
+
 ```
 > /brainstorm "Users want better notifications"
 

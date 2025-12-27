@@ -1,6 +1,6 @@
 /**
  * Compliance Orchestrator
- * Coordinates audit and fix operations across all 13 phases
+ * Coordinates audit and fix operations across all 21 phases
  */
 
 import { SkillAuditor } from './audit-engine.js';

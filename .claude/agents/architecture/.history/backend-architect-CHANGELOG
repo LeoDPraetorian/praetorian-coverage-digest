@@ -1,0 +1,30 @@
+# backend-architect Agent Changelog
+
+## 2025-12-27 - Compliance Fixes
+
+### Fixed
+- **Phase 5/10 CRITICAL**: Removed `analyzing-cyclomatic-complexity` from frontmatter skills (library skill incorrectly in frontmatter)
+  - Also removed from Tier 1 in Skill Loading Protocol
+  - Skill accessible via `gateway-backend` (already in frontmatter)
+
+- **Phase 14 WARNING**: Removed duplicate "Skill References (Load On-Demand via Gateway)" section (lines 24-46)
+  - Content duplicated Tier 3 trigger table
+  - Consolidated into Tier 3 only per Tiered Skill Loading Protocol pattern
+  - Eliminated ~23 lines of duplication
+
+- **Phase 15 CRITICAL**: Fixed invalid library skill paths in Tier 3
+  - Removed 6 non-existent skill paths:
+    - `backend-dynamodb-patterns` (does not exist)
+    - `backend-go-concurrency` (does not exist)
+    - `backend-api-design` (does not exist)
+    - `backend-microservices-design` (does not exist)
+    - `backend-repository-pattern` (does not exist)
+    - `ops-aws-lambda` (does not exist)
+  - Replaced with gateway delegation pattern
+  - Added skill-search CLI guidance for discovering backend patterns
+
+### Result
+- **Before**: 257 lines with 3 critical issues, 1 warning
+- **After**: ~230 lines, all audit phases passing
+- **Lines removed**: ~27 lines (duplication + invalid references)
+- **Agent now compliant** with progressive loading architecture

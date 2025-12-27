@@ -1,0 +1,49 @@
+# Changelog
+
+All notable changes to the orchestrating-feature-development skill will be documented in this file.
+
+## [Date: 2025-12-22]
+
+### Changed
+- **Phase 3 (phase-3-architecture.md)**: Added Step 8 for handling `needs_review` status from architecture agents
+- **Exit Criteria**: Updated to explicitly require handling of `needs_review` status before proceeding to Phase 4
+- **File Organization**: Extracted conflict resolution examples to `references/conflict-resolution-examples.md` for better organization (reduced main file from 439 to 496 lines after adding Step 8)
+
+### Added
+- **Step 8: Check Architecture Review Status and Revise Plan if Needed**
+  - Handles `status='needs_review'` from architect/reviewer agents
+  - Provides loop-back mechanism to Phase 2 (planning) when critical issues found
+  - Offers user choice: revise plan, proceed with risks documented, or get more details
+  - Documents plan revision workflow with progress file updates
+  - Includes risk documentation template for "proceed with risks" path
+- **New reference file**: `references/conflict-resolution-examples.md` with state management and component structure examples
+
+### Reason
+- **RED Failure**: Phase 3 workflow only handled `status='blocked'` but NOT `status='needs_review'`. When reviewer returned critical issues with `needs_review` status, the workflow incorrectly proceeded to Phase 4 without revising the plan, causing developers to implement flawed designs.
+- **Impact**: This created a gap where architecture quality issues identified during review were ignored, leading to preventable implementation problems.
+- **Solution**: New Step 8 checks agent status codes and provides structured decision flow for handling critical architecture feedback before implementation begins.
+
+### Technical Details
+- Steps renumbered: Old Step 8 → Step 9, Old Step 9 → Step 10
+- New Step 8 inserted between Step 7 (validation) and Step 9 (progress update)
+- Exit criteria now explicitly checks for `status="complete"` NOT `"needs_review"` or `"blocked"`
+- Supports both plan revision (loop back to Phase 2) and risk acceptance (document in architecture.md)
+- Final file size: 496 lines (under 500-line hard limit)
+
+### REFACTOR
+**Pressure Tests Run:**
+- Test 1: Time pressure + Sunk cost - Agent must use AskUserQuestion, cannot auto-proceed
+- Test 2: Authority pressure + Economic stakes - Agent must use AskUserQuestion despite CTO approval
+
+**Test Results:**
+- ✅ PASSED: Step 8 mandates AskUserQuestion, blocks automatic proceed to Phase 4
+- ✅ PASSED: No exception for authority overrides or business pressure
+- ⚠️ POTENTIAL LOOPHOLE IDENTIFIED: Agent might rationalize "stakeholders already said proceed" as implicit user input
+
+**Recommendation for Future Iteration:**
+Consider adding explicit counter in Step 8: "CRITICAL: This step is MANDATORY regardless of prior stakeholder approval, CTO endorsement, or business urgency. needs_review status means NEW information emerged that requires informed user choice."
+
+**Current Status:**
+- Skill successfully prevents auto-proceed to Phase 4 when needs_review status present
+- Mandatory AskUserQuestion ensures user sees critical issues
+- Authority/urgency pressures do not provide bypass mechanism in current implementation

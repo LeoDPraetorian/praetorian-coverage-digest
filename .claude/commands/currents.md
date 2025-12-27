@@ -24,6 +24,7 @@ I'll automatically parse your natural language and execute the right tool.
 ## Natural Language Examples
 
 ### Getting Recent Runs
+
 ```bash
 # All of these work:
 /currents get recent runs
@@ -33,6 +34,7 @@ I'll automatically parse your natural language and execute the right tool.
 ```
 
 ### Getting Run Details
+
 ```bash
 # Any of these:
 /currents get run details for <runId>
@@ -42,6 +44,7 @@ I'll automatically parse your natural language and execute the right tool.
 ```
 
 ### Getting Failed Tests
+
 ```bash
 # Multiple ways:
 /currents get failed tests from latest run
@@ -51,6 +54,7 @@ I'll automatically parse your natural language and execute the right tool.
 ```
 
 ### Getting Performance Data
+
 ```bash
 # Performance queries:
 /currents show slow tests
@@ -60,6 +64,7 @@ I'll automatically parse your natural language and execute the right tool.
 ```
 
 ### Listing Projects
+
 ```bash
 # Simple queries:
 /currents list projects
@@ -86,11 +91,13 @@ When you invoke this command, I will:
 **CRITICAL:** This command works from any directory (including submodules like `modules/chariot/`).
 
 First, detect the super-repo root:
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
 ```
 
 Then read the skill file:
+
 ```bash
 Read: $REPO_ROOT/.claude/skill-library/claude/mcp-tools/mcp-tools-currents/SKILL.md
 ```
@@ -100,6 +107,7 @@ This gives me context about available tools and execution patterns.
 ### Step 2: Parse Your Natural Language
 
 I'll analyze your input for:
+
 - **Operation type**: runs, run-details, test-results, performance, projects
 - **Parameters**: projectId, runId, limit, cursor, filters
 - **Intent**: What you're trying to accomplish
@@ -116,6 +124,7 @@ cd "$REPO_ROOT" && npx tsx -e "..." 2>/dev/null
 Based on your request, I'll execute one of:
 
 **get-projects** - List all Currents projects
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
 cd "$REPO_ROOT" && npx tsx -e "(async () => {
@@ -126,6 +135,7 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 ```
 
 **get-runs** - Get recent test runs
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
 cd "$REPO_ROOT" && npx tsx -e "(async () => {
@@ -139,6 +149,7 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 ```
 
 **get-run-details** - Get specific run statistics
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
 cd "$REPO_ROOT" && npx tsx -e "(async () => {
@@ -151,6 +162,7 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 ```
 
 **get-test-results** - Get test execution results
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
 cd "$REPO_ROOT" && npx tsx -e "(async () => {
@@ -165,6 +177,7 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 ```
 
 **get-tests-performance** - Get performance metrics
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
 cd "$REPO_ROOT" && npx tsx -e "(async () => {
@@ -178,6 +191,7 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 ```
 
 **get-spec-files-performance** - Get file-level performance
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
 cd "$REPO_ROOT" && npx tsx -e "(async () => {
@@ -190,6 +204,7 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 ```
 
 **get-spec-instance** - Get spec debugging data
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
 cd "$REPO_ROOT" && npx tsx -e "(async () => {
@@ -202,6 +217,7 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 ```
 
 **get-tests-signatures** - Get test signatures for filtering
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
 cd "$REPO_ROOT" && npx tsx -e "(async () => {
@@ -216,6 +232,7 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 ### Step 4: Format and Display Results
 
 I'll parse the JSON response and display it in a clean, readable format with:
+
 - Summary of key metrics
 - Failed test details (if any)
 - Performance insights (if requested)
@@ -244,21 +261,25 @@ Currents tools use API key authentication configured in `$REPO_ROOT/.claude/tool
 ## What You Can Query
 
 ### Run Information
+
 - Recent test runs with status and timing
 - Specific run details with pass/fail counts
 - Run statistics and metadata
 
 ### Test Results
+
 - Individual test results from a run
 - Failed test details with error messages
 - Flaky test identification
 
 ### Performance Metrics
+
 - Slowest tests across all runs
 - File-level performance data
 - Performance trends over time
 
 ### Projects
+
 - List all Currents projects
 - Project configurations
 
@@ -276,7 +297,9 @@ Currents tools use API key authentication configured in `$REPO_ROOT/.claude/tool
 For developers or debugging, here are the underlying wrapper patterns:
 
 ### Authentication Setup
+
 API key is read from `$REPO_ROOT/.claude/tools/config/credentials.json`:
+
 ```json
 {
   "currents": {
@@ -286,16 +309,19 @@ API key is read from `$REPO_ROOT/.claude/tools/config/credentials.json`:
 ```
 
 Or set via environment variable:
+
 ```bash
 export CURRENTS_API_KEY="your-api-key"
 ```
 
 ### Error Handling
+
 - Filter out debug output with `2>/dev/null`
 - Validate all string inputs against path traversal, command injection, and control chars
 - Handle network errors and provide retry guidance
 - Display clean JSON results
 
 ### Default Chariot Project
+
 - **Project ID**: `1mwNCW`
 - **Name**: "E2E Regression Tests"

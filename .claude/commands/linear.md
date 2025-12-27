@@ -11,10 +11,12 @@ allowed-tools: Bash, Read, Skill
 ## Quick Operations vs Epic Creation
 
 **For quick operations** (seconds to minutes):
+
 - Create single issue, get issue, list issues, update fields
 - Uses `mcp-tools-linear` skill
 
 **For comprehensive epics** (2-4 hours):
+
 - Create epic with codebase research, breakdown, detailed docs
 - Uses `writing-linear-epics-stories` skill
 - Example: `/linear create epic for real-time notifications with research`
@@ -26,6 +28,7 @@ I'll automatically detect which workflow you need based on your request.
 ## Natural Language Examples
 
 ### Creating Issues (Quick)
+
 ```bash
 # All of these work:
 /linear create issue for fixing auth bug with description needs OAuth migration
@@ -35,6 +38,7 @@ I'll automatically detect which workflow you need based on your request.
 ```
 
 ### Creating Epics (Comprehensive)
+
 ```bash
 # Triggers full research workflow:
 /linear create epic for real-time notifications with research
@@ -50,6 +54,7 @@ I'll automatically detect which workflow you need based on your request.
 ```
 
 ### Getting Issues
+
 ```bash
 # Any of these work:
 /linear get CHARIOT-1234
@@ -59,6 +64,7 @@ I'll automatically detect which workflow you need based on your request.
 ```
 
 ### Listing Issues
+
 ```bash
 # Multiple ways to ask:
 /linear list all issues
@@ -68,6 +74,7 @@ I'll automatically detect which workflow you need based on your request.
 ```
 
 ### Updating Issues
+
 ```bash
 # Natural variations:
 /linear update CHARIOT-1234 status to In Progress
@@ -92,31 +99,38 @@ When you invoke this command, I will:
 ### Step 1: Detect Workflow Type
 
 Analyze your input for keywords:
+
 - **Epic workflow**: "epic", "comprehensive", "with research", "with breakdown", "stories"
 - **Quick operation**: "issue", "get", "list", "update", single operations
 
 ### Step 2: Route to Appropriate Skill
 
 **If epic creation detected:**
+
 ```bash
 Skill: "writing-linear-epics-stories"
 ```
+
 → Starts comprehensive workflow with research, breakdown, documentation
 
 **If quick operation detected:**
+
 ```bash
 Read: .claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md
 ```
+
 → Parse natural language and execute wrapper directly
 
 ### Step 3: Execute Workflow
 
 **For epics:**
+
 - Follow structured research → breakdown → documentation → creation process
 - Create TodoWrite todos to track progress
 - Deliver epic + sub-issues with full context
 
 **For quick operations:**
+
 - Parse parameters from natural language
 - Execute appropriate Linear wrapper
 - Display clean results
@@ -129,6 +143,7 @@ Read: .claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md
 ## What You Can Do
 
 ### Quick Operations (mcp-tools-linear)
+
 - **Create issues**: Provide title and optional description
 - **Get issue**: Provide issue ID (e.g., CHARIOT-1234)
 - **List issues**: Optionally specify limit (default 20)
@@ -137,6 +152,7 @@ Read: .claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md
 - **Comment on issues**: Add comments to existing issues
 
 ### Epic Creation (writing-linear-epics-stories)
+
 - **Create comprehensive epics**: With codebase research and breakdown
 - **Generate detailed sub-issues**: With architecture diagrams and workflows
 - **Manage dependencies**: Automatic parent/child linking
@@ -158,6 +174,7 @@ The appropriate skill will guide me through your request!
 For developers or debugging, here are the underlying wrapper patterns:
 
 ### Get Issue (Direct Execution)
+
 ```bash
 npx tsx -e "(async () => {
   const { getIssue } = await import('./.claude/tools/linear/get-issue.ts');
@@ -167,6 +184,7 @@ npx tsx -e "(async () => {
 ```
 
 ### List Issues (Direct Execution)
+
 ```bash
 npx tsx -e "(async () => {
   const { listIssues } = await import('./.claude/tools/linear/list-issues.ts');
@@ -176,6 +194,7 @@ npx tsx -e "(async () => {
 ```
 
 ### Error Handling
+
 - Filter out debug output with `grep -v "^\[" | grep -v "^No credentials"`
 - Validate issue IDs match pattern `[A-Z]+-[0-9]+`
 - Handle network errors and provide retry guidance

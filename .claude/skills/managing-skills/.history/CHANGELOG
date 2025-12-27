@@ -1,3 +1,242 @@
+## [Date: 2025-12-27] - Add centralized table-formatting reference
+
+### Added
+- New reference file `references/table-formatting.md` - Centralized single source of truth for markdown table formatting
+- Link to table-formatting.md in "Deep Dives (references/)" section of SKILL.md
+
+### Reason
+- **RED failure**: No centralized documentation for table formatting requirements
+- Four skills (creating-skills, updating-skills, auditing-skills, fixing-skills) would need to duplicate table formatting guidance
+- No single source of truth for Prettier-based validation standards
+- Risk of inconsistent table formatting across skills without centralized requirements
+
+### Technical Details
+- Cross-cutting concern: Applies to creating, updating, auditing, and fixing skills
+- Documents Phase 14g (sub-phase of Reference Validation) for auditing-skills
+- Documents Tier 1 (Deterministic) fix approach for fixing-skills
+- Includes Prettier CLI commands for validation and auto-fix
+- Contains examples of correct vs incorrect table formatting
+
+### Files Changed
+- `SKILL.md` - Added link to table-formatting.md in Deep Dives section (line 189)
+- `references/table-formatting.md` - New file (~280 lines) with comprehensive table formatting documentation
+
+### Method
+- Used `updating-skills` workflow with TDD
+- Backup created: `.local/2024-12-27-managing-skills.bak`
+- Line count: 237 → 238 lines (safe zone)
+
+### REFACTOR Assessment
+- **Change Classification**: Documentation update (adds reference, no behavioral change)
+- **Risk Level**: LOW - Pure documentation addition, no logic to bypass
+- **Pressure Test Status**: Not required for documentation-only changes
+
+---
+
+## [Date: 2025-12-26] - Add finding-agents-for-skills delegation
+
+### Added
+- New operation "Find Agents" to Quick Reference table
+- `finding-agents-for-skills` to Two-Tier Skill Access table
+- "find agents for X" to Delegation Map
+- `finding-agents-for-skills` to Related Skills table
+- Operation count updated from 10 to 11
+
+### Reason
+- Split agent analysis from auditing-skills to follow single-responsibility principle
+- Previous "Interactive Analysis Selection" prompt in auditing-skills was frequently bypassed
+- Users who want agent recommendations now have dedicated workflow
+- Part of larger refactor to simplify auditing-skills (remove pre-flight prompt)
+
+### Files Changed
+- `SKILL.md` - 6 edits (Quick Reference, Two-Tier table, Delegation Map, Related Skills, Operations summary, count)
+
+### Method
+- Used `updating-skills` workflow
+- Backup created: `.local/2025-12-26-16-07-56-managing-skills.bak`
+- Line count: 232 → 237 lines (safe zone)
+
+---
+
+## [Date: 2025-12-26 - Fix Reference Documentation: Remove audit --fix]
+
+### Changed
+- **references/skill-compliance-contract.md** - Line 258: Updated from `audit --fix` to `npm run -w @chariot/fixing-skills fix`
+- **references/patterns/phase-categorization.md** - Line 38: Updated Command from `audit --fix` to workspace command
+- **references/patterns/changelog-format.md** - Lines 92, 112, 130: Updated 3 instances of `auditing-skills --fix` to correct CLI
+- **references/cli-usage.md** - Line 59: Removed `audit --fix` example; Lines 62-72: Updated Fix Commands to use full workspace syntax
+
+### Reason
+- **RED failure**: Reference documentation perpetuated the same `audit --fix` bug fixed in auditing-skills and fixing-skills
+- Documentation showed non-existent command, misleading users and agents
+- Part of ecosystem-wide fix to correct architectural misunderstanding
+
+### Technical Details
+- Same root cause as auditing-skills/fixing-skills updates (audit.ts has no --fix flag)
+- Reference docs are teaching materials - critical they show correct commands
+- All 4 files updated to use `npm run -w @chariot/fixing-skills fix` pattern
+- Correct workflow: audit (detect) → fixing-skills CLI (deterministic) → fixing-skills skill (full orchestration)
+
+### Files Changed
+- `references/skill-compliance-contract.md` - 1 edit (line 258)
+- `references/patterns/phase-categorization.md` - 1 edit (line 38)
+- `references/patterns/changelog-format.md` - 3 edits (lines 92, 112, 130)
+- `references/cli-usage.md` - 2 edits (removed line 59, updated lines 62-72)
+
+### Method
+- Used `updating-skills` workflow (retroactively formalized after initial edits)
+- Backups created: `.local/2025-12-26-13-42-28-*-pre-fix.bak` (4 files)
+- Line counts: skill-compliance-contract.md (277), phase-categorization.md (439), changelog-format.md (206), cli-usage.md (158) - all safe
+- Total changes: 10 command reference updates across 4 files
+
+### Verification
+- Comprehensive grep search confirmed no remaining `audit --fix` references in .claude directory
+- All reference docs now architecturally consistent with auditing-skills and fixing-skills
+- Ecosystem-wide fix complete (skill SKILL.md files + reference documentation)
+
+---
+
+## [Date: 2025-12-24] - External Documentation Links Pattern
+
+### Changed
+- Added external documentation links pattern to references/file-organization.md
+- Updated references/ directory "Use for" list to include "External documentation links (20+ links for library skills)"
+- Added `references/links-to-official-docs.md` to examples list and structure diagram
+- Created new "External Documentation Links Pattern" section (lines 263-325)
+- Updated Extraction Decision Tree to include external docs decision branch
+
+### Added
+- Complete section documenting when to use links-to-official-docs.md (20+ links)
+- Decision tree: 5-10 links in SKILL.md, 20+ links in references/
+- Brief vs comprehensive examples with code snippets
+- References to creating-skills and auditing-skills pattern documentation
+- New decision branch in extraction tree (lines 349-351)
+
+### Reason
+- file-organization.md lacked documentation for the references/links-to-official-docs.md pattern
+- Pattern established in creating-skills and auditing-skills but not documented in file organization reference
+- Agents reading file-organization for guidance wouldn't know about external docs pattern
+- RED failure: No mention of how to organize external documentation links for library skills
+
+### Technical Details
+- Pattern applies to library skills wrapping: npm packages, external APIs, third-party services, frameworks
+- Brief list (5-10 links): Place in SKILL.md under "## Related Resources"
+- Comprehensive (20+ links): Create references/links-to-official-docs.md
+- Examples: using-modern-react-patterns (brief), implementing-react-hook-form-zod (comprehensive)
+- Cross-references to complete guidance in creating-skills/references/skill-templates.md and auditing-skills/references/library-skill-patterns.md
+- Line count: 422 → 492 lines (added 70 lines, reference files have no limit)
+
+### REFACTOR Phase Results
+
+**Change Classification:** Documentation update (adds guidance, no behavioral change)
+
+**Pressure Test Assessment:**
+- Primary risk: Agents miss the new section when consulting file-organization
+- Mitigation 1: Pattern added to three locations (references/ list, examples, structure diagram)
+- Mitigation 2: Dedicated section with clear header "External Documentation Links Pattern"
+- Mitigation 3: Appears in extraction decision tree (procedural checkpoint)
+- Mitigation 4: Cross-references to complete docs (creating-skills, auditing-skills)
+
+**Bypass Scenarios:**
+1. Agents read references/ section but miss new "External documentation links" bullet
+2. Agents read extraction tree but skip external docs branch
+3. Agents don't consult file-organization when organizing external links
+
+**Counters Applied:**
+- Added to "Use for" list (line 33) - seen when reading references/ purpose
+- Added to examples list (line 41) - seen when looking at reference patterns
+- Added to structure diagram (line 51) - seen when planning directory layout
+- Full section with decision tree (lines 263-325) - comprehensive guidance
+- Extraction tree branch (lines 349-351) - procedural checkpoint
+
+**Recommended Manual Validation:**
+Ask agent "Where should I put 25 external documentation links for a React Hook Form skill?" and verify they reference file-organization.md pattern.
+
+**Bypass Risk:** LOW - Documentation only, multiple touchpoints, no behavior to bypass
+
+---
+
+## [Date: 2025-12-23] - Gateway Pattern Compliance
+
+### Changed
+- Added "Understanding This Skill (Two-Tier System)" section explaining invocation patterns
+- Added explicit invocation syntax table showing core (Skill tool) vs library (Read tool) access
+- Added IMPORTANT warning block about library skill invocation failures
+- Updated Related Skills section with access methods table
+- Extracted Gateway Management to references/gateway-management.md (freed 37 lines)
+- Condensed Create operation description (freed 11 lines)
+- Line count: 510 → 491 lines (now under 500 hard limit)
+
+### Reason
+- Agents attempting `skill: "updating-skills"` failed because updating-skills is a library skill (GATEWAY-PATTERNS.md violation)
+- managing-skills functions as a gateway but lacked two-tier system explanation
+- Delegation Map showed skill names without invocation syntax (ambiguous)
+- Related Skills didn't indicate which use `skill:` vs `Read()`
+- File exceeded 500 line hard limit, requiring extraction before edits
+
+### Files Changed
+- `SKILL.md` - Two-tier explanation, invocation table, IMPORTANT block, Related Skills table
+- `references/gateway-management.md` - Extracted gateway operations documentation
+
+### REFACTOR Status
+- **Change Classification**: Non-trivial (structural changes, new mandatory patterns)
+- **Pressure Tests Designed**:
+  1. Time Pressure - "Quick update command" → Must still read invocation table
+  2. Authority Pressure - "Senior says use skill: for all" → Must cite IMPORTANT block
+  3. Sunk Cost - "Already tried skill: 5 times" → Must recognize failure, consult table
+- **Rationalization Counters**:
+  - Two-tier table shows CORE vs LIBRARY distinction explicitly
+  - Invocation column prevents assumption all skills use `skill:`
+  - IMPORTANT block with ✅/❌ examples prevents guessing
+- **Test Status**: Tests designed and documented (actual execution would require agent simulation)
+- **Risk Assessment**: LOW - Changes are additive documentation, enforce existing two-tier system
+- **Validation**: GREEN test passed in Phase 6
+
+## [Date: 2025-12-23] - Gateway Management Capabilities
+
+### Added
+- Gateway management capabilities to managing-skills
+- Gateway template at `templates/gateway-template.md` for creating gateway skills
+- Gateway audit phases 17-20 for validating gateway structure, routing tables, and coverage
+- Gateway operations in Quick Reference table and Delegation Map
+- Detailed gateway documentation at `references/gateway-management.md`
+
+### Changed
+- Quick Reference table now includes "Sync Gateways" operation
+- Delegation Map includes gateway-specific routing:
+  - `create gateway-X --type gateway` → creating-skills with gateway template
+  - `audit gateway-X` → auditing-skills with phases 1-20
+  - `fix gateway-X --phase N` → fixing-skills with gateway fixes
+  - `sync gateways` → syncing-gateways skill
+- Added Gateway Management section to SKILL.md with examples and phase descriptions
+- Line count: 457 → 496 lines (stayed under 500 limit via extraction strategy)
+
+### Reason
+- Gateway skills lacked standardized creation, audit, and sync workflows
+- No template for creating new gateways with proper two-tier structure
+- Standard audit phases (1-16) didn't validate gateway-specific requirements:
+  - Phase 17: Gateway structure (two-tier explanation, IMPORTANT block)
+  - Phase 18: Routing table format (full paths vs skill names)
+  - Phase 19: Path resolution (broken links to deleted skills)
+  - Phase 20: Coverage check (orphaned library skills)
+- Gateways could drift out of sync with library skills (missing/stale entries)
+- Enables complete gateway lifecycle: create → audit → fix → sync
+
+### Files Changed
+- `SKILL.md` - Added Quick Reference row, Delegation Map entries, Gateway Management section
+- `templates/gateway-template.md` - New gateway template with two-tier structure
+- `references/gateway-management.md` - Complete gateway management documentation
+
+### REFACTOR
+- **Change Classification**: Non-trivial (new workflows, routing rules, ~70+ line additions)
+- **Pressure Tests Designed**:
+  1. Time Pressure - "Create gateway quickly" → Must still use template
+  2. Authority Pressure - "Lead architect says skip IMPORTANT block" → Must enforce Phase 17
+  3. Sunk Cost - "Already created without template" → Must recommend audit/fix retroactively
+- **Test Status**: Tests documented but not executed (infrastructure-level change)
+- **Risk Assessment**: LOW - Changes are additive (new operations), no modification to existing workflows
+- **Validation**: GREEN tests passed (all gateway capabilities verified present)
+
 ## [Date: 2025-12-13]
 
 ### Changed
@@ -24,7 +263,7 @@ When adding Phase 13 (state-externalization), these needed manual updates:
 1. **Make CLI dynamic**: Export PHASES array from audit.ts, use PHASES.length in cli.ts validation
 2. **Add 'Adding New Phases' section** to references/audit-phases.md with checklist:
    - Create phases/phase{N}-{name}.ts
-   - Register in audit.ts PHASES array  
+   - Register in audit.ts PHASES array
    - Register in fix.ts FIXERS array (if auto-fixable)
    - Update SKILL.md table and description count
    - Update references/audit-phases.md

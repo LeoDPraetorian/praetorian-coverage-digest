@@ -6,22 +6,22 @@
 
 ### By Motivation
 
-| Motivation | Description | Typical Targets |
-|------------|-------------|-----------------|
-| **Financial Gain** | Profit through theft, ransom, fraud | Payment data, credentials, ransomware targets |
-| **Espionage** | Steal IP, trade secrets, competitive intelligence | Proprietary data, R&D, M&A plans |
-| **Hacktivism** | Political/social agenda, publicity | Public-facing sites, government, controversial orgs |
-| **Sabotage** | Disrupt operations, cause damage | Critical infrastructure, competitors |
-| **Insider Threat** | Revenge, theft, negligence | Any internal data, systems |
+| Motivation         | Description                                       | Typical Targets                                     |
+| ------------------ | ------------------------------------------------- | --------------------------------------------------- |
+| **Financial Gain** | Profit through theft, ransom, fraud               | Payment data, credentials, ransomware targets       |
+| **Espionage**      | Steal IP, trade secrets, competitive intelligence | Proprietary data, R&D, M&A plans                    |
+| **Hacktivism**     | Political/social agenda, publicity                | Public-facing sites, government, controversial orgs |
+| **Sabotage**       | Disrupt operations, cause damage                  | Critical infrastructure, competitors                |
+| **Insider Threat** | Revenge, theft, negligence                        | Any internal data, systems                          |
 
 ### By Capability
 
-| Level | Skills | Resources | Tactics |
-|-------|--------|-----------|---------|
-| **Script Kiddie** | Minimal technical skills | Public tools, tutorials | Automated scanning, known exploits |
-| **Skilled Attacker** | Programming, networking, security | Custom tools, 0-days | Targeted attacks, custom exploits |
-| **Organized Crime** | Professional teams | Dedicated infrastructure | Sophisticated campaigns, money laundering |
-| **Nation-State** | Elite hackers, researchers | Unlimited resources | APTs, supply chain attacks, 0-days |
+| Level                | Skills                            | Resources                | Tactics                                   |
+| -------------------- | --------------------------------- | ------------------------ | ----------------------------------------- |
+| **Script Kiddie**    | Minimal technical skills          | Public tools, tutorials  | Automated scanning, known exploits        |
+| **Skilled Attacker** | Programming, networking, security | Custom tools, 0-days     | Targeted attacks, custom exploits         |
+| **Organized Crime**  | Professional teams                | Dedicated infrastructure | Sophisticated campaigns, money laundering |
+| **Nation-State**     | Elite hackers, researchers        | Unlimited resources      | APTs, supply chain attacks, 0-days        |
 
 ## Common Threat Actor Profiles
 
@@ -32,6 +32,7 @@
 **Capability**: Low (use public tools)
 
 **Tactics**:
+
 - Automated vulnerability scanning
 - Credential stuffing attacks
 - Exploit kits for known CVEs
@@ -39,6 +40,7 @@
 - Cryptomining malware
 
 **Targets**:
+
 - Internet-facing applications
 - Default credentials
 - Unpatched systems
@@ -47,6 +49,7 @@
 **Industry Focus**: Indiscriminate (target everything)
 
 **Indicators**:
+
 - Application is internet-facing
 - No WAF or basic security controls
 - Default configurations in use
@@ -62,6 +65,7 @@
 **Capability**: Medium to High
 
 **Tactics**:
+
 - Ransomware deployment
 - Payment card theft
 - Banking trojan distribution
@@ -69,18 +73,21 @@
 - Cryptocurrency theft
 
 **Targets**:
+
 - Payment processing systems
 - Financial data
 - Backup systems (for ransom)
 - Executive email accounts
 
 **Industry Focus**:
+
 - Healthcare (ransomware)
 - E-commerce (card theft)
 - Financial services (fraud)
 - Any organization with funds
 
 **Indicators**:
+
 - Handles payment data
 - Valuable databases
 - Limited backup/recovery capability
@@ -97,6 +104,7 @@
 **Capability**: Very High (elite teams)
 
 **Tactics**:
+
 - Spear phishing
 - Supply chain attacks
 - 0-day exploits
@@ -105,6 +113,7 @@
 - Living-off-the-land techniques
 
 **Targets**:
+
 - Intellectual property
 - Government systems
 - Critical infrastructure
@@ -112,6 +121,7 @@
 - Strategic industries
 
 **Industry Focus**:
+
 - Defense/aerospace
 - Energy/utilities
 - Telecommunications
@@ -120,6 +130,7 @@
 - Healthcare (during crisis)
 
 **Indicators**:
+
 - Organization in strategic industry
 - Government contracts
 - Proprietary technology
@@ -138,6 +149,7 @@
 **Capability**: High (legitimate access)
 
 **Tactics**:
+
 - Data exfiltration via authorized channels
 - Privilege abuse
 - Sabotage of systems/data
@@ -145,6 +157,7 @@
 - IP theft before resignation
 
 **Targets**:
+
 - Proprietary data
 - Customer databases
 - Financial records
@@ -153,6 +166,7 @@
 **Industry Focus**: Any (universal risk)
 
 **Indicators**:
+
 - Disgruntled employees
 - Employees with financial stress
 - Contractors/third parties with access
@@ -170,6 +184,7 @@
 **Capability**: Low (lack of security awareness)
 
 **Tactics**:
+
 - Clicking phishing links
 - Using weak passwords
 - Sharing credentials
@@ -182,6 +197,7 @@
 **Industry Focus**: Universal
 
 **Indicators**:
+
 - Limited security training
 - No phishing simulation
 - Weak password policies
@@ -198,6 +214,7 @@
 **Capability**: Low to Medium
 
 **Tactics**:
+
 - Website defacement
 - DDoS attacks
 - Data leaks ("doxing")
@@ -205,12 +222,14 @@
 - Publicity-seeking breaches
 
 **Targets**:
+
 - Public-facing websites
 - Social media accounts
 - Government organizations
 - Controversial companies
 
 **Industry Focus**:
+
 - Government
 - Political organizations
 - Oil/gas, mining
@@ -218,6 +237,7 @@
 - Any controversial industry
 
 **Indicators**:
+
 - Organization in controversial industry
 - Recent PR crisis
 - Government affiliation
@@ -236,6 +256,7 @@
 **Capability**: Medium to High (may hire professionals)
 
 **Tactics**:
+
 - Insider recruitment
 - Spear phishing executives
 - Social engineering
@@ -243,6 +264,7 @@
 - Exploiting business relationships
 
 **Targets**:
+
 - Product roadmaps
 - Pricing strategies
 - Customer lists
@@ -250,12 +272,14 @@
 - M&A plans
 
 **Industry Focus**:
+
 - Any competitive market
 - Tech startups
 - Manufacturing
 - Pharmaceuticals
 
 **Indicators**:
+
 - Intense market competition
 - Valuable IP
 - Pending M&A
@@ -272,6 +296,7 @@
 **Capability**: High
 
 **Tactics**:
+
 - Compromising vendors/partners
 - Software supply chain (dependencies)
 - Managed service provider (MSP) attacks
@@ -279,18 +304,21 @@
 - Trojanized updates
 
 **Targets**:
+
 - Third-party software
 - Cloud service providers
 - Build pipelines
 - Update mechanisms
 
 **Industry Focus**:
+
 - Software vendors (high-value targets)
 - MSPs/MSSPs
 - Cloud providers
 - Any organization with valuable customers
 
 **Indicators**:
+
 - Many downstream customers
 - Software distribution mechanism
 - Privileged access to customer systems
@@ -306,6 +334,7 @@
 ### Financial Services
 
 **Primary Threat Actors**:
+
 1. Financially motivated cybercriminals (fraud, theft)
 2. Nation-state APTs (espionage)
 3. Insider threats (data exfiltration)
@@ -319,6 +348,7 @@
 ### Healthcare
 
 **Primary Threat Actors**:
+
 1. Ransomware groups (financially motivated)
 2. Nation-state APTs (PHI for espionage)
 3. Insider threats (PHI theft for identity fraud)
@@ -332,6 +362,7 @@
 ### E-Commerce
 
 **Primary Threat Actors**:
+
 1. Cybercriminals (payment card theft)
 2. Competitors (pricing/strategy intel)
 3. Opportunistic attackers (card testing)
@@ -345,6 +376,7 @@
 ### SaaS/Cloud Platforms
 
 **Primary Threat Actors**:
+
 1. Supply chain attackers (leverage customer access)
 2. Nation-state APTs (target high-value customers)
 3. Insider threats (customer data access)
@@ -358,6 +390,7 @@
 ### Manufacturing/Industrial
 
 **Primary Threat Actors**:
+
 1. Competitors (trade secret theft)
 2. Nation-state APTs (IP theft)
 3. Sabotage actors (disruption)
@@ -386,11 +419,7 @@ Use this to profile threat actors for your specific application:
         "Credential stuffing",
         "Ransomware via phishing"
       ],
-      "mitigations": [
-        "PCI-DSS compliance",
-        "MFA enforcement",
-        "WAF deployment"
-      ]
+      "mitigations": ["PCI-DSS compliance", "MFA enforcement", "WAF deployment"]
     }
   ]
 }
@@ -417,12 +446,12 @@ Use this to profile threat actors for your specific application:
 
 Map threat actors to ATT&CK techniques for detailed analysis:
 
-| Threat Actor Type | Common ATT&CK Techniques |
-|------------------|--------------------------|
-| **Ransomware Operators** | T1486 (Data Encrypted for Impact), T1490 (Inhibit System Recovery) |
-| **APT Groups** | T1071 (Application Layer Protocol), T1027 (Obfuscated Files) |
-| **Opportunistic Attackers** | T1190 (Exploit Public-Facing Application), T1110 (Brute Force) |
-| **Insiders** | T1213 (Data from Information Repositories), T1048 (Exfiltration Over Alternative Protocol) |
+| Threat Actor Type           | Common ATT&CK Techniques                                                                   |
+| --------------------------- | ------------------------------------------------------------------------------------------ |
+| **Ransomware Operators**    | T1486 (Data Encrypted for Impact), T1490 (Inhibit System Recovery)                         |
+| **APT Groups**              | T1071 (Application Layer Protocol), T1027 (Obfuscated Files)                               |
+| **Opportunistic Attackers** | T1190 (Exploit Public-Facing Application), T1110 (Brute Force)                             |
+| **Insiders**                | T1213 (Data from Information Repositories), T1048 (Exfiltration Over Alternative Protocol) |
 
 ## Output Format
 
@@ -440,17 +469,9 @@ Use this structure for `threat-actors.json`:
       "likelihood": "high",
       "rationale": "Payment processing, limited controls",
       "likely_targets": ["payment_data", "credentials", "customer_pii"],
-      "attack_vectors": [
-        "SQL injection",
-        "Credential stuffing",
-        "Phishing"
-      ],
+      "attack_vectors": ["SQL injection", "Credential stuffing", "Phishing"],
       "mitre_attck_techniques": ["T1190", "T1110", "T1566"],
-      "mitigations": [
-        "PCI-DSS compliance",
-        "MFA enforcement",
-        "Input validation"
-      ]
+      "mitigations": ["PCI-DSS compliance", "MFA enforcement", "Input validation"]
     }
   ],
   "industry_context": {

@@ -28,6 +28,7 @@ Laws derived from cognitive psychology research that explain how humans process 
 **Target:** 5-7 options maximum per level
 
 **Techniques:**
+
 1. **Group similar items** into categories
 2. **Use progressive disclosure** to reveal options gradually
 3. **Provide smart defaults** to reduce decision burden
@@ -41,29 +42,30 @@ Laws derived from cognitive psychology research that explain how humans process 
 // Settings organized into 5 groups
 const settingsGroups = [
   {
-    title: 'Account',
-    items: ['Profile', 'Password', 'Email Preferences']
+    title: "Account",
+    items: ["Profile", "Password", "Email Preferences"],
   },
   {
-    title: 'Security',
-    items: ['Two-Factor Auth', 'API Keys', 'Session Management']
+    title: "Security",
+    items: ["Two-Factor Auth", "API Keys", "Session Management"],
   },
   {
-    title: 'Notifications',
-    items: ['Email Alerts', 'Slack Integration', 'Webhooks']
+    title: "Notifications",
+    items: ["Email Alerts", "Slack Integration", "Webhooks"],
   },
   {
-    title: 'Billing',
-    items: ['Subscription', 'Payment Method', 'Invoices']
+    title: "Billing",
+    items: ["Subscription", "Payment Method", "Invoices"],
   },
   {
-    title: 'Data',
-    items: ['Export', 'Import', 'Integrations']
-  }
+    title: "Data",
+    items: ["Export", "Import", "Integrations"],
+  },
 ];
 ```
 
 **Why this works:**
+
 - Top level: 5 groups (within Hick's Law limit)
 - Each group: 3-4 items (easy to scan)
 - User makes decisions in stages, not all at once
@@ -72,14 +74,26 @@ const settingsGroups = [
 
 ```typescript
 const settingsItems = [
-  'Profile', 'Password', 'Email Preferences', 'Two-Factor Auth',
-  'API Keys', 'Session Management', 'Email Alerts', 'Slack Integration',
-  'Webhooks', 'Subscription', 'Payment Method', 'Invoices',
-  'Export', 'Import', 'Integrations'
+  "Profile",
+  "Password",
+  "Email Preferences",
+  "Two-Factor Auth",
+  "API Keys",
+  "Session Management",
+  "Email Alerts",
+  "Slack Integration",
+  "Webhooks",
+  "Subscription",
+  "Payment Method",
+  "Invoices",
+  "Export",
+  "Import",
+  "Integrations",
 ];
 ```
 
 **Why this fails:**
+
 - 15 simultaneous choices overwhelm users
 - No clear organization or hierarchy
 - Violates both Hick's Law (too many) and Miller's Law (exceeds working memory)
@@ -112,6 +126,7 @@ const settingsItems = [
 ```
 
 **Benefits:**
+
 - Primary choices: 3 (fast decisions)
 - Advanced choices: Hidden until needed
 - Progressive disclosure reduces cognitive load
@@ -167,11 +182,13 @@ Break complex forms into steps to apply Hick's Law:
 ### Trade-offs
 
 **When to violate Hick's Law:**
+
 - Expert users need all options visible (power user mode)
 - Search functionality replaces navigation
 - Options are grouped so clearly that cognitive load is minimal
 
 **Example: VS Code Command Palette**
+
 - 1000+ commands, but search-first interface eliminates Hick's Law paralysis
 
 ---
@@ -208,23 +225,17 @@ Break information into meaningful groups of 5-7 items:
 ```typescript
 // Navigation with Miller's Law applied
 const navigation = [
-  'Dashboard',           // 1
-  'Assets',              // 2
-  'Vulnerabilities',     // 3
-  'Scans',              // 4
-  'Reports',            // 5
-  'Settings',           // 6
-  'Help'                // 7
+  "Dashboard", // 1
+  "Assets", // 2
+  "Vulnerabilities", // 3
+  "Scans", // 4
+  "Reports", // 5
+  "Settings", // 6
+  "Help", // 7
 ];
 
 // Each section has its own 5-7 subitems
-const assetsSubmenu = [
-  'All Assets',
-  'Domains',
-  'IPs',
-  'Web Apps',
-  'Cloud Resources'
-];
+const assetsSubmenu = ["All Assets", "Domains", "IPs", "Web Apps", "Cloud Resources"];
 ```
 
 ### Chariot Examples
@@ -234,18 +245,19 @@ const assetsSubmenu = [
 ```typescript
 // ✅ GOOD: 6 primary widgets
 const defaultWidgets = [
-  'Asset Count',
-  'Critical Vulnerabilities',
-  'Scan Status',
-  'Risk Score Trend',
-  'Recent Findings',
-  'Scheduled Scans'
+  "Asset Count",
+  "Critical Vulnerabilities",
+  "Scan Status",
+  "Risk Score Trend",
+  "Recent Findings",
+  "Scheduled Scans",
 ];
 
 // User can add more via customization, but default is 6
 ```
 
 **Why this works:**
+
 - Users can comprehend all 6 widgets at a glance
 - Within working memory capacity
 - Easy to remember layout when returning
@@ -255,24 +267,24 @@ const defaultWidgets = [
 ```typescript
 // ❌ BAD: Too many columns (12 visible)
 const columns = [
-  'Name', 'Type', 'Status', 'Owner', 'Created', 'Updated',
-  'Risk Score', 'Vulnerabilities', 'Last Scan', 'Next Scan',
-  'Tags', 'Actions'
+  "Name",
+  "Type",
+  "Status",
+  "Owner",
+  "Created",
+  "Updated",
+  "Risk Score",
+  "Vulnerabilities",
+  "Last Scan",
+  "Next Scan",
+  "Tags",
+  "Actions",
 ];
 
 // ✅ GOOD: 5-7 essential columns, rest in details view
-const visibleColumns = [
-  'Name',
-  'Risk Score',
-  'Vulnerabilities',
-  'Last Scan',
-  'Status',
-  'Actions'
-];
+const visibleColumns = ["Name", "Risk Score", "Vulnerabilities", "Last Scan", "Status", "Actions"];
 
-const hiddenDetails = [
-  'Owner', 'Created', 'Updated', 'Next Scan', 'Tags'
-];
+const hiddenDetails = ["Owner", "Created", "Updated", "Next Scan", "Tags"];
 ```
 
 ### Pagination and List Display
@@ -317,11 +329,13 @@ const pageSizeOptions = [25, 50, 100, 250];
 ### Trade-offs
 
 **When to exceed 7 items:**
+
 - Alphabetical lists where users know what they're looking for (e.g., country selector)
 - Search-first interfaces (users type, not scan)
 - Data tables where columns are essential to decision-making
 
 **Mitigation strategies:**
+
 - Add search/filter functionality
 - Use progressive disclosure
 - Implement virtualized scrolling for performance
@@ -422,6 +436,7 @@ Follow Jakob's Law - use conventions users already know:
 **High-Load Scenario: Vulnerability Triage**
 
 Problem: Users must process:
+
 - Vulnerability details (CVE, CVSS, description)
 - Asset context (what's affected)
 - Risk assessment (exploitability, impact)
@@ -471,6 +486,7 @@ Problem: Users must process:
 ```
 
 **Benefits:**
+
 - Card view: Low cognitive load for scanning/sorting
 - Details view: Full information when needed
 - User controls information exposure

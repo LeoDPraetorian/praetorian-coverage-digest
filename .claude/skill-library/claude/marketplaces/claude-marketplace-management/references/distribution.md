@@ -5,6 +5,7 @@ Complete guide to distributing plugin marketplaces to teams.
 ## Overview
 
 Claude Code supports three distribution methods:
+
 1. **GitHub** (recommended for teams)
 2. **Other Git Services** (GitLab, Bitbucket, etc.)
 3. **Local Paths** (for testing)
@@ -14,6 +15,7 @@ Claude Code supports three distribution methods:
 ### Setup
 
 **Step 1: Create GitHub Repository**
+
 ```bash
 # Create new repository on GitHub
 # Public or private (team needs access)
@@ -24,6 +26,7 @@ cd marketplace-name
 ```
 
 **Step 2: Add marketplace.json**
+
 ```bash
 # Create marketplace.json in repository root
 cat > marketplace.json << 'EOF'
@@ -41,6 +44,7 @@ EOF
 **Step 3: Add Plugins**
 
 For bundled plugins:
+
 ```bash
 mkdir -p plugins/plugin-name
 # Add plugin content
@@ -48,6 +52,7 @@ git add plugins/
 ```
 
 For external plugins:
+
 ```json
 {
   "plugins": [
@@ -63,6 +68,7 @@ For external plugins:
 ```
 
 **Step 4: Commit and Push**
+
 ```bash
 git add marketplace.json
 git commit -m "Initial marketplace setup"
@@ -72,16 +78,19 @@ git push origin main
 ### User Installation
 
 **Add marketplace:**
+
 ```bash
 /plugin marketplace add owner/marketplace-name
 ```
 
 **Install plugin from marketplace:**
+
 ```bash
 /plugin install plugin-name@marketplace-name
 ```
 
 **Or use GitHub URL:**
+
 ```bash
 /plugin marketplace add https://github.com/owner/marketplace-name
 ```
@@ -97,11 +106,13 @@ git push origin main
 ### GitHub Access
 
 **Public repositories:**
+
 - No authentication required
 - Anyone can install
 - Good for open source tools
 
 **Private repositories:**
+
 - Team members need repository access
 - GitHub authentication required
 - Good for internal tools
@@ -109,11 +120,13 @@ git push origin main
 ### Updating Marketplace
 
 **Users update:**
+
 ```bash
 /plugin marketplace update marketplace-name
 ```
 
 **Force refresh:**
+
 ```bash
 /plugin marketplace remove marketplace-name
 /plugin marketplace add owner/marketplace-name
@@ -134,6 +147,7 @@ Follow your git service's standard process.
 Same as GitHub method.
 
 **Step 3: Commit and Push**
+
 ```bash
 git add marketplace.json
 git commit -m "Initial marketplace"
@@ -143,6 +157,7 @@ git push origin main
 ### User Installation
 
 **Full git URL required:**
+
 ```bash
 /plugin marketplace add https://gitlab.com/owner/repo.git
 /plugin marketplace add https://bitbucket.org/owner/repo.git
@@ -152,11 +167,13 @@ git push origin main
 ### Authentication
 
 **HTTPS with credentials:**
+
 - Git credential helper
 - SSH keys
 - Personal access tokens
 
 **SSH URLs:**
+
 ```bash
 /plugin marketplace add git@gitlab.com:owner/repo.git
 ```
@@ -174,6 +191,7 @@ For testing before publishing.
 ### Setup
 
 **Create local marketplace:**
+
 ```bash
 mkdir ~/my-test-marketplace
 cd ~/my-test-marketplace
@@ -183,11 +201,13 @@ cd ~/my-test-marketplace
 ### User Installation
 
 **Absolute path:**
+
 ```bash
 /plugin marketplace add /absolute/path/to/marketplace
 ```
 
 **Relative path (from working directory):**
+
 ```bash
 /plugin marketplace add ./relative/path/marketplace
 ```
@@ -195,17 +215,20 @@ cd ~/my-test-marketplace
 ### Use Cases
 
 **Testing:**
+
 - Validate marketplace.json syntax
 - Test plugin installation
 - Verify plugin functionality
 - Debug issues before publishing
 
 **Development:**
+
 - Active plugin development
 - Quick iteration
 - Local changes without commits
 
 **Workshops:**
+
 - Share local marketplace
 - Offline demonstrations
 - Training sessions
@@ -227,16 +250,19 @@ cd ~/my-test-marketplace
 ### Method 1: Manual Installation
 
 Each team member runs commands:
+
 ```bash
 /plugin marketplace add owner/marketplace
 /plugin install plugin-name@marketplace
 ```
 
 **Pros:**
+
 - Simple for small teams
 - User control
 
 **Cons:**
+
 - Manual process
 - Inconsistent across team
 - Easy to forget
@@ -244,6 +270,7 @@ Each team member runs commands:
 ### Method 2: Documented Setup
 
 Create SETUP.md in repository:
+
 ```markdown
 # Plugin Setup
 
@@ -256,10 +283,12 @@ Create SETUP.md in repository:
 ```
 
 **Pros:**
+
 - Clear instructions
 - Self-service
 
 **Cons:**
+
 - Still manual
 - Can become outdated
 
@@ -285,6 +314,7 @@ Use `.claude/settings.json` in project repository:
 ```
 
 **Commit to git:**
+
 ```bash
 git add .claude/settings.json
 git commit -m "Add automatic plugin configuration"
@@ -292,18 +322,21 @@ git push
 ```
 
 **Team members:**
+
 ```bash
 git pull
 # Claude Code automatically installs marketplace and plugins
 ```
 
 **Pros:**
+
 - Zero manual configuration
 - Consistent across team
 - Version controlled
 - Single source of truth
 
 **Cons:**
+
 - Requires project settings
 
 ## Distribution Best Practices
@@ -311,12 +344,14 @@ git pull
 ### Versioning
 
 **Tag releases:**
+
 ```bash
 git tag -a v1.0.0 -m "Release version 1.0.0"
 git push origin v1.0.0
 ```
 
 **Semantic versioning:**
+
 - `1.0.0` - Initial release
 - `1.1.0` - New features
 - `1.0.1` - Bug fixes
@@ -325,6 +360,7 @@ git push origin v1.0.0
 ### Documentation
 
 **README.md:**
+
 ```markdown
 # Company Tools Marketplace
 
@@ -345,27 +381,34 @@ git push origin v1.0.0
 ```
 
 **CHANGELOG.md:**
+
 ```markdown
 # Changelog
 
 ## [1.1.0] - 2024-01-15
+
 ### Added
+
 - New security-scanner plugin
 
 ## [1.0.0] - 2024-01-01
+
 ### Added
+
 - Initial release with dev-tools
 ```
 
 ### Communication
 
 **Announce updates:**
+
 - Slack/Teams message
 - Email to team
 - Pull request description
 - Release notes
 
 **Breaking changes:**
+
 - Warn team in advance
 - Provide migration guide
 - Update documentation
@@ -374,6 +417,7 @@ git push origin v1.0.0
 ### Testing
 
 **Before distributing:**
+
 1. Test locally first
 2. Verify all plugin sources accessible
 3. Check JSON syntax
@@ -381,6 +425,7 @@ git push origin v1.0.0
 5. Validate all plugins load
 
 **CI/CD validation:**
+
 ```yaml
 # .github/workflows/validate.yml
 name: Validate Marketplace
@@ -401,17 +446,20 @@ jobs:
 ### Security
 
 **Repository access:**
+
 - Use private repos for internal tools
 - Control GitHub access carefully
 - Audit team membership regularly
 
 **Plugin vetting:**
+
 - Review plugin code before adding
 - Verify author identity
 - Check for malicious code
 - Document security requirements
 
 **HTTPS only:**
+
 ```json
 {
   "source": {
@@ -420,29 +468,34 @@ jobs:
   }
 }
 ```
+
 Never use `http://` URLs.
 
 ## Troubleshooting Distribution
 
 **Users can't add marketplace:**
+
 - Verify repository exists
 - Check access permissions
 - Confirm URL format correct
 - Try full URL instead of shorthand
 
 **Plugins don't install:**
+
 - Validate marketplace.json syntax
 - Check plugin sources accessible
 - Verify plugin.json exists
 - Review error messages
 
 **Updates don't work:**
+
 - Check git repository has updates
 - Verify user ran update command
 - Try remove/re-add marketplace
 - Clear Claude Code cache
 
 **Different team members see different plugins:**
+
 - Ensure all pulled latest git changes
 - Verify marketplace update ran
 - Check settings.json consistent
@@ -476,23 +529,27 @@ Never use `http://` URLs.
 ## Summary
 
 **Choose GitHub for:**
+
 - Team distribution
 - Version control
 - Easy discovery
 - Standard workflow
 
 **Choose Git Services for:**
+
 - Existing infrastructure
 - Self-hosted requirements
 - Enterprise integration
 
 **Choose Local Paths for:**
+
 - Testing
 - Development
 - Offline work
 - Quick iteration
 
 **Recommended flow:**
+
 1. Develop locally
 2. Test thoroughly
 3. Publish to GitHub

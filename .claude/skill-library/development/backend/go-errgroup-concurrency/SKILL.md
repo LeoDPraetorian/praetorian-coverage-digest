@@ -1,7 +1,7 @@
 ---
 name: go-errgroup-concurrency
 description: Use when implementing parallel processing in Go with error handling - covers errgroup API (Group, WithContext, SetLimit, TryGo), 6 concurrency patterns (basic parallel, mutex-protected results, atomic counters, channels, continue-on-error, fire-and-forget), anti-patterns to avoid, and Chariot concurrency limit standards. Based on 33 real implementations.
-allowed-tools: 'Read, Bash, Grep, Glob'
+allowed-tools: "Read, Bash, Grep, Glob"
 ---
 
 # Go Errgroup Concurrency Patterns
@@ -51,6 +51,7 @@ type Group struct {
 A collection of goroutines working on subtasks of a common task.
 
 **Key characteristics:**
+
 - Zero value is valid (no limit, no context cancellation)
 - Thread-safe for concurrent `Go()` calls
 - **Must NOT be reused after `Wait()` returns**
@@ -312,22 +313,22 @@ func processWithCancellation(ctx context.Context, items []Item) error {
 
 ### Standard Limits (Chariot Convention)
 
-| Limit | Use Case | Example |
-|-------|----------|---------|
-| **10** | Default for most operations | Integrations, API calls, handlers |
-| **25-30** | Higher throughput needed | CSV imports, exports |
-| **100** | Lightweight operations | Okta (simple API calls) |
-| **1000** | Bulk database operations | DynamoDB batch deletes |
+| Limit     | Use Case                    | Example                           |
+| --------- | --------------------------- | --------------------------------- |
+| **10**    | Default for most operations | Integrations, API calls, handlers |
+| **25-30** | Higher throughput needed    | CSV imports, exports              |
+| **100**   | Lightweight operations      | Okta (simple API calls)           |
+| **1000**  | Bulk database operations    | DynamoDB batch deletes            |
 
 ### Choosing a Limit
 
-| Workload Type | Recommendation |
-|---------------|----------------|
-| **CPU-bound** | `runtime.NumCPU()` |
-| **I/O-bound (HTTP, DB)** | 10-100 based on external limits |
-| **Memory-intensive** | Lower limit to prevent OOM |
-| **Rate-limited APIs** | Match API rate limit |
-| **Unknown** | Start with 10, adjust based on metrics |
+| Workload Type            | Recommendation                         |
+| ------------------------ | -------------------------------------- |
+| **CPU-bound**            | `runtime.NumCPU()`                     |
+| **I/O-bound (HTTP, DB)** | 10-100 based on external limits        |
+| **Memory-intensive**     | Lower limit to prevent OOM             |
+| **Rate-limited APIs**    | Match API rate limit                   |
+| **Unknown**              | Start with 10, adjust based on metrics |
 
 ```go
 // Standard constants (consider defining in shared package)
@@ -552,23 +553,25 @@ func processWithRateLimit(ctx context.Context, items []Item) error {
 
 ### errgroup vs sync.WaitGroup
 
-| Feature | sync.WaitGroup | errgroup.Group |
-|---------|----------------|----------------|
-| Error handling | Manual | Built-in |
-| Context cancellation | Manual | Built-in (WithContext) |
-| Concurrency limits | Manual | Built-in (SetLimit) |
-| Panic handling | Crashes | Crashes* |
-| API complexity | Add/Done/Wait | Go/Wait |
+| Feature              | sync.WaitGroup | errgroup.Group         |
+| -------------------- | -------------- | ---------------------- |
+| Error handling       | Manual         | Built-in               |
+| Context cancellation | Manual         | Built-in (WithContext) |
+| Concurrency limits   | Manual         | Built-in (SetLimit)    |
+| Panic handling       | Crashes        | Crashes\*              |
+| API complexity       | Add/Done/Wait  | Go/Wait                |
 
-*For panic recovery, consider `sourcegraph/conc` package.
+\*For panic recovery, consider `sourcegraph/conc` package.
 
 **Use errgroup when:**
+
 - Goroutines can return errors
 - Need coordinated cancellation
 - Want concurrency limits
 - Prefer cleaner API
 
 **Use sync.WaitGroup when:**
+
 - Fire-and-forget goroutines
 - No error handling needed
 - Maximum performance critical
@@ -576,11 +579,13 @@ func processWithRateLimit(ctx context.Context, items []Item) error {
 ### When to Use WithContext
 
 **Use `errgroup.WithContext` when:**
+
 - First error should stop all work
 - Operations are expensive (don't waste resources)
 - Graceful shutdown is needed
 
 **Use bare `errgroup.Group` when:**
+
 - All items should be attempted regardless of errors
 - Using "log and continue" pattern
 - Operations are cheap/fast

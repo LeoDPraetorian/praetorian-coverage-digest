@@ -22,11 +22,13 @@ Enable granular agent access control for chariot operations.
 ## Available Tools (Auto-discovered: 2 wrappers)
 
 ### query
+
 - **Purpose:** MCP wrapper for query
 - **Import:** `import { query } from './.claude/tools/chariot/query.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
+
 ```typescript
 interface QueryInput {
   query: string;
@@ -35,6 +37,7 @@ interface QueryInput {
 ```
 
 **Returns:**
+
 ```typescript
 interface QueryOutput {
   results: array;
@@ -46,11 +49,13 @@ interface QueryOutput {
 ```
 
 ### schema
+
 - **Purpose:** MCP wrapper for schema
 - **Import:** `import { schema } from './.claude/tools/chariot/schema.ts'`
 - **Token cost:** ~unknown tokens
 
 **Returns:**
+
 ```typescript
 interface SchemaOutput {
   entityTypes: array;
@@ -60,10 +65,10 @@ interface SchemaOutput {
 }
 ```
 
-
 ## Common Operations with Parameters
 
 ### Query Assets by Status
+
 ```bash
 npx tsx -e "(async () => {
   const { query } = await import('./.claude/tools/chariot/query.ts');
@@ -87,12 +92,14 @@ npx tsx -e "(async () => {
 ```
 
 **Key parameters:**
+
 - `query` (required) - JSON string of query structure (see below)
 - `stack` (required) - Chariot stack name (from env: `CHARIOT_STACK`)
 - `username` (required) - Username (from env: `PRAETORIAN_CLI_USERNAME`)
 - `tree` (optional) - Return tree structure (default false)
 
 **Query structure:**
+
 ```typescript
 {
   node: {
@@ -110,6 +117,7 @@ npx tsx -e "(async () => {
 ```
 
 ### Query Assets with Vulnerabilities
+
 ```bash
 npx tsx -e "(async () => {
   const { query } = await import('./.claude/tools/chariot/query.ts');
@@ -141,6 +149,7 @@ npx tsx -e "(async () => {
 ```
 
 ### Get Schema Information
+
 ```bash
 npx tsx -e "(async () => {
   const { schema } = await import('./.claude/tools/chariot/schema.ts');
@@ -159,6 +168,7 @@ npx tsx -e "(async () => {
 **CRITICAL**: Graph queries MUST only use fields from `allowedColumns` (see CLAUDE.md for complete list).
 
 **Common queryable fields:**
+
 - **Identity**: `key`, `identifier`, `name`, `dns`, `value`
 - **Status**: `status`, `class`, `type`, `source`, `origin`
 - **Dates**: `created`, `updated`, `visited`
@@ -168,6 +178,7 @@ npx tsx -e "(async () => {
 - **Other**: `group`, `category`, `title`, `registrar`, `registrant`
 
 **Common relationship labels:**
+
 - `HAS_VULNERABILITY`
 - `BELONGS_TO`
 - `DISCOVERED_BY`
@@ -179,6 +190,7 @@ npx tsx -e "(async () => {
 See mcp-tools-registry for complete Bash + tsx execution patterns.
 
 **Generic inline execution:**
+
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
 npx tsx -e "(async () => {

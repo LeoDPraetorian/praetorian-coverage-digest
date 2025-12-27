@@ -12,7 +12,7 @@
 ### Frontend Applications
 
 - **TypeScript 5.x**: Primary frontend language
-- **React 19.1.1**: UI framework for chariot and chariot-ui-components
+- **React 19.1.2**: UI framework for chariot and chariot-ui-components
 - **Node.js 20.x**: Runtime for frontend tooling and Claude Flow
 
 ### Scripting & Tooling
@@ -55,9 +55,9 @@ klauspost/compress v1.17.9
 
 ```json
 // Core React Ecosystem
-"react": "^19.1.1"
-"react-dom": "^19.1.1"
-"react-router": "^7.8.2"
+"react": "^19.1.2"
+"react-dom": "^19.1.2"
+"react-router": "^7.9.1"
 
 // UI Component Libraries
 "@headlessui/react": "^2.2.7"
@@ -69,23 +69,80 @@ klauspost/compress v1.17.9
 
 // Data Visualization
 "recharts": "^3.2.0"
-"@xyflow/react": "^12.8.4"
-"@react-sigma/core": "^5.0.4"
-"react-simple-maps": "^3.0.0"
 "@nivo/line": "^0.99.0"
 
+// Graph & Network Visualization
+"@xyflow/react": "^12.8.5" // Node-based graph UI
+"@react-sigma/core": "^5.0.4" // Network graph rendering
+"@sigma/node-border": "^3.0.0"
+"@sigma/node-image": "^3.0.0"
+"cytoscape": "^3.33.1" // Complex graph layouts
+"cytoscape-dagre": "^2.5.0"
+"@dagrejs/dagre": "^1.1.8"
+"graphology": "^0.26.0" // Graph data structures
+"graphology-layout-forceatlas2": "^0.10.1"
+"graphology-types": "^0.24.8"
+"react-simple-maps": "^4.0.0-beta.6" // Beta - geographic maps
+
 // State & Data Management
-"@tanstack/react-query": "^5.87.1"
+"@tanstack/react-query": "5.90.8" // Pinned version for reproducibility
+"@tanstack/react-query-devtools": "5.90.2"
 "@tanstack/react-virtual": "^3.13.12"
+"zustand": "^4.5.7" // Client-side state (Query Builder only; React Context is primary)
 "aws-amplify": "^6.15.5"
 "axios": "^1.11.0"
 "use-debounce": "^10.0.6"
 
+// File Handling & Processing
+"xlsx": "^0.18.5" // Excel file handling
+"jszip": "^3.10.1" // ZIP file handling
+"papaparse": "^5.5.3" // CSV parsing
+"html-to-image": "^1.11.13" // HTML to image conversion
+
+// Code Editor & Markdown
+"@uiw/react-md-editor": "^4.0.8" // Markdown editor component
+"highlight.js": "^11.11.1" // Syntax highlighting
+"marked": "^16.3.0" // Markdown parser
+"js-yaml": "^4.1.0" // YAML parser
+"he": "^1.2.0" // HTML entities decoder
+
+// Authentication & Analytics
+"logrocket": "^10.1.0" // Session replay and analytics
+"@floating-ui/react": "^0.27.16" // Floating UI positioning
+
+// Utility Libraries
+"lodash": "^4.17.21" // Utility functions
+"immer": "^10.2.0" // Immutable state updates
+"crypto-js": "^4.2.0" // Cryptography utilities
+"qrcode": "^1.5.4" // QR code generation
+"qrcode.react": "^4.2.0"
+"party-js": "^2.2.0" // Particle effects
+"cron-parser": "^5.4.0" // Cron expression parsing
+"config-ini-parser": "^1.6.1" // INI file parsing
+"psl": "^1.15.0" // Public suffix list
+"i18n-iso-countries": "^7.14.0" // Country code library
+
+// Certificate & Security
+"@peculiar/asn1-x509": "^2.5.0" // X.509 certificate parsing
+"@peculiar/x509": "^1.14.0" // X.509 certificate handling
+"sanitize-html": "^2.17.0" // HTML sanitization
+
+// Shared Component Library
+"@praetorian-chariot/ui": "^1.1.0" // Shared component library
+
 // Build Tools
-"vite": "^7.1.5"
+"vite": "^7.1.7"
+"@vitejs/plugin-react": "^5.1.0" // React plugin for Vite
+"@vitejs/plugin-react-swc": "^4.1.0" // SWC compiler option
+"babel-plugin-react-compiler": "^1.0.0" // React Compiler (automatic memoization)
 "tailwindcss": "^4.1.13"
 "@tailwindcss/postcss": "^4.1.13"
-"typescript": "^5.9.2"
+"typescript": "5.9.2" // Pinned version for reproducibility
+"vite-plugin-checker": "^0.10.3" // TypeScript type checking
+"vite-plugin-mkcert": "^1.17.8" // Self-signed certificates
+"vite-plugin-svgr": "^4.5.0" // SVG as React components
+"vite-tsconfig-paths": "^5.1.4" // Path alias resolution
+"rollup-plugin-visualizer": "^6.0.3" // Bundle analysis
 
 // Additional UI Libraries
 "sonner": "^2.0.7"
@@ -112,13 +169,11 @@ rich >= 13.0.0
 ### Primary Data Stores
 
 - **DynamoDB**: Main operational database for all entity storage
-
   - Single table design pattern
   - GSI for query optimization
   - Attribute-based access patterns
 
 - **Neo4j 5.x**: Graph database for relationship mapping
-
   - Asset relationships
   - AD object hierarchies
   - Attack path modeling
@@ -169,11 +224,24 @@ Multi-Cloud Support:
 
 ### Frontend Testing
 
-- **Playwright 1.49**: E2E testing with page object model and AI test generation
-- **Jest**: Unit testing with React Testing Library
+- **Vitest 3.2.4**: Unit testing framework (NOT Jest)
+  - Environment: happy-dom (lightweight DOM simulation)
+  - Pool strategy: threads with 4 workers (local), 16 (CI)
+  - Test timeout: 10 seconds
+  - Coverage: V8 provider with HTML/JSON/Text reports
+  - Mocks: jszip, xlsx, papaparse
+- **React Testing Library 16.3.0**: Component testing utilities
+  - @testing-library/jest-dom 6.9.1 (works with Vitest)
+  - @testing-library/user-event 14.6.1
+- **Playwright 1.49**: E2E testing (separate e2e workspace, not in ui/package.json)
+  - Timeout: 60 seconds per test
+  - Workers: 1 (CI), default (local)
+  - Projects: Chromium + Slow motion mode (500ms delay)
+  - Authentication: Global setup with session state
+  - Reports: HTML + list format
+  - Screenshot: On-failure only, trace on-first-retry
 - **Storybook 9.1.5**: Component documentation and testing
 - **OpenAI 4.96**: AI-powered test generation and enhancement
-- **Coverage Tools**: Built-in coverage reporting
 
 ### Backend Testing
 

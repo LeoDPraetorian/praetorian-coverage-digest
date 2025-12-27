@@ -310,24 +310,28 @@
 ## Additional Schemas
 
 ### Logging & Audit (`logging-audit.json`)
+
 - Security event types logged
 - Log storage and retention
 - Audit trail completeness
 - Alert mechanisms
 
 ### Rate Limiting (`rate-limiting.json`)
+
 - Rate limit configurations
 - Throttling mechanisms
 - Circuit breakers
 - DDoS protection
 
 ### CORS/CSP (`cors-csp.json`)
+
 - CORS configuration
 - CSP headers
 - Allowed origins
 - Unsafe patterns
 
 ### Dependency Security (`dependency-security.json`)
+
 - Dependency scanning tools
 - Lockfile usage
 - Known vulnerability tracking
@@ -338,6 +342,7 @@
 ## Validation Rules
 
 All JSON files MUST:
+
 1. Have `phase`, `category`, `analysis_date` fields
 2. Use consistent ID prefixes (AUTH-, AUTHZ-, VAL-, etc.)
 3. Include `verification_status` for each control

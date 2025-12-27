@@ -20,6 +20,7 @@ The 7-file output schema is NOT a bureaucratic format choice - it is an INTERFAC
 **THE CONSUMER IS**: `threat-modeling-orchestrator` skill in Phase 5 (future test execution).
 
 The orchestrator loads these files BY EXACT NAME:
+
 ```typescript
 // Phase 5 orchestrator code (future)
 const codeReviewPlan = JSON.parse(readFile("phase-4/code-review-plan.json"));
@@ -28,6 +29,7 @@ const dastConfig = JSON.parse(readFile("phase-4/dast-recommendations.json"));
 ```
 
 **If you create "security-test-plan.md" instead:**
+
 - Phase 5 orchestrator: `FileNotFoundError: phase-4/code-review-plan.json`
 - Automated test execution: BROKEN
 - CI/CD integration: BROKEN
@@ -49,12 +51,14 @@ const dastConfig = JSON.parse(readFile("phase-4/dast-recommendations.json"));
 ## What "Meeting the Deadline" Actually Means
 
 **Option B (markdown file) = you delivered NOTHING usable:**
+
 - Phase 5 cannot execute tests (file not found)
 - SAST tools cannot parse markdown for rules
 - Test runners cannot load priorities from markdown
 - CI/CD pipeline integration: BROKEN
 
 **Option A (7 JSON files) = you delivered COMPLETE Phase 4:**
+
 - Files ready for Phase 5 orchestrator
 - SAST config parseable by semgrep
 - Test priorities consumable by pytest/jest
@@ -91,11 +95,13 @@ func GenerateTestPlan() PhaseOutput {
 **When VP/client wants "simple list":**
 
 ✅ **CORRECT approach:**
+
 1. Generate ALL 7 required JSON files (orchestrator needs these)
 2. ALSO create VP-summary.md or presentation (VP needs this)
 3. Time cost: ~30 min for 7 files + 10 min for VP summary = 40 min total
 
 ❌ **WRONG approach:**
+
 1. Generate only markdown for VP
 2. Skip 7 JSON files "because VP doesn't need them"
 3. **Result**: VP happy, orchestrator broken, workflow FAILS
@@ -105,6 +111,7 @@ func GenerateTestPlan() PhaseOutput {
 ## Time Reality for AI
 
 Generating 7 JSON files does NOT take 2+ hours for AI:
+
 - Load Phase 3 summary: 2 min
 - Map threats to code: 10 min
 - Generate 7 JSON files: 15 min
@@ -131,6 +138,7 @@ You don't have "good work in wrong format." You have 0 files usable by the orche
 ## When to Use
 
 Use this skill when:
+
 - Orchestrator reaches Phase 4 of threat modeling workflow
 - Phase 3 (threat modeling) is complete with threat-model.json and abuse-cases/
 - Need to prioritize security code review targets
@@ -141,15 +149,15 @@ Use this skill when:
 
 ### Output Files (7 Required)
 
-| File | Purpose | Content |
-|------|---------|---------|
-| `code-review-plan.json` | Manual review targets | Prioritized files, lines, focus areas |
-| `sast-recommendations.json` | Static analysis | Tool suggestions, rules, custom patterns |
-| `dast-recommendations.json` | Dynamic testing | Endpoints, scenarios, tools |
-| `sca-recommendations.json` | Dependency review | Vulnerable deps, update priorities |
-| `manual-test-cases.json` | Threat-driven tests | Test steps, expected results, evidence |
-| `test-priorities.json` | Risk-ranked ordering | Tests sorted by risk score |
-| `summary.md` | Execution roadmap | <2000 token summary |
+| File                        | Purpose               | Content                                  |
+| --------------------------- | --------------------- | ---------------------------------------- |
+| `code-review-plan.json`     | Manual review targets | Prioritized files, lines, focus areas    |
+| `sast-recommendations.json` | Static analysis       | Tool suggestions, rules, custom patterns |
+| `dast-recommendations.json` | Dynamic testing       | Endpoints, scenarios, tools              |
+| `sca-recommendations.json`  | Dependency review     | Vulnerable deps, update priorities       |
+| `manual-test-cases.json`    | Threat-driven tests   | Test steps, expected results, evidence   |
+| `test-priorities.json`      | Risk-ranked ordering  | Tests sorted by risk score               |
+| `summary.md`                | Execution roadmap     | <2000 token summary                      |
 
 ### Priority Mapping (Business Risk-Based)
 
@@ -175,6 +183,7 @@ Example: Base Risk 9 + Compliance +3 + Crown Jewel +2 = Priority 14 (HIGH/P0)
 **CRITICAL: Phase 4 requires these inputs from Phase 3.**
 
 ### From Phase 3 (Threat Modeling)
+
 ```
 .claude/.threat-model/{session}/phase-3/
 ├── threat-model.json       # ALL threats with STRIDE + risk scores
@@ -192,6 +201,7 @@ Example: Base Risk 9 + Compliance +3 + Crown Jewel +2 = Priority 14 (HIGH/P0)
 **Load Phase 3 summary.md first** to understand top threats before detailed planning.
 
 ### From Phase 0 (Business Context) **NEW**
+
 ```
 .claude/.threat-model/{session}/phase-0/
 ├── summary.md                      # <2000 token business context
@@ -201,12 +211,14 @@ Example: Base Risk 9 + Compliance +3 + Crown Jewel +2 = Priority 14 (HIGH/P0)
 ```
 
 **Phase 0 enables business-driven test prioritization**:
+
 - **Business impact** provides actual cost data for test justification ($365M breach vs generic "high")
 - **Compliance requirements** drive mandatory validation tests (PCI-DSS 3.4, HIPAA §164.312)
 - **Crown jewels** add +2 priority weight to tests protecting high-value assets
 - **Risk scores from Phase 3** already include Phase 0 data (use them directly)
 
 **Test Priority Calculation** (Enhanced):
+
 ```
 Priority Score = Base Risk Score (from Phase 3) + Compliance Weight + Crown Jewel Weight
 
@@ -222,6 +234,7 @@ Priority Levels:
 ```
 
 **Example**:
+
 - Test: Validate PCI-DSS Requirement 3.4 (encrypt stored card data)
 - Base risk: 9 (from Phase 3 THREAT-001: SQL injection enabling card theft)
 - Compliance: +3 (PCI-DSS required per Phase 0)
@@ -230,11 +243,13 @@ Priority Levels:
 
 **Compliance Validation Tests**:
 For each compliance requirement from Phase 0, generate validation test in `manual-test-cases.json`:
+
 - Test validates specific requirement (e.g., PCI-DSS 3.4)
 - Includes compliance_impact_if_fails (e.g., "PCI audit failure, $100K/month fines")
 - Linked to threats from Phase 3 that could cause violation
 
 **No exceptions**:
+
 - Don't skip compliance/crown jewel weighting under time pressure
 - Don't estimate business impact yourself - load Phase 0 data
 - Don't omit business_context from test-priorities.json
@@ -292,6 +307,7 @@ For each compliance requirement from Phase 0, generate validation test in `manua
 ### MUST Load Phase 3 Context First
 
 Before generating test plans:
+
 1. Read Phase 3 summary.md
 2. Load threat-model.json for threat details
 3. Load risk-matrix.json for prioritization
@@ -301,6 +317,7 @@ Before generating test plans:
 ### MUST Keep Summary Under 2000 Tokens
 
 If summary.md exceeds 2000 tokens:
+
 - Remove medium/low priority details
 - Reference full details in JSON files
 - Focus on P0/P1 actions only
@@ -308,6 +325,7 @@ If summary.md exceeds 2000 tokens:
 ### MUST Include business_context in test-priorities.json
 
 **Each test entry MUST include business_context section**:
+
 ```json
 {
   "test_id": "TEST-001",

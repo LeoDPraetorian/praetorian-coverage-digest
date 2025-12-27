@@ -4,11 +4,11 @@ Intelligent TypeScript wrappers for Chariot Graph Database MCP tools with Zod va
 
 ## Token Savings
 
-| Component | Before (Direct MCP) | After (Wrapper) | Reduction |
-|-----------|---------------------|-----------------|-----------|
-| Tool definitions | 6,000-8,000 tokens | 500-1,000 tokens | 85-90% |
-| Query documentation | ~5,000 tokens | ~200 tokens | 96% |
-| Large result sets | 10,000+ tokens | 500-1,000 tokens | 90-95% |
+| Component           | Before (Direct MCP) | After (Wrapper)  | Reduction |
+| ------------------- | ------------------- | ---------------- | --------- |
+| Tool definitions    | 6,000-8,000 tokens  | 500-1,000 tokens | 85-90%    |
+| Query documentation | ~5,000 tokens       | ~200 tokens      | 96%       |
+| Large result sets   | 10,000+ tokens      | 500-1,000 tokens | 90-95%    |
 
 **Total savings: 85-90% reduction in token usage**
 
@@ -35,15 +35,15 @@ npx tsx .claude/tools/chariot/index.test.ts
 ### Basic Query Execution
 
 ```typescript
-import { query, commonQueries } from '.claude/tools/chariot';
+import { query, commonQueries } from ".claude/tools/chariot";
 
 // Use common query pattern for active IPv4 assets
-const queryStructure = commonQueries.activeAssetsByClass('ipv4');
+const queryStructure = commonQueries.activeAssetsByClass("ipv4");
 
 const results = await query.execute({
   query: JSON.stringify(queryStructure),
-  stack: 'your-stack-name',
-  username: 'user@example.com',
+  stack: "your-stack-name",
+  username: "user@example.com",
 });
 
 console.log(`Found ${results.totalCount} assets`);
@@ -53,48 +53,48 @@ console.log(`Token usage: ~${results.estimatedTokens} tokens`);
 ### Custom Graph Query
 
 ```typescript
-import { query } from '.claude/tools/chariot';
+import { query } from ".claude/tools/chariot";
 
 // Build custom query structure
 const customQuery = {
   node: {
-    labels: ['Asset'],
+    labels: ["Asset"],
     filters: [
-      { field: 'status', operator: '=', value: 'A' },
-      { field: 'dns', operator: 'CONTAINS', value: 'example.com' },
+      { field: "status", operator: "=", value: "A" },
+      { field: "dns", operator: "CONTAINS", value: "example.com" },
     ],
     relationships: [
       {
-        label: 'HAS_VULNERABILITY',
+        label: "HAS_VULNERABILITY",
         target: {
-          labels: ['Risk'],
-          filters: [{ field: 'cvss', operator: '>=', value: 8.0 }],
+          labels: ["Risk"],
+          filters: [{ field: "cvss", operator: ">=", value: 8.0 }],
         },
       },
     ],
   },
   limit: 50,
-  orderBy: 'updated',
+  orderBy: "updated",
   descending: true,
 };
 
 const results = await query.execute({
   query: JSON.stringify(customQuery),
-  stack: 'production',
-  username: 'admin@example.com',
+  stack: "production",
+  username: "admin@example.com",
 });
 ```
 
 ### Get Schema Information
 
 ```typescript
-import { schema, schemaHelpers } from '.claude/tools/chariot';
+import { schema, schemaHelpers } from ".claude/tools/chariot";
 
 // Get filtered schema
 const schemaInfo = await schema.execute();
 
-console.log('Entity types:', schemaInfo.totalEntities);
-console.log('Allowed query columns:', schemaInfo.allowedColumns);
+console.log("Entity types:", schemaInfo.totalEntities);
+console.log("Allowed query columns:", schemaInfo.allowedColumns);
 
 // Or use helpers for instant access
 const allowedColumns = schemaHelpers.getAllowedColumns();
@@ -107,7 +107,7 @@ const relationships = schemaHelpers.getCommonRelationships();
 ### 1. Active Assets by Class
 
 ```typescript
-const query = commonQueries.activeAssetsByClass('ipv4');
+const query = commonQueries.activeAssetsByClass("ipv4");
 // Returns up to 100 active IPv4 assets, ordered by most recently updated
 ```
 
@@ -122,26 +122,26 @@ const query = commonQueries.highSeverityRisks(7.0);
 
 ```typescript
 // Assets with specific attribute name and value
-const query = commonQueries.assetsWithAttribute('port', '22');
+const query = commonQueries.assetsWithAttribute("port", "22");
 
 // Assets with attribute name only (any value)
-const query = commonQueries.assetsWithAttribute('cloud_provider');
+const query = commonQueries.assetsWithAttribute("cloud_provider");
 ```
 
 ## Query Structure Reference
 
 ### Filter Operators
 
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `=` | Exact match | `{ field: 'status', operator: '=', value: 'A' }` |
-| `<` | Less than | `{ field: 'cvss', operator: '<', value: 5.0 }` |
-| `>` | Greater than | `{ field: 'priority', operator: '>', value: 0 }` |
-| `<=` | Less than or equal | `{ field: 'cvss', operator: '<=', value: 7.0 }` |
-| `>=` | Greater than or equal | `{ field: 'cvss', operator: '>=', value: 8.0 }` |
-| `CONTAINS` | String contains | `{ field: 'dns', operator: 'CONTAINS', value: '.com' }` |
-| `STARTS WITH` | String prefix | `{ field: 'name', operator: 'STARTS WITH', value: 'api-' }` |
-| `ENDS WITH` | String suffix | `{ field: 'dns', operator: 'ENDS WITH', value: '.example.com' }` |
+| Operator      | Description           | Example                                                          |
+| ------------- | --------------------- | ---------------------------------------------------------------- |
+| `=`           | Exact match           | `{ field: 'status', operator: '=', value: 'A' }`                 |
+| `<`           | Less than             | `{ field: 'cvss', operator: '<', value: 5.0 }`                   |
+| `>`           | Greater than          | `{ field: 'priority', operator: '>', value: 0 }`                 |
+| `<=`          | Less than or equal    | `{ field: 'cvss', operator: '<=', value: 7.0 }`                  |
+| `>=`          | Greater than or equal | `{ field: 'cvss', operator: '>=', value: 8.0 }`                  |
+| `CONTAINS`    | String contains       | `{ field: 'dns', operator: 'CONTAINS', value: '.com' }`          |
+| `STARTS WITH` | String prefix         | `{ field: 'name', operator: 'STARTS WITH', value: 'api-' }`      |
+| `ENDS WITH`   | String suffix         | `{ field: 'dns', operator: 'ENDS WITH', value: '.example.com' }` |
 
 ### Allowed Query Fields
 
@@ -179,6 +179,7 @@ cloudAccount, plextracid, beta
 The wrapper automatically filters results to reduce token usage:
 
 ### Assets
+
 ```typescript
 {
   key: string,           // Unique identifier
@@ -191,6 +192,7 @@ The wrapper automatically filters results to reduce token usage:
 ```
 
 ### Risks
+
 ```typescript
 {
   key: string,           // Unique identifier
@@ -203,6 +205,7 @@ The wrapper automatically filters results to reduce token usage:
 ```
 
 **Verbose fields removed:**
+
 - Full descriptions
 - Nested attributes (unless specifically queried)
 - Internal metadata
@@ -217,6 +220,7 @@ npx tsx .claude/tools/chariot/index.test.ts
 ```
 
 **Expected output:**
+
 ```
 🧪 Quick Validation: Chariot MCP Wrappers
 
@@ -255,6 +259,7 @@ Production ready: Schema validation and query patterns working correctly
 ### Input Validation
 
 All inputs validated via Zod schemas:
+
 - Query structure validation
 - Field name validation against allowed columns
 - Operator validation (prevents injection)
@@ -263,6 +268,7 @@ All inputs validated via Zod schemas:
 ### Filtering
 
 Results filtered to prevent information leakage:
+
 - Limit result count (max 1,000)
 - Remove sensitive fields
 - Summarize instead of returning full data
@@ -270,6 +276,7 @@ Results filtered to prevent information leakage:
 ### Sandbox Support
 
 Optional sandboxing for production environments:
+
 - Linux: bubblewrap configuration
 - macOS: seatbelt configuration
 
@@ -280,6 +287,7 @@ See `.claude/security/` for sandbox configs.
 ### Setup
 
 1. **Enable Chariot MCP** in `.claude/settings.json`:
+
 ```json
 {
   "enabledMcpjsonServers": ["chariot"]
@@ -287,6 +295,7 @@ See `.claude/security/` for sandbox configs.
 ```
 
 2. **Configure MCP** in `modules/chariot/.cursor/mcp.json`:
+
 ```json
 {
   "mcpServers": {
@@ -303,6 +312,7 @@ See `.claude/security/` for sandbox configs.
 ```
 
 3. **Use wrappers** instead of direct MCP tools:
+
 ```typescript
 // ❌ Old way (high token usage)
 await mcp.callTool('chariot', 'query', { query: '...', ... });
@@ -319,15 +329,17 @@ await query.execute({ query: '...', ... });
 **Problem:** Query structure rejected
 
 **Solution:** Verify query structure matches schema:
+
 ```typescript
 const query: QueryStructure = {
   node: {
-    labels: ['Asset'],  // Array of strings
-    filters: [          // Array of filter objects
-      { field: 'status', operator: '=', value: 'A' }
-    ]
+    labels: ["Asset"], // Array of strings
+    filters: [
+      // Array of filter objects
+      { field: "status", operator: "=", value: "A" },
+    ],
   },
-  limit: 100           // Optional number
+  limit: 100, // Optional number
 };
 ```
 
@@ -336,9 +348,10 @@ const query: QueryStructure = {
 **Problem:** Query fails with "field not allowed"
 
 **Solution:** Use only allowed columns from `schemaHelpers.getAllowedColumns()`:
+
 ```typescript
 const allowedColumns = schemaHelpers.getAllowedColumns();
-console.log('Can query:', allowedColumns);
+console.log("Can query:", allowedColumns);
 // Use one of these fields in your filter
 ```
 
@@ -347,6 +360,7 @@ console.log('Can query:', allowedColumns);
 **Problem:** Still getting high token usage
 
 **Solution:** Reduce `limit` parameter or add more specific filters:
+
 ```typescript
 {
   node: { ... },
@@ -377,6 +391,7 @@ console.log('Can query:', allowedColumns);
 ## Support
 
 For issues or questions:
+
 - Review test output: `npx tsx .claude/tools/chariot/index.test.ts`
 - Check allowed columns: `schemaHelpers.getAllowedColumns()`
 - Verify query structure against examples in this README

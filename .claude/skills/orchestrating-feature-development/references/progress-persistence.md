@@ -5,6 +5,7 @@ Maintain feature development state across sessions for reliable resume capabilit
 ## Purpose
 
 Enable long-running feature development by:
+
 - Saving progress after each phase
 - Resuming from last checkpoint
 - Tracking artifacts and decisions
@@ -113,14 +114,14 @@ jq '.phases.brainstorming.status = "complete" |
 Or use Node.js/TypeScript:
 
 ```typescript
-import fs from 'fs';
+import fs from "fs";
 
 const progressPath = `.claude/features/${featureId}/progress.json`;
-const progress = JSON.parse(fs.readFileSync(progressPath, 'utf-8'));
+const progress = JSON.parse(fs.readFileSync(progressPath, "utf-8"));
 
-progress.phases.brainstorming.status = 'complete';
+progress.phases.brainstorming.status = "complete";
 progress.phases.brainstorming.completed_at = new Date().toISOString();
-progress.current_phase = 'planning';
+progress.current_phase = "planning";
 
 fs.writeFileSync(progressPath, JSON.stringify(progress, null, 2));
 ```
@@ -135,7 +136,7 @@ const featureId = args[0];
 const progressPath = `.claude/features/${featureId}/progress.json`;
 
 if (fs.existsSync(progressPath)) {
-  const progress = JSON.parse(fs.readFileSync(progressPath, 'utf-8'));
+  const progress = JSON.parse(fs.readFileSync(progressPath, "utf-8"));
 
   console.log(`Resuming feature: ${progress.feature_name}`);
   console.log(`Current phase: ${progress.current_phase}`);
@@ -143,7 +144,7 @@ if (fs.existsSync(progressPath)) {
 
   // Get last completed phase
   const lastCompleted = Object.entries(progress.phases)
-    .filter(([_, phase]) => phase.status === 'complete')
+    .filter(([_, phase]) => phase.status === "complete")
     .map(([name, _]) => name)
     .pop();
 
@@ -151,12 +152,12 @@ if (fs.existsSync(progressPath)) {
 
   // Load artifacts
   if (progress.artifacts.design) {
-    const design = fs.readFileSync(progress.artifacts.design, 'utf-8');
+    const design = fs.readFileSync(progress.artifacts.design, "utf-8");
     // Use design in context
   }
 
   if (progress.artifacts.plan) {
-    const plan = fs.readFileSync(progress.artifacts.plan, 'utf-8');
+    const plan = fs.readFileSync(progress.artifacts.plan, "utf-8");
     // Use plan in context
   }
 
@@ -177,6 +178,7 @@ payment-integration_20241215_092145
 ```
 
 **Generation**:
+
 ```bash
 FEATURE_SLUG=$(echo "$FEATURE_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
 TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)
@@ -199,13 +201,13 @@ FEATURE_ID="${FEATURE_SLUG}_${TIMESTAMP}"
 
 ## Phase Status Values
 
-| Status | Meaning |
-|--------|---------|
-| `pending` | Not started |
-| `in_progress` | Currently executing |
-| `complete` | Successfully finished |
-| `blocked` | Waiting for user input or blocker resolution |
-| `failed` | Encountered unrecoverable error |
+| Status        | Meaning                                      |
+| ------------- | -------------------------------------------- |
+| `pending`     | Not started                                  |
+| `in_progress` | Currently executing                          |
+| `complete`    | Successfully finished                        |
+| `blocked`     | Waiting for user input or blocker resolution |
+| `failed`      | Encountered unrecoverable error              |
 
 ## Resume Workflow
 
@@ -222,18 +224,18 @@ FEATURE_ID="${FEATURE_SLUG}_${TIMESTAMP}"
 
 ```typescript
 function isPhaseComplete(progress: Progress, phase: string): boolean {
-  return progress.phases[phase]?.status === 'complete';
+  return progress.phases[phase]?.status === "complete";
 }
 ```
 
 ### Get Next Phase
 
 ```typescript
-const phaseSequence = ['brainstorming', 'planning', 'architecture', 'implementation', 'testing'];
+const phaseSequence = ["brainstorming", "planning", "architecture", "implementation", "testing"];
 
 function getNextPhase(currentPhase: string): string {
   const index = phaseSequence.indexOf(currentPhase);
-  return phaseSequence[index + 1] || 'complete';
+  return phaseSequence[index + 1] || "complete";
 }
 ```
 

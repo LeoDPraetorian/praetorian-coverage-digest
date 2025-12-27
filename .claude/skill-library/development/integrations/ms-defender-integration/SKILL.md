@@ -11,6 +11,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 ## When to Use
 
 Use this skill when:
+
 - Integrating Microsoft Defender for Endpoint as a security data source
 - Syncing Microsoft Defender alerts and vulnerabilities to Chariot risks
 - Importing device inventory from Microsoft Defender to Chariot assets
@@ -31,6 +32,7 @@ Use this skill when:
 **Microsoft Graph API requires OAuth 2.0 - there is NO alternative authentication method.**
 
 Common rationalizations that will fail:
+
 - ❌ "We don't have time for Azure AD app registration" → **Microsoft Graph API will reject all requests without OAuth 2.0 access token**
 - ❌ "Can't we use API keys instead?" → **Microsoft Graph does not support API key authentication - only OAuth 2.0**
 - ❌ "Let's skip the Graph API permissions setup" → **Requests will fail with 403 Forbidden without proper permissions configured in Azure AD**
@@ -77,22 +79,22 @@ DEFENDER_ALERT_SEVERITY_FILTER=High,Medium  # Comma-separated
 
 ### Authentication Flow
 
-| Step | Action | Endpoint |
-|------|--------|----------|
-| 1 | Acquire access token | `https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token` |
-| 2 | Use token in requests | Header: `Authorization: Bearer {token}` |
-| 3 | Refresh token (expires 1hr) | Same endpoint with `grant_type=client_credentials` |
+| Step | Action                      | Endpoint                                                       |
+| ---- | --------------------------- | -------------------------------------------------------------- |
+| 1    | Acquire access token        | `https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token` |
+| 2    | Use token in requests       | Header: `Authorization: Bearer {token}`                        |
+| 3    | Refresh token (expires 1hr) | Same endpoint with `grant_type=client_credentials`             |
 
 ## Quick Reference
 
-| Operation | Endpoint | Method | Notes |
-|-----------|----------|--------|-------|
-| List Alerts | `/security/alerts` | GET | Filter by severity, status, time range |
-| Get Alert Details | `/security/alerts/{alertId}` | GET | Full alert context and evidence |
-| List Vulnerabilities | `/security/vulnerabilities` | GET | CVE-based vulnerability data |
-| List Devices | `/deviceManagement/managedDevices` | GET | Device inventory with OS, IP, hostname |
-| Get Secure Score | `/security/secureScores` | GET | Organizational security posture |
-| List Recommendations | `/security/securityRecommendations` | GET | Security improvement recommendations |
+| Operation            | Endpoint                            | Method | Notes                                  |
+| -------------------- | ----------------------------------- | ------ | -------------------------------------- |
+| List Alerts          | `/security/alerts`                  | GET    | Filter by severity, status, time range |
+| Get Alert Details    | `/security/alerts/{alertId}`        | GET    | Full alert context and evidence        |
+| List Vulnerabilities | `/security/vulnerabilities`         | GET    | CVE-based vulnerability data           |
+| List Devices         | `/deviceManagement/managedDevices`  | GET    | Device inventory with OS, IP, hostname |
+| Get Secure Score     | `/security/secureScores`            | GET    | Organizational security posture        |
+| List Recommendations | `/security/securityRecommendations` | GET    | Security improvement recommendations   |
 
 ## Implementation
 
@@ -421,38 +423,38 @@ func (d *Defender) syncDevices(ctx context.Context) error {
 
 ### Microsoft Defender Alert → Chariot Risk
 
-| Defender Field | Chariot Field | Transformation |
-|----------------|---------------|----------------|
-| `id` | `Key` | Use alert ID as unique key |
-| `title` | `Name` | Alert title |
-| `description` | `Description` | Alert description |
-| `severity` | `CVSS` (float) | High→9.0, Medium→6.0, Low→3.0 |
-| `status` | `Status` | Map to Chariot status codes |
-| `category` | `Category` | Alert category (malware, phishing, etc.) |
-| `hostStates[0].fqdn` | `DNS` | Host DNS if available |
-| `createdDateTime` | `Created` | ISO 8601 timestamp |
+| Defender Field       | Chariot Field  | Transformation                           |
+| -------------------- | -------------- | ---------------------------------------- |
+| `id`                 | `Key`          | Use alert ID as unique key               |
+| `title`              | `Name`         | Alert title                              |
+| `description`        | `Description`  | Alert description                        |
+| `severity`           | `CVSS` (float) | High→9.0, Medium→6.0, Low→3.0            |
+| `status`             | `Status`       | Map to Chariot status codes              |
+| `category`           | `Category`     | Alert category (malware, phishing, etc.) |
+| `hostStates[0].fqdn` | `DNS`          | Host DNS if available                    |
+| `createdDateTime`    | `Created`      | ISO 8601 timestamp                       |
 
 ### Microsoft Defender Device → Chariot Asset
 
-| Defender Field | Chariot Field | Transformation |
-|----------------|---------------|----------------|
-| `id` | `Key` | Use device ID as unique key |
-| `deviceName` | `DNS` | Device hostname |
-| `ipAddressV4` | `Value` | Primary IPv4 address |
-| `operatingSystem` | `Name` | OS version string |
-| `deviceClass` | `Class` | Map to Chariot asset class |
-| `complianceState` | `Status` | Compliance status |
-| `lastSyncDateTime` | `Updated` | Last sync timestamp |
+| Defender Field     | Chariot Field | Transformation              |
+| ------------------ | ------------- | --------------------------- |
+| `id`               | `Key`         | Use device ID as unique key |
+| `deviceName`       | `DNS`         | Device hostname             |
+| `ipAddressV4`      | `Value`       | Primary IPv4 address        |
+| `operatingSystem`  | `Name`        | OS version string           |
+| `deviceClass`      | `Class`       | Map to Chariot asset class  |
+| `complianceState`  | `Status`      | Compliance status           |
+| `lastSyncDateTime` | `Updated`     | Last sync timestamp         |
 
 ## Error Handling
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| `invalid_client` | Azure AD app credentials incorrect | Verify tenant ID, client ID, client secret |
-| `insufficient_privileges` | Missing API permissions | Add required Microsoft Graph permissions in Azure AD |
-| `token_expired` | Access token expired | Implement token refresh (handled by GetToken) |
-| `429 Too Many Requests` | Rate limit exceeded | Implement exponential backoff |
-| `device_not_found` | Device query returned empty | Asset not managed by Defender |
+| Error                     | Cause                              | Solution                                             |
+| ------------------------- | ---------------------------------- | ---------------------------------------------------- |
+| `invalid_client`          | Azure AD app credentials incorrect | Verify tenant ID, client ID, client secret           |
+| `insufficient_privileges` | Missing API permissions            | Add required Microsoft Graph permissions in Azure AD |
+| `token_expired`           | Access token expired               | Implement token refresh (handled by GetToken)        |
+| `429 Too Many Requests`   | Rate limit exceeded                | Implement exponential backoff                        |
+| `device_not_found`        | Device query returned empty        | Asset not managed by Defender                        |
 
 ## Frontend Integration
 

@@ -7,6 +7,7 @@ How to organize skill content so Claude reads only what's needed, when it's need
 **Don't load everything upfront.** Provide a lean core (SKILL.md) with links to detailed content that Claude reads on demand.
 
 **Benefits:**
+
 - ✅ Faster skill activation (less to read initially)
 - ✅ Token efficiency (details loaded only when needed)
 - ✅ Better organization (content grouped by purpose)
@@ -51,6 +52,7 @@ skill-name/
 ```
 
 **Why directories:**
+
 - More organized when you have 4+ references
 - Easier to find specific content
 - Natural grouping by topic
@@ -59,6 +61,7 @@ skill-name/
 ## SKILL.md Target: 1,000-2,000 Words (Reasoning Skills)
 
 **Keep in SKILL.md:**
+
 - Overview (what is this, core principle)
 - When to use (symptoms, triggers)
 - Core workflow (main steps)
@@ -66,6 +69,7 @@ skill-name/
 - Links to detailed content
 
 **Move to references/:**
+
 - Detailed explanations (>200 words per topic)
 - API references (field listings, schemas)
 - Advanced patterns
@@ -73,12 +77,14 @@ skill-name/
 - Edge cases and troubleshooting
 
 **Move to examples/:**
+
 - Complete case studies
 - Good vs bad comparisons
 - Real-world scenarios
 - Before/after demonstrations
 
 **Move to templates/:**
+
 - Starter files
 - Copy-paste templates
 - Common patterns ready to use
@@ -88,6 +94,7 @@ skill-name/
 ### Initial Load (SKILL.md only)
 
 When skill matches a task:
+
 1. Claude reads SKILL.md
 2. Scans overview and when-to-use
 3. Reads core workflow
@@ -98,6 +105,7 @@ When skill matches a task:
 ### On-Demand Loading (References)
 
 When Claude needs details:
+
 1. Sees link: `[references/api-reference.md](references/api-reference.md)`
 2. Reads that specific file
 3. Gets detailed information
@@ -108,13 +116,15 @@ When Claude needs details:
 ### Example: marketplace-management Skill
 
 **SKILL.md (885 words):**
-```markdown
+
+````markdown
 ## Creating a Marketplace
 
 See [references/marketplace-schema.md](references/marketplace-schema.md)
 for complete schema.
 
 Basic structure:
+
 ```json
 {
   "name": "...",
@@ -122,9 +132,11 @@ Basic structure:
   "plugins": []
 }
 ```
+````
 
 [Minimal workflow...]
-```
+
+````
 
 **When Claude needs schema details:**
 - Reads references/marketplace-schema.md
@@ -149,9 +161,10 @@ See [details.md](details.md) for implementation details...
 
 # details.md
 Here's the actual information...  ← Claude may only see first 100 lines
-```
+````
 
 **✅ GOOD: One level deep**
+
 ```markdown
 # SKILL.md
 
@@ -161,10 +174,12 @@ Here's the actual information...  ← Claude may only see first 100 lines
 **Implementation details**: See [details.md](references/details.md)
 
 # All reference files link directly from SKILL.md
+
 # Claude reads complete files when needed
 ```
 
 **Why this matters:**
+
 - **Partial reads**: Nested references trigger preview behavior (`head -100`)
 - **Incomplete context**: Claude may miss critical information at end of files
 - **Unpredictable**: Can't guarantee full file will be read
@@ -178,6 +193,7 @@ Here's the actual information...  ← Claude may only see first 100 lines
 This ensures Claude can see the full scope even when previewing with partial reads.
 
 **Example:**
+
 ```markdown
 # API Reference
 
@@ -203,6 +219,7 @@ This ensures Claude can see the full scope even when previewing with partial rea
 ```
 
 **Benefits:**
+
 - Claude sees full outline even with `head -100` preview
 - Can navigate directly to relevant sections
 - Provides complete context map upfront
@@ -214,6 +231,7 @@ This ensures Claude can see the full scope even when previewing with partial rea
 **Purpose:** Detailed technical documentation
 
 **Contents:**
+
 - API references (field listings, schemas)
 - Detailed explanations (advanced topics)
 - Comprehensive guides (step-by-step deep dives)
@@ -221,6 +239,7 @@ This ensures Claude can see the full scope even when previewing with partial rea
 - Best practices collections
 
 **Examples:**
+
 - `references/marketplace-schema.md` (complete JSON schema)
 - `references/frontmatter-fields.md` (all YAML fields)
 - `references/progressive-disclosure.md` (this file!)
@@ -230,6 +249,7 @@ This ensures Claude can see the full scope even when previewing with partial rea
 **Purpose:** Real-world case studies and demonstrations
 
 **Contents:**
+
 - Complete working examples
 - Good vs bad comparisons
 - Before/after transformations
@@ -237,6 +257,7 @@ This ensures Claude can see the full scope even when previewing with partial rea
 - Success stories
 
 **Examples:**
+
 - `examples/chariot-marketplace.md` (real marketplace)
 - `examples/migration-case-study.md` (actual migration)
 - `examples/good-skill-structure.md`
@@ -247,12 +268,14 @@ This ensures Claude can see the full scope even when previewing with partial rea
 **Purpose:** Ready-to-use starter files
 
 **Contents:**
+
 - Copy-paste templates
 - Common pattern starters
 - Configuration templates
 - Boilerplate code
 
 **Examples:**
+
 - `templates/SKILL-template.md` (starter SKILL.md)
 - `templates/marketplace.json` (marketplace template)
 - `templates/frontmatter-template.yaml`
@@ -262,12 +285,14 @@ This ensures Claude can see the full scope even when previewing with partial rea
 **Purpose:** Executable utilities and helpers
 
 **Contents:**
+
 - Helper scripts
 - Validation utilities
 - Code generators
 - Automation tools
 
 **Examples:**
+
 - `scripts/validate-skill.sh`
 - `scripts/word-count.sh`
 - `scripts/extract-frontmatter.sh`
@@ -295,27 +320,29 @@ Use [templates/starter.md](templates/starter.md) as starting point.
 Claude automatically reads linked files when relevant to current task.
 
 **Don't force-load with @:**
+
 ```markdown
-❌ See @references/api-schema.md  # Force-loads immediately
-✅ See [references/api-schema.md](references/api-schema.md)  # Load on demand
+❌ See @references/api-schema.md # Force-loads immediately
+✅ See [references/api-schema.md](references/api-schema.md) # Load on demand
 ```
 
 ## Word Count Targets
 
 Based on skill usage frequency and complexity:
 
-| Skill Type | SKILL.md Target | Total OK |
-|------------|-----------------|----------|
-| Frequently loaded | ~1,500 words | Any (in references/) |
-| Moderate use | ~1,500 words | Any (in references/) |
-| Complex domain | ~2,000 words | Any (in references/) |
-| Simple utility | ~800 words | Keep inline if possible |
+| Skill Type        | SKILL.md Target | Total OK                |
+| ----------------- | --------------- | ----------------------- |
+| Frequently loaded | ~1,500 words    | Any (in references/)    |
+| Moderate use      | ~1,500 words    | Any (in references/)    |
+| Complex domain    | ~2,000 words    | Any (in references/)    |
+| Simple utility    | ~800 words      | Keep inline if possible |
 
 **Rule:** Keep SKILL.md under 2,000 words. Move details to references/.
 
 ## Real Example: claude-marketplace-management
 
 **SKILL.md:** 885 words
+
 - Overview and core concepts
 - Basic workflows
 - Links to 4 detailed references
@@ -323,16 +350,19 @@ Based on skill usage frequency and complexity:
 - Links to 2 templates
 
 **references/** (4 files, ~8,000 words):
+
 - marketplace-schema.md (complete JSON schema)
 - plugin-entry-format.md (detailed entry guide)
 - distribution.md (GitHub, git, local methods)
 - team-config.md (auto-install configuration)
 
 **examples/** (2 files, ~4,000 words):
+
 - chariot-marketplace.md (real marketplace analysis)
 - migration-example.md (step-by-step case study)
 
 **templates/** (2 files):
+
 - marketplace.json (ready to use)
 - plugin-entry.json (copy-paste)
 
@@ -351,6 +381,7 @@ skill-name/
 ```
 
 **Problems:**
+
 - SKILL.md too large
 - All content loads upfront
 - Hard to find specific topics
@@ -372,6 +403,7 @@ skill-name/
 ```
 
 **Benefits:**
+
 - Lean core (faster activation)
 - Organized by content type
 - Load details on demand
@@ -402,24 +434,28 @@ skill-name/
 ## Best Practices
 
 **SKILL.md should be:**
+
 - Scannable (quick reference tables)
 - Workflow-focused (step-by-step)
 - Principle-driven (why, not just what)
 - Link-rich (references detailed docs)
 
 **references/ should be:**
+
 - Comprehensive (all details)
 - Well-organized (one topic per file)
 - Cross-referenced (link between references)
 - Searchable (good headings)
 
 **examples/ should be:**
+
 - Real-world (not contrived)
 - Complete (runnable/usable)
 - Explanatory (why it works)
 - Diverse (good and bad)
 
 **templates/ should be:**
+
 - Ready-to-use (copy-paste)
 - Well-commented (explain blanks)
 - Common patterns (not edge cases)
@@ -447,6 +483,7 @@ ls templates/
 ## Summary
 
 **Progressive disclosure means:**
+
 1. Lean SKILL.md (~1,500 words for reasoning skills)
 2. Detailed content in references/
 3. Real examples in examples/

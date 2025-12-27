@@ -33,23 +33,19 @@ IMPORTANT: Ask these questions one at a time. Wait for the user's response befor
 Ask the questions in this order (skip any that the user has already provided via arguments):
 
 1. **Language** (ask first): "Would you like to use TypeScript or Python?"
-
    - Wait for response before continuing
 
 2. **Project name** (ask second): "What would you like to name your project?"
-
    - If $ARGUMENTS is provided, use that as the project name and skip this question
    - Wait for response before continuing
 
 3. **Agent type** (ask third, but skip if #2 was sufficiently detailed): "What kind of agent are you building? Some examples:
-
    - Coding agent (SRE, security review, code review)
    - Business agent (customer support, content creation)
    - Custom agent (describe your use case)"
    - Wait for response before continuing
 
 4. **Starting point** (ask fourth): "Would you like:
-
    - A minimal 'Hello World' example to start
    - A basic agent with common features
    - A specific example based on your use case"
@@ -64,7 +60,6 @@ After all questions are answered, proceed to create the setup plan.
 Based on the user's answers, create a plan that includes:
 
 1. **Project initialization**:
-
    - Create project directory (if it doesn't exist)
    - Initialize package manager:
      - TypeScript: `npm init -y` and setup `package.json` with type: "module" and scripts (include a "typecheck" script)
@@ -74,14 +69,12 @@ Based on the user's answers, create a plan that includes:
      - Python: Optionally create config files if needed
 
 2. **Check for Latest Versions**:
-
    - BEFORE installing, use WebSearch or check npm/PyPI to find the latest version
    - For TypeScript: Check https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk
    - For Python: Check https://pypi.org/project/claude-agent-sdk/
    - Inform the user which version you're installing
 
 3. **SDK Installation**:
-
    - TypeScript: `npm install @anthropic-ai/claude-agent-sdk@latest` (or specify latest version)
    - Python: `pip install claude-agent-sdk` (pip installs latest by default)
    - After installation, verify the installed version:
@@ -89,14 +82,12 @@ Based on the user's answers, create a plan that includes:
      - Python: Run `pip show claude-agent-sdk`
 
 4. **Create starter files**:
-
    - TypeScript: Create an `index.ts` or `src/index.ts` with a basic query example
    - Python: Create a `main.py` with a basic query example
    - Include proper imports and basic error handling
    - Use modern, up-to-date syntax and patterns from the latest SDK version
 
 5. **Environment setup**:
-
    - Create a `.env.example` file with `ANTHROPIC_API_KEY=your_api_key_here`
    - Add `.env` to `.gitignore`
    - Explain how to get an API key from https://console.anthropic.com/
@@ -141,14 +132,12 @@ After all files are created and dependencies are installed, use the appropriate 
 Once setup is complete and verified, provide the user with:
 
 1. **Next steps**:
-
    - How to set their API key
    - How to run their agent:
      - TypeScript: `npm start` or `node --loader ts-node/esm index.ts`
      - Python: `python main.py`
 
 2. **Useful resources**:
-
    - Link to TypeScript SDK reference: https://docs.claude.com/en/api/agent-sdk/typescript
    - Link to Python SDK reference: https://docs.claude.com/en/api/agent-sdk/python
    - Explain key concepts: system prompts, permissions, tools, MCP servers
@@ -182,6 +171,7 @@ Begin by asking the FIRST requirement question only. Wait for the user's answer 
 ## Example Usage
 
 **Example 1: TypeScript agent (minimal start)**
+
 ```
 > /agent-sdk-write my-coding-agent
 
@@ -198,6 +188,7 @@ Begin by asking the FIRST requirement question only. Wait for the user's answer 
 ```
 
 **Example 2: Python agent (full-featured)**
+
 ```
 > /agent-sdk-write security-scanner
 
@@ -217,6 +208,7 @@ Begin by asking the FIRST requirement question only. Wait for the user's answer 
 ```
 
 **Example 3: Agent with MCP integration**
+
 ```
 > /agent-sdk-write data-analyst
 

@@ -60,39 +60,28 @@ export class Phase6ScriptOrganization {
         !pythonScripts.includes(f) && !bashScripts.includes(f)
       );
 
+      // Build context with script type breakdown
+      const context: string[] = [];
+      if (pythonScripts.length > 0) {
+        context.push(`Python (${pythonScripts.length}): ${pythonScripts.join(', ')}`);
+      }
+      if (bashScripts.length > 0) {
+        context.push(`Shell (${bashScripts.length}): ${bashScripts.join(', ')} (consider TypeScript migration)`);
+      }
+      if (otherScripts.length > 0) {
+        context.push(`Other (${otherScripts.length}): ${otherScripts.join(', ')}`);
+      }
+
       issues.push({
         severity: 'WARNING',
         message: `${scriptsAtRoot.length} script file(s) at root (should be in scripts/ subdirectory per progressive disclosure best practices)`,
+        recommendation: 'Move scripts to scripts/ subdirectory. Consider migrating shell scripts to TypeScript for cross-platform compatibility',
+        context,
         autoFixable: true,
         fix: async () => {
           await this.moveScriptsToSubdirectory(skill.directory, scriptsAtRoot, false);
         },
       });
-
-      // Detail each script type
-      if (pythonScripts.length > 0) {
-        issues.push({
-          severity: 'INFO',
-          message: `Python scripts: ${pythonScripts.join(', ')} → scripts/`,
-          autoFixable: true,
-        });
-      }
-
-      if (bashScripts.length > 0) {
-        issues.push({
-          severity: 'INFO',
-          message: `Shell scripts: ${bashScripts.join(', ')} → scripts/ (consider TypeScript migration per Phase 8)`,
-          autoFixable: true,
-        });
-      }
-
-      if (otherScripts.length > 0) {
-        issues.push({
-          severity: 'INFO',
-          message: `Other scripts: ${otherScripts.join(', ')} → scripts/`,
-          autoFixable: true,
-        });
-      }
     }
 
     return issues;

@@ -8,11 +8,14 @@ allowed-tools: Bash, Read
 
 **Keyword discovery across all agents with relevance scoring.**
 
+> **Compliance**: This skill USES the [Agent Compliance Contract](../../../../skills/managing-agents/references/agent-compliance-contract.md).
+
 ---
 
 ## What This Skill Does
 
 Searches for agents by keyword across:
+
 - **Agent names** (highest relevance: 100 points exact, 50 points substring)
 - **Descriptions** (high relevance: 30 points)
 - **Agent types/categories** (medium relevance: 20 points)
@@ -30,6 +33,7 @@ Returns scored results sorted by relevance.
 - Exploring agent capabilities by domain
 
 **Common workflow:**
+
 ```
 Search → Find relevant agents → Select best match → Use with Task tool
 ```
@@ -38,11 +42,29 @@ Search → Find relevant agents → Select best match → Use with Task tool
 
 ## Quick Reference
 
-| Search Type | Command | Example |
-|-------------|---------|---------|
-| Basic search | `npm run search -- "query"` | Find React agents |
-| Filter by type | `--type <category>` | Only testing agents |
-| Limit results | `--limit N` | Show top 5 matches |
+| Search Type    | Command                     | Example             |
+| -------------- | --------------------------- | ------------------- |
+| Basic search   | `npm run search -- "query"` | Find React agents   |
+| Filter by type | `--type <category>`         | Only testing agents |
+| Limit results  | `--limit N`                 | Show top 5 matches  |
+
+---
+
+## Step 0: Navigate to Repository Root (MANDATORY)
+
+**Execute BEFORE any search operation:**
+
+```bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+```
+
+**See:** [Repository Root Navigation](../../../../skills/managing-agents/references/patterns/repo-root-detection.md)
+
+**⚠️ If agent file not found:** You are in the wrong directory. Navigate to repo root first. Never assume "built-in agent" or "system agent" - the file exists, you're looking in the wrong place.
+
+**Cannot proceed without navigating to repo root** ✅
 
 ---
 
@@ -51,6 +73,7 @@ Search → Find relevant agents → Select best match → Use with Task tool
 ### Basic Search
 
 **Setup:**
+
 ```bash
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
@@ -58,11 +81,13 @@ cd "$REPO_ROOT/.claude/skill-library/claude/agent-management/searching-agents/sc
 ```
 
 **Execute:**
+
 ```bash
 npm run search -- "react"
 ```
 
 **Output:**
+
 ```
 Search Results for "react":
 ────────────────────────────────────────────────────────────────────────────────
@@ -82,6 +107,7 @@ npm run search -- "security" --type analysis
 ```
 
 **Valid categories:**
+
 - `architecture` - Design and architecture decisions
 - `development` - Implementation and coding
 - `testing` - Unit, integration, E2E testing
@@ -103,12 +129,12 @@ npm run search -- "developer" --limit 5
 
 ### Score Ranges
 
-| Score | Meaning | Example |
-|-------|---------|---------|
-| **100+** | Exact name + description match | Exact agent name (100) + desc (30) = 130 |
-| **50-79** | Name match OR strong description | Name substring (50) |
-| **30-49** | Description match only | Mentions term (30) |
-| **10-29** | Type or skills match (weak) | Category match (20) |
+| Score     | Meaning                          | Example                                  |
+| --------- | -------------------------------- | ---------------------------------------- |
+| **100+**  | Exact name + description match   | Exact agent name (100) + desc (30) = 130 |
+| **50-79** | Name match OR strong description | Name substring (50)                      |
+| **30-49** | Description match only           | Mentions term (30)                       |
+| **10-29** | Type or skills match (weak)      | Category match (20)                      |
 
 **Scores are additive** - an agent can match multiple categories.
 
@@ -120,6 +146,7 @@ npm run search -- "developer" --limit 5
 ```
 
 **Icons:**
+
 - ✓ (green) = Valid description
 - ✗ (red) = Invalid/missing description
 
@@ -128,24 +155,28 @@ npm run search -- "developer" --limit 5
 ## Quick Examples
 
 ### Find by Capability
+
 ```bash
 npm run search -- "react"
 # → frontend-developer, frontend-architect, frontend-reviewer
 ```
 
 ### Filter by Domain
+
 ```bash
 npm run search -- "frontend" --type testing
 # → frontend-browser-test-engineer, frontend-unit-test-engineer
 ```
 
 ### Check Existence
+
 ```bash
 npm run search -- "python"
 # → python-developer [Score: 130]
 ```
 
 ### Broad Discovery
+
 ```bash
 npm run search -- "" --type development
 # → All 16 development agents
@@ -170,6 +201,7 @@ Scoring is additive. An agent can match via name, description, type, AND skills.
 ```bash
 npm run search -- "frontend-developer"
 ```
+
 Exact match = score 100+.
 
 ---
@@ -203,4 +235,5 @@ Try searching for: react, go, test, security, architecture
 - `agent-manager` - Routes search operations
 
 **Reference files:**
+
 - `references/search-examples.md` - Complete examples and advanced usage

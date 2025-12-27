@@ -1,5 +1,0 @@
-# Changelog
-
-All notable changes to this skill.
-
-- **2025-12-06**: Align with current tech stack (React 19, TypeScript 5+, Tailwind 4) by exploring codebase. Remove testing best practices (unit/integration/e2e/vitest) - separate skill will handle testing.

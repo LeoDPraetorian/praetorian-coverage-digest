@@ -11,6 +11,7 @@ Use the writing-plans skill exactly as written
 ## Example Usage
 
 **Example 1: Plan for simple feature**
+
 ```
 > /plan-write "Add user profile settings page"
 
@@ -29,6 +30,7 @@ Use the writing-plans skill exactly as written
 ```
 
 **Example 2: Complex multi-domain feature**
+
 ```
 > /plan-write "Real-time vulnerability notifications with WebSocket"
 
@@ -43,6 +45,7 @@ Use the writing-plans skill exactly as written
 ```
 
 **Example 3: From architecture document**
+
 ```
 > /plan-write "docs/architecture/2025-01-10-dashboard-optimization.md"
 

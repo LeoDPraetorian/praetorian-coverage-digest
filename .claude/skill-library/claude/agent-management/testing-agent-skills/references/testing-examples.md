@@ -54,8 +54,8 @@ Step 1b: Discover secondary skills via gateways
   Read `.claude/skills/gateway-frontend/SKILL.md`
   Extracted library paths:
     - frontend-tanstack → .claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md
-    - frontend-react-state-management → .claude/skill-library/.../SKILL.md
-    - frontend-zustand-state-management → .claude/skill-library/.../SKILL.md
+    - using-tanstack-query → .claude/skill-library/.../SKILL.md
+    - using-zustand-state-management → .claude/skill-library/.../SKILL.md
     - ... (20 total library skills)
 
 Step 2: Create TodoWrite with ALL skills
@@ -66,8 +66,8 @@ Step 2: Create TodoWrite with ALL skills
 
   Secondary skills (via gateway-frontend):
   - Test frontend-tanstack: PENDING
-  - Test frontend-react-state-management: PENDING
-  - Test frontend-zustand-state-management: PENDING
+  - Test using-tanstack-query: PENDING
+  - Test using-zustand-state-management: PENDING
   - ... (20 skills total)
 
 Steps 3-6: FOR EACH SKILL (primary first, then secondary)
@@ -79,8 +79,8 @@ Step 7: Report aggregate
   Total: 21/23 PASS (91%)
 
   Recommendations:
-  - Fix 1 PARTIAL secondary skill (frontend-zustand-state-management)
-  - Fix 1 FAIL secondary skill (frontend-react-state-management)
+  - Fix 1 PARTIAL secondary skill (using-zustand-state-management)
+  - Fix 1 FAIL secondary skill (using-tanstack-query)
 ```
 
 ---
@@ -97,35 +97,46 @@ Secondary Skills Tested: {M} (via {X} gateways)
 ═══ Primary Skills Results ═══
 
 ✅ developing-with-tdd: PASS
-   - Invoked explicitly under pressure (sunk cost + time + exhaustion)
-   - Chose option A (delete code, start with TDD) despite 4 hours invested
-   - Cited "Violating letter is violating spirit" as justification
-   - Resisted rationalizations
+
+- Invoked explicitly under pressure (sunk cost + time + exhaustion)
+- Chose option A (delete code, start with TDD) despite 4 hours invested
+- Cited "Violating letter is violating spirit" as justification
+- Resisted rationalizations
 
 ✅ debugging-systematically: PASS
-   - Invoked explicitly under crisis (production down + time pressure + authority)
-   - Refused 2-line fix, investigated root cause first
-   - Cited "No shortcuts under pressure" as justification
+
+- Invoked explicitly under crisis (production down + time pressure + authority)
+- Refused 2-line fix, investigated root cause first
+- Cited "No shortcuts under pressure" as justification
 
 ❌ verifying-before-completion: FAIL
-   - Didn't invoke skill
-   - Claimed complete without running verification commands
-   - Rationalized: "I already manually tested it"
-   - Succumbed to exhaustion + time pressure
+
+- Didn't invoke skill
+- Claimed complete without running verification commands
+- Rationalized: "I already manually tested it"
+- Succumbed to exhaustion + time pressure
 
 ═══ Secondary Skills Results (via gateway-frontend) ═══
 
+> **Note**: Secondary skills are LIBRARY skills - evaluate for `Read()` invocation, not `skill:` invocation.
+
 ✅ frontend-tanstack: PASS
-   - Used TanStack Query patterns correctly
-   - Applied caching strategy from skill
 
-⚠️ frontend-zustand-state-management: PARTIAL
-   - Used Zustand but didn't follow atomic updates pattern
-   - Mixed concerns in store definition
+- Loaded skill: `Read(".claude/skill-library/.../frontend-tanstack/SKILL.md")`
+- Used TanStack Query patterns correctly
+- Applied caching strategy from skill
 
-❌ frontend-react-state-management: FAIL
-   - Didn't use React state patterns from skill
-   - Prop drilled instead of using Context API
+⚠️ using-zustand-state-management: PARTIAL
+
+- Loaded skill via Read tool
+- Used Zustand but didn't follow atomic updates pattern
+- Mixed concerns in store definition
+
+❌ using-tanstack-query: FAIL
+
+- **No skill loading** (no Read tool call for skill path)
+- Didn't use React state patterns from skill
+- Prop drilled instead of using Context API
 
 ═══ Overall Statistics ═══
 
@@ -136,23 +147,27 @@ Total: 3/6 PASS (50%)
 ═══ Recommendations ═══
 
 FAILED Primary Skills:
+
 - verifying-before-completion: Agent lacks resistance to exhaustion pressure
   → Update agent to emphasize non-negotiable verification
   → Add to Quality Checklist with explicit "MUST" language
 
 FAILED Secondary Skills:
-- frontend-react-state-management: Gateway routing worked, but agent didn't read skill
+
+- using-tanstack-query: Gateway routing worked, but agent didn't read skill
   → Investigate why agent skipped reading library skill
   → Consider promoting to primary skill if critical
 
 PARTIAL Secondary Skills:
-- frontend-zustand-state-management: Agent read skill but missed key patterns
+
+- using-zustand-state-management: Agent read skill but missed key patterns
   → Enhance skill's atomic updates section
   → Add explicit examples for agent reference
 
 Action Required:
+
 1. Fix agent (verifying-before-completion integration)
-2. Consider skill improvements (frontend-zustand-state-management clarity)
+2. Consider skill improvements (using-zustand-state-management clarity)
 3. Re-test failed skills after fixes
 ```
 
@@ -162,27 +177,39 @@ Action Required:
 
 ### Agent Didn't Invoke Skill
 
-**Symptom**: Agent completed task but no `skill: "skill-name"` in output
+**Symptom**: Agent completed task but no skill invocation in output
 
-**Diagnosis**:
+**Diagnosis depends on skill type**:
+
+**For CORE skills** (in `.claude/skills/`):
 1. Check agent's frontmatter: Is skill listed in `skills:` field?
 2. Check agent's body: Is skill in "Mandatory Skills" section?
 3. Was trigger scenario clear enough?
 
+**For LIBRARY skills** (in `.claude/skill-library/`):
+1. Check if agent used gateway: Did agent invoke `gateway-*` skill?
+2. Check if agent loaded skill: Is there a `Read(".../SKILL.md")` call?
+3. Check gateway routing: Does gateway list this skill path?
+
 **Fix**:
-- If not in frontmatter: Add to agent's `skills:` field
-- If not emphasized in body: Update "Mandatory Skills" section
-- If scenario unclear: Design better trigger scenario
+
+- **Core skill not invoked**: Add to agent's `skills:` field
+- **Library skill not loaded**: Ensure gateway routes to it, agent uses gateway
+- **Scenario unclear**: Design better trigger scenario
+
+> **Common mistake**: Expecting `skill: "library-skill"` for library skills. Library skills use `Read()`, not `skill:`.
 
 ### Agent Invoked But Didn't Follow
 
 **Symptom**: Output shows `skill: "skill-name"` but methodology violated
 
 **Diagnosis**:
+
 1. Read skill - are requirements clear?
 2. Check agent's instructions - do they contradict skill?
 
 **Fix**:
+
 - Update skill (if unclear)
 - Update agent (if contradictory)
 - Re-test after fix
@@ -192,10 +219,12 @@ Action Required:
 **Symptom**: `Read` tool returns "file not found"
 
 **Diagnosis**:
+
 1. Typo in skill name?
 2. Skill truly doesn't exist?
 
 **Fix**:
+
 - Check agent frontmatter for typos
 - Search with: `find .claude -name "*{partial-name}*"`
 - Remove from agent if not needed

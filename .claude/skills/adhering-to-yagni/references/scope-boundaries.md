@@ -6,11 +6,11 @@
 
 Every potential change falls into one of three categories:
 
-| Category | Definition | Action |
-|----------|------------|--------|
-| **In Scope** | Explicitly requested by user's words | ✅ Implement without asking |
-| **Unclear** | Implied but not explicit | ⚠️ Ask for clarification |
-| **Out of Scope** | Not mentioned at all | ❌ Do NOT implement unless approved |
+| Category         | Definition                           | Action                              |
+| ---------------- | ------------------------------------ | ----------------------------------- |
+| **In Scope**     | Explicitly requested by user's words | ✅ Implement without asking         |
+| **Unclear**      | Implied but not explicit             | ⚠️ Ask for clarification            |
+| **Out of Scope** | Not mentioned at all                 | ❌ Do NOT implement unless approved |
 
 ## How to Categorize
 
@@ -47,21 +47,22 @@ Potential changes:
 
 **Apply the three categories:**
 
-| Change | Category | Reasoning |
-|--------|----------|-----------|
-| 1. Fix login bug | ✅ In Scope | Explicitly requested |
-| 2. Error logging | ⚠️ Unclear | Might be needed for debugging, but not mentioned |
-| 3. Better errors | ❌ Out of Scope | Not mentioned at all |
-| 4. Rate limiting | ❌ Out of Scope | Not mentioned (also, different concern) |
-| 5. Refactor auth | ❌ Out of Scope | Not mentioned |
-| 6. Add tests | ❌ Out of Scope | Not mentioned |
-| 7. Update docs | ❌ Out of Scope | Not mentioned |
+| Change           | Category        | Reasoning                                        |
+| ---------------- | --------------- | ------------------------------------------------ |
+| 1. Fix login bug | ✅ In Scope     | Explicitly requested                             |
+| 2. Error logging | ⚠️ Unclear      | Might be needed for debugging, but not mentioned |
+| 3. Better errors | ❌ Out of Scope | Not mentioned at all                             |
+| 4. Rate limiting | ❌ Out of Scope | Not mentioned (also, different concern)          |
+| 5. Refactor auth | ❌ Out of Scope | Not mentioned                                    |
+| 6. Add tests     | ❌ Out of Scope | Not mentioned                                    |
+| 7. Update docs   | ❌ Out of Scope | Not mentioned                                    |
 
 **Result**: Only #1 is in scope. Everything else requires asking.
 
 ## In Scope: Explicit Requests
 
 **Characteristics:**
+
 - User used specific words requesting this
 - You can point to exact phrase
 - No interpretation needed
@@ -80,12 +81,14 @@ In Scope: Modify API response to include emails
 ```
 
 **Test**: Can you quote the user's exact words that request this change?
+
 - YES → In Scope
 - NO → Not In Scope
 
 ## Unclear: Implied but Not Explicit
 
 **Characteristics:**
+
 - You're inferring from context
 - User didn't say it directly
 - Could go either way
@@ -107,12 +110,14 @@ Unclear: Should preference be persisted?
 ```
 
 **Test**: Is this directly stated, or are you interpreting?
+
 - Stated → In Scope
 - Interpreting → Unclear, ask for clarification
 
 ## Out of Scope: Not Mentioned
 
 **Characteristics:**
+
 - User didn't mention it
 - Not implied by context
 - You're adding it proactively
@@ -134,6 +139,7 @@ Out of Scope: Also add JSON and XML export
 ```
 
 **Test**: Did user mention this at all?
+
 - NO → Out of Scope, do NOT implement without asking
 
 ## Edge Cases
@@ -143,6 +149,7 @@ Out of Scope: Also add JSON and XML export
 **Scenario**: Change requires additional code that wasn't explicitly requested.
 
 **Examples:**
+
 - Adding import statement for new library
 - Adding type definition for new parameter
 - Adding configuration for new service
@@ -150,6 +157,7 @@ Out of Scope: Also add JSON and XML export
 **Classification**: **In Scope** (required for requested change to work)
 
 **But**: Mention it in output
+
 ```
 "I added the search feature. This required:
 - Importing the search library
@@ -166,6 +174,7 @@ Let me know if you'd like details on the setup."
 **Scenario**: User's request would introduce security vulnerability or data loss.
 
 **Examples:**
+
 - User input without sanitization → XSS risk
 - Delete operation without confirmation → Data loss
 - Sensitive data without encryption → Exposure
@@ -173,6 +182,7 @@ Let me know if you'd like details on the setup."
 **Classification**: **In Scope** (critical exception)
 
 **But**: Explain why you added it
+
 ```
 "I implemented the delete feature. For safety, I added:
 - Confirmation dialog (prevents accidental deletion)
@@ -188,6 +198,7 @@ These are security/data-loss mitigations. Let me know if you want different safe
 **Scenario**: While implementing, you discover other bugs in the same file.
 
 **Examples:**
+
 - User asks to fix Bug A
 - You notice Bug B in the same function
 - Temptation: "While I'm here, I'll fix Bug B too"
@@ -195,6 +206,7 @@ These are security/data-loss mitigations. Let me know if you want different safe
 **Classification**: **Out of Scope** (separate concern)
 
 **Action**: Fix Bug A only, report Bug B separately
+
 ```
 "Fixed Bug A (search not working). While investigating, I found Bug B (filter not resetting). Should I:
 1. Leave Bug B for separate PR
@@ -209,6 +221,7 @@ These are security/data-loss mitigations. Let me know if you want different safe
 **Scenario**: User request lacks details needed for implementation.
 
 **Examples:**
+
 - "Add validation" → What validation rules?
 - "Make it faster" → How fast? What's acceptable?
 - "Add error handling" → For which errors? How to handle?
@@ -216,6 +229,7 @@ These are security/data-loss mitigations. Let me know if you want different safe
 **Classification**: **Unclear** (requires clarification)
 
 **Action**: Ask specific questions
+
 ```
 "You asked me to add validation. Questions:
 1. Which fields need validation?
@@ -231,15 +245,18 @@ These are security/data-loss mitigations. Let me know if you want different safe
 **Before implementing ANY change, ask:**
 
 ### Question 1: Is it explicitly requested?
+
 - Can you quote exact words? → ✅ In Scope
 - Interpreting/inferring? → ⚠️ Unclear, ask
 - Not mentioned? → ❌ Out of Scope, ask
 
 ### Question 2: Is it required for requested change to work?
+
 - Syntactic requirement (import, type, config)? → ✅ In Scope
 - Optional improvement? → ❌ Out of Scope, ask
 
 ### Question 3: Is it a critical security/data-loss issue?
+
 - Would cause security vulnerability? → ✅ In Scope (explain why)
 - Would cause data loss? → ✅ In Scope (explain why)
 - "Nice to have" safety? → ❌ Out of Scope, ask
@@ -250,20 +267,20 @@ These are security/data-loss mitigations. Let me know if you want different safe
 
 ### Classification Analysis
 
-| Potential Change | Category | Reasoning |
-|-----------------|----------|-----------|
-| Add comment input field | ✅ In Scope | Explicitly requested ("add comment section") |
-| Add submit button | ✅ In Scope | Required for functionality |
-| Save comments to database | ✅ In Scope | Implied by "comment section" |
-| Display existing comments | ✅ In Scope | Implied by "comment section" |
-| Add author name display | ⚠️ Unclear | Part of comment? Ask what fields to show |
-| Add timestamps | ⚠️ Unclear | Common pattern, but not mentioned |
-| Add edit/delete buttons | ❌ Out of Scope | Not mentioned |
-| Add upvote/downvote | ❌ Out of Scope | Not mentioned |
-| Add nested replies | ❌ Out of Scope | Not mentioned |
-| Add comment moderation | ❌ Out of Scope | Not mentioned |
-| Add email notifications | ❌ Out of Scope | Not mentioned |
-| Add spam filtering | ⚠️ Unclear | Security consideration, ask |
+| Potential Change          | Category        | Reasoning                                    |
+| ------------------------- | --------------- | -------------------------------------------- |
+| Add comment input field   | ✅ In Scope     | Explicitly requested ("add comment section") |
+| Add submit button         | ✅ In Scope     | Required for functionality                   |
+| Save comments to database | ✅ In Scope     | Implied by "comment section"                 |
+| Display existing comments | ✅ In Scope     | Implied by "comment section"                 |
+| Add author name display   | ⚠️ Unclear      | Part of comment? Ask what fields to show     |
+| Add timestamps            | ⚠️ Unclear      | Common pattern, but not mentioned            |
+| Add edit/delete buttons   | ❌ Out of Scope | Not mentioned                                |
+| Add upvote/downvote       | ❌ Out of Scope | Not mentioned                                |
+| Add nested replies        | ❌ Out of Scope | Not mentioned                                |
+| Add comment moderation    | ❌ Out of Scope | Not mentioned                                |
+| Add email notifications   | ❌ Out of Scope | Not mentioned                                |
+| Add spam filtering        | ⚠️ Unclear      | Security consideration, ask                  |
 
 ### Recommended Approach
 

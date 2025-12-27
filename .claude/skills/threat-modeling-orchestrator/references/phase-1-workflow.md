@@ -5,6 +5,7 @@
 ## Overview
 
 Phase 1 builds comprehensive understanding of what the application is and does:
+
 - Architecture and component boundaries
 - Entry points (attack surface)
 - Data flows and transformations
@@ -23,11 +24,13 @@ Task("codebase-mapper", "Analyze {scope} for threat modeling. Create all Phase 1
 ### For Large Codebases (>5 components)
 
 1. **Identify components** by directory heuristics:
+
    ```bash
    ls -d {scope}/*/ | grep -E "(api|backend|frontend|ui|cmd|pkg|services|infra)"
    ```
 
 2. **Spawn parallel agents**:
+
    ```
    Task("codebase-mapper", "Analyze frontend: {scope}/ui")
    Task("codebase-mapper", "Analyze backend: {scope}/backend")
@@ -42,14 +45,14 @@ Task("codebase-mapper", "Analyze {scope} for threat modeling. Create all Phase 1
 
 ## Required Artifacts
 
-| Artifact | Description | Schema |
-|----------|-------------|--------|
-| `manifest.json` | File inventory with sizes | `{files: [{path, size, type}]}` |
-| `components/*.json` | Per-component analysis | See component schema below |
-| `entry-points.json` | Attack surface inventory | `{endpoints: [{path, method, handler}]}` |
-| `data-flows.json` | Data movement map | `{flows: [{source, transformation, sink}]}` |
-| `trust-boundaries.json` | Security boundaries | `{boundaries: [{name, location, controls}]}` |
-| `summary.md` | Compressed handoff | <2000 tokens |
+| Artifact                | Description               | Schema                                       |
+| ----------------------- | ------------------------- | -------------------------------------------- |
+| `manifest.json`         | File inventory with sizes | `{files: [{path, size, type}]}`              |
+| `components/*.json`     | Per-component analysis    | See component schema below                   |
+| `entry-points.json`     | Attack surface inventory  | `{endpoints: [{path, method, handler}]}`     |
+| `data-flows.json`       | Data movement map         | `{flows: [{source, transformation, sink}]}`  |
+| `trust-boundaries.json` | Security boundaries       | `{boundaries: [{name, location, controls}]}` |
+| `summary.md`            | Compressed handoff        | <2000 tokens                                 |
 
 ## Component Schema
 
@@ -76,6 +79,7 @@ Task("codebase-mapper", "Analyze {scope} for threat modeling. Create all Phase 1
 ## Checkpoint Preparation
 
 Before presenting checkpoint, ensure:
+
 - [ ] All component JSONs created
 - [ ] Entry points consolidated
 - [ ] Data flows mapped

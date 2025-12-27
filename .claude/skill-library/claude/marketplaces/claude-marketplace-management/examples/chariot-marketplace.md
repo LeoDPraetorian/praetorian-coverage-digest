@@ -72,11 +72,7 @@ Actual `.claude/settings.json` in Chariot repository:
       "Bash(pwd)",
       "Bash(ls :*)"
     ],
-    "deny": [
-      "Bash(rm -rf /)",
-      "Bash(make deploy:*)",
-      "Bash(make purge)"
-    ]
+    "deny": ["Bash(rm -rf /)", "Bash(make deploy:*)", "Bash(make purge)"]
   },
   "extraKnownMarketplaces": {
     "chariot": {
@@ -90,12 +86,7 @@ Actual `.claude/settings.json` in Chariot repository:
     "chariot-development-platform@chariot": true
   },
   "enableAllProjectMcpServers": false,
-  "enabledMcpjsonServers": [
-    "chariot",
-    "chrome-devtools",
-    "context7",
-    "praetorian-cli"
-  ]
+  "enabledMcpjsonServers": ["chariot", "chrome-devtools", "context7", "praetorian-cli"]
 }
 ```
 
@@ -104,6 +95,7 @@ Actual `.claude/settings.json` in Chariot repository:
 ### Skills (87 total)
 
 **Foundation Skills (20 - migrated from superpowers):**
+
 - brainstorming
 - debugging-systematically
 - developing-with-tdd
@@ -115,6 +107,7 @@ Actual `.claude/settings.json` in Chariot repository:
 - (and 12 more)
 
 **Platform-Specific Skills (67 - Chariot):**
+
 - claude-agent-write
 - claude-plugin-settings
 - claude-marketplace-management
@@ -139,18 +132,21 @@ Actual `.claude/settings.json` in Chariot repository:
 ### Agents (50+)
 
 **Quality Agents:**
+
 - implementation-acceptance-validator
 - test-quality-assessor
 - test-coverage-auditor
 - pattern-compliance-validator
 
 **Development Agents:**
+
 - react-developer
 - go-developer
 - python-developer
 - integration-developer
 
 **Architectural Agents:**
+
 - react-architect
 - go-architect
 - database-neo4j-architect
@@ -162,6 +158,7 @@ Actual `.claude/settings.json` in Chariot repository:
 ### Hooks
 
 **SessionStart Hook:**
+
 - Injects `using-superpowers` skill
 - Provides MANDATORY FIRST RESPONSE PROTOCOL
 - Enforces skill checking at session start
@@ -169,11 +166,13 @@ Actual `.claude/settings.json` in Chariot repository:
 ## Distribution Method
 
 **Local marketplace:**
+
 - Source: `directory` with path `./`
 - Plugin in same repository as marketplace
 - Team clones repository and gets everything
 
 **Installation (for team members):**
+
 ```bash
 git clone https://github.com/praetorian-inc/chariot-development-platform.git
 cd chariot-development-platform
@@ -185,6 +184,7 @@ cd chariot-development-platform
 ### Monorepo Pattern
 
 **Everything in one repository:**
+
 - All 87 skills
 - All 16 commands
 - All 50+ agents
@@ -192,6 +192,7 @@ cd chariot-development-platform
 - Platform documentation
 
 **Benefits:**
+
 - Single git clone
 - Synchronized versions
 - Unified documentation
@@ -200,6 +201,7 @@ cd chariot-development-platform
 ### Directory Source
 
 **Why local marketplace:**
+
 - Development platform lives in project
 - No external dependencies
 - Fast iteration
@@ -208,6 +210,7 @@ cd chariot-development-platform
 ### Skill Organization
 
 **Flat structure in .claude/skills/:**
+
 ```
 .claude/skills/
 ├── brainstorming/
@@ -218,6 +221,7 @@ cd chariot-development-platform
 ```
 
 **Not nested by category:**
+
 - Easier discovery
 - Simpler references
 - No arbitrary categorization
@@ -226,12 +230,14 @@ cd chariot-development-platform
 ### Migration Strategy
 
 **Internalized superpowers:**
+
 - Copied all 20 foundation skills
 - Removed external marketplace dependency
 - Updated SessionStart hook
 - Full ownership of all content
 
 **Result:**
+
 - 87 total skills (20 + 67)
 - Zero external dependencies
 - Complete customization capability
@@ -258,6 +264,7 @@ cd chariot-development-platform
 ### Skill Updates
 
 **Developer updates skill:**
+
 ```bash
 cd chariot-development-platform
 # Edit .claude/skills/skill-name/SKILL.md
@@ -267,6 +274,7 @@ git push
 ```
 
 **Team members get updates:**
+
 ```bash
 git pull
 # Restart Claude Code to reload skills
@@ -275,6 +283,7 @@ git pull
 ### Adding New Skills
 
 **Create skill:**
+
 ```bash
 mkdir -p .claude/skills/new-skill
 # Create SKILL.md and references
@@ -284,6 +293,7 @@ git push
 ```
 
 **Team automatically gets it:**
+
 - Pull changes
 - Restart Claude Code
 - Skill available immediately
@@ -315,18 +325,21 @@ git push
 ## Metrics
 
 **Before migration:**
+
 - 67 Chariot skills
 - Dependency on external superpowers marketplace
 - 2 marketplaces to manage
 - Manual configuration possible
 
 **After migration:**
+
 - 87 total skills (67 + 20)
 - Zero external dependencies
 - 1 marketplace (self-contained)
 - Automatic configuration via settings.json
 
 **Team experience:**
+
 - Same functionality
 - Simplified setup
 - Faster onboarding
@@ -335,12 +348,14 @@ git push
 ## Scalability
 
 **Current state:**
+
 - 87 skills, 16 commands, 50+ agents
 - Repository size: manageable
 - Clone time: reasonable
 - Skill discovery: fast
 
 **Future growth:**
+
 - Can add unlimited skills/commands/agents
 - Monorepo handles hundreds of components
 - Git scales well for this use case
@@ -349,12 +364,14 @@ git push
 ## Security
 
 **Internal distribution:**
+
 - Private GitHub repository
 - Team has access via organization membership
 - No public marketplace exposure
 - Full code review before merging
 
 **Content vetting:**
+
 - All skills reviewed before commit
 - Superpowers code reviewed during migration
 - Hooks audited for security
@@ -363,6 +380,7 @@ git push
 ## Conclusion
 
 The Chariot marketplace demonstrates:
+
 - Successful monorepo marketplace pattern
 - Effective skill organization
 - Zero-config team setup

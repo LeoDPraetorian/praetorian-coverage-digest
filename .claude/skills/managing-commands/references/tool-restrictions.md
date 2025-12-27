@@ -21,33 +21,33 @@ Does command delegate to a skill?
 
 ### Always Allowed (Router Pattern)
 
-| Tool | When to Use |
-|------|-------------|
-| `Skill` | Delegating to any skill |
-| `AskUserQuestion` | Gathering user input |
+| Tool              | When to Use             |
+| ----------------- | ----------------------- |
+| `Skill`           | Delegating to any skill |
+| `AskUserQuestion` | Gathering user input    |
 
 These are the ONLY tools needed when following Router Pattern.
 
 ### Conditional (Direct Commands)
 
-| Tool | When Allowed | Example |
-|------|--------------|---------|
-| `Bash(git:*)` | Git operations without skill | Show status |
-| `Bash(npm:*)` | NPM operations | Run tests |
-| `Glob` | File discovery | Find patterns |
-| `Read` | File reading | View config |
-| `WebFetch` | HTTP requests | API calls |
+| Tool          | When Allowed                 | Example       |
+| ------------- | ---------------------------- | ------------- |
+| `Bash(git:*)` | Git operations without skill | Show status   |
+| `Bash(npm:*)` | NPM operations               | Run tests     |
+| `Glob`        | File discovery               | Find patterns |
+| `Read`        | File reading                 | View config   |
+| `WebFetch`    | HTTP requests                | API calls     |
 
 **Rule:** Only use these when NO skill exists for the operation.
 
 ### Never with Skills
 
-| Tool | Problem |
-|------|---------|
-| `Bash` (broad) | Enables hallucination |
-| `Write` | Command shouldn't write |
-| `Edit` | Command shouldn't edit |
-| `Task` | Command shouldn't spawn agents |
+| Tool           | Problem                        |
+| -------------- | ------------------------------ |
+| `Bash` (broad) | Enables hallucination          |
+| `Write`        | Command shouldn't write        |
+| `Edit`         | Command shouldn't edit         |
+| `Task`         | Command shouldn't spawn agents |
 
 **Rule:** If command has `skills:` frontmatter, these tools are Tool Leakage.
 
@@ -61,7 +61,6 @@ These are the ONLY tools needed when following Router Pattern.
 allowed-tools: Skill, AskUserQuestion
 skills: my-skill
 ---
-
 # WRONG (Tool Leakage)
 ---
 allowed-tools: Skill, Bash, Read, AskUserQuestion
@@ -77,7 +76,6 @@ skills: my-skill
 description: Show git status
 allowed-tools: Bash(git status:*)
 ---
-
 # WRONG (Too broad)
 ---
 allowed-tools: Bash(*)
@@ -92,7 +90,6 @@ allowed-tools: Bash(*)
 description: Find files by pattern
 allowed-tools: Glob
 ---
-
 # ALTERNATIVE
 ---
 allowed-tools: Bash(find:*)
@@ -119,12 +116,14 @@ allowed-tools: Bash(*)
 ```
 
 **Risks:**
+
 - Command injection
 - Unintended file operations
 - System modifications
 - Data exfiltration
 
 **Fix:** Use specific patterns:
+
 ```yaml
 allowed-tools: Bash(git status:*), Bash(npm test:*)
 ```
@@ -138,12 +137,14 @@ skills: my-skill
 ```
 
 **Risks:**
+
 - LLM works around skill failures
 - Hallucinated fixes
 - Unpredictable behavior
 - Security bypass
 
 **Fix:** Remove extra tools:
+
 ```yaml
 allowed-tools: Skill, AskUserQuestion
 skills: my-skill
@@ -153,11 +154,11 @@ skills: my-skill
 
 The `command-manager audit` Check 8 detects:
 
-| Violation | Severity | Auto-Fix |
-|-----------|----------|----------|
-| `skills:` + extra tools | CRITICAL | Yes |
-| `Bash(*)` broad access | WARNING | No |
-| `Write` in command | WARNING | No |
+| Violation               | Severity | Auto-Fix |
+| ----------------------- | -------- | -------- |
+| `skills:` + extra tools | CRITICAL | Yes      |
+| `Bash(*)` broad access  | WARNING  | No       |
+| `Write` in command      | WARNING  | No       |
 
 ## Common Questions
 

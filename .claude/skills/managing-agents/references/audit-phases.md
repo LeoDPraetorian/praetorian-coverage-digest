@@ -6,16 +6,16 @@ The agent audit system runs 8 phases of compliance validation to ensure agents f
 
 ## Phase Summary
 
-| Phase | Name | Auto-Fix | Critical | Focus |
-|-------|------|----------|----------|-------|
-| 1 | Frontmatter Syntax | ✅ Yes | 🔴 Yes | Block scalar, color, permissionMode, ordering |
-| 2 | Description Quality | ❌ No | 🟡 Medium | "Use when" triggers |
-| 3 | Prompt Efficiency | ❌ No | 🟡 Medium | <300 lines |
-| 4 | Skill Integration | ✅ Yes | 🟡 Medium | Gateway skills, tool appropriateness |
-| 5 | Output Standardization | ❌ No | 🟢 Low | JSON format |
-| 6 | Escalation Protocol | ❌ No | 🟢 Low | Handoff conditions |
-| 7 | Body References | ✅ Yes | 🟡 Medium | Phantom skill detection |
-| 8 | Skill Coverage | ❌ No | 🟢 Low | Recommended skills |
+| Phase | Name                   | Auto-Fix | Critical  | Focus                                         |
+| ----- | ---------------------- | -------- | --------- | --------------------------------------------- |
+| 1     | Frontmatter Syntax     | ✅ Yes   | 🔴 Yes    | Block scalar, color, permissionMode, ordering |
+| 2     | Description Quality    | ❌ No    | 🟡 Medium | "Use when" triggers                           |
+| 3     | Prompt Efficiency      | ❌ No    | 🟡 Medium | <300 lines                                    |
+| 4     | Skill Integration      | ✅ Yes   | 🟡 Medium | Gateway skills, tool appropriateness          |
+| 5     | Output Standardization | ❌ No    | 🟢 Low    | JSON format                                   |
+| 6     | Escalation Protocol    | ❌ No    | 🟢 Low    | Handoff conditions                            |
+| 7     | Body References        | ✅ Yes   | 🟡 Medium | Phantom skill detection                       |
+| 8     | Skill Coverage         | ❌ No    | 🟢 Low    | Recommended skills                            |
 
 ## Phase 1: Frontmatter Syntax (CRITICAL)
 
@@ -150,10 +150,10 @@ description: Use when developing React frontend applications - creating componen
 ```markdown
 ## Skill References (Load On-Demand via Gateway)
 
-| Task | Skill to Read |
-|------|---------------|
+| Task         | Skill to Read               |
+| ------------ | --------------------------- |
 | TDD Workflow | `.claude/skill-library/...` |
-| Debugging | `.claude/skill-library/...` |
+| Debugging    | `.claude/skill-library/...` |
 ```
 
 ## Phase 4: Skill Integration
@@ -269,6 +269,7 @@ npm run --silent fix -- <agent> --apply phase4-remove-tool-Write
 ## Escalation Protocol
 
 **Stop and escalate if**:
+
 - Architecture decision needed → Recommend `go-architect`
 - Security concern identified → Recommend `security-architect`
 - Blocked by unclear requirements → Use AskUserQuestion tool
@@ -301,9 +302,11 @@ npm run --silent fix -- <agent> --apply phase4-remove-tool-Write
 
 ```markdown
 # ❌ PHANTOM SKILL - skill doesn't exist
+
 Use the `fake-nonexistent-skill` skill for this task.
 
 # ✅ VALID - skill exists
+
 Use the `debugging-systematically` skill for bug investigation.
 ```
 
@@ -350,6 +353,7 @@ npm run --silent fix -- <agent> --apply phase7-remove-phantom-fake-skill
 ### Scoring
 
 Recommendations are scored by relevance:
+
 - Type match: 8-10 points (high relevance)
 - Keyword match: 6-7 points (medium relevance)
 - Category match: 4-5 points (lower relevance)
@@ -362,11 +366,11 @@ Gateway skills receive +1 bonus if agent lacks gateway.
 ```markdown
 ## Skill Recommendations (Phase 8)
 
-| Skill | Relevance | Source | Reason |
-|-------|-----------|--------|--------|
-| developing-with-tdd | High (9) | type | Development agents need TDD |
-| gateway-frontend | High (8) | body-keywords | Found "react" in description |
-| debugging-systematically | Medium (6) | category | Development benefits from debugging |
+| Skill                    | Relevance  | Source        | Reason                              |
+| ------------------------ | ---------- | ------------- | ----------------------------------- |
+| developing-with-tdd      | High (9)   | type          | Development agents need TDD         |
+| gateway-frontend         | High (8)   | body-keywords | Found "react" in description        |
+| debugging-systematically | Medium (6) | category      | Development benefits from debugging |
 ```
 
 ## Running Audits

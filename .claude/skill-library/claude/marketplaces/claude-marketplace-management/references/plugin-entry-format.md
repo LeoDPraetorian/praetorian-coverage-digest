@@ -33,16 +33,19 @@ Use when plugin is in the same repository as marketplace.
 ```
 
 **When to use:**
+
 - Plugin bundled with marketplace
 - Team wants single repository
 - Simplifies distribution
 
 **Path format:**
+
 - Relative to marketplace.json location
 - Unix-style forward slashes
 - Examples: `"./"`, `"./plugins/my-plugin"`, `"../shared-plugin"`
 
 **Example structure:**
+
 ```
 my-marketplace/
 ├── marketplace.json
@@ -55,6 +58,7 @@ my-marketplace/
 ```
 
 **marketplace.json:**
+
 ```json
 {
   "plugins": [
@@ -91,17 +95,20 @@ Use when plugin is in its own GitHub repository.
 ```
 
 **When to use:**
+
 - Plugin maintained separately
 - Different release cadence
 - Third-party plugins
 - Public plugins
 
 **Format:**
+
 - `owner/repo-name` (standard GitHub format)
 - No `.git` extension
 - No protocol prefix
 
 **Examples:**
+
 - `"obra/superpowers"`
 - `"anthropic/claude-code-examples"`
 - `"mycompany/internal-tools"`
@@ -121,17 +128,20 @@ Use for GitLab, Bitbucket, or custom git servers.
 ```
 
 **When to use:**
+
 - Non-GitHub git repositories
 - Self-hosted git servers
 - Custom deployment workflows
 
 **Format:**
+
 - Full git URL required
 - Must include protocol (https://)
 - Include `.git` extension
 - Must be accessible to users
 
 **Examples:**
+
 - `"https://gitlab.com/myteam/plugin.git"`
 - `"https://bitbucket.org/company/tools.git"`
 - `"https://git.internal.company.com/plugins/auth.git"`
@@ -154,6 +164,7 @@ Brief explanation of plugin functionality.
 ```
 
 **Best practices:**
+
 - Keep concise (1-2 sentences)
 - Explain what plugin does
 - Mention key features
@@ -175,11 +186,13 @@ Semantic version for tracking updates.
 ```
 
 **Format:**
+
 - Semantic versioning: `major.minor.patch`
 - Optional prerelease: `1.0.0-alpha`, `2.0.0-beta.1`
 - Optional build metadata: `1.0.0+20231115`
 
 **When to increment:**
+
 - **Major**: Breaking changes
 - **Minor**: New features (backward compatible)
 - **Patch**: Bug fixes
@@ -203,6 +216,7 @@ Plugin author information.
 ```
 
 **Use cases:**
+
 - Different authors per plugin
 - Contact information for support
 - Credit contributors
@@ -223,6 +237,7 @@ License for plugin code.
 ```
 
 **Common licenses:**
+
 - `"MIT"` - Permissive open source
 - `"Apache-2.0"` - Permissive with patent grant
 - `"GPL-3.0"` - Copyleft open source
@@ -283,12 +298,14 @@ All plugins in same repository as marketplace.
 ```
 
 **Benefits:**
+
 - Single repository to clone
 - Synchronized versions
 - Unified documentation
 - Simple CI/CD
 
 **Structure:**
+
 ```
 marketplace-repo/
 ├── marketplace.json
@@ -335,6 +352,7 @@ Each plugin in its own repository.
 ```
 
 **Benefits:**
+
 - Independent development
 - Separate release cycles
 - Team ownership per plugin
@@ -366,6 +384,7 @@ Common plugins bundled, specialized plugins external.
 ```
 
 **When to use:**
+
 - Core plugins need stability
 - Specialized plugins evolve rapidly
 - Balance simplicity and flexibility
@@ -396,6 +415,7 @@ Simply remove entry from plugins array:
 ```
 
 **Note**: Users must manually uninstall removed plugins:
+
 ```bash
 /plugin uninstall plugin-name
 ```
@@ -403,16 +423,19 @@ Simply remove entry from plugins array:
 ## Troubleshooting
 
 **Plugin not found:**
+
 - Verify source path/URL is correct
 - Check plugin.json exists in source location
 - Ensure git repository is accessible
 
 **Installation fails:**
+
 - Validate JSON syntax
 - Check for duplicate names
 - Verify source type matches configuration
 
 **Plugin doesn't work:**
+
 - Ensure plugin.json is properly formatted
 - Check component paths in plugin
 - Verify dependencies are documented
@@ -420,24 +443,28 @@ Simply remove entry from plugins array:
 ## Best Practices
 
 **Naming:**
+
 - Use descriptive plugin names
 - Follow kebab-case convention
 - Prefix with team/domain (optional)
 - Examples: `eslint-tools`, `frontend-helpers`, `security-scanner`
 
 **Versioning:**
+
 - Use semantic versioning
 - Document breaking changes
 - Increment appropriately
 - Communicate updates
 
 **Documentation:**
+
 - Include descriptions for all plugins
 - Document required setup
 - List dependencies
 - Provide usage examples
 
 **Organization:**
+
 - Group related functionality
 - Keep plugins focused
 - Avoid duplication

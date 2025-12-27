@@ -36,6 +36,7 @@ Master creating, configuring, and distributing Claude Code plugin marketplaces f
 See [references/marketplace-schema.md](references/marketplace-schema.md) for complete schema.
 
 **Minimum marketplace.json:**
+
 ```json
 {
   "name": "my-marketplace",
@@ -48,6 +49,7 @@ See [references/marketplace-schema.md](references/marketplace-schema.md) for com
 ```
 
 **Required fields:**
+
 - `name`: kebab-case identifier
 - `owner`: Maintainer information
 - `plugins`: Array of plugin entries
@@ -57,6 +59,7 @@ See [references/marketplace-schema.md](references/marketplace-schema.md) for com
 Use the template in [templates/marketplace.json](templates/marketplace.json).
 
 **Workflow:**
+
 1. Create marketplace.json in repository root
 2. Define name, owner, and description
 3. Add plugins array (start empty)
@@ -68,6 +71,7 @@ Use the template in [templates/marketplace.json](templates/marketplace.json).
 See [references/plugin-entry-format.md](references/plugin-entry-format.md) for complete reference.
 
 **Basic plugin entry:**
+
 ```json
 {
   "name": "plugin-name",
@@ -79,17 +83,20 @@ See [references/plugin-entry-format.md](references/plugin-entry-format.md) for c
 ```
 
 **Source types:**
+
 - `directory`: Relative path in same repo
 - `github`: GitHub repository (owner/repo)
 - `git`: Full git URL
 
 **Optional metadata:**
+
 - `description`: Brief plugin description
 - `version`: Semantic version
 - `author`: Author information
 - `license`: License type
 
 **Add plugin workflow:**
+
 1. Open marketplace.json
 2. Add entry to plugins array
 3. Verify source path/repo is correct
@@ -103,17 +110,20 @@ See [references/distribution.md](references/distribution.md) for detailed guide.
 ### GitHub (Recommended)
 
 **Setup:**
+
 1. Create GitHub repository
 2. Add marketplace.json to root
 3. Add plugins (as subdirectories or references)
 4. Push to GitHub
 
 **Users install:**
+
 ```bash
 /plugin marketplace add owner/repo
 ```
 
 **Benefits:**
+
 - Easy discovery
 - Version control
 - Team collaboration
@@ -122,6 +132,7 @@ See [references/distribution.md](references/distribution.md) for detailed guide.
 ### Other Git Services
 
 **GitLab, Bitbucket, etc:**
+
 ```bash
 /plugin marketplace add https://gitlab.com/owner/repo.git
 ```
@@ -129,6 +140,7 @@ See [references/distribution.md](references/distribution.md) for detailed guide.
 ### Local Testing
 
 **Test before distributing:**
+
 ```bash
 /plugin marketplace add /absolute/path/to/marketplace
 ```
@@ -140,6 +152,7 @@ See [references/team-config.md](references/team-config.md) for complete guide.
 ### Automatic Marketplace Installation
 
 **In .claude/settings.json:**
+
 ```json
 {
   "extraKnownMarketplaces": {
@@ -157,12 +170,14 @@ See [references/team-config.md](references/team-config.md) for complete guide.
 ```
 
 **Workflow:**
+
 1. Team member commits settings.json to repo
 2. Others pull changes
 3. Claude Code auto-installs marketplace and plugins
 4. No manual configuration needed
 
 **Benefits:**
+
 - Zero-config for team members
 - Consistent plugin setup across team
 - Single source of truth in git
@@ -170,17 +185,20 @@ See [references/team-config.md](references/team-config.md) for complete guide.
 ## Version Management
 
 **Updating marketplace:**
+
 ```bash
 /plugin marketplace update marketplace-name
 ```
 
 **Updating specific plugin:**
+
 ```bash
 /plugin uninstall plugin-name
 /plugin install plugin-name@marketplace-name
 ```
 
 **Best practices:**
+
 - Use semantic versioning for plugins
 - Document breaking changes
 - Test updates before distributing
@@ -191,6 +209,7 @@ See [references/team-config.md](references/team-config.md) for complete guide.
 See [examples/migration-example.md](examples/migration-example.md) for real-world case study.
 
 **Workflow:**
+
 1. Copy plugin content to new location
 2. Add plugin entry to target marketplace.json
 3. Update .claude/settings.json to point to new marketplace
@@ -199,6 +218,7 @@ See [examples/migration-example.md](examples/migration-example.md) for real-worl
 6. Commit and distribute changes
 
 **Common scenarios:**
+
 - Moving from external to private marketplace (what Chariot did)
 - Consolidating multiple marketplaces
 - Creating team-specific marketplace from public sources
@@ -206,23 +226,27 @@ See [examples/migration-example.md](examples/migration-example.md) for real-worl
 ## Best Practices
 
 **Marketplace naming:**
+
 - Use kebab-case
 - Be descriptive (company-plugins, team-tools)
 - Avoid generic names (plugins, marketplace)
 
 **Plugin organization:**
+
 - Group related plugins
 - Use consistent naming conventions
 - Document plugin dependencies
 - Include version numbers
 
 **Distribution:**
+
 - Prefer GitHub for team distribution
 - Use semantic versioning
 - Document breaking changes
 - Test before publishing
 
 **Team coordination:**
+
 - Use extraKnownMarketplaces in settings.json
 - Communicate marketplace updates
 - Document required setup steps
@@ -231,24 +255,28 @@ See [examples/migration-example.md](examples/migration-example.md) for real-worl
 ## Common Tasks
 
 ### Create New Marketplace
+
 1. Use [templates/marketplace.json](templates/marketplace.json)
 2. Add to GitHub repository
 3. Configure in settings.json
 4. Distribute to team
 
 ### Add Plugin to Existing Marketplace
+
 1. Use [templates/plugin-entry.json](templates/plugin-entry.json)
 2. Add to plugins array in marketplace.json
 3. Commit changes
 4. Team updates marketplace
 
 ### Switch Marketplace Sources
+
 1. Update source in settings.json
 2. Remove old marketplace reference
 3. Test plugins load
 4. Commit changes
 
 ### Troubleshoot Installation
+
 1. Verify marketplace.json syntax
 2. Check plugin source paths/URLs
 3. Confirm git repository access

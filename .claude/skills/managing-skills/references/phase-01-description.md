@@ -3,12 +3,14 @@
 ## What It Checks
 
 **Name validation:**
+
 - Lowercase letters, numbers, hyphens only
 - Maximum 64 characters
 - No leading/trailing hyphens
 - No consecutive hyphens
 
 **Description validation:**
+
 - Must start with "Use when..." or "Use this skill when..."
 - Maximum 1024 characters (hard limit)
 - Single-line format only (no YAML block scalars: `>-`, `|`, `>`)
@@ -20,6 +22,7 @@
 **CRITICAL: Claude Code cannot parse YAML block scalars.**
 
 When a skill uses:
+
 ```yaml
 description: >-
   Use when doing something...
@@ -34,6 +37,7 @@ Claude sees an **empty description**. The skill exists but Claude doesn't know w
 ### CRITICAL Issues
 
 **1. YAML Block Scalars**
+
 ```yaml
 # All of these break Claude Code:
 description: >-   # Folded scalar with strip
@@ -43,6 +47,7 @@ description: |-   # Literal with strip
 ```
 
 **2. Missing Description**
+
 ```yaml
 # No description field at all
 ---
@@ -51,6 +56,7 @@ name: my-skill
 ```
 
 **3. Invalid YAML**
+
 ```yaml
 description: Use when: doing something  # Colon causes parse error
 ```
@@ -58,18 +64,21 @@ description: Use when: doing something  # Colon causes parse error
 ### WARNING Issues
 
 **1. Doesn't Start with "Use when"**
+
 ```yaml
 description: This skill helps with data processing...
 # Should be: Use when processing data...
 ```
 
 **2. First/Second Person Voice**
+
 ```yaml
 description: Use when you need to process data...  # "you"
 description: Use this to help your workflow...     # "your"
 ```
 
 **3. Length Issues**
+
 ```yaml
 # Too short for complex skill (missing keywords)
 description: Use when testing React components  # 38 chars, but skill covers Playwright, fixtures, page objects, etc.
@@ -81,6 +90,7 @@ description: Use when implementing... [1100 characters]
 ### INFO Issues
 
 **1. Suboptimal Length for Complexity**
+
 ```yaml
 # Complex skill with simple description (400 chars)
 # Should be 600-800 chars to include all keywords for discovery
@@ -91,6 +101,7 @@ description: Use when implementing... [1100 characters]
 ❌ **NOT auto-fixable** - requires semantic understanding and domain knowledge:
 
 **Why not auto-fixable:**
+
 - Converting `>-` to single-line: Needs intelligent line joining
 - Rewriting to start with "Use when": Requires understanding skill purpose
 - Voice conversion: Needs content rewriting (you → third person)
@@ -103,6 +114,7 @@ description: Use when implementing... [1100 characters]
 ### Example 1: YAML Block Scalar (CRITICAL)
 
 **Before:**
+
 ```yaml
 description: >-
   Use when implementing TanStack Query v5
@@ -113,6 +125,7 @@ description: >-
 **Issues**: Uses `>-` block scalar - Claude sees empty description
 
 **After:**
+
 ```yaml
 description: Use when implementing TanStack Query v5 data fetching patterns with useQuery, useMutation, useInfiniteQuery for React applications - handles query caching, mutations, infinite scrolling, optimistic updates, error handling, retry logic.
 ```
@@ -122,6 +135,7 @@ description: Use when implementing TanStack Query v5 data fetching patterns with
 ### Example 2: Wrong Voice (WARNING)
 
 **Before:**
+
 ```yaml
 description: Use when you need to debug React components and hooks
 ```
@@ -129,6 +143,7 @@ description: Use when you need to debug React components and hooks
 **Issues**: Second person ("you need to")
 
 **After:**
+
 ```yaml
 description: Use when debugging React components and hooks - systematic troubleshooting for useState, useEffect, custom hooks, rendering issues.
 ```
@@ -138,13 +153,15 @@ description: Use when debugging React components and hooks - systematic troubles
 ### Example 3: Complexity Mismatch (INFO)
 
 **Before (complex skill with simple description):**
+
 ```yaml
-description: Use when testing with Playwright  # 38 chars
+description: Use when testing with Playwright # 38 chars
 ```
 
 **Issues**: Skill covers fixtures, page objects, assertions, test organization - but description too short for discovery
 
 **After:**
+
 ```yaml
 description: Use when testing with Playwright - implements page object model, fixtures, test organization, assertions, test data management, parallel execution, screenshot capture, trace collection for E2E testing.
 ```
@@ -156,6 +173,7 @@ description: Use when testing with Playwright - implements page object model, fi
 **1. Multi-Domain Skills**
 
 Skills covering multiple areas need comprehensive keywords:
+
 ```yaml
 # Bad: Generic
 description: Use when working with authentication
@@ -167,6 +185,7 @@ description: Use when implementing authentication - JWT tokens, OAuth2, Cognito 
 **2. Migration Skills**
 
 Include version numbers and breaking changes:
+
 ```yaml
 description: Use when migrating from React Query v4 to v5 - handles breaking changes (onSuccess removed, suspense enabled by default, initialPageParam required), updates query/mutation syntax, refactors infinite queries
 ```
@@ -174,6 +193,7 @@ description: Use when migrating from React Query v4 to v5 - handles breaking cha
 **3. Error-Driven Skills**
 
 Include actual error messages users will see:
+
 ```yaml
 description: Use when encountering "initialPageParam is required" error in useInfiniteQuery, fixing "onSuccess is not a function" after v5 upgrade, resolving stale data issues
 ```
@@ -220,10 +240,10 @@ description: Use when encountering "initialPageParam is required" error in useIn
 
 ## Quick Reference
 
-| Issue | Severity | Auto-Fix | Solution |
-|-------|----------|----------|----------|
-| YAML block scalar (`>-`) | CRITICAL | ❌ | claude-skill-write |
-| Missing "Use when" | WARNING | ❌ | claude-skill-write |
-| Wrong voice (you/your) | WARNING | ❌ | claude-skill-write |
-| Length suboptimal | INFO | ❌ | claude-skill-write |
-| Exceeds 1024 chars | CRITICAL | ❌ | claude-skill-write (trim) |
+| Issue                    | Severity | Auto-Fix | Solution                  |
+| ------------------------ | -------- | -------- | ------------------------- |
+| YAML block scalar (`>-`) | CRITICAL | ❌       | claude-skill-write        |
+| Missing "Use when"       | WARNING  | ❌       | claude-skill-write        |
+| Wrong voice (you/your)   | WARNING  | ❌       | claude-skill-write        |
+| Length suboptimal        | INFO     | ❌       | claude-skill-write        |
+| Exceeds 1024 chars       | CRITICAL | ❌       | claude-skill-write (trim) |

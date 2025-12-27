@@ -9,6 +9,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ## When to Use This Skill
 
 Use this skill when:
+
 - Implementing features that interact with Burp Suite DAST
 - Creating or managing security scan workflows
 - Processing Burp scan results and findings
@@ -17,6 +18,7 @@ Use this skill when:
 - Converting Burp issues to Chariot risk models
 
 **Symptoms this skill addresses:**
+
 - Incorrect GraphQL query/mutation structure for Burp API
 - Missing Chariot headers or authentication patterns
 - Confusion between site IDs, schedule IDs, and scan IDs
@@ -56,16 +58,19 @@ if summary.Status == burp.SCAN_SUCCEEDED {
 This skill is organized into detailed reference documents. Read them as needed:
 
 ### Core Concepts
+
 - **[Burp GraphQL Schema](references/graphql-schema.md)** - Complete schema with queries, mutations, types
 - **[Client Architecture](references/client-architecture.md)** - BurpEnterpriseClient structure and patterns
 - **[Entity Relationships](references/entity-relationships.md)** - Folders, sites, schedules, scans, issues
 
 ### Integration Patterns
+
 - **[Site Provisioning Workflow](references/site-provisioning.md)** - EnsureSite pattern, headers, configurations
 - **[Scan Lifecycle Management](references/scan-lifecycle.md)** - Schedule types, monitoring, cancellation
 - **[Result Processing](references/result-processing.md)** - Issue conversion, scanned items, Tabularium models
 
 ### Advanced Topics
+
 - **[Error Handling](references/error-handling.md)** - GraphQL errors, validation, retry patterns
 - **[Testing Patterns](references/testing.md)** - Mock transport, unit testing GraphQL operations
 - **[Performance Optimization](references/performance.md)** - Caching, pagination, batch operations
@@ -98,6 +103,7 @@ wa, err := client.EnsureSite(model.WebApplication{
 ```
 
 **What EnsureSite does:**
+
 1. Creates folder for username if needed (idempotent)
 2. Creates site in folder if needed (adds Chariot headers automatically)
 3. Creates daily schedule for seeds (recurring midnight scans)
@@ -144,12 +150,14 @@ See [Result Processing](references/result-processing.md) for conversion patterns
 ## Best Practices
 
 **Site Management:**
+
 - ✅ Use `EnsureSite` for idempotent provisioning
 - ✅ Cache `BurpFolderID`, `BurpSiteID`, `BurpScheduleID` on `WebApplication` model
 - ✅ Include Chariot headers automatically (handled by client)
 - ❌ Don't create sites manually - use helper methods
 
 **Scan Lifecycle:**
+
 - ✅ Use `CreateOnDemandSiteSchedule` for ad-hoc scans
 - ✅ Use `CreateDailySiteSchedule` only for seeds (recurring)
 - ✅ Poll with `GetScanFromScheduleItem` → `GetScanSummary`
@@ -157,6 +165,7 @@ See [Result Processing](references/result-processing.md) for conversion patterns
 - ❌ Don't poll scan status faster than every 30 seconds
 
 **Error Handling:**
+
 - ✅ Wrap all errors with context: `fmt.Errorf("operation failed: %w", err)`
 - ✅ Check for empty IDs in GraphQL responses
 - ✅ Validate scan configurations before creating schedules
@@ -164,6 +173,7 @@ See [Result Processing](references/result-processing.md) for conversion patterns
 - ❌ Don't retry indefinitely without backoff
 
 **Testing:**
+
 - ✅ Use `burp_client_test.go` mock transport pattern
 - ✅ Test GraphQL mutations without real Burp connectivity
 - ✅ Verify all error paths
@@ -256,6 +266,7 @@ See [Site Provisioning Workflow](references/site-provisioning.md) for API defini
 **Cause:** GraphQL mutation returned empty ID in response.
 
 **Solution:**
+
 1. Check GraphQL query syntax (variables, types)
 2. Verify API token has correct permissions
 3. Check Burp Enterprise logs for validation errors
@@ -266,6 +277,7 @@ See [Site Provisioning Workflow](references/site-provisioning.md) for API defini
 **Cause:** Config ID doesn't exist in Burp Enterprise.
 
 **Solution:**
+
 ```go
 configs, _ := client.GetScanConfigurations()
 // Find your config in the list, use its ID
@@ -278,6 +290,7 @@ Use `burp.PRAETORIAN_BALANCED_CONFIG` constant for default config.
 **Cause:** Using schedule ID instead of scan ID.
 
 **Solution:**
+
 ```go
 // Get scan ID from schedule first
 scanResp, _ := client.GetScanFromScheduleItem(scheduleID)
@@ -299,7 +312,7 @@ result, err := client.ParseAPIDefinitionFromURL(ctx, url)
 
 - **[go-errgroup-concurrency](./../go-errgroup-concurrency/SKILL.md)** - Parallel scan processing
 - **[aws-cognito](./../aws-cognito/SKILL.md)** - Credential management patterns
-- **[backend-integration-test-engineer](./../../testing/integration/SKILL.md)** - Testing Burp integration
+- **[backend-tester](./../../testing/integration/SKILL.md)** - Testing Burp integration
 
 ## Architecture Context
 
@@ -314,11 +327,13 @@ result, err := client.ParseAPIDefinitionFromURL(ctx, url)
 - `burp_client_test.go` - Mock transport for unit testing
 
 **Integration points:**
+
 - Tabularium models: `model.WebApplication`, `model.Risk`, `model.Asset`
 - AWS credential broker: `model.BurpSuiteInternalCredential`
 - GraphQL helper: `github.com/praetorian-inc/chariot/backend/pkg/lib/graphql`
 
 **Design philosophy:**
+
 - Thin client wrapper - business logic lives in capabilities
 - Small, composable functions - no orchestration in library
 - Idempotent operations - safe to call repeatedly

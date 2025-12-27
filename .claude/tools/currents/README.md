@@ -9,19 +9,22 @@ TypeScript wrappers that call Currents MCP server **independently** via MCP SDK,
 Each of the 8 tools is in its own file (~56-80 lines each), enabling true progressive loading.
 
 ### At Session Start:
-| Approach | Currents in Settings | Tokens Consumed | Savings |
-|----------|---------------------|-----------------|---------|
-| **Traditional** | ✅ Enabled | 2,400 tokens | 0% |
-| **Progressive (This)** | ❌ Disabled | 0 tokens | **100%** |
+
+| Approach               | Currents in Settings | Tokens Consumed | Savings  |
+| ---------------------- | -------------------- | --------------- | -------- |
+| **Traditional**        | ✅ Enabled           | 2,400 tokens    | 0%       |
+| **Progressive (This)** | ❌ Disabled          | 0 tokens        | **100%** |
 
 ### When Using Tools:
-| Scenario | Old Monolithic | Individual Files | Reduction |
-|----------|---------------|------------------|-----------|
-| **Load 1 tool** | 1,308 tokens (all 8) | 140 tokens | **89.3%** ✓ |
-| **Load 3 tools** | 1,308 tokens (all 8) | 420 tokens | **67.9%** ✓ |
-| **Load all 8** | 1,308 tokens | 1,308 tokens | 0% (same) |
+
+| Scenario         | Old Monolithic       | Individual Files | Reduction   |
+| ---------------- | -------------------- | ---------------- | ----------- |
+| **Load 1 tool**  | 1,308 tokens (all 8) | 140 tokens       | **89.3%** ✓ |
+| **Load 3 tools** | 1,308 tokens (all 8) | 420 tokens       | **67.9%** ✓ |
+| **Load all 8**   | 1,308 tokens         | 1,308 tokens     | 0% (same)   |
 
 ### Token Economics:
+
 - **Per tool cost**: ~140-200 tokens (varies by complexity)
 - **Linear scaling**: Load only what you need
 - **Backward compatible**: Can still import from index.ts (loads all 8)
@@ -31,22 +34,27 @@ Each of the 8 tools is in its own file (~56-80 lines each), enabling true progre
 ## How It Works
 
 **Traditional Claude Code MCP:**
+
 ```json
 // .claude/settings.json
 { "enabledMcpjsonServers": ["currents"] }
 ```
+
 Result: 2,400 tokens consumed at every session start
 
 **Progressive Loading with Wrappers:**
+
 ```json
 // .claude/settings.json
-{ "enabledMcpjsonServers": [] }  // Currents DISABLED
+{ "enabledMcpjsonServers": [] } // Currents DISABLED
 ```
+
 Result: 0 tokens at session start, wrappers connect independently via MCP SDK
 
 ## Tools Implemented
 
 ✅ **All Wrappers (8/8 Complete):**
+
 1. `getProjects` - List all Currents projects (prerequisite for other tools)
 2. `getTestsPerformance` - Get test performance metrics with filtering
 3. `getSpecFilesPerformance` - Get spec file performance metrics
@@ -94,6 +102,7 @@ npx tsx .claude/tools/currents/index.test.ts
 ```
 
 **CRITICAL:**
+
 - Currents MUST be disabled in Claude Code settings for token savings
 - CURRENTS_API_KEY MUST be configured in `.claude/tools/config/credentials.json`
 - Uses shared config pattern (same as Linear, future MCPs)
@@ -106,17 +115,17 @@ npx tsx .claude/tools/currents/index.test.ts
 ```typescript
 // ✅ RECOMMENDED: Progressive loading (individual files)
 // Load only the tool you need (~140 tokens per tool)
-import { getProjects } from './.claude/tools/currents/get-projects.js';
+import { getProjects } from "./.claude/tools/currents/get-projects.js";
 
 // ✅ BACKWARD COMPATIBLE: Index import (loads all 8 tools)
 // Convenience for multiple tools (~1,308 tokens)
-import { getProjects, getTestsPerformance } from './.claude/tools/currents/index.js';
+import { getProjects, getTestsPerformance } from "./.claude/tools/currents/index.js";
 ```
 
 ### 1. Get Projects (Required First)
 
 ```typescript
-import { getProjects } from './.claude/tools/currents/get-projects.js';
+import { getProjects } from "./.claude/tools/currents/get-projects.js";
 
 const projects = await getProjects.execute({});
 console.log(`Found ${projects.totalProjects} projects`);
@@ -128,12 +137,12 @@ const projectId = projects.projects[0].id;
 ### 2. Find Flaky Tests
 
 ```typescript
-import { getTestsPerformance } from './.claude/tools/currents/get-tests-performance.js';
+import { getTestsPerformance } from "./.claude/tools/currents/get-tests-performance.js";
 
 const flakyTests = await getTestsPerformance.execute({
-  projectId: 'your-project-id',
-  order: 'flakiness', // Sort by flakiness
-  orderDirection: 'desc',
+  projectId: "your-project-id",
+  order: "flakiness", // Sort by flakiness
+  orderDirection: "desc",
   limit: 10, // Top 10 flaky tests
 });
 
@@ -143,12 +152,12 @@ console.log(`Found ${flakyTests.totalTests} flaky tests`);
 ### 3. Find Slow Spec Files
 
 ```typescript
-import { getSpecFilesPerformance } from './.claude/tools/currents/get-spec-files-performance.js';
+import { getSpecFilesPerformance } from "./.claude/tools/currents/get-spec-files-performance.js";
 
 const slowSpecs = await getSpecFilesPerformance.execute({
-  projectId: 'your-project-id',
-  order: 'avgDuration',
-  orderDirection: 'desc',
+  projectId: "your-project-id",
+  order: "avgDuration",
+  orderDirection: "desc",
   limit: 10,
 });
 
@@ -158,11 +167,11 @@ console.log(`Slowest specs: ${slowSpecs.totalSpecs} found`);
 ### 4. Debug Failed Tests
 
 ```typescript
-import { getTestResults } from './.claude/tools/currents/get-test-results.js';
+import { getTestResults } from "./.claude/tools/currents/get-test-results.js";
 
 const failures = await getTestResults.execute({
-  signature: 'test-signature-from-get-tests-signatures',
-  status: 'failed',
+  signature: "test-signature-from-get-tests-signatures",
+  status: "failed",
   limit: 5,
 });
 
@@ -176,17 +185,17 @@ console.log(`Failed runs: ${failures.totalResults}`);
 ```typescript
 // Get slowest tests across all branches
 const slowTests = await getTestsPerformance.execute({
-  projectId: 'proj-123',
-  order: 'duration',
-  orderDirection: 'desc',
+  projectId: "proj-123",
+  order: "duration",
+  orderDirection: "desc",
   limit: 20,
 });
 
 // Get slowest spec files
 const slowSpecs = await getSpecFilesPerformance.execute({
-  projectId: 'proj-123',
-  order: 'avgDuration',
-  orderDirection: 'desc',
+  projectId: "proj-123",
+  order: "avgDuration",
+  orderDirection: "desc",
   limit: 15,
 });
 ```
@@ -196,16 +205,16 @@ const slowSpecs = await getSpecFilesPerformance.execute({
 ```typescript
 // Most flaky tests
 const flaky = await getTestsPerformance.execute({
-  projectId: 'proj-123',
-  order: 'flakiness',
-  orderDirection: 'desc',
+  projectId: "proj-123",
+  order: "flakiness",
+  orderDirection: "desc",
 });
 
 // Filter by specific branch
 const mainBranchFlaky = await getTestsPerformance.execute({
-  projectId: 'proj-123',
-  order: 'flakiness',
-  branches: ['main'],
+  projectId: "proj-123",
+  order: "flakiness",
+  branches: ["main"],
 });
 ```
 
@@ -214,10 +223,10 @@ const mainBranchFlaky = await getTestsPerformance.execute({
 ```typescript
 // Tests by specific author
 const authorTests = await getTestsPerformance.execute({
-  projectId: 'proj-123',
-  authors: ['user@example.com'],
-  from: '2025-10-24',
-  to: '2025-11-23',
+  projectId: "proj-123",
+  authors: ["user@example.com"],
+  from: "2025-10-24",
+  to: "2025-11-23",
 });
 ```
 
@@ -230,6 +239,7 @@ Lists all projects in Currents platform.
 **Input:** None required
 
 **Output:**
+
 ```typescript
 {
   projects: Array<{
@@ -247,6 +257,7 @@ Lists all projects in Currents platform.
 Get test performance metrics with filtering and ordering.
 
 **Input:**
+
 ```typescript
 {
   projectId: string,           // Required
@@ -265,6 +276,7 @@ Get test performance metrics with filtering and ordering.
 ```
 
 **Output:**
+
 ```typescript
 {
   tests: Array<{
@@ -287,6 +299,7 @@ Get test performance metrics with filtering and ordering.
 Get spec file performance metrics.
 
 **Input:**
+
 ```typescript
 {
   projectId: string,
@@ -306,6 +319,7 @@ Get spec file performance metrics.
 ```
 
 **Output:**
+
 ```typescript
 {
   specFiles: Array<{
@@ -327,6 +341,7 @@ Get spec file performance metrics.
 Get test execution results for debugging.
 
 **Input:**
+
 ```typescript
 {
   signature: string,           // From getTestsSignatures
@@ -340,6 +355,7 @@ Get test execution results for debugging.
 ```
 
 **Output:**
+
 ```typescript
 {
   results: Array<{
@@ -360,11 +376,13 @@ Get test execution results for debugging.
 All wrappers automatically filter to reduce token usage:
 
 ### Performance Metrics
+
 - Limit to essentials: title, duration, failure rate, flakiness
 - Remove: full error traces, stack traces, verbose metadata
 - Summarize: counts instead of full arrays
 
 ### Test Results
+
 - Include: status, duration, essential error info
 - Remove: full stack traces, screenshots, video links
 - Limit: Maximum 50 results per call
@@ -374,7 +392,7 @@ All wrappers automatically filter to reduce token usage:
 All 8 tools follow this structure:
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 const InputSchema = z.object({
   // Tool-specific parameters
@@ -386,7 +404,7 @@ const OutputSchema = z.object({
 });
 
 export const toolName = {
-  name: 'currents.tool-name',
+  name: "currents.tool-name",
   inputSchema: InputSchema,
   outputSchema: OutputSchema,
 
@@ -395,7 +413,7 @@ export const toolName = {
     const validated = InputSchema.parse(input);
 
     // 2. Call MCP tool
-    const rawData = await callCurrentsMCP('tool-name', validated);
+    const rawData = await callCurrentsMCP("tool-name", validated);
 
     // 3. Filter results
     const filtered = filterData(rawData);
@@ -415,6 +433,7 @@ npx tsx .claude/tools/currents/index.test.ts
 ```
 
 Expected output:
+
 ```
 ✅ All validation tests passed
 Production ready
@@ -425,19 +444,22 @@ Production ready
 ### Setup (CRITICAL)
 
 1. **DISABLE Currents MCP in Claude Code settings** (this is what saves tokens):
+
 ```json
 // .claude/settings.json
 {
-  "enabledMcpjsonServers": []  // Remove "currents" - wrappers connect independently!
+  "enabledMcpjsonServers": [] // Remove "currents" - wrappers connect independently!
 }
 ```
 
 2. **Verify Currents MCP server is available** (wrappers need it running):
+
 ```bash
 npx -y @modelcontextprotocol/server-currents --version
 ```
 
 3. **Use wrappers** in agent code:
+
 ```typescript
 // ❌ Old (2,400 tokens at session start + verbose responses)
 // Requires Currents enabled in settings
@@ -450,6 +472,7 @@ await getTestsPerformance.execute({...});
 ```
 
 **How wrappers connect:**
+
 - Use `@modelcontextprotocol/sdk` Client to create independent connection
 - Call Currents MCP server directly (not via Claude Code runtime)
 - Filter results before returning to agent
@@ -467,6 +490,7 @@ await getTestsPerformance.execute({...});
 ### Issue: ProjectId not found
 
 **Solution:** Always call `getProjects` first:
+
 ```typescript
 const projects = await getProjects.execute({});
 const projectId = projects.projects[0].id;
@@ -475,6 +499,7 @@ const projectId = projects.projects[0].id;
 ### Issue: Empty results
 
 **Solution:** Check date ranges and filters:
+
 ```typescript
 {
   from: '2025-10-24',  // 30 days ago
@@ -486,6 +511,7 @@ const projectId = projects.projects[0].id;
 ### Issue: High token usage
 
 **Solution:** Use pagination and limits:
+
 ```typescript
 {
   limit: 10,  // Start small
@@ -533,6 +559,7 @@ const projectId = projects.projects[0].id;
 ```
 
 **Architecture Benefits:**
+
 - ✅ Progressive loading: Import only the tools you need
 - ✅ Individual testing: Each tool has dedicated unit tests
 - ✅ Backward compatible: index.ts re-exports all tools
@@ -556,6 +583,7 @@ const projectId = projects.projects[0].id;
 **After:** 8 individual files (56-80 lines each, 140-200 tokens per tool)
 
 **Benefits Achieved:**
+
 - ✅ 89.3% token reduction when using 1 tool
 - ✅ Linear scaling: 3 tools = 420 tokens (vs 1,308)
 - ✅ Matches architecture pattern of context7 and linear

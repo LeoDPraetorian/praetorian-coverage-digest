@@ -25,6 +25,7 @@ const stripeKey = 'sk_live_1234567890abcdef';
 ## Pre-Commit Protection
 
 Blocks commits with exposed secrets:
+
 ```bash
 git commit
 # 🚨 Cannot commit - secrets detected!

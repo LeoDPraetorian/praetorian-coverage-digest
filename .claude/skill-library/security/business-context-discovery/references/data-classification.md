@@ -9,6 +9,7 @@
 **Definition**: Any data that could identify a specific individual.
 
 **Examples**:
+
 - **Direct identifiers**: Full name, email address, phone number, physical address
 - **Indirect identifiers**: IP address, device ID, cookie ID
 - **Government IDs**: SSN, passport number, driver's license, national ID
@@ -16,6 +17,7 @@
 - **Online**: Usernames, account numbers, profile photos
 
 **Regulatory Context**:
+
 - **GDPR** (EU): Personal data of EU residents
 - **CCPA** (California): Personal information of California residents
 - **PIPEDA** (Canada): Personal information of Canadians
@@ -27,6 +29,7 @@
 **Definition**: Any health-related data that can be linked to an individual.
 
 **Examples**:
+
 - Medical records, diagnoses, treatment plans
 - Prescription information
 - Lab results, imaging studies
@@ -36,6 +39,7 @@
 - Genetic information
 
 **Regulatory Context**:
+
 - **HIPAA** (US): Applies to covered entities and business associates
 - **HITECH Act**: Breach notification requirements
 - **State laws**: Additional requirements (e.g., California CMIA)
@@ -47,6 +51,7 @@
 **Definition**: Data related to financial transactions or accounts.
 
 **Examples**:
+
 - **Payment card**: Credit/debit card numbers, CVV, expiration date
 - **Bank account**: Account numbers, routing numbers
 - **Transaction data**: Purchase history, payment amounts
@@ -54,6 +59,7 @@
 - **Tax information**: Tax IDs, W-2/1099 forms
 
 **Regulatory Context**:
+
 - **PCI-DSS**: Credit card data (Levels 1-4 based on volume)
 - **GLBA** (Gramm-Leach-Bliley): Financial institution customer data
 - **SOX** (Sarbanes-Oxley): Financial reporting data
@@ -65,6 +71,7 @@
 **Definition**: Data used to verify identity or grant access.
 
 **Examples**:
+
 - **Passwords**: Plaintext (critical), hashed (high)
 - **API keys**: Service authentication tokens
 - **Session tokens**: Active user sessions
@@ -74,6 +81,7 @@
 - **Security questions**: Answers to challenge questions
 
 **Regulatory Context**:
+
 - **NIST 800-63**: Password requirements
 - **GDPR Article 32**: Appropriate security measures
 - **SOC2 CC6.1**: Logical access controls
@@ -85,6 +93,7 @@
 **Definition**: Non-public business information providing competitive advantage.
 
 **Examples**:
+
 - **Trade secrets**: Algorithms, formulas, processes
 - **Intellectual property**: Patents, source code
 - **Customer lists**: Client databases, contact information
@@ -93,6 +102,7 @@
 - **Pricing**: Cost structures, discount tiers
 
 **Regulatory Context**:
+
 - **Trade Secrets Act**: Federal protection
 - **DTSA** (Defend Trade Secrets Act): Civil remedies
 - **State laws**: Uniform Trade Secrets Act (UTSA)
@@ -104,12 +114,14 @@
 **Definition**: Data related to legal matters or regulatory compliance.
 
 **Examples**:
+
 - **Legal documents**: Contracts, NDAs, litigation records
 - **Compliance records**: Audit trails, certifications
 - **Employee records**: HR files, performance reviews
 - **Internal investigations**: Incident reports
 
 **Regulatory Context**:
+
 - **Attorney-client privilege**: Legal communications
 - **Work product doctrine**: Litigation materials
 - **Various regulations**: Specific retention requirements
@@ -118,14 +130,14 @@
 
 ## Classification Matrix
 
-| Data Type | GDPR | CCPA | HIPAA | PCI-DSS | SOC2 | Sensitivity |
-|-----------|------|------|-------|---------|------|-------------|
-| Name, Email | ✅ | ✅ | - | - | ✅ | Medium |
-| SSN, Gov ID | ✅ | ✅ | - | - | ✅ | High |
-| Health Records | ✅ | ✅ | ✅ | - | ✅ | High |
-| Payment Cards | ✅ | ✅ | - | ✅ | ✅ | High |
-| Passwords | ✅ | ✅ | - | - | ✅ | Critical |
-| Trade Secrets | - | - | - | - | ✅ | High |
+| Data Type      | GDPR | CCPA | HIPAA | PCI-DSS | SOC2 | Sensitivity |
+| -------------- | ---- | ---- | ----- | ------- | ---- | ----------- |
+| Name, Email    | ✅   | ✅   | -     | -       | ✅   | Medium      |
+| SSN, Gov ID    | ✅   | ✅   | -     | -       | ✅   | High        |
+| Health Records | ✅   | ✅   | ✅    | -       | ✅   | High        |
+| Payment Cards  | ✅   | ✅   | -     | ✅      | ✅   | High        |
+| Passwords      | ✅   | ✅   | -     | -       | ✅   | Critical    |
+| Trade Secrets  | -    | -    | -     | -       | ✅   | High        |
 
 ## Crown Jewels Identification
 
@@ -142,24 +154,26 @@ Ask these questions to identify crown jewels:
 
 ### Industry-Specific Crown Jewels
 
-| Industry | Typical Crown Jewels |
-|----------|---------------------|
-| **Financial Services** | Account numbers, transaction data, trading algorithms |
-| **Healthcare** | PHI, medical records, insurance information |
-| **E-Commerce** | Payment methods, customer PII, purchase history |
-| **SaaS** | Customer API keys, tenant data, proprietary algorithms |
-| **Manufacturing** | Trade secrets, formulas, supply chain data |
+| Industry               | Typical Crown Jewels                                   |
+| ---------------------- | ------------------------------------------------------ |
+| **Financial Services** | Account numbers, transaction data, trading algorithms  |
+| **Healthcare**         | PHI, medical records, insurance information            |
+| **E-Commerce**         | Payment methods, customer PII, purchase history        |
+| **SaaS**               | Customer API keys, tenant data, proprietary algorithms |
+| **Manufacturing**      | Trade secrets, formulas, supply chain data             |
 
 ## Data Flow Considerations
 
 When classifying data, consider:
 
 ### Data States
+
 - **Data at rest**: Stored in databases, filesystems, backups
 - **Data in transit**: Network communications, API calls
 - **Data in use**: Active in memory, processing
 
 ### Data Lifecycle
+
 - **Collection**: How is data obtained?
 - **Storage**: Where is it stored? How long?
 - **Processing**: How is it transformed?
@@ -173,6 +187,7 @@ When classifying data, consider:
 **Applies to**: Processing personal data of EU residents
 
 **Key Requirements**:
+
 - Lawful basis for processing
 - Data minimization principle
 - Right to erasure ("right to be forgotten")
@@ -186,6 +201,7 @@ When classifying data, consider:
 **Applies to**: Businesses collecting personal information of California residents
 
 **Key Requirements**:
+
 - Right to know what data is collected
 - Right to delete personal information
 - Right to opt-out of sale
@@ -198,6 +214,7 @@ When classifying data, consider:
 **Applies to**: Covered entities and business associates handling PHI
 
 **Key Requirements**:
+
 - Administrative safeguards (policies, training)
 - Physical safeguards (facility access control)
 - Technical safeguards (encryption, audit controls)
@@ -210,6 +227,7 @@ When classifying data, consider:
 **Applies to**: Organizations processing, storing, or transmitting credit card data
 
 **Key Requirements** (12 requirements):
+
 1. Install and maintain firewall configuration
 2. Don't use vendor-supplied defaults
 3. Protect stored cardholder data
@@ -224,6 +242,7 @@ When classifying data, consider:
 12. Maintain information security policy
 
 **Levels**:
+
 - Level 1: 6M+ transactions/year
 - Level 2: 1M-6M transactions/year
 - Level 3: 20K-1M transactions/year
@@ -236,12 +255,13 @@ When classifying data, consider:
 ### Step 1: Inventory Data Types
 
 List all data the application handles:
+
 ```json
 {
   "data_inventory": [
-    {"field": "user_email", "type": "PII", "location": "users table"},
-    {"field": "credit_card", "type": "financial", "location": "payments table"},
-    {"field": "password_hash", "type": "credentials", "location": "auth table"}
+    { "field": "user_email", "type": "PII", "location": "users table" },
+    { "field": "credit_card", "type": "financial", "location": "payments table" },
+    { "field": "password_hash", "type": "credentials", "location": "auth table" }
   ]
 }
 ```
@@ -249,6 +269,7 @@ List all data the application handles:
 ### Step 2: Apply Regulatory Mapping
 
 For each data type, identify applicable regulations:
+
 ```json
 {
   "user_email": {
@@ -261,6 +282,7 @@ For each data type, identify applicable regulations:
 ### Step 3: Assess Sensitivity
 
 Rate sensitivity based on:
+
 - Regulatory impact (Critical/High/Medium/Low)
 - Breach damage potential
 - Attacker value
@@ -268,13 +290,10 @@ Rate sensitivity based on:
 ### Step 4: Identify Crown Jewels
 
 Select top 3-5 most critical data types:
+
 ```json
 {
-  "crown_jewels": [
-    "payment_card_data",
-    "user_passwords",
-    "api_keys"
-  ],
+  "crown_jewels": ["payment_card_data", "user_passwords", "api_keys"],
   "rationale": "Highest regulatory penalties + immediate access to customer funds"
 }
 ```

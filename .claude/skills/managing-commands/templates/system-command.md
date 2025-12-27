@@ -26,12 +26,12 @@ Display the output to show the result.
 ## Error Handling
 
 If command fails:
-  Display the error message.
-  Suggest common fixes.
+Display the error message.
+Suggest common fixes.
 
 If arguments invalid:
-  Explain expected format.
-  Show usage example.
+Explain expected format.
+Show usage example.
 ```
 
 ## Template Notes
@@ -52,12 +52,12 @@ If arguments invalid:
 
 ### Tool Permission Patterns
 
-| Operation | Permission |
-|-----------|------------|
-| Git commands | `Bash(git:*)` |
-| NPM commands | `Bash(npm:*)` |
-| File listing | `Glob` or `Bash(ls:*)` |
-| Specific command | `Bash(command:*)` |
+| Operation        | Permission             |
+| ---------------- | ---------------------- |
+| Git commands     | `Bash(git:*)`          |
+| NPM commands     | `Bash(npm:*)`          |
+| File listing     | `Glob` or `Bash(ls:*)` |
+| Specific command | `Bash(command:*)`      |
 
 ### When NOT to Use
 

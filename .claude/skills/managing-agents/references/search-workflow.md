@@ -1,253 +1,79 @@
 # Agent Search Workflow
 
+**Keyword-based agent discovery with relevance scoring.**
+
+⚠️ **As of December 2024, agent searching uses instruction-based workflow with CLI wrapper for scoring algorithm.**
+
+---
+
 ## Overview
 
-The search command finds agents by name, description, category, or skills with relevance scoring.
+Searching finds agents by keyword across names, descriptions, types, and skills. Results are ranked by relevance score (0-100+ points).
 
-## Quick Start
+## How to Search for Agents
 
-```bash
-# Search by keyword
-npm run --silent search -- "react"
-
-# Filter by category
-npm run --silent search -- "test" --type testing
-
-# Limit results
-npm run --silent search -- "security" --limit 5
-
-# JSON output
-npm run --silent search -- "api" --json
-```
-
-## Command Reference
-
-```bash
-npm run --silent search -- "<query>"
-npm run --silent search -- "<query>" --type <category>
-npm run --silent search -- "<query>" --limit <number>
-npm run --silent search -- "<query>" --json
-```
-
-### Parameters
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `query` | (required) | Search term |
-| `--type` | (all) | Filter by category |
-| `--limit` | 10 | Max results to show |
-| `--json` | false | Output as JSON |
-
-## Scoring Algorithm
-
-Results are ranked by relevance score:
-
-| Match Type | Score |
-|------------|-------|
-| Name exact match | 100 |
-| Name substring | 50 |
-| Description match | 30 |
-| Category match | 20 |
-| Skills match | 10 |
-| Valid description bonus | 5 |
-
-### Example Scoring
-
-Query: "react"
-
-| Agent | Name | Desc | Type | Skills | Total |
-|-------|------|------|------|--------|-------|
-| react-developer | 50 | 30 | 0 | 0 | 80 |
-| react-architect | 50 | 30 | 0 | 0 | 80 |
-| frontend-developer | 0 | 30 | 0 | 0 | 30 |
-
-## Search Examples
-
-### Find React-Related Agents
-
-```bash
-npm run --silent search -- "react"
-
-# Output:
-# Search Results for "react":
-# ────────────────────────────────────────────────────────────────
-# ✓ react-developer (development) [Score: 85]
-#    Use when developing React frontend applications...
-#
-# ✓ react-architect (architecture) [Score: 85]
-#    Use when making architectural decisions for React...
-#
-# ✗ react-code-reviewer (quality) [Score: 90]
-#    Use this agent when you need to review React...
-```
-
-### Find Testing Agents
-
-```bash
-npm run --silent search -- "test" --type testing
-
-# Only shows agents in testing category
-```
-
-### Find Security Agents
-
-```bash
-npm run --silent search -- "security"
-
-# Matches:
-# - security-architect
-# - security-risk-assessor
-# - go-security-reviewer
-```
-
-### Find Backend Agents
-
-```bash
-npm run --silent search -- "backend" --limit 5
-
-# Top 5 backend-related agents
-```
-
-## Output Format
-
-### Default Output
+**Route to the searching-agents skill:**
 
 ```
-Search Results for "query":
-────────────────────────────────────────────────────────────────
-✓ agent-name (category) [Score: 85]
-   Truncated description (80 chars)...
-
-✗ broken-agent (category) [Score: 50]
-   Description using block scalar...
+Read: .claude/skill-library/claude/agent-management/searching-agents/SKILL.md
 ```
 
-Legend:
-- ✓ = Valid description (discoverable)
-- ✗ = Broken description (invisible to Claude)
+The `searching-agents` skill provides the complete workflow.
 
-### JSON Output
+---
 
-```bash
-npm run --silent search -- "react" --json
+## What the Workflow Provides
 
-# Output:
-[
-  {
-    "name": "react-developer",
-    "score": 85,
-    "type": "development",
-    "description": "Use when developing React...",
-    "descriptionStatus": "valid"
-  },
-  ...
-]
-```
+### Keyword Search
 
-## Common Search Queries
+- **Searches across** - Names, descriptions, types, skills
+- **Relevance scoring** - Ranks by match quality (0-100+ points)
+- **Category filtering** - Optional filter by agent type
+- **Result limiting** - Show top N matches
+- **Score interpretation** - Explains what scores mean
 
-### By Technology
+### Scoring Algorithm
 
-```bash
-npm run --silent search -- "react"
-npm run --silent search -- "go"
-npm run --silent search -- "typescript"
-npm run --silent search -- "graphql"
-```
+| Match Type              | Points |
+| ----------------------- | ------ |
+| Name exact match        | 100    |
+| Name substring          | 50     |
+| Description match       | 30     |
+| Type match              | 20     |
+| Skills match            | 10     |
+| Valid description bonus | 5      |
 
-### By Task
+---
 
-```bash
-npm run --silent search -- "debug"
-npm run --silent search -- "review"
-npm run --silent search -- "test"
-npm run --silent search -- "deploy"
-```
+## Why Instruction-Based?
 
-### By Domain
+Searching requires specialized capabilities:
 
-```bash
-npm run --silent search -- "frontend"
-npm run --silent search -- "backend"
-npm run --silent search -- "security"
-npm run --silent search -- "infrastructure"
-```
+- **Portable repo root resolution** - Works in super-repo and normal repo
+- **CLI wrapper** - Scoring algorithm implementation
+- **Result interpretation** - Contextual recommendations
+- **Task tool integration** - Search → select → use workflow
 
-### By Category
+---
 
-```bash
-npm run --silent search -- "" --type architecture
-npm run --silent search -- "" --type testing
-npm run --silent search -- "" --type quality
-```
+## Time Estimate
 
-## Integration with Other Commands
+- **Typical:** 30-60 seconds
 
-### Find and Audit
+---
 
-```bash
-# Find agents
-npm run --silent search -- "react" --json | jq '.[].name'
+## Prerequisites
 
-# Audit top result
-npm run --silent audit -- react-developer
-```
+None - the searching-agents skill handles all setup internally.
 
-### Find Broken Agents
+---
 
-```bash
-# Search and look for ✗ markers
-npm run --silent search -- ""  # Empty query lists all with scores
+## Documentation
 
-# Or use list with status filter
-npm run --silent list -- --status broken
-```
+**Full workflow details:**
+`.claude/skill-library/claude/agent-management/searching-agents/SKILL.md`
 
-## Tips
+**Related references:**
 
-### Empty Query Lists All
-
-```bash
-npm run --silent search -- ""
-
-# Returns all agents ranked by valid description bonus
-```
-
-### Combine with Category Filter
-
-```bash
-npm run --silent search -- "unit" --type testing
-
-# Narrows to testing category agents matching "unit"
-```
-
-### Use JSON for Processing
-
-```bash
-# Get all agent names matching query
-npm run --silent search -- "security" --json | jq -r '.[].name'
-
-# Filter by score
-npm run --silent search -- "api" --json | jq '.[] | select(.score >= 50)'
-```
-
-## No Results?
-
-If no results found:
-
-1. Check spelling
-2. Try broader terms
-3. Try without category filter
-4. Use `npm run --silent list` to see all agents
-
-```bash
-npm run --silent search -- "zustand"
-# No agents found matching: "zustand"
-# Try searching for: react, go, test, security, architecture
-```
-
-## References
-
-- [List Workflow](./list-workflow.md)
-- [Audit Phases](./audit-phases.md)
-- [Agent Architecture](../../../docs/AGENT-ARCHITECTURE.md)
+- [List Workflow](list-workflow.md) - Browse all agents
+- [Directory Structure](directory-structure.md) - Agent organization

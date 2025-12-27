@@ -7,11 +7,11 @@ Lints **only the files you've modified**, not the entire codebase.
 ## Why Use It
 
 | Before (npm run lint) | After (smart-eslint) |
-|-----------------------|----------------------|
-| 45 seconds | 2-15 seconds |
-| Modifies 100+ files | Modifies 1-10 files |
-| Massive PRs | Focused PRs |
-| Merge conflicts | Clean merges |
+| --------------------- | -------------------- |
+| 45 seconds            | 2-15 seconds         |
+| Modifies 100+ files   | Modifies 1-10 files  |
+| Massive PRs           | Focused PRs          |
+| Merge conflicts       | Clean merges         |
 
 ## Usage
 
@@ -35,6 +35,7 @@ cd /Users/nathansportsman/chariot-development-platform
 ## Example Output
 
 **Success**:
+
 ```
 🔍 Smart ESLint Check
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -50,6 +51,7 @@ Running: npx eslint --fix src/components/Button.tsx src/hooks/useAssets.ts src/t
 ```
 
 **With Errors**:
+
 ```
 🔍 Smart ESLint Check
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -87,6 +89,7 @@ Please fix these issues before proceeding.
 ### Pre-commit Hook (Optional)
 
 Add to `.git/hooks/pre-commit`:
+
 ```bash
 #!/bin/bash
 ./.claude/skills/smart-eslint/lint-changed.sh
@@ -96,6 +99,7 @@ exit $?
 ### CI/CD (Optional)
 
 Add to `.github/workflows/lint.yml`:
+
 ```yaml
 - name: Lint Changed Files
   run: ./.claude/skills/smart-eslint/lint-changed.sh
@@ -103,11 +107,11 @@ Add to `.github/workflows/lint.yml`:
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| "No files modified" | Normal - no TS/JS files changed |
-| "Not in git repository" | Run from repo root |
-| "ESLint found issues" | Fix reported errors and re-run |
+| Issue                   | Solution                        |
+| ----------------------- | ------------------------------- |
+| "No files modified"     | Normal - no TS/JS files changed |
+| "Not in git repository" | Run from repo root              |
+| "ESLint found issues"   | Fix reported errors and re-run  |
 
 ## Files
 

@@ -49,6 +49,7 @@ npx mcp-remote https://mcp.linear.app/sse
 ```
 
 This will:
+
 1. Open browser for Linear OAuth
 2. Store credentials securely via mcp-remote
 3. No manual credentials.json configuration needed
@@ -58,45 +59,50 @@ This will:
 ### Basic Examples
 
 ```typescript
-import { listIssues, getIssue, createIssue } from './.claude/tools/linear';
+import { listIssues, getIssue, createIssue } from "./.claude/tools/linear";
 
 // List my issues
-const myIssues = await listIssues.execute({ assignee: 'me' });
+const myIssues = await listIssues.execute({ assignee: "me" });
 
 // Get specific issue
-const issue = await getIssue.execute({ id: 'CHARIOT-1366' });
+const issue = await getIssue.execute({ id: "CHARIOT-1366" });
 
 // Create new issue
 const result = await createIssue.execute({
-  title: 'Fix authentication bug',
-  team: 'Engineering',
-  assignee: 'me',
-  priority: 1
+  title: "Fix authentication bug",
+  team: "Engineering",
+  assignee: "me",
+  priority: 1,
 });
 ```
 
 ### Available Tools
 
 #### Issue Operations
+
 - `listIssues` - List issues with filters (assignee, team, state, etc.)
 - `getIssue` - Get detailed issue information
 - `createIssue` - Create new issue
 - `updateIssue` - Update existing issue
 
 #### Project Operations
+
 - `listProjects` - List projects with filters
 - `getProject` - Get detailed project information
 - `createProject` - Create new project
 - `updateProject` - Update existing project
 
 #### Team Operations
+
 - `listTeams` - List all teams
 - `getTeam` - Get team details
 
 #### User Operations
+
 - `listUsers` - List workspace users
 
 #### Comment Operations
+
 - `listComments` - List issue comments
 - `createComment` - Create comment on issue
 
@@ -107,6 +113,7 @@ npm test
 ```
 
 This will verify:
+
 1. Linear MCP connection
 2. OAuth credentials
 3. Basic operations (teams, users, issues, projects)
@@ -115,23 +122,28 @@ This will verify:
 ## Migration from GraphQL API
 
 **Old Pattern** (Direct GraphQL):
+
 ```typescript
 // Located in .claude/tools/linear-graphql-archive/
-import { executeLinearQuery } from './lib/linear-client';
+import { executeLinearQuery } from "./lib/linear-client";
 
-const result = await executeLinearQuery(`
+const result = await executeLinearQuery(
+  `
   query GetIssue($id: String!) {
     issue(id: $id) { ... }
   }
-`, { id });
+`,
+  { id }
+);
 ```
 
 **New Pattern** (MCP Wrappers):
+
 ```typescript
 // Located in .claude/tools/linear/
-import { getIssue } from './.claude/tools/linear';
+import { getIssue } from "./.claude/tools/linear";
 
-const issue = await getIssue.execute({ id: 'CHARIOT-1366' });
+const issue = await getIssue.execute({ id: "CHARIOT-1366" });
 ```
 
 ## Shared MCP Client
@@ -139,13 +151,13 @@ const issue = await getIssue.execute({ id: 'CHARIOT-1366' });
 All Linear wrappers use the shared MCP client:
 
 ```typescript
-import { callMCPTool } from '../config/lib/mcp-client';
+import { callMCPTool } from "../config/lib/mcp-client";
 
 // Independent MCP connection (no Claude Code runtime dependency)
 const rawData = await callMCPTool(
-  'linear',
-  'mcp__plugin_chariot-development-platform_linear__list_issues',
-  { assignee: 'me' }
+  "linear",
+  "mcp__plugin_chariot-development-platform_linear__list_issues",
+  { assignee: "me" }
 );
 ```
 
@@ -167,6 +179,7 @@ Update `.claude/tools/config/lib/mcp-client.ts` to include Linear configuration.
 ### "OAuth not authorized"
 
 Run OAuth flow:
+
 ```bash
 npx mcp-remote https://mcp.linear.app/sse
 ```
@@ -174,6 +187,7 @@ npx mcp-remote https://mcp.linear.app/sse
 ### "Issue not found"
 
 The Linear MCP accepts both:
+
 - Human-readable identifiers: `CHARIOT-1366`
 - UUIDs: `eee0788c-9b67-4b3c-8a08-c9cd4224403e`
 
@@ -187,7 +201,7 @@ All inputs and outputs are validated:
 const listIssuesParams = z.object({
   assignee: z.string().optional(),
   team: z.string().optional(),
-  limit: z.number().min(1).max(250).default(50)
+  limit: z.number().min(1).max(250).default(50),
 });
 ```
 
@@ -197,21 +211,23 @@ Responses are filtered to essential fields:
 
 ```typescript
 // Truncate descriptions for token efficiency
-description: issue.description?.substring(0, 200)
+description: issue.description?.substring(0, 200);
 
 // Filter nested objects to minimal fields
-assignee: issue.assignee ? {
-  id: issue.assignee.id,
-  name: issue.assignee.name,
-  email: issue.assignee.email
-} : undefined
+assignee: issue.assignee
+  ? {
+      id: issue.assignee.id,
+      name: issue.assignee.name,
+      email: issue.assignee.email,
+    }
+  : undefined;
 ```
 
 ### Error Handling
 
 ```typescript
 try {
-  const issue = await getIssue.execute({ id: 'CHARIOT-1366' });
+  const issue = await getIssue.execute({ id: "CHARIOT-1366" });
 } catch (error) {
   // Detailed error with context
   console.error(error.message);

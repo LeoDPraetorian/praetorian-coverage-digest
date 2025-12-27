@@ -5,6 +5,7 @@
 ## Overview
 
 This library provides a complete testing toolkit for MCP wrappers, enabling:
+
 - ✅ **Unit tests** with mocked MCP client (fast, isolated)
 - ✅ **Integration tests** with real MCP server
 - ✅ **Security test scenarios** (OWASP Top 10, injection attacks)
@@ -24,6 +25,7 @@ npm install
 ```
 
 **Workspace configuration** (`.claude/package.json`):
+
 ```json
 {
   "workspaces": ["lib", "lib/testing", "tools/*", "skills/*/scripts", "skill-library/lib"]
@@ -35,17 +37,17 @@ npm install
 ### Basic Unit Test with Mocking
 
 ```typescript
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createMCPMock, Context7Responses } from '@claude/testing';
-import { resolveLibraryId } from './resolve-library-id';
-import * as mcpClient from '../config/lib/mcp-client';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { createMCPMock, Context7Responses } from "@claude/testing";
+import { resolveLibraryId } from "./resolve-library-id";
+import * as mcpClient from "../config/lib/mcp-client";
 
 // Factory mock pattern (REQUIRED to prevent module loading errors)
-vi.mock('../config/lib/mcp-client', () => ({
+vi.mock("../config/lib/mcp-client", () => ({
   callMCPTool: vi.fn(),
 }));
 
-describe('resolveLibraryId - Unit Tests', () => {
+describe("resolveLibraryId - Unit Tests", () => {
   let mcpMock: ReturnType<typeof createMCPMock>;
 
   beforeEach(() => {
@@ -53,17 +55,17 @@ describe('resolveLibraryId - Unit Tests', () => {
     vi.mocked(mcpClient.callMCPTool).mockImplementation(mcpMock);
   });
 
-  it('should filter libraries correctly', async () => {
+  it("should filter libraries correctly", async () => {
     // Arrange: Mock MCP response
     mcpMock.mockResolvedValue(
       Context7Responses.resolveLibraryId([
-        { id: '1', name: 'react', description: 'A'.repeat(500) },
-        { id: '2', name: 'vue', description: 'Short desc' }
+        { id: "1", name: "react", description: "A".repeat(500) },
+        { id: "2", name: "vue", description: "Short desc" },
       ])
     );
 
     // Act: Execute wrapper
-    const result = await resolveLibraryId.execute({ libraryName: 'react' });
+    const result = await resolveLibraryId.execute({ libraryName: "react" });
 
     // Assert: Verify filtering logic
     expect(result.libraries[0].description).toHaveLength(200); // Truncated
@@ -71,10 +73,10 @@ describe('resolveLibraryId - Unit Tests', () => {
     expect(mcpMock).toHaveBeenCalledTimes(1);
   });
 
-  it('should handle empty results', async () => {
+  it("should handle empty results", async () => {
     mcpMock.mockResolvedValue(Context7Responses.emptySearch());
 
-    const result = await resolveLibraryId.execute({ libraryName: 'nonexistent' });
+    const result = await resolveLibraryId.execute({ libraryName: "nonexistent" });
 
     expect(result.libraries).toEqual([]);
     expect(result.totalResults).toBe(0);
@@ -85,31 +87,27 @@ describe('resolveLibraryId - Unit Tests', () => {
 ### Error Handling Tests
 
 ```typescript
-import { MCPErrors } from '@claude/testing';
+import { MCPErrors } from "@claude/testing";
 
-describe('Error handling', () => {
-  it('should handle rate limit errors', async () => {
+describe("Error handling", () => {
+  it("should handle rate limit errors", async () => {
     mcpMock.mockRejectedValue(MCPErrors.rateLimit());
 
-    await expect(
-      resolveLibraryId.execute({ libraryName: 'react' })
-    ).rejects.toThrow(/rate limit/i);
+    await expect(resolveLibraryId.execute({ libraryName: "react" })).rejects.toThrow(/rate limit/i);
   });
 
-  it('should handle server errors', async () => {
+  it("should handle server errors", async () => {
     mcpMock.mockRejectedValue(MCPErrors.serverError());
 
-    await expect(
-      resolveLibraryId.execute({ libraryName: 'react' })
-    ).rejects.toThrow(/server.*error/i);
+    await expect(resolveLibraryId.execute({ libraryName: "react" })).rejects.toThrow(
+      /server.*error/i
+    );
   });
 
-  it('should handle network timeout', async () => {
+  it("should handle network timeout", async () => {
     mcpMock.mockRejectedValue(MCPErrors.timeout());
 
-    await expect(
-      resolveLibraryId.execute({ libraryName: 'react' })
-    ).rejects.toThrow(/ETIMEDOUT/);
+    await expect(resolveLibraryId.execute({ libraryName: "react" })).rejects.toThrow(/ETIMEDOUT/);
   });
 });
 ```
@@ -117,13 +115,12 @@ describe('Error handling', () => {
 ### Security Testing
 
 ```typescript
-import { testSecurityScenarios, getAllSecurityScenarios } from '@claude/testing';
+import { testSecurityScenarios, getAllSecurityScenarios } from "@claude/testing";
 
-describe('Security', () => {
-  it('should block all security attack vectors', async () => {
-    const results = await testSecurityScenarios(
-      getAllSecurityScenarios(),
-      (input) => resolveLibraryId.execute({ libraryName: input })
+describe("Security", () => {
+  it("should block all security attack vectors", async () => {
+    const results = await testSecurityScenarios(getAllSecurityScenarios(), (input) =>
+      resolveLibraryId.execute({ libraryName: input })
     );
 
     expect(results.failed).toBe(0);
@@ -238,12 +235,14 @@ npm run test:coverage
 ## Philosophy
 
 **Unit tests should be:**
+
 - ✅ **Fast** (<1ms per test, no network calls)
 - ✅ **Isolated** (test wrapper logic only, mock MCP)
 - ✅ **Comprehensive** (test all code paths, errors, edge cases)
 - ✅ **Maintainable** (shared utilities, consistent patterns)
 
 **Integration tests should be:**
+
 - ✅ **Realistic** (call real MCP servers)
 - ✅ **Focused** (test end-to-end flows)
 - ✅ **Fewer** (expensive, slow, fewer scenarios)
@@ -253,9 +252,12 @@ npm run test:coverage
 When adding support for a new MCP server:
 
 1. Add response builders to `src/mocks/response-builders.ts`:
+
    ```typescript
    export const YourMCPResponses = {
-     yourTool: (config) => ({ /* mock response */ })
+     yourTool: (config) => ({
+       /* mock response */
+     }),
    };
    ```
 

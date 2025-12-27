@@ -1,0 +1,26 @@
+# frontend-unit-test-engineer Changelog
+
+## 2025-12-27 (Update 2)
+
+### Changed
+- **Tier 3 Skills Expansion** - Added 7 library skills to Tier 3 trigger table based on find-skills semantic analysis:
+  - `condition-based-waiting` (80% relevance) - Async timing, race conditions, flaky test elimination
+  - `using-context-api` (75% relevance) - Testing Context-dependent components
+  - `using-eslint` (60% relevance) - Code quality verification for test files
+  - `implementing-react-hook-form-zod` (85% relevance) - Form lifecycle and validation testing
+  - `vitest-prepush-testing` (70% relevance) - Pre-push hook test infrastructure
+  - `using-shadcn-ui` (65% relevance) - Testing shadcn/ui component primitives
+  - `using-tanstack-query` (90% relevance) - Testing useQuery/useMutation hooks
+- **Alphabetical Sorting** - Re-sorted Tier 3 table by trigger description for easier navigation
+- **Rationale** - Addresses skill gaps for testing modern React patterns heavily used in Chariot platform (TanStack Query, React Hook Form, Context API, shadcn/ui)
+
+## 2025-12-27 (Update 1)
+
+### Fixed
+- **Phase 9: Tier 2 TodoWrite Threshold** - Changed "≥3 steps" to "≥2 steps" (line 33) to comply with MANDATORY requirement for all agents
+- **Phase 14: Duplicate Skill Trigger Mappings** - Removed duplicate "Skill References" section (lines 141-149) to eliminate content duplication with Tier 3
+- **Phase 16: Verbose Triggers** - Shortened 3 triggers in Tier 3 table for readability:
+  - "Test completion reporting, coverage validation" → "Coverage validation" (19 chars)
+  - "Reviewing test files, test quality checks" → "Test quality" (12 chars)
+  - "Multi-component features, test planning" → "Integration tests" (17 chars)
+- **Verification** - Re-audit passed (Phase 0 + all manual phases)

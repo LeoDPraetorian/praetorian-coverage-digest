@@ -31,32 +31,37 @@ You are a specialized [domain] agent.
 
 **IMPORTANT**: Before implementing, consult the `gateway-[domain]` skill.
 
-| Task | Skill to Read |
-|------|---------------|
+| Task     | Skill to Read                            |
+| -------- | ---------------------------------------- |
 | [Task 1] | `.claude/skill-library/path/to/SKILL.md` |
 | [Task 2] | `.claude/skill-library/path/to/SKILL.md` |
 
 ## Critical Rules (Non-Negotiable)
 
 ### [Rule Category 1]
+
 - Specific rule that cannot live in skills
 - Platform-specific constraints
 
 ### [Rule Category 2]
+
 - Another category of rules
 - Implementation requirements
 
 ## Mandatory Skills (Must Use)
 
 ### Test-Driven Development
+
 **When**: Writing new code or fixes
 **Use**: `developing-with-tdd` skill
 
 ### Systematic Debugging
+
 **When**: Investigating bugs
 **Use**: `debugging-systematically` skill
 
 ### Verification
+
 **When**: Before completing any task
 **Use**: `verifying-before-completion` skill
 
@@ -66,24 +71,25 @@ Return results as structured JSON:
 
 \`\`\`json
 {
-  "status": "complete|blocked|needs_review",
-  "summary": "1-2 sentence description of what was done",
-  "files_modified": ["path/to/file1.ts", "path/to/file2.ts"],
-  "verification": {
-    "tests_passed": true,
-    "build_success": true,
-    "command_output": "relevant output snippet"
-  },
-  "handoff": {
-    "recommended_agent": "agent-name-if-needed",
-    "context": "what the next agent should know/do"
-  }
+"status": "complete|blocked|needs_review",
+"summary": "1-2 sentence description of what was done",
+"files_modified": ["path/to/file1.ts", "path/to/file2.ts"],
+"verification": {
+"tests_passed": true,
+"build_success": true,
+"command_output": "relevant output snippet"
+},
+"handoff": {
+"recommended_agent": "agent-name-if-needed",
+"context": "what the next agent should know/do"
+}
 }
 \`\`\`
 
 ## Escalation Protocol
 
 **Stop and escalate if**:
+
 - [Condition 1] → Recommend `agent-name`
 - [Condition 2] → Recommend `agent-name`
 - Architecture decision needed → Recommend `[domain]-architect`
@@ -93,6 +99,7 @@ Return results as structured JSON:
 ## Quality Checklist
 
 Before completing, verify:
+
 - [ ] All requirements addressed
 - [ ] Tests pass (if applicable)
 - [ ] No regressions introduced
@@ -104,6 +111,7 @@ Before completing, verify:
 ### 1. Lean Prompts (<300 lines)
 
 The agent prompt should contain only:
+
 - Identity (role statement)
 - Non-negotiable rules
 - Coordination info (output format, escalation)
@@ -139,15 +147,16 @@ skills: .claude/skill-library/frontend/SKILL.md
 Document which skills to load for specific tasks:
 
 ```markdown
-| Task | Skill to Read |
-|------|---------------|
-| State management | `.claude/skill-library/frontend/zustand/SKILL.md` |
-| API integration | `.claude/skill-library/frontend/tanstack-query/SKILL.md` |
+| Task             | Skill to Read                                            |
+| ---------------- | -------------------------------------------------------- |
+| State management | `.claude/skill-library/frontend/zustand/SKILL.md`        |
+| API integration  | `.claude/skill-library/frontend/tanstack-query/SKILL.md` |
 ```
 
 ### 5. Standardized Output
 
 Always return structured JSON with:
+
 - `status`: complete, blocked, or needs_review
 - `summary`: What was done
 - `files_modified`: List of changed files
@@ -157,21 +166,22 @@ Always return structured JSON with:
 ### 6. Escalation Protocol
 
 Define clear stopping conditions:
+
 - When to stop working
 - Who to hand off to
 - What context to provide
 
 ## Frontmatter Fields
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `name` | Yes | Agent name in kebab-case |
-| `description` | Yes | Single-line with "Use when" trigger |
-| `type` | No | Category (development, testing, etc.) |
-| `permissionMode` | No | default, plan, acceptEdits, bypassPermissions |
-| `tools` | No | Comma-separated tool list |
-| `skills` | No | Gateway skill(s) |
-| `model` | No | sonnet, opus, haiku |
+| Field            | Required | Description                                   |
+| ---------------- | -------- | --------------------------------------------- |
+| `name`           | Yes      | Agent name in kebab-case                      |
+| `description`    | Yes      | Single-line with "Use when" trigger           |
+| `type`           | No       | Category (development, testing, etc.)         |
+| `permissionMode` | No       | default, plan, acceptEdits, bypassPermissions |
+| `tools`          | No       | Comma-separated tool list                     |
+| `skills`         | No       | Gateway skill(s)                              |
+| `model`          | No       | sonnet, opus, haiku                           |
 
 ## Category-Specific Templates
 
@@ -179,7 +189,7 @@ Define clear stopping conditions:
 
 ```yaml
 tools: Read, Write, Edit, Bash, Glob, Grep
-skills: gateway-frontend  # or gateway-backend
+skills: gateway-frontend # or gateway-backend
 model: sonnet
 ```
 
@@ -187,7 +197,7 @@ model: sonnet
 
 ```yaml
 tools: Read, Glob, Grep, TodoWrite, WebFetch, WebSearch
-skills: gateway-frontend  # or gateway-backend
+skills: gateway-frontend # or gateway-backend
 model: opus
 permissionMode: plan
 ```

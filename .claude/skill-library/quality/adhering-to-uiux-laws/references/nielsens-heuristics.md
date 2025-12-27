@@ -59,6 +59,7 @@ function ScanStatus({ status }) {
 ```
 
 **Chariot example:**
+
 - "Assets" not "Entities"
 - "Scan" not "Execute Discovery Protocol"
 - "Vulnerabilities" not "Security Findings"
@@ -92,6 +93,7 @@ function BulkDelete({ selectedAssets }) {
 ```
 
 **Implementation patterns:**
+
 - Undo buttons in toasts
 - Modal confirmation for destructive actions
 - "X" close buttons in all dialogs
@@ -204,6 +206,7 @@ const actions = {
 ```
 
 **Techniques:**
+
 - Recent items lists
 - Autocomplete suggestions
 - Visual icons (not just text labels)
@@ -284,6 +287,7 @@ const actions = {
 ```
 
 **Guidelines:**
+
 - Show 3-4 key fields in cards/lists
 - Hide metadata in details view
 - Remove decoration that doesn't add information
@@ -321,6 +325,7 @@ const actions = {
 ```
 
 **Error message checklist:**
+
 - ✅ Plain language (not error codes)
 - ✅ Explains what happened
 - ✅ Suggests next steps
@@ -372,6 +377,7 @@ const actions = {
 ```
 
 **Help patterns:**
+
 - Tooltips for field-level help
 - Empty states with guidance
 - Onboarding tours for new users

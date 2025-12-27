@@ -1,7 +1,7 @@
 ---
 name: testing-anti-patterns
 description: Use when writing or changing tests, adding mocks, or tempted to add test-only methods to production code - prevents testing mock behavior, production pollution with test-only methods, mocking without understanding dependencies, and guessing API contracts when writing MSW handlers
-allowed-tools: 'Read, Bash, Grep, Glob'
+allowed-tools: "Read, Bash, Grep, Glob"
 ---
 
 # Testing Anti-Patterns
@@ -10,6 +10,8 @@ allowed-tools: 'Read, Bash, Grep, Glob'
 
 Tests must verify real behavior, not mock behavior. Mocks are a means to isolate, not the thing being tested.
 
+
+**Important:** You MUST use TodoWrite before starting to track all workflow steps.
 **Core principle:** Test what the code does, not what the mocks do.
 
 **Following strict TDD prevents these anti-patterns.**
@@ -26,6 +28,7 @@ Tests must verify real behavior, not mock behavior. Mocks are a means to isolate
 ## Anti-Pattern 1: Testing Mock Behavior
 
 **The violation:**
+
 ```typescript
 // ❌ BAD: Testing that the mock exists
 test('renders sidebar', () => {
@@ -35,6 +38,7 @@ test('renders sidebar', () => {
 ```
 
 **Why this is wrong:**
+
 - You're verifying the mock works, not that the component works
 - Test passes when mock is present, fails when it's not
 - Tells you nothing about real behavior
@@ -42,6 +46,7 @@ test('renders sidebar', () => {
 **your human partner's correction:** "Are we testing the behavior of a mock?"
 
 **The fix:**
+
 ```typescript
 // ✅ GOOD: Test real component or don't mock it
 test('renders sidebar', () => {
@@ -68,10 +73,12 @@ BEFORE asserting on any mock element:
 ## Anti-Pattern 2: Test-Only Methods in Production
 
 **The violation:**
+
 ```typescript
 // ❌ BAD: destroy() only used in tests
 class Session {
-  async destroy() {  // Looks like production API!
+  async destroy() {
+    // Looks like production API!
     await this._workspaceManager?.destroyWorkspace(this.id);
     // ... cleanup
   }
@@ -82,12 +89,14 @@ afterEach(() => session.destroy());
 ```
 
 **Why this is wrong:**
+
 - Production class polluted with test-only code
 - Dangerous if accidentally called in production
 - Violates YAGNI and separation of concerns
 - Confuses object lifecycle with entity lifecycle
 
 **The fix:**
+
 ```typescript
 // ✅ GOOD: Test utilities handle test cleanup
 // Session has no destroy() - it's stateless in production
@@ -123,33 +132,36 @@ BEFORE adding any method to production class:
 ## Anti-Pattern 3: Mocking Without Understanding
 
 **The violation:**
+
 ```typescript
 // ❌ BAD: Mock breaks test logic
-test('detects duplicate server', () => {
+test("detects duplicate server", () => {
   // Mock prevents config write that test depends on!
-  vi.mock('ToolCatalog', () => ({
-    discoverAndCacheTools: vi.fn().mockResolvedValue(undefined)
+  vi.mock("ToolCatalog", () => ({
+    discoverAndCacheTools: vi.fn().mockResolvedValue(undefined),
   }));
 
   await addServer(config);
-  await addServer(config);  // Should throw - but won't!
+  await addServer(config); // Should throw - but won't!
 });
 ```
 
 **Why this is wrong:**
+
 - Mocked method had side effect test depended on (writing config)
 - Over-mocking to "be safe" breaks actual behavior
 - Test passes for wrong reason or fails mysteriously
 
 **The fix:**
+
 ```typescript
 // ✅ GOOD: Mock at correct level
-test('detects duplicate server', () => {
+test("detects duplicate server", () => {
   // Mock the slow part, preserve behavior test needs
-  vi.mock('MCPServerManager'); // Just mock slow server startup
+  vi.mock("MCPServerManager"); // Just mock slow server startup
 
-  await addServer(config);  // Config written
-  await addServer(config);  // Duplicate detected ✓
+  await addServer(config); // Config written
+  await addServer(config); // Duplicate detected ✓
 });
 ```
 
@@ -182,11 +194,12 @@ BEFORE mocking any method:
 ## Anti-Pattern 4: Incomplete Mocks
 
 **The violation:**
+
 ```typescript
 // ❌ BAD: Partial mock - only fields you think you need
 const mockResponse = {
-  status: 'success',
-  data: { userId: '123', name: 'Alice' }
+  status: "success",
+  data: { userId: "123", name: "Alice" },
   // Missing: metadata that downstream code uses
 };
 
@@ -194,6 +207,7 @@ const mockResponse = {
 ```
 
 **Why this is wrong:**
+
 - **Partial mocks hide structural assumptions** - You only mocked fields you know about
 - **Downstream code may depend on fields you didn't include** - Silent failures
 - **Tests pass but integration fails** - Mock incomplete, real API complete
@@ -202,12 +216,13 @@ const mockResponse = {
 **The Iron Rule:** Mock the COMPLETE data structure as it exists in reality, not just fields your immediate test uses.
 
 **The fix:**
+
 ```typescript
 // ✅ GOOD: Mirror real API completeness
 const mockResponse = {
-  status: 'success',
-  data: { userId: '123', name: 'Alice' },
-  metadata: { requestId: 'req-789', timestamp: 1234567890 }
+  status: "success",
+  data: { userId: "123", name: "Alice" },
+  metadata: { requestId: "req-789", timestamp: 1234567890 },
   // All fields real API returns
 };
 ```
@@ -233,6 +248,7 @@ BEFORE creating mock responses:
 ## Anti-Pattern 5: Integration Tests as Afterthought
 
 **The violation:**
+
 ```
 ✅ Implementation complete
 ❌ No tests written
@@ -240,11 +256,13 @@ BEFORE creating mock responses:
 ```
 
 **Why this is wrong:**
+
 - Testing is part of implementation, not optional follow-up
 - TDD would have caught this
 - Can't claim complete without tests
 
 **The fix:**
+
 ```
 TDD cycle:
 1. Write failing test
@@ -256,19 +274,21 @@ TDD cycle:
 ## Anti-Pattern 6: Guessing API Contracts
 
 **The violation:**
+
 ```typescript
 // ❌ BAD: Writing MSW handler without verifying real API
-http.get('*/my', ({ request }) => {
+http.get("*/my", ({ request }) => {
   const url = new URL(request.url);
-  const label = url.searchParams.get('label');  // Guessed parameter name!
+  const label = url.searchParams.get("label"); // Guessed parameter name!
 
   return HttpResponse.json({
-    data: [mockData]  // Guessed response structure!
+    data: [mockData], // Guessed response structure!
   });
 });
 ```
 
 **Why this is wrong:**
+
 - **Guessed parameter name** - Real API uses `resource`, not `label`
 - **Guessed response structure** - Real API returns `{count, settings: [...]}`, not `{data: [...]}`
 - **Tests pass with wrong mock** - Production fails despite passing tests
@@ -292,6 +312,7 @@ grep -r "http.get.*my" src/test/mocks/
 ```
 
 **Document what you verified:**
+
 ```typescript
 /**
  * Real API Contract (verified 2025-12-17)
@@ -304,14 +325,14 @@ grep -r "http.get.*my" src/test/mocks/
  * Example: GET /my?resource=setting
  * Returns: { count: 2, settings: [...] }
  */
-http.get('*/my', ({ request }) => {
+http.get("*/my", ({ request }) => {
   const url = new URL(request.url);
-  const resource = url.searchParams.get('resource'); // ✅ Verified
+  const resource = url.searchParams.get("resource"); // ✅ Verified
 
-  if (resource === 'setting') {
+  if (resource === "setting") {
     return HttpResponse.json({
       count: 2,
-      settings: [mockSettings] // ✅ Verified pluralized key
+      settings: [mockSettings], // ✅ Verified pluralized key
     });
   }
 
@@ -352,12 +373,14 @@ BEFORE writing any MSW handler code:
 ```
 
 **Why verification is the fast path:**
+
 - Guessing: 2 min now, 2 hours debugging later
 - Verifying: 2 min now, 5 min implementation, done
 
 ## When Mocks Become Too Complex
 
 **Warning signs:**
+
 - Mock setup longer than test logic
 - Mocking everything to make test pass
 - Mocks missing methods real components have
@@ -370,6 +393,7 @@ BEFORE writing any MSW handler code:
 ## TDD Prevents These Anti-Patterns
 
 **Why TDD helps:**
+
 1. **Write test first** → Forces you to think about what you're actually testing
 2. **Watch it fail** → Confirms test tests real behavior, not mocks
 3. **Minimal implementation** → No test-only methods creep in
@@ -379,15 +403,15 @@ BEFORE writing any MSW handler code:
 
 ## Quick Reference
 
-| Anti-Pattern | Fix |
-|--------------|-----|
-| Assert on mock elements | Test real component or unmock it |
-| Test-only methods in production | Move to test utilities |
-| Mock without understanding | Understand dependencies first, mock minimally |
-| Incomplete mocks | Mirror real API completely |
-| Tests as afterthought | TDD - tests first |
-| Guessing API contracts | Verify contract BEFORE writing handler (2 min check) |
-| Over-complex mocks | Consider integration tests |
+| Anti-Pattern                    | Fix                                                  |
+| ------------------------------- | ---------------------------------------------------- |
+| Assert on mock elements         | Test real component or unmock it                     |
+| Test-only methods in production | Move to test utilities                               |
+| Mock without understanding      | Understand dependencies first, mock minimally        |
+| Incomplete mocks                | Mirror real API completely                           |
+| Tests as afterthought           | TDD - tests first                                    |
+| Guessing API contracts          | Verify contract BEFORE writing handler (2 min check) |
+| Over-complex mocks              | Consider integration tests                           |
 
 ## Red Flags
 

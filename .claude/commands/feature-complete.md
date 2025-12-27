@@ -48,6 +48,7 @@ The Einstein pipeline creates feature-specific directory structures for complete
 ```
 
 **Key Benefits:**
+
 - **Feature Isolation**: Each feature maintains its own pipeline state and logs
 - **Parallel Development**: Multiple features can be developed simultaneously
 - **Easy Cleanup**: Removing a feature removes all associated pipeline data
@@ -62,6 +63,7 @@ The Einstein pipeline creates feature-specific directory structures for complete
 ### Step 1: Determine Execution Mode (Phase 1)
 
 **CRITICAL PIPELINE RULE**
+
 - Never manually create pipeline infrastructure
 - Always use .claude/scripts/phases/initialize-pipeline.sh
 - Any bypassing of this script is a violation of pipeline integrity
@@ -855,7 +857,6 @@ REUSE-FIRST ARCHITECTURAL TRIAGE (15-minute time limit):
 
 2. Architectural Extension Assessment
    For each architectural component needed:
-
    - Leverage Phase 2 Findings: Use existing reuse opportunities identified
    - Extend Existing: Can Phase 2 patterns support architectural needs? (PREFERRED)
    - Adapt Existing: Can Phase 2 patterns be adapted architecturally? (ACCEPTABLE)
@@ -918,12 +919,8 @@ Save to: ${IMPACT_ANALYSIS}
   "phase_2_integration": {
     "phase_2_reuse_percentage": "${PHASE2_REUSE_PERCENTAGE}",
     "phase_2_creation_count": "${PHASE2_CREATION_COUNT}",
-    "phase_2_patterns_leveraged": [
-      "Extracted from gap analysis during execution"
-    ],
-    "phase_2_gaps_for_architecture": [
-      "Architectural needs not covered by Phase 2"
-    ]
+    "phase_2_patterns_leveraged": ["Extracted from gap analysis during execution"],
+    "phase_2_gaps_for_architecture": ["Architectural needs not covered by Phase 2"]
   },
   "reuse_validation": {
     "reuse_metrics": {
@@ -1337,7 +1334,6 @@ MANDATORY IMPLEMENTATION PLANNING RULES:
 ENHANCED PLANNING PROCESS:
 
 1. **Reuse Analysis Integration** (MANDATORY)
-
    - Read exhaustive reuse analysis: ${EXISTING_IMPL_DISCOVERY}
    - Read architectural extension opportunities: ${IMPACT_ANALYSIS}
    - Build plan around documented reuse opportunities
@@ -1370,7 +1366,6 @@ Agent Assignment Format:
 - **Compliance Type**: EXTEND (90% of work), CREATE (10% of work)
 
 - **EXTEND Tasks** (No justification required):
-
   - Extend: modules/chariot/backend/pkg/handlers/asset/handler.go
   - Add new endpoints following existing CRUD pattern
   - Reference: Lines 45-120 show identical pattern
@@ -1394,7 +1389,7 @@ Agent Assignment Format:
 - **Files**: modules/chariot/ui/src/sections/[feature]/
 - **Dependencies**: golang-api-developer (API contracts)
 - **Execution Group**: Secondary (depends on primary)
-- **Architecture Context**: frontend-architecture.md, ui-architecture.md
+- **Architecture Context**: ui-architecture.md
   ...
   ...
 ```
@@ -1461,17 +1456,14 @@ Create structured JSON for reliable parsing:
       "files": ["modules/chariot/ui/src/sections/feature/"],
       "parallel_group": "secondary",
       "dependencies": ["golang-api-developer"],
-      "architecture_files": ["frontend-architecture.md", "ui-architecture.md"],
+      "architecture_files": ["ui-architecture.md"],
       "estimated_effort": "3-5 hours",
       "thinking_level": "think"
     }
   ],
   "coordination_requirements": {
     "api_contracts": "golang-api-developer must document API contracts for react-developer",
-    "shared_workspaces": [
-      "coordination/api-contracts/",
-      "coordination/communication/"
-    ],
+    "shared_workspaces": ["coordination/api-contracts/", "coordination/communication/"],
     "execution_order": "primary_then_secondary"
   },
   "reuse_validation": {
@@ -2189,11 +2181,7 @@ Instruct the universal-coordinator with domain parameter "security":
   "rationale": "Why this approach based on risk level, attack surface, and available security agents",
   "security_assessment": {
     "risk_level": "Critical|High|Medium|Low",
-    "attack_surface_changes": [
-      "API endpoints",
-      "Authentication",
-      "Data handling"
-    ],
+    "attack_surface_changes": ["API endpoints", "Authentication", "Data handling"],
     "threat_vectors": ["Authentication", "Authorization", "Input Validation"],
     "technology_stack": ["Go", "React", "Python"],
     "security_priority": "critical|high|medium|low"
@@ -2216,21 +2204,9 @@ Instruct the universal-coordinator with domain parameter "security":
     "threat_modeling_required": true
   },
   "security_gates": {
-    "critical_blockers": [
-      "Authentication bypass",
-      "SQL injection",
-      "RCE vulnerabilities"
-    ],
-    "high_priority": [
-      "XSS vulnerabilities",
-      "Authorization flaws",
-      "Data exposure"
-    ],
-    "medium_priority": [
-      "Configuration issues",
-      "Information disclosure",
-      "Input validation gaps"
-    ]
+    "critical_blockers": ["Authentication bypass", "SQL injection", "RCE vulnerabilities"],
+    "high_priority": ["XSS vulnerabilities", "Authorization flaws", "Data exposure"],
+    "medium_priority": ["Configuration issues", "Information disclosure", "Input validation gaps"]
   }
 }
 ```
@@ -2533,14 +2509,8 @@ Instruct the test-coordinator:
     "max_test_iterations": 2
   },
   "testing_gates": {
-    "critical_gates": [
-      "All unit tests passing",
-      "Critical user workflows validated"
-    ],
-    "major_gates": [
-      "Integration tests passing",
-      "Performance requirements met"
-    ],
+    "critical_gates": ["All unit tests passing", "Critical user workflows validated"],
+    "major_gates": ["Integration tests passing", "Performance requirements met"],
     "minor_gates": ["Code coverage targets", "Test documentation complete"]
   },
   "feedback_loop_strategy": {
@@ -2836,11 +2806,7 @@ Instruct the universal-coordinator with domain parameter "deployment":
   "deployment_assessment": {
     "risk_level": "Critical|High|Medium|Low",
     "complexity_level": "Complex|Medium|Simple",
-    "deployment_scope": [
-      "Frontend changes",
-      "Backend API changes",
-      "Database migrations"
-    ],
+    "deployment_scope": ["Frontend changes", "Backend API changes", "Database migrations"],
     "technology_stack": ["Go", "React", "AWS", "Python"],
     "deployment_priority": "critical|high|medium|low"
   },
@@ -2858,23 +2824,13 @@ Instruct the universal-coordinator with domain parameter "deployment":
       "priority": "critical|high|medium|low",
       "thinking_budget": "ultrathink|think|basic",
       "estimated_effort": "high|medium|low",
-      "success_criteria": [
-        "Specific validation requirements this agent addresses"
-      ]
+      "success_criteria": ["Specific validation requirements this agent addresses"]
     }
   ],
   "deployment_gates": {
     "pre_deployment": ["Build success", "Security cleared", "Quality approved"],
-    "post_deployment": [
-      "Health checks passed",
-      "Integration validated",
-      "Performance confirmed"
-    ],
-    "rollback_triggers": [
-      "Health failures",
-      "Critical errors",
-      "Performance degradation"
-    ]
+    "post_deployment": ["Health checks passed", "Integration validated", "Performance confirmed"],
+    "rollback_triggers": ["Health failures", "Critical errors", "Performance degradation"]
   }
 }
 ```

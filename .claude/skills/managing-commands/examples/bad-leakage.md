@@ -21,13 +21,13 @@ Help the user manage agents by using the appropriate skill.
 
 ### Problems
 
-| Issue | Severity | Why It's Wrong |
-|-------|----------|----------------|
-| Extra tools with skills | CRITICAL | Enables LLM to work around failures |
-| Vague instructions | CRITICAL | "Help the user" is not imperative |
-| Multiple skills | WARNING | Should route to single unified skill |
-| No argument mapping | WARNING | Unclear how $1, $2 map to skills |
-| No verbatim directive | WARNING | Output may be reformatted |
+| Issue                   | Severity | Why It's Wrong                       |
+| ----------------------- | -------- | ------------------------------------ |
+| Extra tools with skills | CRITICAL | Enables LLM to work around failures  |
+| Vague instructions      | CRITICAL | "Help the user" is not imperative    |
+| Multiple skills         | WARNING  | Should route to single unified skill |
+| No argument mapping     | WARNING  | Unclear how $1, $2 map to skills     |
+| No verbatim directive   | WARNING  | Output may be reformatted            |
 
 ### ✅ Fixed
 
@@ -51,6 +51,7 @@ skills: agent-manager
 **ACTION:** Invoke the `agent-manager` skill.
 
 **Arguments:**
+
 - `operation`: "create"
 - `agentName`: $2 (Required)
 
@@ -61,7 +62,7 @@ skills: agent-manager
 ## Error Handling
 
 If $1 invalid:
-  Explain valid subcommands.
+Explain valid subcommands.
 ```
 
 ---
@@ -109,12 +110,12 @@ allowed-tools: Read, Write, Bash
 
 ### Problems
 
-| Issue | Severity | Why It's Wrong |
-|-------|----------|----------------|
-| 60+ lines | WARNING | Logic belongs in a skill |
-| Uses Write tool | WARNING | Command shouldn't write files |
-| Complex logic | WARNING | Not testable, not reusable |
-| No skill delegation | INFO | Should create data-processor skill |
+| Issue               | Severity | Why It's Wrong                     |
+| ------------------- | -------- | ---------------------------------- |
+| 60+ lines           | WARNING  | Logic belongs in a skill           |
+| Uses Write tool     | WARNING  | Command shouldn't write files      |
+| Complex logic       | WARNING  | Not testable, not reusable         |
+| No skill delegation | INFO     | Should create data-processor skill |
 
 ### ✅ Fixed
 
@@ -135,6 +136,7 @@ skills: data-processor
 Invoke the `data-processor` skill.
 
 **Arguments:**
+
 - `inputFile`: $1 (Required)
 
 **Output:** Display the tool output verbatim.
@@ -142,8 +144,8 @@ Invoke the `data-processor` skill.
 ## Error Handling
 
 If $1 not provided:
-  Explain: Input file path required.
-  Show usage: /process-data <input-file>
+Explain: Input file path required.
+Show usage: /process-data <input-file>
 ```
 
 ---
@@ -167,13 +169,13 @@ Try to be helpful and thorough.
 
 ### Problems
 
-| Issue | Severity | Why It's Wrong |
-|-------|----------|----------------|
-| "You should help" | CRITICAL | Vague, not imperative |
-| "Assist them" | CRITICAL | Vague, not imperative |
-| "Try to be" | CRITICAL | Vague, not imperative |
-| No argument mapping | WARNING | How does $1 map? |
-| No verbatim directive | WARNING | Output may be reformatted |
+| Issue                 | Severity | Why It's Wrong            |
+| --------------------- | -------- | ------------------------- |
+| "You should help"     | CRITICAL | Vague, not imperative     |
+| "Assist them"         | CRITICAL | Vague, not imperative     |
+| "Try to be"           | CRITICAL | Vague, not imperative     |
+| No argument mapping   | WARNING  | How does $1 map?          |
+| No verbatim directive | WARNING  | Output may be reformatted |
 
 ### ✅ Fixed
 
@@ -194,6 +196,7 @@ skills: code-reviewer
 Invoke the `code-reviewer` skill.
 
 **Arguments:**
+
 - `filePath`: $1 (Required)
 
 **Output:** Display the tool output verbatim.
@@ -201,20 +204,20 @@ Invoke the `code-reviewer` skill.
 ## Error Handling
 
 If $1 not provided:
-  Explain: File path required for review.
+Explain: File path required for review.
 ```
 
 ---
 
 ## Quick Reference: Violation Detection
 
-| Pattern | Violation Type | Severity |
-|---------|---------------|----------|
-| `skills:` + `Bash, Read, Write, Edit` | Tool Leakage | CRITICAL |
-| "help the user", "assist with" | Vague Instructions | CRITICAL |
-| Command > 50 lines | Logic Leakage | WARNING |
-| No "verbatim" in output | Missing Directive | WARNING |
-| $1, $2 without mapping | Implicit Mapping | WARNING |
+| Pattern                               | Violation Type     | Severity |
+| ------------------------------------- | ------------------ | -------- |
+| `skills:` + `Bash, Read, Write, Edit` | Tool Leakage       | CRITICAL |
+| "help the user", "assist with"        | Vague Instructions | CRITICAL |
+| Command > 50 lines                    | Logic Leakage      | WARNING  |
+| No "verbatim" in output               | Missing Directive  | WARNING  |
+| $1, $2 without mapping                | Implicit Mapping   | WARNING  |
 
 ## Auto-Fix Available
 

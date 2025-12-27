@@ -1,7 +1,7 @@
 ---
 name: sharing-skills
 description: Use when you've developed a broadly useful skill and want to contribute it upstream via pull request - guides process of branching, committing, pushing, and creating PR to contribute skills back to upstream repository
-allowed-tools: 'Read, Write, Bash'
+allowed-tools: "Read, Write, Bash"
 ---
 
 # Sharing Skills
@@ -15,12 +15,14 @@ Contribute skills from your local branch back to the upstream repository.
 ## When to Share
 
 **Share when:**
+
 - Skill applies broadly (not project-specific)
 - Pattern/technique others would benefit from
 - Well-tested and documented
 - Follows claude-skill-write guidelines
 
 **Keep personal when:**
+
 - Project-specific or organization-specific
 - Experimental or unstable
 - Contains sensitive information
@@ -147,6 +149,7 @@ Addresses common async pitfalls like race conditions, improper error handling, a
 Once your PR is merged:
 
 1. Sync your local main branch:
+
 ```bash
 cd ~/.config/superpowers/skills/
 git checkout main
@@ -155,6 +158,7 @@ git push origin main
 ```
 
 2. Delete the feature branch:
+
 ```bash
 git branch -d "add-${skill_name}-skill"
 git push origin --delete "add-${skill_name}-skill"
@@ -163,18 +167,22 @@ git push origin --delete "add-${skill_name}-skill"
 ## Troubleshooting
 
 **"gh: command not found"**
+
 - Install GitHub CLI: https://cli.github.com/
 - Authenticate: `gh auth login`
 
 **"Permission denied (publickey)"**
+
 - Check SSH keys: `gh auth status`
 - Set up SSH: https://docs.github.com/en/authentication
 
 **"Skill already exists"**
+
 - You're creating a modified version
 - Consider different skill name or coordinate with the skill's maintainer
 
 **PR merge conflicts**
+
 - Rebase on latest upstream: `git fetch upstream && git rebase upstream/main`
 - Resolve conflicts
 - Force push: `git push -f origin your-branch`
@@ -184,6 +192,7 @@ git push origin --delete "add-${skill_name}-skill"
 **Do NOT batch multiple skills in one PR.**
 
 Each skill should:
+
 - Have its own feature branch
 - Have its own PR
 - Be independently reviewable

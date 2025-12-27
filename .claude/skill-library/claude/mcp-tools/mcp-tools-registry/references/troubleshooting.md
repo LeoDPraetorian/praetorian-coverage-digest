@@ -7,6 +7,7 @@ Common issues when using MCP tool wrappers.
 ### Issue: "forEach is not a function"
 
 **Symptom:**
+
 ```
 TypeError: result.items.forEach is not a function
 ```
@@ -14,11 +15,13 @@ TypeError: result.items.forEach is not a function
 **Cause:** You're calling an MCP server directly instead of using a wrapper, and the response format wasn't what you expected.
 
 **Background:** MCP servers return data in **variable formats**:
+
 - **Direct array**: `[item1, item2, ...]`
 - **Tuple format**: `[[item1, item2, ...], offset]` (paginated)
 - **Object format**: `{ data: [...], pagination: {...} }`
 
 **Fix:** Use the wrapper - it handles format normalization:
+
 ```bash
 # ✅ CORRECT: Use wrapper with stderr suppression
 npx tsx -e "(async () => {
@@ -29,15 +32,16 @@ npx tsx -e "(async () => {
 ```
 
 **If extending a wrapper:** Use the defensive pattern:
+
 ```typescript
 // Inside filtering function:
 const items = Array.isArray(rawResult[0])
-  ? rawResult[0]        // Tuple format: [[data], offset]
-  : rawResult;          // Direct array format
+  ? rawResult[0] // Tuple format: [[data], offset]
+  : rawResult; // Direct array format
 
 const nextOffset = Array.isArray(rawResult[0])
-  ? rawResult[1]        // Extract pagination offset from tuple
-  : null;               // No offset in other formats
+  ? rawResult[1] // Extract pagination offset from tuple
+  : null; // No offset in other formats
 ```
 
 ---
@@ -49,6 +53,7 @@ const nextOffset = Array.isArray(rawResult[0])
 **Cause:** MCP server returns direct array format (no pagination), or tuple format not detected.
 
 **Diagnosis:**
+
 ```bash
 npx tsx -e "(async () => {
   const { assetsList } = await import('./.claude/tools/praetorian-cli/assets-list.ts');
@@ -67,11 +72,13 @@ npx tsx -e "(async () => {
 ### Issue: Wrapper returns empty results
 
 **Possible causes:**
+
 1. **Filter too restrictive** - Try removing `key_prefix` or `prefix_filter`
 2. **No data exists** - Check `summary.total_count`
 3. **Authentication issue** - Check MCP server credentials
 
 **Debug:**
+
 ```bash
 npx tsx -e "(async () => {
   const { assetsList } = await import('./.claude/tools/praetorian-cli/assets-list.ts');
@@ -87,11 +94,13 @@ npx tsx -e "(async () => {
 ### Issue: Import not found
 
 **Symptom:**
+
 ```
 Error: Cannot find module './.claude/tools/praetorian-cli/assets-list.ts'
 ```
 
 **Fixes:**
+
 1. **Check file exists:** `ls .claude/tools/praetorian-cli/`
 2. **Use correct extension:** Import `.js` even though source is `.ts`
 3. **Check path:** Must start with `./` for relative imports
@@ -99,6 +108,7 @@ Error: Cannot find module './.claude/tools/praetorian-cli/assets-list.ts'
 ### Issue: Export name mismatch
 
 **Symptom:**
+
 ```
 SyntaxError: The requested module does not provide an export named 'assetList'
 ```
@@ -106,11 +116,13 @@ SyntaxError: The requested module does not provide an export named 'assetList'
 **Cause:** Export name doesn't match filename convention.
 
 **Convention:** kebab-case filename → camelCase export
+
 - `assets-list.ts` → `assetsList`
 - `get-issue.ts` → `getIssue`
 - `search-by-query.ts` → `searchByQuery`
 
 **Verify:**
+
 ```bash
 grep "^export const" .claude/tools/praetorian-cli/assets-list.ts
 # Should output: export const assetsList = {
@@ -123,6 +135,7 @@ grep "^export const" .claude/tools/praetorian-cli/assets-list.ts
 ### Issue: npx tsx command fails
 
 **Symptom:**
+
 ```
 sh: npx: command not found
 ```
@@ -134,11 +147,13 @@ sh: npx: command not found
 **Symptom:** Command hangs or times out after 30+ seconds.
 
 **Possible causes:**
+
 1. **MCP server not responding** - Check server health
 2. **Network issue** - Check connectivity
 3. **Large dataset** - Reduce `pages` parameter
 
 **Debug with timeout:**
+
 ```bash
 timeout 10s npx tsx -e "(async () => {
   const { assetsList } = await import('./.claude/tools/praetorian-cli/assets-list.ts');

@@ -11,6 +11,7 @@ allowed-tools: Read, Write, Bash, TodoWrite
 ## When to Use
 
 Use this skill when:
+
 - Orchestrator reaches Phase 3 of threat modeling workflow
 - Phase 1 (codebase mapping) and Phase 2 (security controls) are complete
 - Need to identify threats, abuse cases, and attack patterns
@@ -21,14 +22,14 @@ Use this skill when:
 
 ### STRIDE Categories
 
-| Category | Threat Type | Focus |
-|----------|-------------|-------|
-| **S**poofing | Identity | Authentication weaknesses |
-| **T**ampering | Integrity | Data modification risks |
-| **R**epudiation | Accountability | Missing audit trails |
-| **I**nfo Disclosure | Confidentiality | Unauthorized data access |
-| **D**oS | Availability | Service disruption |
-| **E**levation of Privilege | Authorization | Permission bypasses |
+| Category                   | Threat Type     | Focus                     |
+| -------------------------- | --------------- | ------------------------- |
+| **S**poofing               | Identity        | Authentication weaknesses |
+| **T**ampering              | Integrity       | Data modification risks   |
+| **R**epudiation            | Accountability  | Missing audit trails      |
+| **I**nfo Disclosure        | Confidentiality | Unauthorized data access  |
+| **D**oS                    | Availability    | Service disruption        |
+| **E**levation of Privilege | Authorization   | Permission bypasses       |
 
 ### Risk Scoring Matrix
 
@@ -58,6 +59,7 @@ Risk Matrix:
 **CRITICAL: Phase 3 requires these inputs from previous phases.**
 
 ### From Phase 1 (Codebase Mapping)
+
 ```
 .claude/.threat-model/{session}/phase-1/
 ├── summary.md              # <2000 token architecture summary
@@ -68,6 +70,7 @@ Risk Matrix:
 ```
 
 ### From Phase 2 (Security Controls)
+
 ```
 .claude/.threat-model/{session}/phase-2/
 ├── summary.md              # <2000 token controls summary
@@ -83,6 +86,7 @@ Risk Matrix:
 **Load Phase 1 and Phase 2 summaries** to understand system before detailed threat analysis.
 
 ### From Phase 0 (Business Context) **MANDATORY**
+
 ```
 .claude/.threat-model/{session}/phase-0/
 ├── summary.md                  # <2000 token business context summary
@@ -92,6 +96,7 @@ Risk Matrix:
 ```
 
 **Phase 0 drives risk-based threat modeling**:
+
 - **Threat actors** filter STRIDE (apply ONLY actors from Phase 0, skip all others)
 - **Business impact** provides actual financial data (not generic "high/medium/low")
 - **Crown jewels** add +2 priority bonus to high-value asset threats
@@ -100,6 +105,7 @@ Risk Matrix:
 **CRITICAL: Phase 0 must be loaded BEFORE starting STRIDE. Cannot retrofit business context after threat analysis.**
 
 **No exceptions**:
+
 - Don't skip Phase 0 under time pressure
 - Don't use generic scoring even with authority approval
 - Don't retrofit business_context fields after completing analysis
@@ -116,6 +122,7 @@ Risk Matrix:
 ### Step 1: Load Context
 
 Load compressed summaries from previous phases:
+
 ```bash
 # Read Phase 1 summary
 cat .claude/.threat-model/{session}/phase-1/summary.md
@@ -129,6 +136,7 @@ cat .claude/.threat-model/{session}/phase-2/summary.md
 ### Step 2: Apply STRIDE Systematically (Filtered by Phase 0 Threat Actors)
 
 **Load threat actors from Phase 0 first**:
+
 ```bash
 cat .claude/.threat-model/{session}/phase-0/threat-actors.json
 ```
@@ -152,15 +160,15 @@ For EACH component identified in Phase 1, apply STRIDE **filtered by relevant th
 
 Apply 7-stage PASTA methodology:
 
-| Stage | Purpose | Key Questions |
-|-------|---------|---------------|
-| 1. Define Objectives | Business context | What assets matter most? Who are the users? |
-| 2. Define Technical Scope | Architecture understanding | What's in scope from Phase 1? |
-| 3. Application Decomposition | Component breakdown | What are trust boundaries? |
-| 4. Threat Analysis | Identify threat actors | External attackers? Insiders? Competitors? |
-| 5. Vulnerability Analysis | Map weaknesses to threats | Which control gaps enable which threats? |
-| 6. Attack Modeling | Build attack trees | What are the attack paths? |
-| 7. Risk/Impact Analysis | Prioritize by business impact | Which threats hurt the business most? |
+| Stage                        | Purpose                       | Key Questions                               |
+| ---------------------------- | ----------------------------- | ------------------------------------------- |
+| 1. Define Objectives         | Business context              | What assets matter most? Who are the users? |
+| 2. Define Technical Scope    | Architecture understanding    | What's in scope from Phase 1?               |
+| 3. Application Decomposition | Component breakdown           | What are trust boundaries?                  |
+| 4. Threat Analysis           | Identify threat actors        | External attackers? Insiders? Competitors?  |
+| 5. Vulnerability Analysis    | Map weaknesses to threats     | Which control gaps enable which threats?    |
+| 6. Attack Modeling           | Build attack trees            | What are the attack paths?                  |
+| 7. Risk/Impact Analysis      | Prioritize by business impact | Which threats hurt the business most?       |
 
 See [references/pasta-methodology.md](references/pasta-methodology.md) for detailed stage guidance.
 
@@ -168,13 +176,13 @@ See [references/pasta-methodology.md](references/pasta-methodology.md) for detai
 
 Map identified threats to Data Flow Diagram elements:
 
-| DFD Element | Security Consideration | Threat Examples |
-|-------------|------------------------|-----------------|
-| External Entities | Untrusted inputs | Injection, XSS, CSRF |
-| Processes | Input validation | Logic bugs, race conditions |
-| Data Stores | Encryption at rest | SQL injection, data breaches |
-| Data Flows | Encryption in transit | MITM, eavesdropping |
-| Trust Boundaries | Security controls | Authentication bypass, elevation |
+| DFD Element       | Security Consideration | Threat Examples                  |
+| ----------------- | ---------------------- | -------------------------------- |
+| External Entities | Untrusted inputs       | Injection, XSS, CSRF             |
+| Processes         | Input validation       | Logic bugs, race conditions      |
+| Data Stores       | Encryption at rest     | SQL injection, data breaches     |
+| Data Flows        | Encryption in transit  | MITM, eavesdropping              |
+| Trust Boundaries  | Security controls      | Authentication bypass, elevation |
 
 **Load data-flows.json and trust-boundaries.json from Phase 1** to map threats.
 
@@ -183,6 +191,7 @@ Map identified threats to Data Flow Diagram elements:
 For top threats (High/Critical risk), create abuse cases showing attack scenarios.
 
 **Template**:
+
 ```json
 {
   "id": "ABUSE-001",
@@ -213,25 +222,26 @@ See [references/abuse-case-patterns.md](references/abuse-case-patterns.md) for m
 For Critical/High threats, visualize attack paths from attacker perspective.
 
 **Example**:
+
 ```markdown
 ## Attack Tree: Credential Theft
 
 **Goal**: Gain unauthorized access to user account
 
 ├── Path 1: Phishing
-│   ├── Craft convincing phishing email
-│   ├── Victim clicks and enters credentials
-│   └── [SUCCESS if MFA disabled]
+│ ├── Craft convincing phishing email
+│ ├── Victim clicks and enters credentials
+│ └── [SUCCESS if MFA disabled]
 │
 ├── Path 2: Credential Stuffing
-│   ├── Obtain leaked password database
-│   ├── Automated login attempts
-│   └── [SUCCESS if no rate limiting]
+│ ├── Obtain leaked password database
+│ ├── Automated login attempts
+│ └── [SUCCESS if no rate limiting]
 │
 └── Path 3: Session Hijacking
-    ├── Intercept session token (XSS/MITM)
-    ├── Replay token
-    └── [SUCCESS if weak session management]
+├── Intercept session token (XSS/MITM)
+├── Replay token
+└── [SUCCESS if weak session management]
 ```
 
 See [references/attack-tree-patterns.md](references/attack-tree-patterns.md) for detailed guidance.
@@ -239,6 +249,7 @@ See [references/attack-tree-patterns.md](references/attack-tree-patterns.md) for
 ### Step 7: Score Risks (Using Phase 0 Business Impact Data)
 
 **Load business impact scenarios from Phase 0**:
+
 ```bash
 cat .claude/.threat-model/{session}/phase-0/business-impact.json
 cat .claude/.threat-model/{session}/phase-0/data-classification.json
@@ -266,6 +277,7 @@ Compliance Bonus = +1 if causes regulatory violation from Phase 0
 ```
 
 **Example**:
+
 - Threat: SQL injection in payment processor
 - Phase 0 scenario: "data_breach_1M_card_records" = $365M
 - Business Impact: 4 (Critical)
@@ -282,6 +294,7 @@ Compliance Bonus = +1 if causes regulatory violation from Phase 0
 **CRITICAL: Phase 4 requires ALL of these files.**
 
 Create output directory structure:
+
 ```bash
 mkdir -p .claude/.threat-model/{session}/phase-3/abuse-cases
 mkdir -p .claude/.threat-model/{session}/phase-3/attack-trees
@@ -302,6 +315,7 @@ mkdir -p .claude/.threat-model/{session}/phase-3/attack-trees
 11. **summary.md** - <2000 token summary with top 5 risks **and Phase 0 business context**
 
 **NEW: Each threat in threat-model.json must include business_context section**:
+
 ```json
 {
   "threat_id": "THR-001",
@@ -319,12 +333,14 @@ See [references/output-schemas.md](references/output-schemas.md) for exact JSON 
 ### Step 9: Generate Summary for Phase 4
 
 Create compressed summary (<2000 tokens) highlighting:
+
 - Top 5 Critical/High threats
 - Key control gaps enabling threats
 - Recommended test priorities
 - Attack vectors to validate
 
 **Template**:
+
 ```markdown
 # Phase 3 Summary: Threat Model
 
@@ -348,6 +364,7 @@ Create compressed summary (<2000 tokens) highlighting:
 ## Recommendations for Phase 4
 
 Priority test targets:
+
 1. Authentication endpoints (credential stuffing, session hijacking)
 2. User input handlers (SQL injection, XSS)
 3. Authorization checks (horizontal/vertical privilege escalation)
@@ -399,6 +416,7 @@ Before handing off to Phase 4, verify:
 ### ✅ Always Load Phase 1 & 2 Summaries First
 
 Before analyzing threats, understand:
+
 - System architecture (Phase 1)
 - Existing controls and gaps (Phase 2)
 
@@ -407,6 +425,7 @@ Threat modeling without context = generic threats that don't help.
 ### ✅ Always Map Threats to Control Gaps
 
 Every threat should trace back to:
+
 - Missing control from Phase 2 (e.g., "No rate limiting" → DoS threat)
 - Weak control from Phase 2 (e.g., "Basic auth, no MFA" → Credential theft)
 
@@ -417,6 +436,7 @@ This creates actionable recommendations for Phase 4.
 Phase 4 orchestrator loads summary.md into context. If >2000 tokens, agent context window fills up.
 
 **Compression strategy**:
+
 - Top 5 threats only (not all 50+)
 - 1-2 sentence descriptions
 - Bulleted key findings
@@ -427,12 +447,12 @@ Phase 4 orchestrator loads summary.md into context. If >2000 tokens, agent conte
 ### Issue: No Control Gaps Found in Phase 2
 
 **Cause**: Phase 2 summary shows "all controls present"
-**Solution**: Analyze control *effectiveness*, not just presence. Is MFA enforced? Is input validation comprehensive? Are logs monitored?
+**Solution**: Analyze control _effectiveness_, not just presence. Is MFA enforced? Is input validation comprehensive? Are logs monitored?
 
 ### Issue: Too Many Threats (100+)
 
 **Cause**: Every potential issue classified as threat
-**Solution**: Focus on *exploitable* threats. If control exists and is effective, risk is LOW (document but don't create abuse case).
+**Solution**: Focus on _exploitable_ threats. If control exists and is effective, risk is LOW (document but don't create abuse case).
 
 ### Issue: Can't Score Business Impact
 

@@ -2,20 +2,23 @@
 
 ## Overview
 
-The `sync-gateways` command validates that gateway skills are synchronized with library skills, detecting broken entries (gateway references non-existent skills) and missing entries (library skills not in any gateway).
+The `syncing-gateways` skill validates that gateway skills are synchronized with library skills, detecting broken entries (gateway references non-existent skills) and missing entries (library skills not in any gateway).
 
-## Command Usage
+> **Note:** Gateway syncing is **instruction-based** (no CLI). Use the `syncing-gateways` library skill.
 
-```bash
-# Check for discrepancies (report only)
-npm run sync-gateways
+## Invoking the Skill
 
-# Preview fixes without applying
-npm run sync-gateways -- --dry-run
-
-# Apply fixes automatically
-npm run sync-gateways -- --fix
+```typescript
+Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md");
 ```
+
+Follow the workflow mode appropriate for your situation:
+
+| Workflow Mode      | Purpose                          | When to Use                  |
+| ------------------ | -------------------------------- | ---------------------------- |
+| **Dry Run**        | Preview changes without applying | Before making actual changes |
+| **Full Sync**      | Sync all gateways with library   | After bulk operations        |
+| **Single Gateway** | Sync specific gateway only       | Targeted fix after migration |
 
 ## What It Checks
 
@@ -24,138 +27,76 @@ npm run sync-gateways -- --fix
 **Detection**: Gateway SKILL.md references a path that doesn't exist
 
 **Example**:
+
 ```
 Gateway: gateway-integrations
 Title: Jira Integration
 Path: .claude/skill-library/development/integrations/jira-integration/SKILL.md (does not exist)
 ```
 
-**Fix**: `--fix` removes the broken entry from the gateway
+**Resolution**: Remove the broken entry from the gateway routing table
 
 ### 2. Missing Gateway Entries
 
 **Detection**: Library skill exists but is not referenced in any gateway
 
 **Example**:
+
 ```
 .claude/skill-library/development/frontend/state/my-skill/SKILL.md
 ```
 
-**Fix**: `--fix` adds the skill to the appropriate gateway based on category mapping
+**Resolution**: Add the skill to the appropriate gateway based on category mapping
 
 ## Category-to-Gateway Mapping
 
-| Category | Gateway |
-|----------|---------|
-| `development/frontend/*` | `gateway-frontend` |
-| `development/backend/*` | `gateway-backend` |
-| `testing/*` | `gateway-testing` |
-| `security/*` | `gateway-security` |
-| `claude/mcp-tools/*` | `gateway-mcp-tools` |
+| Category                     | Gateway                |
+| ---------------------------- | ---------------------- |
+| `development/frontend/*`     | `gateway-frontend`     |
+| `development/backend/*`      | `gateway-backend`      |
+| `testing/*`                  | `gateway-testing`      |
+| `security/*`                 | `gateway-security`     |
+| `claude/mcp-tools/*`         | `gateway-mcp-tools`    |
 | `development/integrations/*` | `gateway-integrations` |
+| `capabilities/*`             | `gateway-capabilities` |
+| `claude/*` (non-mcp)         | `gateway-claude`       |
 
-Skills in other categories (e.g., `workflow/`, `documents/`, `ai/`) will show as "missing" but this is expected - they don't have dedicated gateway skills yet and are accessible via skill-search CLI.
+Skills in other categories will show as "missing" but this is expected - they don't have dedicated gateway skills yet and are accessible via skill-search CLI.
 
-## Automatic Updates
+## When to Run Gateway Sync
 
-Gateway skills are automatically updated in three scenarios:
+### Required After
 
-### 1. Skill Creation (`npm run create`)
+- **Manual skill deletions** - Detect broken references
+- **Skill migrations** - Verify paths updated correctly
+- **Bulk operations** - Ensure all gateways synchronized
+- **Merge conflicts** - Gateway files may have stale entries
 
-When creating a library skill:
-```bash
-npm run create -- my-skill "Use when doing X" --location library:development/frontend
-```
+### Automatic (No Manual Sync Needed)
 
-**Automatic action**: Adds entry to `gateway-frontend`
+When using the proper workflows through creating-skills or migrating-skills, gateway updates are handled as part of those workflows.
 
-### 2. Skill Migration (`npm run migrate`)
+## Workflow Integration
 
-When migrating between locations:
-```bash
-npm run migrate -- my-skill to-library:testing
-```
+### After Creating a Library Skill
 
-**Automatic actions**:
+When you create a library skill using `creating-skills`, the workflow prompts you to update the appropriate gateway as part of the creation process.
+
+### After Migrating a Skill
+
+When you migrate a skill using `migrating-skills`, the workflow includes gateway updates:
+
 - **Same gateway**: Updates path in gateway
 - **Different gateways**: Removes from old gateway, adds to new gateway
 - **To/from core**: Adds or removes gateway entry as needed
 
-### 3. Manual Sync
+### Manual Sync
 
-Run sync command to repair discrepancies:
-```bash
-npm run sync-gateways -- --fix
+Run the syncing-gateways skill directly when:
+
+```typescript
+Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md");
 ```
-
-## Output Format
-
-### Report Mode (no flags)
-
-```
-🔍 Scanning gateway skills...
-
-📊 Validation Results:
-
-❌ Found 1 broken gateway entry(ies):
-  Gateway: gateway-integrations
-  Title: Jira Integration
-  Path: .claude/skill-library/development/integrations/jira-integration/SKILL.md (does not exist)
-
-⚠️  Found 21 library skill(s) not in any gateway:
-  .claude/skill-library/ai/llm-evaluation/SKILL.md
-  .claude/skill-library/workflow/code-review-checklist/SKILL.md
-  ...
-
-💡 To fix these issues, run:
-   npm run sync-gateways -- --dry-run  (preview fixes)
-   npm run sync-gateways -- --fix      (apply fixes)
-```
-
-### Dry-Run Mode (`--dry-run`)
-
-Shows what would be fixed without making changes:
-
-```
-🔧 DRY RUN Mode:
-
-Removing broken gateway entries:
-  [DRY RUN] Would remove from gateway-integrations: jira-integration
-
-Adding missing gateway entries:
-  [DRY RUN] Would add to gateway-frontend: my-skill
-```
-
-### Fix Mode (`--fix`)
-
-Applies fixes and reports results:
-
-```
-🔧 FIX Mode:
-
-Removing broken gateway entries:
-  ✓ Removed from gateway-integrations: jira-integration
-
-Adding missing gateway entries:
-  ✓ Added to gateway-frontend: my-skill
-
-✅ Fixed 2 issue(s)!
-```
-
-## When to Run
-
-### Recommended Schedule
-
-- **After manual skill deletions**: Run `npm run sync-gateways` to detect broken references
-- **After bulk migrations**: Verify all paths updated correctly
-- **Before releases**: Ensure all gateways are synchronized
-- **After merge conflicts**: Gateway files may have stale entries
-
-### Not Required
-
-- After `npm run create` (automatic)
-- After `npm run migrate` (automatic)
-- During normal workflow (automatic updates handle most cases)
 
 ## Troubleshooting
 
@@ -166,20 +107,21 @@ Adding missing gateway entries:
 ```
 
 **Not an error** - This skill is in a category without a dedicated gateway. It's still accessible via:
-- skill-search CLI: `npm run -w @chariot/skill-search search -- "code review"`
-- Direct path in skill body
+
+- skill-search CLI: `npm run -w @chariot/auditing-skills search -- "code review"`
+- Direct path in skill invocation
 
 ### Section Detection
 
 Skills are automatically placed in appropriate sections within gateways based on path keywords:
 
-| Keyword | Section |
-|---------|---------|
-| `ui/` | UI Components & Styling |
-| `state/` | State Management |
-| `testing/` | Testing |
+| Keyword     | Section                 |
+| ----------- | ----------------------- |
+| `ui/`       | UI Components & Styling |
+| `state/`    | State Management        |
+| `testing/`  | Testing                 |
 | `patterns/` | Patterns & Architecture |
-| `forms/` | Forms & Validation |
+| `forms/`    | Forms & Validation      |
 
 If auto-detection fails, skills are placed in a default section.
 

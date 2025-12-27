@@ -21,18 +21,13 @@ export class Phase2AllowedTools {
       issues.push({
         severity: 'INFO',
         message: 'Missing allowed-tools field (recommended)',
+        recommendation: `Suggested tools based on skill type: ${suggested.join(', ')}`,
         autoFixable: true,
         fix: async () => {
           await SkillParser.updateFrontmatter(skill.path, {
             'allowed-tools': suggested.join(', '),
           });
         },
-      });
-
-      issues.push({
-        severity: 'INFO',
-        message: `Suggested tools: ${suggested.join(', ')}`,
-        autoFixable: false,
       });
     }
 

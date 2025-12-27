@@ -43,6 +43,34 @@ function runCommand(command: string, cwd: string): CommandResult {
 
 export class Phase8TypeScriptStructure {
   /**
+   * Check if skill is instruction-only (no CLI references in content)
+   * Instruction-only skills don't need TypeScript infrastructure
+   */
+  private static isInstructionOnly(skill: SkillFile): boolean {
+    // Check frontmatter for explicit opt-out
+    if (skill.frontmatter['cli-driven'] === false ||
+        skill.frontmatter['instruction-only'] === true) {
+      return true;
+    }
+
+    // Check if content references CLI commands
+    const cliPatterns = [
+      /npm run\s+\w+/,
+      /npx\s+tsx/,
+      /npm run -w @chariot/,
+    ];
+
+    for (const pattern of cliPatterns) {
+      if (pattern.test(skill.content)) {
+        return false; // Has CLI references
+      }
+    }
+
+    // No CLI references found - this is instruction-only
+    return true;
+  }
+
+  /**
    * Validate TypeScript project structure for a single skill
    * @param skill - The skill to validate
    * @param singleSkillMode - If true, only run tests for this skill. If false, run all tests (default: true)
@@ -51,20 +79,21 @@ export class Phase8TypeScriptStructure {
     const issues: Issue[] = [];
     const skillDir = dirname(skill.path);
 
+    // Skip TypeScript checks for instruction-only skills
+    // These skills don't need CLI infrastructure
+    if (this.isInstructionOnly(skill)) {
+      return issues; // No TypeScript-related issues for instruction-only skills
+    }
+
     // Check 1: package.json at skill root (CRITICAL violation)
     const rootPackageJson = join(skillDir, 'package.json');
     if (existsSync(rootPackageJson)) {
       issues.push({
         severity: 'CRITICAL',
         message: 'package.json at skill root (should be in scripts/ subdirectory per npm workspace pattern)',
+        recommendation: 'Run "mv package.json package-lock.json tsconfig.json src scripts/" then remove node_modules/ and dist/',
         autoFixable: false,
         fix: undefined,
-      });
-
-      issues.push({
-        severity: 'INFO',
-        message: 'Migration: Run "mv package.json package-lock.json tsconfig.json src scripts/" then remove node_modules/ and dist/',
-        autoFixable: false,
       });
     }
 
@@ -79,12 +108,7 @@ export class Phase8TypeScriptStructure {
         issues.push({
           severity: 'CRITICAL',
           message: 'scripts/package.json exists but scripts/.gitignore is missing',
-          autoFixable: false,
-        });
-
-        issues.push({
-          severity: 'INFO',
-          message: 'Create scripts/.gitignore with: dist/, *.log, *.tmp, .cache/',
+          recommendation: 'Create scripts/.gitignore with: dist/, *.log, *.tmp, .cache/',
           autoFixable: false,
         });
       } else {
@@ -196,12 +220,7 @@ export class Phase8TypeScriptStructure {
             issues.push({
               severity: 'CRITICAL',
               message: 'TypeScript files not using git for path resolution (missing "git rev-parse --show-toplevel")',
-              autoFixable: false,
-            });
-
-            issues.push({
-              severity: 'INFO',
-              message: 'Add findRepoRoot() function using git (see .claude/skills/claude-skill-audit/references/npm-workspace-pattern.md)',
+              recommendation: 'Add findRepoRoot() function using git (see .claude/skills/managing-skills/references/patterns/repo-root-detection.md)',
               autoFixable: false,
             });
           }
@@ -226,21 +245,16 @@ export class Phase8TypeScriptStructure {
         const errorMatch = tscResult.error?.match(/Found (\d+) errors?/);
         const errorCount = errorMatch ? errorMatch[1] : 'multiple';
 
+        // Collect first few error lines as context
+        const errorLines = (tscResult.error || '').split('\n').filter(l => l.trim()).slice(0, 5);
+
         issues.push({
           severity: 'CRITICAL',
           message: `TypeScript compilation failed with ${errorCount} error(s)`,
+          recommendation: 'Fix type errors before proceeding',
+          context: errorLines.length > 0 ? errorLines : undefined,
           autoFixable: false,
         });
-
-        // Include first few error lines for context
-        const errorLines = (tscResult.error || '').split('\n').slice(0, 5).join('\n');
-        if (errorLines) {
-          issues.push({
-            severity: 'INFO',
-            message: `First errors:\n${errorLines}`,
-            autoFixable: false,
-          });
-        }
       }
 
       // Check 7: tsconfig.json has vitest/globals types
@@ -255,12 +269,7 @@ export class Phase8TypeScriptStructure {
             issues.push({
               severity: 'WARNING',
               message: 'tsconfig.json missing "vitest/globals" in compilerOptions.types (required for describe/test/expect globals)',
-              autoFixable: false,
-            });
-
-            issues.push({
-              severity: 'INFO',
-              message: 'Fix: Add "types": ["vitest/globals", "node"] to compilerOptions in tsconfig.json',
+              recommendation: 'Add "types": ["vitest/globals", "node"] to compilerOptions in tsconfig.json',
               autoFixable: false,
             });
           }
@@ -311,26 +320,22 @@ export class Phase8TypeScriptStructure {
               const failMatch = (testResult.error || testResult.output || '').match(/(\d+)\s+failed/i);
               const failCount = failMatch ? failMatch[1] : 'some';
 
+              // Collect first few failure lines as context
+              const outputLines = (testResult.error || testResult.output || '').split('\n').filter(l => l.trim()).slice(0, 10);
+
               issues.push({
                 severity: 'CRITICAL',
                 message: `Unit tests failed: ${failCount} test(s) failing (100% pass required)`,
+                recommendation: 'Fix failing tests before proceeding',
+                context: outputLines.length > 0 ? outputLines : undefined,
                 autoFixable: false,
               });
-
-              // Include first few failure lines
-              const outputLines = (testResult.error || testResult.output || '').split('\n').slice(0, 10).join('\n');
-              if (outputLines) {
-                issues.push({
-                  severity: 'INFO',
-                  message: `Test output:\n${outputLines}`,
-                  autoFixable: false,
-                });
-              }
             } else {
               // Non-test error (missing dependencies, etc.)
               issues.push({
                 severity: 'CRITICAL',
                 message: `Test execution failed: ${testResult.error?.split('\n')[0] || 'Unknown error'}`,
+                recommendation: 'Check npm install completed and dependencies are available',
                 autoFixable: false,
               });
             }

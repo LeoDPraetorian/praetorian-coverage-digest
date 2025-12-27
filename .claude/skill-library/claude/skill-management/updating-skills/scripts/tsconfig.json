@@ -13,7 +13,7 @@
     "declaration": false,
     "sourceMap": true,
     "noEmit": true,
-    "types": ["node"]
+    "types": ["vitest/globals", "node"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

@@ -14,12 +14,14 @@
 Phase 8 intelligently scopes test execution based on audit mode:
 
 ### Single-Skill Audit (`npm run audit -- skill-name`)
+
 - **Runs only tests for the specific skill being audited**
 - Command: `npx vitest run skills/skill-name/scripts`
 - Fast execution (~23 tests for skill-manager)
 - Prevents false negatives from unrelated test failures
 
 ### All-Skills Audit (`npm run audit`)
+
 - **Runs all tests across the entire workspace**
 - Command: `npm run test:unit` (102+ test files)
 - Comprehensive validation
@@ -38,6 +40,7 @@ Phase 8 intelligently scopes test execution based on audit mode:
 **Test scoping**: Before v1.1.0, Phase 8 ran ALL workspace tests (102+ files) even when auditing a single skill, causing false negatives from unrelated test failures. Now tests are scoped to the skill being audited.
 
 ### Example: Before Fix (v1.0.0)
+
 ```bash
 npm run audit -- skill-manager
 # Ran 102 test files (all MCP tools, all skills)
@@ -46,6 +49,7 @@ npm run audit -- skill-manager
 ```
 
 ### Example: After Fix (v1.1.0)
+
 ```bash
 npm run audit -- skill-manager
 # Runs only 23 skill-manager tests
@@ -57,6 +61,7 @@ npm run audit -- skill-manager
 ### CRITICAL Issues
 
 **1. Missing package.json**
+
 ```
 my-skill/scripts/
 ├── src/
@@ -65,6 +70,7 @@ my-skill/scripts/
 ```
 
 **2. Missing tsconfig.json**
+
 ```
 my-skill/scripts/
 ├── package.json
@@ -74,29 +80,34 @@ my-skill/scripts/
 ```
 
 **3. require() in TypeScript**
+
 ```typescript
-const fs = require('fs');  // ❌ CRITICAL - silently fails in ESM!
+const fs = require("fs"); // ❌ CRITICAL - silently fails in ESM!
 ```
 
 **4. Inline findProjectRoot**
+
 ```typescript
-function findProjectRoot() {  // ❌ Should use shared lib
-  return execSync('git rev-parse --show-toplevel').trim();
+function findProjectRoot() {
+  // ❌ Should use shared lib
+  return execSync("git rev-parse --show-toplevel").trim();
 }
 ```
 
 ### WARNING Issues
 
 **1. Wrong Import Paths**
+
 ```typescript
-import { findProjectRoot } from '../../../../../lib/find-project-root.js';
+import { findProjectRoot } from "../../../../../lib/find-project-root.js";
 // ❌ Wrong depth for core skills (should be 4 levels: ../../../../lib/)
 ```
 
 **2. Missing ESM Type**
+
 ```json
 {
-  "name": "@chariot/my-skill",
+  "name": "@chariot/my-skill"
   // Missing: "type": "module"
 }
 ```
@@ -108,6 +119,7 @@ import { findProjectRoot } from '../../../../../lib/find-project-root.js';
 **Delegates to**: claude-skill-audit-script-paths CLI
 
 **What it fixes:**
+
 - ✅ Creates package.json template
 - ✅ Creates tsconfig.json template
 - ✅ Replaces inline findProjectRoot with shared lib import
@@ -119,6 +131,7 @@ import { findProjectRoot } from '../../../../../lib/find-project-root.js';
 ### Example 1: Add TypeScript Config
 
 **Before:**
+
 ```
 scripts/
 └── src/
@@ -126,6 +139,7 @@ scripts/
 ```
 
 **After:**
+
 ```
 scripts/
 ├── package.json
@@ -136,6 +150,7 @@ scripts/
 ```
 
 **Generated package.json:**
+
 ```json
 {
   "name": "@chariot/skill-name",
@@ -155,17 +170,19 @@ scripts/
 ### Example 2: Fix Inline findProjectRoot
 
 **Before:**
+
 ```typescript
 function findProjectRoot(): string {
-  return execSync('git rev-parse --show-toplevel').trim();
+  return execSync("git rev-parse --show-toplevel").trim();
 }
 
 const PROJECT_ROOT = findProjectRoot();
 ```
 
 **After:**
+
 ```typescript
-import { findProjectRoot } from '../../../../lib/find-project-root.js';
+import { findProjectRoot } from "../../../../lib/find-project-root.js";
 
 const PROJECT_ROOT = findProjectRoot();
 ```
@@ -173,15 +190,17 @@ const PROJECT_ROOT = findProjectRoot();
 ### Example 3: Convert require() to import
 
 **Before:**
+
 ```typescript
-const { readFileSync } = require('fs');
-const path = require('path');
+const { readFileSync } = require("fs");
+const path = require("path");
 ```
 
 **After:**
+
 ```typescript
-import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
+import { readFileSync } from "fs";
+import { join, dirname } from "path";
 ```
 
 ## Edge Cases
@@ -189,17 +208,19 @@ import { join, dirname } from 'path';
 **1. Mixed CJS/ESM**
 
 Some dependencies might not be ESM-ready:
+
 ```typescript
 // Use dynamic import for CJS modules
-const cjsModule = await import('legacy-package');
+const cjsModule = await import("legacy-package");
 ```
 
-**2. __dirname in ESM**
+**2. \_\_dirname in ESM**
 
 Not available in ESM, use alternative:
+
 ```typescript
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -235,14 +256,16 @@ npm run dev -- fix --all --phase 8
 ## Shared Lib Import Paths
 
 **Core skills** (.claude/skills/my-skill/scripts/src/):
+
 ```typescript
-import { findProjectRoot } from '../../../../lib/find-project-root.js';
+import { findProjectRoot } from "../../../../lib/find-project-root.js";
 // 4 levels: src → scripts → my-skill → skills → .claude
 ```
 
 **Library skills** (.claude/skill-library/claude/skills/my-skill/scripts/src/):
+
 ```typescript
-import { findProjectRoot } from '../../../../../lib/find-project-root.js';
+import { findProjectRoot } from "../../../../../lib/find-project-root.js";
 // 5 levels to skill-library/lib (which re-exports from .claude/lib)
 ```
 
@@ -253,10 +276,10 @@ import { findProjectRoot } from '../../../../../lib/find-project-root.js';
 
 ## Quick Reference
 
-| Issue | Auto-Fix | Tool |
-|-------|----------|------|
-| Missing package.json | ✅ | script-paths CLI |
-| Missing tsconfig | ✅ | script-paths CLI |
-| Inline findProjectRoot | ✅ | script-paths CLI |
-| require() calls | ✅ | script-paths CLI |
-| Wrong import depth | ✅ | script-paths CLI |
+| Issue                  | Auto-Fix | Tool             |
+| ---------------------- | -------- | ---------------- |
+| Missing package.json   | ✅       | script-paths CLI |
+| Missing tsconfig       | ✅       | script-paths CLI |
+| Inline findProjectRoot | ✅       | script-paths CLI |
+| require() calls        | ✅       | script-paths CLI |
+| Wrong import depth     | ✅       | script-paths CLI |

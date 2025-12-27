@@ -82,25 +82,23 @@ export class Phase5OrganizeFiles {
     }
 
     if (orphanedFiles.length > 0) {
+      // Build context with file → target directory mapping
+      const context = orphanedFiles.map(file => {
+        const filename = path.basename(file);
+        const targetDir = this.determineTargetDirectory(filename);
+        return `${filename} → ${targetDir}/`;
+      });
+
       issues.push({
         severity: 'WARNING',
         message: `${orphanedFiles.length} orphaned .md file(s) at root`,
+        recommendation: 'Move documentation files to references/, examples/, or templates/',
+        context,
         autoFixable: true,
         fix: async () => {
           await this.organizeFiles(skill.directory, orphanedFiles, false);
         },
       });
-
-      for (const file of orphanedFiles) {
-        const filename = path.basename(file);
-        const targetDir = this.determineTargetDirectory(filename);
-
-        issues.push({
-          severity: 'INFO',
-          message: `${filename} → ${targetDir}/`,
-          autoFixable: true,
-        });
-      }
     }
 
     return issues;

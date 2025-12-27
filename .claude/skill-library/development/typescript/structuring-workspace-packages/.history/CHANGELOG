@@ -1,0 +1,29 @@
+# Changelog
+
+## [Initial Creation] - 2025-12-26
+
+**RED Phase Documentation:**
+
+During TypeScript workspace refactoring session, discovered multiple packages using anti-patterns:
+- Relative path imports across packages (e.g., `import * as formatter from '../../../formatting-skill-output/...'`)
+- Namespace imports instead of named imports
+- Missing `exports` field in package.json
+- Inconsistent moduleResolution settings
+
+**Failure Behavior Without Skill:**
+Claude doesn't know to check for these anti-patterns when refactoring TypeScript workspaces, leading to fragile code that works with tsx but violates npm workspace best practices.
+
+**Evidence:**
+Manual discovery and fix took ~2 hours through web research and trial-and-error.
+
+**Category:** development/typescript (new category)
+
+**Skill Type:** Process/Pattern
+
+**Location:** Skill Library
+
+**Files Created:**
+- SKILL.md (192 lines) - Main skill content with progressive disclosure
+- references/ - Placeholder for detailed documentation
+- examples/ - Placeholder for code examples
+- .history/CHANGELOG - This file

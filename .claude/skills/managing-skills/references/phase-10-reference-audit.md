@@ -20,20 +20,26 @@
 ### WARNING Issues
 
 **1. Deprecated Skill Reference**
+
 ```markdown
 Use skill: "old-skill-name"
+
 # old-skill-name was renamed to new-skill-name
 ```
 
 **2. Removed Command Reference**
+
 ```markdown
 Run /old-command to fix this
+
 # /old-command was removed or renamed
 ```
 
 **3. Deprecated Agent Reference**
+
 ```markdown
 Use Task tool with agent "old-agent-name"
+
 # Agent was renamed or removed
 ```
 
@@ -42,15 +48,16 @@ Use Task tool with agent "old-agent-name"
 ✅ **AUTO-FIXABLE** - can replace references using registry mappings
 
 **Fix logic:**
+
 ```typescript
 // Load deprecation registry
 const registry = {
-  "skills": {
-    "old-name": { "new": "new-name", "reason": "Renamed for clarity" }
+  skills: {
+    "old-name": { new: "new-name", reason: "Renamed for clarity" },
   },
-  "commands": {
-    "/old-cmd": { "new": "/new-cmd", "reason": "Consolidated" }
-  }
+  commands: {
+    "/old-cmd": { new: "/new-cmd", reason: "Consolidated" },
+  },
 };
 
 // Replace in skill body
@@ -62,11 +69,13 @@ content = content.replace('skill: "old-name"', 'skill: "new-name"');
 ### Example 1: Renamed Skill
 
 **Before:**
+
 ```markdown
 For testing, use skill: "test-runner"
 ```
 
 **Registry:**
+
 ```json
 {
   "skills": {
@@ -79,6 +88,7 @@ For testing, use skill: "test-runner"
 ```
 
 **After:**
+
 ```markdown
 For testing, use skill: "developing-with-tdd"
 ```
@@ -86,11 +96,13 @@ For testing, use skill: "developing-with-tdd"
 ### Example 2: Removed Command
 
 **Before:**
+
 ```markdown
 Run /feature-complete to implement this
 ```
 
 **Registry:**
+
 ```json
 {
   "commands": {
@@ -103,6 +115,7 @@ Run /feature-complete to implement this
 ```
 
 **After:**
+
 ```markdown
 To implement this feature, follow the TDD workflow manually
 ```
@@ -112,6 +125,7 @@ To implement this feature, follow the TDD workflow manually
 **Location**: `.claude/skill-library/lib/deprecation-registry.json`
 
 **Schema:**
+
 ```json
 {
   "skills": {
@@ -148,7 +162,9 @@ To implement this feature, follow the TDD workflow manually
 
 ```markdown
 # Skill name in prose (not invocation)
+
 "The test-runner skill was useful..."
+
 # Don't auto-replace prose, only invocations
 ```
 
@@ -163,9 +179,11 @@ Registry should map old → final directly.
 **3. Conditional Deprecation**
 
 Some references valid in certain contexts:
+
 ```markdown
 # Legacy mode (still supported)
-skill: "old-name"  # OK if in migration guide
+
+skill: "old-name" # OK if in migration guide
 ```
 
 ## Manual Remediation
@@ -173,11 +191,13 @@ skill: "old-name"  # OK if in migration guide
 **If auto-fix fails or registry incomplete:**
 
 1. Search for deprecated references:
+
    ```bash
    grep -r "skill: \"old-name\"" .
    ```
 
 2. Check registry for mapping:
+
    ```bash
    cat .claude/skill-library/lib/deprecation-registry.json | jq '.skills["old-name"]'
    ```
@@ -194,9 +214,9 @@ skill: "old-name"  # OK if in migration guide
 
 ## Quick Reference
 
-| Deprecated Item | Auto-Fix | Source |
-|-----------------|----------|--------|
-| Skill names | ✅ | deprecation-registry.json |
-| Agent names | ✅ | deprecation-registry.json |
-| Command names | ✅ | deprecation-registry.json |
-| Anti-patterns | ✅ | deprecation-registry.json |
+| Deprecated Item | Auto-Fix | Source                    |
+| --------------- | -------- | ------------------------- |
+| Skill names     | ✅       | deprecation-registry.json |
+| Agent names     | ✅       | deprecation-registry.json |
+| Command names   | ✅       | deprecation-registry.json |
+| Anti-patterns   | ✅       | deprecation-registry.json |
