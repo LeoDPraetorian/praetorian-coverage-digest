@@ -284,7 +284,7 @@ When should agent escalate?"
 ### User
 
 - Architectural questions → backend-architect
-- Security concerns → backend-security-reviewer
+- Security concerns → backend-security
 - Complex testing issues → backend-tester
 
 ### Claude

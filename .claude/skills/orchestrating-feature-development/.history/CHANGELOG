@@ -2,6 +2,58 @@
 
 All notable changes to the orchestrating-feature-development skill will be documented in this file.
 
+## [Date: 2025-12-28]
+
+### Changed (MAJOR WORKFLOW REDESIGN)
+- **Workflow expanded from 5 phases to 8 phases** with parallel agent execution
+- **Phase 3 (Architecture)**: Now uses domain leads (frontend-lead, backend-lead) + security-lead in PARALLEL instead of architect + reviewer pattern
+- **Phase numbering shifted**: Testing moved from Phase 5 to Phase 6
+- **Agent matrix updated**: Uses new agent names (frontend-lead, backend-lead, frontend-reviewer, frontend-security, etc.)
+
+### Added
+- **Phase 0: Setup** - Create feature directory with semantic naming (YYYY-MM-DD-{feature-name})
+- **Phase 5: Code Review (NEW)** - Parallel code + security reviewers with explicit feedback loop (MAX 1 RETRY)
+- **Phase 7: Test Assessment (NEW)** - Quality gate using test-assessor with feedback loop (MAX 1 RETRY)
+- **Feedback Loop Pattern**: MAX 1 RETRY then escalate to user (no infinite loops)
+- **Parallel Execution Rules**: MANDATORY for independent agents in single Task message
+- **Feature Directory Structure**: Centralized outputs to `.claude/features/YYYY-MM-DD-{name}/`
+
+### New Reference Files
+- `references/phase-5-code-review.md` - Parallel reviewers + feedback loop workflow
+- `references/phase-7-test-assessment.md` - Test quality gate workflow
+
+### Updated Reference Files
+- `references/phase-3-architecture.md` - Rewritten for frontend-lead + security-lead pattern
+- `references/phase-4-implementation.md` - Updated references to new Phase 5
+- `references/phase-6-testing.md` - Renamed from phase-5, updated for parallel test modes
+
+### Reason
+- **RED Failure**: Architecture phase ran frontend-lead alone without security assessment. Security-lead only involved later (or never), missing early security review.
+- **Additional Gap**: No code review phase existed - implementation went directly to testing without quality gate.
+- **Additional Gap**: No test assessment phase - tests were written but quality not validated.
+- **Solution**:
+  1. Security-lead always included in architecture (Phase 3), spawned in parallel
+  2. New Code Review phase (Phase 5) with parallel code + security reviewers
+  3. New Test Assessment phase (Phase 7) with quality gate
+  4. MAX 1 RETRY feedback loops prevent infinite loops
+
+### Technical Details
+- SKILL.md: 299 lines (compliant)
+- phase-3-architecture.md: 328 lines (compliant)
+- phase-5-code-review.md: 303 lines (compliant)
+- phase-6-testing.md: 293 lines (compliant)
+- phase-7-test-assessment.md: 285 lines (compliant)
+- All files under 500-line limit ✅
+
+### Agent Matrix
+| Type | Leads (Phase 3) | Developers (Phase 4) | Reviewers (Phase 5) | Testers (Phase 6) |
+|------|-----------------|----------------------|---------------------|-------------------|
+| Frontend | frontend-lead + security-lead | frontend-developer | frontend-reviewer + frontend-security | frontend-tester ×3 |
+| Backend | backend-lead + security-lead | backend-developer | backend-reviewer + backend-security | backend-tester ×3 |
+| Full-stack | All 4 leads | Both developers | All 4 reviewers | All 6 testers |
+
+---
+
 ## [Date: 2025-12-22]
 
 ### Changed

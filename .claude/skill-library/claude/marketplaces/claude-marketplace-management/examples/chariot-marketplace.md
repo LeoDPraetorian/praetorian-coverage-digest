@@ -150,7 +150,7 @@ Actual `.claude/settings.json` in Chariot repository:
 - react-architect
 - go-architect
 - database-neo4j-architect
-- security-architect
+- security-lead
 - aws-architect
 
 (and 35+ more specialized agents)

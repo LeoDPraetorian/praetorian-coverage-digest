@@ -19,7 +19,7 @@ All notable changes to this skill.
 
 ### Reason
 - **Missing validation** - Phase 3 was NOT checking this requirement
-- **Widespread impact** - Catches 4+ currently broken agents (backend-architect, security-architect, backend-developer, backend-reviewer)
+- **Widespread impact** - Catches 4+ currently broken agents (backend-architect, security-lead, backend-developer, backend-reviewer)
 - **Compliance alignment** - Implements agent-compliance-contract.md Section 12
 - **Gold standard** - frontend-developer.md shows this is mandatory pattern
 

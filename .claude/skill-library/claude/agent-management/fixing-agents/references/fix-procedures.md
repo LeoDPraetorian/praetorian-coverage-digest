@@ -119,7 +119,7 @@ Edit({
 
 **Why Critical**: Core skills in frontmatter require Skill tool to invoke via `skill: "name"` syntax. Without Skill tool, agent cannot execute skill invocations → broken at runtime.
 
-**Currently Affects**: 4+ agents (backend-architect, security-architect, backend-developer, backend-reviewer)
+**Currently Affects**: 4+ agents (backend-architect, security-lead, backend-developer, backend-reviewer)
 
 **Reference**: agent-compliance-contract.md Section 12
 

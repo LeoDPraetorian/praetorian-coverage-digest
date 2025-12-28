@@ -63,6 +63,7 @@ This skill tests **agent-skill integration with pressure testing** (Phase 8 + Ph
 | 5    | For each skill: spawn agent                       | 2-5 min/skill  |
 | 6    | For each skill: evaluate under pressure           | 5-10 min/skill |
 | 7    | Report aggregate results (tiered)                 | 5-10 min       |
+| 8    | Cleanup test artifacts (MANDATORY)                | 2-3 min        |
 
 **Total**:
 - Single skill: ~15-30 min
@@ -388,6 +389,104 @@ DEAD SKILL: calibrating-time-estimates
 ```
 
 **For complete report format, see `references/testing-examples.md`.**
+
+### Step 8: Cleanup Test Artifacts (MANDATORY)
+
+**🚨 CRITICAL: Prevent test pollution in production codebase**
+
+After reporting results, you MUST clean up all test artifacts created during agent testing.
+
+**8.1 Track Created Files During Testing**
+
+Throughout Steps 5-6, when agents create files, store their paths:
+
+```typescript
+// Example tracking
+const createdArtifacts: string[] = [];
+
+// When agent creates files (Step 5)
+if (agentOutput.includes("Files Created:")) {
+  // Extract file paths from agent output
+  createdArtifacts.push("modules/chariot/ui/src/components/UserProfile/");
+}
+```
+
+**8.2 Delete All Created Test Artifacts**
+
+```bash
+# For each tracked artifact
+for artifact in "${createdArtifacts[@]}"; do
+  if [ -e "$artifact" ]; then
+    echo "Deleting test artifact: $artifact"
+    rm -rf "$artifact"
+  fi
+done
+```
+
+**8.3 Restore Modified Files**
+
+```bash
+# Revert any modifications to existing files
+git restore .
+```
+
+**8.4 Verify Clean State**
+
+```bash
+# Check git status is clean
+git status --short
+```
+
+**Expected output:** Empty (no untracked or modified files)
+
+**8.5 Report Cleanup Summary**
+
+Add to aggregate results report:
+
+```markdown
+═══ Step 8: Cleanup Summary ═══
+
+✅ Test artifacts deleted: 1 directory
+   - modules/chariot/ui/src/components/UserProfile/
+
+✅ Modified files restored: 0
+
+✅ Git status: Clean
+
+⚠️ If cleanup failed, review artifacts manually and delete before committing.
+```
+
+**Why This Matters:**
+
+- **Prevents production pollution** - Test code won't accidentally be committed
+- **Reproducible environment** - Each test run starts clean
+- **Safety** - Avoids breaking production with test artifacts
+
+**Implementation Pattern:**
+
+```typescript
+// Pseudo-code for cleanup workflow
+async function cleanupTestArtifacts(createdPaths: string[]) {
+  // Delete created directories/files
+  for (const path of createdPaths) {
+    await Bash({ command: `rm -rf ${path}` });
+  }
+
+  // Restore modified files
+  await Bash({ command: 'git restore .' });
+
+  // Verify clean
+  const status = await Bash({ command: 'git status --short' });
+
+  if (status.trim() === '') {
+    return { success: true, message: 'Git status: Clean' };
+  } else {
+    return { success: false, message: `Unclean state: ${status}` };
+  }
+}
+```
+
+**Update TodoWrite** after cleanup completes.
 
 ---
 

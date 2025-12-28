@@ -35,7 +35,7 @@ Add this section to agent body:
 | Situation                       | Recommend                    |
 | ------------------------------- | ---------------------------- |
 | {Domain} architecture decisions | `{domain}-architect` agent   |
-| Security concerns               | `security-architect` agent   |
+| Security concerns               | `security-lead` agent   |
 | Cross-domain coordination       | `orchestrator` agent         |
 | Human decision needed           | Ask user via AskUserQuestion |
 | Unknown domain                  | Search for appropriate agent |
@@ -49,10 +49,10 @@ Add this section to agent body:
 
 | Agent Domain | Escalate Architecture To | Escalate Security To       |
 | ------------ | ------------------------ | -------------------------- |
-| frontend     | frontend-architect       | frontend-security-reviewer |
-| backend      | backend-architect        | backend-security-reviewer  |
-| testing      | test-architect           | security-architect         |
-| research     | -                        | security-architect         |
+| frontend     | frontend-architect       | frontend-security |
+| backend      | backend-architect        | backend-security  |
+| testing      | test-architect           | security-lead         |
+| research     | -                        | security-lead         |
 
 ### By Situation
 

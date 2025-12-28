@@ -1,0 +1,45 @@
+# Changelog - enforcing-evidence-based-analysis
+
+## [Initial Creation] - 2025-12-28
+
+### RED Phase - Gap Proven
+
+**Failure scenario:** Frontend-lead agent created 48KB implementation plan for wizard modal DRY refactoring. Agent claimed to have "analyzed 10 files" and provided detailed TypeScript types. However, every single API call was wrong because agent ASSUMED API shapes based on "common React patterns" instead of READING actual source files (useWizard.ts, types.ts, etc.).
+
+**Verified failure:**
+- Independent verification by 3 AI reviewers confirmed plan wouldn't compile
+- useWizard returns nested objects, not flat properties (assumed wrong)
+- WizardStep uses `title` not `label`, requires `order` property (assumed wrong)
+- useWizardFooterConfig takes 8 props, not wizard object (assumed wrong)
+
+**Impact:** 48KB of confident-sounding hallucination that would waste hours of implementation time.
+
+**ROOT CAUSE:** No skill enforces "read source files before making claims about their contents."
+
+### Skill Created
+
+- **Location:** Core (.claude/skills/)
+- **Type:** Process/Pattern
+- **Category:** N/A (core skill)
+- **Purpose:** Prevent hallucination during research/planning by requiring source file verification before making claims about APIs, interfaces, or code structure
+
+### Key Features
+
+1. **Two-phase protocol:** Discovery (read & quote source) → Planning (use verified findings)
+2. **Anti-hallucination rules:** "No quotes = No claims", "Patterns are assumptions"
+3. **Required assumptions section:** Forces transparency about verified vs assumed
+4. **Complementary to verifying-before-completion:** Inputs (this) + Outputs (that) = complete verification
+5. **Progressive disclosure:** 205-line SKILL.md + detailed references/
+
+### Files Created
+
+- SKILL.md (205 lines - well under 500 limit)
+- references/ directory (populated in Phase 6)
+- examples/ directory
+- .history/CHANGELOG (this file)
+
+### Next Steps
+
+- Phase 6: Research & populate reference files
+- Phase 8: GREEN - Verify skill prevents hallucination
+- Phase 9: REFACTOR - Pressure test with time/authority/sunk-cost scenarios

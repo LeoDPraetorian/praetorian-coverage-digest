@@ -436,7 +436,7 @@ This skill provides a high-level workflow. For detailed implementation guidance:
 
 ## Related Skills
 
-- `frontend-security-reviewer` - Agent for automated security review of React code
+- `frontend-security` - Agent for automated security review of React code
 - `testing-security-with-e2e-tests` - E2E security testing with Playwright (XSS, auth, CSRF tests)
 - `adhering-to-uiux-laws` - UI/UX patterns that impact security (clickjacking, phishing)
 - `using-modern-react-patterns` - React 19 patterns including security considerations

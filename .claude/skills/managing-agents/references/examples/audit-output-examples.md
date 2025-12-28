@@ -49,7 +49,7 @@ No critical issues found
 Agents checked:
   - frontend-developer: PASS
   - backend-developer: PASS
-  - security-architect: PASS
+  - security-lead: PASS
   - test-engineer: PASS
   - orchestrator: PASS
   - code-reviewer: PASS
@@ -104,7 +104,7 @@ Action: Fix errors before committing. Warnings are advisory.
 Results:
   frontend-developer: ❌ FAIL (2 critical issues)
   backend-developer: ✅ PASS
-  security-architect: ⚠️ WARN (1 warning)
+  security-lead: ⚠️ WARN (1 warning)
   test-engineer: ✅ PASS
 
 Summary:
@@ -148,7 +148,7 @@ Can proceed, but consider addressing warnings.
 Available agents:
   - frontend-developer
   - backend-developer
-  - security-architect
+  - security-lead
 
 Try: npm run audit-critical -- frontend-developer
 ```

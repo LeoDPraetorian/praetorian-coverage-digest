@@ -166,11 +166,12 @@ go build ./...
       },
       "completed_at": "2024-12-13T12:00:00Z"
     },
-    "testing": {
-      "status": "in_progress"
+    "review": {
+      "status": "in_progress",
+      "retry_count": 0
     }
   },
-  "current_phase": "testing"
+  "current_phase": "review"
 }
 ```
 
@@ -178,12 +179,12 @@ go build ./...
 
 ```
 TodoWrite: Mark "Phase 4: Implementation" as completed
-TodoWrite: Mark "Phase 5: Testing" as in_progress
+TodoWrite: Mark "Phase 5: Code Review" as in_progress
 ```
 
 ## Exit Criteria
 
-✅ Proceed to Phase 5 when:
+✅ Proceed to Phase 5 (Code Review) when:
 
 - All developers returned `status: "complete"`
 - Build passes
@@ -256,6 +257,7 @@ Deviating from these decisions requires user approval.
 ## Related References
 
 - [Phase 3: Architecture](phase-3-architecture.md) - Previous phase
-- [Phase 5: Testing](phase-5-testing.md) - Next phase
+- [Phase 5: Code Review](phase-5-code-review.md) - Next phase
+- [Phase 6: Testing](phase-6-testing.md) - After code review
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Troubleshooting](troubleshooting.md) - Common issues

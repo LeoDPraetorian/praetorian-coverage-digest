@@ -1,6 +1,6 @@
 ---
 name: gateway-security
-description: Use when implementing security features, performing threat modeling, or testing security controls - access Auth, Secrets, Cryptography, Defense, and Threat Modeling patterns for authentication, authorization, encryption, vulnerability analysis, and security testing.
+description: Use when implementing security features - access Auth, Secrets, Cryptography, Defense, and Threat Modeling patterns. Routes to specialized library skills for security architecture, implementation, and review.
 allowed-tools: Read
 ---
 
@@ -8,42 +8,186 @@ allowed-tools: Read
 
 ## Understanding This Gateway
 
-This is a **gateway skill** that routes you to specialized library skills. The Chariot platform uses a two-tier skill system:
+**This is a gateway skill in Chariot's two-tier skill architecture.**
 
-1. **Core Skills** (~25): High-frequency skills in `.claude/skills/` - invoked with `skill: "name"`
-2. **Library Skills** (~120): Specialized skills in `.claude/skill-library/` - loaded with `Read` tool
+The two-tier system organizes skills into:
 
-This gateway helps you discover security library skills. **You cannot invoke library skills with the Skill tool** - you must use the Read tool with the full path.
+- **Core skills** (are in `.claude/skills/`) - High-frequency skills auto-discovered by Claude Code's Skill tool
+- **Library skills** (are in `.claude/skill-library/`) - Specialized skills loaded on-demand via Read tool
 
-**Invoking this gateway:**
+**Gateways are routing indices, not implementation guides.** They exist in core to help you discover and load library skills.
 
-```
-skill: "gateway-security"
-```
+## Critical: Two-Tier Skill System
 
-<IMPORTANT>
+| Tier             | Location                 | How to Invoke | Example                     |
+| ---------------- | ------------------------ | ------------- | --------------------------- |
+| **Core/Gateway** | `.claude/skills/`        | Skill tool    | `skill: "gateway-security"` |
+| **Library**      | `.claude/skill-library/` | Read tool     | `Read("path/to/SKILL.md")`  |
+
+<EXTREMELY_IMPORTANT>
 **Library skills cannot be invoked with the Skill tool.** You MUST use the Read tool to load them.
 
 ### Common Anti-Patterns
 
-```bash
-# ❌ WRONG: Trying to use Skill tool for library skills
-skill: "auth-implementation-patterns"  # FAILS - library skills are NOT in Skill tool
+```typescript
+// ❌ WRONG: Trying to use Skill tool for library skills
+skill: "auth-implementation-patterns"; // FAILS - library skills are NOT in Skill tool
 
-# ❌ WRONG: Guessing or shortening paths
-Read(".claude/skill-library/auth-implementation-patterns/...")  # FAILS - missing nested folders
+// ❌ WRONG: Guessing or shortening paths
+Read(".claude/skill-library/auth-implementation-patterns/..."); // FAILS - missing nested folders
 
-# ❌ WRONG: Using skill name instead of full path
-Read("auth-implementation-patterns")  # FAILS - must be full path
+// ❌ WRONG: Using skill name instead of full path
+Read("threat-modeling"); // FAILS - must be full path
 
-# ❌ WRONG: Looking in core /skills/ instead of /skill-library/
-Read(".claude/skills/auth-implementation-patterns/...")  # FAILS - library skills are NOT in /skills/
-
-# ✅ CORRECT: Full path to library skill
-Read(".claude/skill-library/security/auth-implementation-patterns/SKILL.md")
+// ❌ WRONG: Looking in core /skills/ instead of /skill-library/
+Read(".claude/skills/secrets-management/..."); // FAILS - library skills are NOT in /skills/
 ```
 
-</IMPORTANT>
+### Correct Patterns
+
+```typescript
+// ✅ CORRECT: Use gateway to find skill, then Read with FULL path
+Read(".claude/skill-library/security/auth-implementation-patterns/SKILL.md");
+
+// ✅ CORRECT: Copy path exactly as shown in this gateway
+Read(".claude/skill-library/security/threat-modeling/SKILL.md");
+
+// ✅ CORRECT: Core skills (this gateway) use Skill tool
+skill: "gateway-security"; // Core skills work with Skill tool
+```
+
+**Workflow:**
+
+1. Invoke this gateway: `skill: "gateway-security"`
+2. Find the skill you need in the categorized list below
+3. Copy the EXACT path shown (do not modify or shorten)
+4. Use Read tool with that path
+5. Follow the loaded skill's instructions
+
+</EXTREMELY_IMPORTANT>
+
+## Mandatory Skills by Role
+
+**Load mandatory skills based on your role before starting work.**
+
+### Role Filter
+
+| Your Role               | Mandatory Sections                                                        |
+|-------------------------|---------------------------------------------------------------------------|
+| **Security Lead/Architect** | ALL ROLES + THREAT MODELING + DEFENSE PATTERNS                        |
+| **Security Reviewer**   | ALL ROLES + SECURITY REVIEW                                               |
+| **Developer**           | ALL ROLES + SECURITY IMPLEMENTATION                                       |
+| **Tester**              | ALL ROLES (security testing skills come from `gateway-testing`)           |
+
+**Note:** All skills remain available to any role via the routing tables below. The table shows what you MUST load upfront—not what you're limited to.
+
+---
+
+### ALL ROLES (Everyone Must Read)
+
+**1. Defense in Depth**
+
+`.claude/skill-library/security/defense-in-depth/SKILL.md`
+
+Layered security, principle of least privilege, attack surface reduction, zero trust architecture. **Essential for understanding security architecture principles.**
+
+**2. Auth Implementation Patterns**
+
+`.claude/skill-library/security/auth-implementation-patterns/SKILL.md`
+
+JWT tokens, OAuth flows, session management, RBAC. **Required to understand authentication and authorization basics.**
+
+---
+
+### THREAT MODELING (Mandatory: Security Lead/Architect)
+
+**3. Business Context Discovery (Phase 0)**
+
+`.claude/skill-library/security/business-context-discovery/SKILL.md`
+
+Discovers business context, data classification, threat actors, compliance requirements before technical analysis. **Required for architects starting threat modeling work.**
+
+**4. Codebase Sizing (Phase 1.0)**
+
+`.claude/skill-library/security/codebase-sizing/SKILL.md`
+
+Assesses codebase size, categorizes components, outputs parallelization strategy. **Required before Phase 1 to determine approach.**
+
+**5. Codebase Mapping (Phase 1)**
+
+`.claude/skill-library/security/codebase-mapping/SKILL.md`
+
+Systematic codebase analysis - architecture, components, data flows, entry points, trust boundaries. **Required for understanding attack surface.**
+
+**6. Security Controls Mapping (Phase 2)**
+
+`.claude/skill-library/security/security-controls-mapping/SKILL.md`
+
+Maps existing security controls to STRIDE categories, identifies gaps. **Required before identifying threats.**
+
+**7. Threat Modeling (Phase 3)**
+
+`.claude/skill-library/security/threat-modeling/SKILL.md`
+
+STRIDE + PASTA + DFD principles to identify threats, generate abuse cases, create attack trees. **Core threat modeling skill.**
+
+**8. CVSS Scoring (Phase 3 Scoring)**
+
+`.claude/skill-library/security/cvss-scoring/SKILL.md`
+
+Scores threats with CVSS 3.1/4.0, Base/Temporal/Environmental metrics. **Required for risk-based prioritization.**
+
+**9. Security Test Planning (Phase 4)**
+
+`.claude/skill-library/security/security-test-planning/SKILL.md`
+
+Converts threat models into prioritized test plans - code review targets, SAST/DAST recommendations. **Required to complete threat modeling workflow.**
+
+---
+
+### SECURITY REVIEW (Mandatory: Security Reviewer)
+
+**10. Authorization Testing**
+
+`.claude/skill-library/security/authorization-testing/SKILL.md`
+
+Testing access controls, privilege escalation checks, permission boundaries. **Required for reviewing auth implementations.**
+
+**11. Secret Scanner**
+
+`.claude/skill-library/security/secret-scanner/SKILL.md`
+
+Detecting hardcoded secrets, credential scanning, pre-commit hooks. **Required to prevent credential leaks.**
+
+---
+
+### SECURITY IMPLEMENTATION (Mandatory: Developer)
+
+**12. Secrets Management**
+
+`.claude/skill-library/security/secrets-management/SKILL.md`
+
+Credential storage, secret rotation, secure configuration, vault patterns. **Required when implementing features that handle secrets.**
+
+**13. Discover Cryptography**
+
+`.claude/skill-library/security/discover-cryptography/SKILL.md`
+
+Encryption patterns, key management, hashing algorithms, cryptographic best practices. **Required when implementing encryption or hashing.**
+
+---
+
+### Workflow
+
+1. Identify your role from the Role Filter table above
+2. Read ALL ROLES skills (2 skills)
+3. Based on your role, also read:
+   - Security Lead/Architect: THREAT MODELING (7 skills) + DEFENSE PATTERNS
+   - Security Reviewer: SECURITY REVIEW (2 skills)
+   - Developer: SECURITY IMPLEMENTATION (2 skills)
+4. Then load task-specific skills from the routing tables below
+
+**Remember:** These are mandatory minimums. Any role can load any skill from the routing tables when relevant to their task.
 
 ## How to Use
 
@@ -58,161 +202,192 @@ Each skill is organized by domain for easy discovery.
 ## Authentication & Authorization
 
 **Auth Implementation Patterns**: `.claude/skill-library/security/auth-implementation-patterns/SKILL.md`
-
 - JWT tokens, OAuth flows, session management, role-based access control (RBAC)
 
 **Authorization Testing**: `.claude/skill-library/security/authorization-testing/SKILL.md`
-
 - Testing access controls, privilege escalation checks, permission boundaries
 
 ## Secrets & Credentials
 
 **Secrets Management**: `.claude/skill-library/security/secrets-management/SKILL.md`
-
 - Credential storage, secret rotation, secure configuration, vault patterns
 
 **Secret Scanner**: `.claude/skill-library/security/secret-scanner/SKILL.md`
-
 - Detecting hardcoded secrets, credential scanning, pre-commit hooks
 
 ## Cryptography
 
 **Discover Cryptography**: `.claude/skill-library/security/discover-cryptography/SKILL.md`
-
 - Encryption patterns, key management, hashing algorithms, cryptographic best practices
 
 ## Defense Patterns
 
 **Defense in Depth**: `.claude/skill-library/security/defense-in-depth/SKILL.md`
-
 - Layered security, principle of least privilege, attack surface reduction, zero trust
 
 ## Threat Modeling
 
 **Business Context Discovery** (Phase 0): `.claude/skill-library/security/business-context-discovery/SKILL.md`
-
 - Discovers business context, data classification, threat actors, compliance requirements, and security objectives before technical analysis - PASTA Stage 1
 
-**Codebase Mapping** (Phase 1): `.claude/skill-library/security/codebase-mapping/SKILL.md`
+**Codebase Sizing** (Phase 1.0): `.claude/skill-library/security/codebase-sizing/SKILL.md`
+- Assesses codebase size before Phase 1, counts files per component, categorizes as small/medium/large, outputs sizing-report.json with parallelization strategy
 
+**Codebase Mapping** (Phase 1): `.claude/skill-library/security/codebase-mapping/SKILL.md`
 - Systematic codebase analysis for threat modeling, identifies architecture, components, data flows, entry points, trust boundaries
 
 **Security Controls Mapping** (Phase 2): `.claude/skill-library/security/security-controls-mapping/SKILL.md`
-
 - Maps security controls to STRIDE categories, identifies authentication, authorization, validation, cryptography, logging controls and gaps
 
 **Threat Modeling** (Phase 3): `.claude/skill-library/security/threat-modeling/SKILL.md`
-
 - Combines STRIDE, PASTA, and DFD principles to identify threats, generate abuse cases, create attack trees, and produce risk-scored threat intelligence
 
-**Security Test Planning** (Phase 4): `.claude/skill-library/security/security-test-planning/SKILL.md`
+**CVSS Scoring** (Phase 3 Scoring): `.claude/skill-library/security/cvss-scoring/SKILL.md`
+- Scores threats with CVSS 3.1/4.0, guides version selection, Base metric assessment for theoretical threats, Temporal/Threat scoring, Environmental metrics from Phase 0 business context
 
+**Security Test Planning** (Phase 4): `.claude/skill-library/security/security-test-planning/SKILL.md`
 - Converts threat models into prioritized code review targets, SAST/DAST/SCA recommendations, and threat-driven manual test cases
+
+## Usage Examples
+
+### Example 1: Security Architect Designing Auth System
+
+```
+1. Invoke gateway: skill: "gateway-security"
+2. Load ALL ROLES skills:
+   Read(".claude/skill-library/security/defense-in-depth/SKILL.md")
+   Read(".claude/skill-library/security/auth-implementation-patterns/SKILL.md")
+3. Load THREAT MODELING skills for architecture:
+   Read(".claude/skill-library/security/business-context-discovery/SKILL.md")
+   Read(".claude/skill-library/security/threat-modeling/SKILL.md")
+   Read(".claude/skill-library/security/cvss-scoring/SKILL.md")
+4. Design auth architecture following patterns
+```
+
+### Example 2: Developer Implementing Secret Storage
+
+```
+1. Invoke gateway: skill: "gateway-security"
+2. Load ALL ROLES skills:
+   Read(".claude/skill-library/security/defense-in-depth/SKILL.md")
+   Read(".claude/skill-library/security/auth-implementation-patterns/SKILL.md")
+3. Load SECURITY IMPLEMENTATION skills:
+   Read(".claude/skill-library/security/secrets-management/SKILL.md")
+   Read(".claude/skill-library/security/discover-cryptography/SKILL.md")
+4. Implement secret storage following patterns
+```
 
 ## Quick Reference
 
-| Need                     | Skill Path                                                             |
-| ------------------------ | ---------------------------------------------------------------------- |
-| JWT/OAuth implementation | `.claude/skill-library/security/auth-implementation-patterns/SKILL.md` |
-| Testing access controls  | `.claude/skill-library/security/authorization-testing/SKILL.md`        |
-| Storing secrets securely | `.claude/skill-library/security/secrets-management/SKILL.md`           |
-| Finding hardcoded creds  | `.claude/skill-library/security/secret-scanner/SKILL.md`               |
-| Encryption/hashing       | `.claude/skill-library/security/discover-cryptography/SKILL.md`        |
-| Security architecture    | `.claude/skill-library/security/defense-in-depth/SKILL.md`             |
-| Threat modeling Phase 0  | `.claude/skill-library/security/business-context-discovery/SKILL.md`   |
-| Threat modeling Phase 1  | `.claude/skill-library/security/codebase-mapping/SKILL.md`             |
-| Threat modeling Phase 2  | `.claude/skill-library/security/security-controls-mapping/SKILL.md`    |
-| Threat modeling Phase 3  | `.claude/skill-library/security/threat-modeling/SKILL.md`              |
-| Threat modeling Phase 4  | `.claude/skill-library/security/security-test-planning/SKILL.md`       |
+**⭐ = Mandatory for ALL ROLES | 🛡️ = Mandatory for THREAT MODELING | 🔍 = Mandatory for SECURITY REVIEW | 🔒 = Mandatory for SECURITY IMPLEMENTATION**
 
-## Concrete Use Case Examples
-
-### Example 1: Adding JWT Authentication to an API
-
-**Scenario**: You need to implement JWT-based authentication for a new REST API endpoint.
-
-**Steps**:
-
-1. Load the auth skill: `Read(".claude/skill-library/security/auth-implementation-patterns/SKILL.md")`
-2. Follow the JWT token generation patterns
-3. Implement token validation middleware
-4. Add refresh token handling
-
-### Example 2: Rotating API Keys in Production
-
-**Scenario**: Your application has hardcoded API keys that need to be moved to secure storage.
-
-**Steps**:
-
-1. First, scan for secrets: `Read(".claude/skill-library/security/secret-scanner/SKILL.md")`
-2. Then implement secure storage: `Read(".claude/skill-library/security/secrets-management/SKILL.md")`
-3. Follow the rotation patterns for zero-downtime migration
-
-### Example 3: Full Threat Model for a New Feature
-
-**Scenario**: You're adding a payment processing feature and need a complete security assessment.
-
-**Steps**:
-
-1. Start with business context (Phase 0): `Read(".claude/skill-library/security/business-context-discovery/SKILL.md")`
-2. Map the codebase (Phase 1): `Read(".claude/skill-library/security/codebase-mapping/SKILL.md")`
-3. Identify existing controls (Phase 2): `Read(".claude/skill-library/security/security-controls-mapping/SKILL.md")`
-4. Model threats (Phase 3): `Read(".claude/skill-library/security/threat-modeling/SKILL.md")`
-5. Generate test plan (Phase 4): `Read(".claude/skill-library/security/security-test-planning/SKILL.md")`
-
-## Troubleshooting Guide
-
-**"Which skill for API key rotation?"**
-→ Use `secrets-management` for rotation patterns, then `secret-scanner` to verify no keys remain hardcoded
-
-**"Which skill for RBAC implementation?"**
-→ Use `auth-implementation-patterns` for role-based access control patterns
-
-**"Which skill for encrypting sensitive data at rest?"**
-→ Use `discover-cryptography` for encryption patterns and key management
-
-**"Which skill for security code review?"**
-→ Start with `defense-in-depth` for principles, then use `authorization-testing` for verification
-
-**"Which skill for compliance requirements?"**
-→ Use `business-context-discovery` (Phase 0) which includes compliance requirement mapping
-
-**"Which skill for identifying attack vectors?"**
-→ Use `threat-modeling` (Phase 3) which includes attack tree generation and STRIDE analysis
+| Need                          | Skill Path                                                                 |
+| ----------------------------- | -------------------------------------------------------------------------- |
+| ⭐ Defense patterns           | `.claude/skill-library/security/defense-in-depth/SKILL.md`                 |
+| ⭐ Auth/RBAC basics           | `.claude/skill-library/security/auth-implementation-patterns/SKILL.md`     |
+| 🛡️ Business context (Phase 0) | `.claude/skill-library/security/business-context-discovery/SKILL.md`       |
+| 🛡️ Codebase sizing (Phase 1.0)| `.claude/skill-library/security/codebase-sizing/SKILL.md`                  |
+| 🛡️ Codebase mapping (Phase 1) | `.claude/skill-library/security/codebase-mapping/SKILL.md`                 |
+| 🛡️ Controls mapping (Phase 2) | `.claude/skill-library/security/security-controls-mapping/SKILL.md`        |
+| 🛡️ Threat modeling (Phase 3)  | `.claude/skill-library/security/threat-modeling/SKILL.md`                  |
+| 🛡️ CVSS scoring (Phase 3)     | `.claude/skill-library/security/cvss-scoring/SKILL.md`                     |
+| 🛡️ Test planning (Phase 4)    | `.claude/skill-library/security/security-test-planning/SKILL.md`           |
+| 🔍 Authorization testing      | `.claude/skill-library/security/authorization-testing/SKILL.md`            |
+| 🔍 Secret scanner             | `.claude/skill-library/security/secret-scanner/SKILL.md`                   |
+| 🔒 Secrets management         | `.claude/skill-library/security/secrets-management/SKILL.md`               |
+| 🔒 Cryptography               | `.claude/skill-library/security/discover-cryptography/SKILL.md`            |
 
 ## When to Use This Gateway
 
 Use this gateway skill when:
-
+- Designing security architecture or threat modeling
 - Implementing authentication or authorization features
 - Working with secrets, credentials, or API keys
 - Adding encryption or cryptographic operations
 - Reviewing code for security vulnerabilities
-- Designing security architecture
-- Performing threat modeling on codebases
+- Planning security testing strategies
 
 For specific implementations, always load the individual skill rather than working from this gateway alone.
 
-## Security Review Workflow
+## Quick Decision Guide
 
-**You MUST use TodoWrite before starting to track all steps.** Security work involves multiple phases that must be completed systematically - mental tracking leads to missed steps.
+**What are you trying to do?**
 
-When doing security work, consider this sequence:
+```
+Security architecture? (Security Lead/Architect role)
+├── Starting threat model → business-context-discovery 🛡️
+├── Understanding codebase → codebase-sizing 🛡️ + codebase-mapping 🛡️
+├── Mapping existing controls → security-controls-mapping 🛡️
+├── Identifying threats → threat-modeling 🛡️ + cvss-scoring 🛡️
+├── Planning security tests → security-test-planning 🛡️
+└── General security design → defense-in-depth ⭐
 
-1. **Threat Model Phase 0**: Start with `business-context-discovery` to understand business purpose, crown jewels, threat actors, and compliance requirements
-2. **Threat Model Phase 1**: Use `codebase-mapping` to understand attack surface and technical architecture
-3. **Threat Model Phase 2**: Use `security-controls-mapping` to identify existing controls and gaps
-4. **Threat Model Phase 3**: Use `threat-modeling` to identify threats and abuse cases
-5. **Threat Model Phase 4**: Use `security-test-planning` to generate prioritized test plans
-6. **Architecture**: Use `defense-in-depth` for design principles
-7. **Auth**: Use `auth-implementation-patterns` for identity management
-8. **Secrets**: Apply `secrets-management` for credential handling
-9. **Validation**: Run `authorization-testing` to verify controls
-10. **Scan**: Use `secret-scanner` before committing code
+Implementing security features? (Developer role)
+├── Storing secrets → secrets-management 🔒
+├── Encryption/hashing → discover-cryptography 🔒
+├── Authentication → auth-implementation-patterns ⭐
+└── Authorization → auth-implementation-patterns ⭐
 
-**Why TodoWrite is mandatory**: This 10-step workflow is complex. Skipping steps (especially Phase 0 business context or Phase 4 test planning) leads to incomplete security assessments. Track each phase explicitly.
+Reviewing for security? (Security Reviewer role)
+├── Testing access controls → authorization-testing 🔍
+├── Scanning for secrets → secret-scanner 🔍
+└── Understanding auth → auth-implementation-patterns ⭐
+
+General security knowledge?
+└── Security principles → defense-in-depth ⭐
+```
+
+## Troubleshooting
+
+### "Skill not found" or "Cannot read file"
+
+**Problem:** Read tool returns error about missing file.
+
+**Solutions:**
+
+1. **Verify path exactly** - Copy the full path from this gateway
+2. **Check nested folders** - Paths have `/security/` folder: `.claude/skill-library/security/...`
+3. **Don't shorten paths** - Must include all folders
+4. **Case-sensitive** - Match capitalization exactly
+
+### "Which skill should I use?"
+
+**Problem:** Multiple skills seem relevant.
+
+**Solutions:**
+
+1. **Start with mandatory** - Load ALL ROLES skills first
+2. **Follow phases** - Threat modeling has sequential phases (0 → 1.0 → 1 → 2 → 3 → 4)
+3. **Check Quick Reference table** - Maps common needs to skills
+4. **Use decision tree** - Follow the Quick Decision Guide above
+
+### "Skill doesn't cover my use case"
+
+**Problem:** Loaded skill doesn't address your specific scenario.
+
+**Solutions:**
+
+1. **Check related skills** - Skills often reference other skills for advanced cases
+2. **Combine skills** - Load multiple complementary skills
+3. **Try Defense in Depth** - Applies broadly to security architecture
+
+### "I'm still confused about core vs library"
+
+**Quick reference:**
+
+- **Core skills** (~35): In `.claude/skills/` → Use `skill: "name"`
+- **Library skills** (~120): In `.claude/skill-library/` → Use `Read("full/path")`
+- **This gateway**: Core skill that helps you find library skills
+- **Rule**: If path contains `skill-library`, you MUST use Read tool
 
 ## Related Gateways
 
-- **gateway-backend**: Backend patterns (includes some security)
-- **gateway-testing**: Testing patterns (for security test automation)
+Other domain gateways you can invoke via Skill tool:
+
+| Gateway      | Invoke With                     | Use For                                           |
+| ------------ | ------------------------------- | ------------------------------------------------- |
+| Frontend     | `skill: "gateway-frontend"`     | React, TypeScript, UI components                  |
+| Backend      | `skill: "gateway-backend"`      | Go, AWS Lambda, DynamoDB, Infrastructure          |
+| Testing      | `skill: "gateway-testing"`      | API tests, E2E, Mocking, Performance              |
+| MCP Tools    | `skill: "gateway-mcp-tools"`    | Linear, Praetorian CLI, Context7, Chrome DevTools |
+| Integrations | `skill: "gateway-integrations"` | Third-party APIs, Jira, HackerOne, MS Defender    |

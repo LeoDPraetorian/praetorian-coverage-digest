@@ -23,7 +23,7 @@
 - **Why Critical** - Core skills in frontmatter require Skill tool to invoke via `skill: "name"` syntax
 - **Gold Standard** - Reference to frontend-developer.md line 5 as correct pattern
 - **Examples** - CORRECT vs BROKEN patterns showing tools/skills relationship
-- **Impact Documentation** - Lists 4 currently broken agents (backend-architect, security-architect, backend-developer, backend-reviewer)
+- **Impact Documentation** - Lists 4 currently broken agents (backend-architect, security-lead, backend-developer, backend-reviewer)
 - **Validation Reference** - Points to Phase 3 Tool Validation in auditing-agents workflow
 - **Quick Validation Checklist** - Added "Skill tool: Present when skills: field has values (Section 12)" at line 312
 

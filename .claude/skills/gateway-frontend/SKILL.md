@@ -66,21 +66,145 @@ skill: "gateway-frontend"; // Core skills work with Skill tool
 
 </EXTREMELY_IMPORTANT>
 
-## Mandatory for All Frontend Work
+## Mandatory Skills by Role
 
-**Regardless of task type, you MUST Read these skills before implementing any frontend code.**
+**Load mandatory skills based on your role before starting work.**
 
-| SkilL             | Path                                                                                      | Why Mandatory                                                                                            |
-| ----------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Performance       | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`        | React 19 paradigm - write clean code, let compiler optimize. Covers virtualization, concurrent features. |
-| Info Architecture | `.claude/skill-library/architecture/frontend/enforcing-information-architecture/SKILL.md` | File structure, import order, file length limits, component organization.                                |
-| Brand             | `.claude/skill-library/development/frontend/chariot-brand-guidelines/SKILL.md`            | Colors, typography, theme classes (never hardcode colors).                                               |
-| Modern React      | `.claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md`         | React 19 patterns - useOptimistic, Suspense boundaries, concurrent features, compiler compatibility.     |
+### Role Filter
 
-**Workflow:**
+| Your Role              | Mandatory Sections                                                        |
+|------------------------|---------------------------------------------------------------------------|
+| **Developer**          | ALL ROLES + UI STYLING                                                    |
+| **Lead/Architect**     | ALL ROLES + UI STYLING + ARCHITECTURE PATTERNS                            |
+| **E2E Tester**         | ALL ROLES + E2E TESTING (also invoke `gateway-testing`)                   |
+| **Unit Tester**        | ALL ROLES + UNIT TESTING (also invoke `gateway-testing`)                  |
+| **Integration Tester** | ALL ROLES + INTEGRATION TESTING (also invoke `gateway-testing`)           |
+| **Reviewer**           | ALL ROLES + UI STYLING                                                    |
+| **Security**           | ALL ROLES (security-specific skills come from `gateway-security`)         |
+| **Designer**           | ALL ROLES + UI STYLING                                                    |
 
-1. Read all four mandatory skills above
-2. Then load task-specific skills from the routing tables below (forms, state management, testing, etc.)
+**Note:** All skills remain available to any role via the routing tables below. The table shows what you MUST load upfront—not what you're limited to.
+
+**For Testers:** You MUST also invoke `gateway-testing` for general testing patterns (anti-patterns, behavior testing, condition-based waiting).
+
+---
+
+### ALL ROLES (Everyone Must Read)
+
+**1. React 19 Conventions (BLOCKING)**
+
+`.claude/skill-library/development/frontend/enforcing-react-19-conventions/SKILL.md`
+
+BLOCKS PRs for anti-patterns: React.FC, forwardRef, useEffect setState, Zustand without selectors, data fetching in useEffect. Provides reviewer checklist. **Essential for understanding what patterns are valid/invalid.**
+
+**2. Modern React Patterns**
+
+`.claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md`
+
+React 19 patterns - useOptimistic, Suspense boundaries, concurrent features, compiler compatibility. **Required to understand what you're building/testing/reviewing.**
+
+**3. Performance Optimization**
+
+`.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`
+
+React 19 paradigm - write clean code, let compiler optimize. Covers virtualization, concurrent features. **Applies to all roles - don't introduce performance regressions.**
+
+**4. Information Architecture**
+
+`.claude/skill-library/architecture/frontend/enforcing-information-architecture/SKILL.md`
+
+File structure, import order, file length limits, component organization. **Only needed when creating/modifying production files.**
+
+---
+
+### UI STYLING (Mandatory: Developer, Lead, Reviewer, Designer)
+
+**5. Brand Guidelines**
+
+`.claude/skill-library/development/frontend/chariot-brand-guidelines/SKILL.md`
+
+Colors, typography, theme classes (never hardcode colors). **Required when building or reviewing UI. Testers/Security can load if inspecting styling issues.**
+
+---
+
+### ARCHITECTURE PATTERNS (Mandatory: Lead/Architect)
+
+**6. Architecting State Management**
+
+`.claude/skill-library/architecture/frontend/architecting-state-management/SKILL.md`
+
+Decision framework for selecting state management approach (TanStack Query vs Context vs Zustand vs useReducer). Four-tier architecture, trade-off analysis, anti-patterns. **Required for architects creating implementation plans. Developers/Reviewers can load when working with complex state decisions.**
+
+**7. Integrating TanStack Components**
+
+`.claude/skill-library/architecture/frontend/integrating-tanstack-components/SKILL.md`
+
+Architecture patterns for integrating TanStack Router + Query + Table + Virtual together. Data flow patterns, cache key strategies, virtualization with tables. **Required for architects designing multi-library features. Developers can load when implementing complex integrations.**
+
+---
+
+### E2E TESTING (Mandatory: E2E Tester)
+
+**8. Frontend E2E Testing Patterns**
+
+`.claude/skill-library/testing/frontend/frontend-e2e-testing-patterns/SKILL.md`
+
+Playwright patterns for end-to-end testing - page objects, selectors, fixtures, authentication flows, CI configuration. **Required for E2E testers. Developers can load when writing E2E tests for their features.**
+
+**9. Testing Security with E2E Tests**
+
+`.claude/skill-library/testing/frontend/testing-security-with-e2e-tests/SKILL.md`
+
+Security-focused E2E testing - XSS prevention, CSRF protection, authentication flows, authorization boundaries, input validation. **Required for E2E testers to catch security regressions.**
+
+---
+
+### UNIT TESTING (Mandatory: Unit Tester)
+
+**10. Frontend Testing Patterns**
+
+`.claude/skill-library/testing/frontend/frontend-testing-patterns/SKILL.md`
+
+React Testing Library patterns for component testing - render utilities, user events, async testing, accessibility queries. **Required for unit testers. Developers can load when writing component tests.**
+
+**11. Frontend Interactive Form Testing**
+
+`.claude/skill-library/testing/frontend/frontend-interactive-form-testing/SKILL.md`
+
+Form testing patterns - validation testing, user interaction simulation, error state handling, submission flows. **Required for testing form-heavy features.**
+
+---
+
+### INTEGRATION TESTING (Mandatory: Integration Tester)
+
+**12. React Query Cache Debugging**
+
+`.claude/skill-library/testing/frontend/react-query-cache-debugging/SKILL.md`
+
+TanStack Query testing and debugging - cache state investigation, invalidation patterns, optimistic update testing. **Required for integration testers working with server state.**
+
+**13. Creating Mocks (via gateway-testing)**
+
+For MSW handlers and API mocking patterns, invoke `gateway-testing` and read:
+`.claude/skill-library/testing/creating-mocks/SKILL.md`
+
+Mock service worker setup, request handlers, response factories. **Required for integration testers mocking API boundaries.**
+
+---
+
+### Workflow
+
+1. Identify your role from the Role Filter table above
+2. Read ALL ROLES skills (4 skills)
+3. Based on your role, also read:
+   - Developer/Reviewer/Designer: UI STYLING (1 skill)
+   - Lead/Architect: UI STYLING + ARCHITECTURE PATTERNS (3 skills)
+   - E2E Tester: E2E TESTING (2 skills) + invoke `gateway-testing`
+   - Unit Tester: UNIT TESTING (2 skills) + invoke `gateway-testing`
+   - Integration Tester: INTEGRATION TESTING (2 skills) + invoke `gateway-testing`
+4. Then load task-specific skills from the routing tables below
+
+**Remember:** These are mandatory minimums. Any role can load any skill from the routing tables when relevant to their task.
 
 ## How to Use
 
@@ -188,29 +312,13 @@ skill: "gateway-frontend"   # React-specific patterns (this gateway)
 
 ## Patterns & Architecture
 
+**Mandatory skills (already listed above):** React 19 Conventions, Modern React Patterns, Performance Optimization, Information Architecture, Brand Guidelines - see "Mandatory Skills by Role" section.
+
+**Additional pattern skills:**
+
 **Adhering to UI/UX Laws**: `.claude/skill-library/quality/adhering-to-uiux-laws/SKILL.md`
 
 - Applies 31 cognitive psychology and UX laws (Hick's, Fitts', Miller's, Gestalt, Nielsen's heuristics) to interface design
-
-**Chariot Brand Guidelines**: `.claude/skill-library/development/frontend/chariot-brand-guidelines/SKILL.md`
-
-- Chariot-specific UI/UX patterns and brand standards
-
-**Enforcing Information Architecture**: `.claude/skill-library/architecture/frontend/enforcing-information-architecture/SKILL.md`
-
-- Application structure and navigation patterns
-
-**Frontend Performance Optimization**: `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`
-
-- Performance tuning, lazy loading, and optimization techniques
-
-**Frontend React Modernization**: `.claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md`
-
-- Upgrading React applications and modern patterns
-
-**Frontend React 19 Conventions**: `.claude/skill-library/development/frontend/enforcing-react-19-conventions/SKILL.md`
-
-- React 19 code review conventions - enforces required patterns (function declarations, TanStack Query, Zustand selectors), flags anti-patterns (useEffect setState, React.FC, forwardRef, unnecessary memoization), provides BLOCK/REQUEST CHANGE/VERIFY PRESENT reviewer checklist
 
 **Securing React Implementations**: `.claude/skill-library/development/frontend/securing-react-implementations/SKILL.md`
 
@@ -269,25 +377,35 @@ These foundational skills apply across all frontend development:
 
 ## Quick Reference
 
-| Need                      | Skill Path                                                                             |
-| ------------------------- | -------------------------------------------------------------------------------------- |
-| Component migration       | `.claude/skill-library/development/frontend/migrating-chariot-ui-components/SKILL.md`  |
-| Server state (API calls)  | `.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md`             |
-| TanStack integration      | `.claude/skill-library/architecture/frontend/integrating-tanstack-components/SKILL.md` |
-| Client state (complex)    | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md`   |
-| Shared state (theme/auth) | `.claude/skill-library/development/frontend/using-context-api/SKILL.md`                |
-| React Query cache issues  | `.claude/skill-library/testing/frontend/react-query-cache-debugging/SKILL.md`          |
-| Browser console debugging | `.claude/skill-library/testing/frontend/debugging-chrome-console/SKILL.md`             |
-| E2E testing               | `.claude/skill-library/testing/frontend/frontend-e2e-testing-patterns/SKILL.md`        |
-| E2E security testing      | `.claude/skill-library/testing/frontend/testing-security-with-e2e-tests/SKILL.md`      |
-| Form handling             | `.claude/skill-library/development/frontend/implementing-react-hook-form-zod/SKILL.md` |
-| Performance issues        | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`     |
-| UI animations             | `.claude/skill-library/development/frontend/frontend-animation-designer/SKILL.md`      |
-| Shadcn components         | `.claude/skill-library/development/frontend/using-shadcn-ui/SKILL.md`                  |
-| UI/UX design laws         | `.claude/skill-library/quality/adhering-to-uiux-laws/SKILL.md`                         |
-| Code quality (linting)    | `.claude/skill-library/development/frontend/using-eslint/SKILL.md`                     |
-| Code complexity metrics   | `.claude/skill-library/development/analyzing-cyclomatic-complexity/SKILL.md`           |
-| React 19 code review      | `.claude/skill-library/development/frontend/enforcing-react-19-conventions/SKILL.md`   |
+**⭐ = Mandatory for ALL ROLES | 🎨 = Mandatory for UI STYLING | 🏗️ = Mandatory for ARCHITECTURE PATTERNS**
+**🧪 = Mandatory for E2E TESTING | 🔬 = Mandatory for UNIT TESTING | 🔗 = Mandatory for INTEGRATION TESTING**
+
+| Need                      | Skill Path                                                                                |
+| ------------------------- | ------------------------------------------------------------------------------------------|
+| ⭐ React 19 conventions   | `.claude/skill-library/development/frontend/enforcing-react-19-conventions/SKILL.md`      |
+| ⭐ Modern React patterns  | `.claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md`         |
+| ⭐ Performance            | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`        |
+| ⭐ Info architecture      | `.claude/skill-library/architecture/frontend/enforcing-information-architecture/SKILL.md` |
+| 🎨 Brand guidelines       | `.claude/skill-library/development/frontend/chariot-brand-guidelines/SKILL.md`            |
+| 🏗️ State management arch  | `.claude/skill-library/architecture/frontend/architecting-state-management/SKILL.md`      |
+| 🏗️ TanStack integration   | `.claude/skill-library/architecture/frontend/integrating-tanstack-components/SKILL.md`    |
+| 🧪 E2E testing             | `.claude/skill-library/testing/frontend/frontend-e2e-testing-patterns/SKILL.md`           |
+| 🧪 E2E security testing    | `.claude/skill-library/testing/frontend/testing-security-with-e2e-tests/SKILL.md`         |
+| 🔬 Component testing       | `.claude/skill-library/testing/frontend/frontend-testing-patterns/SKILL.md`               |
+| 🔬 Form testing            | `.claude/skill-library/testing/frontend/frontend-interactive-form-testing/SKILL.md`       |
+| 🔗 Query cache debugging   | `.claude/skill-library/testing/frontend/react-query-cache-debugging/SKILL.md`             |
+| Component migration       | `.claude/skill-library/development/frontend/migrating-chariot-ui-components/SKILL.md`     |
+| Server state (API calls)  | `.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md`                |
+| Client state (complex)    | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md`      |
+| Shared state (theme/auth) | `.claude/skill-library/development/frontend/using-context-api/SKILL.md`                   |
+| Browser console debugging | `.claude/skill-library/testing/frontend/debugging-chrome-console/SKILL.md`                |
+| Form handling             | `.claude/skill-library/development/frontend/implementing-react-hook-form-zod/SKILL.md`    |
+| UI animations             | `.claude/skill-library/development/frontend/frontend-animation-designer/SKILL.md`         |
+| Shadcn components         | `.claude/skill-library/development/frontend/using-shadcn-ui/SKILL.md`                     |
+| UI/UX design laws         | `.claude/skill-library/quality/adhering-to-uiux-laws/SKILL.md`                            |
+| Code quality (linting)    | `.claude/skill-library/development/frontend/using-eslint/SKILL.md`                        |
+| Code complexity metrics   | `.claude/skill-library/development/analyzing-cyclomatic-complexity/SKILL.md`              |
+| Security patterns         | `.claude/skill-library/development/frontend/securing-react-implementations/SKILL.md`      |
 
 ## When to Use This Gateway
 
@@ -305,6 +423,12 @@ For specific implementations, always load the individual skill rather than worki
 **What are you trying to do?**
 
 ```
+Architecting a feature? (Lead/Architect role)
+├── State management decisions → architecting-state-management 🏗️
+├── tanstack component integration → integrating-tanstack-components 🏗️
+├── File organization → enforcing-information-architecture
+└── Component hierarchy → (use brainstorming + writing-plans core skills)
+
 Building UI components?
 ├── Using @praetorian-chariot/ui → migrating-chariot-ui-components (migrate to local first!)
 ├── Using Shadcn/UI library → using-shadcn-ui
@@ -322,10 +446,16 @@ Managing data/state?
 Working with forms?
 └── Form + validation → implementing-react-hook-form-zod
 
-Testing?
-├── E2E/Playwright tests → frontend-e2e-testing-patterns
-├── Component tests → frontend-testing-patterns
-├── Form interaction tests → frontend-interactive-form-testing
+Testing? (Also invoke gateway-testing for general patterns)
+├── E2E Testing (Playwright)
+│   ├── Page objects, fixtures → frontend-e2e-testing-patterns 🧪
+│   └── Security E2E → testing-security-with-e2e-tests 🧪
+├── Unit Testing (RTL)
+│   ├── Component tests → frontend-testing-patterns 🔬
+│   └── Form interaction → frontend-interactive-form-testing 🔬
+├── Integration Testing
+│   ├── Query cache → react-query-cache-debugging 🔗
+│   └── API mocking → creating-mocks (via gateway-testing)
 └── Browser debugging → debugging-chrome-console
 
 Performance issues?

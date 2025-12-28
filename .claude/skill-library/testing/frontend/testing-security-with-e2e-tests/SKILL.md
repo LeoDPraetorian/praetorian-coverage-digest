@@ -260,6 +260,6 @@ See [examples/](examples/) for complete security test implementations:
 ## Related Skills
 
 - `frontend-e2e-test-engineer` - General E2E testing patterns
-- `frontend-security-reviewer` - Frontend security code review
-- `backend-security-reviewer` - Backend security validation
+- `frontend-security` - Frontend security code review
+- `backend-security` - Backend security validation
 - `security-test-planning` - Security test planning and prioritization

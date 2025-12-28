@@ -1,55 +1,55 @@
 ---
 name: orchestrating-feature-development
-description: Use when implementing complete features - coordinates brainstorming, planning, architecture, implementation, and testing phases with agent delegation
+description: Use when implementing complete features - coordinates brainstorming, planning, architecture, implementation, review, and testing phases with parallel agent execution and feedback loops
 allowed-tools: Skill, Task, TodoWrite, Read, Write, Bash, AskUserQuestion
 ---
 
 # Feature Development Orchestration
 
-Systematically guides feature development through five phases with quality gates, progress persistence, and structured agent handoffs.
+Systematically guides feature development through eight phases with parallel agent execution, explicit feedback loops, and structured feature directories.
 
 ## When to Use This Skill
 
 Use this skill when you need to:
 
 - Implement a complete feature from concept to tested code
-- Ensure systematic quality assurance through all phases
-- Coordinate multiple specialized agents (architects, developers, testers)
-- Maintain progress across multiple sessions
-- Get human approval at key checkpoints
+- Coordinate multiple specialized agents (leads, developers, reviewers, testers)
+- Ensure quality through parallel review (code + security)
+- Maintain progress with structured handoffs and feedback loops
 
 **Symptoms this skill addresses:**
 
 - Manual orchestration of skills and agents
+- Sequential execution when parallel is possible
+- Missing security review in architecture
+- No feedback loops before escalation
 - Lost context between sessions
-- Skipped phases or quality gates
-- No structured handoffs between agents
-- Mental progress tracking instead of persistent state
 
-## Quick Start
+## Quick Reference
 
-```
-User: "Implement user dashboard with metrics display"
-
-Skill workflow:
-1. Brainstorm design → Human checkpoint
-2. Write implementation plan → Human checkpoint
-3. Task(frontend-architect) + Task(frontend-reviewer) in parallel → Architecture validation
-4. Task(frontend-developer) → Implementation
-5. Task(frontend-unit-test-engineer) → Tests
-```
+| Phase | Agents | Execution | Checkpoint |
+|-------|--------|-----------|------------|
+| 0: Setup | - | Create feature directory | - |
+| 1: Brainstorming | brainstorming skill | Sequential | 🛑 Human |
+| 2: Planning | writing-plans skill | Sequential | 🛑 Human |
+| 3: Architecture | frontend-lead + security-lead | **PARALLEL** | 🛑 Human |
+| 4: Implementation | frontend-developer | Sequential | - |
+| 5: Code Review | frontend-reviewer + frontend-security | **PARALLEL** | 1 retry → escalate |
+| 6: Testing | frontend-tester (unit + integration + e2e) | **PARALLEL** | - |
+| 7: Test Assessment | test-assessor | Sequential | 1 retry → escalate |
+| 8: Completion | - | Final verification | - |
 
 ## Table of Contents
-
-This skill coordinates five phases with detailed workflows in references:
 
 ### Core Phases
 
 - **[Phase 1: Brainstorming](references/phase-1-brainstorming.md)** - Design refinement with human-in-loop
 - **[Phase 2: Planning](references/phase-2-planning.md)** - Detailed implementation plan creation
-- **[Phase 3: Architecture](references/phase-3-architecture.md)** - Design decisions via architect agents
+- **[Phase 3: Architecture](references/phase-3-architecture.md)** - Parallel leads + security assessment
 - **[Phase 4: Implementation](references/phase-4-implementation.md)** - Code development via developer agents
-- **[Phase 5: Testing](references/phase-5-testing.md)** - Test creation via test engineer agents
+- **[Phase 5: Code Review](references/phase-5-code-review.md)** - Parallel reviewers with feedback loop
+- **[Phase 6: Testing](references/phase-6-testing.md)** - Parallel test modes (unit + integration + e2e)
+- **[Phase 7: Test Assessment](references/phase-7-test-assessment.md)** - Quality gate with feedback loop
 
 ### Supporting Documentation
 
@@ -61,165 +61,221 @@ This skill coordinates five phases with detailed workflows in references:
 
 **CRITICAL: Use TodoWrite to track all phases.** Do NOT track mentally.
 
-### Phase Sequence
-
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  Phase 1: Brainstorming                                     │
-│  Tool: Skill("brainstorming")                               │
-│  Exit: Human approves design                                │
-└─────────────────┬───────────────────────────────────────────┘
-                  │ Checkpoint
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 0: Setup                                                          │
+│  Create: .claude/features/YYYY-MM-DD-{semantic-name}/                    │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
                   ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Phase 2: Planning                                          │
-│  Tool: Skill("writing-plans")                               │
-│  Exit: Plan saved to .claude/features/{id}/plan.md          │
-└─────────────────┬───────────────────────────────────────────┘
-                  │ Checkpoint
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 1: Brainstorming                                                  │
+│  Tool: Skill("brainstorming")                                            │
+│  Output: design.md                                                       │
+│  🛑 Human Checkpoint                                                     │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
                   ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Phase 3: Dual-Agent Architecture Review                    │
-│  Tool: Task("*-architect") + Task("*-reviewer") parallel    │
-│  Exit: Architecture validated, conflicts resolved           │
-└─────────────────┬───────────────────────────────────────────┘
-                  │ (No checkpoint - automated with user input if conflicts)
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 2: Planning                                                       │
+│  Tool: Skill("writing-plans")                                            │
+│  Output: plan.md                                                         │
+│  🛑 Human Checkpoint                                                     │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
                   ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Phase 4: Implementation                                    │
-│  Tool: Task(subagent_type: "*-developer")                   │
-│  Exit: Code implemented, builds passing                     │
-└─────────────────┬───────────────────────────────────────────┘
-                  │ (No checkpoint - automated)
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 3: Architecture (PARALLEL)                                        │
+│  Agents: frontend-lead + security-lead (single Task message)             │
+│  Output: architecture.md, security-assessment.md                         │
+│  🛑 Human Checkpoint                                                     │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
                   ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Phase 5: Testing                                           │
-│  Tool: Task(subagent_type: "*-test-engineer")               │
-│  Exit: Tests passing, coverage met                          │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 4: Implementation                                                 │
+│  Agent: frontend-developer (+ backend-developer if full-stack)           │
+│  Input: architecture.md + security-assessment.md                         │
+│  Output: Code files + implementation-log.md                              │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 5: Code Review (PARALLEL, MAX 1 RETRY)                            │
+│  Agents: frontend-reviewer + frontend-security                  │
+│  Output: review.md, security-review.md                                   │
+│  Loop: If CHANGES_REQUESTED → developer fixes → re-review ONCE           │
+│  Escalate: If still failing → AskUserQuestion                            │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 6: Testing (PARALLEL - all 3 modes)                               │
+│  Agents: frontend-tester × 3 (unit, integration, e2e)                    │
+│  Output: test files + test-summary-*.md                                  │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 7: Test Assessment (MAX 1 RETRY)                                  │
+│  Agent: test-assessor                                                    │
+│  Output: test-assessment.md                                              │
+│  Loop: If quality < 70 → tester fixes → re-assess ONCE                   │
+│  Escalate: If still failing → AskUserQuestion                            │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 8: Completion                                                     │
+│  Final verification: npm run build, npx tsc --noEmit, npm test           │
+│  Update metadata.json status: "complete"                                 │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Initial Setup
+## Phase 0: Setup
 
-1. **Create TodoWrite checklist** for all 5 phases
-2. **Create feature workspace**:
-   ```bash
-   mkdir -p .claude/features/{feature-id}
-   ```
-3. **Initialize progress file**:
-   ```json
-   {
-     "feature_id": "{feature-id}",
-     "created": "2024-12-13",
-     "current_phase": "brainstorming",
-     "phases": {
-       "brainstorming": { "status": "in_progress" },
-       "planning": { "status": "pending" },
-       "architecture": { "status": "pending" },
-       "implementation": { "status": "pending" },
-       "testing": { "status": "pending" }
-     }
-   }
-   ```
+Create feature workspace with semantic naming:
 
-See [Progress Persistence](references/progress-persistence.md) for complete schema.
+```bash
+FEATURE_DATE=$(date +%Y-%m-%d)
+FEATURE_NAME="<semantic-abbreviation>"  # e.g., "asset-filtering"
+FEATURE_ID="${FEATURE_DATE}-${FEATURE_NAME}"
+FEATURE_DIR=".claude/features/${FEATURE_ID}"
 
-## Critical Rules
+mkdir -p "${FEATURE_DIR}"
+```
 
-### Must Use TodoWrite
+**Semantic naming rules:**
+- 2-4 words describing the feature, lowercase with hyphens
+- Examples: `asset-filtering`, `dark-mode-toggle`, `settings-refactor`
 
-**You MUST create TodoWrite todos for all phases.** Mental tracking leads to skipped steps.
-
-### Human Checkpoints Are Mandatory
-
-**After brainstorming and planning phases**, you MUST:
-
-1. Use AskUserQuestion to confirm approval
-2. Do NOT proceed to next phase without approval
-3. Record approval in progress file
-
-### Agent Handoffs Must Be Structured
-
-All Task agents must return JSON with:
-
+**Initialize metadata.json:**
 ```json
 {
-  "status": "complete|blocked|needs_review",
-  "phase": "architecture|implementation|testing",
-  "summary": "What was accomplished",
-  "files_modified": ["paths"],
-  "handoff": {
-    "next_phase": "phase-name",
-    "context": "Key decisions for next phase"
+  "feature_id": "2025-12-28-asset-filtering",
+  "description": "Original feature description",
+  "created": "2025-12-28T10:00:00Z",
+  "status": "in_progress",
+  "current_phase": "brainstorming",
+  "phases": {
+    "brainstorming": { "status": "in_progress" },
+    "planning": { "status": "pending" },
+    "architecture": { "status": "pending" },
+    "implementation": { "status": "pending" },
+    "review": { "status": "pending", "retry_count": 0 },
+    "testing": { "status": "pending" },
+    "assessment": { "status": "pending", "retry_count": 0 },
+    "completion": { "status": "pending" }
   }
 }
 ```
 
-See [Agent Handoffs](references/agent-handoffs.md) for complete format.
+## Critical Rules
 
-### Resume Capability Required
+### Parallel Execution is MANDATORY
 
-**Every phase must save progress** to `.claude/features/{feature-id}/progress.json`.
+**Spawn independent agents in a SINGLE message:**
 
-On resume:
+```
+// Good - all in one message
+Task("frontend-lead", ...)
+Task("security-lead", ...)
+```
 
-1. Read progress file
-2. Identify current phase from `current_phase` field
-3. Continue from that phase
-4. Do NOT restart from beginning
+**Do NOT spawn sequentially when parallel is possible:**
 
-## Best Practices
+```
+// Bad - wastes time
+await Task("frontend-lead", ...)
+await Task("security-lead", ...)
+```
 
-✅ **Do:**
+### Human Checkpoints are MANDATORY
 
-- Create TodoWrite todos at start
-- Save progress after each phase
-- Use AskUserQuestion for human checkpoints
-- Spawn agents in parallel when tasks are independent
-- Read existing code before architecture phase
+After phases 1, 2, and 3, you MUST:
+1. Use AskUserQuestion to confirm approval
+2. Do NOT proceed without approval
+3. Record approval in metadata.json
 
-❌ **Don't:**
+### Feedback Loops: MAX 1 Retry
 
-- Skip human checkpoints
-- Track progress mentally
-- Spawn all agents at once (sequence matters)
-- Proceed without structured handoffs
-- Ignore blocked status from agents
+After ONE retry cycle, escalate to user via AskUserQuestion. Do NOT loop indefinitely.
 
-## Determining Agent Types
+### Agent Handoffs Must Be Structured
 
-| Feature Domain | Architect          | Reviewer          | Developer          | Tester                      |
-| -------------- | ------------------ | ----------------- | ------------------ | --------------------------- |
-| React UI       | frontend-architect | frontend-reviewer | frontend-developer | frontend-unit-test-engineer |
-| Go API         | backend-architect  | backend-reviewer  | backend-developer  | backend-tester              |
-| Full-stack     | Both architects    | Both reviewers    | Both developers    | Both test engineers         |
+All Task agents must return JSON with:
+```json
+{
+  "status": "complete|blocked|needs_review",
+  "summary": "What was accomplished",
+  "files_modified": ["paths"],
+  "verdict": "APPROVED|CHANGES_REQUESTED|BLOCKED",
+  "handoff": {
+    "recommended_agent": "next-agent",
+    "context": "Key info for next phase"
+  }
+}
+```
 
-**Rule**: Match agents to feature domain, not codebase composition.
+## Agent Matrix by Feature Type
 
-**Phase 3 Note**: Always spawn architect AND reviewer in parallel for quality assurance.
+| Type | Leads (Phase 3) | Developers (Phase 4) | Reviewers (Phase 5) | Testers (Phase 6) |
+|------|-----------------|----------------------|---------------------|-------------------|
+| Frontend | frontend-lead + security-lead | frontend-developer | frontend-reviewer + frontend-security | frontend-tester ×3 |
+| Backend | backend-lead + security-lead | backend-developer | backend-reviewer + backend-security | backend-tester ×3 |
+| Full-stack | All 4 leads | Both developers | All 4 reviewers | All 6 testers |
+
+**Rule**: Match agents to feature domain. Full-stack features spawn ALL agents in parallel.
+
+## Feature Directory Structure
+
+```
+.claude/features/YYYY-MM-DD-{semantic-name}/
+├── metadata.json              # Status, timestamps, phase tracking
+├── design.md                  # Phase 1: brainstorming output
+├── plan.md                    # Phase 2: planning output
+├── architecture.md            # Phase 3: frontend-lead output
+├── security-assessment.md     # Phase 3: security-lead output
+├── backend-architecture.md    # Phase 3: backend-lead output (if applicable)
+├── implementation-log.md      # Phase 4: developer output
+├── review.md                  # Phase 5: frontend-reviewer output
+├── security-review.md         # Phase 5: security-reviewer output
+├── test-summary-unit.md       # Phase 6: unit test output
+├── test-summary-integration.md # Phase 6: integration test output
+├── test-summary-e2e.md        # Phase 6: e2e test output
+└── test-assessment.md         # Phase 7: test-assessor output
+```
 
 ## Troubleshooting
 
 ### "I lost context mid-workflow"
 
-**Solution**: Read `.claude/features/{feature-id}/progress.json` and continue from `current_phase`.
+**Solution**: Read `.claude/features/{feature-id}/metadata.json` and continue from `current_phase`.
 
-### "Agent returned blocked status"
+### "Reviewer returned CHANGES_REQUESTED twice"
 
-**Solution**:
+**Solution**: After 1 retry, escalate to user:
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "Reviews still failing after retry. How to proceed?",
+    header: "Review",
+    options: [
+      { label: "Show me the issues", description: "Review feedback details" },
+      { label: "Proceed anyway", description: "Accept current state" },
+      { label: "Cancel feature", description: "Stop development" }
+    ]
+  }]
+})
+```
 
-1. Read agent's `handoff.context` for details
-2. Use AskUserQuestion to get user input
-3. Update plan/architecture as needed
-4. Re-run blocked phase
+### "How do I handle full-stack features?"
 
-### "How do I handle parallel work?"
-
-**Solution**:
-
-- Frontend + Backend implementation → Spawn in parallel
-- Architecture → Implementation → Sequence required
-- Unit tests + E2E tests → Spawn in parallel
+**Solution**: Spawn ALL domain agents in parallel:
+- Phase 3: frontend-lead + backend-lead + security-lead (3 agents)
+- Phase 4: frontend-developer + backend-developer (2 agents)
+- Phase 5: All 4 reviewers in parallel
+- Phase 6: All 6 testers in parallel
 
 See [Troubleshooting](references/troubleshooting.md) for more scenarios.
 
@@ -230,12 +286,14 @@ See [Troubleshooting](references/troubleshooting.md) for more scenarios.
 - `executing-plans` - Alternative pattern for batch execution
 - `persisting-progress-across-sessions` - Cross-session state management
 - `orchestrating-multi-agent-workflows` - Multi-agent coordination patterns
+- `dispatching-parallel-agents` - For 3+ independent failures during debugging
 
 ## Exit Criteria
 
 Feature development is complete when:
 
-- ✅ All 5 phases marked "complete" in progress file
-- ✅ Tests passing
-- ✅ Build successful
+- ✅ All 8 phases marked "complete" in metadata.json
+- ✅ All reviewers returned verdict: APPROVED
+- ✅ Test assessment quality_score >= 70
+- ✅ Final verification passed (build, lint, tests)
 - ✅ User approves final result

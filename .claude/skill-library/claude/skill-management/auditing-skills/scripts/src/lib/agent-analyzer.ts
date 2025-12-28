@@ -605,7 +605,7 @@ export function formatAgentDataForAnalysis(
         0: 'None - no relevance',
       },
       output_format: 'agent-name:score (comma-separated, only agents with score >= 20)',
-      example: 'frontend-developer:40,frontend-architect:30,security-architect:20',
+      example: 'frontend-developer:40,frontend-architect:30,security-lead:20',
     },
   };
 

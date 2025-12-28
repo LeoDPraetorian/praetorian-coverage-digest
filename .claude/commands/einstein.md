@@ -1112,7 +1112,7 @@ Focus on:
 
 Generate thinking level recommendations for potential architecture agents:
 
-- react-typescript-architect, go-backend-architect, security-architect, cloud-aws-architect, database-neo4j-architect, general-system-architect, information-architect
+- react-typescript-architect, go-backend-architect, security-lead, cloud-aws-architect, database-neo4j-architect, general-system-architect, information-architect
 
 Save your thinking allocation recommendations to: ${ARCH_THINKING_ALLOCATION}"
 

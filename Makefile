@@ -272,10 +272,6 @@ setup-ui: ## Install UI dependencies and run setup
 	cd modules/chariot/ui && npm run setup
 	@echo "UI setup completed successfully"
 
-.PHONY: mcp-manager
-mcp-manager: ## Launch Claude Code with MCP server selection
-	@./scripts/mcp-manager.sh
-
 info:
 	@echo "HOME: $(HOME)" # from the shell
 	@echo "SHELL: $(SHELL)" # from the shell
@@ -303,6 +299,7 @@ endif
 	@make install-git-hooks
 	@make setup-ui
 	@make mcp-tools-setup
+	@make claude-skills-setup
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
 		echo "AWS credentials not found, running aws configure..."; \
 		aws configure; \
@@ -348,7 +345,6 @@ setup-mac:
 	@npm install -g @anthropic-ai/claude-code > /dev/null
 	@echo "Installing Claude Agent SDK..."
 	@python3 -m pip install --no-cache-dir claude-agent-sdk > /dev/null
-	@make mcp-manager-install
 
 update-mac:
 	@echo "Upgrading core packages on macOS..."
@@ -371,7 +367,6 @@ setup-ubuntu:
 	@sudo npm install -g @anthropic-ai/claude-code > /dev/null
 	@echo "Installing Claude Agent SDK..."
 	@sudo python3 -m pip install --no-cache-dir claude-agent-sdk --break-system-packages > /dev/null
-	@sudo make mcp-manager-install
 # devcontainer specific for go path
 	@if ! grep -q "/usr/local/go/bin" $(PROFILE_FILE) 2>/dev/null; then \
 		echo "export PATH=\$$PATH:/usr/local/go/bin" >> $(PROFILE_FILE); \
@@ -434,34 +429,6 @@ configure-cli:
 	echo "Use this command prefix for Praetorian CLI:" && \
 	echo "  praetorian --profile $$UUID"
 
-mcp-manager-uninstall: ## Remove MCP manager and clean up broken symlinks
-	@echo "🧹 Uninstalling MCP manager..."
-	@npm uninstall -g mcp-manager > /dev/null 2>&1 || true
-	@echo "✅ MCP manager uninstalled successfully"
-
-mcp-manager-install: ## Install MCP server manager for toggling Claude Desktop MCP servers
-	@echo "📦 Installing MCP manager..."
-	@cd mcp-manager && npm install > /dev/null 2>&1 && npx tsc > /dev/null 2>&1
-	@cd mcp-manager && npm install -g . > /dev/null 2>&1
-	@SHELL_NAME=$$(basename $$SHELL); \
-	if [ "$$SHELL_NAME" = "zsh" ]; then \
-		PROFILE=~/.zshrc; \
-	elif [ "$$SHELL_NAME" = "bash" ]; then \
-		if [ -f ~/.bash_profile ]; then \
-			PROFILE=~/.bash_profile; \
-		else \
-			PROFILE=~/.bashrc; \
-		fi; \
-	else \
-		PROFILE=~/.profile; \
-	fi; \
-	if ! grep -q 'export PATH="$$HOME/.local/bin:$$PATH"' $$PROFILE 2>/dev/null; then \
-		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> $$PROFILE > /dev/null 2>&1; \
-	fi; \
-	export PATH="$$HOME/.local/bin:$$PATH"; \
-	hash -r 2>/dev/null || true
-	@echo "✅ MCP manager installed successfully"
-
 .PHONY: mcp-tools-setup
 mcp-tools-setup: ## Install dependencies for all MCP custom tools (chrome-devtools, currents, context7, linear)
 	@echo "📦 Installing MCP tool dependencies..."
@@ -474,6 +441,17 @@ mcp-tools-setup: ## Install dependencies for all MCP custom tools (chrome-devtoo
 	@echo "  → linear..."
 	@cd .claude/tools/linear && npm install > /dev/null 2>&1
 	@echo "✅ All MCP tool dependencies installed"
+
+.PHONY: claude-skills-setup
+claude-skills-setup: ## Install and build Claude skill management CLI tools (audit, fix, search, update)
+	@echo "📦 Installing Claude skill management dependencies..."
+	@cd .claude && npm install > /dev/null 2>&1
+	@echo "🔨 Building skill management packages..."
+	@cd .claude && npm run -w @chariot/formatting-skill-output build > /dev/null 2>&1 || true
+	@cd .claude && npm run -w @chariot/auditing-skills build > /dev/null 2>&1 || true
+	@cd .claude && npm run -w @chariot/fixing-skills build > /dev/null 2>&1 || true
+	@cd .claude && npm run -w @chariot/updating-skills build > /dev/null 2>&1 || true
+	@echo "✅ Claude skill tools ready (npm run audit, fix, search, update)"
 
 # ============================================================
 # DevPod Management

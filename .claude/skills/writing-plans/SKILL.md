@@ -16,6 +16,162 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
+## Prerequisites (MANDATORY - Cannot Skip)
+
+**Before writing ANY implementation plan, you MUST complete evidence-based analysis:**
+
+### Step 1: Invoke enforcing-evidence-based-analysis
+
+```
+skill: "enforcing-evidence-based-analysis"
+```
+
+**This skill enforces the Discovery phase where you:**
+1. READ all source files you'll modify or reference
+2. QUOTE actual API signatures with line numbers
+3. DOCUMENT verified findings in required format
+4. MARK assumptions explicitly
+
+### Step 2: Verify Required Artifacts Exist
+
+**Cannot proceed without these verified artifacts:**
+
+| Required Artifact | What It Contains | How to Verify |
+|------------------|------------------|---------------|
+| **Verified APIs** | Source quotes showing actual API shapes, interfaces, function signatures | Must have Read tool evidence with exact line numbers |
+| **Current Implementation** | Actual code from files to be modified | Must quote existing code showing what's there now |
+| **Assumptions List** | Explicitly documented unverified items with risk assessment | Must exist even if empty ('All verified') |
+
+### Step 3: Check Discovery Output Format
+
+Your enforcing-evidence-based-analysis phase MUST produce documentation like this:
+
+```markdown
+## Verified APIs (from enforcing-evidence-based-analysis phase)
+
+### API: useWizard
+**Source:** src/hooks/useWizard.ts (lines 72-77)
+**Actual Return Type:**
+\`\`\`typescript
+// QUOTED FROM SOURCE - NOT FROM MEMORY:
+return {
+  navigation: { goToNextStep, goToPreviousStep, ... },
+  progress: { currentStep, totalSteps, ... },
+  validation: { isValid, errors, ... },
+}
+\`\`\`
+**My Planned Usage:**
+\`\`\`typescript
+const wizard = useWizard(config);
+wizard.navigation.goToNextStep();  // ✅ Matches actual API
+\`\`\`
+**Verified Match:** ✅ Signatures match
+
+### API: WizardStep Interface
+**Source:** src/types.ts (lines 15-22)
+**Actual Interface:**
+\`\`\`typescript
+// QUOTED FROM SOURCE:
+interface WizardStep<T> {
+  id: string;
+  title: string;        // NOT 'label'
+  order: number;        // REQUIRED property
+  validate: (data: T) => boolean;  // Returns boolean, NOT string
+}
+\`\`\`
+**My Planned Usage:** [show your step definitions]
+**Verified Match:** ✅ Yes
+
+## Assumptions (Not Directly Verified)
+
+| Assumption | Why Unverified | Risk if Wrong |
+|------------|----------------|---------------|
+| Error handling pattern follows standard toast pattern | Didn't read error handler implementation | Plan might show wrong error handling |
+
+If this section is empty: 'All claims verified against source files.'
+```
+
+### Step 4: Integration - How Discovery Feeds Planning
+
+Evidence-based analysis (Phase 1) discovers WHAT EXISTS:
+- Reads source files
+- Quotes actual APIs
+- Documents current state
+
+Writing plans (Phase 2) documents HOW TO CHANGE IT:
+- Uses verified APIs in task code
+- Shows transformations from current to proposed
+- References the verified findings
+
+Example flow:
+
+```
+# Phase 1 Output (enforcing-evidence-based-analysis):
+## Verified API: Repository.Create
+**Source:** pkg/repository/asset.go (lines 45-52)
+**Actual Signature:** func (r *Repository) Create(ctx context.Context, asset *model.Asset) error
+
+# Phase 2 Input (writing-plans uses this):
+### Task 1: Add asset creation
+**Code:**
+\`\`\`go
+// Using verified API from discovery phase:
+err := repo.Create(ctx, newAsset)  // ✅ Signature matches line 45 of asset.go
+if err != nil {
+    return fmt.Errorf("creating asset: %w", err)
+}
+\`\`\`
+```
+
+### Pre-Planning Validation Checklist
+
+Before writing a single task in your plan, verify:
+
+- [ ] I invoked skill: "enforcing-evidence-based-analysis"
+- [ ] I have source file quotes (with Read tool evidence) for every API I reference
+- [ ] I have exact line numbers for all code I reference
+- [ ] I verified my planned API usage matches actual source signatures
+- [ ] I created an Assumptions section listing anything NOT directly verified
+- [ ] Every code example in my plan uses APIs that ACTUALLY EXIST (not assumed/hallucinated)
+
+If ANY checkbox is unchecked:
+→ STOP. Return to enforcing-evidence-based-analysis phase.
+→ DO NOT proceed to planning with unverified APIs.
+→ DO NOT assume we'll catch it during implementation - catch it NOW.
+
+### Why This Gate Exists
+
+Real failure: Frontend-lead created 48KB plan without this prerequisite:
+- Claimed analyzed 10 files but never read them
+- Assumed useWizard returns flat properties (wrong - returns nested)
+- Assumed WizardStep has 'label' (wrong - uses 'title' + requires 'order')
+- Every API call in all 15 tasks was incorrect
+- Three independent reviewers confirmed: plan won't compile
+- Would have wasted hours of implementation debugging broken assumptions
+
+The 5 minutes to complete evidence-based analysis prevents 5 hours of debugging hallucinated plans.
+
+### Relationship to Design Phase
+
+If brainstorming was also used (for design decisions):
+
+Complete sequence:
+1. enforcing-evidence-based-analysis → Verify what exists now
+2. brainstorming → Explore design alternatives
+3. writing-plans → Document implementation with verified APIs
+4. verifying-before-completion → Confirm plan completeness
+
+### Escape Hatch (Rare Cases)
+
+Only skip evidence-based-analysis if:
+- Creating completely NEW files with NO existing codebase dependencies
+- Pure greenfield implementation with no API integration
+- Theoretical architecture document (no code references)
+
+Even then: If you reference ANY existing file, API, or interface → evidence-based-analysis is REQUIRED.
+
+---
+
 **Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md`
 
 ## Bite-Sized Task Granularity

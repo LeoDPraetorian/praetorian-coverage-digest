@@ -49,7 +49,7 @@ What is the primary purpose?
 
 - frontend-architect: Component hierarchy design
 - backend-architect: API architecture decisions
-- security-architect: Security architecture planning
+- security-lead: Security architecture planning
 
 ---
 
@@ -159,8 +159,8 @@ What is the primary purpose?
 
 **Examples**:
 
-- backend-security-reviewer: Security vulnerability analysis
-- frontend-security-reviewer: XSS, auth, authorization analysis
+- backend-security: Security vulnerability analysis
+- frontend-security: XSS, auth, authorization analysis
 - complexity-assessor: Cyclomatic complexity assessment
 
 ---

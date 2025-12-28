@@ -289,7 +289,7 @@ skills: brainstorming, debugging-systematically, gateway-backend, verifying-befo
 **Currently Broken Agents** (as of audit discovery):
 
 - `backend-architect.md` - Has 6 core skills, no Skill tool
-- `security-architect.md` - Has core skills, no Skill tool
+- `security-lead.md` - Has core skills, no Skill tool
 - `backend-developer.md` - Has core skills, no Skill tool
 - `backend-reviewer.md` - Has core skills, no Skill tool
 

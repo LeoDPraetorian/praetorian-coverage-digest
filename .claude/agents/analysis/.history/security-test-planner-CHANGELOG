@@ -8,7 +8,7 @@
 ### RED Phase Evidence
 - Gap: Phase 4 has no executor agent (unlike Phases 1-3 which have dedicated executors)
 - Failure: Orchestrator must directly apply security-test-planning skill instead of delegating to agent
-- Inconsistency: Breaks agent delegation pattern established by codebase-mapper, security-controls-mapper, security-architect
+- Inconsistency: Breaks agent delegation pattern established by codebase-mapper, security-controls-mapper, security-lead
 
 ### Configuration
 - Tools: Bash, Glob, Grep, Read, TodoWrite, Write

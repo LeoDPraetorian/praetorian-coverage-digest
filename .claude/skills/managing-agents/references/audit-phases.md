@@ -271,7 +271,7 @@ npm run --silent fix -- <agent> --apply phase4-remove-tool-Write
 **Stop and escalate if**:
 
 - Architecture decision needed → Recommend `go-architect`
-- Security concern identified → Recommend `security-architect`
+- Security concern identified → Recommend `security-lead`
 - Blocked by unclear requirements → Use AskUserQuestion tool
 ```
 

@@ -1,5 +1,5 @@
 ---
-description: Complete feature development - brainstorm, plan, architect, implement, test
+description: Complete feature development - brainstorm, plan, architect, implement, review, test (8 phases with parallel agents)
 allowed-tools: Skill, AskUserQuestion
 argument-hint: <feature-description>
 ---

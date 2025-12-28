@@ -42,7 +42,7 @@ color: green
 
 - `python-developer`
 - `frontend-architect`
-- `backend-security-reviewer`
+- `backend-security`
 
 **Invalid examples**:
 
@@ -258,12 +258,12 @@ description: Use when developing Python applications - CLI tools, pytest
 
 **Use opus when errors are costly and deep reasoning is non-negotiable.**
 
-**Architecture agents** (backend-architect, frontend-architect, security-architect):
+**Architecture agents** (backend-architect, frontend-architect, security-lead):
 
 - Reason: System design requires trade-off analysis
 - Cost of error: Architectural mistakes are expensive to fix later
 
-**Security analysis** (backend-security-reviewer, frontend-security-reviewer):
+**Security analysis** (backend-security, frontend-security):
 
 - Reason: Vulnerability detection requires thoroughness
 - Cost of error: Missing vulnerabilities is unacceptable

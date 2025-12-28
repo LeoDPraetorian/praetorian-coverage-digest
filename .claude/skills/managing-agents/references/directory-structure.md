@@ -23,7 +23,7 @@ Agents are organized by purpose in `.claude/agents/`. Each category has a specif
 
 - **Purpose:** System design, architectural patterns, technology decisions
 - **Permission Mode:** `plan` (requires user approval before implementation)
-- **Examples:** `frontend-architect`, `backend-architect`, `security-architect`
+- **Examples:** `frontend-architect`, `backend-architect`, `security-lead`
 
 ### development/
 

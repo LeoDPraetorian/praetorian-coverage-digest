@@ -1,0 +1,47 @@
+# Changelog - writing-plans
+
+## 2025-12-28 - Add mandatory Prerequisites section
+
+**Type:** Enhancement (Hard gate for evidence-based analysis)
+
+**Problem:**
+The writing-plans skill allowed agents to create implementation plans without reading source files first. This led to hallucinated API calls and broken plans.
+
+**Actual Failure Case:**
+- Frontend-lead agent created 48KB implementation plan claiming to have "analyzed 10 files"
+- Never used Read tool to verify APIs
+- ALL API calls were wrong:
+  - Assumed useWizard returns flat object (actually nested: {navigation, progress, validation})
+  - Assumed WizardStep has 'label' property (actually 'title' + requires 'order')
+  - Assumed useWizardFooterConfig takes wizard object (actually requires 8 individual props)
+- Three independent AI reviewers confirmed: plan won't compile
+- Would have wasted hours debugging
+
+**Solution:**
+Added "Prerequisites (MANDATORY - Cannot Skip)" section (line 19) that creates hard gate before planning:
+
+1. **Step 1:** Invoke enforcing-evidence-based-analysis skill
+2. **Step 2:** Verify required artifacts (Verified APIs, Current Implementation, Assumptions List)
+3. **Step 3:** Check discovery output format (with wizard examples showing correct API documentation)
+4. **Step 4:** Integration explanation (how discovery feeds planning)
+5. **Pre-Planning Validation Checklist:** 6 checkboxes that must all pass before proceeding
+6. **Why This Gate Exists:** Documents wizard modal failure as concrete example
+7. **Relationship to Design Phase:** Documents workflow sequence with brainstorming
+8. **Escape Hatch:** Rare cases when skip is acceptable (greenfield only)
+
+**Impact:**
+- Prevents hallucinated implementation plans
+- Enforces Read tool evidence before planning
+- Documents actual vs assumed API shapes
+- 5 minutes of discovery prevents 5 hours of debugging
+
+**File Changes:**
+- Added 156 lines to SKILL.md (140 → 296 lines, still under 500 limit)
+- Section positioned after Context (line 17) and before Bite-Sized Task Granularity
+
+**Testing:**
+- ✅ Prerequisites section present at line 19
+- ✅ All 8 subsections included
+- ✅ Wizard modal failure example documented
+- ✅ Checklist with 6 validation items
+- ✅ Line count under 500 (296 total)

@@ -93,7 +93,7 @@ Return results as structured JSON:
 - [Condition 1] → Recommend `agent-name`
 - [Condition 2] → Recommend `agent-name`
 - Architecture decision needed → Recommend `[domain]-architect`
-- Security concern identified → Recommend `security-architect`
+- Security concern identified → Recommend `security-lead`
 - Blocked by unclear requirements → Use AskUserQuestion tool
 
 ## Quality Checklist
@@ -227,7 +227,7 @@ permissionMode: plan
 - Description: Valid single-line with examples
 - Gateway: gateway-frontend
 - Output format: Standardized JSON
-- Escalation: Clear handoffs to react-architect, security-architect
+- Escalation: Clear handoffs to react-architect, security-lead
 
 ### react-architect
 
@@ -235,7 +235,7 @@ permissionMode: plan
 - Description: Valid single-line with examples
 - Gateway: gateway-frontend
 - Output format: Standardized JSON
-- Escalation: Clear handoffs to react-developer, security-architect
+- Escalation: Clear handoffs to react-developer, security-lead
 
 ## Validation Checklist
 
