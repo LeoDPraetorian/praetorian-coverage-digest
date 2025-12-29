@@ -29,7 +29,7 @@ REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
 cd "$REPO_ROOT/.claude" && npm run audit -- gateway-frontend
 ```
 
-Runs all 21 phases (phases 17-20 are gateway-specific):
+Runs all 22 phases (phases 17-20 are gateway-specific):
 
 - **Phase 17**: Gateway structure (two-tier explanation, IMPORTANT block)
 - **Phase 18**: Routing table format (full paths, not skill names)

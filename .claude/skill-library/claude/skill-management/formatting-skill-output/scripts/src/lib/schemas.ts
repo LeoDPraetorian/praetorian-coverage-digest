@@ -5,18 +5,12 @@
  * so the CLI can format deterministically.
  */
 
-import { Finding, Severity } from './table-formatter';
+import { Finding, Severity } from "./table-formatter";
 
 /**
  * Semantic finding criteria for auditing-skills.
  */
-export type SemanticCriterion =
-  | 'Description Quality'
-  | 'Skill Categorization'
-  | 'Gateway Membership'
-  | 'Tool Appropriateness'
-  | 'Content Density'
-  | 'External Documentation';
+export type SemanticCriterion = string;
 
 /**
  * Semantic finding from Claude's semantic review.
@@ -68,29 +62,29 @@ export interface AgentRecommendationsJson {
  * Validate semantic findings JSON.
  */
 export function validateSemanticFindings(json: unknown): SemanticFindingsJson {
-  if (typeof json !== 'object' || json === null) {
-    throw new Error('Invalid JSON: expected object');
+  if (typeof json !== "object" || json === null) {
+    throw new Error("Invalid JSON: expected object");
   }
 
   const obj = json as Record<string, unknown>;
 
   if (!Array.isArray(obj.findings)) {
-    throw new Error('Invalid JSON: expected findings array');
+    throw new Error("Invalid JSON: expected findings array");
   }
 
-  const validSeverities = ['CRITICAL', 'WARNING', 'INFO'];
+  const validSeverities = ["CRITICAL", "WARNING", "INFO"];
   const validCriteria = [
-    'Description Quality',
-    'Skill Categorization',
-    'Gateway Membership',
-    'Tool Appropriateness',
-    'Content Density',
-    'External Documentation',
+    "Description Quality",
+    "Skill Categorization",
+    "Gateway Membership",
+    "Tool Appropriateness",
+    "Content Density",
+    "External Documentation",
   ];
 
   for (const finding of obj.findings) {
-    if (typeof finding !== 'object' || finding === null) {
-      throw new Error('Invalid finding: expected object');
+    if (typeof finding !== "object" || finding === null) {
+      throw new Error("Invalid finding: expected object");
     }
 
     const f = finding as Record<string, unknown>;
@@ -99,16 +93,16 @@ export function validateSemanticFindings(json: unknown): SemanticFindingsJson {
       throw new Error(`Invalid severity: ${f.severity}`);
     }
 
-    if (!validCriteria.includes(f.criterion as string)) {
-      throw new Error(`Invalid criterion: ${f.criterion}`);
+    if (typeof f.criterion !== "string" || f.criterion.length === 0) {
+      throw new Error("Invalid criterion: expected non-empty string");
     }
 
-    if (typeof f.issue !== 'string' || f.issue.length === 0) {
-      throw new Error('Invalid issue: expected non-empty string');
+    if (typeof f.issue !== "string" || f.issue.length === 0) {
+      throw new Error("Invalid issue: expected non-empty string");
     }
 
-    if (typeof f.recommendation !== 'string' || f.recommendation.length === 0) {
-      throw new Error('Invalid recommendation: expected non-empty string');
+    if (typeof f.recommendation !== "string" || f.recommendation.length === 0) {
+      throw new Error("Invalid recommendation: expected non-empty string");
     }
   }
 
@@ -124,7 +118,7 @@ export function semanticFindingsToFindings(json: SemanticFindingsJson): Finding[
     phase: `Semantic: ${f.criterion}`,
     issue: f.issue,
     recommendation: f.recommendation,
-    source: 'semantic' as const,
+    source: "semantic" as const,
   }));
 }
 
@@ -136,11 +130,11 @@ export function agentRecommendationsToFindings(json: AgentRecommendationsJson): 
     // Map relevance to severity for table formatting
     let severity: Severity;
     if (r.relevance >= 90) {
-      severity = 'CRITICAL' as const;
+      severity = "CRITICAL" as const;
     } else if (r.relevance >= 70) {
-      severity = 'WARNING' as const;
+      severity = "WARNING" as const;
     } else {
-      severity = 'INFO' as const;
+      severity = "INFO" as const;
     }
 
     return {
@@ -148,7 +142,7 @@ export function agentRecommendationsToFindings(json: AgentRecommendationsJson): 
       phase: r.agentName,
       issue: r.agentDescription,
       recommendation: r.reasoning,
-      source: 'agent-analysis' as const,
+      source: "agent-analysis" as const,
     };
   });
 }

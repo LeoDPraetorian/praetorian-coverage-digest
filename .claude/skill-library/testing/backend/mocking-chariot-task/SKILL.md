@@ -330,14 +330,16 @@ func TestCapabilityHTTPError(t *testing.T) {
 **This skill uses method signatures instead of static line numbers for code references.**
 
 **Rationale:**
+
 - Line numbers drift with every code change (inserts, deletions, refactors)
 - Creates maintenance debt to keep skills synchronized
 - Method signatures are stable across refactors
 - Grep-friendly: `rg "func.*MockCollectors"` finds the method instantly
 
 **Pattern for references:**
+
 ```markdown
-✅ GOOD: file.go - func (c *Capability) MethodName(...)
+✅ GOOD: file.go - func (c \*Capability) MethodName(...)
 ✅ GOOD: file.go (between Match() and Invoke() methods)
 ❌ AVOID: file.go:123-127 (will become outdated)
 ```

@@ -2,7 +2,7 @@
 import { readdirSync, readFileSync, statSync, existsSync } from 'fs';
 import { join } from 'path';
 import matter from 'gray-matter';
-import { findProjectRoot } from '../../../../../../../lib/find-project-root.js';
+import { findProjectRoot } from '@chariot/lib';
 
 const PROJECT_ROOT = findProjectRoot();
 const CORE_SKILLS_DIR = join(PROJECT_ROOT, '.claude/skills');

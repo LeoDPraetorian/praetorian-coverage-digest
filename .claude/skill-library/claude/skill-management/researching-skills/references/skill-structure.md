@@ -8,7 +8,7 @@ Generated skills follow the progressive disclosure pattern: a lean SKILL.md with
 
 ```
 skill-name/
-├── SKILL.md                 # 300-600 lines (main entry point)
+├── SKILL.md                 # Keep under 500 lines (main entry point)
 ├── references/              # 8-15 documentation files
 │   ├── {package-name}.md    # Full package documentation
 │   ├── {package-name}-api.md # API reference (for large docs)
@@ -63,11 +63,9 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 
 ### Line Count Guidelines
 
-| Skill Type | Target Lines | Max Lines |
-| ---------- | ------------ | --------- |
-| Library    | 300-600      | 800       |
-| Process    | 200-400      | 600       |
-| Pattern    | 150-300      | 500       |
+**All skills:** Keep SKILL.md under 500 lines for optimal performance.
+
+See [Skill Compliance Contract](../../../../../skills/managing-skills/references/skill-compliance-contract.md) for authoritative line count limits and thresholds.
 
 ## Reference Files
 

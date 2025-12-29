@@ -35,15 +35,15 @@ function UsersTable() {
 ```typescript
 // BAD: Same key for different data
 const { data } = useQuery({
-  queryKey: ['users'],
+  queryKey: ["users"],
   queryFn: () => fetchUsers(filters), // filters not in key!
-})
+});
 
 // GOOD: Include all dependencies in key
 const { data } = useQuery({
-  queryKey: ['users', filters],
+  queryKey: ["users", filters],
   queryFn: () => fetchUsers(filters),
-})
+});
 ```
 
 ### ❌ Fetching in useEffect
@@ -106,28 +106,32 @@ function UsersTable() {
 
 ```typescript
 // BAD: useState for server data
-const [users, setUsers] = useState([])
-const [isLoading, setIsLoading] = useState(true)
-const [error, setError] = useState(null)
+const [users, setUsers] = useState([]);
+const [isLoading, setIsLoading] = useState(true);
+const [error, setError] = useState(null);
 
 // GOOD: Query handles all server state
-const { data: users, isLoading, error } = useQuery({
-  queryKey: ['users'],
+const {
+  data: users,
+  isLoading,
+  error,
+} = useQuery({
+  queryKey: ["users"],
   queryFn: fetchUsers,
-})
+});
 ```
 
 ### ❌ Separate Query and Table Pagination
 
 ```typescript
 // BAD: Two sources of pagination truth
-const [queryPage, setQueryPage] = useState(1)
-const [tablePage, setTablePage] = useState(0)
+const [queryPage, setQueryPage] = useState(1);
+const [tablePage, setTablePage] = useState(0);
 
 // They can get out of sync!
 
 // GOOD: Single source (Router search params)
-const search = Route.useSearch()
+const search = Route.useSearch();
 // Both Query and Table read from search.page
 ```
 
@@ -140,14 +144,14 @@ const search = Route.useSearch()
 const virtualizer = useVirtualizer({
   count: rows.length,
   estimateSize: () => 48, // Fixed, but rows have different heights
-})
+});
 
 // GOOD: Use measureElement for dynamic heights
 const virtualizer = useVirtualizer({
   count: rows.length,
   estimateSize: (index) => estimateRowHeight(rows[index]),
   measureElement: (element) => element?.getBoundingClientRect().height,
-})
+});
 ```
 
 ### ❌ Creating Functions in Render
@@ -156,16 +160,16 @@ const virtualizer = useVirtualizer({
 // BAD: New function reference every render
 const table = useReactTable({
   onSortingChange: (updater) => handleSort(updater), // New function
-})
+});
 
 // GOOD: Stable function reference
 const handleSortingChange = useCallback((updater) => {
   // handle sort
-}, [])
+}, []);
 
 const table = useReactTable({
   onSortingChange: handleSortingChange,
-})
+});
 ```
 
 ### ❌ Not Memoizing Columns
@@ -173,20 +177,16 @@ const table = useReactTable({
 ```typescript
 // BAD: Columns recreated every render
 function Table() {
-  const columns = [
-    { accessorKey: 'name', header: 'Name' },
-  ] // New array every render!
+  const columns = [{ accessorKey: "name", header: "Name" }]; // New array every render!
 
-  const table = useReactTable({ columns, data })
+  const table = useReactTable({ columns, data });
 }
 
 // GOOD: Memoize columns
 function Table() {
-  const columns = useMemo(() => [
-    { accessorKey: 'name', header: 'Name' },
-  ], [])
+  const columns = useMemo(() => [{ accessorKey: "name", header: "Name" }], []);
 
-  const table = useReactTable({ columns, data })
+  const table = useReactTable({ columns, data });
 }
 ```
 
@@ -224,15 +224,13 @@ const value = row.getValue<string>()
 // BAD: No validation, runtime errors possible
 validateSearch: (search) => ({
   page: search.page, // Could be anything!
-})
+});
 
 // GOOD: Strict validation with defaults
 validateSearch: (search) => ({
   page: Math.max(1, Number(search.page) || 1),
-  pageSize: [10, 25, 50].includes(Number(search.pageSize))
-    ? Number(search.pageSize)
-    : 25,
-})
+  pageSize: [10, 25, 50].includes(Number(search.pageSize)) ? Number(search.pageSize) : 25,
+});
 ```
 
 ## Cache Management Anti-Patterns
@@ -242,13 +240,13 @@ validateSearch: (search) => ({
 ```typescript
 // BAD: Manually updating cache is error-prone
 mutation.onSuccess((newUser) => {
-  queryClient.setQueryData(['users'], (old) => [...old, newUser])
-})
+  queryClient.setQueryData(["users"], (old) => [...old, newUser]);
+});
 
 // GOOD: Invalidate and refetch for consistency
 mutation.onSuccess(() => {
-  queryClient.invalidateQueries({ queryKey: ['users'] })
-})
+  queryClient.invalidateQueries({ queryKey: ["users"] });
+});
 ```
 
 ### ❌ Not Including Dependencies in Query Keys
@@ -256,25 +254,25 @@ mutation.onSuccess(() => {
 ```typescript
 // BAD: Stale data when dependencies change
 const { data } = useQuery({
-  queryKey: ['users'],
+  queryKey: ["users"],
   queryFn: () => fetchUsers({ status, search }), // status, search not in key
-})
+});
 
 // GOOD: All dependencies in key
 const { data } = useQuery({
-  queryKey: ['users', { status, search }],
+  queryKey: ["users", { status, search }],
   queryFn: () => fetchUsers({ status, search }),
-})
+});
 ```
 
 ## Summary
 
-| Anti-Pattern | Problem | Solution |
-|--------------|---------|----------|
-| Fetch in component | Waterfalls | Route loaders |
-| Static query keys | Stale data | Include all deps |
-| Duplicate state | Desync | Single source (Router) |
-| Fixed estimateSize | Scroll jumps | measureElement |
-| Functions in render | Re-renders | useCallback/useMemo |
-| Manual cache updates | Inconsistency | Invalidate queries |
-| Type assertions | Runtime errors | Proper types |
+| Anti-Pattern         | Problem        | Solution               |
+| -------------------- | -------------- | ---------------------- |
+| Fetch in component   | Waterfalls     | Route loaders          |
+| Static query keys    | Stale data     | Include all deps       |
+| Duplicate state      | Desync         | Single source (Router) |
+| Fixed estimateSize   | Scroll jumps   | measureElement         |
+| Functions in render  | Re-renders     | useCallback/useMemo    |
+| Manual cache updates | Inconsistency  | Invalidate queries     |
+| Type assertions      | Runtime errors | Proper types           |

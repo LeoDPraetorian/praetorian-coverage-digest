@@ -5,6 +5,7 @@
 ## Placeholder Content
 
 This reference file will contain:
+
 - Threat identification process
 - STRIDE methodology for frontend
 - Attack surface mapping

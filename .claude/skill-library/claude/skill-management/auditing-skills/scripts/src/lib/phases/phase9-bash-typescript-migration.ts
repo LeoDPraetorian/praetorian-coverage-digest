@@ -230,13 +230,20 @@ export class Phase9BashTypeScriptMigration {
    */
   static async run(skillsDir: string, options?: FixOptions): Promise<PhaseResult> {
     const skillPaths = await SkillParser.findAllSkills(skillsDir);
+    const skills = await Promise.all(skillPaths.map(p => SkillParser.parseSkillFile(p)));
+    return this.runOnParsedSkills(skills, options);
+  }
+
+  /**
+   * Run Phase 9 audit on pre-parsed skills (performance optimized)
+   */
+  static async runOnParsedSkills(skills: SkillFile[], options?: FixOptions): Promise<PhaseResult> {
     let skillsAffected = 0;
     let issuesFound = 0;
     let issuesFixed = 0;
     const details: string[] = [];
 
-    for (const skillPath of skillPaths) {
-      const skill = await SkillParser.parseSkillFile(skillPath);
+    for (const skill of skills) {
       const issues = await this.validate(skill);
 
       if (issues.length > 0) {

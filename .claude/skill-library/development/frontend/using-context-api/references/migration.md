@@ -29,6 +29,7 @@ function UserProfile() {
 ```
 
 **Steps:**
+
 1. Convert class to function component
 2. Replace `this.context` with `useContext(Context)`
 3. Create custom hook for better DX
@@ -39,13 +40,7 @@ function UserProfile() {
 ```tsx
 // ❌ OLD: Consumer component pattern
 function UserProfile() {
-  return (
-    <UserContext.Consumer>
-      {value => (
-        <div>{value.user.name}</div>
-      )}
-    </UserContext.Consumer>
-  );
+  return <UserContext.Consumer>{(value) => <div>{value.user.name}</div>}</UserContext.Consumer>;
 }
 ```
 
@@ -60,6 +55,7 @@ function UserProfile() {
 ```
 
 **Steps:**
+
 1. Remove `<Context.Consumer>` wrapper
 2. Replace render prop with `useContext(Context)`
 3. Access value directly instead of via callback
@@ -70,11 +66,11 @@ function UserProfile() {
 
 ```tsx
 // ❌ OLD: PropTypes for context
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 ThemeContext.Provider.propTypes = {
   value: PropTypes.shape({
-    theme: PropTypes.oneOf(['light', 'dark']).isRequired,
+    theme: PropTypes.oneOf(["light", "dark"]).isRequired,
     toggleTheme: PropTypes.func.isRequired,
   }).isRequired,
 };
@@ -85,7 +81,7 @@ ThemeContext.Provider.propTypes = {
 ```tsx
 // ✅ NEW: TypeScript
 type ThemeContextType = {
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   toggleTheme: () => void;
 };
 
@@ -93,6 +89,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 ```
 
 **Benefits:**
+
 - Compile-time type checking
 - Better IDE autocomplete
 - Eliminates runtime PropTypes overhead
@@ -140,24 +137,20 @@ class Button extends React.Component {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const toggleTheme = useCallback(() => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   }, []);
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {
   const context = useContext(ThemeContext);
-  if (!context) throw new Error('useTheme must be used within ThemeProvider');
+  if (!context) throw new Error("useTheme must be used within ThemeProvider");
   return context;
 }
 
@@ -169,6 +162,7 @@ function Button() {
 ```
 
 **Steps:**
+
 1. Remove `childContextTypes` and `contextTypes`
 2. Replace `getChildContext` with `createContext`
 3. Create provider component with `useState`
@@ -181,21 +175,22 @@ function Button() {
 
 ```tsx
 // ❌ OLD: React 16.3 experimental Context
-import { unstable_createContext } from 'react';
+import { unstable_createContext } from "react";
 
-const ThemeContext = unstable_createContext('light');
+const ThemeContext = unstable_createContext("light");
 ```
 
 **Migration:**
 
 ```tsx
 // ✅ NEW: Stable Context
-import { createContext } from 'react';
+import { createContext } from "react";
 
 const ThemeContext = createContext<Theme | undefined>(undefined);
 ```
 
 **Steps:**
+
 1. Remove `unstable_` prefix
 2. Use TypeScript for type safety
 3. Use `undefined` as default value
@@ -239,7 +234,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
 export function useUser() {
   const context = useContext(UserContext);
-  if (!context) throw new Error('useUser must be used within UserProvider');
+  if (!context) throw new Error("useUser must be used within UserProvider");
   return context;
 }
 
@@ -257,12 +252,14 @@ function UserProfile() {
 ### When to Migrate from Redux
 
 ✅ **Migrate when:**
+
 - Store has <5 actions
 - No middleware needed
 - No time-travel debugging needed
 - State is mostly static
 
 ❌ **Don't migrate when:**
+
 - Complex async logic
 - Need Redux DevTools
 - Multiple reducers
@@ -272,10 +269,10 @@ function UserProfile() {
 
 ```tsx
 // ❌ OLD: Redux for simple theme
-const themeReducer = (state = 'light', action) => {
+const themeReducer = (state = "light", action) => {
   switch (action.type) {
-    case 'TOGGLE_THEME':
-      return state === 'light' ? 'dark' : 'light';
+    case "TOGGLE_THEME":
+      return state === "light" ? "dark" : "light";
     default:
       return state;
   }
@@ -284,17 +281,13 @@ const themeReducer = (state = 'light', action) => {
 const store = createStore(themeReducer);
 
 // Usage
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from "react-redux";
 
 function ThemeToggle() {
-  const theme = useSelector(state => state);
+  const theme = useSelector((state) => state);
   const dispatch = useDispatch();
 
-  return (
-    <button onClick={() => dispatch({ type: 'TOGGLE_THEME' })}>
-      Theme: {theme}
-    </button>
-  );
+  return <button onClick={() => dispatch({ type: "TOGGLE_THEME" })}>Theme: {theme}</button>;
 }
 ```
 
@@ -305,19 +298,15 @@ function ThemeToggle() {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const toggleTheme = useCallback(() => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   }, []);
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 // Usage
@@ -333,29 +322,25 @@ function ThemeToggle() {
 
 ```tsx
 // ❌ OLD: MobX for simple state
-import { makeAutoObservable } from 'mobx';
-import { observer } from 'mobx-react-lite';
+import { makeAutoObservable } from "mobx";
+import { observer } from "mobx-react-lite";
 
 class ThemeStore {
-  theme = 'light';
+  theme = "light";
 
   constructor() {
     makeAutoObservable(this);
   }
 
   toggleTheme() {
-    this.theme = this.theme === 'light' ? 'dark' : 'light';
+    this.theme = this.theme === "light" ? "dark" : "light";
   }
 }
 
 const themeStore = new ThemeStore();
 
 const ThemeToggle = observer(() => {
-  return (
-    <button onClick={() => themeStore.toggleTheme()}>
-      Theme: {themeStore.theme}
-    </button>
-  );
+  return <button onClick={() => themeStore.toggleTheme()}>Theme: {themeStore.theme}</button>;
 });
 ```
 
@@ -364,19 +349,15 @@ const ThemeToggle = observer(() => {
 ```tsx
 // ✅ NEW: Context
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const toggleTheme = useCallback(() => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   }, []);
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 function ThemeToggle() {
@@ -434,11 +415,7 @@ function ThemeToggle() {
 // ❌ BAD: Creates new object every render
 function Provider({ children }) {
   const [state, setState] = useState(initialState);
-  return (
-    <Context.Provider value={{ state, setState }}>
-      {children}
-    </Context.Provider>
-  );
+  return <Context.Provider value={{ state, setState }}>{children}</Context.Provider>;
 }
 
 // ✅ GOOD: Memoized value
@@ -455,14 +432,14 @@ function Provider({ children }) {
 // ❌ BAD: Direct useContext everywhere
 function Component() {
   const context = useContext(UserContext);
-  if (!context) throw new Error('...');
+  if (!context) throw new Error("...");
   return <div>{context.user.name}</div>;
 }
 
 // ✅ GOOD: Custom hook
 export function useUser() {
   const context = useContext(UserContext);
-  if (!context) throw new Error('useUser must be used within UserProvider');
+  if (!context) throw new Error("useUser must be used within UserProvider");
   return context;
 }
 
@@ -487,7 +464,7 @@ const Context = createContext<ContextType | undefined>(undefined);
 ```tsx
 // ❌ BAD: Mixed update frequencies
 const Context = createContext({
-  user: null,        // Rarely changes
+  user: null, // Rarely changes
   notifications: [], // Changes frequently
 });
 
@@ -499,11 +476,11 @@ const NotificationsContext = createContext([]);
 ## Testing After Migration
 
 ```tsx
-import { render, screen } from '@testing-library/react';
-import { ThemeProvider, useTheme } from './ThemeContext';
+import { render, screen } from "@testing-library/react";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 
-describe('ThemeContext migration', () => {
-  it('provides theme value', () => {
+describe("ThemeContext migration", () => {
+  it("provides theme value", () => {
     function TestComponent() {
       const { theme } = useTheme();
       return <div>Theme: {theme}</div>;
@@ -518,14 +495,10 @@ describe('ThemeContext migration', () => {
     expect(screen.getByText(/Theme: light/i)).toBeInTheDocument();
   });
 
-  it('toggles theme', () => {
+  it("toggles theme", () => {
     function TestComponent() {
       const { theme, toggleTheme } = useTheme();
-      return (
-        <button onClick={toggleTheme}>
-          Theme: {theme}
-        </button>
-      );
+      return <button onClick={toggleTheme}>Theme: {theme}</button>;
     }
 
     render(
@@ -534,25 +507,25 @@ describe('ThemeContext migration', () => {
       </ThemeProvider>
     );
 
-    const button = screen.getByRole('button');
-    expect(button).toHaveTextContent('Theme: light');
+    const button = screen.getByRole("button");
+    expect(button).toHaveTextContent("Theme: light");
 
     button.click();
-    expect(button).toHaveTextContent('Theme: dark');
+    expect(button).toHaveTextContent("Theme: dark");
   });
 
-  it('throws error when used outside provider', () => {
+  it("throws error when used outside provider", () => {
     function TestComponent() {
       const { theme } = useTheme();
       return <div>{theme}</div>;
     }
 
     // Suppress console.error for this test
-    const spy = jest.spyOn(console, 'error').mockImplementation();
+    const spy = jest.spyOn(console, "error").mockImplementation();
 
     expect(() => {
       render(<TestComponent />);
-    }).toThrow('useTheme must be used within ThemeProvider');
+    }).toThrow("useTheme must be used within ThemeProvider");
 
     spy.mockRestore();
   });
@@ -561,13 +534,13 @@ describe('ThemeContext migration', () => {
 
 ## Performance Comparison
 
-| Metric | Legacy (Class) | Modern (Hooks) |
-|--------|----------------|----------------|
-| Bundle size | Larger (classes) | Smaller (functions) |
-| Initial render | Similar | Similar |
-| Re-render | Slower | Faster (with memoization) |
-| Memory | Higher | Lower |
-| DevTools | Limited | Full support |
+| Metric         | Legacy (Class)   | Modern (Hooks)            |
+| -------------- | ---------------- | ------------------------- |
+| Bundle size    | Larger (classes) | Smaller (functions)       |
+| Initial render | Similar          | Similar                   |
+| Re-render      | Slower           | Faster (with memoization) |
+| Memory         | Higher           | Lower                     |
+| DevTools       | Limited          | Full support              |
 
 ## Further Reading
 

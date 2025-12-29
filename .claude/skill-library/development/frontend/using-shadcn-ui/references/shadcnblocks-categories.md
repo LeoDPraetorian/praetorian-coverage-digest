@@ -6,12 +6,12 @@ shadcnblocks.com provides **829 production-ready blocks** across 42 categories b
 
 ## Block Categories Overview
 
-| Category Group      | Total Blocks | Categories |
-| ------------------- | ------------ | ---------- |
-| Layout & Navigation | 200          | Hero, Navbar, Footer, Banner |
-| Content Sections    | 367          | Feature, Blog, Gallery, Timeline, Team, About |
-| Business Components | 116          | Pricing, Testimonial, Case Studies, Integration, Service, Stats |
-| User Engagement     | 64           | CTA, Contact, Signup/Login, Waitlist, Community |
+| Category Group      | Total Blocks | Categories                                                                  |
+| ------------------- | ------------ | --------------------------------------------------------------------------- |
+| Layout & Navigation | 200          | Hero, Navbar, Footer, Banner                                                |
+| Content Sections    | 367          | Feature, Blog, Gallery, Timeline, Team, About                               |
+| Business Components | 116          | Pricing, Testimonial, Case Studies, Integration, Service, Stats             |
+| User Engagement     | 64           | CTA, Contact, Signup/Login, Waitlist, Community                             |
 | Information Display | 82           | FAQ, Comparison, Logos, Resources, Download, Changelog, Careers, Compliance |
 
 ## Layout & Navigation (200 blocks)
@@ -317,6 +317,7 @@ Legal and privacy:
 ### Common Block Combinations
 
 **SaaS Landing Page:**
+
 1. Navbar (13 options)
 2. Hero (162 options)
 3. Feature (266 options)
@@ -327,6 +328,7 @@ Legal and privacy:
 8. Footer (18 options)
 
 **Marketing Site:**
+
 1. Navbar
 2. Hero
 3. Stats

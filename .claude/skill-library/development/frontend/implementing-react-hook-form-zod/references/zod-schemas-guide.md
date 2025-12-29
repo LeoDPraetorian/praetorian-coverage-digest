@@ -10,12 +10,12 @@ Complete reference for all Zod schema types and patterns.
 
 **String format validators** moved from methods to top-level functions:
 
-| Deprecated (v3) | Current (v4) | Notes |
-|-----------------|--------------|-------|
-| `z.string().email()` | `z.email()` | Method deprecated, will be removed |
-| `z.string().url()` | `z.url()` | Method deprecated, will be removed |
-| `z.string().uuid()` | `z.uuid()` | Now RFC 9562/4122 strict |
-| N/A | `z.guid()` | New: Permissive UUID-like validation |
+| Deprecated (v3)      | Current (v4) | Notes                                |
+| -------------------- | ------------ | ------------------------------------ |
+| `z.string().email()` | `z.email()`  | Method deprecated, will be removed   |
+| `z.string().url()`   | `z.url()`    | Method deprecated, will be removed   |
+| `z.string().uuid()`  | `z.uuid()`   | Now RFC 9562/4122 strict             |
+| N/A                  | `z.guid()`   | New: Permissive UUID-like validation |
 
 **Why the change**: Top-level functions are less verbose, more tree-shakable, and string formats are now subclasses of ZodString instead of refinements.
 
@@ -25,10 +25,10 @@ Complete reference for all Zod schema types and patterns.
 
 ```typescript
 // Zod v4 - Strict RFC compliance
-z.uuid()  // Only accepts valid UUIDs with correct variant bits
+z.uuid(); // Only accepts valid UUIDs with correct variant bits
 
 // For permissive validation (any 8-4-4-4-12 hex pattern)
-z.guid()  // Accepts UUID-like strings without strict RFC validation
+z.guid(); // Accepts UUID-like strings without strict RFC validation
 ```
 
 **Migration**: If your UUIDs fail validation after upgrading, use `z.guid()` for the previous behavior.
@@ -39,10 +39,10 @@ z.guid()  // Accepts UUID-like strings without strict RFC validation
 
 ```typescript
 // Deprecated (still works but will be removed)
-z.string().min(3, { message: "Too short" })
+z.string().min(3, { message: "Too short" });
 
 // Recommended
-z.string().min(3, { error: "Too short" })
+z.string().min(3, { error: "Too short" });
 ```
 
 **`invalid_type_error` and `required_error` dropped**:
@@ -51,11 +51,11 @@ z.string().min(3, { error: "Too short" })
 // ❌ No longer works in v4
 z.string({
   required_error: "Name is required",
-  invalid_type_error: "Name must be text"
-})
+  invalid_type_error: "Name must be text",
+});
 
 // ✅ Use error customization API instead
-z.string().min(1, { error: "Name is required" })
+z.string().min(1, { error: "Name is required" });
 ```
 
 ---
@@ -74,10 +74,10 @@ z.string().toLowerCase(); //Convert to lowercase
 z.string().toUpperCase(); // Convert to uppercase
 
 // String format validators (Zod v4 top-level functions)
-z.email("Invalid email");       // Use instead of z.string().email()
-z.url("Invalid URL");            // Use instead of z.string().url()
-z.uuid("Invalid UUID");          // Use instead of z.string().uuid() - RFC 9562/4122 strict
-z.guid("Invalid GUID");          // Permissive UUID-like pattern (8-4-4-4-12)
+z.email("Invalid email"); // Use instead of z.string().email()
+z.url("Invalid URL"); // Use instead of z.string().url()
+z.uuid("Invalid UUID"); // Use instead of z.string().uuid() - RFC 9562/4122 strict
+z.guid("Invalid GUID"); // Permissive UUID-like pattern (8-4-4-4-12)
 
 // Number
 z.number();
@@ -325,20 +325,21 @@ z.preprocess((val) => Number(val), z.number());
 
 ```typescript
 // String → Number
-z.coerce.number()
+z.coerce.number();
 
 // String → Boolean
-z.coerce.boolean()
+z.coerce.boolean();
 
 // String → Date
-z.coerce.date()
+z.coerce.date();
 ```
 
 **Critical gotcha**: `z.coerce.number()` converts empty strings to `0`, causing false positives on required fields.
 
 **Solution** - Use pipe pattern:
+
 ```typescript
-z.string().min(1, "Required").pipe(z.coerce.number().min(18))
+z.string().min(1, "Required").pipe(z.coerce.number().min(18));
 ```
 
 **For complete coercion guide including empty string handling, when NOT to use coercion, and z.coerce vs z.preprocess comparison, see [coercion-guide.md](coercion-guide.md)**

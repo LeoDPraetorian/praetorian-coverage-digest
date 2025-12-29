@@ -32,29 +32,32 @@ From the CLI source code (audit-critical.ts:5-8):
 ## Why LLMs Can't Replace This
 
 **Pattern Detection Challenges:**
+
 - Block scalars appear in multiple syntactic contexts
 - Regex patterns must handle YAML edge cases
 - False positive/negative rates too high with LLM-based detection
 
 **Impact of Failures:**
+
 - Block scalar descriptions make agents completely invisible to Task tool
 - Name mismatches prevent agent discovery
 - Missing descriptions break agent selection UI
 
 **Historical Evidence:**
+
 - Before CLI enforcement: 8/10 agents had critical issues
 - After CLI enforcement: <1/10 agents have issues
 - Manual LLM detection: ~40% miss rate on block scalars
 
 ## When to Use Instruction-Based vs CLI
 
-| Aspect | CLI-Based | Instruction-Based |
-|--------|-----------|-------------------|
-| Pattern complexity | High (regex, parsing) | Low (read, compare) |
-| Execution speed | <1 second | 10-30 seconds |
-| Consistency | 100% deterministic | ~95% consistent |
-| Maintenance | TypeScript updates | Skill document updates |
-| **Use for** | Critical structural validation | Quality checks, semantic validation |
+| Aspect             | CLI-Based                      | Instruction-Based                   |
+| ------------------ | ------------------------------ | ----------------------------------- |
+| Pattern complexity | High (regex, parsing)          | Low (read, compare)                 |
+| Execution speed    | <1 second                      | 10-30 seconds                       |
+| Consistency        | 100% deterministic             | ~95% consistent                     |
+| Maintenance        | TypeScript updates             | Skill document updates              |
+| **Use for**        | Critical structural validation | Quality checks, semantic validation |
 
 ## Related Tools
 

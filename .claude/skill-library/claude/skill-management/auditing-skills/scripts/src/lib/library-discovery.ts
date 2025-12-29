@@ -5,7 +5,7 @@
 
 import { readdirSync, statSync, existsSync } from 'fs';
 import { join, basename } from 'path';
-import { findProjectRoot } from '../../../../../../../lib/find-project-root.js';
+import { findProjectRoot } from '@chariot/lib';
 
 const PROJECT_ROOT = findProjectRoot();
 const SKILL_LIBRARY_PATH = join(PROJECT_ROOT, '.claude/skill-library');

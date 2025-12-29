@@ -11,6 +11,7 @@ A **library skill** wraps external tools, libraries, or frameworks that have the
 ### Characteristics
 
 Library skills typically:
+
 - Document an npm package (React, TanStack Query, Zod)
 - Wrap external APIs (GitHub, Linear, Jira, Stripe)
 - Cover third-party services (Chromatic, Playwright, Sentry)
@@ -19,6 +20,7 @@ Library skills typically:
 ### Location Pattern
 
 Library skills are usually in:
+
 - `.claude/skill-library/development/frontend/` (UI libraries)
 - `.claude/skill-library/development/backend/` (Backend libraries/APIs)
 - `.claude/skill-library/development/integrations/` (Third-party integrations)
@@ -32,15 +34,15 @@ Library skills are usually in:
 
 **Does the skill's primary purpose involve external documentation that exists outside this repository?**
 
-| If skill is about... | Library Skill? | Needs External Docs? |
-|----------------------|----------------|----------------------|
-| React Hook Form usage | ✅ Yes | ✅ Yes - official React Hook Form docs |
-| TanStack Query patterns | ✅ Yes | ✅ Yes - official TanStack docs |
-| TDD methodology | ❌ No | ❌ No - internal process skill |
-| Systematic debugging | ❌ No | ❌ No - internal process skill |
-| GitHub API integration | ✅ Yes | ✅ Yes - GitHub API docs |
-| Jira API integration | ✅ Yes | ✅ Yes - Jira API docs |
-| Progressive disclosure | ❌ No | ❌ No - internal architecture pattern |
+| If skill is about...    | Library Skill? | Needs External Docs?                   |
+| ----------------------- | -------------- | -------------------------------------- |
+| React Hook Form usage   | ✅ Yes         | ✅ Yes - official React Hook Form docs |
+| TanStack Query patterns | ✅ Yes         | ✅ Yes - official TanStack docs        |
+| TDD methodology         | ❌ No          | ❌ No - internal process skill         |
+| Systematic debugging    | ❌ No          | ❌ No - internal process skill         |
+| GitHub API integration  | ✅ Yes         | ✅ Yes - GitHub API docs               |
+| Jira API integration    | ✅ Yes         | ✅ Yes - Jira API docs                 |
+| Progressive disclosure  | ❌ No          | ❌ No - internal architecture pattern  |
 
 ### Decision Tree
 
@@ -80,6 +82,7 @@ references/links-to-official-docs.md
 ```
 
 Referenced from SKILL.md:
+
 ```markdown
 ## Related Resources
 
@@ -115,16 +118,19 @@ See: .claude/skill-library/claude/skill-management/creating-skills/references/sk
 ### Library Skills WITH External Docs ✅
 
 **using-modern-react-patterns** (after update):
+
 - Has "## Related Resources" section in SKILL.md
 - Links to 6 React 19 official docs
 - Brief list (appropriate for focused skill)
 
 **implementing-react-hook-form-zod**:
+
 - Has references/links-to-official-docs.md
 - 50+ categorized links to official documentation
 - Comprehensive file (appropriate for complex integration)
 
 **frontend-tanstack**:
+
 - Has "## Related Resources" section in SKILL.md
 - Links to TanStack Query, Router, Table docs
 - Brief list with key references
@@ -143,14 +149,17 @@ Expected: ✅ Links to Stripe API docs, webhook reference, error code reference
 ### Non-Library Skills (No External Docs Needed) ✅
 
 **developing-with-tdd**:
+
 - ✅ No external docs needed (internal methodology)
 - ✅ Has internal references only (RED-GREEN-REFACTOR patterns)
 
 **debugging-systematically**:
+
 - ✅ No external docs needed (internal process)
 - ✅ Has internal references only (root cause analysis, hypothesis testing)
 
 **adhering-to-yagni**:
+
 - ✅ No external docs needed (internal principle)
 - ✅ References internal examples only
 
@@ -161,12 +170,14 @@ Expected: ✅ Links to Stripe API docs, webhook reference, error code reference
 ### Step 1: Classify Skill
 
 Read skill description and content:
+
 - Is this a library/integration skill?
 - Does it wrap an external tool/service?
 
 ### Step 2: Check for External Docs
 
 If library skill:
+
 - Look for "## Related Resources" in SKILL.md
 - Look for references/links-to-official-docs.md
 - Check if links are present and relevant
@@ -174,6 +185,7 @@ If library skill:
 ### Step 3: Flag as Warning
 
 If library skill is missing external docs:
+
 - **Severity:** WARNING (not error)
 - **Rationale:** Skill may still be functional, but less discoverable
 - **Action:** Suggest adding external docs section

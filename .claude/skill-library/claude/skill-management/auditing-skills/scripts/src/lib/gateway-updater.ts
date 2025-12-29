@@ -7,7 +7,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { findProjectRoot } from '../../../../../../../lib/find-project-root.js';
+import { findProjectRoot } from '@chariot/lib';
 
 const PROJECT_ROOT = findProjectRoot();
 

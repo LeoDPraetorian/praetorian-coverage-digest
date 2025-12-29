@@ -72,14 +72,14 @@ We implemented progressive loading for MCPs through TypeScript wrappers that ach
 
 ### Token Savings
 
-| MCP Server          | Tools   | Before (startup)  | After (startup) | Savings   |
-|---------------------|---------|-------------------|-----------------|-----------|
-| `praetorian-cli`    | 17      | 25,000 tokens     | 0 tokens        | **25k**   |
-| `linear`            | 23      | 15,000 tokens     | 0 tokens        | **15k**   |
-| `playwright`        | 25      | 14,000 tokens     | 0 tokens        | **14k**   |
-| `currents`          | 8       | 8,000 tokens      | 0 tokens        | **8k**    |
-| `context7`          | 2       | 2,000 tokens      | 0 tokens        | **2k**    |
-| **TOTAL**           | **75+** | **64,000 tokens** | **0 tokens**    | **64k**   |
+| MCP Server       | Tools   | Before (startup)  | After (startup) | Savings |
+| ---------------- | ------- | ----------------- | --------------- | ------- |
+| `praetorian-cli` | 17      | 25,000 tokens     | 0 tokens        | **25k** |
+| `linear`         | 23      | 15,000 tokens     | 0 tokens        | **15k** |
+| `playwright`     | 25      | 14,000 tokens     | 0 tokens        | **14k** |
+| `currents`       | 8       | 8,000 tokens      | 0 tokens        | **8k**  |
+| `context7`       | 2       | 2,000 tokens      | 0 tokens        | **2k**  |
+| **TOTAL**        | **75+** | **64,000 tokens** | **0 tokens**    | **64k** |
 
 Additional savings from eliminated MCP infrastructure: **7,800 tokens**
 
@@ -193,13 +193,13 @@ skills:
 
 ### Token Budget Summary
 
-| Component               | Location                 | Discovery Cost      | Execution Cost        |
-|-------------------------|--------------------------|---------------------|-----------------------|
-| `gateway-mcp-tools`     | `.claude/skills/`        | ~100 chars (1 slot) | ~500 tokens           |
-| `mcp-tools-{service}`   | `.claude/skill-library/` | 0 (library)         | ~300-500 tokens       |
-| `mcp-tools-registry`    | `.claude/skill-library/` | 0 (library)         | ~1500 tokens          |
-| TypeScript wrappers     | `.claude/tools/`         | 0                   | ~50-100 tokens each   |
-| MCP servers             | (spawned on-demand)      | 0                   | 0 (external process)  |
+| Component             | Location                 | Discovery Cost      | Execution Cost       |
+| --------------------- | ------------------------ | ------------------- | -------------------- |
+| `gateway-mcp-tools`   | `.claude/skills/`        | ~100 chars (1 slot) | ~500 tokens          |
+| `mcp-tools-{service}` | `.claude/skill-library/` | 0 (library)         | ~300-500 tokens      |
+| `mcp-tools-registry`  | `.claude/skill-library/` | 0 (library)         | ~1500 tokens         |
+| TypeScript wrappers   | `.claude/tools/`         | 0                   | ~50-100 tokens each  |
+| MCP servers           | (spawned on-demand)      | 0                   | 0 (external process) |
 
 **Total at session start: 1 slot (~100 chars) vs legacy 71.8k tokens**
 
@@ -321,13 +321,13 @@ The MCP Manager is the lifecycle management system for MCP wrappers. It enforces
 
 ### Overview
 
-| Aspect           | Details                                                    |
-|------------------|-----------------------------------------------------------|
-| **Location**     | `.claude/skills/mcp-manager/`                              |
-| **Purpose**      | Create, test, audit, and maintain MCP wrappers             |
-| **Philosophy**   | TDD-first: tests must exist and fail before implementation |
-| **Coverage**     | Minimum 80% unit test coverage required                    |
-| **Invocation**   | Via `/mcp-manager` command or `mcp-manager` skill          |
+| Aspect         | Details                                                    |
+| -------------- | ---------------------------------------------------------- |
+| **Location**   | `.claude/skills/mcp-manager/`                              |
+| **Purpose**    | Create, test, audit, and maintain MCP wrappers             |
+| **Philosophy** | TDD-first: tests must exist and fail before implementation |
+| **Coverage**   | Minimum 80% unit test coverage required                    |
+| **Invocation** | Via `/mcp-manager` command or `mcp-manager` skill          |
 
 ### Directory Structure
 
@@ -411,18 +411,18 @@ The MCP Manager enforces a strict Red-Green-Refactor cycle. You cannot generate 
 
 MCP wrappers must pass compliance validation across 10 phases:
 
-| Phase | Name                   | Auto-Fix | Description                                                  |
-|-------|------------------------|----------|--------------------------------------------------------------|
-| 1     | Schema Discovery       | ❌       | Validates discovery docs exist for MCP tool                  |
-| 2     | Optional Fields        | ✅       | Tests verify `.optional()` Zod usage                         |
-| 3     | Type Unions            | ❌       | Tests cover `z.union()` edge cases                           |
-| 4     | Nested Access Safety   | ✅       | Tests catch unsafe property access                           |
-| 5     | Reference Validation   | ❌       | Detects deprecated MCP tool references                       |
-| 6     | Unit Test Coverage     | ❌       | **≥80% coverage required**                                   |
-| 7     | Integration Tests      | ❌       | Tests with real MCP server (recommended)                     |
-| 8     | Test Quality           | ❌       | Validates test patterns and structure                        |
-| 9     | Security Validation    | ❌       | Scans for dangerous patterns (eval, hardcoded keys)          |
-| 10    | TypeScript Validation  | ❌       | **CRITICAL if tsconfig.json missing**; detects type errors   |
+| Phase | Name                  | Auto-Fix | Description                                                |
+| ----- | --------------------- | -------- | ---------------------------------------------------------- |
+| 1     | Schema Discovery      | ❌       | Validates discovery docs exist for MCP tool                |
+| 2     | Optional Fields       | ✅       | Tests verify `.optional()` Zod usage                       |
+| 3     | Type Unions           | ❌       | Tests cover `z.union()` edge cases                         |
+| 4     | Nested Access Safety  | ✅       | Tests catch unsafe property access                         |
+| 5     | Reference Validation  | ❌       | Detects deprecated MCP tool references                     |
+| 6     | Unit Test Coverage    | ❌       | **≥80% coverage required**                                 |
+| 7     | Integration Tests     | ❌       | Tests with real MCP server (recommended)                   |
+| 8     | Test Quality          | ❌       | Validates test patterns and structure                      |
+| 9     | Security Validation   | ❌       | Scans for dangerous patterns (eval, hardcoded keys)        |
+| 10    | TypeScript Validation | ❌       | **CRITICAL if tsconfig.json missing**; detects type errors |
 
 > **STEPS vs PHASES Clarification:**
 >
@@ -439,25 +439,25 @@ cd .claude/skills/mcp-manager/scripts
 
 #### TDD Workflow Commands
 
-| Command                                        | Description                                  |
-|------------------------------------------------|----------------------------------------------|
-| `npm run create -- <service> <tool>`           | Generate test file only (RED phase setup)    |
-| `npm run verify-red -- <service>/<tool>`       | Verify tests fail (proves tests work)        |
-| `npm run generate-wrapper -- <service>/<tool>` | Generate wrapper (blocked until RED passes)  |
-| `npm run verify-green -- <service>/<tool>`     | Verify tests pass with ≥80% coverage         |
+| Command                                        | Description                                 |
+| ---------------------------------------------- | ------------------------------------------- |
+| `npm run create -- <service> <tool>`           | Generate test file only (RED phase setup)   |
+| `npm run verify-red -- <service>/<tool>`       | Verify tests fail (proves tests work)       |
+| `npm run generate-wrapper -- <service>/<tool>` | Generate wrapper (blocked until RED passes) |
+| `npm run verify-green -- <service>/<tool>`     | Verify tests pass with ≥80% coverage        |
 
 #### Maintenance Commands
 
-| Command                                     | Description                             |
-|---------------------------------------------|-----------------------------------------|
-| `npm run update -- <service> <tool>`        | Update existing wrapper (test-guarded)  |
-| `npm run audit -- <service>/<tool>`         | Run 10-phase compliance check           |
-| `npm run audit -- --all`                    | Audit all wrappers                      |
-| `npm run audit -- --service <service>`      | Audit all wrappers in a service         |
-| `npm run fix -- <service>/<tool>`           | Auto-fix issues (phases 2, 4)           |
-| `npm run fix -- <service>/<tool> --dry-run` | Preview fixes without applying          |
-| `npm run test -- <service>/<tool>`          | Run test suite for wrapper              |
-| `npm run generate-skill -- <service>`       | Generate/update service skill           |
+| Command                                     | Description                            |
+| ------------------------------------------- | -------------------------------------- |
+| `npm run update -- <service> <tool>`        | Update existing wrapper (test-guarded) |
+| `npm run audit -- <service>/<tool>`         | Run 10-phase compliance check          |
+| `npm run audit -- --all`                    | Audit all wrappers                     |
+| `npm run audit -- --service <service>`      | Audit all wrappers in a service        |
+| `npm run fix -- <service>/<tool>`           | Auto-fix issues (phases 2, 4)          |
+| `npm run fix -- <service>/<tool> --dry-run` | Preview fixes without applying         |
+| `npm run test -- <service>/<tool>`          | Run test suite for wrapper             |
+| `npm run generate-skill -- <service>`       | Generate/update service skill          |
 
 #### Example: Creating a New Wrapper
 
@@ -507,12 +507,12 @@ MCP wrappers execute external code and handle credentials, creating a significan
 
 ### Threat Model
 
-| Threat                  | Attack Vector                             | Impact                                    |
-|-------------------------|-------------------------------------------|-------------------------------------------|
-| **Injection attacks**   | Malicious input passed to MCP tools       | Command execution, data exfiltration      |
-| **Credential leakage**  | API keys in code, logs, or error messages | Unauthorized access to external services  |
-| **Resource exhaustion** | Unbounded responses, hanging connections  | Memory exhaustion, denial of service      |
-| **Supply chain**        | Compromised MCP server or dependency      | Full system compromise                    |
+| Threat                  | Attack Vector                             | Impact                                   |
+| ----------------------- | ----------------------------------------- | ---------------------------------------- |
+| **Injection attacks**   | Malicious input passed to MCP tools       | Command execution, data exfiltration     |
+| **Credential leakage**  | API keys in code, logs, or error messages | Unauthorized access to external services |
+| **Resource exhaustion** | Unbounded responses, hanging connections  | Memory exhaustion, denial of service     |
+| **Supply chain**        | Compromised MCP server or dependency      | Full system compromise                   |
 
 ### Input Validation
 
@@ -534,22 +534,22 @@ const InputSchema = z.object({
 
 ### Response Safety
 
-| Control         | Implementation                               | Default                |
-|-----------------|----------------------------------------------|------------------------|
-| **Timeout**     | `withTimeout()` wrapper aborts hanging calls | 30 seconds             |
-| **Size limit**  | `ResponseTooLargeError` if exceeded          | 1MB                    |
-| **Retries**     | Exponential backoff for transient failures   | 3 retries (1s, 2s, 4s) |
-| **Filtering**   | Wrappers return only essential fields        | Per-wrapper            |
+| Control        | Implementation                               | Default                |
+| -------------- | -------------------------------------------- | ---------------------- |
+| **Timeout**    | `withTimeout()` wrapper aborts hanging calls | 30 seconds             |
+| **Size limit** | `ResponseTooLargeError` if exceeded          | 1MB                    |
+| **Retries**    | Exponential backoff for transient failures   | 3 retries (1s, 2s, 4s) |
+| **Filtering**  | Wrappers return only essential fields        | Per-wrapper            |
 
 ### Credential Management
 
-| Principle                   | Implementation                                                   |
-|-----------------------------|------------------------------------------------------------------|
-| **No credentials in code**  | All credentials in `credentials.json` or OAuth tokens            |
-| **Per-service isolation**   | `getToolConfig(service)` returns ONLY that service's credentials |
-| **OAuth preferred**         | Linear uses OAuth; API keys only where OAuth unavailable         |
-| **Token storage**           | OAuth tokens in `~/.mcp-auth/` (outside repo)                    |
-| **Audit logging**           | Optional via `AUDIT_MCP_CALLS` environment variable              |
+| Principle                  | Implementation                                                   |
+| -------------------------- | ---------------------------------------------------------------- |
+| **No credentials in code** | All credentials in `credentials.json` or OAuth tokens            |
+| **Per-service isolation**  | `getToolConfig(service)` returns ONLY that service's credentials |
+| **OAuth preferred**        | Linear uses OAuth; API keys only where OAuth unavailable         |
+| **Token storage**          | OAuth tokens in `~/.mcp-auth/` (outside repo)                    |
+| **Audit logging**          | Optional via `AUDIT_MCP_CALLS` environment variable              |
 
 ### Code Quality
 
@@ -569,12 +569,12 @@ const InputSchema = z.object({
 
 MCP execution currently runs in the same process as the wrapper. Sandboxing options have been researched but implementation is deferred due to complexity:
 
-| Option                | Isolation                 | Trade-offs                  |
-|-----------------------|---------------------------|-----------------------------|
-| Docker containers     | Process + filesystem      | CVE risks, startup overhead |
-| isolated-vm           | V8 isolate                | Limited npm support         |
-| Deno permissions      | Fine-grained capabilities | Different runtime           |
-| Firecracker microVMs  | Hardware-level            | Complex setup               |
+| Option               | Isolation                 | Trade-offs                  |
+| -------------------- | ------------------------- | --------------------------- |
+| Docker containers    | Process + filesystem      | CVE risks, startup overhead |
+| isolated-vm          | V8 isolate                | Limited npm support         |
+| Deno permissions     | Fine-grained capabilities | Different runtime           |
+| Firecracker microVMs | Hardware-level            | Complex setup               |
 
 See **Phase 4.1** and **Phase 6** in Current Status & TODO for implementation roadmap.
 
@@ -749,11 +749,11 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
 
 ### Test Coverage Summary
 
-| Component         | Tests | Location                                           |
-|-------------------|-------|----------------------------------------------------|
-| `mcp-client.ts`   | 118   | `.claude/tools/config/lib/mcp-client.unit.test.ts` |
-| `sanitize.ts`     | 48    | `.claude/tools/config/lib/sanitize.unit.test.ts`   |
-| `config-loader.ts`| 25    | `.claude/tools/config/config-loader.unit.test.ts`  |
+| Component          | Tests | Location                                           |
+| ------------------ | ----- | -------------------------------------------------- |
+| `mcp-client.ts`    | 118   | `.claude/tools/config/lib/mcp-client.unit.test.ts` |
+| `sanitize.ts`      | 48    | `.claude/tools/config/lib/sanitize.unit.test.ts`   |
+| `config-loader.ts` | 25    | `.claude/tools/config/config-loader.unit.test.ts`  |
 
 ### Pending
 
@@ -763,22 +763,22 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
 
   **Why OAuth > API Keys**:
 
-  | Aspect     | OAuth                            | API Keys                                 |
-  |------------|----------------------------------|------------------------------------------|
-  | Storage    | `~/.mcp-auth/` (outside repo)    | `credentials.json` + `.env` (repo-adjacent) |
-  | Lifetime   | 7-day tokens, auto-refresh       | Permanent until manually revoked         |
-  | Scopes     | Granular permissions             | Full account access                      |
-  | Consent    | Explicit browser authorization   | Silent/implicit                          |
-  | If Leaked  | Limited window, auto-expires     | Persistent access until discovered       |
+  | Aspect    | OAuth                          | API Keys                                    |
+  | --------- | ------------------------------ | ------------------------------------------- |
+  | Storage   | `~/.mcp-auth/` (outside repo)  | `credentials.json` + `.env` (repo-adjacent) |
+  | Lifetime  | 7-day tokens, auto-refresh     | Permanent until manually revoked            |
+  | Scopes    | Granular permissions           | Full account access                         |
+  | Consent   | Explicit browser authorization | Silent/implicit                             |
+  | If Leaked | Limited window, auto-expires   | Persistent access until discovered          |
 
   **Current Status**:
 
-  | MCP      | Current Auth  | OAuth Available?                           | Priority |
-  |----------|---------------|--------------------------------------------|----------|
-  | Linear   | ✅ OAuth      | Yes (implemented)                          | Done     |
+  | MCP      | Current Auth  | OAuth Available?                            | Priority |
+  | -------- | ------------- | ------------------------------------------- | -------- |
+  | Linear   | ✅ OAuth      | Yes (implemented)                           | Done     |
   | GitHub   | API Key (PAT) | Yes (investigate `mcp-remote` or OAuth MCP) | High     |
-  | Currents | API Key       | Unknown (research needed)                  | Medium   |
-  | Context7 | API Key       | Unknown (research needed)                  | Medium   |
+  | Currents | API Key       | Unknown (research needed)                   | Medium   |
+  | Context7 | API Key       | Unknown (research needed)                   | Medium   |
 
   **Migration Pattern** (from Linear implementation):
   1. Check if service has remote MCP server with OAuth (like `mcp.linear.app`)
@@ -804,13 +804,13 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
 
   **Research Complete** (see Phase 4 Architecture):
 
-  | Option                    | Isolation Level           | Trade-offs                 | Priority |
-  |---------------------------|---------------------------|----------------------------|----------|
+  | Option                    | Isolation Level           | Trade-offs                  | Priority |
+  | ------------------------- | ------------------------- | --------------------------- | -------- |
   | Docker containers         | Process + filesystem      | CVE risks, startup overhead | Medium   |
-  | isolated-vm               | V8 isolate                | Limited npm support        | Low      |
-  | Deno permissions          | Fine-grained capabilities | Different runtime          | Medium   |
-  | Firecracker microVMs      | Hardware-level            | Complex setup              | Low      |
-  | Windows Runtime Isolation | Declarative privileges    | Windows-only               | Low      |
+  | isolated-vm               | V8 isolate                | Limited npm support         | Low      |
+  | Deno permissions          | Fine-grained capabilities | Different runtime           | Medium   |
+  | Firecracker microVMs      | Hardware-level            | Complex setup               | Low      |
+  | Windows Runtime Isolation | Declarative privileges    | Windows-only                | Low      |
 
   **Implementation Tasks**:
   - [ ] Choose sandboxing approach based on security/complexity trade-off

@@ -15,6 +15,7 @@ This document outlines the strategy for preventing submodule commits in the char
 5. **Independent Workflows**: Each submodule has its own CI/CD, testing, and release process
 
 **Correct Workflow:**
+
 - Develop and commit in the submodule's own repository
 - Create PRs in the submodule repository
 - Super-repo only tracks stable submodule releases
@@ -28,11 +29,13 @@ This document outlines the strategy for preventing submodule commits in the char
 **Location:** `.githooks/pre-commit`
 
 **How it works:**
+
 - Runs before every git commit
 - Checks if any staged changes are in `modules/*`
 - Blocks the commit with a helpful error message
 
 **Installation:**
+
 ```bash
 make setup              # Automatic during setup
 make install-git-hooks  # Manual installation
@@ -53,7 +56,7 @@ name: Prevent Submodule Commits
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   check-submodule-changes:
@@ -62,7 +65,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for comparison
+          fetch-depth: 0 # Fetch all history for comparison
 
       - name: Check for submodule changes
         run: |
@@ -122,6 +125,7 @@ jobs:
 **Reviewer Checklist:**
 
 When reviewing PRs, verify:
+
 - [ ] No changes to `modules/*` directories visible in Files Changed tab
 - [ ] PR description doesn't mention submodule updates
 - [ ] If submodule updates are mentioned, request removal

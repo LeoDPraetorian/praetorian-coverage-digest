@@ -224,7 +224,7 @@ Use WebFetch for user-selected sources. Summarize key findings.
 
 ```
 skill-name/
-├── SKILL.md                 # 300-600 lines
+├── SKILL.md                 # Keep under 500 lines
 ├── references/              # Detailed documentation
 │   ├── api-reference.md
 │   ├── patterns.md
@@ -233,7 +233,7 @@ skill-name/
     └── typescript/
 ```
 
-See [Skill Structure](references/skill-structure.md) for full specification.
+See [Skill Compliance Contract](../../../../skills/managing-skills/references/skill-compliance-contract.md) for line count limits and validation rules.
 
 ### 5.2 SKILL.md Template
 
@@ -289,7 +289,7 @@ Run quality checklist. See [Quality Checklist](references/quality-checklist.md).
 **Must pass:**
 
 - [ ] Description starts with "Use when"
-- [ ] Line count under maximum (600 for library, 400 for process)
+- [ ] Line count under 500 lines (see [Skill Compliance Contract](../../../../skills/managing-skills/references/skill-compliance-contract.md))
 - [ ] No TODO placeholders
 - [ ] At least 2 reference files
 

@@ -24,14 +24,14 @@ React Context is appropriate for:
 
 ### Chariot Platform Examples (12 Contexts)
 
-| Context                   | Purpose                        | Update Frequency | Lines |
-| ------------------------- | ------------------------------ | ---------------- | ----- |
-| **AuthContext**           | JWT, user, impersonation       | Very Low         | ~654  |
-| **ThemeContext**          | Light/dark/system toggle       | Very Low         | ~99   |
-| **GlobalStateContext**    | Modals, drawer stack           | Medium           | ~1048 |
-| **QueryBuilderContext**   | Filter options (from Query)    | Low              | -     |
-| **GraphStateProvider**    | Graph UI state (useReducer)    | Medium-High      | ~660  |
-| **CellFiltersContext** x2 | Table cell filters (scoped)    | High (localized) | -     |
+| Context                   | Purpose                     | Update Frequency | Lines |
+| ------------------------- | --------------------------- | ---------------- | ----- |
+| **AuthContext**           | JWT, user, impersonation    | Very Low         | ~654  |
+| **ThemeContext**          | Light/dark/system toggle    | Very Low         | ~99   |
+| **GlobalStateContext**    | Modals, drawer stack        | Medium           | ~1048 |
+| **QueryBuilderContext**   | Filter options (from Query) | Low              | -     |
+| **GraphStateProvider**    | Graph UI state (useReducer) | Medium-High      | ~660  |
+| **CellFiltersContext** x2 | Table cell filters (scoped) | High (localized) | -     |
 
 **Why split**: Prevents components from re-rendering when unrelated state changes.
 
@@ -62,7 +62,7 @@ export const AppProvider = ({ children }) => {
 ```typescript
 // ✅ GOOD - separate contexts
 const ThemeContext = createContext(); // Very low frequency
-const AuthContext = createContext();  // Low frequency
+const AuthContext = createContext(); // Low frequency
 const UIStateContext = createContext(); // Medium-high frequency
 ```
 
@@ -139,14 +139,14 @@ const AuthProvider = ({ children }) => {
 
 ```typescript
 // Drawer state is read from URL params
-const drawerOrder = JSON.parse(searchParams.get('drawerOrder') || '[]');
-const assetDrawerKey = searchParams.get('assetDrawerKey') || '';
+const drawerOrder = JSON.parse(searchParams.get("drawerOrder") || "[]");
+const assetDrawerKey = searchParams.get("assetDrawerKey") || "";
 
 // Updates modify URL for deep linking
 function handleOpenAssetDrawer(asset?: PartialAsset) {
   handleSetSearchParams({
-    drawerType: 'asset',
-    tabKeys: ['assetDrawerTab', 'assetDrawerSubTab'],
+    drawerType: "asset",
+    tabKeys: ["assetDrawerTab", "assetDrawerSubTab"],
     resource: asset,
   });
 }
@@ -165,14 +165,14 @@ function handleOpenAssetDrawer(asset?: PartialAsset) {
 
 ### When to Use URL vs Context
 
-| State Type       | Solution | Why                                  |
-| ---------------- | -------- | ------------------------------------ |
-| Drawer open/ID   | URL      | Deep linkable, survives refresh      |
-| Active tab       | URL      | Sharable, browser history            |
-| Modal open/close | Context  | Ephemeral, not sharable              |
-| Theme            | Context  | Persisted separately (localStorage)  |
-| Table filters    | URL      | Sharable, refreshable                |
-| Form input       | useState | Component-local, not shared          |
+| State Type       | Solution | Why                                 |
+| ---------------- | -------- | ----------------------------------- |
+| Drawer open/ID   | URL      | Deep linkable, survives refresh     |
+| Active tab       | URL      | Sharable, browser history           |
+| Modal open/close | Context  | Ephemeral, not sharable             |
+| Theme            | Context  | Persisted separately (localStorage) |
+| Table filters    | URL      | Sharable, refreshable               |
+| Form input       | useState | Component-local, not shared         |
 
 ## React 19 Compiler Impact
 

@@ -72,16 +72,16 @@ skill: "gateway-frontend"; // Core skills work with Skill tool
 
 ### Role Filter
 
-| Your Role              | Mandatory Sections                                                        |
-|------------------------|---------------------------------------------------------------------------|
-| **Developer**          | ALL ROLES + UI STYLING                                                    |
-| **Lead/Architect**     | ALL ROLES + UI STYLING + ARCHITECTURE PATTERNS                            |
-| **E2E Tester**         | ALL ROLES + E2E TESTING (also invoke `gateway-testing`)                   |
-| **Unit Tester**        | ALL ROLES + UNIT TESTING (also invoke `gateway-testing`)                  |
-| **Integration Tester** | ALL ROLES + INTEGRATION TESTING (also invoke `gateway-testing`)           |
-| **Reviewer**           | ALL ROLES + UI STYLING                                                    |
-| **Security**           | ALL ROLES (security-specific skills come from `gateway-security`)         |
-| **Designer**           | ALL ROLES + UI STYLING                                                    |
+| Your Role              | Mandatory Sections                                                |
+| ---------------------- | ----------------------------------------------------------------- |
+| **Developer**          | ALL ROLES + UI STYLING                                            |
+| **Lead/Architect**     | ALL ROLES + UI STYLING + ARCHITECTURE PATTERNS                    |
+| **E2E Tester**         | ALL ROLES + E2E TESTING (also invoke `gateway-testing`)           |
+| **Unit Tester**        | ALL ROLES + UNIT TESTING (also invoke `gateway-testing`)          |
+| **Integration Tester** | ALL ROLES + INTEGRATION TESTING (also invoke `gateway-testing`)   |
+| **Reviewer**           | ALL ROLES + UI STYLING                                            |
+| **Security**           | ALL ROLES (security-specific skills come from `gateway-security`) |
+| **Designer**           | ALL ROLES + UI STYLING                                            |
 
 **Note:** All skills remain available to any role via the routing tables below. The table shows what you MUST load upfront—not what you're limited to.
 
@@ -381,7 +381,7 @@ These foundational skills apply across all frontend development:
 **🧪 = Mandatory for E2E TESTING | 🔬 = Mandatory for UNIT TESTING | 🔗 = Mandatory for INTEGRATION TESTING**
 
 | Need                      | Skill Path                                                                                |
-| ------------------------- | ------------------------------------------------------------------------------------------|
+| ------------------------- | ----------------------------------------------------------------------------------------- |
 | ⭐ React 19 conventions   | `.claude/skill-library/development/frontend/enforcing-react-19-conventions/SKILL.md`      |
 | ⭐ Modern React patterns  | `.claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md`         |
 | ⭐ Performance            | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`        |
@@ -389,11 +389,11 @@ These foundational skills apply across all frontend development:
 | 🎨 Brand guidelines       | `.claude/skill-library/development/frontend/chariot-brand-guidelines/SKILL.md`            |
 | 🏗️ State management arch  | `.claude/skill-library/architecture/frontend/architecting-state-management/SKILL.md`      |
 | 🏗️ TanStack integration   | `.claude/skill-library/architecture/frontend/integrating-tanstack-components/SKILL.md`    |
-| 🧪 E2E testing             | `.claude/skill-library/testing/frontend/frontend-e2e-testing-patterns/SKILL.md`           |
-| 🧪 E2E security testing    | `.claude/skill-library/testing/frontend/testing-security-with-e2e-tests/SKILL.md`         |
-| 🔬 Component testing       | `.claude/skill-library/testing/frontend/frontend-testing-patterns/SKILL.md`               |
-| 🔬 Form testing            | `.claude/skill-library/testing/frontend/frontend-interactive-form-testing/SKILL.md`       |
-| 🔗 Query cache debugging   | `.claude/skill-library/testing/frontend/react-query-cache-debugging/SKILL.md`             |
+| 🧪 E2E testing            | `.claude/skill-library/testing/frontend/frontend-e2e-testing-patterns/SKILL.md`           |
+| 🧪 E2E security testing   | `.claude/skill-library/testing/frontend/testing-security-with-e2e-tests/SKILL.md`         |
+| 🔬 Component testing      | `.claude/skill-library/testing/frontend/frontend-testing-patterns/SKILL.md`               |
+| 🔬 Form testing           | `.claude/skill-library/testing/frontend/frontend-interactive-form-testing/SKILL.md`       |
+| 🔗 Query cache debugging  | `.claude/skill-library/testing/frontend/react-query-cache-debugging/SKILL.md`             |
 | Component migration       | `.claude/skill-library/development/frontend/migrating-chariot-ui-components/SKILL.md`     |
 | Server state (API calls)  | `.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md`                |
 | Client state (complex)    | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md`      |
@@ -528,4 +528,3 @@ Other domain gateways you can invoke via Skill tool:
 | Integrations | `skill: "gateway-integrations"` | Third-party APIs, Jira, HackerOne, MS Defender    |
 | Capabilities | `skill: "gateway-capabilities"` | VQL, Nuclei templates, Scanner integration        |
 | Claude       | `skill: "gateway-claude"`       | Skills, Agents, Commands, MCP wrappers            |
-| Analytics    | `skill: "gateway-analytics"`    | Metrics, Data visualization, Reporting            |

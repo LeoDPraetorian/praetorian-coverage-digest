@@ -1,498 +1,156 @@
-## [Date: 2025-12-27] - Remove finding-agents-for-skills Reference
+# Changelog
 
-### Removed
-- "Agent Analysis" section that referenced finding-agents-for-skills
+All notable changes to the auditing-skills skill.
 
-### Reason
-- finding-agents-for-skills skill is being deleted
-- Library skills route through gateways, not direct agent references
-- Agent analysis no longer needed for skill lifecycle
-
-### Files Changed
-- `SKILL.md` - Removed Agent Analysis section (lines 77-82)
-
-### Method
-- Quick update via managing-skills
-- Backup: `.local/2025-12-27-*-auditing-skills.bak`
-
----
-
-## [Date: 2025-12-27] - Add Phase 14g: Prettier Table Formatting
-
-### Added
-- **Phase 14g** - Prettier-based table formatting validation
-- Added to deterministic phases list (8 phases total now)
-- Added to "Fixes phases" list in Fix Workflow section
-- Reference to centralized requirements at `managing-skills/references/table-formatting.md`
-
-### Reason
-- **RED failure**: No validation for Prettier table formatting
-- Phase 14a validates table STRUCTURE (columns, separators), not FORMATTING (spacing, alignment)
-- Skills can have inconsistently formatted tables without any audit warning
-
-### Technical Details
-- **Validation**: `npx prettier --check --parser markdown`
-- **Auto-fix**: `npx prettier --write --parser markdown`
-- **Tier**: 1 (Deterministic) - one correct answer, CLI auto-applies
-- **Severity**: WARNING (auto-fixable)
-- Centralized requirements: `managing-skills/references/table-formatting.md`
-
-### Files Changed
-- `SKILL.md` - 3 edits (phase categories, Phase Details, Fix Workflow)
-
-### Method
-- Used `updating-skills` TDD workflow
-- Backup: `.local/2024-12-27-auditing-skills.bak`
-- Line count: 451 → 455 (under 500 limit)
-
----
-
-## [Date: 2025-12-26] - Phase 15 Router Skill Recognition
-
-### Added
-- `ROUTER_SKILLS` constant - List of non-gateway router skills (currently: `managing-skills`)
-- `isSkillInRouterSkill()` function - Checks if skill is referenced in router skills
-- Router skill check in `isOrphanedSkill()` - Fourth discovery path check
-
-### Reason
-- **RED failure**: `finding-agents-for-skills` showed orphan warning despite being referenced in `managing-skills`
-- Phase 15 only recognized `gateway-*` patterns as routers
-- `managing-skills` is a router skill but doesn't follow `gateway-*` naming
-
-### Technical Details
-- Added router check parallel to gateway check pattern
-- `isOrphanedSkill()` now checks: agent refs → core skill → gateway → router
-- Extensible: Add more routers to `ROUTER_SKILLS` array as needed
-
-### Files Changed
-- `scripts/src/lib/agent-analyzer.ts` - Added ROUTER_SKILLS, isSkillInRouterSkill(), updated isOrphanedSkill()
-
-### Method
-- Used `updating-skills` TDD workflow
-- Backup: `.local/2025-12-26-16-15-11-agent-analyzer.ts.bak`
-
----
-
-## [Date: 2025-12-26] - Split Agent Analysis to Dedicated Skill
-
-### Removed
-- **Interactive Analysis Selection** section (lines 59-78) - Pre-flight prompt asking "Audit only / Find agents / Both"
-- **Agent Evaluation (Two-Phase)** section (lines 81-121) - Agent scoring workflow
-
-### Added
-- Brief "Agent Analysis" section with link to `finding-agents-for-skills` skill
-
-### Reason
-- **RED failure**: Pre-flight prompt was frequently bypassed when Claude went straight to CLI
-- **Single-responsibility principle**: Audit skill should only audit, not also do agent analysis
-- **Simplification**: Users who want agent recommendations use dedicated `/skill-manager find-agents` command
-- Part of larger refactor to create `finding-agents-for-skills` skill
-
-### Technical Details
-- Line count: 490 → 433 (freed 57 lines)
-- CLI flags (`--agents-data`, `--agents-render`) remain available for `finding-agents-for-skills` to use
-- No changes to scripts/src/ - only SKILL.md documentation changes
-
-### Files Changed
-- `SKILL.md` - Replaced 64 lines with 7-line reference section
-
-### Method
-- Used `updating-skills` TDD workflow
-- Backup: `.local/2025-12-26-16-11-41-auditing-skills.bak`
-
----
-
-## [Date: 2025-12-26 - Two-Phase Agent Recommendation Architecture]
+## [2025-12-28] - Mandatory Description Quality Assessment
 
 ### Changed
-- **Agent Evaluation section** - Replaced single `--agents` flag with two-phase CLI flow
-- **Phase 1**: `--agents-data` outputs JSON for Claude to analyze
-- **Phase 2**: `--agents-render --scores="..."` renders table with Claude's scores
-- **Output Rules** - Claude outputs only "See table above" after Phase 2
-
-### Reason
-- **RED failure**: CLI outputting table with "← evaluate" placeholders, then Claude duplicating
-- **Root cause**: CLI ran first (printed table), Claude responded after (couldn't fill in table)
-- **Architectural fix**: Claude analyzes data, passes scores as CLI INPUT, CLI renders table
+- **INSTRUCTION-BASED ENFORCEMENT**: Added explicit, mandatory Description Quality Assessment instructions to semantic review
+  - Before: Vague checklist item "Description Quality (CSO)" with no concrete criteria
+  - After: Dedicated subsection with 5-criteria evaluation framework (Accuracy, Completeness, Specificity, Discoverability, Honesty)
+  - Impact: Transforms description quality from "easy to skip" to "impossible to bypass"
 
 ### Technical Details
-- `agent-analyzer.ts`: Added `formatAgentDataForAnalysis()` (JSON output)
-- `agent-analyzer.ts`: Added `renderAgentTableWithScores()` (table with scores)
-- `audit.ts`: Added `--agents-data` and `--agents-render --scores` flags
-- `SKILL.md`: Updated Agent Evaluation section with two-phase instructions
-- Line count: 486 → 490 (under 500 limit)
+- Updated "Semantic Review Checklist" to mark Description Quality as "MANDATORY detailed assessment (see section below)"
+- Added new subsection "Description Quality Assessment (MANDATORY)" with brief summary + link
+- Full 5-criteria framework extracted to `references/description-quality-assessment.md`:
+  - 5-criteria evaluation table with specific questions and failure examples
+  - Step-by-step assessment instructions
+  - JSON output format for findings
+  - Concrete examples of issues to report (4 examples)
+  - Severity guidance table
+- Added enforcement statement before "END OF TASK": "⚠️ AUDIT IS INCOMPLETE if you skip Description Quality Assessment"
 
-### Files Changed
-- `scripts/src/lib/agent-analyzer.ts` - Two new functions
-- `scripts/src/audit.ts` - New CLI flags
-- `SKILL.md` - Two-phase instructions + output rules
+### Why This Matters
+The deleted `phase1b-description-quality.ts` was "fantasy code" that expected Claude to magically populate quality issues during TypeScript execution. Real enforcement requires explicit instructions that Claude must follow during semantic review.
 
-### Method
-- Used `updating-skills` TDD workflow (RED-GREEN)
-- Followed architectural discussion before implementation
+**Description quality = skill discoverability.** A skill with poor description is an invisible skill.
 
----
+### Files Modified
+- `SKILL.md` - Reduced from 2286 to 1438 words via progressive disclosure
+- `references/description-quality-assessment.md` - NEW: Full 5-criteria framework (~70 lines)
+- `references/semantic-review-output.md` - NEW: JSON format, severity levels, output contract (~75 lines)
 
-## [Date: 2025-12-26 - Fix Post-Audit Prompt + Agent Output Duplication]
+### Extractions Applied
+1. **Description Quality Assessment** - Full framework extracted, inline summary retained
+2. **Semantic Review Output** - JSON examples, severity levels, output contract extracted
+3. **Fix Workflow** - Detailed procedures removed, link to fixing-skills retained
+4. **Fixing Issues subsection** - Shortened to link only
+5. **Post-Audit Semantic Review** - Duplicate section removed
+
+### Testing
+- ✅ Word count: 1438 (under 1500 limit)
+- ✅ Line count: 307 (under 500 limit)
+- ✅ All existing semantic review structure preserved
+- ✅ Reference files integrate with existing JSON output format
+
+### User-Facing Changes
+When performing semantic review, Claude will now:
+1. Evaluate descriptions against 5 concrete criteria
+2. Report specific issues with recommendations
+3. Cannot bypass or skip this assessment (multiple enforcement points)
+
+## [2024-12-28] - Phase Registry Pattern (Open/Closed Principle)
 
 ### Changed
-- **Interpreting Results section** - Removed "Stop there" and "Do NOT provide next steps"
-- Added "proceed to Post-Audit Actions if issues were found"
-- Condensed "What NOT to do" list from 7 items to 3 (saved 10 lines)
-- **Agent Output Format** - Removed markdown table template, replaced with inline scores
-- Changed from `| Agent | Score |` table to `**40 (direct):** agent1, agent2` format
-
-### Reason
-- **RED failure 1**: Post-audit prompt never fired because "Stop there" blocked it
-- "Do NOT provide next steps" contradicted "Post-Audit Actions" section
-- **RED failure 2**: Agent table duplicated - CLI outputs beautiful table, Claude created another
-- Template showed markdown table despite saying "DO NOT duplicate"
+- **ARCHITECTURE**: Implemented Phase Registry Pattern to fix Open/Closed Principle violation
+  - Before: Adding a phase required manual updates in 6-8 locations
+  - After: Adding a phase requires ONE entry in phase-registry.ts
+  - Impact: Eliminates forgotten wiring when extending the system
 
 ### Technical Details
-- Line 223: "Stop there" → "proceed to Post-Audit Actions if issues were found"
-- Line 229: Removed "Do NOT provide next steps (the CLI already does)"
-- Lines 114-117: Removed markdown table template, added inline score format
-- Line count: 498 → 486 (saved 12 lines)
+- Created `phase-registry.ts` as single source of truth for all 23 phases
+  - PHASE_REGISTRY array with metadata (number, name, fixable, requiresSkillsDir, etc.)
+  - PHASE_COUNT derived from registry (no manual constant)
+  - FIXABLE_PHASES filtered list for fix CLI
+  - Helper functions: getPhaseKey(), findPhasesByNumber(), findPhaseByKey()
+- Refactored `audit-engine.ts` to iterate over PHASE_REGISTRY:
+  - runFull(): Replaced 136 lines of explicit calls with 12-line loop
+  - runFullForSingleSkill(): Replaced 91 lines with registry iteration
+  - runSinglePhaseForSkill(): Replaced 28-entry object with findPhasesByNumber() lookup
+- Refactored `fixing-skills/fix.ts`:
+  - Replaced 88 lines of if-block cascade with 12-line loop over FIXABLE_PHASES
+  - Auto-fix routing now works dynamically
 
-### Files Changed
-- `SKILL.md` - Two edits: Interpreting Results + Agent Output Format
+### Benefits
+1. **Single Source of Truth**: All phase definitions in `phase-registry.ts`
+2. **Open/Closed Principle**: System now open for extension, closed for modification
+3. **No Manual Coordination**: Consumers automatically iterate over registry
+4. **Reduced Maintenance**: Previously 6-8 touch points, now just 1
+5. **Type Safety**: TypeScript compilation validates all phase references
 
-### Method
-- Used `updating-skills` TDD workflow (RED-GREEN)
+### Future Phase Addition
+To add Phase 22:
+1. Create `phase22-my-feature.ts` in `phases/` directory
+2. Add ONE entry to PHASE_REGISTRY in `phase-registry.ts`
+3. Done! All commands automatically pick it up
 
----
+No changes needed to audit-engine.ts, fix.ts, or any consumers.
 
-## [Date: 2025-12-26 - Fix Agent Evaluation Output Instructions]
+### Files Modified
+- **Created**: `scripts/src/lib/phase-registry.ts` (133 lines)
+- **Modified**: `scripts/src/lib/audit-engine.ts` (reduced complexity)
+- **Modified**: `fixing-skills/scripts/src/fix.ts` (simplified fix routing)
+
+### Testing
+- ✅ TypeScript compilation successful (both packages)
+- ✅ Full audit on using-skills passed
+- ✅ Single-phase audit (--phase 1) passed
+- ✅ Phase 14 sub-phases work correctly
+- ✅ Fix command (--phase 2) works with registry routing
+- ✅ Compliance audit on auditing-skills passed
+
+### Backward Compatibility
+- 100% backward compatible - all existing commands work identically
+- Fix methods maintained for existing phases
+- CLI help text shows correct phase count (21)
+
+## [2024-12-28] - Performance Optimization
 
 ### Changed
-- Updated "Agent Evaluation > Output Format" section (lines 105-118)
-- Removed instructions telling Claude to create its own markdown table
-- Added "⚠️ DO NOT duplicate the CLI table" warning
-- New pattern: Point to Bash output, then provide semantic scores
-
-### Reason
-- **RED failure**: SKILL.md told Claude to create markdown table, ignoring beautiful CLI output
-- Lines 105-114 contradicted "Interpreting Results" section (lines 203-236)
-- Users saw ugly markdown instead of cli-table3 output with colored badges
-- CLI outputs: `╔═══════════╗` with colored badges
-- Claude created: `| Agent | Score |` plain markdown
+- **PERFORMANCE**: Eliminated O(N×M) complexity in full audit execution
+  - Before: Each of 23 phases independently parsed all N skills (23 × N file operations)
+  - After: Parse all skills once, then run 23 validation phases (N file operations)
+  - Impact: ~23× reduction in file system operations for full audits
 
 ### Technical Details
-- Previous: "After seeing agent list, Claude provides a recommendation table:"
-- Now: "⚠️ DO NOT duplicate the CLI table. Point to Bash output, then provide scores:"
-- Line count: 494 → 498 (under 500 limit)
-
-### Files Changed
-- `SKILL.md` - Updated Agent Evaluation > Output Format section
-
-### Method
-- Used `updating-skills` TDD workflow (RED-GREEN)
-
----
-
-## [Date: 2025-12-26 - Agent Table Visual Consistency with Audit Table]
-
-### Changed
-- **formatAgentListForClaudeEvaluation()** - Updated to match audit table visual styling
-- Changed from 3 columns to 4 columns: Category | Agent | Description | Score
-- Added `formatCategoryBadge()` function with colored symbols (● DEV, ● TEST, etc.)
-- Column widths now match audit table: [14, 28, 60, 60] (was [30, 80, 20])
-- Agents sorted by category for visual grouping
-- Empty descriptions now show "(see agent file for details)" placeholder
-
-### Reason
-- **RED failure**: Agent table output looked visually different from audit table
-- Both used same cli-table3 library and Unicode box-drawing, but different columns
-- Audit table had 4 columns with colored severity badges; agent table had 3 plain columns
-- Visual inconsistency made output look less sophisticated
-
-### Technical Details
-- Category badges use geometric symbols (●, ○) like severity badges
-- Color coding: DEV=green, TEST=blue, ARCH=magenta, QUALITY=yellow, etc.
-- Score column shows "← evaluate" placeholder for Claude to reference
-- Claude still does semantic evaluation (data unchanged, presentation improved)
-
-### Files Changed
-- `scripts/src/lib/agent-analyzer.ts` - Updated formatAgentListForClaudeEvaluation()
-
-### Method
-- Used `updating-skills` TDD workflow (RED-GREEN)
-
----
-
-## [Date: 2025-12-26 - Fix Documentation Bug: Remove Non-Existent --fix Flag]
-
-### Changed
-- **Quick Reference table** - Removed `npm run audit -- <name> --fix` row (command doesn't exist)
-- **"Fixing Issues" section** - Updated to reference `fixing-skills` skill and correct CLI command
-- **Post-Audit Actions table** - Changed "Deterministic only" to use `npm run -w @chariot/fixing-skills fix`
-- **Common workflow section** - Updated Step 3 command from `audit --fix` to correct fixing-skills CLI
-- **references/common-failure-patterns.md** - Updated line 70 to use correct fix command
-
-### Reason
-- **RED failure**: Users got `error: unknown option '--fix'` when following documentation
-- Documentation referenced `audit --fix` but audit.ts only has: --phase, --verbose, --quiet, --agents
-- Correct workflow is: audit (detect) → fixing-skills (remediate) with separate CLI commands
-
-### Technical Details
-- `audit.ts` (detection) and `fix.ts` (remediation) are separate commands in different packages
-- Audit: `npm run audit -- <skill>`
-- Fix: `npm run -w @chariot/fixing-skills fix -- <skill>`
-- fixing-skills can also be invoked as a skill via Read tool for full orchestration
-
-### Files Changed
-- `SKILL.md` - 5 edits (lines 51, 131, 231, 368, plus section restructure)
-- `references/common-failure-patterns.md` - 1 edit (line 70)
-
-### Method
-- Used `updating-skills` TDD workflow (RED-GREEN-REFACTOR)
-- Line count: 452 → 451 lines (minimal change, removed one table row)
-
----
-
-## [Date: 2025-12-26 - Post-Audit Fix Workflow Integration]
-
-### Added
-- **Post-Audit Actions section** - AskUserQuestion prompts user when audit finds issues
-- Four options: Full fixing workflow, Deterministic only, Show categorization, Skip
-- Integration with `fixing-skills` for hybrid (mechanical + reasoning) fixes
-
-### Changed
-- Updated description from "20-phase" to "21-phase" audit
-- Updated phase categories to reflect Phase 14a-c (visual/style) and Phase 21 (line numbers)
-- Extracted "Common Failure Patterns" to `references/common-failure-patterns.md` (saved ~70 lines)
-- Line count: 484 → 452 lines (extraction offset by new section)
-
-### Reason
-- **RED failure**: After audit completed with issues, users had no guidance on next steps
-- No prompt to invoke `fixing-skills` workflow
-- Missing integration between audit detection and fix orchestration
-
-### Files Changed
-- `SKILL.md` - Added Post-Audit Actions section, updated phase counts, extracted content
-- `references/common-failure-patterns.md` - NEW file with extracted failure patterns
-
-### Technical Details
-- AskUserQuestion appears after audit shows results (only if issues found)
-- "Full fixing workflow" invokes `fixing-skills` skill with context
-- "Deterministic only" runs `npm run audit -- <skill> --fix`
-- "Show categorization" displays phase-categorization.md table
-
-### Method
-- Used `updating-skills` TDD workflow
-
----
-
-## [Date: 2025-12-24 - Phase 14 Expansion: Visual & Style Quality]
-
-### Added
-- **Phase 14a: Table Formatting** - Validates markdown tables (alignment, structure)
-- **Phase 14b: Code Block Quality** - Validates language tags, syntax highlighting
-- **Phase 14c: Header Hierarchy** - Validates logical H1-H6 flow
-
-### Changed
-- Renamed Phase 14 from "Example Quality" to parent category with 3 sub-phases
-- Added visual quality checks (table formatting, code blocks, headers)
-- Updated phase count references: 18 → 21 phases
-
-### Reason
-- **RED failure**: Skills had malformed tables, missing code block language tags, broken header hierarchies
-- Phase 14 was too narrow (only checked examples)
-- Visual quality issues caused readability problems
-
-### Technical Details
-- Phase 14a checks: table pipes alignment, header separators, row consistency
-- Phase 14b checks: code blocks have language tags, no mismatched tags
-- Phase 14c checks: no skipped levels (H1→H3), no duplicate H1s
-
-### Files Changed
-- `SKILL.md` - Updated phase descriptions, added Phase 14a-c details
-- `scripts/src/lib/phases/phase14a-table-formatting.ts` - NEW
-- `scripts/src/lib/phases/phase14b-code-block-quality.ts` - NEW
-- `scripts/src/lib/phases/phase14c-header-hierarchy.ts` - NEW
-
-### Method
-- Created via TDD (RED-GREEN-REFACTOR)
-
----
-
-## [Date: 2025-12-24 - Phase 15: Orphan Detection]
-
-### Added
-- **Phase 15: Orphan Detection** - Identifies library skills with no discovery path
-- Agent recommendation algorithm (domain matching, keyword overlap, skill type)
-- Confidence scoring: HIGH (>0.7), MEDIUM (0.4-0.7), LOW (<0.4)
-
-### Reason
-- **RED failure**: Library skills created but never referenced by gateways or agents
-- Skills became invisible to users (no discovery path from core)
-- Progressive disclosure broken (skills existed but unreachable)
-
-### Technical Details
-- Checks both gateway routing tables and agent allowed-tools
-- Uses fuzzy matching: domain, description keywords, skill type patterns
-- Only flags library skills (core skills discoverable by default)
-
-### Files Changed
-- `SKILL.md` - Added Phase 15 documentation
-- `scripts/src/lib/phases/phase15-orphan-detection.ts` - NEW
-- `scripts/src/lib/agent-analyzer.ts` - NEW (recommendation engine)
-
-### Method
-- Created via TDD with pressure testing
-
----
-
-## [Date: 2025-12-23 - Phase 21: Line Number Reference Validation]
-
-### Added
-- **Phase 21: Line Number References** - Detects brittle `file.go:123` patterns
-- Enforcement of durable code reference patterns (method signatures, structural descriptions)
-
-### Reason
-- **RED failure**: Skills contained line number references (e.g., `nuclei.go:167-171`)
-- Line numbers become outdated with every code change
-- References broke silently, causing confusion
-
-### Technical Details
-- Detects patterns: `file.ext:123`, `file.ext:123-456`
-- Recommends durable patterns: method signatures, structural descriptions, file-only
-- Example: `nuclei.go:167` → `nuclei.go` - `func (n *Nuclei) MockCollectors(...)`
-
-### Files Changed
-- `SKILL.md` - Added Phase 21 documentation
-- `scripts/src/lib/phases/phase21-line-number-references.ts` - NEW
-
-### Method
-- Created via TDD (RED-GREEN-REFACTOR)
-
----
-
-## [Date: 2025-12-17 - Initial Creation]
-
-### Added
-- 18-phase structural audit framework
-- CLI with audit, search commands
-- Shared validation library (audit-engine, phases, utilities)
-- Integration with skill-manager ecosystem
-
-### Method
-- Migrated from previous audit system
-- Consolidated validation logic into reusable library
-
-## [2025-12-26] - Changed
-
-### Fixed
-- Agent recommendations now use Claude semantic evaluation instead of broken heuristics
-- Previously: shadcn-ui (React UI) scored 40/40 for backend-developer (WRONG)
-- Now: Claude compares skill description to agent description semantically
-
-### Changed
-- `--agents` flag now outputs skill + agent list for Claude to evaluate
-- Added `formatAgentListForClaudeEvaluation()` function in agent-analyzer.ts
-- Deprecated old `formatRecommendationTable()` and scoring functions
-- Added "Agent Evaluation" section to SKILL.md with scoring criteria
-
-### Technical Details
-- Removed: API calls, caching layers, async pipelines (over-engineering)
-- Added: Simple table output + instructions for Claude reasoning
-- Architecture: CLI outputs data, Claude evaluates semantically
-
-## [$TIMESTAMP] - Changed
-
-**What changed:**
-- Updated "Interpreting Results" section: Changed "DO NOT INTERPRET" to "DO NOT REFORMAT SCRIPT OUTPUT" to clarify that reasoning is required, only script output reformatting is prohibited
-- Added new "Performing Semantic Review" section between "Interpreting Results" and "Post-Audit Actions" with mandatory semantic review workflow
-- Updated "Post-Audit Actions" section: Changed trigger from "when audit completes with issues" to "after semantic review completes and combined findings displayed"
-- Updated audit-phases.md "When to Skip Semantic Review": Removed "all structural phases passed with zero warnings" condition (semantic review now mandatory for all audits)
-
-**Reason (RED failure):**
-Semantic review workflow was documented but not integrated into execution flow. The instruction "DO NOT INTERPRET" was misunderstood as "don't use reasoning" when it actually meant "don't reformat deterministic script output". This caused agents to skip semantic review entirely, even though it's mandatory per audit-phases.md line 473. Workflow terminated early at "Post-Audit Actions" before reaching "Post-Audit Semantic Review" section.
-
-**Impact:**
-Semantic review (skill categorization, gateway membership, tool appropriateness, etc.) now executes for ALL audits. Findings are displayed in deterministic table format matching script output style. Linear workflow: script → display → semantic review → combined findings → prompt for fixes.
-
-**Files modified:**
-- auditing-skills/SKILL.md (lines 152-274)
-- managing-skills/references/audit-phases.md (lines 580-587)
-
-## [$TIMESTAMP] - Changed
-
-**What changed:**
-- Removed completion message from "Interpreting Results" section (lines 152-168)
-- Added explicit instruction: "Do NOT display any completion message yet"
-- Added new "Completion Output" subsection to "Performing Semantic Review" section (lines 231-243)
-- Completion message now appears AFTER semantic findings are displayed
-
-**Reason (RED failure):**
-Completion message "✅ Audit complete" was appearing immediately after CLI script ran, BEFORE semantic review was performed. This created false impression that audit was complete when only structural validation (50%) had been done. User observed: script → "✅ Audit complete" → semantic review begins. This was backwards - completion message should be LAST output after ALL findings (structural + semantic) are collected and displayed.
-
-**Impact:**
-Workflow order fixed:
-1. Run CLI script (Bash output with structural table appears)
-2. Perform semantic review (silent reasoning, read skill, evaluate 6 criteria)
-3. Output semantic findings table
-4. Output "✅ Audit complete" message (LAST)
-
-Completion message now correctly signals that BOTH structural AND semantic audits are complete.
-
-**Files modified:**
-- auditing-skills/SKILL.md (lines 152-243)
-
-## [Changed] - 2025-12-26
-
-**What**: Integrated formatting-skill-output library for deterministic combined output
-
-**Reason**: Previously, Claude manually formatted semantic findings as ANSI tables, which was not deterministic and created duplicate output formatting. The new approach has Claude output JSON only, and the CLI merges structural + semantic findings using the shared formatting library.
-
-**Changes**:
-- Updated SKILL.md "Output Format" section to instruct JSON-only output for semantic findings
-- Removed ANSI table example (CLI handles formatting now)
-- Updated "Completion Output" section to use CLI merge command
-- Added imports to audit.ts: formatFindingsTable, validateSemanticFindings, semanticFindingsToFindings
-- Added --merge-semantic flag to audit.ts for combining structural + semantic findings
-- Implemented merge logic to run audit, convert findings, merge, and format using formatting-skill-output library
-
-**Result**: ONE deterministic combined table output, no duplicate formatting code, consistent with fixing-skills output
-
-**REFACTOR Phase**:
-- Pressure test: Verified that the updated instructions clearly state "Output semantic findings as JSON ONLY. Do NOT output tables or prose."
-- The skill now provides explicit bash code examples for JSON output, making it less likely Claude will revert to manual table formatting
-- The CLI integration (--merge-semantic flag) provides a clear deterministic path for combining findings
-- Risk mitigation: The skill explicitly states "The CLI outputs ONE combined deterministic table. Do NOT output completion message yourself."
-
-**REFACTOR Result**: PASS - Instructions are explicit and provide no room for Claude to format output manually
-
-## [Changed] - 2025-12-26
-
-### Added (Extraction)
-- Created `references/phase-details.md` - Extracted detailed phase explanations (Phase 1, 3, 4, 5, 6, 8, 10, 13)
-- Reduced SKILL.md Phase Details section from ~103 lines to ~12 lines (reference link)
-
-### Added (Output Control - Two Points)
-1. **Semantic Review Output Control** (line 198):
-   - ⛔ CRITICAL marker with JSON-only output instruction
-   - References `formatting-skill-output` skill for shared formatter
-   - Clarifies Claude provides data, CLI provides formatting
-
-2. **Final Output Termination Protocol** (line 247-270):
-   - ⛔ CRITICAL header with ABSOLUTE RULE (response COMPLETE after CLI renders)
-   - Explicit ❌ forbidden outputs list (no summary, no "Audit complete", no "Found X issues", NOTHING)
-   - Output Contract table defining roles (You/CLI split)
-   - "Violation of this contract = task failure" consequences
-   - Why determinism matters explanation
-   - ⛔ END OF TASK marker
-
-### Reason
-RED failure: Similar to finding-agents-for-skills, auditing-skills had TWO output points where Claude adds non-deterministic prose:
-1. After semantic review - Claude output semantic findings with commentary instead of pure JSON
-2. After final CLI render - Claude added summary ("Audit complete. Found X issues...")
-
-Solution: Apply same methodology as finding-agents-for-skills but adapted for two-phase workflow (structural CLI + optional semantic review). Explicit stop instructions at BOTH output points with strong language (⛔ CRITICAL, ABSOLUTE RULE) to enforce "Claude reasons, CLI formats" architecture.
-
-### Impact
-- Enforces deterministic output at BOTH phases (same input → identical CLI-formatted output)
-- Prevents non-deterministic Claude prose after semantic JSON and after final table
-- Makes Output Contract explicit and testable
-- Line count: 496 → 433 lines (extraction freed space for new sections, staying under 500 limit)
-
+- Added `parseAllSkills()` private method to `SkillAuditor` class in `audit-engine.ts`
+- Refactored `runFull()` to parse skills once and pass to all phases
+- Added `runOnParsedSkills(skills: SkillFile[])` method to all 23 phase classes:
+  - phase1-description-format.ts through phase21-line-number-references.ts
+  - Special cases: phase10 and phase20 require additional `skillsDir` parameter
+- Maintained 100% backward compatibility - existing `run(skillsDir)` methods still work
+- All phases now support both interfaces:
+  - `run(skillsDir)` - Standalone execution (parses files internally)
+  - `runOnParsedSkills(skills)` - Optimized execution (accepts pre-parsed array)
+
+### Testing
+- ✅ TypeScript compilation successful
+- ✅ Full audit on using-skills passed
+- ✅ Full audit on auditing-skills passed with warnings (pre-existing)
+- ✅ Console output shows "Parsed X skills. Running 23 phases..." message
+
+### Files Modified
+- `scripts/src/lib/audit-engine.ts` - Added parseAllSkills(), updated runFull()
+- `scripts/src/lib/phases/*.ts` - All 23 phase files refactored with new pattern
+- `scripts/src/lib/types.ts` - Added SkillFile to exports
+
+### Backward Compatibility
+- CLI commands unchanged - `npm run audit` and `npm run audit -- <skill-name>` work identically
+- Single-phase execution (`runSinglePhaseForSkill`) unchanged
+- Fix workflows (`fixPhase2`, etc.) unchanged
+- All existing tests pass without modification
+
+## [Previous Entries]
+See git history for earlier changes.
+## 2025-12-29
+
+**Updated phase categorization to match implementation:**
+
+- Deterministic: 2, 5, 6, 7, 12, 14a, 16, 18 (8 phases, down from 10)
+- Hybrid: 4, 10, 19 (3 phases, up from 1)  
+- Claude-Automated: Added Phase 15 (Orphan Detection) - now 8 phases
+
+**Changed:** Lines 20-25 - Phase category counts and lists
+
+**Reason:** Documentation incorrectly listed phases 4, 10 as deterministic and was missing Phase 15 from Claude-Automated category.

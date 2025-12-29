@@ -16,7 +16,7 @@ This is a **super-repository** containing 16 submodules organized under `/module
 chariot-development-platform/                  # Super-repo root
 ├── modules/                                   # All submodules (16 total)
 │   ├── chariot/                               # Core platform (backend API + React UI)
-│   ├── chariot-ui-components/                 # Shared React component library
+│   ├── chariot-ui-components/                 # Shared React component library (end-of-lifing)
 │   ├── tabularium/                            # Universal data schema and models
 │   ├── janus-framework/                       # Go framework for security tool chains
 │   ├── janus/                                 # Tool orchestration system
@@ -70,20 +70,6 @@ This hook **prevents accidental submodule commits** that cause PR conflicts. If 
 make install-git-hooks
 ```
 
-### Skill Architecture
-
-- **Core Skills** (~15): High-frequency skills in `.claude/skills/` - auto-discovered
-- **Gateway Skills** (6): Domain entry points that route to library skills
-  - `gateway-frontend` - React, State, UI, Testing patterns
-  - `gateway-backend` - Go, AWS, Infrastructure, Integration
-  - `gateway-testing` - API, E2E, Mocking, Performance
-  - `gateway-mcp-tools` - External APIs (Linear, CLI, Context7)
-  - `gateway-security` - Auth, Secrets, Cryptography, Defense
-  - `gateway-integrations` - API research, Chariot patterns
-- **Library Skills** (~120): Specialized skills in `.claude/skill-library/` - load on-demand
-
-**Full architecture details:** `docs/SKILLS-ARCHITECTURE.md`
-
 ## Essential Development Commands
 
 ### Core Platform Commands
@@ -101,10 +87,6 @@ make submodule-pull           # Pull latest changes from all submodules
 make checkout branch=main     # Checkout branch across all submodules
 make create branch=feature-x  # Create branch across all submodules
 make create-prs               # Create PRs across all submodules
-
-# AI Developer Instructions
-Before writing any code, review the summary of [Clean Code by Robert C. Martin](docs/CLEAN_CODE.md).
-Follow its principles to ensure your work is consistent with the cleanliness, readability, and maintainability standards of our existing codebase.
 ```
 
 ### Module-Specific Commands
@@ -140,31 +122,15 @@ npx playwright test
 pytest                        # Run Python test suites (in praetorian-cli)
 ```
 
-### MCP Tools (Model Context Protocol)
+### Claude Code Infrastructure (.claude/)
 
-This repository uses **TypeScript wrappers** for MCP tools to achieve **0 tokens at session start** (vs 71.8k tokens with native MCPs).
+The platform has an extensive Claude Code skill system:
 
-**Available MCP Services:**
-- `praetorian-cli` - Chariot API access (17 tools)
-- `linear` - Issue tracking (23 tools)
-- `context7` - Documentation lookup (2 tools)
-
-**Access via Gateway:**
-```bash
-# Agents access via gateway-mcp-tools skill
-# Executes wrappers with: npx tsx .claude/tools/{service}/{tool}.ts
-```
-
-**Create New Wrapper:**
-```bash
-cd .claude/skills/managing-mcp-wrappers/scripts
-npm run create -- <service> <tool>           # TDD workflow
-npm run verify-red -- <service>/<tool>
-npm run generate-wrapper -- <service>/<tool>
-npm run verify-green -- <service>/<tool>
-```
-
-**Full architecture details:** `docs/MCP-TOOLS-ARCHITECTURE.md`
+- **Core Skills** : `.claude/skills/` - High-frequency skills, use with Skill tool
+- **Library Skills** : `.claude/skill-library/` - Specialized skills, use skill-search + Read tool
+- **Agents**: `.claude/agents/` - Specialized subagents (analysis, architecture, development, testing)
+- **MCP Tools**: `.claude/tools/` - External integrations (Chrome DevTools, Linear, Currents, Context7)
+- **Commands**: `.claude/commands/` - Slash commands (router pattern)
 
 ## Technology Stack & Patterns
 
@@ -237,6 +203,7 @@ git restore --staged modules/*
 ```
 
 **Why This Matters:**
+
 - Submodule pointer changes clutter the super-repo history
 - They create merge conflicts across team members
 - They make PRs harder to review
@@ -368,41 +335,40 @@ When making queries to the Chariot graph database (Neo4j), verify fields against
 **Critical Rule**: Before using a field in a graph query filter, read `allowed_columns.go` to verify it exists. Do NOT rely on hardcoded lists - they drift.
 
 **Skill Available**: Use the `constructing-graph-queries` library skill for:
+
 - Dynamic column validation
 - Query structure patterns
 - Common filter examples
 - Relationship traversal
 
 **Quick Field Lookup**:
+
 ```bash
 # Check if a field is allowed
 grep -w "fieldname" modules/chariot/backend/pkg/query/allowed_columns.go
 ```
 
 **Example Valid Graph Query**:
+
 ```json
 {
   "node": {
     "labels": ["Asset"],
     "filters": [
-      {"field": "status", "operator": "=", "value": "A"},
-      {"field": "class", "operator": "=", "value": "ipv4"}
+      { "field": "status", "operator": "=", "value": "A" },
+      { "field": "class", "operator": "=", "value": "ipv4" }
     ]
   },
   "limit": 100
 }
 ```
 
-## Essential Reference Files
-
-**Architecture & Technology:**
-
-- @docs/TECH-STACK.md - Complete technology stack with versions and dependencies
-- @docs/DESIGN-PATTERNS.md - Architectural patterns and security guidelines
-
 **Module Documentation:**
 
 - `modules/chariot/CLAUDE.md` - Core platform development workflows
+- `modules/chariot/ui/e2e/CLAUDE.md` - Playwright E2E testing (fixtures, POM, environment config)
+- `modules/chariot/backend/CLAUDE.md` - Lambda handlers, capabilities, SAM deployment
+- `modules/chariot/ui/CLAUDE.md` - React components, state management, Vitest testing
 - `modules/tabularium/CLAUDE.md` - Data schema and code generation patterns
 - Individual module README files for specific implementation details
 

@@ -14,17 +14,17 @@ type State = {
 };
 
 type Action =
-  | { type: 'increment' }
-  | { type: 'setUser'; payload: User }
-  | { type: 'setLoading'; payload: boolean };
+  | { type: "increment" }
+  | { type: "setUser"; payload: User }
+  | { type: "setLoading"; payload: boolean };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
-    case 'increment':
+    case "increment":
       return { ...state, count: state.count + 1 };
-    case 'setUser':
+    case "setUser":
       return { ...state, user: action.payload };
-    case 'setLoading':
+    case "setLoading":
       return { ...state, loading: action.payload };
     default:
       return state;
@@ -52,22 +52,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
 export function useApp() {
   const context = useContext(AppContext);
-  if (!context) throw new Error('useApp must be used within AppProvider');
+  if (!context) throw new Error("useApp must be used within AppProvider");
   return context;
 }
 
 // Usage
 function Counter() {
   const { state, dispatch } = useApp();
-  return (
-    <button onClick={() => dispatch({ type: 'increment' })}>
-      Count: {state.count}
-    </button>
-  );
+  return <button onClick={() => dispatch({ type: "increment" })}>Count: {state.count}</button>;
 }
 ```
 
 **When to use:**
+
 - Complex state logic with multiple sub-values
 - State updates depend on previous state
 - Want to separate state logic from component logic
@@ -85,33 +82,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   return (
     <StateContext.Provider value={state}>
-      <DispatchContext.Provider value={dispatch}>
-        {children}
-      </DispatchContext.Provider>
+      <DispatchContext.Provider value={dispatch}>{children}</DispatchContext.Provider>
     </StateContext.Provider>
   );
 }
 
 export function useState() {
   const context = useContext(StateContext);
-  if (!context) throw new Error('useState must be used within AppProvider');
+  if (!context) throw new Error("useState must be used within AppProvider");
   return context;
 }
 
 export function useDispatch() {
   const context = useContext(DispatchContext);
-  if (!context) throw new Error('useDispatch must be used within AppProvider');
+  if (!context) throw new Error("useDispatch must be used within AppProvider");
   return context;
 }
 
 // Components that only dispatch don't re-render when state changes
 function AddButton() {
   const dispatch = useDispatch(); // No re-render when state changes!
-  return <button onClick={() => dispatch({ type: 'add' })}>Add</button>;
+  return <button onClick={() => dispatch({ type: "add" })}>Add</button>;
 }
 ```
 
 **Benefits:**
+
 - Components that only dispatch don't re-render
 - Similar to Redux's `connect` separation
 
@@ -142,12 +138,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   });
 
   const fetchUser = useCallback(async (id: string) => {
-    setUser(prev => ({ ...prev, loading: true, error: null }));
+    setUser((prev) => ({ ...prev, loading: true, error: null }));
     try {
       const data = await userAPI.fetch(id);
       setUser({ data, loading: false, error: null });
     } catch (error) {
-      setUser(prev => ({
+      setUser((prev) => ({
         ...prev,
         loading: false,
         error: error as Error,
@@ -156,12 +152,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateUser = useCallback(async (updatedUser: User) => {
-    setUser(prev => ({ ...prev, loading: true }));
+    setUser((prev) => ({ ...prev, loading: true }));
     try {
       await userAPI.update(updatedUser);
       setUser({ data: updatedUser, loading: false, error: null });
     } catch (error) {
-      setUser(prev => ({
+      setUser((prev) => ({
         ...prev,
         loading: false,
         error: error as Error,
@@ -169,10 +165,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const value = useMemo(
-    () => ({ user, fetchUser, updateUser }),
-    [user, fetchUser, updateUser]
-  );
+  const value = useMemo(() => ({ user, fetchUser, updateUser }), [user, fetchUser, updateUser]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
@@ -188,20 +181,14 @@ Create reusable context factories:
 function createGenericContext<T>() {
   const Context = createContext<T | undefined>(undefined);
 
-  function Provider({
-    value,
-    children,
-  }: {
-    value: T;
-    children: ReactNode;
-  }) {
+  function Provider({ value, children }: { value: T; children: ReactNode }) {
     return <Context.Provider value={value}>{children}</Context.Provider>;
   }
 
   function useValue() {
     const context = useContext(Context);
     if (context === undefined) {
-      throw new Error('useValue must be used within Provider');
+      throw new Error("useValue must be used within Provider");
     }
     return context;
   }
@@ -210,7 +197,7 @@ function createGenericContext<T>() {
 }
 
 // Usage
-type Theme = { mode: 'light' | 'dark' };
+type Theme = { mode: "light" | "dark" };
 const [ThemeProvider, useTheme] = createGenericContext<Theme>();
 
 type User = { id: string; name: string };
@@ -231,7 +218,7 @@ Compose multiple providers cleanly:
       </NotificationsProvider>
     </FeatureFlagsProvider>
   </ThemeProvider>
-</AuthProvider>
+</AuthProvider>;
 
 // Create a composed provider:
 export function AppProviders({ children }: { children: ReactNode }) {
@@ -239,9 +226,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <AuthProvider>
       <ThemeProvider>
         <FeatureFlagsProvider>
-          <NotificationsProvider>
-            {children}
-          </NotificationsProvider>
+          <NotificationsProvider>{children}</NotificationsProvider>
         </FeatureFlagsProvider>
       </ThemeProvider>
     </AuthProvider>
@@ -251,7 +236,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 // Usage
 <AppProviders>
   <App />
-</AppProviders>
+</AppProviders>;
 ```
 
 ## 6. Lazy Context Pattern
@@ -330,35 +315,31 @@ type Settings = {
   notifications: boolean;
 };
 
-const SettingsContext = createContext<{
-  settings: Settings;
-  updateSettings: (settings: Partial<Settings>) => void;
-} | undefined>(undefined);
+const SettingsContext = createContext<
+  | {
+      settings: Settings;
+      updateSettings: (settings: Partial<Settings>) => void;
+    }
+  | undefined
+>(undefined);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings>(() => {
-    const stored = localStorage.getItem('settings');
+    const stored = localStorage.getItem("settings");
     return stored ? JSON.parse(stored) : defaultSettings;
   });
 
   const updateSettings = useCallback((newSettings: Partial<Settings>) => {
-    setSettings(prev => {
+    setSettings((prev) => {
       const updated = { ...prev, ...newSettings };
-      localStorage.setItem('settings', JSON.stringify(updated));
+      localStorage.setItem("settings", JSON.stringify(updated));
       return updated;
     });
   }, []);
 
-  const value = useMemo(
-    () => ({ settings, updateSettings }),
-    [settings, updateSettings]
-  );
+  const value = useMemo(() => ({ settings, updateSettings }), [settings, updateSettings]);
 
-  return (
-    <SettingsContext.Provider value={value}>
-      {children}
-    </SettingsContext.Provider>
-  );
+  return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 }
 ```
 
@@ -372,9 +353,9 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
 
   const filters = useMemo(
     () => ({
-      search: searchParams.get('search') || '',
-      category: searchParams.get('category') || 'all',
-      sort: searchParams.get('sort') || 'recent',
+      search: searchParams.get("search") || "",
+      category: searchParams.get("category") || "all",
+      sort: searchParams.get("sort") || "recent",
     }),
     [searchParams]
   );
@@ -391,10 +372,7 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
     [searchParams, setSearchParams]
   );
 
-  const value = useMemo(
-    () => ({ filters, updateFilters }),
-    [filters, updateFilters]
-  );
+  const value = useMemo(() => ({ filters, updateFilters }), [filters, updateFilters]);
 
   return <FiltersContext.Provider value={value}>{children}</FiltersContext.Provider>;
 }
@@ -427,7 +405,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   });
 
   const set = useCallback((newPresent: EditorState) => {
-    setHistory(prev => ({
+    setHistory((prev) => ({
       past: [...prev.past, prev.present],
       present: newPresent,
       future: [],
@@ -435,7 +413,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const undo = useCallback(() => {
-    setHistory(prev => {
+    setHistory((prev) => {
       if (prev.past.length === 0) return prev;
       const previous = prev.past[prev.past.length - 1];
       const newPast = prev.past.slice(0, prev.past.length - 1);
@@ -448,7 +426,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const redo = useCallback(() => {
-    setHistory(prev => {
+    setHistory((prev) => {
       if (prev.future.length === 0) return prev;
       const next = prev.future[0];
       const newFuture = prev.future.slice(1);
@@ -478,18 +456,18 @@ export function EditorProvider({ children }: { children: ReactNode }) {
 
 ## Pattern Selection Guide
 
-| Pattern | Use Case |
-|---------|----------|
-| Reducer | Complex state logic, multiple actions |
+| Pattern       | Use Case                                     |
+| ------------- | -------------------------------------------- |
+| Reducer       | Complex state logic, multiple actions        |
 | Split Context | Minimize re-renders, separate state/dispatch |
-| Async | Async operations, loading/error states |
-| Factory | Reusable context logic |
-| Composition | Multiple providers |
-| Lazy | Async initialization |
-| Selective | Large state, minimize re-renders |
-| Local Storage | Persist user preferences |
-| URL Sync | Share state via URL |
-| Undo/Redo | Editor or canvas applications |
+| Async         | Async operations, loading/error states       |
+| Factory       | Reusable context logic                       |
+| Composition   | Multiple providers                           |
+| Lazy          | Async initialization                         |
+| Selective     | Large state, minimize re-renders             |
+| Local Storage | Persist user preferences                     |
+| URL Sync      | Share state via URL                          |
+| Undo/Redo     | Editor or canvas applications                |
 
 ## Anti-Patterns
 
@@ -501,9 +479,7 @@ function Component() {
   return (
     <Provider1>
       <Provider2>
-        <Provider3>
-          {/* 10 more levels */}
-        </Provider3>
+        <Provider3>{/* 10 more levels */}</Provider3>
       </Provider2>
     </Provider1>
   );
@@ -514,9 +490,7 @@ function AppProviders({ children }) {
   return (
     <Provider1>
       <Provider2>
-        <Provider3>
-          {children}
-        </Provider3>
+        <Provider3>{children}</Provider3>
       </Provider2>
     </Provider1>
   );

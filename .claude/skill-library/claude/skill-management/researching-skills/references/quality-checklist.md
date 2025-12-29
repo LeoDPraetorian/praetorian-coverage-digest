@@ -43,12 +43,9 @@ Create these todos after generating the skill:
 
 ### 3. Line Count
 
-| Skill Type   | Target  | Maximum |
-| ------------ | ------- | ------- |
-| Library      | 400-600 | 800     |
-| Process      | 200-400 | 600     |
-| Integration  | 300-500 | 700     |
-| Tool Wrapper | 150-300 | 400     |
+**All skills:** Keep SKILL.md under 500 lines for optimal performance.
+
+See [Skill Compliance Contract](../../../../../skills/managing-skills/references/skill-compliance-contract.md) for authoritative thresholds and extraction guidance.
 
 Check with:
 

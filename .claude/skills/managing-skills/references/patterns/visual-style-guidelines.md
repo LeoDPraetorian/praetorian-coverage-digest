@@ -6,7 +6,7 @@ This pattern is referenced by:
 
 - `auditing-skills` - Validates table, code block, and header formatting (Phase 14a-c)
 - `creating-skills` - Ensures new skills follow style guidelines
-- `fixing-skills` - Restores style compliance (Claude-automated phases 14d-f)
+- `fixing-skills` - Restores style compliance (Phase 14a deterministic fixes)
 
 ---
 
@@ -28,11 +28,10 @@ This pattern is referenced by:
 | Phase | Name                 | Type             | What It Checks                             |
 | ----- | -------------------- | ---------------- | ------------------------------------------ |
 | 14a   | Table Formatting     | Deterministic    | Header rows, separators, column counts     |
-| 14b   | Code Block Quality   | Deterministic    | Language tags, line length, content match  |
-| 14c   | Header Hierarchy     | Deterministic    | H1 count, level skipping, orphan headers   |
-| 14d   | Section Organization | Claude-Automated | Required sections, logical order           |
-| 14e   | Visual Readability   | Claude-Automated | Wall-of-text, emphasis, whitespace         |
-| 14f   | Example Quality      | Hybrid           | Before/after examples, self-contained code |
+| 14b   | Code Block Quality   | Validation-Only  | Language tags, line length, content match  |
+| 14c   | Header Hierarchy     | Validation-Only  | H1 count, level skipping, orphan headers   |
+
+> **Note:** Section organization, visual readability, and example quality are checked during **Post-Audit Semantic Review**, not as numbered phases. See [audit-phases.md](../audit-phases.md#post-audit-semantic-review).
 
 ---
 
@@ -146,116 +145,6 @@ Content here...
 
 ---
 
-## Phase 14d: Section Organization (Claude-Automated)
-
-### Required Sections
-
-Skills should have these sections in logical order:
-
-1. **Quick Reference** - Table or bulleted summary at top
-2. **When to Use** - Clear trigger conditions
-3. **Workflow/How to Use** - Step-by-step process
-4. **Related Skills** - Links to related skills
-
-### Section Order Guidelines
-
-```markdown
-# Skill Name
-
-## Quick Reference ← Summary table
-
-## When to Use ← Triggers
-
-## Workflow ← Main content
-
-### Phase 1
-
-### Phase 2
-
-## Troubleshooting ← Common issues (optional)
-
-## Related Skills ← Cross-references
-```
-
----
-
-## Phase 14e: Visual Readability (Claude-Automated)
-
-### Requirements
-
-1. **No wall-of-text** - Break paragraphs longer than 5-6 lines
-2. **Use emphasis** - **Bold** for important terms, `code` for technical terms
-3. **Use lists** - Convert comma-separated items to bullet lists
-4. **Adequate whitespace** - Blank line between sections
-5. **Use callouts** - `> **Note:**` for important information
-
-### Good Example
-
-```markdown
-## Overview
-
-This skill helps you **debug systematically** using the `tracing-root-causes` approach.
-
-Key benefits:
-
-- Faster root cause identification
-- Reproducible debugging process
-- Clear documentation of findings
-
-> **Note:** Always use TodoWrite to track debugging steps.
-```
-
-### Bad Example
-
-```markdown
-## Overview
-
-This skill helps you debug systematically using the tracing root causes approach which provides faster root cause identification and reproducible debugging process and clear documentation of findings. Note that you should always use TodoWrite to track debugging steps because it helps maintain context and prevent missed steps during long debugging sessions.
-```
-
----
-
-## Phase 14f: Example Quality (Hybrid)
-
-### Requirements
-
-1. **Before/after format** - Show transformation clearly
-2. **Self-contained** - Examples should work without external context
-3. **Appropriate code blocks** - Use proper language tags
-4. **Relevant** - Examples should match skill purpose
-
-### Good Example Pattern
-
-````markdown
-## Example
-
-**Before:**
-
-```typescript
-// Unfocused test
-test("user flow", async () => {
-  // 50 lines of mixed assertions
-});
-```
-````
-
-**After:**
-
-```typescript
-// Focused tests
-test("validates email format", async () => {
-  await expect(validateEmail("bad")).toBe(false);
-});
-
-test("accepts valid email", async () => {
-  await expect(validateEmail("user@example.com")).toBe(true);
-});
-```
-
-````
-
----
-
 ## Validation
 
 ### Running Phase 14 Audit
@@ -275,14 +164,13 @@ npm run -w @chariot/auditing-skills audit -- <skill-name>
 
 ### Auto-fixable Issues
 
-| Phase | Issue                 | Auto-fix Available             |
-| ----- | --------------------- | ------------------------------ | --- | --- | --- |
-| 14a   | Missing separator row | Yes (add `                     | --- | --- | `)  |
-| 14b   | Missing language tag  | Yes (suggest based on content) |
-| 14c   | Skipped header level  | Yes (adjust level)             |
-| 14d   | Missing sections      | Partial (Claude generates)     |
-| 14e   | Wall-of-text          | No (requires judgment)         |
-| 14f   | Poor examples         | No (requires context)          |
+| Phase | Issue                 | Auto-fix Available                   |
+| ----- | --------------------- | ------------------------------------ |
+| 14a   | Missing separator row | Yes (add separator row)              |
+| 14b   | Missing language tag  | No (validation only)                 |
+| 14c   | Skipped header level  | No (validation only)                 |
+
+> **Note:** Section organization, visual readability, and example quality are checked during **Post-Audit Semantic Review**. See [audit-phases.md](../audit-phases.md#post-audit-semantic-review).
 
 ---
 

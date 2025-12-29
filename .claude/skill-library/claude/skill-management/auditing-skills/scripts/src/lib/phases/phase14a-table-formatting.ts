@@ -1,231 +1,112 @@
 /**
- * Phase 14a: Markdown Table Formatting
- * Validates markdown tables for proper structure and formatting:
- * - Tables have header row with separators (|---|---|)
- * - Column count is consistent across all rows
- * - No broken/malformed table syntax
- * - Alignment indicators are valid (:---, :---:, ---:)
+ * Phase 14a: Markdown Table Formatting (Prettier)
+ * Validates markdown tables are formatted using Prettier.
+ * Auto-fixable via `prettier --write`.
  */
 
 import type { SkillFile, Issue, PhaseResult } from '../types.js';
 import { SkillParser } from '../utils/skill-parser.js';
-
-interface TableInfo {
-  startLine: number;
-  endLine: number;
-  headerRow: string;
-  separatorRow: string;
-  dataRows: string[];
-  columnCount: number;
-}
+import { execSync } from 'child_process';
+import { writeFileSync, readFileSync } from 'fs';
 
 export class Phase14aTableFormatting {
   /**
-   * Extract all tables from markdown content
+   * Validate table formatting using Prettier
+   * Runs prettier --check to detect formatting issues
    */
-  private static extractTables(content: string): TableInfo[] {
-    const lines = content.split('\n');
-    const tables: TableInfo[] = [];
-    let i = 0;
-
-    while (i < lines.length) {
-      const line = lines[i];
-
-      // Check if this line looks like a table header (contains |)
-      if (this.isTableRow(line)) {
-        // Check if next line is a separator row
-        const nextLine = lines[i + 1];
-        if (nextLine && this.isSeparatorRow(nextLine)) {
-          // Found a table, collect all rows
-          const startLine = i + 1; // 1-indexed
-          const headerRow = line;
-          const separatorRow = nextLine;
-          const dataRows: string[] = [];
-          const headerColumnCount = this.countColumns(headerRow);
-
-          let j = i + 2;
-          while (j < lines.length && this.isTableRow(lines[j])) {
-            dataRows.push(lines[j]);
-            j++;
-          }
-
-          tables.push({
-            startLine,
-            endLine: j, // 1-indexed end
-            headerRow,
-            separatorRow,
-            dataRows,
-            columnCount: headerColumnCount,
-          });
-
-          i = j;
-          continue;
-        }
-      }
-      i++;
-    }
-
-    return tables;
-  }
-
-  /**
-   * Check if a line looks like a table row
-   */
-  private static isTableRow(line: string): boolean {
-    const trimmed = line.trim();
-    // Must start with | or contain | and have content
-    return trimmed.includes('|') && trimmed.length > 1;
-  }
-
-  /**
-   * Check if a line is a separator row (|---|---|)
-   */
-  private static isSeparatorRow(line: string): boolean {
-    const trimmed = line.trim();
-    // Separator row should only contain |, -, :, and whitespace
-    return /^\|?[\s\-:|]+\|?$/.test(trimmed) && trimmed.includes('-');
-  }
-
-  /**
-   * Count columns in a table row
-   */
-  private static countColumns(row: string): number {
-    const trimmed = row.trim();
-    // Split by | and filter out empty strings from leading/trailing pipes
-    const cells = trimmed.split('|').filter((cell, index, arr) => {
-      // Keep non-empty cells, but filter edge empties from | at start/end
-      if (index === 0 && cell.trim() === '') return false;
-      if (index === arr.length - 1 && cell.trim() === '') return false;
-      return true;
-    });
-    return cells.length;
-  }
-
-  /**
-   * Validate separator row alignment indicators
-   */
-  private static validateSeparatorRow(separatorRow: string): Issue[] {
+  static validate(skill: SkillFile): Issue[] {
     const issues: Issue[] = [];
-    const cells = separatorRow.split('|').filter(c => c.trim() !== '');
 
-    for (const cell of cells) {
-      const trimmed = cell.trim();
-      // Valid patterns: ---, :---, ---:, :---:
-      if (!/^:?-+:?$/.test(trimmed)) {
+    try {
+      // Run prettier --check on the skill file
+      execSync(`npx prettier --check "${skill.path}"`, {
+        encoding: 'utf-8',
+        stdio: 'pipe',
+      });
+
+      // If we get here, file is already formatted
+      return issues;
+    } catch (error: any) {
+      // prettier --check exits with 1 if file needs formatting
+      if (error.status === 1) {
         issues.push({
           severity: 'WARNING',
-          message: `Invalid separator cell: "${trimmed}" (expected pattern like ---, :---, ---:, or :---:)`,
+          message: 'Tables not formatted with Prettier',
+          recommendation: 'Run prettier --write to auto-format tables',
           autoFixable: true,
         });
-      }
-    }
-
-    return issues;
-  }
-
-  /**
-   * Validate a single table
-   */
-  private static validateTable(table: TableInfo): Issue[] {
-    const issues: Issue[] = [];
-
-    // Check separator row validity
-    const separatorIssues = this.validateSeparatorRow(table.separatorRow);
-    for (const issue of separatorIssues) {
-      issue.line = table.startLine + 1;
-      issues.push(issue);
-    }
-
-    // Check separator column count matches header
-    const separatorColumnCount = this.countColumns(table.separatorRow);
-    if (separatorColumnCount !== table.columnCount) {
-      issues.push({
-        severity: 'CRITICAL',
-        message: `Table separator row has ${separatorColumnCount} columns but header has ${table.columnCount} columns (line ${table.startLine + 1})`,
-        line: table.startLine + 1,
-        autoFixable: false,
-      });
-    }
-
-    // Check each data row column count
-    for (let i = 0; i < table.dataRows.length; i++) {
-      const row = table.dataRows[i];
-      const rowColumnCount = this.countColumns(row);
-      const lineNum = table.startLine + 2 + i;
-
-      if (rowColumnCount !== table.columnCount) {
+      } else {
+        // Other errors (file not found, prettier error, etc.)
         issues.push({
-          severity: 'WARNING',
-          message: `Table row has ${rowColumnCount} columns but header has ${table.columnCount} columns (line ${lineNum})`,
-          line: lineNum,
+          severity: 'CRITICAL',
+          message: `Prettier check failed: ${error.message}`,
           autoFixable: false,
         });
       }
     }
 
-    // Check for empty header cells
-    const headerCells = table.headerRow.split('|').filter(c => c.trim() !== '');
-    const emptyHeaders = headerCells.filter(c => c.trim() === '');
-    if (emptyHeaders.length > 0) {
-      issues.push({
-        severity: 'INFO',
-        message: `Table has ${emptyHeaders.length} empty header cell(s) (line ${table.startLine})`,
-        line: table.startLine,
-        autoFixable: false,
-      });
-    }
-
     return issues;
   }
 
   /**
-   * Validate table formatting for a single skill
+   * Fix table formatting by running prettier --write
+   * Returns number of files modified (0 or 1)
    */
-  static validate(skill: SkillFile): Issue[] {
-    const issues: Issue[] = [];
-
-    // Extract tables from content (not code blocks)
-    const contentWithoutCodeBlocks = skill.content.replace(/```[\s\S]*?```/g, '');
-    const tables = this.extractTables(contentWithoutCodeBlocks);
-
-    if (tables.length === 0) {
-      // No tables - that's fine, just info
-      return [];
+  static async fix(skill: SkillFile, dryRun: boolean = false): Promise<number> {
+    if (dryRun) {
+      // In dry run mode, just check if formatting would change
+      try {
+        execSync(`npx prettier --check "${skill.path}"`, {
+          encoding: 'utf-8',
+          stdio: 'pipe',
+        });
+        return 0; // Already formatted
+      } catch (error: any) {
+        return error.status === 1 ? 1 : 0; // Would be modified
+      }
     }
 
-    // Validate each table
-    for (const table of tables) {
-      const tableIssues = this.validateTable(table);
-      issues.push(...tableIssues);
-    }
+    // Read original content for comparison
+    const originalContent = readFileSync(skill.path, 'utf-8');
 
-    // Add summary if all tables are valid
-    if (issues.length === 0 && tables.length > 0) {
-      issues.push({
-        severity: 'INFO',
-        message: `Found ${tables.length} well-formatted table(s)`,
-        autoFixable: false,
+    try {
+      // Run prettier --write to format the file
+      execSync(`npx prettier --write "${skill.path}"`, {
+        encoding: 'utf-8',
+        stdio: 'pipe',
       });
-    }
 
-    return issues;
+      // Check if content changed
+      const newContent = readFileSync(skill.path, 'utf-8');
+      return originalContent !== newContent ? 1 : 0;
+    } catch (error: any) {
+      console.error(`Prettier format failed: ${error.message}`);
+      return 0;
+    }
   }
 
   /**
-   * Run Phase 14a audit on all skills
+   * Run Phase 14a audit on all skills (backward compatible - parses files)
    */
   static async run(skillsDir: string): Promise<PhaseResult> {
     const skillPaths = await SkillParser.findAllSkills(skillsDir);
+    const skills = await Promise.all(skillPaths.map(p => SkillParser.parseSkillFile(p)));
+    return this.runOnParsedSkills(skills);
+  }
+
+  /**
+   * Run Phase 14a audit on pre-parsed skills (performance optimized)
+   */
+  static async runOnParsedSkills(skills: SkillFile[]): Promise<PhaseResult> {
     let skillsAffected = 0;
     let issuesFound = 0;
     const details: string[] = [];
 
-    for (const skillPath of skillPaths) {
-      const skill = await SkillParser.parseSkillFile(skillPath);
+    for (const skill of skills) {
       const issues = this.validate(skill);
 
       // Only count as affected if there are warnings or criticals
-      const significantIssues = issues.filter(i => i.severity !== 'INFO');
+      const significantIssues = issues.filter((i) => i.severity !== 'INFO');
 
       if (significantIssues.length > 0) {
         skillsAffected++;
@@ -239,7 +120,7 @@ export class Phase14aTableFormatting {
     }
 
     return {
-      phaseName: 'Phase 14a: Table Formatting',
+      phaseName: 'Phase 14a: Table Formatting (Prettier)',
       skillsAffected,
       issuesFound,
       issuesFixed: 0,

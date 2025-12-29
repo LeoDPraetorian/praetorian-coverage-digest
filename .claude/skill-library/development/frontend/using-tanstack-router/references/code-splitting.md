@@ -5,11 +5,13 @@ Advanced code splitting patterns for TanStack Router using `.lazy.tsx` files, in
 ## Overview
 
 TanStack Router enables **route-based code splitting** by separating critical route options (data loading) from non-critical options (UI components). This allows:
+
 - **Faster initial bundle**: Critical options stay small, UI components load on-demand
 - **Better performance**: Route data loads immediately while component code lazy loads
 - **Optimal caching**: Data loading logic cached separately from UI code
 
 **Key principle:** Split each route into two files:
+
 1. **`route.tsx`** - Critical options (loader, beforeLoad, validateSearch)
 2. **`route.lazy.tsx`** - Non-critical options (component, errorComponent, pendingComponent)
 
@@ -19,16 +21,16 @@ TanStack Router enables **route-based code splitting** by separating critical ro
 
 ### Option Classification
 
-| Option | Classification | File | Reason |
-|--------|----------------|------|--------|
-| `loader` | ✅ Critical | `route.tsx` | Data must load before navigation |
-| `beforeLoad` | ✅ Critical | `route.tsx` | Auth/redirects block navigation |
-| `validateSearch` | ✅ Critical | `route.tsx` | Search params validated before load |
-| `loaderDeps` | ✅ Critical | `route.tsx` | Dependencies for loader cache key |
-| `component` | ❌ Non-critical | `route.lazy.tsx` | UI can lazy load after data ready |
-| `errorComponent` | ❌ Non-critical | `route.lazy.tsx` | Error UI only needed if error occurs |
-| `pendingComponent` | ❌ Non-critical | `route.lazy.tsx` | Loading UI only shown during load |
-| `notFoundComponent` | ❌ Non-critical | `route.lazy.tsx` | 404 UI only needed if not found |
+| Option              | Classification  | File             | Reason                               |
+| ------------------- | --------------- | ---------------- | ------------------------------------ |
+| `loader`            | ✅ Critical     | `route.tsx`      | Data must load before navigation     |
+| `beforeLoad`        | ✅ Critical     | `route.tsx`      | Auth/redirects block navigation      |
+| `validateSearch`    | ✅ Critical     | `route.tsx`      | Search params validated before load  |
+| `loaderDeps`        | ✅ Critical     | `route.tsx`      | Dependencies for loader cache key    |
+| `component`         | ❌ Non-critical | `route.lazy.tsx` | UI can lazy load after data ready    |
+| `errorComponent`    | ❌ Non-critical | `route.lazy.tsx` | Error UI only needed if error occurs |
+| `pendingComponent`  | ❌ Non-critical | `route.lazy.tsx` | Loading UI only shown during load    |
+| `notFoundComponent` | ❌ Non-critical | `route.lazy.tsx` | 404 UI only needed if not found      |
 
 **Rule of thumb:** If it runs **before** component renders → Critical. If it **is** the render → Non-critical.
 
@@ -41,22 +43,22 @@ TanStack Router enables **route-based code splitting** by separating critical ro
 **`assets.tsx`** - Critical data loading:
 
 ```typescript
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/assets')({
+export const Route = createFileRoute("/assets")({
   // Critical: Data loading
   loader: async ({ context }) => {
-    return context.queryClient.ensureQueryData(assetsQueryOptions())
+    return context.queryClient.ensureQueryData(assetsQueryOptions());
   },
 
   // Critical: Search param validation
   validateSearch: z.object({
     page: z.number().default(1),
-    filter: z.enum(['all', 'active']).default('all'),
+    filter: z.enum(["all", "active"]).default("all"),
   }),
 
   // No component here - it's in the lazy file
-})
+});
 ```
 
 ### Step 2: Create Lazy Route File
@@ -117,14 +119,14 @@ function ErrorFallback({ error, reset }: { error: Error; reset: () => void }) {
 ### Base Route (`assets.$assetId.tsx`)
 
 ```typescript
-import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
-import { assetQueryOptions, risksQueryOptions } from '@/api/assets'
+import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+import { assetQueryOptions, risksQueryOptions } from "@/api/assets";
 
-export const Route = createFileRoute('/assets/$assetId')({
+export const Route = createFileRoute("/assets/$assetId")({
   // Critical: Search param validation
   validateSearch: z.object({
-    tab: z.enum(['details', 'risks', 'attributes']).default('details'),
+    tab: z.enum(["details", "risks", "attributes"]).default("details"),
   }),
 
   // Critical: Loader dependencies
@@ -135,27 +137,23 @@ export const Route = createFileRoute('/assets/$assetId')({
   // Critical: Data loading
   loader: async ({ params, deps, context }) => {
     // Parallel data loading
-    const queries = [
-      context.queryClient.ensureQueryData(assetQueryOptions(params.assetId)),
-    ]
+    const queries = [context.queryClient.ensureQueryData(assetQueryOptions(params.assetId))];
 
     // Only load risks if on risks tab
-    if (deps.tab === 'risks') {
-      queries.push(
-        context.queryClient.ensureQueryData(risksQueryOptions(params.assetId))
-      )
+    if (deps.tab === "risks") {
+      queries.push(context.queryClient.ensureQueryData(risksQueryOptions(params.assetId)));
     }
 
-    await Promise.all(queries)
+    await Promise.all(queries);
   },
 
   // Critical: Auth guard
   beforeLoad: async ({ context, params }) => {
     if (!context.auth.canViewAsset(params.assetId)) {
-      throw redirect({ to: '/unauthorized' })
+      throw redirect({ to: "/unauthorized" });
     }
   },
-})
+});
 ```
 
 ### Lazy Route (`assets.$assetId.lazy.tsx`)
@@ -246,6 +244,7 @@ ls -lh dist/assets/*.js | grep "assets"
 ```
 
 **Typical sizes:**
+
 - Base route (`assets.tsx`): ~2-5 KB (just data logic)
 - Lazy route (`assets.lazy.tsx`): ~50-200 KB (full UI components + deps)
 
@@ -346,9 +345,9 @@ Routes with no data loading don't benefit:
 
 ```typescript
 // No loader = no benefit from splitting
-export const Route = createFileRoute('/terms')({
+export const Route = createFileRoute("/terms")({
   component: TermsOfService,
-})
+});
 ```
 
 ### Frequently Visited Routes
@@ -532,15 +531,15 @@ Put all lazy component imports together:
 
 ```typescript
 // ✅ GOOD - Clear separation
-import { createLazyFileRoute } from '@tanstack/react-router'
-import { lazy, Suspense } from 'react'
+import { createLazyFileRoute } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
 
-const HeavyChart = lazy(() => import('./HeavyChart'))
-const HeavyTable = lazy(() => import('./HeavyTable'))
+const HeavyChart = lazy(() => import("./HeavyChart"));
+const HeavyTable = lazy(() => import("./HeavyTable"));
 
-export const Route = createLazyFileRoute('/analytics')({
+export const Route = createLazyFileRoute("/analytics")({
   component: Analytics,
-})
+});
 ```
 
 ### 4. Use Preloading for Common Paths
@@ -550,9 +549,9 @@ Preload routes users are likely to visit:
 ```typescript
 // On dashboard mount, preload likely next routes
 useEffect(() => {
-  router.preloadRoute({ to: '/assets' })
-  router.preloadRoute({ to: '/risks' })
-}, [])
+  router.preloadRoute({ to: "/assets" });
+  router.preloadRoute({ to: "/risks" });
+}, []);
 ```
 
 ### 5. Measure Before Optimizing

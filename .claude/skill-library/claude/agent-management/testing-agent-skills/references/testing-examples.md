@@ -182,11 +182,13 @@ Action Required:
 **Diagnosis depends on skill type**:
 
 **For CORE skills** (in `.claude/skills/`):
+
 1. Check agent's frontmatter: Is skill listed in `skills:` field?
 2. Check agent's body: Is skill in "Mandatory Skills" section?
 3. Was trigger scenario clear enough?
 
 **For LIBRARY skills** (in `.claude/skill-library/`):
+
 1. Check if agent used gateway: Did agent invoke `gateway-*` skill?
 2. Check if agent loaded skill: Is there a `Read(".../SKILL.md")` call?
 3. Check gateway routing: Does gateway list this skill path?

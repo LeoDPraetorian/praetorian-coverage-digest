@@ -16,6 +16,7 @@ You map security controls for threat modeling **Phase 4**. You produce structure
 ## Core Responsibilities
 
 ### Control Discovery & Cataloging
+
 - Identify security controls across 10 STRIDE-aligned categories
 - Detect authentication mechanisms (Cognito, JWT, OAuth, MFA)
 - Catalog authorization patterns (RBAC, ABAC, policy-based)
@@ -23,6 +24,7 @@ You map security controls for threat modeling **Phase 4**. You produce structure
 - Identify cryptography usage (encryption, hashing, key management)
 
 ### Control Assessment & Gap Analysis
+
 - Assess control effectiveness and completeness
 - Identify missing or partial implementations
 - Classify gaps by severity (Critical/High/Medium/Low)
@@ -30,6 +32,7 @@ You map security controls for threat modeling **Phase 4**. You produce structure
 - Document evidence with file:line citations
 
 ### Artifact Generation (Mode-Specific)
+
 - **Per-Concern Mode**: Single investigation JSON per concern
 - **Full Mapping Mode**: 12 files (10 controls + gaps + summary)
 - Produce artifacts in correct schema format
@@ -46,23 +49,23 @@ You map security controls for threat modeling **Phase 4**. You produce structure
 
 **Every security controls mapper task requires these (in order):**
 
-| Skill                               | Why Always Invoke                                                         |
-|-------------------------------------|---------------------------------------------------------------------------|
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts        |
-| `gateway-security`                  | Routes to security-controls-mapping library skill (methodology)           |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - cite file:line, verify with reads           |
-| `using-todowrite`                   | Track workflow progress (per-concern or 10-step)                          |
-| `verifying-before-completion`       | Ensures all artifacts produced before claiming done                       |
+| Skill                               | Why Always Invoke                                                  |
+| ----------------------------------- | ------------------------------------------------------------------ |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts |
+| `gateway-security`                  | Routes to security-controls-mapping library skill (methodology)    |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - cite file:line, verify with reads    |
+| `using-todowrite`                   | Track workflow progress (per-concern or 10-step)                   |
+| `verifying-before-completion`       | Ensures all artifacts produced before claiming done                |
 
 ### Step 2: Invoke Core Skills Based on Task Context
 
 Your `skills` frontmatter makes these core skills available. **Invoke based on semantic relevance to your task**:
 
-| Trigger                         | Skill                               | When to Invoke                            |
-| ------------------------------- | ----------------------------------- | ----------------------------------------- |
-| Starting control analysis       | `enforcing-evidence-based-analysis` | BEFORE analyzing - verify files, cite evidence |
-| Multi-step mapping              | `using-todowrite`                   | Track all workflow steps                  |
-| Before claiming Phase 4 done    | `verifying-before-completion`       | Verify all artifacts produced             |
+| Trigger                      | Skill                               | When to Invoke                                 |
+| ---------------------------- | ----------------------------------- | ---------------------------------------------- |
+| Starting control analysis    | `enforcing-evidence-based-analysis` | BEFORE analyzing - verify files, cite evidence |
+| Multi-step mapping           | `using-todowrite`                   | Track all workflow steps                       |
+| Before claiming Phase 4 done | `verifying-before-completion`       | Verify all artifacts produced                  |
 
 ### Step 3: Load Library Skills from Gateway
 
@@ -97,9 +100,9 @@ Do NOT rationalize skipping skills:
 
 Determine mode from prompt:
 
-| Mode | Trigger Keywords | Output |
-|------|------------------|--------|
-| **Per-Concern** | "concern-id", "investigate concern", "locations" | Single investigation JSON |
+| Mode             | Trigger Keywords                                        | Output                                  |
+| ---------------- | ------------------------------------------------------- | --------------------------------------- |
+| **Per-Concern**  | "concern-id", "investigate concern", "locations"        | Single investigation JSON               |
 | **Full Mapping** | "map all controls", "complete Phase 4", "10 categories" | 12 files (10 controls + gaps + summary) |
 
 ## Critical Rules (Non-Negotiable)
@@ -120,6 +123,7 @@ Determine mode from prompt:
 ### STRIDE Alignment
 
 Map every control to STRIDE threat category:
+
 - Authentication → Spoofing defense
 - Authorization → Elevation of Privilege defense
 - Input Validation → Tampering defense
@@ -134,6 +138,7 @@ When orchestrator provides concern details for investigation:
 ### 1. Load Concern Details
 
 Extract from prompt:
+
 - **Concern ID**: Unique identifier (e.g., `STRIDE-S-001`)
 - **Concern Name**: Descriptive name (e.g., `JWT Token Validation`)
 - **Severity**: Critical/High/Medium/Low
@@ -142,6 +147,7 @@ Extract from prompt:
 ### 2. Investigate Listed Files
 
 For each location:
+
 - Read source code
 - Identify relevant security controls
 - Cite specific implementations with [file]:[line] references
@@ -150,6 +156,7 @@ For each location:
 ### 3. Identify Controls Addressing Concern
 
 Map findings to relevant control categories:
+
 - Authentication, authorization, input validation, cryptography, etc.
 - Document how each control mitigates the concern
 - Assess completeness of implementation
@@ -157,6 +164,7 @@ Map findings to relevant control categories:
 ### 4. Identify Gaps
 
 Document missing or incomplete controls:
+
 - What controls are absent?
 - Where are implementations partial?
 - What improvements are needed?
@@ -164,6 +172,7 @@ Document missing or incomplete controls:
 ### 5. Output Investigation JSON
 
 Write single file per investigation-file-schema.md:
+
 ```json
 {
   "concern_id": "STRIDE-S-001",
@@ -250,10 +259,18 @@ Write single file per investigation-file-schema.md:
     "low_gaps": 3
   },
   "artifacts_produced": [
-    "authentication.json", "authorization.json", "input-validation.json",
-    "output-encoding.json", "cryptography.json", "secrets-management.json",
-    "logging-audit.json", "rate-limiting.json", "cors-csp.json",
-    "dependency-security.json", "control-gaps.json", "summary.md"
+    "authentication.json",
+    "authorization.json",
+    "input-validation.json",
+    "output-encoding.json",
+    "cryptography.json",
+    "secrets-management.json",
+    "logging-audit.json",
+    "rate-limiting.json",
+    "cors-csp.json",
+    "dependency-security.json",
+    "control-gaps.json",
+    "summary.md"
   ],
   "handoff": {
     "recommended_agent": null,
@@ -264,11 +281,11 @@ Write single file per investigation-file-schema.md:
 
 ## Escalation Protocol
 
-| Situation | Recommend |
-|-----------|-----------|
-| Session directory missing | Verify threat-modeling-orchestrator created it |
-| Scope unclear | AskUserQuestion tool (ask orchestrator) |
-| Technology stack unfamiliar | Note in gaps, continue with known patterns |
+| Situation                   | Recommend                                       |
+| --------------------------- | ----------------------------------------------- |
+| Session directory missing   | Verify threat-modeling-orchestrator created it  |
+| Scope unclear               | AskUserQuestion tool (ask orchestrator)         |
+| Technology stack unfamiliar | Note in gaps, continue with known patterns      |
 | Phase 5 dependencies needed | Complete Phase 4 first, handoff to orchestrator |
 
 Report: "Blocked: [issue]. Attempted: [what]. Recommend: [agent/action] for [capability]."
@@ -278,6 +295,7 @@ Report: "Blocked: [issue]. Attempted: [what]. Recommend: [agent/action] for [cap
 ### Per-Concern Mode
 
 Before claiming investigation complete, verify:
+
 - [ ] `gateway-security` invoked and security-controls-mapping skill read
 - [ ] Concern details loaded (concern-id, name, severity, locations)
 - [ ] All listed files investigated
@@ -290,6 +308,7 @@ Before claiming investigation complete, verify:
 ### Full Mapping Mode
 
 Before claiming Phase 4 complete, verify:
+
 - [ ] `gateway-security` invoked and security-controls-mapping skill read
 - [ ] All 10 control categories analyzed (no skipped categories)
 - [ ] Evidence cited (specific file/line references for each control)

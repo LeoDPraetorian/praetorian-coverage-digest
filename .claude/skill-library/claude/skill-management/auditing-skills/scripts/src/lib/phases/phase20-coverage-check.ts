@@ -7,7 +7,7 @@ import type { SkillFile, Issue, PhaseResult } from '../types.js';
 import { SkillParser } from '../utils/skill-parser.js';
 import { resolve } from 'path';
 import { readdirSync, statSync } from 'fs';
-import { findProjectRoot } from '../../../../../../../lib/find-project-root.js';
+import { findProjectRoot } from '@chariot/lib';
 
 const PROJECT_ROOT = findProjectRoot();
 
@@ -179,6 +179,17 @@ export class Phase20CoverageCheck {
    * Run Phase 20 audit
    */
   static async run(skillsDir: string): Promise<PhaseResult> {
+    // Parse all skills first
+    const skillPaths = await SkillParser.findAllSkills(skillsDir);
+    const skills = await Promise.all(skillPaths.map(p => SkillParser.parseSkillFile(p)));
+    return this.runOnParsedSkills(skills, skillsDir);
+  }
+
+  /**
+   * Run Phase 20 audit on pre-parsed skills (performance optimized)
+   * Note: skillsDir is still needed for validateAllGateways
+   */
+  static async runOnParsedSkills(skills: SkillFile[], skillsDir: string): Promise<PhaseResult> {
     // Run coverage check across all gateways
     const issues = await this.validateAllGateways(skillsDir);
 

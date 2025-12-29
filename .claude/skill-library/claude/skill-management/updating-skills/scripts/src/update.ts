@@ -16,12 +16,10 @@ import ora from 'ora';
 import { spawn } from 'child_process';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { dirname, join } from 'path';
-import { findSkill } from '../../../auditing-skills/scripts/src/lib/skill-finder.js';
+
+// Import from @chariot/auditing-skills public API
 import {
-  Context7SourceMetadata,
-  UpdateSuggestionWithContext7,
-} from '../../../auditing-skills/scripts/src/lib/types.js';
-import {
+  findSkill,
   parseContext7Data,
   generateApiReference,
   generatePatterns,
@@ -29,7 +27,9 @@ import {
   createContext7SourceMetadata,
   compareContext7Data,
   hashContent,
-} from '../../../auditing-skills/scripts/src/lib/context7-integration.js';
+  type Context7SourceMetadata,
+  type UpdateSuggestionWithContext7,
+} from '@chariot/auditing-skills';
 
 const program = new Command();
 
@@ -117,6 +117,16 @@ function formatDate(isoDate: string): string {
   });
 }
 
+/**
+ * Calculate days between two dates
+ */
+function daysBetween(dateStr1: string, dateStr2: string): number {
+  const date1 = new Date(dateStr1);
+  const date2 = new Date(dateStr2);
+  const diffMs = date2.getTime() - date1.getTime();
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+}
+
 program
   .name('skill-manager-update')
   .description('Update existing skill with TDD workflow')
@@ -163,6 +173,28 @@ program
 
       // Check for context7 metadata
       const context7Metadata = getContext7Metadata(skillDir);
+
+      // Check for stale context7 docs before proceeding (not in refresh or suggest mode)
+      if (context7Metadata && !options?.refreshContext7 && !options?.suggest) {
+        const now = new Date().toISOString();
+        const daysSince = daysBetween(context7Metadata.fetchedAt, now);
+
+        if (daysSince > 30) {
+          console.log(chalk.yellow(`\n⚠️  Context7 docs are ${daysSince} days old`));
+          const shouldCheck = await new Confirm({
+            message: 'Check for documentation updates first?',
+          }).run();
+
+          if (shouldCheck) {
+            // Show instructions and exit
+            console.log(chalk.blue('\n📚 To refresh context7 documentation:\n'));
+            console.log(chalk.gray(`  1. Query context7 MCP for '${context7Metadata.libraryName}'`));
+            console.log(chalk.gray('  2. Save results to /tmp/context7-update.json'));
+            console.log(chalk.gray(`  3. npm run update -- ${name} --refresh-context7 --context7-data /tmp/context7-update.json\n`));
+            process.exit(0);
+          }
+        }
+      }
 
       // Suggest mode - output JSON for Claude
       if (options?.suggest) {

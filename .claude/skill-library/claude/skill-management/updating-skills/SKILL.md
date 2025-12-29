@@ -80,12 +80,14 @@ For significant content updates, consider using `researching-skills` before edit
 Ask user via AskUserQuestion if the update involves:
 
 **Suggest Research:**
+
 - Library/framework skill updates (TanStack Query, Zustand, React Hook Form, etc.)
 - New API patterns or features
 - Major version refreshes (React 18→19, etc.)
 - Content expansions with new examples
 
 **Skip Research:**
+
 - Typo fixes and small clarifications
 - Structural reorganization (moving to references/)
 - Adding TodoWrite mandates
@@ -97,30 +99,49 @@ Between **Step 3 (Backup)** and **Step 4 (Edit)**, if update involves significan
 
 ```typescript
 AskUserQuestion({
-  questions: [{
-    question: "This update involves significant content changes. Would you like to research first?",
-    header: "Research",
-    multiSelect: false,
-    options: [
-      { label: "Yes, invoke researching-skills", description: "Recommended for library/framework updates" },
-      { label: "No, I have the information I need", description: "Skip research phase" }
-    ]
-  }]
+  questions: [
+    {
+      question:
+        "This update involves significant content changes. Would you like to research first?",
+      header: "Research",
+      multiSelect: false,
+      options: [
+        {
+          label: "Yes, invoke researching-skills",
+          description: "Recommended for library/framework updates",
+        },
+        { label: "No, I have the information I need", description: "Skip research phase" },
+      ],
+    },
+  ],
 });
 ```
 
 **If user selects "Yes":**
 
 ```typescript
-Read(".claude/skill-library/claude/skill-management/researching-skills/SKILL.md")
+Read(".claude/skill-library/claude/skill-management/researching-skills/SKILL.md");
 ```
 
 The researching-skills skill provides:
+
 1. **Codebase research** - Find similar patterns in existing skills
 2. **Context7 research** - Fetch official documentation from external sources
 3. **Web research** - Supplemental articles and guides
 
 **After research completes**, return to Step 4 (Edit) with gathered information.
+
+---
+
+## Context7 Documentation Refresh
+
+Skills with context7 documentation can become stale (>30 days). The CLI automatically:
+
+- Detects staleness before updates
+- Prompts to refresh documentation first
+- Provides refresh instructions if needed
+
+**For complete workflow**, see [references/context7-refresh.md](references/context7-refresh.md)
 
 ---
 

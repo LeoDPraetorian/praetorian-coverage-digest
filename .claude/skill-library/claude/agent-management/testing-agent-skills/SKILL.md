@@ -52,20 +52,21 @@ This skill tests **agent-skill integration with pressure testing** (Phase 8 + Ph
 
 ## Quick Reference
 
-| Step | Action                                            | Time           |
-| ---- | ------------------------------------------------- | -------------- |
-| 0.5  | Frontmatter-Body Coverage Check                   | 2-5 min        |
-| 1    | Extract skills from agent frontmatter             | 1-2 min        |
-| 1b   | Intelligent gateway parsing (Tier 1/2/3)          | 5-10 min       |
-| 2    | Create TodoWrite tracking (tiered)                | 2-3 min        |
-| 3    | For each skill: verify exists & classify          | 30 sec/skill   |
-| 4    | For each skill: design pressure scenario          | 5-10 min/skill |
-| 5    | For each skill: spawn agent                       | 2-5 min/skill  |
-| 6    | For each skill: evaluate under pressure           | 5-10 min/skill |
-| 7    | Report aggregate results (tiered)                 | 5-10 min       |
-| 8    | Cleanup test artifacts (MANDATORY)                | 2-3 min        |
+| Step | Action                                   | Time           |
+| ---- | ---------------------------------------- | -------------- |
+| 0.5  | Frontmatter-Body Coverage Check          | 2-5 min        |
+| 1    | Extract skills from agent frontmatter    | 1-2 min        |
+| 1b   | Intelligent gateway parsing (Tier 1/2/3) | 5-10 min       |
+| 2    | Create TodoWrite tracking (tiered)       | 2-3 min        |
+| 3    | For each skill: verify exists & classify | 30 sec/skill   |
+| 4    | For each skill: design pressure scenario | 5-10 min/skill |
+| 5    | For each skill: spawn agent              | 2-5 min/skill  |
+| 6    | For each skill: evaluate under pressure  | 5-10 min/skill |
+| 7    | Report aggregate results (tiered)        | 5-10 min       |
+| 8    | Cleanup test artifacts (MANDATORY)       | 2-3 min        |
 
 **Total**:
+
 - Single skill: ~15-30 min
 - Primary only: ~1-2.5 hrs
 - Primary + Tier 1 + Tier 2: ~3-6 hrs
@@ -111,6 +112,7 @@ cd "$REPO_ROOT"
 ### 0.5.1 Extract Skills from Frontmatter
 
 Read agent file and extract skills field:
+
 ```yaml
 skills: calibrating-time-estimates, gateway-frontend, developing-with-tdd, ...
 ```
@@ -118,6 +120,7 @@ skills: calibrating-time-estimates, gateway-frontend, developing-with-tdd, ...
 ### 0.5.2 Check Each Skill for Body Guidance
 
 For each skill in frontmatter, search agent body for:
+
 - **Step 1/Step 2/Tier mentions** - "Step 1: Always Invoke", "Step 2: Invoke Core Skills"
 - **Trigger table entries** - Table rows with skill name
 - **Semantic matching examples** - Code examples showing when to invoke
@@ -134,6 +137,7 @@ The following skills are declared in frontmatter but have NO invocation guidance
 - calibrating-time-estimates (in frontmatter, not in Step 1 or Step 2)
 
 Agent won't know when to invoke these skills. Recommend:
+
 - Add to Step 1 (if always required)
 - Add to Step 2 trigger table (if conditionally required)
 - Remove from frontmatter (if not actually needed)
@@ -176,15 +180,16 @@ Read .claude/skills/{gateway-skill}/SKILL.md
 Find section titled **"Mandatory for All {Domain} Work"** in gateway.
 
 **Example from `gateway-frontend`:**
+
 ```markdown
 ## Mandatory for All Frontend Work
 
 Regardless of task type, you MUST Read these skills...
 
-| Skill | Path | Why Mandatory |
-|-------|------|---------------|
-| Performance | `.claude/skill-library/.../optimizing-react-performance/SKILL.md` | ... |
-| Info Architecture | `.claude/skill-library/.../enforcing-information-architecture/SKILL.md` | ... |
+| Skill             | Path                                                                    | Why Mandatory |
+| ----------------- | ----------------------------------------------------------------------- | ------------- |
+| Performance       | `.claude/skill-library/.../optimizing-react-performance/SKILL.md`       | ...           |
+| Info Architecture | `.claude/skill-library/.../enforcing-information-architecture/SKILL.md` | ...           |
 ```
 
 Extract ALL skills listed there → **Tier 1 (Required)**
@@ -193,27 +198,28 @@ Extract ALL skills listed there → **Tier 1 (Required)**
 
 Parse agent body (description + examples + trigger tables) for domain keywords:
 
-| Keywords Found | Relevant Library Skills |
-|----------------|------------------------|
-| "forms", "validation", "input" | `implementing-react-hook-form-zod` |
-| "table", "sorting", "filtering", "pagination" | `using-tanstack-table` |
-| "API", "data fetching", "queries", "mutations" | `using-tanstack-query` |
-| "state management", "client state", "store" | `using-zustand-state-management` |
-| "E2E", "Playwright", "browser testing" | `frontend-e2e-testing-patterns` |
-| "context", "shared state", "providers" | `using-context-api` |
-| "performance", "slow", "optimization" | `optimizing-react-performance` |
-| "animation", "motion", "transitions" | `frontend-animation-designer` |
+| Keywords Found                                 | Relevant Library Skills            |
+| ---------------------------------------------- | ---------------------------------- |
+| "forms", "validation", "input"                 | `implementing-react-hook-form-zod` |
+| "table", "sorting", "filtering", "pagination"  | `using-tanstack-table`             |
+| "API", "data fetching", "queries", "mutations" | `using-tanstack-query`             |
+| "state management", "client state", "store"    | `using-zustand-state-management`   |
+| "E2E", "Playwright", "browser testing"         | `frontend-e2e-testing-patterns`    |
+| "context", "shared state", "providers"         | `using-context-api`                |
+| "performance", "slow", "optimization"          | `optimizing-react-performance`     |
+| "animation", "motion", "transitions"           | `frontend-animation-designer`      |
 
 #### 1b.4 Cross-Reference Gateway Quick Reference Table
 
 Use gateway's **Quick Reference** or **Quick Decision Guide** to map agent keywords to library skills.
 
 **Example from `gateway-frontend` Quick Reference:**
+
 ```markdown
-| Need | Skill Path |
-|------|------------|
-| React components | `.claude/skill-library/.../frontend-react-component-generator/SKILL.md` |
-| Server state (API calls) | `.claude/skill-library/.../using-tanstack-query/SKILL.md` |
+| Need                     | Skill Path                                                              |
+| ------------------------ | ----------------------------------------------------------------------- |
+| React components         | `.claude/skill-library/.../frontend-react-component-generator/SKILL.md` |
+| Server state (API calls) | `.claude/skill-library/.../using-tanstack-query/SKILL.md`               |
 ```
 
 If agent mentions "components" → Add `frontend-react-component-generator` to Tier 2
@@ -221,14 +227,17 @@ If agent mentions "components" → Add `frontend-react-component-generator` to T
 #### 1b.5 Categorize Secondary Skills
 
 **Tier 1 (Required - Always Test):**
+
 - Gateway mandatory skills
 - Test EVERY one of these
 
 **Tier 2 (Agent-Matched - Should Test):**
+
 - Skills matching agent's domain keywords
 - High priority for testing
 
 **Tier 3 (Optional - Test If Time Permits):**
+
 - Remaining gateway skills not in Tier 1 or Tier 2
 - Lower priority
 
@@ -262,10 +271,10 @@ TodoWrite:
 
 **Skill types determine evaluation criteria:**
 
-| Type | Location | Invocation | Evaluation Looks For |
-|------|----------|------------|---------------------|
-| **Core** | `.claude/skills/` | `skill: "name"` | Skill tool invocation |
-| **Library** | `.claude/skill-library/` | `Read("full/path")` | Read tool with path |
+| Type        | Location                 | Invocation          | Evaluation Looks For  |
+| ----------- | ------------------------ | ------------------- | --------------------- |
+| **Core**    | `.claude/skills/`        | `skill: "name"`     | Skill tool invocation |
+| **Library** | `.claude/skill-library/` | `Read("full/path")` | Read tool with path   |
 
 **Find and classify:**
 
@@ -312,10 +321,12 @@ Task({
 #### PASS Criteria ✅ (varies by skill type)
 
 **Core skills** (in `.claude/skills/`):
+
 - Agent explicitly invoked: `skill: "{skill-name}"`
 - Agent followed methodology DESPITE pressure
 
 **Library skills** (in `.claude/skill-library/`):
+
 - Agent loaded skill via Read tool: `Read(".claude/skill-library/.../SKILL.md")`
 - OR agent stated: "I'm reading the {skill-name} skill"
 - Agent followed methodology from the loaded skill
@@ -352,10 +363,12 @@ Testing Scope: Primary + Tier 1 + Tier 2
 Tested: {N} skills
 
 ✅ developing-with-tdd: PASS
+
 - Invoked explicitly under pressure
 - Chose correct option despite sunk cost
 
 ❌ verifying-before-completion: FAIL
+
 - Didn't invoke skill
 - Rationalized: "I already manually tested it"
 
@@ -447,7 +460,8 @@ Add to aggregate results report:
 ═══ Step 8: Cleanup Summary ═══
 
 ✅ Test artifacts deleted: 1 directory
-   - modules/chariot/ui/src/components/UserProfile/
+
+- modules/chariot/ui/src/components/UserProfile/
 
 ✅ Modified files restored: 0
 
@@ -473,13 +487,13 @@ async function cleanupTestArtifacts(createdPaths: string[]) {
   }
 
   // Restore modified files
-  await Bash({ command: 'git restore .' });
+  await Bash({ command: "git restore ." });
 
   // Verify clean
-  const status = await Bash({ command: 'git status --short' });
+  const status = await Bash({ command: "git status --short" });
 
-  if (status.trim() === '') {
-    return { success: true, message: 'Git status: Clean' };
+  if (status.trim() === "") {
+    return { success: true, message: "Git status: Clean" };
   } else {
     return { success: false, message: `Unclean state: ${status}` };
   }

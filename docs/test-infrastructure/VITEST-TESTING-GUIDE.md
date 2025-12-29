@@ -40,6 +40,7 @@ npm run test:coverage
 ### Problem
 
 Running all 146 test files simultaneously on a laptop causes:
+
 - **High CPU usage** - System becomes unresponsive
 - **Memory pressure** - Can trigger swapping or OOM
 - **Import failures** - Vite fails to resolve modules under resource contention
@@ -48,6 +49,7 @@ Running all 146 test files simultaneously on a laptop causes:
 ### Solution
 
 Break tests into logical sections that run independently:
+
 - **Faster feedback** - 2-5 seconds per section
 - **Lower resource usage** - Only 4 concurrent test files
 - **Better isolation** - Easier to identify failing tests
@@ -104,6 +106,7 @@ npm run test:shard:4                  # 4/4 of all tests
 ### During Active Development
 
 **Option 1: Watch Mode** (Best for iteration)
+
 ```bash
 # Only runs tests for files you're actively changing
 npm test -- src/sections/settings
@@ -112,6 +115,7 @@ npm test -- src/sections/settings
 ```
 
 **Option 2: Section Testing** (Best for feature work)
+
 ```bash
 # Test the feature you're working on
 npm run test:sections:settings
@@ -120,6 +124,7 @@ npm run test:sections:settings
 ```
 
 **Option 3: Specific Test File**
+
 ```bash
 # Run one test file
 npm test -- NotificationsTab.test.tsx
@@ -142,6 +147,7 @@ npm run test:sections:vulnerabilities
 ### For CI/CD Pipeline
 
 **GitHub Actions Example**:
+
 ```yaml
 name: Test
 
@@ -160,6 +166,7 @@ jobs:
 ## Performance Comparison
 
 ### Full Suite
+
 - **Test Files**: 146
 - **Total Tests**: 2,569
 - **Duration**: ~71 seconds
@@ -168,6 +175,7 @@ jobs:
 - **System Impact**: Significant slowdown
 
 ### Sectioned (Example: Metrics)
+
 - **Test Files**: 6
 - **Total Tests**: 130
 - **Duration**: ~2.3 seconds
@@ -176,6 +184,7 @@ jobs:
 - **System Impact**: Minimal
 
 ### Improvement
+
 - **30x faster** - Per section vs full suite
 - **97% less resource usage** - Laptop stays responsive
 - **Better DX** - Instant feedback during development
@@ -202,6 +211,7 @@ The sectioned testing is enabled by:
 ### 2. NPM Scripts (`modules/chariot/ui/package.json`)
 
 Each script targets a specific directory:
+
 ```json
 "test:sections:settings": "vitest run src/sections/settings"
 ```
@@ -213,6 +223,7 @@ Vitest automatically finds all `*.test.ts` and `*.test.tsx` files in that direct
 ### Issue: "No test files found"
 
 **Symptom**:
+
 ```
 No test files found, exiting with code 1
 ```
@@ -220,6 +231,7 @@ No test files found, exiting with code 1
 **Cause**: Running script from wrong directory
 
 **Solution**:
+
 ```bash
 # Must be in modules/chariot/ui/
 cd modules/chariot/ui
@@ -233,9 +245,10 @@ npm run test:metrics
 **Cause**: Too many tests in one section
 
 **Solution**: Break into smaller sections or reduce `maxForks`:
+
 ```typescript
 // vitest.config.ts
-maxForks: 2  // Reduce from 4
+maxForks: 2; // Reduce from 4
 ```
 
 ### Issue: Import resolution failures
@@ -253,6 +266,7 @@ maxForks: 2  // Reduce from 4
 **Cause**: Shared state or timing issues
 
 **Solution**: Run with `--reporter=verbose` to see details:
+
 ```bash
 npm run test:sections -- --reporter=verbose
 ```
@@ -307,11 +321,13 @@ npm test -- src/sections/metrics -u
 ## Summary
 
 **For Laptop Development**:
+
 ```bash
 npm run test:sections:settings    # Fast, targeted testing
 ```
 
 **For CI/CD**:
+
 ```bash
 npm run test:shard:1              # Parallel across 4 runners
 ```

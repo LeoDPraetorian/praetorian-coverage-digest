@@ -22,6 +22,7 @@ export interface SkillFile {
   frontmatter: SkillFrontmatter;
   content: string;
   wordCount: number;
+  lineCount: number;  // Added for Phase 3 (Anthropic recommends <500 lines)
   skillType: SkillType;  // Auto-detected or from frontmatter
 }
 
@@ -455,6 +456,168 @@ export interface Context7DiffResult {
   changedSignatures: { name: string; oldSig: string; newSig: string }[];
   updatedExamples: number;
   summary: string;
+}
+
+// ============================================
+// Hybrid Fix Types (CLI + Claude Reasoning)
+// ============================================
+// These types support the hybrid fix model where:
+// - CLI handles deterministic cases automatically
+// - Ambiguous cases are passed to Claude for reasoning
+// - User confirms ambiguous case resolutions
+
+/**
+ * Base interface for ambiguous cases that need Claude reasoning.
+ * Each hybrid phase extends this with phase-specific fields.
+ */
+export interface AmbiguousCase {
+  /** Phase number (4, 10, 19) */
+  phase: number;
+  /** Type identifier for the ambiguous case */
+  type: string;
+  /** Human-readable context explaining the issue */
+  context: string;
+  /** Available resolution options */
+  options: HybridFixOption[];
+}
+
+/**
+ * Option for resolving an ambiguous case.
+ * More flexible than SuggestionOption to support hybrid-specific actions.
+ */
+export interface HybridFixOption {
+  /** Action key (e.g., 'create', 'remove', 'replace', 'fix') */
+  key: string;
+  /** User-friendly label */
+  label: string;
+  /** Additional description */
+  description?: string;
+  /** Value to pass when applying (e.g., file path, replacement name) */
+  value?: string;
+}
+
+/**
+ * Phase 4: Broken link where file doesn't exist anywhere.
+ * CLI can't auto-fix, needs Claude to decide: create, remove, or use similar.
+ */
+export interface Phase4AmbiguousCase extends AmbiguousCase {
+  phase: 4;
+  type: 'broken-link-missing';
+  /** The link text from markdown [linkText](path) */
+  linkText: string;
+  /** The broken path from markdown [text](linkPath) */
+  linkPath: string;
+  /** Surrounding text for context (~100 chars) */
+  surroundingContext: string;
+  /** Similar files found in skill directory */
+  similarFiles: string[];
+}
+
+/**
+ * Phase 10: Reference not in deprecation registry.
+ * CLI can't auto-fix, needs Claude to fuzzy match and suggest.
+ */
+export interface Phase10AmbiguousCase extends AmbiguousCase {
+  phase: 10;
+  type: 'phantom-reference-fuzzy';
+  /** The reference that wasn't found */
+  reference: string;
+  /** Type of reference (skill, agent, command, mcp-tool) */
+  refType: 'skill' | 'agent' | 'command' | 'mcp-tool';
+  /** Fuzzy matches with similarity scores */
+  fuzzyMatches: FuzzyMatch[];
+}
+
+/**
+ * Phase 19: Broken gateway path.
+ * Needs Claude to determine: fix typo, remove entry, or note for creation.
+ */
+export interface Phase19AmbiguousCase extends AmbiguousCase {
+  phase: 19;
+  type: 'broken-gateway-path';
+  /** The path in the routing table that doesn't resolve */
+  brokenPath: string;
+  /** Skill name from the routing table */
+  skillName: string;
+  /** Fuzzy matches against existing skill paths */
+  fuzzyMatches: FuzzyMatch[];
+}
+
+/**
+ * Fuzzy match result with similarity score
+ */
+export interface FuzzyMatch {
+  /** The matched name or path */
+  name: string;
+  /** Similarity score 0-1 (higher = more similar) */
+  score: number;
+  /** Full path if applicable */
+  path?: string;
+}
+
+/**
+ * Result from a hybrid phase fix that includes both
+ * deterministic fixes and ambiguous cases for Claude.
+ */
+export interface HybridPhaseResult extends PhaseResult {
+  /** Cases that couldn't be auto-fixed and need Claude reasoning */
+  ambiguousCases: AmbiguousCase[];
+}
+
+/**
+ * Phase 4 specific result
+ */
+export interface Phase4HybridResult extends HybridPhaseResult {
+  ambiguousCases: Phase4AmbiguousCase[];
+}
+
+/**
+ * Phase 10 specific result
+ */
+export interface Phase10HybridResult extends HybridPhaseResult {
+  ambiguousCases: Phase10AmbiguousCase[];
+}
+
+/**
+ * Phase 19 specific result
+ */
+export interface Phase19HybridResult extends HybridPhaseResult {
+  ambiguousCases: Phase19AmbiguousCase[];
+}
+
+/**
+ * Extended fix options to support hybrid mode
+ */
+export interface HybridFixOptions extends FixOptions {
+  /** Return ambiguous cases instead of just counts */
+  returnAmbiguous?: boolean;
+}
+
+/**
+ * Apply command for hybrid fixes
+ * Format: phase{N}-{type} --value "{action}:{details}"
+ * Examples:
+ *   phase4-broken-link-missing --value "create:references/workflow.md"
+ *   phase4-broken-link-missing --value "remove:[link text]"
+ *   phase4-broken-link-missing --value "replace:oldpath:newpath"
+ *   phase10-phantom-reference-fuzzy --value "replace:debugging-systematically"
+ *   phase19-broken-gateway-path --value "fix:correct/path/to/skill"
+ *   phase19-broken-gateway-path --value "remove:skill-name"
+ */
+export type HybridApplyAction =
+  | { action: 'create'; path: string; content?: string }
+  | { action: 'remove'; target: string }
+  | { action: 'replace'; from: string; to: string }
+  | { action: 'fix'; newPath: string };
+
+/**
+ * Parsed hybrid fix application request
+ */
+export interface HybridApplyRequest {
+  phase: 4 | 10 | 19;
+  type: string;
+  action: HybridApplyAction;
+  skillPath: string;
 }
 
 // ============================================

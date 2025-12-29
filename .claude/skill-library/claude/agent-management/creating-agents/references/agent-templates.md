@@ -75,13 +75,14 @@ Use Read() for ALL skills. Do NOT use Skill tool. Do NOT rely on training data.
 ### Tier 1: Always Read (Every Task)
 
 Before any implementation, read these in order:
-
 ```
+
 Read('.claude/skills/calibrating-time-estimates/SKILL.md')
 Read('.claude/skills/gateway-[domain]/SKILL.md')
 Read('.claude/skills/developing-with-tdd/SKILL.md')
 Read('.claude/skills/adhering-to-yagni/SKILL.md')
 Read('.claude/skills/verifying-before-completion/SKILL.md')
+
 ```
 
 ### Tier 2: Multi-Step Tasks
@@ -89,8 +90,10 @@ Read('.claude/skills/verifying-before-completion/SKILL.md')
 If task has ≥2 steps:
 
 ```
+
 Read('.claude/skills/using-todowrite/SKILL.md')
-```
+
+````
 
 ### Tier 3: Triggered by Task Type
 
@@ -135,17 +138,18 @@ Do NOT rationalize skipping skill reads:
     "command_output": "snippet"
   }
 }
-```
+````
 
 ## Escalation
 
-| Situation | Recommend |
-|-----------|-----------|
-| [Condition 1] | `agent-name` |
-| [Condition 2] | `agent-name` |
+| Situation            | Recommend            |
+| -------------------- | -------------------- |
+| [Condition 1]        | `agent-name`         |
+| [Condition 2]        | `agent-name`         |
 | Unclear requirements | AskUserQuestion tool |
 
 Report: 'Blocked: [issue]. Attempted: [what]. Recommend: [agent] for [capability].'
+
 ```
 
 **Template size**: ~100-130 lines
@@ -173,3 +177,4 @@ When creating agents, customize based on type:
 
 - **`gold-standards.md`** - Analysis of frontend-developer as exemplar
 - **`../SKILL.md`** - Full agent creation workflow
+```

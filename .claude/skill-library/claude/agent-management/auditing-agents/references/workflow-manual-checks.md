@@ -11,26 +11,31 @@ Detailed procedures for the 5 instruction-based manual checks that Claude perfor
 **Verification Steps**:
 
 1. Verify Skill Loading Protocol section exists:
+
    ```bash
    grep '## Skill Loading Protocol' .claude/agents/{type}/{name}.md
    ```
 
 2. Verify 3 tiers present:
+
    ```bash
    grep -E '### Tier [123]' .claude/agents/{type}/{name}.md
    ```
 
 3. Verify Anti-Bypass section:
+
    ```bash
    grep '## Anti-Bypass' .claude/agents/{type}/{name}.md
    ```
 
 4. Verify output includes skills_read:
+
    ```bash
    grep 'skills_read' .claude/agents/{type}/{name}.md
    ```
 
 5. Verify Tier 2 TodoWrite requirement (MANDATORY for ALL agents):
+
    ```bash
    # Check Tier 2 section mentions TodoWrite/using-todowrite
    grep -A 5 '### Tier 2' .claude/agents/{type}/{name}.md | grep -iE 'todowrite|using-todowrite'
@@ -40,6 +45,7 @@ Detailed procedures for the 5 instruction-based manual checks that Claude perfor
    ```
 
 **Results**:
+
 - ✅ PASS: Tiered Skill Loading Protocol present and complete, Tier 2 has TodoWrite with ≥2 steps
 - ⚠️ WARNING: Missing protocol (agent has skills: but no loading protocol)
 - ❌ ERROR: Tier 2 missing TodoWrite or uses wrong threshold (≥3 steps instead of ≥2 steps)
@@ -177,14 +183,14 @@ grep '^type:' .claude/agents/{category}/{agent-name}.md
 
 b. **Domain detection patterns:**
 
-| Pattern | Recommended Gateway |
-|---------|---------------------|
-| Name contains `frontend`, `react`, `ui` | `gateway-frontend` |
-| Name contains `backend`, `go`, `api` | `gateway-backend` |
-| Name contains `test`, `e2e`, `playwright` | `gateway-testing` |
-| Name contains `security`, `auth`, `crypto` | `gateway-security` |
-| Type is `development` + frontend keywords | `gateway-frontend` |
-| Type is `development` + backend keywords | `gateway-backend` |
+| Pattern                                    | Recommended Gateway |
+| ------------------------------------------ | ------------------- |
+| Name contains `frontend`, `react`, `ui`    | `gateway-frontend`  |
+| Name contains `backend`, `go`, `api`       | `gateway-backend`   |
+| Name contains `test`, `e2e`, `playwright`  | `gateway-testing`   |
+| Name contains `security`, `auth`, `crypto` | `gateway-security`  |
+| Type is `development` + frontend keywords  | `gateway-frontend`  |
+| Type is `development` + backend keywords   | `gateway-backend`   |
 
 c. **Check if agent has recommended gateway:**
 
@@ -835,12 +841,14 @@ Result: PASS
 **Fix guidance:**
 
 Add `verifying-before-completion` and `calibrating-time-estimates` to:
+
 1. Frontmatter `skills:` field, AND
 2. Tier 1 of Skill Loading Protocol section
 
 **Why WARNING severity?** These skills are MANDATORY for all agents - they prevent incomplete work and time estimation errors.
 
 **For comprehensive skill discovery** (type-based, domain-based, trigger analysis), use the `finding-skills-for-agents` skill which handles:
+
 - Type-based recommended skills (development/testing/quality)
 - Domain-based gateway suggestions (frontend/backend/testing)
 - Body trigger analysis (TDD/debugging/planning patterns)
@@ -896,6 +904,7 @@ grep -n '## Anti-Bypass' .claude/agents/{category}/{agent-name}.md
 d. **Check for duplicate skill trigger tables:**
 
 Look for multiple sections with skill trigger mappings:
+
 - "## Skill Loading Protocol" with "### Tier 3: Triggered by Task Type"
 - "## Skill References (Load On-Demand via Gateway)"
 - "## Architecture-Specific Skill Routing"
@@ -968,6 +977,7 @@ fi
 c. **Check for known renamed skills:**
 
 Common renames not yet in deprecation registry:
+
 - `frontend-tanstack-query` → `using-tanstack-query`
 - `frontend-tanstack-table` → Renamed to `using-tanstack-table`
 - `frontend-tanstack-router` → Renamed to `using-tanstack-router`
@@ -1067,6 +1077,7 @@ Tables are consecutive lines starting with `|`. A blank line or non-table line e
 **Step 2: Extract table components**
 
 For each table:
+
 - **Header row**: First line of table block
 - **Separator row**: Second line (must match pattern `|---|---|...`)
 - **Data rows**: Remaining lines in block
@@ -1172,11 +1183,13 @@ Assess if table will render poorly:
 
 ```markdown
 ℹ️ INFO checks:
+
 - Long paths (>80 chars) combined with verbose triggers
 - Table would wrap awkwardly in standard terminal (80-120 char width)
 - Columns wouldn't visually align due to content length variance
 
 Suggest: Consider alternative format for complex mappings:
+
 - Bullet list with inline code paths
 - Multiple tables split by category
 - Abbreviate common path prefixes
@@ -1223,15 +1236,15 @@ Overall: WARNING (1 table with readability issues, 1 table with errors)
 
 **Common Issues:**
 
-| Issue | Severity | Example |
-|-------|----------|---------|
-| Column count mismatch | ERROR | Header 3 cols, row has 4 |
-| Trigger too verbose | WARNING | 60-char trigger vs 30-char max |
-| Combined row width excessive | WARNING | Trigger + path = 142 chars vs 120 max |
-| Separator too short | WARNING | Using `\| - \|` instead of `\|---\|` |
-| Missing trailing pipe | WARNING | `\| A \| B \| C` (some parsers accept) |
-| Visual alignment poor | INFO | Long content causes wrapping/chaos |
-| Inconsistent spacing | INFO | Mixing `\|A\|B\|` and `\| A \| B \|` |
+| Issue                        | Severity | Example                                |
+| ---------------------------- | -------- | -------------------------------------- |
+| Column count mismatch        | ERROR    | Header 3 cols, row has 4               |
+| Trigger too verbose          | WARNING  | 60-char trigger vs 30-char max         |
+| Combined row width excessive | WARNING  | Trigger + path = 142 chars vs 120 max  |
+| Separator too short          | WARNING  | Using `\| - \|` instead of `\|---\|`   |
+| Missing trailing pipe        | WARNING  | `\| A \| B \| C` (some parsers accept) |
+| Visual alignment poor        | INFO     | Long content causes wrapping/chaos     |
+| Inconsistent spacing         | INFO     | Mixing `\|A\|B\|` and `\| A \| B \|`   |
 
 **Fix Guidance:**
 
@@ -1246,6 +1259,7 @@ Overall: WARNING (1 table with readability issues, 1 table with errors)
 **Why Manual?**
 
 Requires context-aware table parsing:
+
 - Line-by-line analysis to identify table blocks
 - Column counting logic
 - Format validation
@@ -1287,12 +1301,14 @@ Readability warnings should be fixed for quality, even though agents function wi
 a. **Read agent body and identify instructional content:**
 
 Read the agent body sections (everything after frontmatter) and identify:
+
 - Patterns, workflows, or methodologies (>100 characters)
 - Step-by-step processes or rules
 - Technical guidance or best practices
 - Checklist items or verification steps
 
 Skip:
+
 - Agent-specific context (description, examples, output format)
 - Skill Loading Protocol section (defines WHICH skills, not duplicates CONTENT)
 - Anti-Bypass section (short rationalization warnings)
@@ -1301,6 +1317,7 @@ Skip:
 b. **For each substantial instructional section (>100 chars), reason about skill coverage:**
 
 For each identified section, ask:
+
 - Does this content explain a pattern/workflow that a skill likely covers?
 - Common duplication targets:
   - TDD workflow steps → `developing-with-tdd`
@@ -1327,6 +1344,7 @@ npm run -w @chariot/auditing-skills search -- "QUERY"
 ```
 
 Example queries based on content found:
+
 - Agent has TDD steps → `npm run -w @chariot/auditing-skills search -- "TDD"`
 - Agent has debugging flow → `npm run -w @chariot/auditing-skills search -- "debugging"`
 - Agent has React patterns → `npm run -w @chariot/auditing-skills search -- "react patterns"`
@@ -1344,6 +1362,7 @@ Read('.claude/skill-library/{domain}/{skill-name}/SKILL.md')
 ```
 
 Compare:
+
 - Does the skill cover the same workflow/pattern?
 - Is the agent content a subset of what the skill provides?
 - Would referencing the skill instead be sufficient?
@@ -1351,6 +1370,7 @@ Compare:
 e. **Report duplications found:**
 
 For each confirmed duplication, report:
+
 - Section location (line numbers in agent file)
 - Overlapping skill path
 - Fix suggestion (delete section + add Tier 3 trigger reference)
@@ -1391,8 +1411,9 @@ DUPLICATION CONFIRMED:
 2. **Add skill to Tier 3** (if not already present):
    ```markdown
    ### Tier 3: Triggered by Task Type
-   | Trigger | Read Path |
-   |---------|-----------|
+
+   | Trigger                        | Read Path                            |
+   | ------------------------------ | ------------------------------------ |
    | [task that needs this content] | `.claude/skill-library/.../SKILL.md` |
    ```
 3. **Verify skill is accessible** via gateway (if library skill)
@@ -1401,23 +1422,29 @@ DUPLICATION CONFIRMED:
 
 ```markdown
 # Before (agent with embedded TDD workflow)
+
 ## Development Workflow
+
 When implementing features:
+
 1. Write failing test first (RED)
 2. Write minimal code to pass (GREEN)
 3. Refactor while tests pass (REFACTOR)
-...
+   ...
 
 # After (agent references skill instead)
+
 ### Tier 3: Triggered by Task Type
-| Trigger | Read Path |
-|---------|-----------|
+
+| Trigger               | Read Path                                     |
+| --------------------- | --------------------------------------------- |
 | Implementing features | `.claude/skills/developing-with-tdd/SKILL.md` |
 ```
 
 **Why Manual?**
 
 This is a reasoning task that requires:
+
 - Semantic understanding of what content "means"
 - Judgment about whether content is truly duplicated vs agent-specific
 - Knowledge of the skill ecosystem to find matches
@@ -1428,6 +1455,7 @@ Cannot be automated with simple grep patterns - requires Claude's reasoning.
 **Why Important?**
 
 Content duplication causes:
+
 - **Agent bloat**: Same content in multiple places (agent + skill)
 - **Maintenance burden**: Updates must be made in multiple locations
 - **Inconsistency**: Agent version may drift from skill version
@@ -1435,4 +1463,3 @@ Content duplication causes:
 - **Architecture violation**: Agents should be lean coordinators, skills should hold detailed patterns
 
 **Reference:** Lean agent pattern (<300 lines) depends on delegating detailed content to skills via Tier 3 triggers rather than embedding duplicates.
-

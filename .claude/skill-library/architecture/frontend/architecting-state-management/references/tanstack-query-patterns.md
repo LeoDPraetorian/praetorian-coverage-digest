@@ -8,13 +8,10 @@
 
 ```typescript
 // Entity-based keys (hierarchical)
-['assets']                          // All assets
-['assets', { status: 'active' }]    // Filtered
-['assets', assetId]                 // Single entity
-['assets', assetId, 'risks']        // Nested relationship
-
-// User-scoped keys (impersonation safety)
-['assets', userId, filters]         // Include user for cache isolation
+["assets"][("assets", { status: "active" })][("assets", assetId)][("assets", assetId, "risks")][ // All assets // Filtered // Single entity // Nested relationship
+  // User-scoped keys (impersonation safety)
+  ("assets", userId, filters)
+]; // Include user for cache isolation
 ```
 
 **Why include userId**: For multi-tenant applications with impersonation, including userId in query keys ensures cache isolation between users.
@@ -33,8 +30,8 @@
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: mToMs(5),    // 5 min - data stays fresh
-      gcTime: mToMs(15),      // 15 min - keep in cache (3x staleTime)
+      staleTime: mToMs(5), // 5 min - data stays fresh
+      gcTime: mToMs(15), // 15 min - keep in cache (3x staleTime)
     },
   },
 });
@@ -44,29 +41,31 @@ export const queryClient = new QueryClient({
 
 Different data types need different strategies:
 
-| Data Type | staleTime | gcTime | Reasoning |
-|-----------|-----------|--------|-----------|
-| User profile | 5 min | 15 min | Changes infrequently, moderate freshness needs |
-| Assets list | 30 sec | 5 min | Changes frequently, need fresh data |
-| Reference data (capabilities) | 30 min | 60 min | Rarely changes, can cache aggressively |
-| Real-time data | 0 sec | 1 min | Always fetch latest, minimal cache |
+| Data Type                     | staleTime | gcTime | Reasoning                                      |
+| ----------------------------- | --------- | ------ | ---------------------------------------------- |
+| User profile                  | 5 min     | 15 min | Changes infrequently, moderate freshness needs |
+| Assets list                   | 30 sec    | 5 min  | Changes frequently, need fresh data            |
+| Reference data (capabilities) | 30 min    | 60 min | Rarely changes, can cache aggressively         |
+| Real-time data                | 0 sec     | 1 min  | Always fetch latest, minimal cache             |
 
 **Implementation**:
 
 ```typescript
 // In custom hooks - override defaults per domain
-const useAssets = (filters) => useQuery({
-  queryKey: ['assets', userId, filters],
-  queryFn: () => api.getAssets(filters),
-  staleTime: 30_000,  // 30 sec - assets change frequently
-});
+const useAssets = (filters) =>
+  useQuery({
+    queryKey: ["assets", userId, filters],
+    queryFn: () => api.getAssets(filters),
+    staleTime: 30_000, // 30 sec - assets change frequently
+  });
 
-const useCapabilities = () => useQuery({
-  queryKey: ['capabilities'],
-  queryFn: api.getCapabilities,
-  staleTime: 600_000, // 10 min - reference data
-  gcTime: 1_800_000,  // 30 min
-});
+const useCapabilities = () =>
+  useQuery({
+    queryKey: ["capabilities"],
+    queryFn: api.getCapabilities,
+    staleTime: 600_000, // 10 min - reference data
+    gcTime: 1_800_000, // 30 min
+  });
 ```
 
 ## Mutation Patterns
@@ -78,7 +77,7 @@ const { mutate } = useMutation({
   mutationFn: api.updateAsset,
   onSuccess: () => {
     // Invalidate marks queries stale, triggers background refetch
-    queryClient.invalidateQueries({ queryKey: ['assets'] });
+    queryClient.invalidateQueries({ queryKey: ["assets"] });
   },
 });
 ```
@@ -92,24 +91,24 @@ const { mutate } = useMutation({
   mutationFn: api.updateAsset,
   onMutate: async (variables) => {
     // Cancel outgoing queries
-    await queryClient.cancelQueries({ queryKey: ['assets'] });
+    await queryClient.cancelQueries({ queryKey: ["assets"] });
 
     // Snapshot current data for rollback
-    const previous = queryClient.getQueryData(['assets']);
+    const previous = queryClient.getQueryData(["assets"]);
 
     // Optimistically update cache
-    queryClient.setQueryData(['assets'], variables);
+    queryClient.setQueryData(["assets"], variables);
 
     // Return rollback snapshot
     return { previous };
   },
   onError: (_err, _vars, context) => {
     // Rollback on error
-    queryClient.setQueryData(['assets'], context.previous);
+    queryClient.setQueryData(["assets"], context.previous);
   },
   onSettled: () => {
     // Always refetch to sync with server
-    queryClient.invalidateQueries({ queryKey: ['assets'] });
+    queryClient.invalidateQueries({ queryKey: ["assets"] });
   },
 });
 ```
@@ -136,7 +135,7 @@ const { mutate } = useMutation({
 **invalidateQueries**: Marks queries stale, triggers background refetch when active
 
 ```typescript
-queryClient.invalidateQueries({ queryKey: ['assets'] });
+queryClient.invalidateQueries({ queryKey: ["assets"] });
 // - Marks ['assets'] as stale
 // - If query is active, refetches in background
 // - Shows cached data until refetch completes
@@ -145,7 +144,7 @@ queryClient.invalidateQueries({ queryKey: ['assets'] });
 **setQueryData**: Synchronously updates cache
 
 ```typescript
-queryClient.setQueryData(['assets'], newData);
+queryClient.setQueryData(["assets"], newData);
 // - Immediately updates cache
 // - No network request
 // - You must provide correct data
@@ -166,7 +165,7 @@ queryClient.setQueryData(['assets'], newData);
 
 ```typescript
 // ❌ BAD - defeats caching, causes stale data
-const { data } = useQuery({ queryKey: ['assets'], queryFn: getAssets });
+const { data } = useQuery({ queryKey: ["assets"], queryFn: getAssets });
 const [assets, setAssets] = useState(data);
 ```
 
@@ -176,7 +175,7 @@ const [assets, setAssets] = useState(data);
 
 ```typescript
 // ✅ GOOD - cache updates automatically
-const { data: assets } = useQuery({ queryKey: ['assets'], queryFn: getAssets });
+const { data: assets } = useQuery({ queryKey: ["assets"], queryFn: getAssets });
 ```
 
 ### ❌ Manual Fetch with useEffect
@@ -185,13 +184,13 @@ const { data: assets } = useQuery({ queryKey: ['assets'], queryFn: getAssets });
 // ❌ BAD - reinventing TanStack Query
 useEffect(() => {
   setLoading(true);
-  fetch('/api/assets')
-    .then(res => res.json())
-    .then(data => {
+  fetch("/api/assets")
+    .then((res) => res.json())
+    .then((data) => {
       setAssets(data);
       setLoading(false);
     })
-    .catch(err => setError(err));
+    .catch((err) => setError(err));
 }, []);
 ```
 
@@ -201,9 +200,13 @@ useEffect(() => {
 
 ```typescript
 // ✅ GOOD - automatic caching, refetch, deduplication
-const { data: assets, isLoading, error } = useQuery({
-  queryKey: ['assets'],
-  queryFn: () => fetch('/api/assets').then(res => res.json()),
+const {
+  data: assets,
+  isLoading,
+  error,
+} = useQuery({
+  queryKey: ["assets"],
+  queryFn: () => fetch("/api/assets").then((res) => res.json()),
 });
 ```
 
@@ -225,7 +228,7 @@ export const AssetProvider = ({ children }) => {
 ```typescript
 // ✅ GOOD - TanStack Query for server state
 const { data: assets } = useQuery({
-  queryKey: ['assets'],
+  queryKey: ["assets"],
   queryFn: getAssets,
 });
 
@@ -251,7 +254,7 @@ function Component() {
 // ✅ GOOD - in mutation callback
 const { mutate } = useMutation({
   mutationFn: updateAsset,
-  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['assets'] }),
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ["assets"] }),
 });
 ```
 

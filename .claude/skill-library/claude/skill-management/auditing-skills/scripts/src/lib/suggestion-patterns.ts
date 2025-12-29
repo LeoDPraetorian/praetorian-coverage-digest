@@ -61,19 +61,19 @@ export const SUGGESTION_PATTERNS = {
   },
 
   /**
-   * Phase 3: Word count issues
+   * Phase 3: Line count issues (Anthropic recommends <500 lines)
    */
   'phase3-too-long': {
-    title: 'SKILL.md exceeds recommended word count',
-    explanationTemplate: (currentWords: number, targetWords: number, skillType: string) =>
-      `At ${currentWords} words, this ${skillType} skill exceeds the ${targetWords} word target. Consider extracting detailed sections to references/.`,
+    title: 'SKILL.md exceeds 500 line limit',
+    explanationTemplate: (currentLines: number, limitLines: number) =>
+      `At ${currentLines} lines, this skill exceeds the ${limitLines} line limit. Extract detailed sections to references/ directory.`,
     options: ACKNOWLEDGE_OPTIONS, // Can't auto-fix, requires manual extraction
   },
 
-  'phase3-too-short': {
-    title: 'SKILL.md may need more content',
-    explanationTemplate: (currentWords: number, targetMin: number, skillType: string) =>
-      `At ${currentWords} words, this ${skillType} skill is below the ${targetMin} word minimum. Consider adding more guidance.`,
+  'phase3-approaching-limit': {
+    title: 'SKILL.md approaching 500 line limit',
+    explanationTemplate: (currentLines: number, limitLines: number) =>
+      `At ${currentLines} lines, this skill is approaching the ${limitLines} line limit. Plan extraction before adding more content.`,
     options: ACKNOWLEDGE_OPTIONS,
   },
 

@@ -16,23 +16,27 @@ These have deterministic parts that Claude handles automatically, but ambiguous 
 
 ```typescript
 AskUserQuestion({
-  questions: [{
-    question: "Found library skill 'using-react-patterns' in frontmatter. Replace with which gateway?",
-    header: "Gateway Fix",
-    multiSelect: false,
-    options: [
-      { label: "gateway-frontend", description: "Frontend/React/UI patterns" },
-      { label: "gateway-backend", description: "Backend/Go/API patterns" },
-      { label: "gateway-testing", description: "Testing patterns" },
-      { label: "gateway-security", description: "Security/Auth/Crypto patterns" },
-      { label: "gateway-integrations", description: "Third-party API integrations" },
-      { label: "Keep as-is", description: "Has specific justification" }
-    ]
-  }]
+  questions: [
+    {
+      question:
+        "Found library skill 'using-react-patterns' in frontmatter. Replace with which gateway?",
+      header: "Gateway Fix",
+      multiSelect: false,
+      options: [
+        { label: "gateway-frontend", description: "Frontend/React/UI patterns" },
+        { label: "gateway-backend", description: "Backend/Go/API patterns" },
+        { label: "gateway-testing", description: "Testing patterns" },
+        { label: "gateway-security", description: "Security/Auth/Crypto patterns" },
+        { label: "gateway-integrations", description: "Third-party API integrations" },
+        { label: "Keep as-is", description: "Has specific justification" },
+      ],
+    },
+  ],
 });
 ```
 
 **Gateway selection logic:**
+
 - Name contains `react`, `ui`, `frontend` → `gateway-frontend`
 - Name contains `go`, `api`, `backend` → `gateway-backend`
 - Name contains `test`, `playwright`, `vitest` → `gateway-testing`
@@ -49,20 +53,27 @@ AskUserQuestion({
 
 ```typescript
 AskUserQuestion({
-  questions: [{
-    question: "Agent uses 'skill: \"using-tanstack-query\"' which will fail (library skill). Fix how?",
-    header: "Invocation Fix",
-    multiSelect: false,
-    options: [
-      { label: "Replace with Read() syntax", description: "Read('.claude/skill-library/.../SKILL.md')" },
-      { label: "Add to gateway-frontend", description: "Use gateway instead" },
-      { label: "Remove reference", description: "Not needed for this agent" }
-    ]
-  }]
+  questions: [
+    {
+      question:
+        "Agent uses 'skill: \"using-tanstack-query\"' which will fail (library skill). Fix how?",
+      header: "Invocation Fix",
+      multiSelect: false,
+      options: [
+        {
+          label: "Replace with Read() syntax",
+          description: "Read('.claude/skill-library/.../SKILL.md')",
+        },
+        { label: "Add to gateway-frontend", description: "Use gateway instead" },
+        { label: "Remove reference", description: "Not needed for this agent" },
+      ],
+    },
+  ],
 });
 ```
 
 **Fix patterns:**
+
 - **Replace with Read():** For one-off skill usage
 - **Add gateway:** For domain-wide skill access
 - **Remove:** For unnecessary references
@@ -76,6 +87,7 @@ AskUserQuestion({
 **Ambiguous part:** Delete section entirely or refactor to agent-specific summary?
 
 **Detection process:**
+
 1. Read agent body sections (>100 chars)
 2. Search for matching skills: `npm run search -- "{content keywords}"`
 3. Read candidate skill files to confirm overlap
@@ -83,20 +95,27 @@ AskUserQuestion({
 
 ```typescript
 AskUserQuestion({
-  questions: [{
-    question: "Agent duplicates content from 'developing-with-tdd' skill (lines 89-145). How to fix?",
-    header: "Duplication",
-    multiSelect: false,
-    options: [
-      { label: "Delete section + add Tier 3 trigger", description: "Remove duplication entirely (Recommended)" },
-      { label: "Refactor to brief summary", description: "Keep agent-specific twist" },
-      { label: "Keep as-is", description: "Justification for duplication exists" }
-    ]
-  }]
+  questions: [
+    {
+      question:
+        "Agent duplicates content from 'developing-with-tdd' skill (lines 89-145). How to fix?",
+      header: "Duplication",
+      multiSelect: false,
+      options: [
+        {
+          label: "Delete section + add Tier 3 trigger",
+          description: "Remove duplication entirely (Recommended)",
+        },
+        { label: "Refactor to brief summary", description: "Keep agent-specific twist" },
+        { label: "Keep as-is", description: "Justification for duplication exists" },
+      ],
+    },
+  ],
 });
 ```
 
 **Decision factors:**
+
 - **Delete:** When skill covers 100% of content
 - **Refactor:** When agent adds specific context/examples
 - **Keep:** When duplication serves agent-specific pedagogical purpose
@@ -112,6 +131,7 @@ These require genuine human judgment that cannot be automated.
 **Issue:** Reference to non-existent or deprecated skill
 
 **Guidance process:**
+
 1. Search for similar skills:
    ```bash
    npm run search -- "{skill-name}"
@@ -120,16 +140,18 @@ These require genuine human judgment that cannot be automated.
 3. Ask user to choose replacement:
    ```typescript
    AskUserQuestion({
-     questions: [{
-       question: "Phantom skill 'old-react-patterns' not found. Replace with?",
-       header: "Replacement",
-       multiSelect: false,
-       options: [
-         { label: "using-modern-react-patterns", description: "Found in library (score: 95)" },
-         { label: "gateway-frontend", description: "Use gateway instead" },
-         { label: "Remove reference", description: "No longer needed" }
-       ]
-     }]
+     questions: [
+       {
+         question: "Phantom skill 'old-react-patterns' not found. Replace with?",
+         header: "Replacement",
+         multiSelect: false,
+         options: [
+           { label: "using-modern-react-patterns", description: "Found in library (score: 95)" },
+           { label: "gateway-frontend", description: "Use gateway instead" },
+           { label: "Remove reference", description: "No longer needed" },
+         ],
+       },
+     ],
    });
    ```
 4. Apply user's choice with Edit tool
@@ -143,20 +165,26 @@ These require genuine human judgment that cannot be automated.
 **Issue:** Agent missing recommended gateway or mandatory universal skills
 
 **Guidance process:**
+
 1. Review agent's domain (from name, type, tools)
 2. Identify appropriate gateway based on domain
 3. Present skill recommendations:
    ```typescript
    AskUserQuestion({
-     questions: [{
-       question: "Agent 'frontend-developer' missing gateway-frontend. Add it?",
-       header: "Gateway",
-       multiSelect: false,
-       options: [
-         { label: "Yes, add to frontmatter + Tier 1", description: "Appropriate for this agent (Recommended)" },
-         { label: "No, agent is intentionally narrow", description: "Skip this suggestion" }
-       ]
-     }]
+     questions: [
+       {
+         question: "Agent 'frontend-developer' missing gateway-frontend. Add it?",
+         header: "Gateway",
+         multiSelect: false,
+         options: [
+           {
+             label: "Yes, add to frontmatter + Tier 1",
+             description: "Appropriate for this agent (Recommended)",
+           },
+           { label: "No, agent is intentionally narrow", description: "Skip this suggestion" },
+         ],
+       },
+     ],
    });
    ```
 4. If accepted:
@@ -165,6 +193,7 @@ These require genuine human judgment that cannot be automated.
    - Generate Skill Loading Protocol if missing (Phase 9)
 
 **For MANDATORY universal skills** (verifying-before-completion, calibrating-time-estimates):
+
 - These MUST be added for ALL agents
 - Present as requirement, not suggestion
 
@@ -177,20 +206,26 @@ These require genuine human judgment that cannot be automated.
 **Issue:** Missing applicable skills from gateways, orphaned skills, miscategorization
 
 **Guidance process:**
+
 1. Run 3-tier skill discovery analysis (see Phase 18 in workflow-manual-checks.md)
 2. For each suggested skill, ask user:
    ```typescript
    AskUserQuestion({
-     questions: [{
-       question: "Skill 'using-tanstack-query' applies to this agent (frontend domain). Add it?",
-       header: "Skill Discovery",
-       multiSelect: true,
-       options: [
-         { label: "Add to Tier 3 (triggered)", description: "Load when specific task detected (Recommended)" },
-         { label: "Add to frontmatter (always)", description: "Always available" },
-         { label: "Skip", description: "Not applicable to this agent" }
-       ]
-     }]
+     questions: [
+       {
+         question: "Skill 'using-tanstack-query' applies to this agent (frontend domain). Add it?",
+         header: "Skill Discovery",
+         multiSelect: true,
+         options: [
+           {
+             label: "Add to Tier 3 (triggered)",
+             description: "Load when specific task detected (Recommended)",
+           },
+           { label: "Add to frontmatter (always)", description: "Always available" },
+           { label: "Skip", description: "Not applicable to this agent" },
+         ],
+       },
+     ],
    });
    ```
 3. Apply accepted additions:
@@ -198,6 +233,7 @@ These require genuine human judgment that cannot be automated.
    - Frontmatter → Add to `skills:` field + Tier 1
 
 **Analysis tiers:**
+
 1. **Gateway coverage** - Skills in agent's gateway(s) not yet referenced
 2. **Orphaned skills** - Library skills with matching domain not in any gateway
 3. **Miscategorization** - Skills in wrong gateway that should be in agent's gateway

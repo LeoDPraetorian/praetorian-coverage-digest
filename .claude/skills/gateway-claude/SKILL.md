@@ -201,6 +201,28 @@ Read: .claude/skill-library/claude/skill-management/researching-skills/SKILL.md
 
 ---
 
+## Core Workflow Skills
+
+**These skills enforce critical practices during planning and development workflows.**
+
+| Skill                              | Purpose                                          | When to Use                                 |
+| ---------------------------------- | ------------------------------------------------ | ------------------------------------------- |
+| `enforcing-evidence-based-analysis` | Prevents hallucination during planning/analysis | Creating plans, analyzing code, using APIs  |
+| `verifying-before-completion`      | Verifies outputs before claiming completion      | Before commit, before "task complete" claim |
+| `developing-with-tdd`              | Test-first development methodology               | Implementing any feature or bugfix          |
+| `debugging-systematically`         | Four-phase root cause investigation              | Encountering bugs or unexpected behavior    |
+
+**Usage:**
+
+```
+skill: "enforcing-evidence-based-analysis"
+skill: "verifying-before-completion"
+skill: "developing-with-tdd"
+skill: "debugging-systematically"
+```
+
+---
+
 ## How to Use This Gateway
 
 **Step 1: Find the skill** you need in the sections above

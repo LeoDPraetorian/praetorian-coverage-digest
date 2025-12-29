@@ -111,11 +111,13 @@ Error: "invalid filter column: badfield"
 ```
 
 1. **Check the exact field name:**
+
    ```bash
    grep -w "badfield" modules/chariot/backend/pkg/query/allowed_columns.go
    ```
 
 2. **If not found, search for similar:**
+
    ```bash
    grep -i "bad" modules/chariot/backend/pkg/query/allowed_columns.go
    ```

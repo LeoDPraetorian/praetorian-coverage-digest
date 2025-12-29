@@ -40,6 +40,7 @@ Tailwind v4 uses the `@theme` directive and OKLCH color space for better percept
 ```
 
 **OKLCH format:** `oklch(lightness chroma hue)`
+
 - **Lightness**: 0 (black) to 1 (white)
 - **Chroma**: 0 (gray) to ~0.4 (saturated)
 - **Hue**: 0-360 degrees (red=25, yellow=90, green=145, blue=250, purple=300)
@@ -77,11 +78,11 @@ For projects still on Tailwind v3:
 ```css
 /* Brand colors - Purple theme */
 @theme {
-  --color-primary: oklch(0.55 0.25 300);        /* Purple */
-  --color-primary-foreground: oklch(1 0 0);     /* White */
+  --color-primary: oklch(0.55 0.25 300); /* Purple */
+  --color-primary-foreground: oklch(1 0 0); /* White */
   --color-secondary: oklch(0.96 0.01 300);
   --color-accent: oklch(0.55 0.25 300);
-  --color-destructive: oklch(0.55 0.2 25);      /* Red */
+  --color-destructive: oklch(0.55 0.2 25); /* Red */
   --color-ring: oklch(0.55 0.25 300);
 }
 ```
@@ -109,7 +110,7 @@ Components use `class-variance-authority` (CVA) for variants.
 Edit `components/ui/button.tsx`:
 
 ```typescript
-import { cva, type VariantProps } from "class-variance-authority"
+import { cva, type VariantProps } from "class-variance-authority";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
@@ -125,7 +126,8 @@ const buttonVariants = cva(
         // Add custom variants:
         success: "bg-green-600 text-white hover:bg-green-700",
         warning: "bg-yellow-500 text-black hover:bg-yellow-600",
-        gradient: "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600",
+        gradient:
+          "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -141,7 +143,7 @@ const buttonVariants = cva(
       size: "default",
     },
   }
-)
+);
 ```
 
 ### Usage
@@ -170,7 +172,7 @@ const cardVariants = cva("rounded-lg border bg-card text-card-foreground", {
   defaultVariants: {
     variant: "default",
   },
-})
+});
 ```
 
 ## Custom Input Styles
@@ -198,7 +200,7 @@ const inputVariants = cva(
       inputSize: "default",
     },
   }
-)
+);
 ```
 
 ## Global Style Overrides
@@ -234,7 +236,7 @@ const inputVariants = cva(
 ```typescript
 // tailwind.config.ts
 
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   // ... existing config
@@ -271,9 +273,9 @@ const config: Config = {
       },
     },
   },
-}
+};
 
-export default config
+export default config;
 ```
 
 ## Key Points

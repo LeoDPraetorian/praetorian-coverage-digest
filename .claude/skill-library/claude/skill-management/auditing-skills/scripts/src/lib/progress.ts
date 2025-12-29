@@ -4,7 +4,7 @@
 
 import { Phase1DescriptionFormat } from './phases/phase1-description-format.js';
 import { Phase2AllowedTools } from './phases/phase2-allowed-tools.js';
-import { Phase3WordCount } from './phases/phase3-word-count.js';
+import { Phase3LineCount } from './phases/phase3-line-count.js';
 import { Phase4BrokenLinks } from './phases/phase4-broken-links.js';
 import { Phase5OrganizeFiles } from './phases/phase5-organize-files.js';
 import { Phase7OutputDirectory } from './phases/phase7-output-directory.js';
@@ -22,10 +22,10 @@ interface FullMetrics {
     percentage: number;
   };
   phase3: {
-    optimal: number;
-    tooShort: number;
-    tooLong: number;
-    critical: number;
+    safe: number;      // < 350 lines
+    caution: number;   // 350-450 lines
+    warning: number;   // 450-500 lines
+    critical: number;  // > 500 lines
     percentage: number;
   };
   phase4: {
@@ -68,7 +68,7 @@ export class ProgressChecker {
     const phase2 = await Phase2AllowedTools.getCompliance(this.skillsDir);
 
     // Phase 3 metrics
-    const phase3 = await Phase3WordCount.getStatistics(this.skillsDir);
+    const phase3 = await Phase3LineCount.getStatistics(this.skillsDir);
 
     // Phase 4 metrics
     const phase4 = await Phase4BrokenLinks.getStatistics(this.skillsDir);
@@ -105,9 +105,9 @@ export class ProgressChecker {
         percentage: phase2.percentage,
       },
       phase3: {
-        optimal: phase3.optimal,
-        tooShort: phase3.tooShort,
-        tooLong: phase3.tooLong,
+        safe: phase3.safe,
+        caution: phase3.caution,
+        warning: phase3.warning,
         critical: phase3.critical,
         percentage: phase3.percentage,
       },
@@ -172,16 +172,16 @@ export class ProgressChecker {
     console.log();
 
     // Phase 3
-    console.log(chalk.bold('Phase 3: Word Count Optimization'));
+    console.log(chalk.bold('Phase 3: Line Count (Anthropic recommends <500 lines)'));
     console.log(chalk.gray('─'.repeat(50)));
     console.log(
-      `  Optimal (1,500-2,000): ${metrics.phase3.optimal}/${metrics.totalSkills} (${metrics.phase3.percentage.toFixed(1)}%)`
+      `  Safe (<350 lines): ${metrics.phase3.safe}/${metrics.totalSkills} (${metrics.phase3.percentage.toFixed(1)}%)`
     );
-    console.log(`  Too short (<1,000): ${metrics.phase3.tooShort}`);
-    console.log(`  Too long (2,000-2,500): ${metrics.phase3.tooLong}`);
+    console.log(`  Caution (350-450): ${metrics.phase3.caution}`);
+    console.log(`  Warning (450-500): ${metrics.phase3.warning}`);
 
     if (metrics.phase3.critical > 0) {
-      console.log(chalk.red(`  Way too long (>2,500): ${metrics.phase3.critical} ⚠️`));
+      console.log(chalk.red(`  Over limit (>500): ${metrics.phase3.critical} ⚠️`));
       console.log(chalk.yellow('  Status: ⚠️  Needs progressive disclosure'));
     } else if (metrics.phase3.percentage >= 80) {
       console.log(chalk.green('  Status: ✅ GOOD'));
@@ -262,7 +262,7 @@ export class ProgressChecker {
       let step = 1;
 
       if (metrics.phase3.critical > 0) {
-        console.log(chalk.blue(`  ${step}. Extract content from ${metrics.phase3.critical} oversized skills (>2,500 words)`));
+        console.log(chalk.blue(`  ${step}. Extract content from ${metrics.phase3.critical} oversized skills (>500 lines)`));
         step++;
       }
 

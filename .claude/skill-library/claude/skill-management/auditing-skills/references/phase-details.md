@@ -27,7 +27,7 @@ description: I help you create skills
 description: Use when creating skills - guides through TDD workflow
 ```
 
-## Phase 3: Word Count (Critical)
+## Phase 3: Line Count (Critical)
 
 See [Line Count Limits](../../../../../skills/managing-skills/references/patterns/line-count-limits.md) for complete thresholds, validation script, and extraction strategy.
 

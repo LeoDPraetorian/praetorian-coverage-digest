@@ -223,6 +223,43 @@ Your human partner's specific instructions describe WHAT to do, not HOW.
 
 **Why:** Specific instructions mean clear requirements, which is when workflows matter MOST. Skipping process on "simple" tasks is how simple tasks become complex problems.
 
+## Context7-Enabled Skills
+
+Some library skills are populated from context7 documentation (official library/framework docs). These skills can become stale as upstream libraries evolve.
+
+**Examples of context7-enabled skills:**
+- `using-tanstack-query`
+- `using-shadcn-ui`
+- `using-zustand-state-management`
+- `using-react-hook-form-zod`
+
+### How to Check for Staleness
+
+After reading a library skill, check if it has context7 documentation:
+
+1. Look for `.local/context7-source.json` in the skill directory
+2. If it exists, check the `fetchedAt` date
+3. If >30 days old, consider refreshing before relying on the content
+
+**Staleness indicators:**
+- Skill-search CLI now shows warnings: `⚠️ Docs 45d old`
+- Update CLI prompts before modifying stale skills
+
+### How to Refresh Stale Documentation
+
+If you discover a skill with stale context7 docs:
+
+```bash
+npm run update -- skill-name --suggest
+```
+
+This command will:
+- Check if updates are available
+- Show you the refresh workflow
+- Guide you through updating the documentation
+
+**Why this matters:** Stale docs can recommend deprecated APIs, missing new features, or outdated patterns. Always check staleness for library skills before implementing their recommendations.
+
 ## Summary
 
 **Starting any task:**

@@ -5,6 +5,7 @@
 ## Placeholder Content
 
 This reference file will contain:
+
 - Validation strategies (whitelist vs blacklist)
 - Common validation libraries (validator.js, Zod, Yup)
 - Type validation patterns

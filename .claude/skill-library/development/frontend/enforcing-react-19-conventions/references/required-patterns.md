@@ -677,17 +677,20 @@ function Component({ prop, ref }: Props & { ref?: RefObject<HTMLDivElement> }) {
 
 ```typescript
 // Before
-const [data, setData] = useState(null)
-const [loading, setLoading] = useState(true)
+const [data, setData] = useState(null);
+const [loading, setLoading] = useState(true);
 useEffect(() => {
-  fetch('/api/data').then(res => res.json()).then(setData).finally(() => setLoading(false))
-}, [])
+  fetch("/api/data")
+    .then((res) => res.json())
+    .then(setData)
+    .finally(() => setLoading(false));
+}, []);
 
 // After
 const { data, isLoading } = useQuery({
-  queryKey: ['data'],
-  queryFn: () => fetch('/api/data').then(res => res.json())
-})
+  queryKey: ["data"],
+  queryFn: () => fetch("/api/data").then((res) => res.json()),
+});
 ```
 
 ### From Entire Store to Selectors

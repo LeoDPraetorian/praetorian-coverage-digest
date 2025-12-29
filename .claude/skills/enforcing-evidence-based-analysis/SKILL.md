@@ -8,11 +8,14 @@ allowed-tools: Read, Grep, Glob, Bash
 
 **Prevents hallucination during research and planning by requiring source verification before claims.**
 
+> **You MUST use TodoWrite** before starting analysis or planning tasks to track which files you've verified and which claims need evidence. This prevents skipping verification steps.
+
 ## Core Principle
 
 **If you didn't READ the file, you cannot claim to KNOW its contents.**
 
 This skill is complementary to `verifying-before-completion`:
+
 - **verifying-before-completion**: Verifies OUTPUTS (tests pass, build succeeds) at END of work
 - **enforcing-evidence-based-analysis**: Verifies INPUTS (source code, APIs) at BEGINNING of work
 
@@ -46,78 +49,29 @@ Agents claim to know file contents, API shapes, and interface definitions WITHOU
 
 ## The Evidence-Based Protocol
 
-### Phase 1: Discovery (BEFORE Planning)
+**Two-phase workflow:** Discovery (read and document) → Planning (reference verified APIs).
 
-For each file/API you will use or modify:
+**See:** [Complete Protocol](references/protocol.md) for detailed steps, examples, and documentation format.
 
-1. **READ** the actual source file with Read tool
-2. **QUOTE** relevant code with exact line numbers
-3. **DOCUMENT** in required format (see [Discovery Format](references/discovery-format.md))
+**Key steps:**
 
-**Example:**
-
-```markdown
-## Verified API: useWizard
-
-**Source:** src/components/wizards/hooks/useWizard.ts (lines 45-80)
-
-**Actual Return Type:**
-\`\`\`typescript
-// QUOTED FROM SOURCE (lines 72-77):
-return {
-  navigation: { goToNextStep, goToPreviousStep, ... },
-  progress: { currentStep, totalSteps, ... },
-  validation: { isValid, errors, ... },
-}
-\`\`\`
-
-**My Planned Usage:**
-\`\`\`typescript
-const wizard = useWizard(config);
-wizard.navigation.goToNextStep();  // ✅ Matches actual API
-\`\`\`
-
-**Verified Match:** ✅ Signatures match
-```
-
-### Phase 2: Planning (Only After Discovery)
-
-Only after documenting APIs with evidence:
-
-1. Create plan referencing verified findings
-2. Show "Actual API" vs "My Usage" for each
-3. List assumptions in dedicated section
+1. **READ** source files with Read tool
+2. **QUOTE** actual code with line numbers
+3. **DOCUMENT** findings before planning
+4. **REFERENCE** verified APIs in your plan
 
 ---
 
 ## Anti-Hallucination Rules
 
-| Rule | Why It Matters |
-|------|----------------|
-| **No quotes = No claims** | If you can't quote source, you don't know it |
-| **Memory is suspect** | "I think it returns X" requires verification |
-| **Patterns are assumptions** | "Most hooks return..." is NOT evidence |
-| **Read before write** | Read the file before proposing changes |
+| Rule                         | Why It Matters                               |
+| ---------------------------- | -------------------------------------------- |
+| **No quotes = No claims**    | If you can't quote source, you don't know it |
+| **Memory is suspect**        | "I think it returns X" requires verification |
+| **Patterns are assumptions** | "Most hooks return..." is NOT evidence       |
+| **Read before write**        | Read the file before proposing changes       |
 
 **See:** [Complete Anti-Hallucination Rules](references/anti-hallucination-rules.md)
-
----
-
-## Required Assumptions Section
-
-Every analysis or plan MUST end with:
-
-```markdown
-## Assumptions (Not Directly Verified)
-
-| Assumption | Why Unverified | Risk if Wrong |
-|------------|----------------|---------------|
-| [What] | [Why couldn't verify] | [Impact] |
-
-If this section is empty: "All claims verified against source files."
-```
-
-**Why:** Forces transparency about what's verified vs. assumed.
 
 ---
 
@@ -129,63 +83,19 @@ If this section is empty: "All claims verified against source files."
 - Claiming file analysis without Read tool evidence
 - Confident about code you haven't seen this session
 
----
-
-## Verification Checklist
-
-Before completing any plan, verify:
-
-- [ ] I READ every file I reference (used Read tool, not memory)
-- [ ] I QUOTED actual code with line numbers
-- [ ] I did NOT assume API shapes from patterns
-- [ ] I LISTED all assumptions in Assumptions section
-- [ ] My example code uses APIs that ACTUALLY EXIST
-
----
-
-## Why This Matters
-
-From the wizard modal failure:
-
-- 48KB "comprehensive" plan was fundamentally broken
-- Every API call used wrong property names/signatures
-- Agent claimed "analyzed 10 files" but never read them
-- Three independent reviewers confirmed: won't compile
-- Hours of implementation time would have been wasted
-
-**The 30 seconds to read a file prevents 30 hours debugging a broken plan.**
+**See:** [Why This Matters](references/why-this-matters.md) for the real cost of skipping verification and the verification checklist.
 
 ---
 
 ## Common Rationalizations (DO NOT ACCEPT)
 
-| Excuse | Reality |
-|--------|---------|
-| "I already know this API" | Knowledge cutoff is 18 months ago |
-| "Common React pattern" | Patterns are assumptions, not facts |
-| "Simple to verify later" | Later is too late - plan is written |
-| "Just a quick analysis" | Quick = hallucination risk |
-| "No time to read files" | 30 sec now prevents 30 hours later |
+**DO NOT accept excuses like:**
 
-**See:** [Complete Rationalization Table](references/rationalizations.md)
+- "I already know this API" → Knowledge cutoff is 18 months ago
+- "Common React pattern" → Patterns are assumptions, not facts
+- "No time to read files" → 30 sec now prevents 30 hours later
 
----
-
-## Progressive Disclosure
-
-**Quick Start (5 min):**
-- Read source files before referencing them
-- Quote actual code with line numbers
-- Mark assumptions explicitly
-
-**Comprehensive (15 min):**
-- [Discovery Format](references/discovery-format.md) - Required documentation structure
-- [Anti-Hallucination Rules](references/anti-hallucination-rules.md) - Complete ruleset
-- [Rationalizations](references/rationalizations.md) - How agents bypass rules
-
-**Advanced (30 min):**
-- [Pressure Scenarios](references/pressure-scenarios.md) - Time/authority/sunk-cost tests
-- [Integration with Other Skills](references/integration.md) - How this fits workflow
+**See:** [Complete Rationalization Table](references/rationalizations.md) for the full list and why each fails.
 
 ---
 

@@ -7,6 +7,7 @@ Complete guide for building enterprise-grade data tables using shadcn/ui compone
 TanStack Table is a headless UI library for building powerful tables and datagrids. Combined with shadcn/ui, it provides a complete solution for displaying and manipulating tabular data with sorting, filtering, pagination, and more.
 
 **Official Documentation:**
+
 - [shadcn/ui Data Table Component](https://ui.shadcn.com/docs/components/data-table)
 - [TanStack Table Documentation](https://tanstack.com/table/latest)
 - [TanStack Table React Guide](https://tanstack.com/table/latest/docs/framework/react/react-table)
@@ -31,12 +32,12 @@ npx shadcn@latest add button dropdown-menu input
 ```typescript
 // types/data.ts
 export type Payment = {
-  id: string
-  amount: number
-  status: 'pending' | 'processing' | 'success' | 'failed'
-  email: string
-  createdAt: Date
-}
+  id: string;
+  amount: number;
+  status: "pending" | "processing" | "success" | "failed";
+  email: string;
+  createdAt: Date;
+};
 ```
 
 ### 2. Define Column Definitions
@@ -597,41 +598,41 @@ export function ExportButton({ table }) {
 const columns = useMemo<ColumnDef<Payment>[]>(
   () => [
     {
-      accessorKey: 'email',
-      header: 'Email',
+      accessorKey: "email",
+      header: "Email",
     },
     // ...
   ],
   []
-)
+);
 
 // ❌ Bad - redefined on every render
 const columns = [
   {
-    accessorKey: 'email',
-    header: 'Email',
+    accessorKey: "email",
+    header: "Email",
   },
-]
+];
 ```
 
 ### 2. Type-Safe Column Definitions
 
 ```typescript
 // Use ColumnDef<T> for type safety
-import { ColumnDef } from '@tanstack/react-table'
+import { ColumnDef } from "@tanstack/react-table";
 
 type User = {
-  id: string
-  name: string
-  email: string
-}
+  id: string;
+  name: string;
+  email: string;
+};
 
 const columns: ColumnDef<User>[] = [
   {
-    accessorKey: 'name', // Type-safe - knows 'name' exists on User
-    header: 'Name',
+    accessorKey: "name", // Type-safe - knows 'name' exists on User
+    header: "Name",
   },
-]
+];
 ```
 
 ### 3. Controlled vs Uncontrolled State
@@ -698,13 +699,13 @@ const table = useReactTable({
 
 ```typescript
 const [sorting, setSorting] = useState<SortingState>(() => {
-  const saved = localStorage.getItem('table-sorting')
-  return saved ? JSON.parse(saved) : []
-})
+  const saved = localStorage.getItem("table-sorting");
+  return saved ? JSON.parse(saved) : [];
+});
 
 useEffect(() => {
-  localStorage.setItem('table-sorting', JSON.stringify(sorting))
-}, [sorting])
+  localStorage.setItem("table-sorting", JSON.stringify(sorting));
+}, [sorting]);
 ```
 
 ## Related Resources

@@ -41,17 +41,9 @@ Create `src/index.ts` in provider package:
 
 ```typescript
 // Re-export all public APIs
-export {
-  functionA,
-  functionB,
-  type TypeA,
-  type TypeB,
-} from './lib/module-a.js';
+export { functionA, functionB, type TypeA, type TypeB } from "./lib/module-a.js";
 
-export {
-  functionC,
-  type TypeC,
-} from './lib/module-b.js';
+export { functionC, type TypeC } from "./lib/module-b.js";
 ```
 
 ## Step 3: Add Workspace Dependency
@@ -89,18 +81,17 @@ ls -la node_modules/@org/
 Replace relative paths with package imports:
 
 **Before:**
+
 ```typescript
-import * as utils from '../../../provider/scripts/src/lib/utils.js';
+import * as utils from "../../../provider/scripts/src/lib/utils.js";
 type MyType = utils.MyType;
 utils.doSomething();
 ```
 
 **After:**
+
 ```typescript
-import {
-  doSomething,
-  type MyType,
-} from '@org/provider/lib/utils';
+import { doSomething, type MyType } from "@org/provider/lib/utils";
 ```
 
 ## Step 6: Update tsconfig Settings
@@ -133,6 +124,7 @@ npm run -w @org/provider build
 ```
 
 Verify dist/ contains:
+
 - `index.js` and `index.d.ts`
 - `lib/*.js` and `lib/*.d.ts` for each module
 

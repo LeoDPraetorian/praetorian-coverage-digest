@@ -12,19 +12,19 @@ TanStack Router uses **file naming conventions** to generate route paths. Unders
 
 ## Complete Convention Reference
 
-| Convention | Meaning | Example File | Generated Route | Notes |
-|------------|---------|--------------|-----------------|-------|
-| `$param` | Dynamic path parameter | `posts.$postId.tsx` | `/posts/:postId` | Captures dynamic segment |
-| `_layout` (prefix) | Pathless layout | `_layout.tsx` | - | Wraps children without URL |
-| `_suffix` | Exclude from parent | `settings_.tsx` | `/settings` | Breaks out of parent nesting |
-| `(folder)` | Route group | `(auth)/login.tsx` | `/login` | Folder not in URL |
-| `-prefix` | Exclude from routes | `-utils.tsx` | - | Not a route |
-| `[x]` | Escape special chars | `[products].tsx` | `/[products]` | Literal brackets in URL |
-| `.route.tsx` | Route at directory | `posts.route.tsx` | `/posts` | Index + directory |
-| `index` | Index route | `index.tsx` | `/` | Matches parent exactly |
-| `__root` | Root route | `__root.tsx` | - | App root (required) |
-| `$` (alone) | Splat/catch-all | `$.tsx` | `/*` | Matches rest of path |
-| `.lazy.tsx` | Lazy-loaded route | `posts.lazy.tsx` | `/posts` | Code-split UI |
+| Convention         | Meaning                | Example File        | Generated Route  | Notes                        |
+| ------------------ | ---------------------- | ------------------- | ---------------- | ---------------------------- |
+| `$param`           | Dynamic path parameter | `posts.$postId.tsx` | `/posts/:postId` | Captures dynamic segment     |
+| `_layout` (prefix) | Pathless layout        | `_layout.tsx`       | -                | Wraps children without URL   |
+| `_suffix`          | Exclude from parent    | `settings_.tsx`     | `/settings`      | Breaks out of parent nesting |
+| `(folder)`         | Route group            | `(auth)/login.tsx`  | `/login`         | Folder not in URL            |
+| `-prefix`          | Exclude from routes    | `-utils.tsx`        | -                | Not a route                  |
+| `[x]`              | Escape special chars   | `[products].tsx`    | `/[products]`    | Literal brackets in URL      |
+| `.route.tsx`       | Route at directory     | `posts.route.tsx`   | `/posts`         | Index + directory            |
+| `index`            | Index route            | `index.tsx`         | `/`              | Matches parent exactly       |
+| `__root`           | Root route             | `__root.tsx`        | -                | App root (required)          |
+| `$` (alone)        | Splat/catch-all        | `$.tsx`             | `/*`             | Matches rest of path         |
+| `.lazy.tsx`        | Lazy-loaded route      | `posts.lazy.tsx`    | `/posts`         | Code-split UI                |
 
 ---
 
@@ -41,6 +41,7 @@ routes/
 **Generated route:** `/posts/:postId`
 
 **Example URLs:**
+
 - `/posts/123` → matches, `postId = "123"`
 - `/posts/my-first-post` → matches, `postId = "my-first-post"`
 - `/posts` → doesn't match (postId missing)
@@ -49,12 +50,12 @@ routes/
 
 ```typescript
 // posts/$postId.tsx
-export const Route = createFileRoute('/posts/$postId')({
+export const Route = createFileRoute("/posts/$postId")({
   loader: async ({ params }) => {
-    console.log(params.postId)  // "123"
-    return fetchPost(params.postId)
+    console.log(params.postId); // "123"
+    return fetchPost(params.postId);
   },
-})
+});
 ```
 
 ### Multiple Dynamic Segments
@@ -70,18 +71,19 @@ routes/
 **Generated route:** `/users/:userId/posts/:postId`
 
 **Example URLs:**
+
 - `/users/alice/posts/hello` → matches
 - `/users/123/posts/456` → matches
 
 **Accessing multiple params:**
 
 ```typescript
-export const Route = createFileRoute('/users/$userId/posts/$postId')({
+export const Route = createFileRoute("/users/$userId/posts/$postId")({
   loader: async ({ params }) => {
-    const { userId, postId } = params
-    return { user: await fetchUser(userId), post: await fetchPost(postId) }
+    const { userId, postId } = params;
+    return { user: await fetchUser(userId), post: await fetchPost(postId) };
   },
-})
+});
 ```
 
 ---
@@ -99,6 +101,7 @@ routes/
 ```
 
 **`_layout.tsx` behavior:**
+
 - Wraps child routes with shared UI (sidebar, header, etc.)
 - Does NOT add `/layout` to URL
 - Children render inside `<Outlet />`
@@ -205,6 +208,7 @@ routes/
 ```
 
 **Use for:**
+
 - Utility functions
 - Type definitions
 - Helper modules
@@ -215,8 +219,8 @@ routes/
 ```typescript
 const router = createRouter({
   routeTree,
-  routeFileIgnorePrefix: '-',  // Ignore files starting with -
-})
+  routeFileIgnorePrefix: "-", // Ignore files starting with -
+});
 ```
 
 ---
@@ -232,6 +236,7 @@ routes/
 ```
 
 **Generated routes:**
+
 - `[products].tsx` → `/[products]` (not a dynamic param)
 - `[$special].tsx` → `/[$special]` (not a dynamic param)
 
@@ -252,6 +257,7 @@ routes/
 ```
 
 **`posts.route.tsx` behavior:**
+
 - Handles `/posts` path
 - Parent for `/posts/` directory routes
 
@@ -272,10 +278,12 @@ routes/
 ```
 
 **`index.tsx` behavior:**
+
 - Matches parent path exactly
 - Does NOT add `/index` to URL
 
 **Example:**
+
 - `routes/dashboard/index.tsx` → matches `/dashboard`
 - `routes/dashboard/settings.tsx` → matches `/dashboard/settings`
 
@@ -293,6 +301,7 @@ routes/
 **Required:** Every TanStack Router app must have a `__root.tsx` file.
 
 **Purpose:**
+
 - Wraps entire application
 - Defines root context
 - Handles global error/not-found components
@@ -337,6 +346,7 @@ routes/
 **Generated route:** `/docs/*`
 
 **Example URLs:**
+
 - `/docs/getting-started` → matches
 - `/docs/api/reference` → matches
 - `/docs/some/deep/path` → matches
@@ -344,12 +354,12 @@ routes/
 **Accessing splat:**
 
 ```typescript
-export const Route = createFileRoute('/docs/$')({
+export const Route = createFileRoute("/docs/$")({
   loader: async ({ params }) => {
-    console.log(params._splat)  // "getting-started" or "api/reference"
-    return fetchDoc(params._splat)
+    console.log(params._splat); // "getting-started" or "api/reference"
+    return fetchDoc(params._splat);
   },
-})
+});
 ```
 
 **Use case:** Documentation sites, dynamic catch-all routes.
@@ -405,6 +415,7 @@ src/routes/
 ```
 
 **Generated routes:**
+
 - `/` (home)
 - `/about`
 - `/pricing`

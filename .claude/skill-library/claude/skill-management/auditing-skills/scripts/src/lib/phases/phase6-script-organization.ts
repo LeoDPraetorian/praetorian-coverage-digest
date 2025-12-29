@@ -111,7 +111,7 @@ export class Phase6ScriptOrganization {
   }
 
   /**
-   * Run Phase 5C audit on all skills (or a single skill if skillName provided)
+   * Run Phase 5C audit on all skills (backward compatible - parses files)
    */
   static async run(skillsDir: string, options?: FixOptions): Promise<PhaseResult> {
     let skillPaths = await SkillParser.findAllSkills(skillsDir);
@@ -130,13 +130,20 @@ export class Phase6ScriptOrganization {
       }
     }
 
+    const skills = await Promise.all(skillPaths.map(p => SkillParser.parseSkillFile(p)));
+    return this.runOnParsedSkills(skills, options);
+  }
+
+  /**
+   * Run Phase 5C audit on pre-parsed skills (performance optimized)
+   */
+  static async runOnParsedSkills(skills: SkillFile[], options?: FixOptions): Promise<PhaseResult> {
     let skillsAffected = 0;
     let issuesFound = 0;
     let issuesFixed = 0;
     const details: string[] = [];
 
-    for (const skillPath of skillPaths) {
-      const skill = await SkillParser.parseSkillFile(skillPath);
+    for (const skill of skills) {
       const issues = await this.validate(skill);
 
       if (issues.length > 0) {

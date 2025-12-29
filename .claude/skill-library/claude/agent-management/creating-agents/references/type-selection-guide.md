@@ -360,10 +360,10 @@ Example: Agent does research AND implementation
 
 **Every agent MUST include these two skills in frontmatter AND Tier 1:**
 
-| Skill | Purpose | Why Mandatory |
-|-------|---------|---------------|
-| `verifying-before-completion` | Final validation before claiming complete | Prevents incomplete work, forces verification |
-| `calibrating-time-estimates` | Prevent time estimation errors | AI estimates are 10-24x too high without calibration |
+| Skill                         | Purpose                                   | Why Mandatory                                        |
+| ----------------------------- | ----------------------------------------- | ---------------------------------------------------- |
+| `verifying-before-completion` | Final validation before claiming complete | Prevents incomplete work, forces verification        |
+| `calibrating-time-estimates`  | Prevent time estimation errors            | AI estimates are 10-24x too high without calibration |
 
 **No exceptions.** These skills are required for ALL agent types.
 
@@ -371,16 +371,16 @@ Example: Agent does research AND implementation
 
 ## Type-Specific Additional Skills
 
-| Type         | Always Include (+ universal skills)                                        | Often Include                           | Rarely                   |
-| ------------ | -------------------------------------------------------------------------- | --------------------------------------- | ------------------------ |
-| architecture | brainstorming                                                              | debugging-systematically, writing-plans | -                        |
-| development  | developing-with-tdd, debugging-systematically                              | -                                       | -                        |
-| testing      | developing-with-tdd                                                        | -                                       | debugging-systematically |
-| quality      | debugging-systematically                                                   | -                                       | -                        |
-| analysis     | debugging-systematically                                                   | -                                       | -                        |
-| research     | -                                                                          | -                                       | -                        |
-| orchestrator | writing-plans, executing-plans, dispatching-parallel-agents                | -                                       | -                        |
-| mcp-tools    | gateway-mcp-tools                                                          | -                                       | -                        |
+| Type         | Always Include (+ universal skills)                         | Often Include                           | Rarely                   |
+| ------------ | ----------------------------------------------------------- | --------------------------------------- | ------------------------ |
+| architecture | brainstorming                                               | debugging-systematically, writing-plans | -                        |
+| development  | developing-with-tdd, debugging-systematically               | -                                       | -                        |
+| testing      | developing-with-tdd                                         | -                                       | debugging-systematically |
+| quality      | debugging-systematically                                    | -                                       | -                        |
+| analysis     | debugging-systematically                                    | -                                       | -                        |
+| research     | -                                                           | -                                       | -                        |
+| orchestrator | writing-plans, executing-plans, dispatching-parallel-agents | -                                       | -                        |
+| mcp-tools    | gateway-mcp-tools                                           | -                                       | -                        |
 
 **Note**: Every type above ALSO includes `verifying-before-completion` and `calibrating-time-estimates` from the universal requirements.
 

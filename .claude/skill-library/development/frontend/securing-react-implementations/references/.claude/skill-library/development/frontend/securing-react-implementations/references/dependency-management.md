@@ -5,6 +5,7 @@
 ## Placeholder Content
 
 This reference file will contain:
+
 - npm audit workflows
 - Snyk integration
 - Dependency update strategies

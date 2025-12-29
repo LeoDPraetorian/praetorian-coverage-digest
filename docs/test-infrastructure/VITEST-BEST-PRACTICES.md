@@ -11,6 +11,7 @@ This document captures Vitest configuration best practices learned from optimizi
 ### Initial Issues (December 2024)
 
 When running the full test suite on developer laptops:
+
 - **Resource exhaustion** - 146 test files with only 2 threads caused severe contention
 - **Import resolution failures** - `@tanstack/react-table` and other modules failed to resolve under load
 - **System impact** - High CPU usage, memory pressure, system slowdown
@@ -19,6 +20,7 @@ When running the full test suite on developer laptops:
 ### Root Cause
 
 Original configuration used `pool: 'threads'` with `maxThreads: 2`, which:
+
 1. Created resource bottlenecks for large test suites
 2. Caused module loading failures under memory pressure
 3. Did not distinguish between laptop and CI/CD environments
@@ -30,6 +32,7 @@ Original configuration used `pool: 'threads'` with `maxThreads: 2`, which:
 **"Optimize for developer experience on laptops, scale for CI/CD"**
 
 Sources:
+
 - [Vitest Performance Guide](https://vitest.dev/guide/improving-performance)
 - [Optimize Thread Usage in CI/CD](https://willmendesneto.com/posts/optimize-thread-usage-in-vitest-for-ci-cd-environments/)
 - [Pool Strategy Discussion](https://github.com/vitest-dev/vitest/discussions/4914)
@@ -42,11 +45,11 @@ Sources:
 // vitest.config.ts
 export default defineConfig({
   test: {
-    pool: 'forks',  // NOT 'threads'
+    pool: "forks", // NOT 'threads'
     poolOptions: {
       forks: {
         singleFork: false,
-        maxForks: process.env.CI ? 8 : 4,  // Adaptive based on environment
+        maxForks: process.env.CI ? 8 : 4, // Adaptive based on environment
         minForks: 1,
       },
     },
@@ -55,6 +58,7 @@ export default defineConfig({
 ```
 
 **Rationale**:
+
 - **Better Stability**: Vitest now defaults to `forks` due to `worker_threads` compatibility issues
 - **Stronger Isolation**: Child processes provide better module isolation than workers
 - **Import Reliability**: Prevents Vite import resolution failures under resource pressure
@@ -65,16 +69,18 @@ export default defineConfig({
 ### 2. Dynamic Thread/Fork Allocation
 
 ```typescript
-maxForks: process.env.CI ? 8 : 4
+maxForks: process.env.CI ? 8 : 4;
 ```
 
 **Laptop (Local)**:
+
 - 4 concurrent test files maximum
 - Prevents resource exhaustion
 - Reduces memory pressure
 - Maintains system responsiveness
 
 **CI/CD**:
+
 - 8 concurrent test files
 - Leverages cloud resources
 - Faster overall execution
@@ -149,11 +155,13 @@ Create npm scripts that run tests by feature area:
 ### Performance Comparison
 
 **Full Suite** (146 files, 2,569 tests):
+
 - Duration: ~71 seconds
 - Resource usage: High CPU, high memory
 - System impact: Significant slowdown
 
 **Sectioned** (Metrics: 6 files, 130 tests):
+
 - Duration: ~2.3 seconds
 - Resource usage: Minimal
 - System impact: None
@@ -163,12 +171,14 @@ Create npm scripts that run tests by feature area:
 ### For Active Development (Laptop)
 
 **Option 1: Watch Mode** (Recommended)
+
 ```bash
 # Only runs tests affected by file changes
 npm test -- src/sections/settings
 ```
 
 **Option 2: Section-by-Section**
+
 ```bash
 # Test the feature you're working on
 npm run test:sections:settings
@@ -176,6 +186,7 @@ npm run test:querybuilder
 ```
 
 **Option 3: Sharded Testing**
+
 ```bash
 # Run tests in smaller batches
 npm run test:shard:1
@@ -187,6 +198,7 @@ npm run test:shard:4
 ### For CI/CD Pipelines
 
 **Parallel Execution Across Runners** (Recommended):
+
 ```yaml
 # GitHub Actions example
 strategy:
@@ -198,6 +210,7 @@ steps:
 ```
 
 **Sequential Sections** (Alternative):
+
 ```yaml
 - run: npm run test:components
 - run: npm run test:hooks
@@ -217,21 +230,21 @@ steps:
 export default defineWorkspace([
   {
     test: {
-      name: 'unit',
-      include: ['src/**/*.{test,spec}.{ts,tsx}'],
-      exclude: ['e2e/**'],
+      name: "unit",
+      include: ["src/**/*.{test,spec}.{ts,tsx}"],
+      exclude: ["e2e/**"],
     },
   },
   {
     test: {
-      name: 'integration',
-      include: ['src/**/*.integration.{test,spec}.{ts,tsx}'],
+      name: "integration",
+      include: ["src/**/*.integration.{test,spec}.{ts,tsx}"],
     },
   },
   {
     test: {
-      name: 'e2e',
-      include: ['e2e/**/*.{test,spec}.{ts,tsx}'],
+      name: "e2e",
+      include: ["e2e/**/*.{test,spec}.{ts,tsx}"],
       testTimeout: 30000,
     },
   },
@@ -256,10 +269,10 @@ open vitest-profile.json
 
 ```typescript
 // ❌ Avoid
-pool: 'threads'
+pool: "threads";
 
 // ✅ Prefer
-pool: 'forks'
+pool: "forks";
 ```
 
 **Exception**: Use `threads` only if you have specific performance benchmarks showing benefits in your environment.
@@ -268,23 +281,24 @@ pool: 'forks'
 
 ```typescript
 // ❌ Bad: Will overwhelm laptop
-maxForks: 16
+maxForks: 16;
 
 // ✅ Good: Adaptive to environment
-maxForks: process.env.CI ? 8 : 4
+maxForks: process.env.CI ? 8 : 4;
 ```
 
 ### ❌ DON'T: Disable Isolation Without Careful Testing
 
 ```typescript
 // ❌ Risky: Can cause test pollution
-isolate: false
+isolate: false;
 
 // ✅ Safe: Isolated by default
-isolate: true
+isolate: true;
 ```
 
 **Only disable isolation if**:
+
 1. Tests are carefully designed to avoid shared state
 2. You've measured 3-8x performance improvement
 3. You have high test coverage to catch pollution issues
@@ -292,24 +306,28 @@ isolate: true
 ## Performance Optimization Checklist
 
 ### Configuration
+
 - [ ] Using `pool: 'forks'` for stability
 - [ ] Adaptive `maxForks` based on `process.env.CI`
 - [ ] Reasonable timeouts (10s test, 5s teardown)
 - [ ] `isolate: true` unless proven safe to disable
 
 ### Test Organization
+
 - [ ] Sectioned test scripts by feature area
 - [ ] Sharding configuration for CI/CD
 - [ ] Test projects for different test types (unit, integration, e2e)
 - [ ] Mock heavy dependencies (file processing, etc.)
 
 ### Developer Experience
+
 - [ ] Watch mode for active development
 - [ ] Fast feedback loops (<5s for single section)
 - [ ] Minimal system impact on laptop
 - [ ] Clear test failure messages
 
 ### CI/CD Pipeline
+
 - [ ] Parallel execution with sharding or test projects
 - [ ] Higher thread/fork count (8-16)
 - [ ] Proper resource limits in containerized environments
@@ -322,11 +340,13 @@ isolate: true
 **Symptom**: `Failed to resolve import "@tanstack/react-table"`
 
 **Causes**:
+
 1. Too many concurrent test files for available resources
 2. Using `threads` pool under memory pressure
 3. Insufficient `maxThreads/maxForks` configuration
 
 **Solution**:
+
 ```typescript
 pool: 'forks',
 poolOptions: {
@@ -341,11 +361,13 @@ poolOptions: {
 **Symptom**: Tests never complete or timeout at 30s+
 
 **Causes**:
+
 1. Missing `teardownTimeout` configuration
 2. Test not properly cleaning up async operations
 3. Blocked event loop in test
 
 **Solution**:
+
 ```typescript
 testTimeout: 10000,      // Fail tests after 10s
 teardownTimeout: 5000,   // Force cleanup after 5s
@@ -356,11 +378,13 @@ teardownTimeout: 5000,   // Force cleanup after 5s
 **Symptom**: Tests pass locally, fail in CI
 
 **Causes**:
+
 1. Different `maxForks` causing race conditions
 2. Shared state between tests (need `isolate: true`)
 3. Timing-dependent tests
 
 **Solution**:
+
 ```typescript
 isolate: true,           // Ensure isolation
 fileParallelism: false,  // Run sequentially if needed
@@ -371,11 +395,13 @@ fileParallelism: false,  // Run sequentially if needed
 **Symptom**: `JavaScript heap out of memory`
 
 **Causes**:
+
 1. Too many concurrent test files
 2. Memory leaks in tests
 3. Large fixtures or mocks
 
 **Solution**:
+
 ```bash
 # Increase Node.js memory limit
 NODE_OPTIONS='--max-old-space-size=8192' npm test
@@ -447,6 +473,7 @@ export default defineConfig({
 ## Additional Resources
 
 ### Official Documentation
+
 - [Vitest Configuration](https://vitest.dev/config/)
 - [Improving Performance](https://vitest.dev/guide/improving-performance)
 - [Parallelism Guide](https://vitest.dev/guide/parallelism)
@@ -454,12 +481,14 @@ export default defineConfig({
 - [Profiling Tests](https://vitest.dev/guide/profiling-test-performance)
 
 ### Community Resources
+
 - [Optimize Thread Usage in Vitest for CI/CD](https://willmendesneto.com/posts/optimize-thread-usage-in-vitest-for-ci-cd-environments/)
 - [How to Speed Up Vitest](https://buildpulse.io/blog/how-to-speed-up-vitest)
 - [Improving Vitest Performance](https://dev.to/thejaredwilcurt/improving-vitest-performance-42c6)
 - [Vitest vs Jest Performance](https://github.com/vitest-dev/vitest/issues/579)
 
 ### GitHub Discussions
+
 - [Why is pool: 'forks' not default?](https://github.com/vitest-dev/vitest/discussions/4914)
 - [maxConcurrency vs maxThreads](https://github.com/vitest-dev/vitest/discussions/4356)
 - [Manual Shard Configuration](https://github.com/vitest-dev/vitest/discussions/5480)
@@ -467,6 +496,7 @@ export default defineConfig({
 ## Changelog
 
 ### December 2024 - Initial Optimization
+
 - Migrated from `threads` to `forks` pool
 - Implemented adaptive fork configuration (4 local, 8 CI)
 - Created sectioned test scripts for feature areas

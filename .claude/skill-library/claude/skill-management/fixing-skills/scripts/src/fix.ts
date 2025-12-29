@@ -5,15 +5,26 @@
  * 1. Default: Apply deterministic fixes, report semantic issues
  * 2. --suggest: Apply deterministic, output semantic as JSON for Claude
  * 3. --apply: Apply specific semantic fix with provided value
+ *
+ * **Path Resolution:**
+ * Uses git-based repo root detection via findProjectRoot() utility
+ * (imported indirectly through findSkill in skill-finder.ts)
+ * See: .claude/lib/find-project-root.ts for implementation details
  */
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
-import { SkillAuditor } from '../../../auditing-skills/scripts/src/lib/audit-engine.js';
-import { findSkill } from '../../../auditing-skills/scripts/src/lib/skill-finder.js';
-import { runSuggestMode } from '../../../auditing-skills/scripts/src/lib/fix-suggest.js';
-import { applySemanticFix } from '../../../auditing-skills/scripts/src/lib/fix-applier.js';
+
+// Import from @chariot/auditing-skills public API - no more relative path hell!
+import {
+  SkillAuditor,
+  FIXABLE_PHASES,
+  getPhaseKey,
+  findSkill,
+  runSuggestMode,
+  applySemanticFix,
+} from '@chariot/auditing-skills';
 
 /**
  * Create backup in .local directory with timestamp
@@ -44,7 +55,7 @@ program
   .description('Fix skill compliance issues')
   .argument('<name>', 'Skill name')
   .option('--dry-run', 'Preview fixes without applying')
-  .option('--phase <number>', 'Fix specific phase (auto-fix: 2, 4, 5, 6, 7, 10, 12; guidance: 8, 11; or all)')
+  .option('--phase <number>', 'Fix specific phase (auto-fix: 2, 4, 5, 6, 7, 10, 12, 14a, 16, 18; guidance: 8, 11; or all)')
   .option('--suggest', 'Output suggestions as JSON for Claude-mediated fixes')
   .option('--apply <fix-id>', 'Apply specific semantic fix (e.g., phase1-description)')
   .option('--value <value>', 'Value to use when applying semantic fix')
@@ -107,29 +118,18 @@ program
       const phase = options?.phase || 'all';
       const results: string[] = [];
 
-      if (phase === '2' || phase === 'all') {
-        const result = await auditor.fixPhase2(fixOptions);
-        results.push(result.summary);
-      }
+      // Iterate through fixable phases from registry
+      for (const phaseDef of FIXABLE_PHASES) {
+        const phaseKey = getPhaseKey(phaseDef);
 
-      if (phase === '4' || phase === 'all') {
-        const result = await auditor.fixPhase4(fixOptions);
-        results.push(result.summary);
-      }
+        if (phase === phaseKey || phase === 'all') {
+          const fixMethodName = `fixPhase${phaseKey}` as keyof typeof auditor;
 
-      if (phase === '5' || phase === 'all') {
-        const result = await auditor.fixPhase5(fixOptions);
-        results.push(result.summary);
-      }
-
-      if (phase === '6' || phase === 'all') {
-        const result = await auditor.fixPhase6(fixOptions);
-        results.push(result.summary);
-      }
-
-      if (phase === '7' || phase === 'all') {
-        const result = await auditor.fixPhase7(fixOptions);
-        results.push(result.summary);
+          if (typeof auditor[fixMethodName] === 'function') {
+            const result = await (auditor[fixMethodName] as Function).call(auditor, fixOptions);
+            results.push(result.summary);
+          }
+        }
       }
 
       // Phase 8: TypeScript Structure (specialized - automatic validation, manual fixes)
@@ -152,11 +152,6 @@ program
         results.push('Phase 8: See guidance above (automatic validation, manual fixes required)');
       }
 
-      if (phase === '10' || phase === 'all') {
-        const result = await auditor.fixPhase10(fixOptions);
-        results.push(result.summary);
-      }
-
       // Phase 11: Command Portability (specialized - guidance only)
       if (phase === '11') {
         console.log(chalk.blue('📦 Phase 11: Command Portability\n'));
@@ -174,11 +169,6 @@ program
         console.log(chalk.gray('  5. Re-run audit to verify:\n'));
         console.log(chalk.cyan(`     npm run audit -- ${name} --phase 11\n`));
         results.push('Phase 11: See guidance above (manual path portability checks required)');
-      }
-
-      if (phase === '12' || phase === 'all') {
-        const result = await auditor.fixPhase12(fixOptions);
-        results.push(result.summary);
       }
 
       // Display results

@@ -73,6 +73,7 @@ export class SkillParser {
       const { data, content: markdownContent } = matter(content);
 
       const wordCount = this.countWords(markdownContent);
+      const lineCount = this.countLines(content);  // Count lines of full file (including frontmatter)
       const skillType = this.detectSkillType(markdownContent, data as SkillFrontmatter);
 
       return {
@@ -82,6 +83,7 @@ export class SkillParser {
         frontmatter: data as SkillFrontmatter,
         content: markdownContent,
         wordCount,
+        lineCount,
         skillType,
       };
     } catch (error) {
@@ -100,6 +102,7 @@ export class SkillParser {
         frontmatter,
         content: content,
         wordCount: this.countWords(content),
+        lineCount: this.countLines(content),
         skillType: this.detectSkillType(content, frontmatter),
       };
     }
@@ -153,6 +156,14 @@ export class SkillParser {
       .filter((word) => word.length > 0 && !/^[^\w]*$/.test(word));
 
     return words.length;
+  }
+
+  /**
+   * Count lines in content (for Phase 3 validation)
+   * Anthropic recommends keeping SKILL.md under 500 lines for optimal performance
+   */
+  static countLines(content: string): number {
+    return content.split('\n').length;
   }
 
   /**

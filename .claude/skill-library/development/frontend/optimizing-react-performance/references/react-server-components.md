@@ -18,12 +18,14 @@ React Server Components are components that render on the server without sending
 ### Server Components (Default)
 
 **When to use:**
+
 - Data fetching from APIs or databases
 - Non-interactive UI (text, images, layout)
 - Components with no state or effects
 - Heavy dependencies that don't need client-side
 
 **Benefits:**
+
 - Zero client JavaScript
 - Direct backend access (databases, secrets)
 - Faster initial page load
@@ -48,6 +50,7 @@ async function UserProfile({ userId }: { userId: string }) {
 ### Client Components
 
 **When to use:**
+
 - Interactivity (onClick, onChange)
 - React hooks (useState, useEffect, useContext)
 - Browser APIs (window, localStorage)
@@ -94,14 +97,14 @@ export function Interactive() {
 Marks server actions that can be called from client components:
 
 ```typescript
-'use server';
+"use server";
 
 export async function updateUser(formData: FormData) {
-  const name = formData.get('name');
+  const name = formData.get("name");
   // Direct database access from server
   await db.user.update({
     where: { id: userId },
-    data: { name }
+    data: { name },
   });
 }
 ```
@@ -186,6 +189,7 @@ async function SlowData() {
 ```
 
 **How it works:**
+
 1. Server sends shell HTML immediately (Header, Skeleton, Footer)
 2. User sees page layout instantly
 3. When `SlowData` finishes, server streams updated HTML
@@ -355,6 +359,7 @@ export async function Component() { // Server component
 ### Phase 1: Audit Components
 
 Categorize components:
+
 - **Pure server**: No interactivity, no hooks, no browser APIs
 - **Pure client**: Interactive, uses hooks
 - **Mixed**: Could be split
@@ -384,9 +389,9 @@ Mark interactive components:
 
 ```typescript
 // components/SearchBar.tsx
-'use client';
+"use client";
 export function SearchBar() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   // ... interactive logic
 }
 ```
@@ -428,12 +433,12 @@ export function Interactive() {
 
 Track these improvements:
 
-| Metric | Before RSC | After RSC | Improvement |
-|--------|-----------|-----------|-------------|
-| **Bundle size** | 500KB | 200KB | -60% |
-| **FCP** | 2.1s | 1.3s | -38% |
-| **LCP** | 3.5s | 2.2s | -37% |
-| **TTI** | 4.2s | 2.8s | -33% |
+| Metric          | Before RSC | After RSC | Improvement |
+| --------------- | ---------- | --------- | ----------- |
+| **Bundle size** | 500KB      | 200KB     | -60%        |
+| **FCP**         | 2.1s       | 1.3s      | -38%        |
+| **LCP**         | 3.5s       | 2.2s      | -37%        |
+| **TTI**         | 4.2s       | 2.8s      | -33%        |
 
 ### Tools
 
@@ -444,6 +449,7 @@ Track these improvements:
 ## When NOT to Use RSC
 
 RSC may not help when:
+
 - **Highly interactive apps** - Most UI needs client-side state (games, editors)
 - **Real-time apps** - Constant WebSocket updates require client components
 - **Small apps** - Overhead not worth it for simple sites

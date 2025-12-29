@@ -158,7 +158,7 @@ ls {source-path}  # Should error
 Use `syncing-gateways` skill to automatically detect and fix gateway inconsistencies:
 
 ```typescript
-Read('.claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md')
+Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md");
 ```
 
 **What syncing-gateways does:**
@@ -190,8 +190,8 @@ After completing Step 3 (Move Directory), execute the `syncing-gateways` workflo
 Grep({
   pattern: "{skill-name}",
   path: ".claude/commands",
-  output_mode: "files_with_matches"
-})
+  output_mode: "files_with_matches",
+});
 ```
 
 **Update each:**
@@ -201,15 +201,15 @@ Grep({
 Edit({
   file_path: "{command}",
   old_string: ".claude/skill-library/{cat}/{skill-name}",
-  new_string: ".claude/skills/{skill-name}"
-})
+  new_string: ".claude/skills/{skill-name}",
+});
 
 // If demoting to Library
 Edit({
   file_path: "{command}",
   old_string: ".claude/skills/{skill-name}",
-  new_string: ".claude/skill-library/{cat}/{skill-name}"
-})
+  new_string: ".claude/skill-library/{cat}/{skill-name}",
+});
 ```
 
 ### Step 6: Update Invocation Syntax
@@ -223,10 +223,10 @@ Find all `skill:` references and change to `Read()`:
 ```typescript
 // Find skill: invocations
 Grep({
-  pattern: 'skill:\\s*["\']?{skill-name}["\']?',
+  pattern: "skill:\\s*[\"']?{skill-name}[\"']?",
   path: ".claude",
-  output_mode: "content"
-})
+  output_mode: "content",
+});
 ```
 
 Update each reference:
@@ -235,8 +235,8 @@ Update each reference:
 Edit({
   file_path: "{file-with-reference}",
   old_string: 'skill: "{skill-name}"',
-  new_string: 'Read(".claude/skill-library/{cat}/{skill-name}/SKILL.md")'
-})
+  new_string: 'Read(".claude/skill-library/{cat}/{skill-name}/SKILL.md")',
+});
 ```
 
 **If promoting to Core (Library → Core):**
@@ -246,10 +246,10 @@ Find all `Read()` references and change to `skill:`:
 ```typescript
 // Find Read() invocations
 Grep({
-  pattern: 'Read\\(["\'].*/skill-library/.*/{skill-name}/SKILL\\.md["\']\\)',
+  pattern: "Read\\([\"'].*/skill-library/.*/{skill-name}/SKILL\\.md[\"']\\)",
   path: ".claude",
-  output_mode: "content"
-})
+  output_mode: "content",
+});
 ```
 
 Update each reference:
@@ -258,8 +258,8 @@ Update each reference:
 Edit({
   file_path: "{file-with-reference}",
   old_string: 'Read(".claude/skill-library/{cat}/{skill-name}/SKILL.md")',
-  new_string: 'skill: "{skill-name}"'
-})
+  new_string: 'skill: "{skill-name}"',
+});
 ```
 
 **Why this matters:**
@@ -276,8 +276,8 @@ Edit({
 Grep({
   pattern: "{old-path}",
   path: ".claude",
-  output_mode: "files_with_matches"
-})
+  output_mode: "files_with_matches",
+});
 ```
 
 **Expected:** Zero matches (or only documentation/changelog)
@@ -286,10 +286,10 @@ Grep({
 
 ```typescript
 // Core skill
-skill: "{skill-name}"  // Should work
+skill: "{skill-name}"; // Should work
 
 // Library skill
-Read(".claude/skill-library/{cat}/{skill-name}/SKILL.md")  // Should work
+Read(".claude/skill-library/{cat}/{skill-name}/SKILL.md"); // Should work
 ```
 
 ---
@@ -385,8 +385,8 @@ mv {target-path} {source-path}
 Edit({
   file_path: "{file}",
   old_string: "{new-path}",
-  new_string: "{old-path}"
-})
+  new_string: "{old-path}",
+});
 ```
 
 ---

@@ -357,6 +357,7 @@ export const Route = createRootRoute({
 ```
 
 **References:**
+
 - [Document Head Management Guide](https://tanstack.com/router/v1/docs/framework/react/guide/document-head-management)
 
 ### Route Validation

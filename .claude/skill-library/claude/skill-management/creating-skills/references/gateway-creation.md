@@ -11,7 +11,7 @@ Gateway skills are routing indices that help discover library skills. They:
 - Use specialized templates with two-tier explanations
 - Have additional validation phases (17-20)
 
-**Gateway naming pattern**: `gateway-{domain}` (e.g., `gateway-frontend`, `gateway-analytics`)
+**Gateway naming pattern**: `gateway-{domain}` (e.g., `gateway-frontend`, `gateway-backend`)
 
 ---
 
@@ -29,7 +29,7 @@ You're creating a gateway if:
 
 - `gateway-frontend`
 - `gateway-backend`
-- `gateway-analytics`
+- `gateway-claude`
 - `gateway-security`
 
 **Invalid examples**:
@@ -325,15 +325,15 @@ Use `testing-skills-with-subagents` skill with gateway-specific scenarios:
 
 ## Gateway vs Regular Skill Differences
 
-| Aspect            | Regular Skill           | Gateway Skill                         |
-| ----------------- | ----------------------- | ------------------------------------- |
-| **Location**      | Core or Library         | Always Core                           |
-| **Category**      | May have category       | No category                           |
-| **Template**      | skill-templates.md      | gateway-template.md                   |
+| Aspect            | Regular Skill           | Gateway Skill                            |
+| ----------------- | ----------------------- | ---------------------------------------- |
+| **Location**      | Core or Library         | Always Core                              |
+| **Category**      | May have category       | No category                              |
+| **Template**      | skill-templates.md      | gateway-template.md                      |
 | **Validation**    | Phases 1-21             | Phases 1-21 (17-20 are gateway-specific) |
-| **Purpose**       | Implement functionality | Route to library skills               |
-| **Allowed-tools** | Various                 | Read only                             |
-| **Content**       | Implementation details  | Routing table with paths              |
+| **Purpose**       | Implement functionality | Route to library skills                  |
+| **Allowed-tools** | Various                 | Read only                                |
+| **Content**       | Implementation details  | Routing table with paths                 |
 
 ---
 
@@ -346,7 +346,7 @@ Once the gateway is created and validated:
 If you left the routing table empty during creation, use the `syncing-gateways` skill:
 
 ```typescript
-Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")
+Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md");
 // Follow Single Gateway workflow for gateway-{domain}
 ```
 
@@ -480,7 +480,7 @@ Gateway routing tables should ONLY list library skills (`.claude/skill-library/`
 
 **Phase 8**: Verification
 
-- Full audit: ✅ All 21 phases pass (17-20 are gateway-specific)
+- Full audit: ✅ All 22 phases pass (17-20 are gateway-specific)
 - Manual test: ✅ Gateway loads correctly
 
 **Phase 9**: REFACTOR
@@ -513,7 +513,7 @@ Before completing gateway creation:
 - [ ] Two-tier system table present
 - [ ] Routing table uses full paths (not abbreviated)
 - [ ] All paths in routing table exist
-- [ ] All 21 phases pass audit
+- [ ] All 22 phases pass audit
 - [ ] Changelog entry created
 - [ ] Manual load test successful
 - [ ] REFACTOR phase completed

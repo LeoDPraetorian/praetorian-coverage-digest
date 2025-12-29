@@ -258,6 +258,5 @@ Deviating from these decisions requires user approval.
 
 - [Phase 3: Architecture](phase-3-architecture.md) - Previous phase
 - [Phase 5: Code Review](phase-5-code-review.md) - Next phase
-- [Phase 6: Testing](phase-6-testing.md) - After code review
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Troubleshooting](troubleshooting.md) - Common issues

@@ -19,7 +19,7 @@ All phases passed, no issues found:
 ✅ Audit passed
   Skill: creating-skills
   Location: .claude/skill-library/claude/skill-management/creating-skills
-  21/21 phases passed
+  22/22 phases passed
   No issues found
 ```
 
@@ -33,7 +33,7 @@ Passed with non-blocking warnings:
 ⚠️ Audit passed with warnings
   Skill: updating-skills
   Location: .claude/skill-library/claude/skill-management/updating-skills
-  20/21 phases passed
+  21/22 phases passed
 
   Phase 1 (Description Format): WARNING
     Description is 127 characters (target: <120)
@@ -50,7 +50,7 @@ One or more phases failed:
 ✗ Audit failed
   Skill: my-broken-skill
   Location: .claude/skills/my-broken-skill
-  17/21 phases passed
+  18/22 phases passed
 
   Phase 3 (Word Count): FAILURE
     SKILL.md has 687 lines (limit: 500)
@@ -89,7 +89,7 @@ Manual fixes completed:
 ✅ Phase 1: Rewrote description (now 98 chars)
 ✅ Phase 3: Extracted workflow to references/ (now 347 lines)
 
-Final audit: ✅ 21/21 phases passed
+Final audit: ✅ 22/22 phases passed
 
 The skill is now compliant and ready to commit.
 ```
@@ -117,13 +117,13 @@ Apply these 3 fixes? [Yes/No/Preview each]
 
 ## Gateway-Specific Output
 
-For `gateway-*` skills, additional phases 17-20 are included:
+For `gateway-*` skills, all 22 phases are run (including gateway-specific phases 17-20):
 
 ```
 ✅ Audit passed
   Skill: gateway-frontend
   Location: .claude/skills/gateway-frontend
-  20/20 phases passed (16 standard + 4 gateway)
+  22/22 phases passed
   No issues found
 ```
 
@@ -133,7 +133,7 @@ Gateway failure example:
 ✗ Audit failed
   Skill: gateway-backend
   Location: .claude/skills/gateway-backend
-  18/20 phases passed
+  20/22 phases passed
 
   Phase 18 (Routing Table Format): FAILURE
     3 entries use skill names instead of full paths:

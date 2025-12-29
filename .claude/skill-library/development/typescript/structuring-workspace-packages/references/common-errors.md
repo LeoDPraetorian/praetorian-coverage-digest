@@ -13,6 +13,7 @@ SyntaxError: The requested module '@org/package/lib/module' does not provide an 
 **Root Cause**: The exports field points to dist/ files, but dist/ doesn't exist (package not built).
 
 **Solution**:
+
 ```bash
 # Build the provider package first
 npm run -w @org/provider build
@@ -58,10 +59,12 @@ Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@org/package'
 ```
 
 **Root Cause**:
+
 1. Workspace dependency not added to consumer's package.json, OR
 2. npm install not run after adding dependency
 
 **Solution**:
+
 ```bash
 # Add dependency to consumer package.json
 # "dependencies": { "@org/package": "*" }
@@ -84,17 +87,19 @@ error TS2688: Cannot find type definition file for '@org/package'
 ```
 
 **Root Cause**:
+
 1. `types` condition missing or not first in exports, OR
 2. `declaration: true` not set in provider tsconfig
 
 **Solution**:
 
 1. Ensure `types` is FIRST in each export condition:
+
 ```json
 {
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",  // MUST be first
+      "types": "./dist/index.d.ts", // MUST be first
       "import": "./dist/index.js"
     }
   }
@@ -102,6 +107,7 @@ error TS2688: Cannot find type definition file for '@org/package'
 ```
 
 2. Ensure provider generates declarations:
+
 ```json
 {
   "compilerOptions": {
@@ -112,6 +118,7 @@ error TS2688: Cannot find type definition file for '@org/package'
 ```
 
 3. Rebuild provider:
+
 ```bash
 npm run -w @org/provider build
 ```
@@ -125,25 +132,28 @@ error TS2305: Module '@org/package' has no exported member 'functionName'
 ```
 
 **Root Cause**:
+
 1. Function/type not exported from barrel file (index.ts), OR
 2. Using namespace import but trying to access named export
 
 **Solution**:
 
 1. Check barrel export includes the member:
+
 ```typescript
 // src/index.ts
-export { functionName } from './lib/module.js';
+export { functionName } from "./lib/module.js";
 ```
 
 2. If using namespace import, change to named import:
+
 ```typescript
 // WRONG
-import * as pkg from '@org/package';
-pkg.functionName();  // May fail
+import * as pkg from "@org/package";
+pkg.functionName(); // May fail
 
 // RIGHT
-import { functionName } from '@org/package';
+import { functionName } from "@org/package";
 functionName();
 ```
 
@@ -152,11 +162,13 @@ functionName();
 ### Types not showing in IDE / IntelliSense not working
 
 **Root Cause**:
+
 1. `types` condition not first in exports
 2. Declaration files not generated
 3. IDE cache stale
 
 **Solution**:
+
 1. Verify exports field order (types first)
 2. Rebuild provider: `npm run -w @org/provider build`
 3. Restart TypeScript server: In VS Code, Cmd+Shift+P → "TypeScript: Restart TS Server"
@@ -174,6 +186,7 @@ SyntaxError: Unexpected token 'export'
 **Root Cause**: Running ESM code without proper module configuration.
 
 **Solution**: Ensure both packages have:
+
 ```json
 {
   "type": "module"
@@ -191,6 +204,7 @@ Error [ERR_REQUIRE_ESM]: require() of ES Module not supported
 **Root Cause**: Trying to use CommonJS require() on an ESM package.
 
 **Solution**:
+
 1. Use import instead of require
 2. Ensure consumer has `"type": "module"`
 3. Use tsx or similar ESM-aware runner
@@ -208,6 +222,7 @@ error TS6059: File '/path/to/file.ts' is not under 'rootDir'
 **Root Cause**: TypeScript trying to compile files outside rootDir.
 
 **Solution**: Ensure imports don't reach outside the package:
+
 ```json
 {
   "compilerOptions": {
@@ -226,6 +241,7 @@ If you need files from another package, use workspace dependency instead of rela
 **Root Cause**: Importing from source files (`.ts`) instead of built output.
 
 **Solution**:
+
 1. Import from package name, not relative path
 2. Build provider before building consumer
 3. Use `skipLibCheck: true` in consumer tsconfig

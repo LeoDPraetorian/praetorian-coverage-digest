@@ -8,7 +8,7 @@ allowed-tools: Read, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion
 
 **Safe skill renaming with comprehensive reference tracking and validation.**
 
-> **IMPORTANT**: Use TodoWrite to track the 7-step rename process. Missing a step can leave broken references.
+> **IMPORTANT**: Use TodoWrite to track the 9-step rename process. Missing a step can leave broken references.
 
 ---
 
@@ -43,17 +43,20 @@ Safely renames skills by:
 
 ---
 
-## Quick Reference - 7-Step Safe Rename
+## Quick Reference - 10-Step Safe Rename
 
-| Step | Action                    | Tool       | Verification                  |
-| ---- | ------------------------- | ---------- | ----------------------------- |
-| 1    | Validate source exists    | Bash, Read | Directory exists, valid skill |
-| 2    | Validate target available | Bash       | No conflicts                  |
-| 3    | Update frontmatter        | Edit       | Name field updated            |
-| 4    | Move directory            | Bash       | New dir exists, old gone      |
-| 5    | Find references           | Grep       | List all matches              |
-| 6    | Update references         | Edit       | All updated                   |
-| 7    | Verify integrity          | Grep       | Zero matches for old name     |
+| Step | Action                        | Tool              | Verification                  |
+| ---- | ----------------------------- | ----------------- | ----------------------------- |
+| 1    | Validate source exists        | Bash, Read        | Directory exists, valid skill |
+| 2    | Validate target available     | Bash              | No conflicts                  |
+| 3    | Confirm with user             | AskUserQuestion   | User approves                 |
+| 4    | Update frontmatter            | Edit              | Name field updated            |
+| 5    | Move directory                | Bash              | New dir exists, old gone      |
+| 6    | Find references               | Grep              | List all matches              |
+| 7    | Update non-gateway references | Edit              | Commands, skills updated      |
+| 8    | Sync gateways                 | syncing-gateways  | Tables formatted, sorted      |
+| 9    | Verify integrity              | Grep              | Zero matches for old name     |
+| 10   | Report success                | Output            | Summary displayed             |
 
 ---
 
@@ -67,7 +70,7 @@ test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 ```
 
-**See:** [Repository Root Navigation](references/patterns/repo-root-detection.md)
+**See:** [Repository Root Navigation](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
 
 **⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
 
@@ -77,21 +80,23 @@ cd "$REPO_ROOT"
 
 ## Complete Workflow
 
-> **You MUST use TodoWrite before starting** to track all 9 steps of this workflow. Steps get skipped without tracking.
+> **You MUST use TodoWrite before starting** to track all 10 steps of this workflow. Steps get skipped without tracking.
 
 Copy this checklist and track with TodoWrite:
 
 ```markdown
 Rename Progress:
+
 - [ ] Step 1: Validate source skill exists
 - [ ] Step 2: Validate target name available
 - [ ] Step 3: Confirm with user (show impact)
 - [ ] Step 4: Update frontmatter name
 - [ ] Step 5: Move/rename directory
 - [ ] Step 6: Find all references
-- [ ] Step 7: Update each reference with Edit
-- [ ] Step 8: Verify integrity (no old name remains)
-- [ ] Step 9: Report success with summary
+- [ ] Step 7: Update non-gateway references (commands, skills)
+- [ ] Step 8: Sync gateways with syncing-gateways skill
+- [ ] Step 9: Verify integrity (no old name remains)
+- [ ] Step 10: Report success with summary
 ```
 
 ---
@@ -253,7 +258,9 @@ ls {new-path}  # Should succeed
 
 **Search strategy:** Find all references to old skill name
 
-**In gateways:**
+**Note:** Gateway references are tracked here but updated separately in Step 8 using `syncing-gateways` for proper table formatting and sorting.
+
+**In gateways (for tracking only):**
 
 ```bash
 Grep {
@@ -305,9 +312,11 @@ Files with references:
 
 ---
 
-### Step 7: Update Each Reference
+### Step 7: Update Non-Gateway References
 
-For each file found, update references:
+For each non-gateway file found (commands, other skills), update references:
+
+**Note:** Gateways are handled in Step 8 by `syncing-gateways` skill.
 
 **Pattern 1: Skill invocation**
 
@@ -365,15 +374,53 @@ Edit {
 **Track updates:**
 
 ```text
-Updated references:
-✅ .claude/skills/gateway-claude/SKILL.md (2 occurrences)
+Updated non-gateway references:
 ✅ .claude/commands/skill-manager.md (1 occurrence)
-✅ .claude/skills/skill-manager/SKILL.md (3 occurrences)
+✅ .claude/skills/using-skills/SKILL.md (2 occurrences)
+✅ .claude/skill-library/.../other-skill/SKILL.md (3 occurrences)
+
+Note: Gateway references will be updated in Step 8.
 ```
 
 ---
 
-### Step 8: Verify Integrity
+### Step 8: Sync Gateway Tables
+
+**Use `syncing-gateways` skill for proper structural validation.**
+
+After updating non-gateway references, gateway routing tables need to be synced to:
+1. Update skill name references with proper formatting
+2. Maintain alphabetical sorting
+3. Ensure Prettier-compliant table structure
+
+**Read the syncing-gateways skill:**
+
+```typescript
+Read('.claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md')
+```
+
+**Execute the gateway sync workflow:**
+
+The `syncing-gateways` skill will:
+- Detect old skill name in gateway routing tables
+- Update to new skill name
+- Re-sort tables alphabetically
+- Validate table formatting
+- Fix any structural issues
+
+**Why this matters:**
+
+Using regex/Edit directly on gateway tables can:
+- Break table alignment
+- Lose alphabetical sorting
+- Create formatting inconsistencies
+- Miss multi-line routing entries
+
+The `syncing-gateways` skill ensures gateway tables remain structurally sound.
+
+---
+
+### Step 9: Verify Integrity
 
 **Search for any remaining old name references:**
 
@@ -413,7 +460,7 @@ Options:
 
 ---
 
-### Step 9: Report Success
+### Step 10: Report Success
 
 **Summary output:**
 
@@ -427,13 +474,12 @@ Location: {core or library path}
 Changes made:
 - ✅ Updated frontmatter name field
 - ✅ Renamed directory
-- ✅ Updated {count} references across {file-count} files:
-  - Gateway files: {count}
-  - Command files: {count}
-  - Skill files: {count}
+- ✅ Updated non-gateway references (commands, skills): {count} files
+- ✅ Synced gateway routing tables (formatted, sorted)
 
 Verification:
 - ✅ No broken references found
+- ✅ Gateway tables structurally valid
 - ✅ Old directory removed
 - ✅ New directory exists with all files
 
@@ -539,3 +585,5 @@ ls {new-path}  # Should error
 - `creating-skills` - Create new skills
 - `updating-skills` - Update existing skills
 - `migrating-skills` - Move skills between core ↔ library
+- `syncing-gateways` - Validate and fix gateway routing tables
+- `deleting-skills` - Safe skill deletion with reference cleanup

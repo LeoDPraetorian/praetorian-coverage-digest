@@ -185,14 +185,6 @@ export class Phase12CliErrorHandling {
    * Run Phase 12 audit across all skills (with optional auto-fix)
    */
   static async run(skillsDir: string, options?: any): Promise<PhaseResult> {
-    const result: PhaseResult = {
-      phaseName: 'Phase 12: CLI Error Handling',
-      skillsAffected: 0,
-      issuesFound: 0,
-      issuesFixed: 0,
-      details: [],
-    };
-
     const skillNames = readdirSync(skillsDir).filter((name) => {
       const fullPath = join(skillsDir, name);
       return (
@@ -203,17 +195,36 @@ export class Phase12CliErrorHandling {
       );
     });
 
-    for (const skillName of skillNames) {
-      const skillDir = join(skillsDir, skillName);
-      const issues = await this.validate({ name: skillName, directory: skillDir });
+    const skills: Array<{ name: string; directory: string }> = skillNames.map(name => ({
+      name,
+      directory: join(skillsDir, name),
+    }));
+
+    return this.runOnParsedSkills(skills, options);
+  }
+
+  /**
+   * Run phase on pre-parsed skills (performance optimized)
+   */
+  static async runOnParsedSkills(skills: Array<{ name: string; directory: string }>, options?: any): Promise<PhaseResult> {
+    const result: PhaseResult = {
+      phaseName: 'Phase 12: CLI Error Handling',
+      skillsAffected: 0,
+      issuesFound: 0,
+      issuesFixed: 0,
+      details: [],
+    };
+
+    for (const skill of skills) {
+      const issues = await this.validate(skill);
 
       if (issues.length > 0) {
         result.skillsAffected++;
         result.issuesFound += issues.length;
-        result.details.push(`${skillName}:`);
+        result.details.push(`${skill.name}:`);
 
         // Auto-fix if enabled
-        const cliPath = join(skillDir, 'scripts', 'src', 'cli.ts');
+        const cliPath = join(skill.directory, 'scripts', 'src', 'cli.ts');
         if (options?.autoFix && !options.dryRun) {
           const fixed = await this.fix(cliPath, options.dryRun);
           if (fixed > 0) {

@@ -5,6 +5,7 @@ Review implementation by spawning code reviewer + security reviewer agents in pa
 ## Purpose
 
 Validate implementation quality before testing by:
+
 - Reviewing code quality and best practices (code reviewer)
 - Identifying security vulnerabilities (security reviewer)
 - Ensuring architecture adherence
@@ -13,6 +14,7 @@ Validate implementation quality before testing by:
 ## Why Parallel Code + Security Review?
 
 **Code Reviewer** (frontend-reviewer or backend-reviewer) focuses on:
+
 - Plan adherence
 - Code quality (component size, types, imports)
 - React 19 / Go best practices
@@ -20,6 +22,7 @@ Validate implementation quality before testing by:
 - Maintainability
 
 **Security Reviewer** (frontend-security or backend-security) focuses on:
+
 - XSS vulnerabilities
 - Auth/authz implementation
 - Input validation
@@ -34,11 +37,11 @@ Validate implementation quality before testing by:
 
 Based on feature domain:
 
-| Feature Type | Code Reviewer | Security Reviewer | Total |
-|--------------|---------------|-------------------|-------|
-| Frontend | `frontend-reviewer` | `frontend-security` | 2 |
-| Backend | `backend-reviewer` | `backend-security` | 2 |
-| Full-stack | Both code reviewers | Both security reviewers | 4 |
+| Feature Type | Code Reviewer       | Security Reviewer       | Total |
+| ------------ | ------------------- | ----------------------- | ----- |
+| Frontend     | `frontend-reviewer` | `frontend-security`     | 2     |
+| Backend      | `backend-reviewer`  | `backend-security`      | 2     |
+| Full-stack   | Both code reviewers | Both security reviewers | 4     |
 
 ### Step 2: Spawn All Reviewers in Parallel
 
@@ -140,17 +143,21 @@ If ANY reviewer returned `verdict: "CHANGES_REQUESTED"`:
 #### Retry #1: Developer Fixes
 
 1. **Compile all feedback:**
+
    ```markdown
    # Review Feedback for {feature-name}
 
    ## Code Review Issues
+
    {from review.md}
 
    ## Security Issues
+
    {from security-review.md}
    ```
 
 2. **Spawn developer to fix:**
+
    ```
    Task(
      subagent_type: "frontend-developer",
@@ -169,6 +176,7 @@ If ANY reviewer returned `verdict: "CHANGES_REQUESTED"`:
    ```
 
 3. **Re-spawn reviewers (retry #1):**
+
    ```
    # Increment retry_count in metadata.json
    Task(subagent_type: "frontend-reviewer", ...)
@@ -183,26 +191,28 @@ If ANY reviewer STILL returns `verdict: "CHANGES_REQUESTED"` after retry:
 
 ```typescript
 AskUserQuestion({
-  questions: [{
-    question: "Reviews still failing after 1 retry. How should we proceed?",
-    header: "Review",
-    multiSelect: false,
-    options: [
-      {
-        label: "Show me the issues",
-        description: "Display remaining review feedback"
-      },
-      {
-        label: "Proceed anyway",
-        description: "Accept current state, document known issues"
-      },
-      {
-        label: "Cancel feature",
-        description: "Stop development, revisit design"
-      }
-    ]
-  }]
-})
+  questions: [
+    {
+      question: "Reviews still failing after 1 retry. How should we proceed?",
+      header: "Review",
+      multiSelect: false,
+      options: [
+        {
+          label: "Show me the issues",
+          description: "Display remaining review feedback",
+        },
+        {
+          label: "Proceed anyway",
+          description: "Accept current state, document known issues",
+        },
+        {
+          label: "Cancel feature",
+          description: "Stop development, revisit design",
+        },
+      ],
+    },
+  ],
+});
 ```
 
 **Do NOT retry more than once.** Escalate to user.
@@ -226,11 +236,11 @@ AskUserQuestion({
       },
       "completed_at": "2025-12-28T12:30:00Z"
     },
-    "testing": {
+    "test_planning": {
       "status": "in_progress"
     }
   },
-  "current_phase": "testing"
+  "current_phase": "test_planning"
 }
 ```
 
@@ -238,12 +248,13 @@ AskUserQuestion({
 
 ```
 TodoWrite: Mark "Phase 5: Code Review" as completed
-TodoWrite: Mark "Phase 6: Testing" as in_progress
+TodoWrite: Mark "Phase 6: Test Planning" as in_progress
 ```
 
 ## Exit Criteria
 
-✅ Proceed to Phase 6 (Testing) when:
+✅ Proceed to Phase 6 (Test Planning) when:
+
 - ALL reviewers returned `verdict: "APPROVED"`
 - OR user explicitly approved despite issues
 - Review files saved (review.md, security-review.md)
@@ -251,6 +262,7 @@ TodoWrite: Mark "Phase 6: Testing" as in_progress
 - TodoWrite marked complete
 
 ❌ Do NOT proceed if:
+
 - Any reviewer returned `verdict: "BLOCKED"`
 - CHANGES_REQUESTED after retry without user approval
 - Security findings with severity "critical" unaddressed
@@ -268,12 +280,14 @@ Task(subagent_type: "backend-security", ...)
 ```
 
 **Outputs:**
+
 - `.claude/features/{id}/review.md` (frontend code review)
 - `.claude/features/{id}/security-review.md` (frontend security)
 - `.claude/features/{id}/backend-review.md` (backend code review)
 - `.claude/features/{id}/backend-security-review.md` (backend security)
 
 **Feedback loop for full-stack**: If issues exist in BOTH domains:
+
 - Spawn BOTH developers to fix in parallel
 - Re-spawn ALL FOUR reviewers
 
@@ -298,6 +312,6 @@ Task(subagent_type: "backend-security", ...)
 ## Related References
 
 - [Phase 4: Implementation](phase-4-implementation.md) - Previous phase
-- [Phase 6: Testing](phase-6-testing.md) - Next phase
+- [Phase 6: Test Planning](phase-6-test-planning.md) - Next phase
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Troubleshooting](troubleshooting.md) - Common issues

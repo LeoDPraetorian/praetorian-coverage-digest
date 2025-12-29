@@ -12,6 +12,7 @@ function createSkillFixture(overrides: Partial<SkillFile> & { name: string; cont
     directory: '/test',
     frontmatter: { name: overrides.name, description: 'test' },
     wordCount: 100,
+    lineCount: 10,  // Default line count for tests
     skillType: 'reasoning',
     ...overrides,
   };

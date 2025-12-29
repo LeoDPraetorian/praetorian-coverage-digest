@@ -43,58 +43,58 @@ src/
 ### 1. API Layer (api/users.ts)
 
 ```typescript
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions } from "@tanstack/react-query";
 
 // Types
 export interface User {
-  id: string
-  name: string
-  email: string
-  status: 'active' | 'inactive'
-  createdAt: string
+  id: string;
+  name: string;
+  email: string;
+  status: "active" | "inactive";
+  createdAt: string;
 }
 
 export interface UserSearchParams {
-  page: number
-  pageSize: number
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
-  status?: string
-  search?: string
+  page: number;
+  pageSize: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  status?: string;
+  search?: string;
 }
 
 export interface UsersResponse {
-  users: User[]
+  users: User[];
   pagination: {
-    page: number
-    pageSize: number
-    totalPages: number
-    totalRows: number
-  }
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    totalRows: number;
+  };
 }
 
 // API function
 async function fetchUsers(params: UserSearchParams): Promise<UsersResponse> {
-  const searchParams = new URLSearchParams()
-  searchParams.set('page', String(params.page))
-  searchParams.set('pageSize', String(params.pageSize))
-  if (params.sortBy) searchParams.set('sortBy', params.sortBy)
-  if (params.sortOrder) searchParams.set('sortOrder', params.sortOrder)
-  if (params.status) searchParams.set('status', params.status)
-  if (params.search) searchParams.set('search', params.search)
+  const searchParams = new URLSearchParams();
+  searchParams.set("page", String(params.page));
+  searchParams.set("pageSize", String(params.pageSize));
+  if (params.sortBy) searchParams.set("sortBy", params.sortBy);
+  if (params.sortOrder) searchParams.set("sortOrder", params.sortOrder);
+  if (params.status) searchParams.set("status", params.status);
+  if (params.search) searchParams.set("search", params.search);
 
-  const response = await fetch(`/api/users?${searchParams}`)
-  if (!response.ok) throw new Error('Failed to fetch users')
-  return response.json()
+  const response = await fetch(`/api/users?${searchParams}`);
+  if (!response.ok) throw new Error("Failed to fetch users");
+  return response.json();
 }
 
 // Query options factory - reusable across loaders and components
 export const usersQueryOptions = (params: UserSearchParams) =>
   queryOptions({
-    queryKey: ['users', params] as const,
+    queryKey: ["users", params] as const,
     queryFn: () => fetchUsers(params),
     staleTime: 30 * 1000, // 30 seconds
-  })
+  });
 ```
 
 ### 2. Router Configuration (router.tsx)
@@ -492,13 +492,13 @@ createRoot(document.getElementById('root')!).render(
 
 ## Key Integration Points
 
-| Integration | Pattern |
-|-------------|---------|
-| Router → Query | `ensureQueryData` in route loader with `loaderDeps` |
-| Router → Table | Table state from `Route.useSearch()`, handlers call `navigate()` |
-| Query → Table | `useSuspenseQuery` feeds data to `useReactTable` |
-| Table → Virtual | `table.getRowModel().rows` provides count and data to `useVirtualizer` |
-| Virtual → Router | Scroll position preserved by Router automatically |
+| Integration      | Pattern                                                                |
+| ---------------- | ---------------------------------------------------------------------- |
+| Router → Query   | `ensureQueryData` in route loader with `loaderDeps`                    |
+| Router → Table   | Table state from `Route.useSearch()`, handlers call `navigate()`       |
+| Query → Table    | `useSuspenseQuery` feeds data to `useReactTable`                       |
+| Table → Virtual  | `table.getRowModel().rows` provides count and data to `useVirtualizer` |
+| Virtual → Router | Scroll position preserved by Router automatically                      |
 
 ## Benefits
 

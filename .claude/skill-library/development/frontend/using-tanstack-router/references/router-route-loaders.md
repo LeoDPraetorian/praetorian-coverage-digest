@@ -446,7 +446,7 @@ export const Route = createFileRoute("/posts")({
     // TanStack Query handles abort signals reliably
     await context.queryClient.ensureQueryData({
       queryKey: ["posts"],
-      queryFn: ({ signal }) => fetch("/api/posts", { signal }).then(r => r.json()),
+      queryFn: ({ signal }) => fetch("/api/posts", { signal }).then((r) => r.json()),
     });
   },
 });

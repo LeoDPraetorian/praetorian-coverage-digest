@@ -44,10 +44,10 @@ Encountered @praetorian-chariot/ui import?
 
 ## Source Locations
 
-| Source               | Path                                    | Import Pattern             | Status          |
-| -------------------- | --------------------------------------- | -------------------------- | --------------- |
-| **Local (use this)** | `modules/chariot/ui/src/components/`    | `@/components/...`         | Active          |
-| **Shared (migrate)** | `modules/chariot-ui-components/src/`    | `@praetorian-chariot/ui`   | Decommissioning |
+| Source               | Path                                 | Import Pattern           | Status          |
+| -------------------- | ------------------------------------ | ------------------------ | --------------- |
+| **Local (use this)** | `modules/chariot/ui/src/components/` | `@/components/...`       | Active          |
+| **Shared (migrate)** | `modules/chariot-ui-components/src/` | `@praetorian-chariot/ui` | Decommissioning |
 
 ## Migration Workflow
 
@@ -66,12 +66,12 @@ grep -E "^import.*from ['\"]" "$COMPONENT_FILE"
 
 **Dependency types:**
 
-| Type                      | Pattern                             | Action                     |
-| ------------------------- | ----------------------------------- | -------------------------- |
-| Internal components       | `from './OtherComponent'`           | Migrate first (recursive)  |
-| Icons                     | `from '../icons/IconName'`          | Migrate to local icons/    |
-| Utilities                 | `from '../utils/...'`               | Migrate or use local utils |
-| External packages         | `from 'react'`, `from 'tailwind-merge'` | Keep as-is             |
+| Type                | Pattern                                 | Action                     |
+| ------------------- | --------------------------------------- | -------------------------- |
+| Internal components | `from './OtherComponent'`               | Migrate first (recursive)  |
+| Icons               | `from '../icons/IconName'`              | Migrate to local icons/    |
+| Utilities           | `from '../utils/...'`                   | Migrate or use local utils |
+| External packages   | `from 'react'`, `from 'tailwind-merge'` | Keep as-is                 |
 
 ### Phase 2: Recursive Migration
 
@@ -83,11 +83,11 @@ For each component:
 2. **Copy verbatim** to appropriate local directory
 3. **Rewrite internal imports:**
 
-| Original                    | Rewritten                           |
-| --------------------------- | ----------------------------------- |
-| `from './OtherComponent'`   | `from '@/components/OtherComponent'`|
-| `from '../icons/IconName'`  | `from '@/components/icons/IconName'`|
-| `from '../utils/someUtil'`  | `from '@/utils/someUtil'`           |
+| Original                   | Rewritten                            |
+| -------------------------- | ------------------------------------ |
+| `from './OtherComponent'`  | `from '@/components/OtherComponent'` |
+| `from '../icons/IconName'` | `from '@/components/icons/IconName'` |
+| `from '../utils/someUtil'` | `from '@/utils/someUtil'`            |
 
 ### Phase 3: Update All References
 
@@ -103,11 +103,11 @@ grep -r "from '@praetorian-chariot/ui'" modules/chariot/ui/src/ \
 
 ```typescript
 // Before
-import { Button, Dropdown } from '@praetorian-chariot/ui';
+import { Button, Dropdown } from "@praetorian-chariot/ui";
 
 // After (both migrated)
-import { Button } from '@/components/Button';
-import { Dropdown } from '@/components/Dropdown';
+import { Button } from "@/components/Button";
+import { Dropdown } from "@/components/Dropdown";
 ```
 
 ### Phase 4: Verification
@@ -124,13 +124,13 @@ grep -r "ComponentName.*@praetorian-chariot/ui" modules/chariot/ui/src/
 
 ## Target Directories
 
-| Component Type       | Local Destination     |
-| -------------------- | --------------------- |
-| Generic UI primitives| `components/ui/`      |
-| Form controls        | `components/form/`    |
-| Icons                | `components/icons/`   |
-| Charts/visualization | `components/charts/`  |
-| Complex components   | `components/` (root)  |
+| Component Type        | Local Destination    |
+| --------------------- | -------------------- |
+| Generic UI primitives | `components/ui/`     |
+| Form controls         | `components/form/`   |
+| Icons                 | `components/icons/`  |
+| Charts/visualization  | `components/charts/` |
+| Complex components    | `components/` (root) |
 
 ## User Interaction
 
@@ -193,10 +193,10 @@ Plus icons in `modules/chariot-ui-components/src/icons/`
 
 ```typescript
 // WRONG - using deprecated library
-import { Button } from '@praetorian-chariot/ui';
+import { Button } from "@praetorian-chariot/ui";
 
 // CORRECT - use local
-import { Button } from '@/components/Button';
+import { Button } from "@/components/Button";
 ```
 
 ### Do NOT modify chariot-ui-components directly
@@ -213,10 +213,10 @@ After migrating a component, ALL references must be updated. Never leave a mix o
 
 ```typescript
 // File A
-import { Button } from '@/components/Button';
+import { Button } from "@/components/Button";
 
 // File B (WRONG - still using deprecated)
-import { Button } from '@praetorian-chariot/ui';
+import { Button } from "@praetorian-chariot/ui";
 ```
 
 ## Checklist

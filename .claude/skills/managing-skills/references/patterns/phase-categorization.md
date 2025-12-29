@@ -11,14 +11,15 @@ This pattern is referenced by:
 
 ## Overview
 
-The 21-phase skill audit (with Phase 14 sub-phases) uses a **three-tier fix model**:
+The 22-phase skill audit (with Phase 14 sub-phases) uses a **three-tier fix model**:
 
-| Category             | Handler          | Characteristics                           | Phases                             |
-| -------------------- | ---------------- | ----------------------------------------- | ---------------------------------- |
-| **Deterministic**    | TypeScript CLI   | One correct answer, no judgment           | 2, 5, 7, 14a, 14b, 14c, 18         |
-| **Hybrid**           | CLI + Claude     | Auto-fix part, Claude for ambiguous cases | 4, 6, 10, 12, 14f, 19              |
-| **Claude-Automated** | Claude reasoning | Semantic understanding, no human input    | 1, 3, 11, 13, 14d, 14e, 15, 17, 21 |
-| **Human-Required**   | Human decision   | Genuinely ambiguous, policy decisions     | 8, 9, 20                           |
+| Category             | Handler          | Characteristics                           | Phases                                |
+| -------------------- | ---------------- | ----------------------------------------- | ------------------------------------- |
+| **Deterministic**    | TypeScript CLI   | One correct answer, no judgment           | 2, 5, 6, 7, 12, 14a, 16, 18           |
+| **Hybrid**           | CLI + Claude     | Auto-fix part, Claude for ambiguous cases | 4, 10, 19                             |
+| **Validation-Only**  | Report only      | Detects issues, no automated fix          | 14b, 14c                              |
+| **Claude-Automated** | Claude reasoning | Semantic understanding, no human input    | 1, 3, 11, 13, 15, 17, 21, 22 |
+| **Human-Required**   | Human decision   | Genuinely ambiguous, policy decisions     | 8, 9, 20                              |
 
 ---
 
@@ -26,56 +27,45 @@ The 21-phase skill audit (with Phase 14 sub-phases) uses a **three-tier fix mode
 
 These phases have exactly one correct answer derivable from rules:
 
-| Phase | Name                 | CLI Action               | Why Deterministic                   |
-| ----- | -------------------- | ------------------------ | ----------------------------------- |
-| 2     | Allowed-tools field  | Fix comma-separation     | YAML syntax has one correct format  |
-| 5     | File organization    | Create directories       | Directory structure is prescribed   |
-| 7     | Output directories   | Create .output/, .local/ | Standard directories, no choices    |
-| 14a   | Table formatting     | Validate/fix tables      | Markdown table syntax is prescribed |
-| 14b   | Code block quality   | Add language tags        | Language detection is pattern-based |
-| 14c   | Header hierarchy     | Fix level skipping       | Hierarchy rules are deterministic   |
-| 18    | Routing table format | Convert names → paths    | Path format is deterministic        |
+| Phase | Name                 | CLI Action               | Why Deterministic                  |
+| ----- | -------------------- | ------------------------ | ---------------------------------- |
+| 2     | Allowed-tools field  | Fix comma-separation     | YAML syntax has one correct format |
+| 5     | File organization    | Create directories       | Directory structure is prescribed  |
+| 6     | Script organization  | Move scripts to scripts/ | Directory structure is prescribed  |
+| 7     | Output directories   | Create .output/, .local/ | Standard directories, no choices   |
+| 12    | CLI error handling   | Fix exit codes (1→2)     | Exit code convention is prescribed |
+| 14a   | Table formatting     | Validate/fix tables      | Markdown table syntax is prescribed|
+| 16    | Windows path detection| Fix backslashes         | Path format is deterministic       |
+| 18    | Routing table format | Convert names → paths    | Path format is deterministic       |
 
 **Command:** `npm run -w @chariot/fixing-skills fix -- <skill-name>`
 
 **Behavior:** Apply automatically, no user confirmation needed.
 
-### Phase 14a-c: Visual/Style (Deterministic)
+---
 
-See [Visual Style Guidelines](visual-style-guidelines.md) for detailed requirements.
+## Validation-Only Phases (Report Only)
 
-**Phase 14a (Table Formatting):**
+These phases detect issues but provide no automated fix:
 
-- Validates header rows have separators (`|---|---|`)
-- Checks column count consistency
-- Validates alignment indicators (`:---`, `---:`, `:---:`)
+| Phase | Name                 | What It Reports              | Why No Auto-Fix                    |
+| ----- | -------------------- | ---------------------------- | ---------------------------------- |
+| 14b   | Code block quality   | Missing language tags        | Content-aware decision needed      |
+| 14c   | Header hierarchy     | Skipped H-levels, orphans    | Structural reorganization required |
 
-**Phase 14b (Code Block Quality):**
-
-- Detects missing language tags
-- Suggests language based on content patterns
-- Warns on excessively long lines (>120 chars)
-
-**Phase 14c (Header Hierarchy):**
-
-- Ensures single H1 at top
-- Detects skipped levels (H1 → H3)
-- Identifies orphan headers (no content)
+**Behavior:** Reports issues for manual resolution. No `--fix` support.
 
 ---
 
 ## Hybrid Phases (CLI + Claude Reasoning)
 
-These phases have deterministic parts but may need Claude for ambiguous cases:
+These phases combine deterministic CLI auto-fix with Claude reasoning for ambiguous cases:
 
-| Phase | Name                 | CLI Part                     | Claude Part                                         |
-| ----- | -------------------- | ---------------------------- | --------------------------------------------------- |
-| 4     | Broken links         | Correct wrong paths          | Create meaningful content for missing files         |
-| 6     | Missing scripts      | Create boilerplate (opt-in)  | Decide if scripts/ is even needed                   |
-| 10    | Phantom references   | Registry-based replacements  | Fuzzy matching for typos, suggest corrections       |
-| 12    | CLI error handling   | Fix exit codes (1→2)         | Generate contextual error messages                  |
-| 14f   | Example quality      | Validate code block presence | Assess example completeness, before/after pattern   |
-| 19    | Broken gateway paths | —                            | Determine: typo fix, remove entry, or create skill? |
+| Phase | Name                 | CLI Part (Deterministic)       | Claude Part (Ambiguous)                             |
+| ----- | -------------------- | ------------------------------ | --------------------------------------------------- |
+| 4     | Broken links         | Auto-fix when file exists elsewhere | Fuzzy match + user confirms (create/remove/replace) |
+| 10    | Phantom references   | Auto-replace from registry     | Fuzzy match against skills/agents + user confirms   |
+| 19    | Broken gateway paths | —                              | Fuzzy match gateway paths + user confirms fix       |
 
 ### Hybrid Decision Tree
 
@@ -96,61 +86,60 @@ Issue Detected
 
 ### Phase 4: Broken Links (Hybrid)
 
-**CLI handles:**
+**CLI handles (deterministic):**
 
-- File exists but path is wrong → Correct path automatically
+- File exists elsewhere in skill directory → Auto-correct path
 
-**Claude handles:**
+**Claude handles (ambiguous - Levenshtein fuzzy matching):**
 
 - File doesn't exist anywhere:
-  - Analyze link text context
-  - Generate meaningful placeholder content
-  - Or suggest removing the reference
+  1. Use Levenshtein distance to find similar files (>40% similarity)
+  2. Extract surrounding context (~100 chars) for user to understand intent
+  3. Present options:
+     - **Create**: Generate placeholder file with TODO content
+     - **Remove**: Delete the link reference
+     - **Replace**: Use similar file (if found)
+  4. User confirms choice, CLI applies
 
-### Phase 6: Missing Scripts (Hybrid - Opt-in)
-
-**Changed behavior:** No longer auto-creates boilerplate.
-
-**Claude handles:**
-
-- Analyze skill content to determine if scripts/ is needed
-- If skill has CLI commands: Ask user if scripts/ should be created
-- If no CLI indicators: Skip silently
+**Example:** Link to `references/workflow.md` → Similar file `references/workflows.md` found (87% match)
 
 ### Phase 10: Phantom References (Hybrid)
 
-**CLI handles:**
+**CLI handles (deterministic):**
 
-- References in deprecation registry → Replace automatically
+- References in deprecation registry → Auto-replace
 
-**Claude handles:**
+**Claude handles (ambiguous - Levenshtein fuzzy matching):**
 
-- References not in registry:
-  - Fuzzy match against existing skills
-  - Suggest: "Did you mean `debugging-skills`?"
-  - Let user confirm correction or removal
+- References NOT in registry:
+  1. Use Levenshtein distance against all existing skills/agents (>60% similarity)
+  2. Present top 3 matches with similarity scores
+  3. Options:
+     - **Replace**: Use suggested match
+     - **Remove**: Delete backticks (unquote)
+     - **Keep**: Leave unchanged
+  4. User confirms, CLI applies
 
-### Phase 12: CLI Error Handling (Hybrid)
+**Example:** `debuging-systematically` → Match `debugging-systematically` (93% similar)
 
-**CLI handles:**
+**Filters out false positives:** Ignores npm packages, git commands, common prefixes/suffixes
 
-- Exit code changes: `process.exit(1)` → `process.exit(2)` in catch blocks
+### Phase 19: Broken Gateway Paths (Hybrid)
 
-**Claude handles:**
+**No CLI deterministic part** - All cases are ambiguous.
 
-- Error message generation:
-  - Analyze CLI purpose from code
-  - Generate contextual messages: "Tool Error - {skill}: Failed to {action}"
+**Claude handles (Levenshtein fuzzy matching):**
 
-### Phase 19: Broken Gateway Paths (Hybrid - Claude-Primary)
+1. Use Levenshtein distance against all existing skill paths (>50% similarity)
+2. Weighted scoring: skill name (70%) + full path (30%)
+3. Present options:
+   - **Fix**: Replace with similar existing path
+   - **Remove**: Delete from routing table
+   - **Create**: Add TODO comment for missing skill
+4. User confirms, CLI applies
 
-**No CLI auto-fix.** Removal is often wrong.
-
-**Claude handles all cases:**
-
-1. Fuzzy match against existing skills
-2. Present options: correct path, remove entry, or note skill needs creation
-3. Apply user's choice
+**Example:** `.claude/skill-library/development/frontend/using-react-hooks/SKILL.md` (broken)
+→ Match `.claude/skill-library/development/frontend/using-react-hook-form-zod/SKILL.md` (68% similar)
 
 ---
 
@@ -164,8 +153,6 @@ These phases require semantic understanding but Claude can handle without human 
 | 3     | Line count >500        | Identify extraction candidates, create references/                        |
 | 11    | cd commands            | Update to REPO_ROOT pattern                                               |
 | 13    | TodoWrite missing      | Detect multi-step workflows, add mandate                                  |
-| 14d   | Section organization   | Verify required sections, suggest additions                               |
-| 14e   | Visual readability     | Identify wall-of-text, suggest formatting improvements                    |
 | 15    | Orphan detection       | Identify orphaned library skills, suggest agent integrations              |
 | 17    | Gateway structure      | Populate from template with gateway-specific details                      |
 | 21    | Line number references | Replace `:123` patterns with method signatures or structural descriptions |
@@ -228,66 +215,7 @@ description: Use when creating skills - TDD workflow (RED-GREEN-REFACTOR) with v
    ```
 3. Add checklist template if applicable
 
-### Phase 14d: Section Organization (Claude-Automated)
-
-**Purpose:** Ensure skills have required sections in logical order.
-
-**Process:**
-
-1. Identify required sections:
-   - Quick Reference (summary table)
-   - When to Use (triggers)
-   - Workflow/How to Use (main content)
-   - Related Skills (cross-references)
-2. Check section order is logical
-3. If missing sections:
-   - Generate section headers with placeholder content
-   - Suggest content based on skill purpose
-4. Apply with Edit tool
-
-**Output:**
-
-```
-[WARNING] Missing "Related Skills" section
-[INFO] Suggested: Add ## Related Skills with links to similar skills
-```
-
-### Phase 14e: Visual Readability (Claude-Automated)
-
-**Purpose:** Identify readability issues and suggest formatting improvements.
-
-**Process:**
-
-1. Detect wall-of-text paragraphs (>5-6 lines without breaks)
-2. Identify missing emphasis on key terms
-3. Find comma-separated lists that should be bullet points
-4. Check for adequate whitespace between sections
-5. Verify callouts use consistent format (`> **Note:**`)
-6. Generate formatted alternatives
-
-**Output:**
-
-```
-[INFO] Paragraph at line 45 is 8 lines - consider breaking up
-[INFO] List at line 67 could use bullet points for readability
-```
-
-### Phase 14f: Example Quality (Hybrid)
-
-**Purpose:** Validate example quality with deterministic checks + Claude assessment.
-
-**CLI Part:**
-
-- Check examples have code blocks with language tags
-- Verify before/after examples have both parts
-
-**Claude Part:**
-
-- Assess if examples are self-contained
-- Check if examples match skill purpose
-- Suggest improvements for incomplete examples
-
-See [Visual Style Guidelines](visual-style-guidelines.md) for complete requirements.
+> **Note:** Section organization, visual readability, and example quality checks are part of the **Post-Audit Semantic Review** process, not numbered CLI phases. See [audit-phases.md](../audit-phases.md#post-audit-semantic-review) for the semantic review checklist.
 
 ### Phase 15: Orphan Detection (Claude-Automated)
 
@@ -444,24 +372,33 @@ These phases only run for skills with names starting with `gateway-`:
 ## Quick Reference
 
 ```
-Deterministic (CLI only):     2, 5, 7, 14a, 14b, 14c, 18
-Hybrid (CLI + Claude):        4, 6, 10, 12, 14f, 19
-Claude-Automated:             1, 3, 11, 13, 14d, 14e, 15, 17
+Deterministic (CLI only):     2, 5, 6, 7, 12, 14a, 16, 18
+Hybrid (CLI + Claude):        4, 10, 19
+Validation-Only:              14b, 14c
+Claude-Automated:             1, 3, 11, 13, 15, 17, 21, 22
 Human-Required:               8, 9, 20
 
 Phase 14 sub-phases (Visual/Style):
-  Deterministic:  14a (tables), 14b (code blocks), 14c (headers)
-  Claude-Auto:    14d (sections), 14e (readability)
-  Hybrid:         14f (examples)
+  Deterministic:  14a (tables)
+  Validation:     14b (code blocks), 14c (headers)
+  (Section/readability checks → Semantic Review)
 
 Phase 15:
   Orphan detection (Claude-Automated)
+
+Phase 22:
+  Context7 staleness check (Claude-Automated)
 
 Gateway phases (17-20):
   Deterministic:  18
   Hybrid:         19
   Claude-Auto:    17
   Human:          20
+
+Hybrid Phases Use Levenshtein Fuzzy Matching:
+  Phase 4:  Find similar files (>40% similarity)
+  Phase 10: Match against skills/agents (>60% similarity)
+  Phase 19: Match gateway paths (>50% similarity)
 ```
 
 ---

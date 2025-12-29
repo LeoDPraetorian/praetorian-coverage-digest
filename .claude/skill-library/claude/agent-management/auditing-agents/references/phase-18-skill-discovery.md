@@ -41,12 +41,12 @@ Options:
 
 ## Step 2: Execute Based on User Choice
 
-| User Choice           | Execute                      |
-| --------------------- | ---------------------------- |
-| Skip                  | Mark Phase 18 as N/A         |
-| Gateway coverage      | Run Tier 1 only              |
-| Gateway + Orphans     | Run Tier 1 + Tier 2          |
-| Full analysis         | Run Tier 1 + Tier 2 + Tier 3 |
+| User Choice       | Execute                      |
+| ----------------- | ---------------------------- |
+| Skip              | Mark Phase 18 as N/A         |
+| Gateway coverage  | Run Tier 1 only              |
+| Gateway + Orphans | Run Tier 1 + Tier 2          |
+| Full analysis     | Run Tier 1 + Tier 2 + Tier 3 |
 
 ---
 
@@ -65,6 +65,7 @@ grep '^skills:' .claude/agents/{category}/{agent-name}.md | grep -o 'gateway-[a-
 #### b. For each gateway, read its SKILL.md to get skill inventory
 
 Gateway skills typically document their routing in one of these patterns:
+
 - Routing tables with skill paths
 - "Routes to:" sections listing skills
 - Examples showing skill delegation
@@ -242,6 +243,7 @@ Read($skill_path)
 #### c. Infer intended domain from skill content
 
 Analyze:
+
 - **Name**: Does name contain domain keywords? (react, go, python, aws, security, test)
 - **Description**: What domain does it describe? (frontend, backend, testing, security)
 - **Content**: What technologies/patterns does it cover?
@@ -249,14 +251,14 @@ Analyze:
 
 **Categorization rules:**
 
-| Domain       | Indicators                                                           |
-| ------------ | -------------------------------------------------------------------- |
+| Domain       | Indicators                                                                  |
+| ------------ | --------------------------------------------------------------------------- |
 | Frontend     | React, TypeScript (UI), JSX, components, hooks, browser, DOM, UI, CSS, HTML |
-| Backend      | Go, API, endpoints, handlers, Lambda, DynamoDB, server, database    |
-| Testing      | Vitest, Playwright, Jest, test, spec, assertion, mock               |
-| Security     | auth, crypto, vulnerability, OWASP, threat, attack                   |
-| Python       | Python, pytest, Click, asyncio                                       |
-| Capabilities | VQL, Nuclei, Velociraptor, scanner, Janus                            |
+| Backend      | Go, API, endpoints, handlers, Lambda, DynamoDB, server, database            |
+| Testing      | Vitest, Playwright, Jest, test, spec, assertion, mock                       |
+| Security     | auth, crypto, vulnerability, OWASP, threat, attack                          |
+| Python       | Python, pytest, Click, asyncio                                              |
+| Capabilities | VQL, Nuclei, Velociraptor, scanner, Janus                                   |
 
 #### d. Compare inferred domain vs actual path
 

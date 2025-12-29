@@ -51,12 +51,12 @@ function getTestCredentials() {
 
   if (!email || !password) {
     throw new Error(
-      'Test credentials not configured.\n\n' +
-        'Please set up your credentials in e2e/.env:\n' +
-        '  TEST_USER_1_EMAIL=your-test-email@example.com\n' +
-        '  TEST_USER_1_PASSWORD=your-password\n' +
-        '  TEST_USER_1_TOTP_SECRET=your-totp-secret (if MFA enabled)\n\n' +
-        'See e2e/.env.example for details.'
+      "Test credentials not configured.\n\n" +
+        "Please set up your credentials in e2e/.env:\n" +
+        "  TEST_USER_1_EMAIL=your-test-email@example.com\n" +
+        "  TEST_USER_1_PASSWORD=your-password\n" +
+        "  TEST_USER_1_TOTP_SECRET=your-totp-secret (if MFA enabled)\n\n" +
+        "See e2e/.env.example for details."
     );
   }
 
@@ -67,11 +67,11 @@ function getTestCredentials() {
  * Generate TOTP code from secret
  */
 async function generateTOTP(secret: string): Promise<string> {
-  const { TOTP } = await import('otpauth');
+  const { TOTP } = await import("otpauth");
   const totp = new TOTP({
-    issuer: 'Chariot',
-    label: 'E2E Test',
-    algorithm: 'SHA1',
+    issuer: "Chariot",
+    label: "E2E Test",
+    algorithm: "SHA1",
     digits: 6,
     period: 30,
     secret: secret,
@@ -83,58 +83,56 @@ async function generateTOTP(secret: string): Promise<string> {
  * Perform login with email and password, handling MFA if required
  */
 async function performLogin(
-  page: import('@playwright/test').Page,
+  page: import("@playwright/test").Page,
   email: string,
   password: string,
   totpSecret?: string
 ): Promise<void> {
   // Fill email
-  const emailInput = page.getByLabel('Business Email Address');
-  await emailInput.waitFor({ state: 'visible', timeout: 10000 });
+  const emailInput = page.getByLabel("Business Email Address");
+  await emailInput.waitFor({ state: "visible", timeout: 10000 });
   await emailInput.clear();
   await emailInput.fill(email);
 
   // Fill password
-  const passwordInput = page.getByLabel('Password');
+  const passwordInput = page.getByLabel("Password");
   await passwordInput.clear();
   await passwordInput.fill(password);
 
   // Click Continue
-  const submitButton = page.getByRole('button', { name: 'Continue' });
+  const submitButton = page.getByRole("button", { name: "Continue" });
   await submitButton.click();
 
   // Wait for response
-  await page.waitForLoadState('networkidle', { timeout: 30000 });
+  await page.waitForLoadState("networkidle", { timeout: 30000 });
 
   // Check for MFA modal
-  const mfaHeading = page.locator('text=MFA Setup');
+  const mfaHeading = page.locator("text=MFA Setup");
   let isMfaRequired = false;
 
   try {
-    await mfaHeading.waitFor({ state: 'visible', timeout: 5000 });
+    await mfaHeading.waitFor({ state: "visible", timeout: 5000 });
     isMfaRequired = true;
-    console.log('MFA modal detected, handling TOTP...');
+    console.log("MFA modal detected, handling TOTP...");
   } catch {
     // No MFA required
   }
 
   if (isMfaRequired) {
     if (!totpSecret) {
-      throw new Error(
-        'MFA is required but TEST_USER_1_TOTP_SECRET is not configured in .env'
-      );
+      throw new Error("MFA is required but TEST_USER_1_TOTP_SECRET is not configured in .env");
     }
 
     // Generate and enter TOTP code
     const totpCode = await generateTOTP(totpSecret);
-    console.log('Entering TOTP code...');
+    console.log("Entering TOTP code...");
 
     // Wait for modal to be interactive
     await page.waitForTimeout(500);
 
     // Find OTP inputs - they are typically 6 separate input boxes
     const otpInputs = page
-      .locator('input:visible')
+      .locator("input:visible")
       .filter({ hasNot: page.locator('[type="email"], [type="password"]') });
     const inputCount = await otpInputs.count();
 
@@ -152,13 +150,13 @@ async function performLogin(
 
     // Try to click Submit if available (may auto-submit)
     try {
-      const mfaSubmit = page.getByRole('button', { name: /submit/i });
+      const mfaSubmit = page.getByRole("button", { name: /submit/i });
       await mfaSubmit.click({ timeout: 3000 });
     } catch {
       // Auto-submitted
     }
 
-    await page.waitForLoadState('networkidle', { timeout: 30000 });
+    await page.waitForLoadState("networkidle", { timeout: 30000 });
   }
 }
 ```
@@ -167,18 +165,18 @@ async function performLogin(
 
 ```typescript
 // tests/security/xss-prevention.spec.ts
-import { test, expect } from '@playwright/test';
-import { performLogin, getTestCredentials } from '../helpers/auth';
+import { test, expect } from "@playwright/test";
+import { performLogin, getTestCredentials } from "../helpers/auth";
 
-test.describe('XSS Prevention with Authentication', () => {
+test.describe("XSS Prevention with Authentication", () => {
   // Use fresh browser context without storage state
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test('prevents XSS in authenticated user profile', async ({ page }) => {
+  test("prevents XSS in authenticated user profile", async ({ page }) => {
     const { email, password, totpSecret } = getTestCredentials();
 
     // Navigate to profile page (will redirect to login)
-    await page.goto('/settings/profile');
+    await page.goto("/settings/profile");
 
     // Perform login with MFA
     await performLogin(page, email, password, totpSecret);
@@ -223,11 +221,11 @@ VITE_API_URL=https://localhost:8080  # Local backend
 
 ```typescript
 // At the top of test files
-import * as dotenv from 'dotenv';
-import * as path from 'path';
+import * as dotenv from "dotenv";
+import * as path from "path";
 
 // Load environment variables from .env file
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 ```
 
 ## Playwright Configuration
@@ -236,49 +234,45 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 ```typescript
 // playwright.config.ts (from modules/chariot/ui/e2e/)
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: './src/tests',
-  timeout: 60000,  // 60 seconds per test (security tests may take longer)
+  testDir: "./src/tests",
+  timeout: 60000, // 60 seconds per test (security tests may take longer)
   expect: {
     timeout: 5000,
   },
-  fullyParallel: false,  // Security tests should run sequentially
+  fullyParallel: false, // Security tests should run sequentially
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,  // Single worker in CI
-  reporter: [
-    ['html'],
-    ['list'],
-    ['junit', { outputFile: 'test-results/junit.xml' }],
-  ],
+  workers: process.env.CI ? 1 : undefined, // Single worker in CI
+  reporter: [["html"], ["list"], ["junit", { outputFile: "test-results/junit.xml" }]],
   use: {
-    baseURL: 'https://localhost:3000',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    baseURL: "https://localhost:3000",
+    trace: "on-first-retry",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
     actionTimeout: 10000,
   },
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
     },
     {
-      name: 'chromium-slow-mo',
+      name: "chromium-slow-mo",
       use: {
-        ...devices['Desktop Chrome'],
+        ...devices["Desktop Chrome"],
         launchOptions: {
-          slowMo: 500,  // Helpful for debugging security tests
+          slowMo: 500, // Helpful for debugging security tests
         },
       },
     },
   ],
   // Run local dev server before tests
   webServer: {
-    command: 'npm start',
-    url: 'https://localhost:3000',
+    command: "npm start",
+    url: "https://localhost:3000",
     timeout: 120000,
     reuseExistingServer: !process.env.CI,
   },
@@ -291,7 +285,7 @@ export default defineConfig({
 
 ```typescript
 // pages/SecurityTestPage.ts
-import { Page, expect } from '@playwright/test';
+import { Page, expect } from "@playwright/test";
 
 export class SecurityTestPage {
   constructor(private page: Page) {}
@@ -307,7 +301,7 @@ export class SecurityTestPage {
     // Fill input with XSS payload
     await this.page.fill(inputSelector, payload);
     await this.page.click(submitSelector);
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState("networkidle");
 
     // Verify script did not execute
     const xssTriggered = await this.page.evaluate(() => window.xssTriggered);
@@ -321,12 +315,9 @@ export class SecurityTestPage {
   /**
    * Test authorization boundary - attempt unauthorized access
    */
-  async testUnauthorizedAccess(
-    protectedRoute: string,
-    expectedRedirect: string
-  ): Promise<void> {
+  async testUnauthorizedAccess(protectedRoute: string, expectedRedirect: string): Promise<void> {
     await this.page.goto(protectedRoute);
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState("networkidle");
 
     // Should redirect to expected page (login or error)
     const currentUrl = this.page.url();
@@ -348,8 +339,8 @@ export class SecurityTestPage {
   async monitorConsoleForXSS(): Promise<string[]> {
     const consoleErrors: string[] = [];
 
-    this.page.on('console', msg => {
-      if (msg.type() === 'error' && msg.text().includes('XSS')) {
+    this.page.on("console", (msg) => {
+      if (msg.type() === "error" && msg.text().includes("XSS")) {
         consoleErrors.push(msg.text());
       }
     });
@@ -363,19 +354,19 @@ export class SecurityTestPage {
 
 ```typescript
 // tests/security/xss-prevention.spec.ts
-import { test, expect } from '@playwright/test';
-import { SecurityTestPage } from '../pages/SecurityTestPage';
-import { XSS_PAYLOADS } from '../fixtures/security-payloads';
+import { test, expect } from "@playwright/test";
+import { SecurityTestPage } from "../pages/SecurityTestPage";
+import { XSS_PAYLOADS } from "../fixtures/security-payloads";
 
-test.describe('XSS Prevention', () => {
+test.describe("XSS Prevention", () => {
   let securityPage: SecurityTestPage;
 
   test.beforeEach(async ({ page }) => {
     securityPage = new SecurityTestPage(page);
-    await page.goto('/assets');
+    await page.goto("/assets");
   });
 
-  test('prevents XSS in search input', async ({ page }) => {
+  test("prevents XSS in search input", async ({ page }) => {
     await securityPage.testXSSPrevention(
       '[data-testid="search"]',
       '[data-testid="search-button"]',
@@ -408,17 +399,17 @@ export const AUTHORIZATION_TEST_USERS = {
   REGULAR_USER: {
     email: process.env.TEST_USER_1_EMAIL!,
     password: process.env.TEST_USER_1_PASSWORD!,
-    role: 'user',
+    role: "user",
   },
   ADMIN_USER: {
     email: process.env.TEST_ADMIN_EMAIL!,
     password: process.env.TEST_ADMIN_PASSWORD!,
-    role: 'admin',
+    role: "admin",
   },
   READONLY_USER: {
     email: process.env.TEST_USER_2_EMAIL!,
     password: process.env.TEST_USER_2_PASSWORD!,
-    role: 'readonly',
+    role: "readonly",
   },
 };
 ```
@@ -429,9 +420,9 @@ export const AUTHORIZATION_TEST_USERS = {
 
 ```typescript
 // fixtures/security-fixtures.ts
-import { test as base, expect } from '@playwright/test';
-import { SecurityTestPage } from '../pages/SecurityTestPage';
-import { performLogin, getTestCredentials } from '../helpers/auth';
+import { test as base, expect } from "@playwright/test";
+import { SecurityTestPage } from "../pages/SecurityTestPage";
+import { performLogin, getTestCredentials } from "../helpers/auth";
 
 type SecurityFixtures = {
   securityPage: SecurityTestPage;
@@ -446,7 +437,7 @@ export const test = base.extend<SecurityFixtures>({
 
   authenticatedPage: async ({ page }, use) => {
     const { email, password, totpSecret } = getTestCredentials();
-    await page.goto('/');
+    await page.goto("/");
     await performLogin(page, email, password, totpSecret);
     await use(page);
   },
@@ -459,11 +450,11 @@ export { expect };
 
 ```typescript
 // tests/security/authenticated-xss.spec.ts
-import { test, expect } from '../fixtures/security-fixtures';
+import { test, expect } from "../fixtures/security-fixtures";
 
-test('XSS prevention in authenticated context', async ({ authenticatedPage, securityPage }) => {
+test("XSS prevention in authenticated context", async ({ authenticatedPage, securityPage }) => {
   // authenticatedPage is already logged in
-  await authenticatedPage.goto('/settings/profile');
+  await authenticatedPage.goto("/settings/profile");
 
   // Use security page helper
   await securityPage.testXSSPrevention(
@@ -491,21 +482,23 @@ tests/security/
 ### Naming Conventions
 
 **Chariot patterns:**
+
 - Test files: `kebab-case.spec.ts`
 - Test suites: `describe('Feature Name', () => {})`
 - Test cases: `test('should do specific thing', async () => {})`
 
 **Security test naming:**
+
 ```typescript
-test.describe('XSS Prevention', () => {
-  test('prevents XSS in search input', async ({ page }) => {});
-  test('prevents XSS in profile bio', async ({ page }) => {});
-  test('prevents stored XSS in comments', async ({ page }) => {});
+test.describe("XSS Prevention", () => {
+  test("prevents XSS in search input", async ({ page }) => {});
+  test("prevents XSS in profile bio", async ({ page }) => {});
+  test("prevents stored XSS in comments", async ({ page }) => {});
 });
 
-test.describe('Authorization Boundaries', () => {
-  test('prevents regular user from accessing admin panel', async ({ page }) => {});
-  test('prevents user from editing other users profiles', async ({ page }) => {});
+test.describe("Authorization Boundaries", () => {
+  test("prevents regular user from accessing admin panel", async ({ page }) => {});
+  test("prevents user from editing other users profiles", async ({ page }) => {});
 });
 ```
 
@@ -533,7 +526,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: |
@@ -592,10 +585,10 @@ npx playwright test --ui
 
 ```typescript
 // Add console logging for debugging
-test('debug XSS prevention', async ({ page }) => {
-  page.on('console', msg => console.log('BROWSER:', msg.text()));
+test("debug XSS prevention", async ({ page }) => {
+  page.on("console", (msg) => console.log("BROWSER:", msg.text()));
 
-  await page.goto('/assets');
+  await page.goto("/assets");
   await page.fill('[data-testid="search"]', '<script>alert("XSS")</script>');
   await page.click('[data-testid="search-button"]');
 
@@ -628,12 +621,12 @@ When adding security tests to Chariot E2E suite:
 
 ```typescript
 // tests/security/profile-security.spec.ts
-import { test, expect } from '@playwright/test';
-import { performLogin, getTestCredentials } from '../helpers/auth';
-import { SecurityTestPage } from '../pages/SecurityTestPage';
-import { XSS_PAYLOADS } from '../fixtures/security-payloads';
+import { test, expect } from "@playwright/test";
+import { performLogin, getTestCredentials } from "../helpers/auth";
+import { SecurityTestPage } from "../pages/SecurityTestPage";
+import { XSS_PAYLOADS } from "../fixtures/security-payloads";
 
-test.describe('Profile Security Tests', () => {
+test.describe("Profile Security Tests", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   let securityPage: SecurityTestPage;
@@ -643,14 +636,14 @@ test.describe('Profile Security Tests', () => {
 
     // Authenticate with MFA
     const { email, password, totpSecret } = getTestCredentials();
-    await page.goto('/settings/profile');
+    await page.goto("/settings/profile");
     await performLogin(page, email, password, totpSecret);
 
     // Wait for profile page to load
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState("networkidle");
   });
 
-  test('prevents XSS in profile bio', async ({ page }) => {
+  test("prevents XSS in profile bio", async ({ page }) => {
     await securityPage.testXSSPrevention(
       '[data-testid="bio"]',
       '[data-testid="save-button"]',
@@ -658,15 +651,15 @@ test.describe('Profile Security Tests', () => {
     );
   });
 
-  test('validates CSRF token in profile form', async ({ page }) => {
+  test("validates CSRF token in profile form", async ({ page }) => {
     await securityPage.verifyCsrfToken('[data-testid="profile-form"]');
   });
 
-  test('prevents unauthorized profile edits', async ({ page }) => {
+  test("prevents unauthorized profile edits", async ({ page }) => {
     // Try to access another user's profile
     await securityPage.testUnauthorizedAccess(
-      '/u/another-user@example.com/settings/profile',
-      '/u/' + getTestCredentials().email
+      "/u/another-user@example.com/settings/profile",
+      "/u/" + getTestCredentials().email
     );
   });
 });
@@ -675,6 +668,7 @@ test.describe('Profile Security Tests', () => {
 ## Summary
 
 Chariot's E2E infrastructure provides:
+
 - ✅ **Robust authentication** with MFA/TOTP support
 - ✅ **Environment-based configuration** for flexible testing
 - ✅ **Page Object Model patterns** for maintainable tests

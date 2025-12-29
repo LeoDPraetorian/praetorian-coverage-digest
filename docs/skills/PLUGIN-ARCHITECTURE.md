@@ -2,7 +2,6 @@
 
 ## Quick Start (Required for All Team Members)
 
-
 ### 1. Install Chariot Skills (Project-Specific)
 
 ```bash
@@ -11,11 +10,11 @@
 ```
 
 **Provides:**
+
 - SessionStart hook (auto-loads using-superpowers)
 - MANDATORY FIRST RESPONSE PROTOCOL (enforces skill checking)
 - Foundation skills
 - Chariot-specific skills (unique to our platform)
-
 
 ### 2. Restart Claude Code
 
@@ -26,6 +25,7 @@ Close and reopen Claude Code to load all plugins.
 **Check SessionStart hook loaded:**
 
 You should see at session start:
+
 ```
 <EXTREMELY_IMPORTANT>
 You have superpowers...
@@ -38,6 +38,7 @@ MANDATORY FIRST RESPONSE PROTOCOL
 Ask Claude: "What skills are available?"
 
 Should see 100+ skills from:
+
 - superpowers (20 skills)
 - chariot-development-platform (83 skills)
 - Your personal ~/.claude/skills/ (if any)
@@ -74,6 +75,7 @@ Should load and activate the skill (not "Unknown skill" error).
 **Issue:** Skills show as "Unknown skill"
 
 **Fix:**
+
 ```bash
 # Reinstall plugins
 /plugin uninstall superpowers
@@ -90,6 +92,7 @@ Should load and activate the skill (not "Unknown skill" error).
 **Issue:** Don't see <EXTREMELY_IMPORTANT> message at session start
 
 **Check:**
+
 1. Verify superpowers installed: `/plugin list`
 2. Check working directory: `pwd` (should be in project root)
 3. Restart Claude Code completely
@@ -164,14 +167,17 @@ git pull
 ## What NOT to Do
 
 **❌ Don't modify .claude/settings.json for hooks**
+
 - Use plugin hooks instead (hooks/hooks.json in repo)
 - Settings.json is user-local, not team-shared
 
 **❌ Don't copy skills to ~/.claude/skills/ manually**
+
 - Install as plugin instead
 - Plugin system handles discovery
 
 **❌ Don't skip superpowers installation**
+
 - SessionStart hook comes from superpowers
 - Foundation skills required for TDD workflows
 

@@ -21,6 +21,7 @@ Use this skill when:
 - Need authoritative, version-specific guidance for React Context API
 
 **Don't use Context API when:**
+
 - State is only needed in 2-3 components (use props drilling or composition)
 - State changes frequently and updates many components (use Zustand or state management library)
 - Managing server state (use TanStack Query)
@@ -35,7 +36,7 @@ Use this skill when:
 ```tsx
 // 1. Create context with TypeScript
 type ThemeContextType = {
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   toggleTheme: () => void;
 };
 
@@ -44,28 +45,24 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 // 2. Provider component with state
 // ✅ NEW React 19 syntax: Use <Context> directly instead of <Context.Provider>
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const toggleTheme = useCallback(() => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   }, []);
 
   // Memoize value to prevent unnecessary re-renders
   // Note: React Compiler (19+) can auto-memoize, but explicit is still valid
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
 
-  return (
-    <ThemeContext value={value}>
-      {children}
-    </ThemeContext>
-  );
+  return <ThemeContext value={value}>{children}</ThemeContext>;
 }
 
 // 3. Custom hook for consuming context
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within ThemeProvider');
+    throw new Error("useTheme must be used within ThemeProvider");
   }
   return context;
 }
@@ -78,6 +75,7 @@ function ThemedButton() {
 ```
 
 **React 19 Provider Syntax Change:**
+
 ```tsx
 // ❌ LEGACY (React 18 and earlier) - will be deprecated
 <ThemeContext.Provider value={value}>
@@ -121,7 +119,7 @@ Do you need middleware, time-travel, or DevTools?
 **Modern approach (React 19+):**
 
 ```tsx
-import { createContext, useContext } from 'react';
+import { createContext, useContext } from "react";
 
 type UserContextType = {
   user: User | null;
@@ -133,6 +131,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 ```
 
 **Key points:**
+
 - Always use TypeScript for type safety
 - Set default value to `undefined` and check in custom hook
 - Never use default objects/arrays (causes confusion about whether provider is mounted)
@@ -155,17 +154,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
-  const value = useMemo(
-    () => ({ user, login, logout }),
-    [user, login, logout]
-  );
+  const value = useMemo(() => ({ user, login, logout }), [user, login, logout]);
 
   // ✅ React 19+ syntax: Use <Context> directly
-  return (
-    <UserContext value={value}>
-      {children}
-    </UserContext>
-  );
+  return <UserContext value={value}>{children}</UserContext>;
 }
 ```
 
@@ -183,13 +175,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
 export function useUser() {
   const context = useContext(UserContext);
   if (context === undefined) {
-    throw new Error('useUser must be used within UserProvider');
+    throw new Error("useUser must be used within UserProvider");
   }
   return context;
 }
 ```
 
 **Benefits:**
+
 - Type safety (TypeScript narrows from `T | undefined` to `T`)
 - Better error messages (runtime check for provider)
 - Encapsulation (consumers don't need to know about Context internals)
@@ -201,9 +194,9 @@ export function useUser() {
 ```tsx
 // ❌ BAD: Single context with mixed concerns
 type AppContextType = {
-  user: User;           // Changes rarely
-  notifications: Notification[];  // Changes frequently
-  theme: Theme;         // Changes rarely
+  user: User; // Changes rarely
+  notifications: Notification[]; // Changes frequently
+  theme: Theme; // Changes rarely
 };
 
 // ✅ GOOD: Separate contexts by update frequency
@@ -260,12 +253,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 ```tsx
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem('theme');
-    return (stored as Theme) || 'light';
+    const stored = localStorage.getItem("theme");
+    return (stored as Theme) || "light";
   });
 
   useEffect(() => {
-    localStorage.setItem('theme', theme);
+    localStorage.setItem("theme", theme);
   }, [theme]);
 
   const value = useMemo(() => ({ theme, setTheme }), [theme]);
@@ -292,18 +285,11 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
     fetchFeatureFlags().then(setFlags);
   }, []);
 
-  const isEnabled = useCallback(
-    (flag: string) => flags[flag] ?? false,
-    [flags]
-  );
+  const isEnabled = useCallback((flag: string) => flags[flag] ?? false, [flags]);
 
   const value = useMemo(() => ({ flags, isEnabled }), [flags, isEnabled]);
 
-  return (
-    <FeatureFlagsContext.Provider value={value}>
-      {children}
-    </FeatureFlagsContext.Provider>
-  );
+  return <FeatureFlagsContext.Provider value={value}>{children}</FeatureFlagsContext.Provider>;
 }
 ```
 
@@ -315,9 +301,7 @@ export function FeatureFlagsProvider({ children }: { children: ReactNode }) {
 
 ```tsx
 // ❌ OLD: Consumer component pattern
-<ThemeContext.Consumer>
-  {value => <Button theme={value.theme} />}
-</ThemeContext.Consumer>
+<ThemeContext.Consumer>{(value) => <Button theme={value.theme} />}</ThemeContext.Consumer>;
 
 // ✅ NEW: useContext hook
 function Button() {
@@ -400,11 +384,7 @@ const NotificationsContext = createContext<Notification[] | undefined>(undefined
 // ❌ BAD: Creates new object on every render
 function Provider({ children }) {
   const [state, setState] = useState(initialState);
-  return (
-    <Context.Provider value={{ state, setState }}>
-      {children}
-    </Context.Provider>
-  );
+  return <Context.Provider value={{ state, setState }}>{children}</Context.Provider>;
 }
 
 // ✅ GOOD: Memoized value
@@ -418,8 +398,8 @@ function Provider({ children }) {
 ## Testing Context
 
 ```tsx
-import { render, screen } from '@testing-library/react';
-import { ThemeProvider, useTheme } from './ThemeContext';
+import { render, screen } from "@testing-library/react";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 
 // Test component that uses context
 function TestComponent() {
@@ -428,7 +408,7 @@ function TestComponent() {
 }
 
 // Test with provider wrapper
-test('provides theme value', () => {
+test("provides theme value", () => {
   render(
     <ThemeProvider>
       <TestComponent />
@@ -438,14 +418,12 @@ test('provides theme value', () => {
 });
 
 // Test hook directly
-import { renderHook } from '@testing-library/react';
+import { renderHook } from "@testing-library/react";
 
-test('useTheme returns theme value', () => {
-  const wrapper = ({ children }) => (
-    <ThemeProvider>{children}</ThemeProvider>
-  );
+test("useTheme returns theme value", () => {
+  const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
   const { result } = renderHook(() => useTheme(), { wrapper });
-  expect(result.current.theme).toBe('light');
+  expect(result.current.theme).toBe("light");
 });
 ```
 
@@ -469,7 +447,7 @@ test('useTheme returns theme value', () => {
 The `use()` hook is a **stable, production-ready** API that provides more flexibility than `useContext`:
 
 ```tsx
-import { use } from 'react';
+import { use } from "react";
 
 function ThemedButton({ show }) {
   // ✅ Can be called conditionally - unlike useContext!
@@ -483,13 +461,14 @@ function ThemedButton({ show }) {
 
 **Key Differences from `useContext`:**
 
-| Feature | `useContext` | `use` |
-|---------|-------------|-------|
-| Call location | Must be at component top level | Can be in conditionals/loops |
-| Suspense integration | No | Yes, works with Suspense boundaries |
-| Promise support | No | Yes, can consume Promises directly |
+| Feature              | `useContext`                   | `use`                               |
+| -------------------- | ------------------------------ | ----------------------------------- |
+| Call location        | Must be at component top level | Can be in conditionals/loops        |
+| Suspense integration | No                             | Yes, works with Suspense boundaries |
+| Promise support      | No                             | Yes, can consume Promises directly  |
 
 **When to use `use()` over `useContext`:**
+
 - Need conditional context consumption (after early returns)
 - Working with Suspense-based data fetching
 - Need to read context in loops
@@ -499,7 +478,7 @@ function ThemedButton({ show }) {
 function ConditionalTheme({ enabled }) {
   if (!enabled) return <DefaultComponent />;
 
-  const theme = use(ThemeContext);  // Called after early return
+  const theme = use(ThemeContext); // Called after early return
   return <ThemedComponent theme={theme} />;
 }
 ```
@@ -536,6 +515,7 @@ In the Chariot codebase, Context is used for:
 This skill documents **React 19.2+** patterns (verified December 2025).
 
 ### React 19.x Timeline
+
 - **React 19.0** (December 2024): Initial release with `use()` hook, `<Context>` as provider
 - **React 19.1** (June 2025): Stability improvements, useId prefix change
 - **React 19.2** (October 2025): `<Activity>` component, Suspense batching for SSR, useEffectEvent
@@ -543,14 +523,15 @@ This skill documents **React 19.2+** patterns (verified December 2025).
 
 ### Compatibility Notes
 
-| Feature | React 18 | React 19.0+ | React 19.2+ |
-|---------|----------|-------------|-------------|
-| `<Context>` syntax | ❌ Use `.Provider` | ✅ Direct syntax | ✅ Direct syntax |
-| `use()` hook | ❌ Not available | ✅ Stable | ✅ Stable |
-| React Compiler | ❌ Manual memoization | ✅ Auto-memoization | ✅ Auto-memoization |
-| `<Activity>` | ❌ Not available | ❌ Not available | ✅ Available |
+| Feature            | React 18              | React 19.0+         | React 19.2+         |
+| ------------------ | --------------------- | ------------------- | ------------------- |
+| `<Context>` syntax | ❌ Use `.Provider`    | ✅ Direct syntax    | ✅ Direct syntax    |
+| `use()` hook       | ❌ Not available      | ✅ Stable           | ✅ Stable           |
+| React Compiler     | ❌ Manual memoization | ✅ Auto-memoization | ✅ Auto-memoization |
+| `<Activity>`       | ❌ Not available      | ❌ Not available    | ✅ Available        |
 
 **For older React versions:**
+
 - React 18: Use `<Context.Provider>` syntax, manual `useMemo`/`useCallback`
 - React 17: Works, but lacks automatic batching benefits
 - React 16.8+: Core hooks work, but performance characteristics differ

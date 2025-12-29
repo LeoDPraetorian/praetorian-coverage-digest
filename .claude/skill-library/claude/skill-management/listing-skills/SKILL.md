@@ -65,8 +65,6 @@ test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 ```
 
-**See:** [Repository Root Navigation](references/patterns/repo-root-detection.md)
-
 **⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
 
 **Cannot proceed without navigating to repo root** ✅

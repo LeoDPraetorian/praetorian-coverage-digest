@@ -168,6 +168,7 @@ function Counter() {
 ```
 
 **Why this pattern?**
+
 - **Cleaner API**: `useStore((s) => s.actions)` is more explicit than mixing state and actions
 - **Easier testing**: Actions are grouped and can be tested independently
 - **Better organization**: Clear separation of concerns between state and behavior

@@ -42,6 +42,7 @@ function App() {
 ### When Memoization is Working
 
 **Ideal scenario:**
+
 ```
 actualDuration: 5ms
 baseDuration: 50ms
@@ -53,6 +54,7 @@ This indicates memoization is highly effective - React skipped re-rendering 90% 
 ### When Memoization is Failing
 
 **Problem scenario:**
+
 ```
 actualDuration: 48ms
 baseDuration: 50ms
@@ -62,6 +64,7 @@ Savings: 2ms (4% improvement)
 This indicates memoization is barely working - almost everything is re-rendering despite attempts to optimize.
 
 **Common causes:**
+
 1. **Unstable dependencies**: Props/state changing on every render
 2. **Inline objects/functions**: New references bypass memoization
 3. **Context changes**: Context updates force re-renders regardless of memo
@@ -76,7 +79,7 @@ function onRenderCallback(id, phase, actualDuration, baseDuration) {
 
     if (efficiency > 80) {
       console.warn(`⚠️ Poor memoization in ${id}: ${efficiency.toFixed(0)}% of tree re-rendered`);
-      console.warn('Check for unstable dependencies or missing memoization');
+      console.warn("Check for unstable dependencies or missing memoization");
     } else if (efficiency < 20) {
       console.log(`✅ Excellent memoization in ${id}: Only ${efficiency.toFixed(0)}% re-rendered`);
     }
@@ -124,6 +127,7 @@ React DevTools Performance tab now shows detailed work prioritization through th
 **What it is**: Urgent updates that block user input
 
 **Examples:**
+
 - Direct user input (typing, clicking)
 - Animations that must stay smooth
 - Critical UI updates
@@ -131,9 +135,10 @@ React DevTools Performance tab now shows detailed work prioritization through th
 **Visual indicator**: Red/orange bars in Scheduler track
 
 **When to use:**
+
 ```typescript
 // Default state updates are blocking
-const [value, setValue] = useState('');
+const [value, setValue] = useState("");
 
 function handleChange(e) {
   setValue(e.target.value); // Blocking - runs immediately
@@ -147,6 +152,7 @@ function handleChange(e) {
 **What it is**: Non-urgent updates that can be interrupted
 
 **Examples:**
+
 - Search filtering
 - Tab switching
 - Data table sorting
@@ -155,11 +161,12 @@ function handleChange(e) {
 **Visual indicator**: Blue/green bars in Scheduler track
 
 **When to use:**
+
 ```typescript
-import { useTransition } from 'react';
+import { useTransition } from "react";
 
 function SearchComponent() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [isPending, startTransition] = useTransition();
 
@@ -181,6 +188,7 @@ function SearchComponent() {
 **What it is**: Priority for loading states and data fetching
 
 **Examples:**
+
 - Component lazy loading
 - Data fetching with Suspense
 - Streaming server components
@@ -188,6 +196,7 @@ function SearchComponent() {
 **Visual indicator**: Purple bars in Scheduler track
 
 **When to use:**
+
 ```typescript
 import { Suspense, lazy } from 'react';
 
@@ -203,6 +212,7 @@ function App() {
 ```
 
 **What you'll see in Scheduler**:
+
 - Suspense work shows when fallbacks render
 - Shows when real content replaces fallback
 - Helps identify slow data fetching
@@ -212,6 +222,7 @@ function App() {
 **What it is**: Work that runs when browser is idle
 
 **Examples:**
+
 - Analytics tracking
 - Prefetching
 - Non-critical logging
@@ -220,13 +231,14 @@ function App() {
 **Visual indicator**: Gray bars in Scheduler track
 
 **When to use:**
+
 ```typescript
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 function Analytics() {
   useEffect(() => {
     // Run analytics during idle time
-    if ('requestIdleCallback' in window) {
+    if ("requestIdleCallback" in window) {
       requestIdleCallback(() => {
         trackPageView();
         trackUserBehavior();
@@ -245,6 +257,7 @@ function Analytics() {
 ### Interpreting the Scheduler Track
 
 **Healthy pattern:**
+
 ```
 Blocking:    ▓░░░░░░░░░     (Minimal, only critical updates)
 Transition:  ░░▓▓▓▓░░░░     (Most work here)
@@ -253,6 +266,7 @@ Idle:        ░░░░░░░░▓░     (Background tasks)
 ```
 
 **Problem pattern:**
+
 ```
 Blocking:    ▓▓▓▓▓▓▓▓▓▓     (Too much blocking work!)
 Transition:  ░░░░░░░░░░     (Not using transitions)
@@ -287,6 +301,7 @@ Idle:        ░░░░░░░░░░
 ### Why Development Profiling Misleads
 
 **Development builds include:**
+
 - Extra validation logic
 - Detailed error messages
 - Hot module replacement overhead
@@ -312,10 +327,10 @@ npm install --save-dev react-dom@profiling
 module.exports = {
   resolve: {
     alias: {
-      'react-dom$': 'react-dom/profiling',
-      'scheduler/tracing': 'scheduler/tracing-profiling',
-    }
-  }
+      "react-dom$": "react-dom/profiling",
+      "scheduler/tracing": "scheduler/tracing-profiling",
+    },
+  },
 };
 ```
 
@@ -326,12 +341,12 @@ module.exports = {
 export default defineConfig({
   resolve: {
     alias: {
-      'react-dom': 'react-dom/profiling',
-    }
+      "react-dom": "react-dom/profiling",
+    },
   },
   build: {
     minify: false, // Keep readable for profiling
-  }
+  },
 });
 ```
 
@@ -356,11 +371,11 @@ npx serve -s dist
 
 **Example component timing:**
 
-| Environment | Render Time | Notes |
-|------------|-------------|-------|
-| Development | 45ms | Includes validation overhead |
-| Production (standard) | ❌ No profiling | Cannot measure |
-| Production (profiling build) | 12ms | Accurate measurement |
+| Environment                  | Render Time     | Notes                        |
+| ---------------------------- | --------------- | ---------------------------- |
+| Development                  | 45ms            | Includes validation overhead |
+| Production (standard)        | ❌ No profiling | Cannot measure               |
+| Production (profiling build) | 12ms            | Accurate measurement         |
 
 **Key insight**: If component takes 45ms in dev, it likely takes 10-15ms in production. Always verify with profiling build.
 
@@ -376,12 +391,14 @@ npx serve -s dist
 ### Why Real User Monitoring (RUM) Matters
 
 **Synthetic tests don't capture:**
+
 - Real user devices (low-end phones, old browsers)
 - Real network conditions (slow 3G, intermittent connections)
 - Real usage patterns (edge cases, power users)
 - Geographic variations (CDN effectiveness, latency)
 
 **RUM provides:**
+
 - Actual user experience data
 - Performance percentiles (p50, p95, p99)
 - Regression detection before widespread impact
@@ -413,11 +430,12 @@ Sentry.init({
       cores: navigator.hardwareConcurrency,
     };
     return event;
-  }
+  },
 });
 ```
 
 **Tracks:**
+
 - Page load times
 - Route transitions
 - API response times
@@ -433,32 +451,33 @@ Sentry.init({
 **Setup:**
 
 ```typescript
-import LogRocket from 'logrocket';
+import LogRocket from "logrocket";
 
-LogRocket.init('your-app-id', {
+LogRocket.init("your-app-id", {
   console: {
-    shouldAggregateConsoleErrors: true
+    shouldAggregateConsoleErrors: true,
   },
   network: {
-    requestSanitizer: request => {
+    requestSanitizer: (request) => {
       // Sanitize sensitive data
-      if (request.headers['Authorization']) {
-        request.headers['Authorization'] = '[REDACTED]';
+      if (request.headers["Authorization"]) {
+        request.headers["Authorization"] = "[REDACTED]";
       }
       return request;
-    }
-  }
+    },
+  },
 });
 
 // Track custom performance metrics
-LogRocket.track('SlowRender', {
-  component: 'AssetTable',
+LogRocket.track("SlowRender", {
+  component: "AssetTable",
   duration: 150,
-  itemCount: 5000
+  itemCount: 5000,
 });
 ```
 
 **Features:**
+
 - Session replay (watch actual user interactions)
 - Performance timeline
 - Network waterfall
@@ -474,12 +493,12 @@ LogRocket.track('SlowRender', {
 **Setup:**
 
 ```typescript
-import { onCLS, onFID, onLCP, onFCP, onTTFB } from 'web-vitals';
+import { onCLS, onFID, onLCP, onFCP, onTTFB } from "web-vitals";
 
 function sendToAnalytics(metric) {
   // Send to your analytics endpoint
-  fetch('/api/analytics', {
-    method: 'POST',
+  fetch("/api/analytics", {
+    method: "POST",
     body: JSON.stringify({
       name: metric.name,
       value: metric.value,
@@ -487,7 +506,7 @@ function sendToAnalytics(metric) {
       delta: metric.delta,
       id: metric.id,
       navigationType: metric.navigationType,
-    })
+    }),
   });
 }
 
@@ -500,6 +519,7 @@ onTTFB(sendToAnalytics);
 ```
 
 **Why use this**:
+
 - Zero-dependency option
 - Reports exact metrics Google uses for rankings
 - Can send to any analytics platform
@@ -511,21 +531,23 @@ onTTFB(sendToAnalytics);
 ```javascript
 const performanceBudgets = {
   // Core Web Vitals
-  LCP: 2500,  // Largest Contentful Paint
-  FID: 100,   // First Input Delay
-  CLS: 0.1,   // Cumulative Layout Shift
+  LCP: 2500, // Largest Contentful Paint
+  FID: 100, // First Input Delay
+  CLS: 0.1, // Cumulative Layout Shift
 
   // Custom metrics
-  initialLoad: 3000,      // Time to interactive
-  routeTransition: 500,   // Navigation time
-  apiResponse: 1000,      // API latency
-  componentRender: 50,    // Individual component
+  initialLoad: 3000, // Time to interactive
+  routeTransition: 500, // Navigation time
+  apiResponse: 1000, // API latency
+  componentRender: 50, // Individual component
 };
 
 // Alert if exceeded
 function checkBudget(metric, value) {
   if (value > performanceBudgets[metric]) {
-    alertTeam(`Performance budget exceeded: ${metric} = ${value}ms (limit: ${performanceBudgets[metric]}ms)`);
+    alertTeam(
+      `Performance budget exceeded: ${metric} = ${value}ms (limit: ${performanceBudgets[metric]}ms)`
+    );
   }
 }
 ```
@@ -541,7 +563,9 @@ const lastWeekP95 = 2100;
 const threshold = 0.2; // 20% regression
 
 if ((currentP95 - lastWeekP95) / lastWeekP95 > threshold) {
-  alertTeam(`🚨 Performance regression detected: LCP increased ${Math.round((currentP95 - lastWeekP95) / lastWeekP95 * 100)}%`);
+  alertTeam(
+    `🚨 Performance regression detected: LCP increased ${Math.round(((currentP95 - lastWeekP95) / lastWeekP95) * 100)}%`
+  );
 }
 ```
 
@@ -551,12 +575,12 @@ if ((currentP95 - lastWeekP95) / lastWeekP95 > threshold) {
 
 Lighthouse audits four categories, each weighted differently:
 
-| Category | Target | Weight | Impact |
-|----------|--------|--------|--------|
-| **Performance** | 90+ | High | SEO, user retention |
-| **Accessibility** | 100 | Medium | Legal compliance, UX |
-| **Best Practices** | 90+ | Medium | Security, reliability |
-| **SEO** | 90+ | Low | Search rankings |
+| Category           | Target | Weight | Impact                |
+| ------------------ | ------ | ------ | --------------------- |
+| **Performance**    | 90+    | High   | SEO, user retention   |
+| **Accessibility**  | 100    | Medium | Legal compliance, UX  |
+| **Best Practices** | 90+    | Medium | Security, reliability |
+| **SEO**            | 90+    | Low    | Search rankings       |
 
 ### Performance Score Breakdown (0-100)
 
@@ -581,14 +605,14 @@ Cumulative Layout Shift (CLS)     - 15%
 
 **Target values for 90+ score:**
 
-| Metric | Target | Weighted Score |
-|--------|--------|----------------|
-| FCP | <1.8s | 10/10 |
-| LCP | <2.5s | 25/25 |
-| TBT | <200ms | 30/30 |
-| CLS | <0.1 | 15/15 |
-| Speed Index | <3.4s | 10/10 |
-| TTI | <3.8s | 10/10 |
+| Metric      | Target | Weighted Score |
+| ----------- | ------ | -------------- |
+| FCP         | <1.8s  | 10/10          |
+| LCP         | <2.5s  | 25/25          |
+| TBT         | <200ms | 30/30          |
+| CLS         | <0.1   | 15/15          |
+| Speed Index | <3.4s  | 10/10          |
+| TTI         | <3.8s  | 10/10          |
 
 **Total**: 100/100 (if all targets met)
 

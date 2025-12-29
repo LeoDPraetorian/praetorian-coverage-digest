@@ -52,13 +52,14 @@ Use `.default()` when the search parameter is **not present** in the URL:
 
 ```typescript
 const searchSchema = z.object({
-  sortBy: z.enum(['date', 'name', 'size']).default('date'),
+  sortBy: z.enum(["date", "name", "size"]).default("date"),
   // URL: /files → sortBy = 'date' (missing, uses default)
   // URL: /files?sortBy=name → sortBy = 'name'
-})
+});
 ```
 
 **When it triggers:**
+
 - Parameter doesn't exist in query string
 - Parameter key is present but value is empty
 
@@ -68,14 +69,15 @@ Use `.catch()` when validation **fails** and you want to recover with a fallback
 
 ```typescript
 const searchSchema = z.object({
-  sortBy: z.enum(['date', 'name', 'size']).catch('date'),
+  sortBy: z.enum(["date", "name", "size"]).catch("date"),
   // URL: /files?sortBy=invalid → sortBy = 'date' (invalid, catches and uses fallback)
   // URL: /files?sortBy=name → sortBy = 'name'
   // URL: /files → sortBy = undefined (missing, not caught)
-})
+});
 ```
 
 **When it triggers:**
+
 - Parameter exists but fails validation
 - Wrong type (string when number expected)
 - Invalid enum value
@@ -92,7 +94,7 @@ const searchSchema = z.object({
   // URL: /posts?page=5 → page = 5 (valid)
   // URL: /posts?page=-1 → page = 1 (invalid, catch)
   // URL: /posts?page=abc → page = 1 (invalid type, catch)
-})
+});
 ```
 
 ## fallback() Utility
@@ -100,19 +102,20 @@ const searchSchema = z.object({
 The `fallback()` utility combines `.default()` and `.catch()` behaviors in one call:
 
 ```typescript
-import { zodValidator, fallback } from '@tanstack/zod-adapter'
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
 
 const searchSchema = z.object({
   page: fallback(z.number().int().positive(), 1),
   pageSize: fallback(z.number().int().min(10).max(100), 20),
-  sortBy: fallback(z.enum(['date', 'name', 'size']), 'date'),
-})
+  sortBy: fallback(z.enum(["date", "name", "size"]), "date"),
+});
 
 // Equivalent to:
 // page: z.number().int().positive().catch(1).default(1)
 ```
 
 **Benefits of `fallback()`:**
+
 - More concise syntax
 - Handles both missing and invalid values
 - Clear intent (single source of truth for default value)
@@ -121,9 +124,9 @@ const searchSchema = z.object({
 ## Complete Example
 
 ```typescript
-import { createFileRoute } from '@tanstack/react-router'
-import { zodValidator, fallback } from '@tanstack/zod-adapter'
-import { z } from 'zod'
+import { createFileRoute } from "@tanstack/react-router";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 
 // Production-ready search schema
 const assetsSearchSchema = z.object({
@@ -132,21 +135,21 @@ const assetsSearchSchema = z.object({
   pageSize: fallback(z.number().int().min(10).max(100), 20),
 
   // Filtering
-  status: fallback(z.enum(['active', 'inactive', 'all']), 'all'),
+  status: fallback(z.enum(["active", "inactive", "all"]), "all"),
   category: z.string().optional(),
 
   // Sorting
-  sortBy: fallback(z.enum(['name', 'created', 'updated']), 'created'),
-  sortOrder: fallback(z.enum(['asc', 'desc']), 'desc'),
+  sortBy: fallback(z.enum(["name", "created", "updated"]), "created"),
+  sortOrder: fallback(z.enum(["asc", "desc"]), "desc"),
 
   // Search
-  query: z.string().default(''),
+  query: z.string().default(""),
 
   // Boolean flags
   includeArchived: z.boolean().catch(false).default(false),
-})
+});
 
-export const Route = createFileRoute('/assets')({
+export const Route = createFileRoute("/assets")({
   validateSearch: zodValidator(assetsSearchSchema),
   loader: async ({ search }) => {
     // All search params are validated and type-safe
@@ -157,10 +160,10 @@ export const Route = createFileRoute('/assets')({
       sortBy: search.sortBy,
       sortOrder: search.sortOrder,
       query: search.query,
-    })
+    });
   },
   component: AssetsList,
-})
+});
 ```
 
 ## Error Handling with User Feedback
@@ -169,21 +172,26 @@ Show user-friendly error messages when validation fails:
 
 ```typescript
 const searchSchema = z.object({
-  price: z.number().positive().catch((ctx) => {
-    console.warn('Invalid price parameter:', ctx.error)
-    return 0
-  }),
-})
+  price: z
+    .number()
+    .positive()
+    .catch((ctx) => {
+      console.warn("Invalid price parameter:", ctx.error);
+      return 0;
+    }),
+});
 
 // Or use .default() with .catch() to show error but continue
 const searchSchemaWithError = z.object({
-  price: z.number().positive()
+  price: z
+    .number()
+    .positive()
     .catch((ctx) => {
-      console.error('Price validation failed:', ctx.input)
-      return 0
+      console.error("Price validation failed:", ctx.input);
+      return 0;
     })
     .default(0),
-})
+});
 ```
 
 ## Type Inference
@@ -193,10 +201,10 @@ The adapter automatically infers TypeScript types:
 ```typescript
 const schema = z.object({
   page: fallback(z.number(), 1),
-  status: z.enum(['active', 'inactive']).optional(),
-})
+  status: z.enum(["active", "inactive"]).optional(),
+});
 
-type SearchParams = z.infer<typeof schema>
+type SearchParams = z.infer<typeof schema>;
 // type SearchParams = {
 //   page: number
 //   status?: 'active' | 'inactive'
@@ -219,11 +227,8 @@ type SearchParams = z.infer<typeof schema>
 ```typescript
 const paginationSchema = z.object({
   page: fallback(z.number().int().positive(), 1),
-  pageSize: fallback(
-    z.number().int().min(10).max(100),
-    20
-  ),
-})
+  pageSize: fallback(z.number().int().min(10).max(100), 20),
+});
 ```
 
 ### Multi-Select Filters
@@ -233,24 +238,26 @@ const filtersSchema = z.object({
   tags: z.array(z.string()).catch([]).default([]),
   // URL: /posts?tags=react&tags=typescript
   // Parsed: { tags: ['react', 'typescript'] }
-})
+});
 ```
 
 ### Date Range Validation
 
 ```typescript
-const dateRangeSchema = z.object({
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional(),
-}).refine(
-  (data) => {
-    if (data.startDate && data.endDate) {
-      return new Date(data.startDate) <= new Date(data.endDate)
-    }
-    return true
-  },
-  { message: 'Start date must be before end date' }
-)
+const dateRangeSchema = z
+  .object({
+    startDate: z.string().datetime().optional(),
+    endDate: z.string().datetime().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.startDate && data.endDate) {
+        return new Date(data.startDate) <= new Date(data.endDate);
+      }
+      return true;
+    },
+    { message: "Start date must be before end date" }
+  );
 ```
 
 ## Related

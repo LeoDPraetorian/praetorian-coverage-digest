@@ -30,20 +30,18 @@ Query keys serve three critical functions:
 
 ```typescript
 // Rule 1: Keys MUST be arrays at the top level
-['todos']                           // ✅ Correct
-'todos'                             // ❌ Wrong (converted internally, avoid)
-
-// Rule 2: Keys must be serializable (JSON.stringify)
-['todos', { status: 'active' }]     // ✅ Object is serializable
-['todos', new Date()]               // ❌ Date creates new reference each render
-['todos', classInstance]            // ❌ Class instances may have circular refs
+["todos"]; // ✅ Correct
+"todos"[ // ❌ Wrong (converted internally, avoid)
+  // Rule 2: Keys must be serializable (JSON.stringify)
+  ("todos", { status: "active" })
+][("todos", new Date())][("todos", classInstance)]; // ✅ Object is serializable // ❌ Date creates new reference each render // ❌ Class instances may have circular refs
 
 // Rule 3: Keys are dependency arrays
 // Everything used in queryFn MUST be in queryKey
 useQuery({
-  queryKey: ['todos', status, sorting],  // ✅ All deps included
+  queryKey: ["todos", status, sorting], // ✅ All deps included
   queryFn: () => fetchTodos(status, sorting),
-})
+});
 ```
 
 ### Deterministic Hashing
@@ -51,16 +49,15 @@ useQuery({
 Object key order **doesn't matter** for cache identity:
 
 ```typescript
-['todos', { status, page }]  // Same cache entry as:
-['todos', { page, status }]  // Same cache entry as:
-['todos', { page, status, other: undefined }]  // undefined values ignored
+["todos", { status, page }][("todos", { page, status })][ // Same cache entry as: // Same cache entry as:
+  ("todos", { page, status, other: undefined })
+]; // undefined values ignored
 ```
 
 Array order **matters strictly**:
 
 ```typescript
-['todos', status, page]  // Different from:
-['todos', page, status]  // Different cache entry
+["todos", status, page][("todos", page, status)]; // Different from: // Different cache entry
 ```
 
 ---
@@ -76,20 +73,20 @@ TkDodo (maintainer): "Separating QueryKey from QueryFunction was a mistake. The 
 ### Basic Usage
 
 ```typescript
-import { queryOptions, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 // Define once
 const todosQuery = queryOptions({
-  queryKey: ['todos'],
+  queryKey: ["todos"],
   queryFn: fetchTodos,
   staleTime: 5000,
-})
+});
 
 // Use everywhere - type-safe and consistent
-useQuery(todosQuery)
-useSuspenseQuery(todosQuery)
-queryClient.prefetchQuery(todosQuery)
-queryClient.ensureQueryData(todosQuery)
+useQuery(todosQuery);
+useSuspenseQuery(todosQuery);
+queryClient.prefetchQuery(todosQuery);
+queryClient.ensureQueryData(todosQuery);
 ```
 
 ### Type-Safe Cache Access (DataTag)
@@ -98,12 +95,12 @@ queryClient.ensureQueryData(todosQuery)
 
 ```typescript
 const todosQuery = queryOptions({
-  queryKey: ['todos'],
-  queryFn: fetchTodos,  // Returns Todo[]
-})
+  queryKey: ["todos"],
+  queryFn: fetchTodos, // Returns Todo[]
+});
 
 // Type automatically inferred as: Todo[] | undefined
-const todos = queryClient.getQueryData(todosQuery.queryKey)
+const todos = queryClient.getQueryData(todosQuery.queryKey);
 
 // Without queryOptions, this would be: unknown
 ```
@@ -114,35 +111,37 @@ Combine factory pattern with `queryOptions` for full type safety:
 
 ```typescript
 // features/todos/queries.ts
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions } from "@tanstack/react-query";
 
 export const todoQueries = {
   // Key-only entries for hierarchy/invalidation
-  all: () => ['todos'] as const,
-  lists: () => [...todoQueries.all(), 'list'] as const,
-  details: () => [...todoQueries.all(), 'detail'] as const,
+  all: () => ["todos"] as const,
+  lists: () => [...todoQueries.all(), "list"] as const,
+  details: () => [...todoQueries.all(), "detail"] as const,
 
   // Full query definitions with queryOptions
-  list: (filters: TodoFilters) => queryOptions({
-    queryKey: [...todoQueries.lists(), filters],
-    queryFn: () => fetchTodos(filters),
-    staleTime: 1000 * 60 * 5,
-  }),
+  list: (filters: TodoFilters) =>
+    queryOptions({
+      queryKey: [...todoQueries.lists(), filters],
+      queryFn: () => fetchTodos(filters),
+      staleTime: 1000 * 60 * 5,
+    }),
 
-  detail: (id: number) => queryOptions({
-    queryKey: [...todoQueries.details(), id],
-    queryFn: () => fetchTodo(id),
-    staleTime: 1000 * 60 * 10,
-  }),
-}
+  detail: (id: number) =>
+    queryOptions({
+      queryKey: [...todoQueries.details(), id],
+      queryFn: () => fetchTodo(id),
+      staleTime: 1000 * 60 * 10,
+    }),
+};
 
 // Usage
-useQuery(todoQueries.list({ status: 'active' }))
-useQuery(todoQueries.detail(5))
+useQuery(todoQueries.list({ status: "active" }));
+useQuery(todoQueries.detail(5));
 
 // Invalidation using key-only entries
-queryClient.invalidateQueries({ queryKey: todoQueries.all() })
-queryClient.invalidateQueries({ queryKey: todoQueries.lists() })
+queryClient.invalidateQueries({ queryKey: todoQueries.all() });
+queryClient.invalidateQueries({ queryKey: todoQueries.lists() });
 ```
 
 ---
@@ -155,12 +154,12 @@ For simpler cases or when you need standalone key definitions:
 
 ```typescript
 export const todoKeys = {
-  all: ['todos'] as const,
-  lists: () => [...todoKeys.all, 'list'] as const,
+  all: ["todos"] as const,
+  lists: () => [...todoKeys.all, "list"] as const,
   list: (filters: string) => [...todoKeys.lists(), { filters }] as const,
-  details: () => [...todoKeys.all, 'detail'] as const,
+  details: () => [...todoKeys.all, "detail"] as const,
   detail: (id: number) => [...todoKeys.details(), id] as const,
-}
+};
 ```
 
 ### Usage Patterns
@@ -168,23 +167,23 @@ export const todoKeys = {
 ```typescript
 // Queries
 useQuery({
-  queryKey: todoKeys.list({ status: 'active' }),
-  queryFn: () => fetchTodos({ status: 'active' }),
-})
+  queryKey: todoKeys.list({ status: "active" }),
+  queryFn: () => fetchTodos({ status: "active" }),
+});
 
 // Invalidation - hierarchical
-queryClient.invalidateQueries({ queryKey: todoKeys.all })        // Everything
-queryClient.invalidateQueries({ queryKey: todoKeys.lists() })    // All lists
-queryClient.invalidateQueries({ queryKey: todoKeys.details() })  // All details
+queryClient.invalidateQueries({ queryKey: todoKeys.all }); // Everything
+queryClient.invalidateQueries({ queryKey: todoKeys.lists() }); // All lists
+queryClient.invalidateQueries({ queryKey: todoKeys.details() }); // All details
 
 // Prefetching
 queryClient.prefetchQuery({
   queryKey: todoKeys.detail(id),
   queryFn: () => fetchTodo(id),
-})
+});
 
 // Direct cache updates
-queryClient.setQueryData(todoKeys.detail(id), updatedTodo)
+queryClient.setQueryData(todoKeys.detail(id), updatedTodo);
 ```
 
 ### @lukemorales/query-key-factory Library
@@ -192,9 +191,9 @@ queryClient.setQueryData(todoKeys.detail(id), updatedTodo)
 For larger applications, this library provides additional structure:
 
 ```typescript
-import { createQueryKeys, mergeQueryKeys } from '@lukemorales/query-key-factory'
+import { createQueryKeys, mergeQueryKeys } from "@lukemorales/query-key-factory";
 
-export const todos = createQueryKeys('todos', {
+export const todos = createQueryKeys("todos", {
   all: null,
   detail: (id: number) => ({
     queryKey: [id],
@@ -204,13 +203,13 @@ export const todos = createQueryKeys('todos', {
     queryKey: [{ filters }],
     queryFn: () => fetchTodos(filters),
   }),
-})
+});
 
 // Merge multiple feature factories
-export const queries = mergeQueryKeys(todos, users, posts)
+export const queries = mergeQueryKeys(todos, users, posts);
 
 // Invalidate all lists (uses _def for scope)
-queryClient.invalidateQueries({ queryKey: todos.list._def })
+queryClient.invalidateQueries({ queryKey: todos.list._def });
 ```
 
 ---
@@ -222,30 +221,27 @@ queryClient.invalidateQueries({ queryKey: todos.list._def })
 ### Example Hierarchy
 
 ```typescript
-['todos']                                    // Level 0: All todos
-['todos', 'list']                           // Level 1: All lists
-['todos', 'list', { status: 'active' }]     // Level 2: Specific list
-['todos', 'detail']                         // Level 1: All details
-['todos', 'detail', 5]                      // Level 2: Specific detail
-['todos', 'detail', 5, 'comments']          // Level 3: Nested resource
+["todos"][("todos", "list")][("todos", "list", { status: "active" })][("todos", "detail")][ // Level 0: All todos // Level 1: All lists // Level 2: Specific list // Level 1: All details
+  ("todos", "detail", 5)
+][("todos", "detail", 5, "comments")]; // Level 2: Specific detail // Level 3: Nested resource
 ```
 
 ### Invalidation by Level
 
 ```typescript
 // Invalidate everything related to todos
-queryClient.invalidateQueries({ queryKey: ['todos'] })
+queryClient.invalidateQueries({ queryKey: ["todos"] });
 
 // Invalidate all list queries (preserves details cache)
-queryClient.invalidateQueries({ queryKey: ['todos', 'list'] })
+queryClient.invalidateQueries({ queryKey: ["todos", "list"] });
 
 // Invalidate only active todos list
 queryClient.invalidateQueries({
-  queryKey: ['todos', 'list', { status: 'active' }]
-})
+  queryKey: ["todos", "list", { status: "active" }],
+});
 
 // Invalidate specific detail and its nested resources
-queryClient.invalidateQueries({ queryKey: ['todos', 'detail', 5] })
+queryClient.invalidateQueries({ queryKey: ["todos", "detail", 5] });
 ```
 
 ---
@@ -258,12 +254,11 @@ Objects in query keys provide named access and flexible matching:
 
 ```typescript
 const todoKeys = {
-  all: [{ scope: 'todos' }] as const,
+  all: [{ scope: "todos" }] as const,
   list: (state: State, sorting: Sorting) =>
-    [{ scope: 'todos', entity: 'list', state, sorting }] as const,
-  detail: (id: number) =>
-    [{ scope: 'todos', entity: 'detail', id }] as const,
-}
+    [{ scope: "todos", entity: "list", state, sorting }] as const,
+  detail: (id: number) => [{ scope: "todos", entity: "detail", id }] as const,
+};
 ```
 
 ### Advantages of Object Keys
@@ -274,14 +269,14 @@ const todoKeys = {
 // ✅ Object key - named access
 const fetchTodos = async ({
   queryKey: [{ state, sorting }],
-}: QueryFunctionContext<ReturnType<typeof todoKeys['list']>>) => {
-  return api.getTodos({ state, sorting })
-}
+}: QueryFunctionContext<ReturnType<(typeof todoKeys)["list"]>>) => {
+  return api.getTodos({ state, sorting });
+};
 
 // ❌ Array key - fragile index access
 const fetchTodos = async ({ queryKey }) => {
-  const [, state, sorting] = queryKey  // Easy to miscount
-}
+  const [, state, sorting] = queryKey; // Easy to miscount
+};
 ```
 
 **Cross-scope invalidation**:
@@ -289,18 +284,18 @@ const fetchTodos = async ({ queryKey }) => {
 ```typescript
 // Invalidate ALL list entities across all scopes
 queryClient.invalidateQueries({
-  queryKey: [{ entity: 'list' }]
-})
+  queryKey: [{ entity: "list" }],
+});
 ```
 
 ### Trade-offs
 
-| Aspect | Array Keys | Object Keys |
-|--------|-----------|-------------|
-| Simplicity | ✅ Simpler to write | ❌ More verbose |
-| Matching | Prefix-based | Named property-based |
-| Type Safety | Index-based (fragile) | Named (robust) |
-| Best For | Small apps, simple keys | Large apps, complex keys |
+| Aspect      | Array Keys              | Object Keys              |
+| ----------- | ----------------------- | ------------------------ |
+| Simplicity  | ✅ Simpler to write     | ❌ More verbose          |
+| Matching    | Prefix-based            | Named property-based     |
+| Type Safety | Index-based (fragile)   | Named (robust)           |
+| Best For    | Small apps, simple keys | Large apps, complex keys |
 
 ---
 
@@ -310,7 +305,7 @@ queryClient.invalidateQueries({
 
 ```typescript
 // Invalidates all queries starting with ['todos']
-queryClient.invalidateQueries({ queryKey: ['todos'] })
+queryClient.invalidateQueries({ queryKey: ["todos"] });
 ```
 
 ### Exact Matching
@@ -318,9 +313,9 @@ queryClient.invalidateQueries({ queryKey: ['todos'] })
 ```typescript
 // Only invalidates exact key match
 queryClient.invalidateQueries({
-  queryKey: ['todos', 'detail', 5],
-  exact: true
-})
+  queryKey: ["todos", "detail", 5],
+  exact: true,
+});
 ```
 
 ### Predicate Functions
@@ -328,10 +323,8 @@ queryClient.invalidateQueries({
 ```typescript
 // Custom matching logic
 queryClient.invalidateQueries({
-  predicate: (query) =>
-    query.queryKey[0] === 'todos' &&
-    (query.state.data as Todo[])?.length > 10
-})
+  predicate: (query) => query.queryKey[0] === "todos" && (query.state.data as Todo[])?.length > 10,
+});
 ```
 
 ### Mutation Integration
@@ -341,30 +334,30 @@ const mutation = useMutation({
   mutationFn: createTodo,
   onSuccess: () => {
     // Invalidate lists, keep details cache
-    queryClient.invalidateQueries({ queryKey: todoQueries.lists() })
+    queryClient.invalidateQueries({ queryKey: todoQueries.lists() });
   },
-})
+});
 ```
 
 ### Global Automatic Invalidation
 
 ```typescript
-import { MutationCache, QueryClient, matchQuery } from '@tanstack/react-query'
+import { MutationCache, QueryClient, matchQuery } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
   mutationCache: new MutationCache({
     onSuccess: (_data, _variables, _context, mutation) => {
       // Use mutation meta to specify what to invalidate
-      const invalidates = mutation.meta?.invalidates as string[][] | undefined
+      const invalidates = mutation.meta?.invalidates as string[][] | undefined;
 
       if (invalidates) {
-        invalidates.forEach(queryKey => {
-          queryClient.invalidateQueries({ queryKey })
-        })
+        invalidates.forEach((queryKey) => {
+          queryClient.invalidateQueries({ queryKey });
+        });
       }
     },
   }),
-})
+});
 
 // Usage with meta
 useMutation({
@@ -372,7 +365,7 @@ useMutation({
   meta: {
     invalidates: [todoQueries.lists()],
   },
-})
+});
 ```
 
 ---
@@ -383,14 +376,13 @@ useMutation({
 
 ```typescript
 export const todoKeys = {
-  all: ['todos'] as const,
-  lists: () => [...todoKeys.all, 'list'] as const,
-  list: (filters: TodoFilters) =>
-    [...todoKeys.lists(), filters] as const,
-} as const
+  all: ["todos"] as const,
+  lists: () => [...todoKeys.all, "list"] as const,
+  list: (filters: TodoFilters) => [...todoKeys.lists(), filters] as const,
+} as const;
 
 // Inferred type: readonly ["todos", "list", TodoFilters]
-type TodoListKey = ReturnType<typeof todoKeys.list>
+type TodoListKey = ReturnType<typeof todoKeys.list>;
 ```
 
 ### Inferring Types from Factory
@@ -407,17 +399,14 @@ type TodoQueryKeys = inferQueryKeyStore<typeof todoQueries>
 ### QueryFunctionContext Typing
 
 ```typescript
-import { QueryFunctionContext } from '@tanstack/react-query'
+import { QueryFunctionContext } from "@tanstack/react-query";
 
-type TodoListKey = ReturnType<typeof todoKeys.list>
+type TodoListKey = ReturnType<typeof todoKeys.list>;
 
-const fetchTodos = async ({
-  queryKey,
-  signal,
-}: QueryFunctionContext<TodoListKey>) => {
-  const [, , filters] = queryKey  // Type: TodoFilters
-  return api.getTodos(filters, { signal })
-}
+const fetchTodos = async ({ queryKey, signal }: QueryFunctionContext<TodoListKey>) => {
+  const [, , filters] = queryKey; // Type: TodoFilters
+  return api.getTodos(filters, { signal });
+};
 ```
 
 ---
@@ -447,50 +436,52 @@ src/features/
 
 ```typescript
 // features/todos/queries.ts
-import { queryOptions } from '@tanstack/react-query'
-import { fetchTodos, fetchTodo } from './api'
-import type { TodoFilters } from './types'
+import { queryOptions } from "@tanstack/react-query";
+import { fetchTodos, fetchTodo } from "./api";
+import type { TodoFilters } from "./types";
 
 export const todoQueries = {
-  all: () => ['todos'] as const,
-  lists: () => [...todoQueries.all(), 'list'] as const,
-  list: (filters: TodoFilters) => queryOptions({
-    queryKey: [...todoQueries.lists(), filters],
-    queryFn: () => fetchTodos(filters),
-  }),
-  details: () => [...todoQueries.all(), 'detail'] as const,
-  detail: (id: number) => queryOptions({
-    queryKey: [...todoQueries.details(), id],
-    queryFn: () => fetchTodo(id),
-  }),
-}
+  all: () => ["todos"] as const,
+  lists: () => [...todoQueries.all(), "list"] as const,
+  list: (filters: TodoFilters) =>
+    queryOptions({
+      queryKey: [...todoQueries.lists(), filters],
+      queryFn: () => fetchTodos(filters),
+    }),
+  details: () => [...todoQueries.all(), "detail"] as const,
+  detail: (id: number) =>
+    queryOptions({
+      queryKey: [...todoQueries.details(), id],
+      queryFn: () => fetchTodo(id),
+    }),
+};
 ```
 
 ### hooks.ts Pattern
 
 ```typescript
 // features/todos/hooks.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { todoQueries } from './queries'
-import { createTodo, updateTodo } from './api'
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { todoQueries } from "./queries";
+import { createTodo, updateTodo } from "./api";
 
 export function useTodos(filters: TodoFilters) {
-  return useQuery(todoQueries.list(filters))
+  return useQuery(todoQueries.list(filters));
 }
 
 export function useTodo(id: number) {
-  return useQuery(todoQueries.detail(id))
+  return useQuery(todoQueries.detail(id));
 }
 
 export function useCreateTodo() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createTodo,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: todoQueries.lists() })
+      queryClient.invalidateQueries({ queryKey: todoQueries.lists() });
     },
-  })
+  });
 }
 ```
 
@@ -503,56 +494,53 @@ export function useCreateTodo() {
 ```typescript
 // ❌ WRONG: Creates new reference every render
 useQuery({
-  queryKey: ['todos', { filters: { status, page } }],
+  queryKey: ["todos", { filters: { status, page } }],
   queryFn: fetchTodos,
-})
+});
 
 // ❌ WRONG: Date changes constantly
 useQuery({
-  queryKey: ['todos', new Date()],
+  queryKey: ["todos", new Date()],
   queryFn: fetchTodos,
-})
+});
 
 // ✅ CORRECT: Stable primitives
 useQuery({
-  queryKey: ['todos', status, page],
+  queryKey: ["todos", status, page],
   queryFn: () => fetchTodos({ status, page }),
-})
+});
 ```
 
 ### Separated Key/Function Definitions
 
 ```typescript
 // ❌ WRONG: Key and function can drift out of sync
-const todoKeys = { list: ['todos', 'list'] }
+const todoKeys = { list: ["todos", "list"] };
 
 // Elsewhere...
 useQuery({
   queryKey: todoKeys.list,
-  queryFn: () => fetchTodos(filters),  // filters not in key!
-})
+  queryFn: () => fetchTodos(filters), // filters not in key!
+});
 
 // ✅ CORRECT: Use queryOptions to co-locate
 const todoQueries = {
-  list: (filters) => queryOptions({
-    queryKey: ['todos', 'list', filters],
-    queryFn: () => fetchTodos(filters),
-  }),
-}
+  list: (filters) =>
+    queryOptions({
+      queryKey: ["todos", "list", filters],
+      queryFn: () => fetchTodos(filters),
+    }),
+};
 ```
 
 ### Overly Flat Keys
 
 ```typescript
 // ❌ WRONG: No hierarchy, can't do targeted invalidation
-['todos-list-active']
-['todos-list-done']
-['todos-detail-5']
-
-// ✅ CORRECT: Hierarchical structure
-['todos', 'list', 'active']
-['todos', 'list', 'done']
-['todos', 'detail', 5]
+["todos-list-active"]["todos-list-done"]["todos-detail-5"][
+  // ✅ CORRECT: Hierarchical structure
+  ("todos", "list", "active")
+][("todos", "list", "done")][("todos", "detail", 5)];
 ```
 
 ### Global Key Files

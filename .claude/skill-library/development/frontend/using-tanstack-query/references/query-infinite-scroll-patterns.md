@@ -353,7 +353,7 @@ When `maxPages` is set, TanStack Query automatically purges pages from **either 
 ```typescript
 // ❌ WRONG: Only defines getNextPageParam
 const query = useInfiniteQuery({
-  queryKey: ['items'],
+  queryKey: ["items"],
   queryFn: fetchItems,
   initialPageParam: 0,
   getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -370,7 +370,7 @@ const query = useInfiniteQuery({
 ```typescript
 // ✅ CORRECT: Both directions defined
 const query = useInfiniteQuery({
-  queryKey: ['items'],
+  queryKey: ["items"],
   queryFn: fetchItems,
   initialPageParam: 0,
 

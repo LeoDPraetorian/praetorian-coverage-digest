@@ -24,14 +24,14 @@ Use this skill when:
 
 ## Quick Reference
 
-| Security Concern | Test Pattern | Playwright Approach |
-|------------------|--------------|---------------------|
-| XSS Prevention | Injection attempts, sanitization verification | Input malicious payloads, verify no execution |
-| Authentication | Login, logout, session expiry, token refresh, MFA | Page Object Model for auth flows |
-| Authorization | RBAC, privilege escalation | Test role boundaries, unauthorized access attempts |
-| CSRF Protection | Token validation | Verify token presence and validation |
-| Input Validation | Boundary testing, malicious inputs | Fixture-based payload testing |
-| Secure Redirects | Open redirect prevention | Test redirect validation logic |
+| Security Concern | Test Pattern                                      | Playwright Approach                                |
+| ---------------- | ------------------------------------------------- | -------------------------------------------------- |
+| XSS Prevention   | Injection attempts, sanitization verification     | Input malicious payloads, verify no execution      |
+| Authentication   | Login, logout, session expiry, token refresh, MFA | Page Object Model for auth flows                   |
+| Authorization    | RBAC, privilege escalation                        | Test role boundaries, unauthorized access attempts |
+| CSRF Protection  | Token validation                                  | Verify token presence and validation               |
+| Input Validation | Boundary testing, malicious inputs                | Fixture-based payload testing                      |
+| Secure Redirects | Open redirect prevention                          | Test redirect validation logic                     |
 
 ## Security Testing Fundamentals
 
@@ -116,8 +116,8 @@ Test authorization boundaries:
 
 ```typescript
 // Test unauthorized access attempt
-await loginAsUser('regularUser');
-await page.goto('/admin/settings');
+await loginAsUser("regularUser");
+await page.goto("/admin/settings");
 
 // Verify redirect or error
 await expect(page.locator('[data-testid="access-denied"]')).toBeVisible();
@@ -164,13 +164,13 @@ Create reusable fixtures for common attack vectors:
 export const SQL_INJECTION_PAYLOADS = [
   "' OR '1'='1",
   "'; DROP TABLE users--",
-  "1' UNION SELECT * FROM users--"
+  "1' UNION SELECT * FROM users--",
 ];
 
 export const XSS_PAYLOADS = [
   '<script>alert("XSS")</script>',
   '<img src=x onerror=alert("XSS")>',
-  'javascript:alert("XSS")'
+  'javascript:alert("XSS")',
 ];
 ```
 
@@ -184,12 +184,12 @@ Test that redirects validate destination URLs:
 
 ```typescript
 // Test invalid redirect attempt
-await page.goto('/login?redirect=https://evil.com');
+await page.goto("/login?redirect=https://evil.com");
 await login(page);
 
 // Verify redirect stayed within app domain
 expect(page.url()).toContain(APP_DOMAIN);
-expect(page.url()).not.toContain('evil.com');
+expect(page.url()).not.toContain("evil.com");
 ```
 
 For secure redirect patterns, see [references/secure-redirect-testing.md](references/secure-redirect-testing.md).

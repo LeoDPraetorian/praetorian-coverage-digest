@@ -64,6 +64,7 @@ NOT: Day 1 unit → Day 2 realize wrong → pivot
 **STOP. Do NOT write unit tests yet.**
 
 Test complete workflows at integration/E2E level:
+
 - Render full components (not isolated units)
 - Execute user workflows end-to-end
 - Verify state propagation and cache invalidation

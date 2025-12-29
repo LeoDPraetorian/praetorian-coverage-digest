@@ -5,28 +5,27 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [State Machine Model](#state-machine-model)
-3. [Four-Layer Architecture](#four-layer-architecture)
+2. [Workflow Phases](#workflow-phases)
+3. [Three-Tier Architecture](#three-tier-architecture)
 4. [Delegation Flow](#delegation-flow)
-5. [Circular Workflow Patterns](#circular-workflow-patterns)
-6. [CLI Architecture](#cli-architecture)
-7. [TDD Enforcement](#tdd-enforcement)
-8. [Tool Usage Patterns](#tool-usage-patterns)
-9. [Shared Libraries](#shared-libraries)
-10. [Data Flow](#data-flow)
-11. [Key Design Decisions](#key-design-decisions)
+5. [CLI Architecture](#cli-architecture)
+6. [TDD Enforcement](#tdd-enforcement)
+7. [Tool Usage Patterns](#tool-usage-patterns)
+8. [Shared Libraries](#shared-libraries)
+9. [Data Flow](#data-flow)
+10. [Key Design Decisions](#key-design-decisions)
 
 ---
 
 ## Overview
 
-The Skill Manager is a comprehensive lifecycle management system for Claude Code skills. It enforces quality through TDD (Test-Driven Development), maintains compliance through 21-phase auditing with semantic review, and orchestrates complex workflows through circular delegation patterns.
+The Skill Manager is a comprehensive lifecycle management system for Claude Code skills. It enforces quality through TDD (Test-Driven Development), maintains compliance through 22-phase auditing with semantic review, and orchestrates workflows through simple delegation patterns.
 
 **System Capabilities:**
 
 - **Lifecycle Management**: Create, update, delete, rename, migrate skills
-- **Quality Assurance**: 21-phase structural audit + Claude semantic review
-- **Compliance Remediation**: Four-tier fix orchestration (deterministic, Claude-automated, hybrid, human-required)
+- **Quality Assurance**: 22-phase structural audit + Claude semantic review
+- **Compliance Remediation**: Three-tier fix orchestration (deterministic, semantic, manual)
 - **Discovery**: Search and list skills across dual locations (core + library)
 - **Research**: Context7, web, and codebase research for comprehensive skill creation/updates
 - **Gateway Sync**: Validate gateway-library consistency
@@ -35,93 +34,61 @@ The Skill Manager is a comprehensive lifecycle management system for Claude Code
 
 - **Progressive Disclosure**: Keep skills under 500 lines, extract details to references/
 - **Deterministic Output**: CLI produces identical results for same inputs
-- **TDD Enforcement**: RED-GREEN-REFACTOR mandatory for all changes
+- **TDD Enforcement**: RED-GREEN-REFACTOR for creation, RED-GREEN for updates
 - **Router Pattern**: Pure delegation without implementation logic
 - **Single Responsibility**: Each component does one thing well
 
 ---
 
-## State Machine Model
+## Workflow Phases
 
-The Skill Manager operates as a **finite state machine** with circular transitions for iterative quality improvement. Understanding this model is essential for:
+The Skill Manager uses a simple delegation model where operations flow through predictable phases based on user choices and system capabilities. Understanding these workflow phases helps users navigate the different operation types:
 
-- **Debugging**: Knowing which state transitions are valid helps diagnose stuck workflows
-- **Extension**: Adding new operations requires defining their state transitions
-- **Monitoring**: State tracking enables progress visibility and timeout detection
+### Workflow Categories
 
-### State Categories
+| Category              | Operations                                                              | Characteristics                           |
+| --------------------- | ----------------------------------------------------------------------- | ----------------------------------------- |
+- **Instruction-Based**: CREATE, DELETE, RENAME, MIGRATE, LIST, SYNC-GATEWAYS
+- **CLI-Based**: AUDIT, FIX, UPDATE, SEARCH
+- **Delegated**: RESEARCH, PRESSURE-TESTING
 
-| Category                | States                                                                                          | Characteristics                     |
-| ----------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------- |
-| **Entry States**        | CREATING, UPDATING, AUDITING, FIXING, DELETING, RENAMING, MIGRATING, SEARCHING, LISTING, SYNCING_GATEWAYS | User-initiated via `/skill-manager` |
-| **Intermediate States** | RESEARCHING, PRESSURE_TESTING, AWAITING_HUMAN                                                   | Delegation or waiting states        |
-| **Terminal States**     | COMPLETE, ERROR, CANCELLED                                                                      | Workflow endpoints                  |
+### Operation Flow Patterns
 
-### State Transition Matrix
-
-The complete matrix of all valid state transitions in the system:
+The system follows simple delegation patterns rather than complex state machines:
 
 ```
-╔═══════════════════════════════════════════════════════════════════════════════════════════╗
-║                         STATE TRANSITION MATRIX - SKILL MANAGER                           ║
-╠═══════════════════════════════════════════════════════════════════════════════════════════╣
-║ Current State       │ Event/Condition               │ Next State         │ Notes          ║
-╠═══════════════════════════════════════════════════════════════════════════════════════════╣
-║                                                                                           ║
-║ ─── CREATION WORKFLOW (9 phases) ─────────────────────────────────────────────────────── ║
-║ CREATING            │ phase_6_research_needed       │ RESEARCHING        │ delegation     ║
-║ CREATING            │ phase_7_audit_needed          │ AUDITING           │ GREEN phase    ║
-║ CREATING            │ phase_8_refactor_needed       │ PRESSURE_TESTING   │ via subagent   ║
-║ CREATING            │ phase_9_complete              │ COMPLETE           │ ─              ║
-║ RESEARCHING         │ research_complete             │ CREATING           │ return ph6     ║
-║ PRESSURE_TESTING    │ all_scenarios_pass            │ CREATING           │ continue ph9   ║
-║ PRESSURE_TESTING    │ bypass_detected               │ CREATING           │ add counters   ║
-║                                                                                           ║
-║ ─── UPDATE WORKFLOW (7 phases) ───────────────────────────────────────────────────────── ║
-║ UPDATING            │ research_needed               │ RESEARCHING        │ optional       ║
-║ UPDATING            │ phase_6_green_pass            │ AUDITING           │ compliance     ║
-║ UPDATING            │ phase_7_refactor_needed       │ PRESSURE_TESTING   │ non-trivial    ║
-║ UPDATING            │ phase_7_cosmetic_only         │ COMPLETE           │ <10 lines      ║
-║ RESEARCHING         │ research_complete             │ UPDATING           │ continue edit  ║
-║                                                                                           ║
-║ ─── AUDIT ↔ FIX CYCLE (primary circular pattern) ──────────────────────────────────────── ║
-║ AUDITING            │ all_pass                      │ COMPLETE           │ ─              ║
-║ AUDITING            │ failures + user_full_fix      │ FIXING             │ recommended    ║
-║ AUDITING            │ failures + user_determ_only   │ FIXING             │ Tier 1 only    ║
-║ AUDITING            │ failures + user_skip          │ COMPLETE           │ with warnings  ║
-║ FIXING              │ fixes_applied                 │ AUDITING           │ re-audit ⟲     ║
-║ FIXING              │ iteration_count > 5           │ ERROR              │ max reached    ║
-║ FIXING              │ human_required_remaining      │ AWAITING_HUMAN     │ Tier 4         ║
-║ AWAITING_HUMAN      │ human_fixes_applied           │ AUDITING           │ re-verify      ║
-║ AWAITING_HUMAN      │ user_skip                     │ COMPLETE           │ with warnings  ║
-║                                                                                           ║
-║ ─── STRUCTURAL OPERATIONS ─────────────────────────────────────────────────────────────── ║
-║ DELETING            │ refs_found                    │ DELETING           │ update refs    ║
-║ DELETING            │ deletion_complete             │ COMPLETE           │ ─              ║
-║ DELETING            │ user_cancel                   │ CANCELLED          │ ─              ║
-║ RENAMING            │ step_n_complete (n < 7)       │ RENAMING           │ 7-step proto   ║
-║ RENAMING            │ all_7_steps_complete          │ AUDITING           │ verify rename  ║
-║ MIGRATING           │ move_complete                 │ AUDITING           │ verify paths   ║
-║ MIGRATING           │ user_skip_audit               │ COMPLETE           │ trust user     ║
-║                                                                                           ║
-║ ─── DISCOVERY & SYNC OPERATIONS ───────────────────────────────────────────────────────── ║
-║ SEARCHING           │ results_returned              │ COMPLETE           │ stateless      ║
-║ LISTING             │ skills_displayed              │ COMPLETE           │ stateless      ║
-║ SYNCING_GATEWAYS    │ all_consistent                │ COMPLETE           │ ─              ║
-║ SYNCING_GATEWAYS    │ inconsistencies + auto_fix    │ FIXING             │ gateway fixes  ║
-║ SYNCING_GATEWAYS    │ inconsistencies + manual      │ AWAITING_HUMAN     │ complex issues ║
-║                                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════════════════════╝
+INSTRUCTION-BASED WORKFLOWS:
+User Command → Router → Library Skill → Interactive Steps → Complete
 
-Legend:
-  ⟲  = Circular transition (returns to earlier state)
-  ─  = No special notes
-  Tier 1-4 = Fix categorization (Deterministic, Claude-Auto, Hybrid, Human)
+CLI-BASED WORKFLOWS:
+User Command → Router → Library Skill → CLI Execution → Complete
+
+DELEGATED WORKFLOWS:
+Main Skill → Sub-skill Delegation → Return to Main → Continue
 ```
 
-### Circular Dependency Graph
+### Key Workflow Characteristics
 
-Visual representation of state flows and circular patterns:
+**Instruction-Based Operations:**
+
+- Use native Claude tools (Read, Write, Edit, AskUserQuestion, etc.)
+- Interactive prompts guide users through multi-step processes
+- No automation - human judgment required for decisions
+- Examples: creating-skills (9 phases), renaming-skills (7 steps), deleting-skills
+
+**CLI-Based Operations:**
+
+- Execute compiled TypeScript programs via Bash tool
+- Deterministic output with structured error handling
+- Automated processing with user confirmation points
+- Examples: auditing-skills (22-phase validation), fixing-skills (4-tier remediation)
+
+**Delegated Operations:**
+
+- Main workflows invoke sub-skills for specialized tasks
+- Research delegation: creating-skills → researching-skills
+- Testing delegation: creating-skills → testing-skills-with-subagents
+- Return to main workflow after completion
 
 ```
                                  ┌─────────────────────┐
@@ -148,7 +115,7 @@ Visual representation of state flows and circular patterns:
     │      │   │                                                          │
     │      │   │                    AUDITING                              │
     │      │   │  ┌────────────────────────────────────────────────────┐  │
-    │      └──►│  │  1. CLI: 21-phase structural validation            │  │◄───┐
+    │      └──►│  │  1. CLI: 22-phase structural validation            │  │◄───┐
     │          │  │  2. Claude: Semantic review (6 criteria)           │  │    │
     └─────────►│  │  3. Merge: Deterministic combined output           │  │    │
                │  └────────────────────────────────────────────────────┘  │    │
@@ -195,127 +162,40 @@ Visual representation of state flows and circular patterns:
                └─────────┘
 ```
 
-### Secondary Delegation Chains
+### TodoWrite Integration
 
-Beyond the primary AUDIT ↔ FIX cycle, several secondary chains exist:
+**TodoWrite is optional workflow tracking** used in complex multi-step operations:
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────────┐
-│                           SECONDARY DELEGATION CHAINS                               │
-├─────────────────────────────────────────────────────────────────────────────────────┤
-│                                                                                     │
-│  CHAIN 1: Research Delegation (CREATE phase 6, UPDATE optional)                     │
-│  ───────────────────────────────────────────────────────────────────────────────    │
-│                                                                                     │
-│    CREATE ──phase_6──► RESEARCHING ──complete──► CREATE (continue ph7)              │
-│    UPDATE ──optional──► RESEARCHING ──complete──► UPDATE (continue edit)            │
-│                             │                                                       │
-│                             ├─► Codebase: Find similar patterns in existing skills  │
-│                             ├─► Context7: Official library/framework documentation  │
-│                             └─► Web: Supplemental articles and guides               │
-│                                                                                     │
-│                                                                                     │
-│  CHAIN 2: Pressure Testing (CREATE phase 8, UPDATE phase 7)                         │
-│  ───────────────────────────────────────────────────────────────────────────────    │
-│                                                                                     │
-│    CREATE ──phase_8──► PRESSURE_TESTING ──pass──► CREATE (continue ph9)             │
-│    UPDATE ──phase_7──► PRESSURE_TESTING ──pass──► COMPLETE                          │
-│                             │                                                       │
-│                             ├─► Spawns isolated subagent via Task tool              │
-│                             ├─► Scenario: TIME ("ship in 30 min")                   │
-│                             ├─► Scenario: AUTHORITY ("senior says skip")            │
-│                             ├─► Scenario: SUNK_COST ("already 4 hours in")          │
-│                             └─► If bypass detected: add counter-rationalizations    │
-│                                                                                     │
-│                                                                                     │
-│  CHAIN 3: Gateway Synchronization (maintenance)                                     │
-│  ───────────────────────────────────────────────────────────────────────────────    │
-│                                                                                     │
-│    SYNCING_GATEWAYS ──inconsistent──► FIXING ──► AUDITING ──► COMPLETE              │
-│           │                                                                         │
-│           ├─► Validate: gateway references match skill locations                    │
-│           ├─► Validate: no orphaned or phantom references                           │
-│           └─► Validate: all library skills have gateway coverage                    │
-│                                                                                     │
-│                                                                                     │
-│  CHAIN 4: Structural Operations (RENAME, MIGRATE)                                   │
-│  ───────────────────────────────────────────────────────────────────────────────    │
-│                                                                                     │
-│    RENAMING ──7_steps──► AUDITING ──► (normal audit flow)                           │
-│         │                                                                           │
-│         ├─► Step 1: Validate new name available                                     │
-│         ├─► Step 2: Update frontmatter name field                                   │
-│         ├─► Step 3: Move directory/files                                            │
-│         ├─► Step 4: Update gateway references                                       │
-│         ├─► Step 5: Update agent skills: fields                                     │
-│         ├─► Step 6: Update cross-skill references                                   │
-│         └─► Step 7: Update changelog                                                │
-│                                                                                     │
-│    MIGRATING ──move──► AUDITING ──► (normal audit flow)                             │
-│         │                                                                           │
-│         ├─► Validate: target location appropriate (core vs library)                 │
-│         ├─► Move: directory structure preserved                                     │
-│         └─► Update: all path-dependent references                                   │
-│                                                                                     │
-└─────────────────────────────────────────────────────────────────────────────────────┘
-```
+- **Not mandatory**: Single-step operations don't require TodoWrite
+- **Recommended**: Multi-step workflows (>5 steps) benefit from tracking
+- **Automatic**: Router suggests TodoWrite for complex operations
+- **Purpose**: Prevents missed steps in long interactive workflows
 
-### Cycle Characteristics
+**When TodoWrite is used:**
+
+- Creating skills (9 phases)
+- Renaming skills (7 steps)
+- Complex fixes (multiple issues)
+- Gateway synchronization (multiple validations)
+
+**When TodoWrite is not needed:**
+
+- Single CLI operations (audit, search, list)
+- Simple fixes (1-2 issues)
+- Basic operations (delete single skill)
 
 ```
-╔═════════════════════════════════════════════════════════════════════════════════════╗
-║                              CYCLE CHARACTERISTICS                                  ║
-╠═════════════════════════════════════════════════════════════════════════════════════╣
-║                                                                                     ║
-║  PRIMARY CYCLE: AUDIT ↔ FIX                                                         ║
-║  ─────────────────────────────────────────────────────────────────────────────────  ║
-║  │ Property        │ Value                                                     │    ║
-║  ├─────────────────┼───────────────────────────────────────────────────────────┤    ║
-║  │ Max iterations  │ 5                                                         │    ║
-║  │ Exit success    │ audit.status === 'all_pass'                               │    ║
-║  │ Exit failure    │ iteration > 5 → ERROR state                               │    ║
-║  │ User escape     │ user_skip → COMPLETE (warnings preserved)                 │    ║
-║  │ State tracking  │ TodoWrite maintains iteration count                       │    ║
-║                                                                                     ║
-║  SECONDARY CYCLES                                                                   ║
-║  ─────────────────────────────────────────────────────────────────────────────────  ║
-║  │ Cycle               │ Max Iter │ Exit Condition                            │     ║
-║  ├─────────────────────┼──────────┼───────────────────────────────────────────┤     ║
-║  │ PRESSURE_TESTING    │ 3        │ All scenarios pass OR counters added      │     ║
-║  │ RENAMING            │ 7        │ Sequential steps (not circular)           │     ║
-║  │ DELETING refs       │ N        │ N = count of references to update         │     ║
-║                                                                                     ║
-║  TERMINAL STATES                                                                    ║
-║  ─────────────────────────────────────────────────────────────────────────────────  ║
-║  │ State     │ Meaning                              │ Recovery                │     ║
-║  ├───────────┼──────────────────────────────────────┼─────────────────────────┤     ║
-║  │ COMPLETE  │ Success (may include warnings)       │ N/A                     │     ║
-║  │ ERROR     │ Unrecoverable (max iter, validation) │ Manual intervention     │     ║
-║  │ CANCELLED │ User-initiated abort                 │ Re-run operation        │     ║
-║                                                                                     ║
-╚═════════════════════════════════════════════════════════════════════════════════════╝
-```
-
-### State Machine Invariants
-
-The following invariants must hold for correct system operation:
-
-1. **Single Active State**: Only one state can be active at any time per workflow instance
-2. **Deterministic Transitions**: Given a state and event, the next state is always the same
-3. **Bounded Iterations**: All cycles have explicit iteration limits to prevent infinite loops
-4. **User Escape Hatches**: Every interactive state has a skip/cancel option to reach a terminal state
-5. **Audit Convergence**: The AUDIT ↔ FIX cycle must converge (fixes reduce failure count each iteration)
-6. **TodoWrite Tracking**: State transitions are recorded via TodoWrite for observability
 
 ---
 
-## Four-Layer Architecture
+## Three-Tier Architecture
 
-The system is organized in four distinct layers, each with clear responsibilities:
+The system is organized in three distinct tiers, each with clear responsibilities:
 
 ```
+
 ┌─────────────────────────────────────────────────────────────────┐
-│ LAYER 1: COMMAND ENTRY POINT                                    │
+│ TIER 1: COMMAND ENTRY POINT                                     │
 │ ┌─────────────────────────────────────────────────────────────┐ │
 │ │ /skill-manager command (.claude/commands/skill-manager.md)  │ │
 │ │ • User invokes: /skill-manager <operation> [args]           │ │
@@ -323,77 +203,62 @@ The system is organized in four distinct layers, each with clear responsibilitie
 │ │ • Delegates to managing-skills router                       │ │
 │ └─────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
-                              ↓
+↓
 ┌─────────────────────────────────────────────────────────────────┐
-│ LAYER 2: ROUTER SKILL                                           │
+│ TIER 2: ROUTER SKILL                                            │
 │ ┌─────────────────────────────────────────────────────────────┐ │
 │ │ managing-skills (.claude/skills/managing-skills/SKILL.md)   │ │
-│ │ • Pure router - NO implementation logic                     │ │
+│ │ • Routes requests to appropriate library skills             │ │
 │ │ • Maintains delegation map (10 operations)                  │ │
-│ │ • Routes to appropriate sub-skill                           │ │
-│ │ • Enforces TodoWrite tracking for all operations            │ │
+│ │ • Handles workflow tracking and coordination                │ │
 │ └─────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
-                              ↓
+↓
 ┌─────────────────────────────────────────────────────────────────┐
-│ LAYER 3: SPECIALIZED SUB-SKILLS (10 operations)                 │
+│ TIER 3: LIBRARY SKILLS                                          │
 │ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ INSTRUCTION-BASED (No CLI):                                 │ │
-│ │ • creating-skills      - Skill creation with TDD            │ │
-│ │ • deleting-skills      - Safe deletion with cleanup         │ │
-│ │ • renaming-skills      - 7-step safe rename protocol        │ │
-│ │ • listing-skills       - Display all skills                 │ │
-│ │ • researching-skills   - Codebase/Context7/web research     │ │
-│ │ • migrating-skills     - Move between core ↔ library        │ │
-│ │ • syncing-gateways     - Validate gateway consistency       │ │
+│ │ INSTRUCTION-BASED:                                          │ │
+│ │ • creating-skills - Skill creation with TDD                 │ │
+│ │ • deleting-skills - Safe deletion with cleanup              │ │
+│ │ • renaming-skills - 7-step safe rename protocol             │ │
+│ │ • listing-skills - Display all skills                       │ │
+│ │ • researching-skills - Codebase/Context7/web research       │ │
+│ │ • migrating-skills - Move between core ↔ library            │ │
+│ │ • syncing-gateways - Validate gateway consistency           │ │
 │ └─────────────────────────────────────────────────────────────┘ │
 │ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ CLI-BASED (TypeScript + Claude):                            │ │
-│ │ • auditing-skills      - 21-phase structural + semantic     │ │
-│ │ • fixing-skills        - Four-tier fix orchestration        │ │
-│ │ • updating-skills      - Test-guarded updates               │ │
-│ │ • searching-skills     - Keyword search (uses audit CLI)    │ │
-│ └─────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│ LAYER 4: CLI IMPLEMENTATION (TypeScript)                        │
-│ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ auditing-skills/scripts/                                    │ │
-│ │ ├── src/audit.ts        - 21-phase audit orchestration      │ │
-│ │ ├── src/search.ts       - Dual-location keyword search      │ │
-│ │ └── src/lib/            - Shared audit engine + phases      │ │
-│ │     ├── audit-engine.ts - Phase validation engine           │ │
-│ │     ├── types.ts        - Shared type definitions           │ │
-│ │     └── phases/         - Phase implementations             │ │
+│ │ CLI-BASED:                                                  │ │
+│ │ • auditing-skills - 22-phase structural + semantic          │ │
+│ │ • fixing-skills - Four-tier fix orchestration               │ │
+│ │ • updating-skills - Test-guarded updates                    │ │
+│ │ • searching-skills - Keyword search (uses audit CLI)        │ │
 │ └─────────────────────────────────────────────────────────────┘ │
 │ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ fixing-skills/scripts/                                      │ │
-│ │ ├── src/fix.ts          - Fix orchestration CLI             │ │
-│ │ └── Uses: ../auditing-skills/lib/ (shared engine)           │ │
-│ └─────────────────────────────────────────────────────────────┘ │
-│ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ updating-skills/scripts/                                    │ │
-│ │ ├── src/update.ts       - TDD update workflow               │ │
-│ │ └── Uses: ../auditing-skills/lib/ (shared engine)           │ │
-│ └─────────────────────────────────────────────────────────────┘ │
-│ ┌─────────────────────────────────────────────────────────────┐ │
-│ │ formatting-skill-output/scripts/                            │ │
-│ │ ├── src/format.ts       - Deterministic table formatter     │ │
-│ │ └── src/index.ts        - Shared formatting library         │ │
-│ │ Used by: auditing, fixing                                   │ │
+│ │ SHARED CLI INFRASTRUCTURE:                                  │ │
+│ │ • formatting-skill-output - Deterministic table formatting  │ │
+│ │ • auditing-skills/lib - Shared audit engine + phases        │ │
+│ │ • npm workspace system - Code reuse across CLIs             │ │
 │ └─────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
+
 ```
 
-**Layer Responsibilities:**
+**Tier Responsibilities:**
 
-| Layer             | Responsibility                             | Implementation              | Tools Used                   |
-| ----------------- | ------------------------------------------ | --------------------------- | ---------------------------- |
-| **1. Command**    | User entry point, operation validation     | Markdown command file       | Skill tool                   |
-| **2. Router**     | Pure delegation, TodoWrite enforcement     | Markdown skill file         | Read, Skill, AskUserQuestion |
-| **3. Sub-Skills** | Operation-specific workflows and logic     | Markdown skills (10 total)  | All tools (varies by skill)  |
-| **4. CLI**        | Deterministic automation, shared libraries | TypeScript (npm workspaces) | N/A (executed by Bash tool)  |
+**Tier 1: Command**
+- **Responsibility**: User entry point, operation validation
+- **Implementation**: Markdown command file
+- **Tools Used**: Skill tool
+
+**Tier 2: Router**
+- **Responsibility**: Request routing and workflow coordination
+- **Implementation**: Markdown skill file
+- **Tools Used**: Read, Skill, AskUserQuestion
+
+**Tier 3: Library**
+- **Responsibility**: Operation-specific workflows and automation
+- **Implementation**: Markdown skills + TypeScript
+- **Tools Used**: All tools (varies by skill)
 
 ---
 
@@ -404,219 +269,60 @@ The system is organized in four distinct layers, each with clear responsibilitie
 When a user invokes `/skill-manager <operation>`, the system routes through this delegation chain:
 
 ```
+
 USER INPUT: /skill-manager create my-new-skill
 
 Step 1: Command validates operation
-  → .claude/commands/skill-manager.md
-  → Recognizes "create" operation
-  → Delegates to managing-skills router
+→ .claude/commands/skill-manager.md
+→ Recognizes "create" operation
+→ Delegates to managing-skills router
 
 Step 2: Router delegates to sub-skill
-  → .claude/skills/managing-skills/SKILL.md
-  → Maps "create" → creating-skills
-  → Uses Read tool to load sub-skill
-  → Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")
+→ .claude/skills/managing-skills/SKILL.md
+→ Maps "create" → creating-skills
+→ Uses Read tool to load sub-skill
+→ Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")
 
 Step 3: Sub-skill executes workflow
-  → creating-skills/SKILL.md
-  → 9-phase creation workflow
-  → Phase 1: RED (prove gap exists)
-  → Phase 2-5: Validation, location, category, type
-  → Phase 6: Research (researching-skills delegation)
-  → Phase 7: GREEN (verify skill works)
-  → Phase 8: REFACTOR (pressure testing)
-  → Phase 9: Complete
+→ creating-skills/SKILL.md
+→ 9-phase creation workflow
+→ Phase 1: RED (prove gap exists)
+→ Phase 2-5: Validation, location, category, type
+→ Phase 6: Research (researching-skills delegation)
+→ Phase 7: GREEN (verify skill works)
+→ Phase 8: REFACTOR (pressure testing)
+→ Phase 9: Complete
 
 Step 4: Audit validation (automatic)
-  → creating-skills invokes auditing-skills
-  → CLI executes: npm run audit -- my-new-skill
-  → Returns compliance status
+→ creating-skills invokes auditing-skills
+→ CLI executes: npm run audit -- my-new-skill
+→ Returns compliance status
 
-Step 5: Fix if needed (circular delegation)
-  → If audit fails, prompt user
-  → User selects "Run full fixing workflow"
-  → Delegates to fixing-skills
-  → fixing-skills applies fixes
-  → Re-audits (back to auditing-skills)
+Step 5: Fix if needed
+→ If audit fails, prompt user
+→ User selects "Run full fixing workflow"
+→ Delegates to fixing-skills
+→ fixing-skills applies fixes
+
 ```
 
 **Complete Delegation Table:**
 
-| User Input                      | Command → Router → Sub-Skill                        | CLI Involved?          | Circular?           |
-| ------------------------------- | --------------------------------------------------- | ---------------------- | ------------------- |
-| `/skill-manager create X`       | skill-manager → managing-skills → creating-skills   | Yes (audit)            | Yes (audit → fix)   |
-| `/skill-manager update X`       | skill-manager → managing-skills → updating-skills   | Yes (update CLI)       | Yes (audit → fix)   |
-| `/skill-manager audit X`        | skill-manager → managing-skills → auditing-skills   | Yes (audit CLI)        | Yes (→ fix → audit) |
-| `/skill-manager fix X`          | skill-manager → managing-skills → fixing-skills     | Yes (fix CLI)          | Yes (→ audit → fix) |
-| `/skill-manager delete X`       | skill-manager → managing-skills → deleting-skills   | No (instructions)      | No                  |
-| `/skill-manager rename X Y`     | skill-manager → managing-skills → renaming-skills   | No (instructions)      | No                  |
-| `/skill-manager search "query"` | skill-manager → managing-skills → searching-skills  | Yes (audit CLI search) | No                  |
-| `/skill-manager list`           | skill-manager → managing-skills → listing-skills    | No (instructions)      | No                  |
-| `/skill-manager migrate X`      | skill-manager → managing-skills → migrating-skills  | No (instructions)      | No                  |
-| `/skill-manager sync-gateways`  | skill-manager → managing-skills → syncing-gateways  | No (instructions)      | No                  |
+| Operation              | Target Skill          | CLI Used?    |
+| ---------------------- | --------------------- | ------------ |
+| `create <name>`        | `creating-skills`     | ✓ Audit      |
+| `update <name>`        | `updating-skills`     | ✓ Update     |
+| `audit <name>`         | `auditing-skills`     | ✓ Audit      |
+| `fix <name>`           | `fixing-skills`       | ✓ Fix        |
+| `search <query>`       | `searching-skills`    | ✓ Search     |
+| `delete <name>`        | `deleting-skills`     | —            |
+| `rename <old> <new>`   | `renaming-skills`     | —            |
+| `list`                 | `listing-skills`      | —            |
+| `migrate <name>`       | `migrating-skills`    | —            |
+| `sync-gateways`        | `syncing-gateways`    | —            |
 
 ---
 
-## Circular Workflow Patterns
-
-The system implements circular delegation patterns for iterative quality improvement. These patterns enable Claude to automatically remediate issues until compliance is achieved.
-
-### Pattern 1: Audit → Fix → Audit Loop
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│ USER ACTION: /skill-manager audit my-skill                       │
-└──────────────────────────────────────────────────────────────────┘
-                              ↓
-┌──────────────────────────────────────────────────────────────────┐
-│ AUDITING-SKILLS                                                  │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ Step 1: Run CLI audit                                        │ │
-│ │   npm run audit -- my-skill                                  │ │
-│ │   → 21-phase structural validation                           │ │
-│ │   → Returns: 5 failures (phases 1, 3, 4, 10, 14e)            │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ Step 2: Claude semantic review                               │ │
-│ │   Evaluate 6 criteria:                                       │ │
-│ │   → Description quality, categorization, gateway membership  │ │
-│ │   → Tool appropriateness, content density, documentation     │ │
-│ │   → Output: JSON findings                                    │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ Step 3: Merge and render                                     │ │
-│ │   npm run audit -- my-skill --merge-semantic /tmp/file.json  │ │
-│ │   → Deterministic combined table                             │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ Step 4: Prompt user for action                               │ │
-│ │   AskUserQuestion:                                           │ │
-│ │   → Run full fixing workflow (Recommended)                   │ │
-│ │   → Apply deterministic fixes only                           │ │
-│ │   → Show fix categorization                                  │ │
-│ │   → Skip                                                     │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────────────┘
-                              ↓
-                   User selects "Run full fixing workflow"
-                              ↓
-┌──────────────────────────────────────────────────────────────────┐
-│ FIXING-SKILLS (Invoked via Read tool)                            │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ Step 1: Categorize issues                                    │ │
-│ │   Deterministic: Phase 2, 5, 7, 14a-c, 16, 18 (CLI auto-fix) │ │
-│ │   Claude-Auto:   Phase 1, 3, 11, 13, 15, 17, 21              │ │
-│ │   Hybrid:        Phase 4, 6, 10, 12, 19                      │ │
-│ │   Human:         Phase 8, 9, 20                              │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ Step 2: Apply deterministic fixes                            │ │
-│ │   npm run fix -- my-skill                                    │ │
-│ │   → Phases 2, 5, 7, 14a-c, 16, 18 fixed                      │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ Step 3: Apply Claude-automated fixes                         │ │
-│ │   Phase 1: Rewrite description (Edit tool)                   │ │
-│ │   Phase 3: Extract to references/ (Write, Edit tools)        │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ Step 4: Apply hybrid fixes                                   │ │
-│ │   Phase 4: Broken link → AskUserQuestion                     │ │
-│ │     User: "Create placeholder with generated content"        │ │
-│ │     → Write reference file with Claude-generated content     │ │
-│ │   Phase 10: Phantom ref → Fuzzy match suggestions            │ │
-│ │     User: "Correct to suggested skill"                       │ │
-│ │     → Edit with corrected reference                          │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ Step 5: Update changelog                                     │ │
-│ │   Document: Fixed phases 1, 2, 3, 4, 7, 10, 14a-c            │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ Step 6: Re-audit to verify fixes                             │ │
-│ │   CIRCULAR DELEGATION back to auditing-skills                │ │
-│ │   Read(".../auditing-skills/SKILL.md")                       │ │
-│ │   → Run audit again                                          │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────────────┘
-                              ↓
-┌──────────────────────────────────────────────────────────────────┐
-│ BACK TO AUDITING-SKILLS (Re-audit)                               │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ npm run audit -- my-skill                                    │ │
-│ │ Result: All 21 phases PASS                                   │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-│ ┌──────────────────────────────────────────────────────────────┐ │
-│ │ Output: Success message (no prompt needed)                   │ │
-│ └──────────────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────────────┘
-```
-
-**Key Characteristics:**
-
-1. **Automatic Iteration**: Claude continues fixing until audit passes
-2. **Progressive Fix Tiers**: Deterministic → Claude-Auto → Hybrid → Human
-3. **User Involvement**: Only for ambiguous cases (hybrid fixes) or critical decisions
-4. **State Tracking**: TodoWrite maintains fix progress across iterations
-5. **Exit Condition**: Audit passes with zero failures
-
-### Pattern 2: Create → Audit → Fix Loop
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│ USER ACTION: /skill-manager create my-new-skill                  │
-└──────────────────────────────────────────────────────────────────┘
-                              ↓
-┌──────────────────────────────────────────────────────────────────┐
-│ CREATING-SKILLS                                                  │
-│ Phase 1-6: Creation workflow completes                           │
-│ Phase 7: GREEN verification (run audit)                          │
-│   → Delegates to auditing-skills                                 │
-│   → npm run audit -- my-new-skill                                │
-│   → Result: 3 warnings (phases 4, 6, 14e)                        │
-│                                                                  │
-│ Phase 7 continued: Prompt user                                   │
-│   AskUserQuestion:                                               │
-│   → Run full fixing workflow (Recommended)                       │
-│   → Skip (fix manually later)                                    │
-└──────────────────────────────────────────────────────────────────┘
-                              ↓
-                   User selects "Run full fixing workflow"
-                              ↓
-┌──────────────────────────────────────────────────────────────────┐
-│ FIXING-SKILLS (Delegated from creating-skills)                   │
-│ Apply fixes → Re-audit → Pass                                    │
-│ (Same pattern as Audit → Fix → Audit above)                      │
-└──────────────────────────────────────────────────────────────────┘
-                              ↓
-┌──────────────────────────────────────────────────────────────────┐
-│ BACK TO CREATING-SKILLS                                          │
-│ Phase 8: REFACTOR (pressure testing)                             │
-│ Phase 9: Complete ✅                                             │
-└──────────────────────────────────────────────────────────────────┘
-```
-
-### Pattern 3: Update → Research → Audit → Fix Loop
-
-```
-UPDATING-SKILLS
-  → Step 3.5 (Optional): Research via researching-skills
-    → User chooses to research for library/framework updates
-    → Delegates to researching-skills
-    → Returns with updated documentation
-  → Step 4: Edit skill content
-  → Step 6 (Compliance): Delegates to auditing-skills
-  → If failures: Prompt user → fixing-skills
-  → fixing-skills → Re-audit
-  → Loop until pass
-```
-
-**Why Circular Patterns?**
-
-- **Quality Assurance**: No skill leaves non-compliant
-- **Automation**: Claude handles routine fixes without interruption
-- **User Control**: Ambiguous cases still require human judgment
-- **Iterative Improvement**: Each iteration brings skill closer to compliance
 
 ---
 
@@ -627,44 +333,46 @@ The CLI layer provides deterministic automation for operations that require comp
 ### Workspace Structure
 
 ```
+
 .claude/skill-library/claude/skill-management/
-├── auditing-skills/scripts/          (@chariot/auditing-skills)
-│   ├── package.json
-│   ├── src/
-│   │   ├── audit.ts                  # 21-phase audit CLI
-│   │   ├── search.ts                 # Dual-location search CLI
-│   │   └── lib/                      # Shared audit engine
-│   │       ├── audit-engine.ts       # Phase validation engine
-│   │       ├── orchestrator.ts       # Multi-phase orchestration
-│   │       ├── types.ts              # Shared types
-│   │       ├── phases/               # Phase implementations
-│   │       └── reporters/            # Output formatters
-│   └── tsconfig.json
+├── auditing-skills/scripts/ (@chariot/auditing-skills)
+│ ├── package.json
+│ ├── src/
+│ │ ├── audit.ts # 22-phase audit CLI
+│ │ ├── search.ts # Dual-location search CLI
+│ │ └── lib/ # Shared audit engine
+│ │ ├── audit-engine.ts # Phase validation engine
+│ │ ├── orchestrator.ts # Multi-phase orchestration
+│ │ ├── types.ts # Shared types
+│ │ ├── phases/ # Phase implementations
+│ │ └── reporters/ # Output formatters
+│ └── tsconfig.json
 │
-├── fixing-skills/scripts/            (@chariot/fixing-skills)
-│   ├── package.json
-│   ├── src/
-│   │   └── fix.ts                    # Fix orchestration CLI
-│   │       Uses: ../auditing-skills/scripts/src/lib/
-│   └── tsconfig.json
+├── fixing-skills/scripts/ (@chariot/fixing-skills)
+│ ├── package.json
+│ ├── src/
+│ │ └── fix.ts # Fix orchestration CLI
+│ │ Uses: ../auditing-skills/scripts/src/lib/
+│ └── tsconfig.json
 │
-├── updating-skills/scripts/          (@chariot/updating-skills)
-│   ├── package.json
-│   ├── src/
-│   │   └── update.ts                 # TDD update CLI
-│   │       Uses: ../auditing-skills/scripts/src/lib/
-│   └── tsconfig.json
+├── updating-skills/scripts/ (@chariot/updating-skills)
+│ ├── package.json
+│ ├── src/
+│ │ └── update.ts # TDD update CLI
+│ │ Uses: ../auditing-skills/scripts/src/lib/
+│ └── tsconfig.json
 │
-└── formatting-skill-output/scripts/  (@chariot/formatting-skill-output)
-    ├── package.json
-    ├── src/
-    │   ├── format.ts                 # CLI entry point
-    │   ├── index.ts                  # Shared library export
-    │   └── lib/
-    │       ├── table-formatter.ts    # Deterministic tables
-    │       └── schemas.ts            # Zod validation
-    └── tsconfig.json
-```
+└── formatting-skill-output/scripts/ (@chariot/formatting-skill-output)
+├── package.json
+├── src/
+│ ├── format.ts # CLI entry point
+│ ├── index.ts # Shared library export
+│ └── lib/
+│ ├── table-formatter.ts # Deterministic tables
+│ └── schemas.ts # Zod validation
+└── tsconfig.json
+
+````
 
 ### Shared Library Pattern
 
@@ -676,7 +384,7 @@ export class SkillAuditor {
   // Phase validation logic
   validatePhase1(skill: Skill): PhaseResult { /* ... */ }
   validatePhase2(skill: Skill): PhaseResult { /* ... */ }
-  // ... all 21 phases
+  // ... all 22 phases
 
   runAudit(skillPath: string, phase?: number): AuditResult {
     // Orchestrate phase execution
@@ -684,12 +392,12 @@ export class SkillAuditor {
   }
 }
 
-export const PHASE_COUNT = 21; // Single source of truth
-```
+export const PHASE_COUNT = 22; // Single source of truth
+````
 
 **Used by:**
 
-1. **auditing-skills/audit.ts**: Full 21-phase audit
+1. **auditing-skills/audit.ts**: Full 22-phase audit
 2. **fixing-skills/fix.ts**: Identify which issues to fix
 3. **updating-skills/update.ts**: Validate changes don't break compliance
 
@@ -729,7 +437,7 @@ export function formatFindingsTable(findings: Finding[]): string {
 
 ### Four-Tier Fix Architecture
 
-The fixing-skills CLI implements a sophisticated four-tier orchestration:
+The fixing-skills CLI implements a robust three-tier orchestration:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -742,25 +450,16 @@ The fixing-skills CLI implements a sophisticated four-tier orchestration:
 │ Example: Fix allowed-tools YAML format                          │
 └─────────────────────────────────────────────────────────────────┘
 ┌─────────────────────────────────────────────────────────────────┐
-│ TIER 2: CLAUDE-AUTOMATED (Claude applies without confirm)       │
-│ Phases: 1, 3, 11, 13, 15, 17, 21                                │
+│ TIER 2: SEMANTIC (Claude reasoning)                             │
+│ Phases: 1, 3, 4, 6, 10-13, 15, 17, 19, 21, 22                   │
 │ Characteristics:                                                │
 │ • Requires semantic understanding                               │
-│ • Clear correct outcome (once understood)                       │
-│ • No user confirmation needed                                   │
-│ Example: Rewrite description to "Use when..." format            │
+│ • Automated or interactive based on confidence                  │
+│ • Handles ambiguous cases via user prompts                      │
+│ Example: Rewrite description, choose gateway                    │
 └─────────────────────────────────────────────────────────────────┘
 ┌─────────────────────────────────────────────────────────────────┐
-│ TIER 3: HYBRID (Claude + user for ambiguous)                    │
-│ Phases: 4, 6, 10, 12, 19                                        │
-│ Characteristics:                                                │
-│ • Multiple valid approaches                                     │
-│ • Context-dependent decisions                                   │
-│ • User confirmation required for ambiguous cases                │
-│ Example: Broken link - create placeholder or remove?            │
-└─────────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────────┐
-│ TIER 4: HUMAN-REQUIRED (Interactive guidance)                   │
+│ TIER 3: MANUAL (Human-required)                                 │
 │ Phases: 8, 9, 20                                                │
 │ Characteristics:                                                │
 │ • Genuine human judgment needed                                 │
@@ -774,7 +473,7 @@ The fixing-skills CLI implements a sophisticated four-tier orchestration:
 
 ## TDD Enforcement
 
-Test-Driven Development is mandatory across all skill lifecycle operations. The system enforces RED-GREEN-REFACTOR at multiple levels.
+Test-Driven Development is enforced for skill creation and updates. The system uses RED-GREEN-REFACTOR for new skills and RED-GREEN for updates.
 
 ### TDD Workflow Integration
 
@@ -890,20 +589,20 @@ Test Execution:
 
 The system uses different tools at different layers. Understanding which tools are appropriate for each operation is critical.
 
-### Tool Usage by Layer
+### Tool Usage by Tier
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ LAYER 2: ROUTER (managing-skills)                               │
+│ TIER 2: ROUTER (managing-skills)                                │
 │ ┌─────────────────────────────────────────────────────────────┐ │
 │ │ Allowed Tools: Read, Bash, Grep, Glob, TodoWrite, Skill,    │ │
 │ │                AskUserQuestion                              │ │
 │ │                                                             │ │
 │ │ Usage:                                                      │ │
-│ │ • Read: Load sub-skill markdown files                       │ │
+│ │ • Read: Load library skill markdown files                   │ │
 │ │ • Bash: Execute CLI commands (npm run audit/fix/search)     │ │
 │ │ • Grep/Glob: Discover skills for routing                    │ │
-│ │ • TodoWrite: Track multi-phase workflows (MANDATORY)        │ │
+│ │ • TodoWrite: Track multi-phase workflows                    │ │
 │ │ • Skill: Invoke core skills (testing-skills-with-subagents) │ │
 │ │ • AskUserQuestion: Prompt for operation confirmation        │ │
 │ │                                                             │ │
@@ -913,7 +612,7 @@ The system uses different tools at different layers. Understanding which tools a
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│ LAYER 3: INSTRUCTION-BASED SUB-SKILLS                           │
+│ TIER 3: INSTRUCTION-BASED LIBRARY SKILLS                        │
 │ ┌─────────────────────────────────────────────────────────────┐ │
 │ │ creating-skills                                             │ │
 │ │ Allowed Tools: Read, Write, Edit, Bash, Grep, Glob,         │ │
@@ -948,7 +647,7 @@ The system uses different tools at different layers. Understanding which tools a
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│ LAYER 3: CLI-BASED SUB-SKILLS                                   │
+│ TIER 3: CLI-BASED LIBRARY SKILLS                                │
 │ ┌─────────────────────────────────────────────────────────────┐ │
 │ │ auditing-skills                                             │ │
 │ │ Allowed Tools: Bash, Read, Grep, TodoWrite, AskUserQuestion │ │
@@ -991,7 +690,7 @@ The system uses different tools at different layers. Understanding which tools a
 **Use CLI when:**
 
 - **Deterministic Analysis**: File structure validation, frontmatter parsing
-- **Complex Logic**: 21-phase audit with cross-referencing
+- **Complex Logic**: 22-phase audit with cross-referencing
 - **Performance**: Scanning hundreds of skills
 - **Shared Code**: Multiple operations need same validation logic
 - **Reproducible Output**: Formatting must be identical across runs
@@ -1043,7 +742,7 @@ The system maximizes code reuse through shared TypeScript libraries and patterns
 
 **Consumers:**
 
-1. **auditing-skills/audit.ts**: Uses audit-engine.ts for 21-phase validation
+1. **auditing-skills/audit.ts**: Uses audit-engine.ts for 22-phase validation
 2. **fixing-skills/fix.ts**: Imports audit-engine.ts via relative path
 3. **updating-skills/update.ts**: Imports library-discovery.ts, audit-engine.ts
 
@@ -1051,9 +750,9 @@ The system maximizes code reuse through shared TypeScript libraries and patterns
 
 ```typescript
 // fixing-skills/scripts/src/fix.ts
-import { SkillAuditor, PHASE_COUNT } from '../../auditing-skills/scripts/src/lib/audit-engine.js';
-import { findSkill } from '../../auditing-skills/scripts/src/lib/skill-finder.js';
-import { type PhaseResult, type AuditResult } from '../../auditing-skills/scripts/src/lib/types.js';
+import { SkillAuditor, PHASE_COUNT } from "../../auditing-skills/scripts/src/lib/audit-engine.js";
+import { findSkill } from "../../auditing-skills/scripts/src/lib/skill-finder.js";
+import { type PhaseResult, type AuditResult } from "../../auditing-skills/scripts/src/lib/types.js";
 
 // Now fixing-skills can run audits without duplicating logic
 const auditor = new SkillAuditor();
@@ -1082,7 +781,12 @@ const results = await auditor.runAudit(skillPath);
 
 ```typescript
 // auditing-skills/scripts/src/audit.ts
-import { formatFindingsTable, countFindings, formatCompletionMessage, type Finding } from '@chariot/formatting-skill-output/lib/table-formatter';
+import {
+  formatFindingsTable,
+  countFindings,
+  formatCompletionMessage,
+  type Finding,
+} from "@chariot/formatting-skill-output/lib/table-formatter";
 
 // Use shared formatter
 const output = formatFindingsTable(findings);
@@ -1121,6 +825,7 @@ Understanding how data moves through the system is critical for debugging and ex
 │ managing-skills/SKILL.md                                         │
 │   → Maps "audit" → auditing-skills                               │
 │   → Loads: Read(".../auditing-skills/SKILL.md")                  │
+│   → Enforces: Step 0 (Repo Root Navigation)                      │
 └──────────────────────────────────────────────────────────────────┘
                               ↓
 ┌──────────────────────────────────────────────────────────────────┐
@@ -1141,7 +846,7 @@ Understanding how data moves through the system is critical for debugging and ex
 │   ┌────────────────────────────────────────────────────────────┐ │
 │   │ 4b. Audit Engine Execution                                 │ │
 │   │   • SkillAuditor.runAudit(path)                            │ │
-│   │   • Runs phases 1-21 sequentially                          │ │
+│   │   • Runs phases 1-22 sequentially                          │ │
 │   │   • Each phase returns: PhaseResult                        │ │
 │   │     { phase, status: 'pass'|'warn'|'fail', message }       │ │
 │   └────────────────────────────────────────────────────────────┘ │
@@ -1211,9 +916,8 @@ Understanding how data moves through the system is critical for debugging and ex
 └──────────────────────────────────────────────────────────────────┘
                               ↓
 ┌──────────────────────────────────────────────────────────────────┐
-│ STEP 8: Circular Delegation (if fixes chosen)                    │
-│ fixing-skills/SKILL.md → Apply fixes → Re-audit                  │
-│ (See Circular Workflow Patterns section)                         │
+│ STEP 8: Apply fixes (if chosen)                    │
+│ fixing-skills/SKILL.md → Apply fixes                  │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1277,29 +981,28 @@ Understanding the rationale behind architectural choices.
 - **Clarity**: Delegation map is clear and explicit
 - **Testing**: Router logic is trivial (just mapping)
 
-### 4. Four-Tier Fix Model
+### 4. Three-Tier Fix Model
 
-**Decision**: Fixes categorized as Deterministic, Claude-Automated, Hybrid, Human-Required
+**Decision**: Fixes categorized as Deterministic, Semantic, and Manual
 
 **Rationale:**
 
-- **Efficiency**: Auto-fix what's safe, prompt only when needed
-- **Safety**: Hybrid tier catches ambiguous cases before wrong fix applied
-- **User Control**: Human-required tier respects genuine judgment needs
-- **Progressive Enhancement**: Can move fixes between tiers as confidence grows
+- **Efficiency**: Auto-fix what's safe (Tier 1)
+- **Flexibility**: Claude handles semantics, prompting only when needed (Tier 2)
+- **Safety**: Complex judgment reserved for humans (Tier 3)
 
 **Tier Selection Criteria:**
 
-| Question                        | Deterministic | Claude-Auto | Hybrid          | Human        |
-| ------------------------------- | ------------- | ----------- | --------------- | ------------ |
-| One correct answer?             | Yes           | No          | No              | No           |
-| Semantic interpretation needed? | No            | Yes         | Yes             | Yes          |
-| Context-dependent?              | No            | No          | Yes             | Yes          |
-| User confirmation needed?       | No            | No          | Yes (ambiguous) | Yes (always) |
+| Question                        | Deterministic | Semantic    | Manual       |
+| ------------------------------- | ------------- | ----------- | ------------ |
+| One correct answer?             | Yes           | No          | No           |
+| Semantic interpretation needed? | No            | Yes         | Yes          |
+| Context-dependent?              | No            | Yes         | Yes          |
+| User confirmation needed?       | No            | Sometimes   | Always       |
 
 ### 5. TDD Enforcement
 
-**Decision**: RED-GREEN-REFACTOR mandatory for all creation/update
+**Decision**: RED-GREEN-REFACTOR for creation, RED-GREEN for updates
 
 **Rationale:**
 
@@ -1308,33 +1011,16 @@ Understanding the rationale behind architectural choices.
 - **Loophole Detection**: Pressure testing reveals bypass attempts
 - **Documentation**: RED phase documents "why skill exists"
 
-### 6. Circular Delegation
+### 6. Simple Delegation
 
-**Decision**: Allow skills to delegate back to earlier skills in workflow
+**Decision**: Clean routing without complex state machines
 
 **Rationale:**
 
-- **Iterative Improvement**: Continue fixing until compliance achieved
-- **Automation**: Claude handles routine iterations without user interruption
-- **Quality Gates**: Automatic re-audit after fixes prevents regressions
-
-**Cycle Detection:**
-
-```typescript
-// Prevent infinite loops
-const MAX_ITERATIONS = 5;
-let iteration = 0;
-
-while (auditFails && iteration < MAX_ITERATIONS) {
-  applyFixes();
-  iteration++;
-  reAudit();
-}
-
-if (iteration >= MAX_ITERATIONS) {
-  throw new Error('Max iterations reached, manual intervention needed');
-}
-```
+- **Clarity**: Direct delegation paths are easy to understand
+- **Reliability**: No complex state transitions to debug
+- **Maintainability**: Simple routing logic is easy to modify
+- **User Control**: Each step is explicit and user-guided
 
 ### 7. CLI + Claude Hybrid
 
@@ -1391,9 +1077,9 @@ Is skill domain-specific?
 
 The Skill Manager architecture is a sophisticated system that:
 
-1. **Enforces Quality**: 21-phase audit + TDD + pressure testing
+1. **Enforces Quality**: 22-phase audit + TDD + pressure testing
 2. **Enables Automation**: Deterministic CLI + Claude reasoning hybrid
-3. **Maintains Compliance**: Circular workflows iterate until pass
+3. **Maintains Compliance**: User-guided fix workflows with automated assistance
 4. **Scales Elegantly**: Router pattern + shared libraries + dual locations
 5. **Respects Users**: Interactive prompts for ambiguous decisions
 
@@ -1402,8 +1088,8 @@ The Skill Manager architecture is a sophisticated system that:
 - **Progressive Disclosure**: Keep skills lean, extract details
 - **Deterministic Output**: Same input → identical output
 - **Single Responsibility**: Each component does one thing well
-- **TDD Enforcement**: RED-GREEN-REFACTOR mandatory
-- **Circular Delegation**: Iterate until quality achieved
+- **TDD Enforcement**: RED-GREEN-REFACTOR for creation, RED-GREEN for updates
+- **Simple Delegation**: Clean routing without complex state machines
 
 **System Performance:**
 
@@ -1412,4 +1098,4 @@ The Skill Manager architecture is a sophisticated system that:
 - **Token Usage**: Router + sub-skill ~2K tokens (vs 10K for monolithic)
 - **Maintainability**: 10 focused sub-skills vs 1 giant skill
 
-This architecture enables Claude Code to maintain a high-quality skill library with automated compliance checks, iterative improvement loops, and clear separation of concerns.
+This architecture enables Claude Code to maintain a high-quality skill library with automated compliance checks, user-guided improvement workflows, and clear separation of concerns.

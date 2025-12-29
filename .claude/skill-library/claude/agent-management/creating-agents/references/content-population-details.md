@@ -92,6 +92,7 @@ Brief, essential constraints for the agent's domain. Ask user for platform-speci
 ### Section 3: Output Format
 
 Verify JSON present with:
+
 - status (complete/blocked/needs_review)
 - summary
 - skills_read array

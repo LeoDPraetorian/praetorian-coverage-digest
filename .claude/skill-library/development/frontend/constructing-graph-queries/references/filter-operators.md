@@ -81,15 +81,15 @@ Combine multiple filters.
 ```typescript
 // Status is active AND (high CVSS OR known exploited)
 filters: [
-  { field: 'status', operator: '=', value: 'T' },
+  { field: "status", operator: "=", value: "T" },
   {
-    operator: 'OR',
+    operator: "OR",
     value: [
-      { field: 'cvss', operator: '>=', value: 9 },
-      { field: 'kev', operator: '=', value: true }
-    ]
-  }
-]
+      { field: "cvss", operator: ">=", value: 9 },
+      { field: "kev", operator: "=", value: true },
+    ],
+  },
+];
 ```
 
 ### Negation: `not` flag

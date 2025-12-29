@@ -390,10 +390,10 @@ Copy this to TodoWrite:
 
 2. **Choose organization approach:**
 
-   | Link Count | Location | Pattern |
-   |------------|----------|---------|
-   | **5-10 links** | End of SKILL.md | Brief list |
-   | **20+ links** | `references/links-to-official-docs.md` | Comprehensive file |
+   | Link Count     | Location                               | Pattern            |
+   | -------------- | -------------------------------------- | ------------------ |
+   | **5-10 links** | End of SKILL.md                        | Brief list         |
+   | **20+ links**  | `references/links-to-official-docs.md` | Comprehensive file |
 
 **Fix Pattern 1: Brief List in SKILL.md (5-10 links)**
 
@@ -470,6 +470,7 @@ For comprehensive official documentation links, see [references/links-to-officia
 **Template Reference:**
 
 See `.claude/skill-library/claude/skill-management/creating-skills/references/skill-templates.md` (External Documentation Links Pattern section) for:
+
 - Complete template examples
 - Organization guidelines
 - When to use brief vs comprehensive
@@ -477,9 +478,9 @@ See `.claude/skill-library/claude/skill-management/creating-skills/references/sk
 
 **Decision Guide:**
 
-| Skill Type | Typical Link Count | Recommendation |
-|------------|-------------------|----------------|
-| Single library (Zod, Zustand) | 5-8 | Brief list in SKILL.md |
-| Framework (React 19, Next.js) | 8-12 | Brief list in SKILL.md |
-| Complex integration (React Hook Form + Zod + shadcn) | 30-50 | Comprehensive file |
-| Multiple services (Jira + GitHub + Linear) | 20-30 | Comprehensive file |
+| Skill Type                                           | Typical Link Count | Recommendation         |
+| ---------------------------------------------------- | ------------------ | ---------------------- |
+| Single library (Zod, Zustand)                        | 5-8                | Brief list in SKILL.md |
+| Framework (React 19, Next.js)                        | 8-12               | Brief list in SKILL.md |
+| Complex integration (React Hook Form + Zod + shadcn) | 30-50              | Comprehensive file     |
+| Multiple services (Jira + GitHub + Linear)           | 20-30              | Comprehensive file     |

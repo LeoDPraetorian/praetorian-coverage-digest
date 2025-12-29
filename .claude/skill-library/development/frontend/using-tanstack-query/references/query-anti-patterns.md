@@ -631,9 +631,9 @@ Using object rest/spread destructuring (`...rest`) when destructuring useQuery r
 ```typescript
 // WRONG: Breaks tracked queries optimization
 const { data, ...rest } = useQuery({
-  queryKey: ['todos'],
+  queryKey: ["todos"],
   queryFn: fetchTodos,
-})
+});
 // Component re-renders on ANY property change (isFetching, isStale, etc.)
 ```
 
@@ -669,9 +669,9 @@ function TodoList() {
 ```typescript
 // CORRECT: Explicitly list needed properties
 const { data, isPending, error, isFetching } = useQuery({
-  queryKey: ['todos'],
+  queryKey: ["todos"],
   queryFn: fetchTodos,
-})
+});
 // Component only re-renders when these 4 properties change
 ```
 
@@ -680,10 +680,10 @@ const { data, isPending, error, isFetching } = useQuery({
 ```typescript
 // CORRECT: Explicitly define which properties trigger re-renders
 const { data, ...rest } = useQuery({
-  queryKey: ['todos'],
+  queryKey: ["todos"],
   queryFn: fetchTodos,
-  notifyOnChangeProps: ['data'], // Only re-render on data changes
-})
+  notifyOnChangeProps: ["data"], // Only re-render on data changes
+});
 // rest can be used safely now
 ```
 
@@ -692,9 +692,9 @@ const { data, ...rest } = useQuery({
 ```typescript
 // CORRECT: No destructuring = tracking still works
 const todoQuery = useQuery({
-  queryKey: ['todos'],
+  queryKey: ["todos"],
   queryFn: fetchTodos,
-})
+});
 // Access via todoQuery.data, todoQuery.isPending, etc.
 ```
 
@@ -709,22 +709,22 @@ npm install -D @tanstack/eslint-plugin-query
 ```js
 // .eslintrc.js
 module.exports = {
-  plugins: ['@tanstack/query'],
+  plugins: ["@tanstack/query"],
   rules: {
-    '@tanstack/query/no-rest-destructuring': 'error',
+    "@tanstack/query/no-rest-destructuring": "error",
   },
-}
+};
 ```
 
 ### Real-World Impact
 
 ```typescript
 // ❌ Component re-renders 50+ times during a single mutation
-const { data, ...rest } = useQuery({ queryKey: ['todos'], queryFn: fetchTodos })
+const { data, ...rest } = useQuery({ queryKey: ["todos"], queryFn: fetchTodos });
 // Re-renders on: isPending, isFetching, isStale, isLoading, etc.
 
 // ✅ Component re-renders 2 times during a single mutation
-const { data, isPending } = useQuery({ queryKey: ['todos'], queryFn: fetchTodos })
+const { data, isPending } = useQuery({ queryKey: ["todos"], queryFn: fetchTodos });
 // Re-renders only on: isPending and data changes
 ```
 

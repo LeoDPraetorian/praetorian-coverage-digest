@@ -36,9 +36,9 @@ Zustand should only be used when Context becomes unwieldy:
 ```typescript
 interface QueryBuilderState {
   // Core query structure
-  blocks: EntityBlock[];                    // Entity blocks with filters
-  relationshipDividers: RelationshipDivider[];  // Connections between blocks
-  pathOptions: PathOptions;                 // Graph path configuration
+  blocks: EntityBlock[]; // Entity blocks with filters
+  relationshipDividers: RelationshipDivider[]; // Connections between blocks
+  pathOptions: PathOptions; // Graph path configuration
 
   // Context from React (filter options)
   context: QueryBuilderContextData | null;
@@ -50,25 +50,27 @@ interface QueryBuilderState {
   // Saved query management
   currentLoadedQueryId: string | null;
   loadedQueryData: SavedQuery | null;
-  lastSavedState: SavedQueryState | null;   // For change detection
+  lastSavedState: SavedQueryState | null; // For change detection
 
   // UI state
   selectedUsernames: string[];
-  activeTab: 'queries' | 'guide';
+  activeTab: "queries" | "guide";
   isSidebarCollapsed: boolean;
   sidebarWidth: number;
   expandedFolders: QueryFolderType[];
 
   // Actions
-  actions: { /* 30+ action methods */ };
+  actions: {
+    /* 30+ action methods */
+  };
 }
 ```
 
 ## Zustand + Immer Setup
 
 ```typescript
-import { immer } from 'zustand/middleware/immer';
-import { createWithEqualityFn } from 'zustand/traditional';
+import { immer } from "zustand/middleware/immer";
+import { createWithEqualityFn } from "zustand/traditional";
 
 export const useQueryBuilderStore = createWithEqualityFn<QueryBuilderState>()(
   immer((set) => ({
@@ -143,13 +145,10 @@ const blocks = store.blocks;
 For objects/arrays, use custom equality:
 
 ```typescript
-import { shallow } from 'zustand/shallow';
+import { shallow } from "zustand/shallow";
 
 // Only re-render if array contents change (not reference)
-const selectedUsernames = useQueryBuilderStore(
-  (state) => state.selectedUsernames,
-  shallow
-);
+const selectedUsernames = useQueryBuilderStore((state) => state.selectedUsernames, shallow);
 ```
 
 ## Deep Clone Pattern (Critical for Change Detection)
@@ -243,17 +242,20 @@ actions: {
 ## Middleware Stack
 
 ```typescript
-import { immer } from 'zustand/middleware/immer';
-import { devtools } from 'zustand/middleware';
-import { persist } from 'zustand/middleware';
+import { immer } from "zustand/middleware/immer";
+import { devtools } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 
 export const useStore = createWithEqualityFn<State>()(
-  devtools(              // Redux DevTools integration
-    persist(             // LocalStorage persistence
-      immer((set) => ({  // Immer for mutable syntax
+  devtools(
+    // Redux DevTools integration
+    persist(
+      // LocalStorage persistence
+      immer((set) => ({
+        // Immer for mutable syntax
         // Store definition
       })),
-      { name: 'my-store' }
+      { name: "my-store" }
     )
   )
 );
@@ -303,7 +305,7 @@ const useAssetStore = create((set) => ({
 ```typescript
 // ✅ GOOD - automatic caching, refetching
 const { data: assets } = useQuery({
-  queryKey: ['assets'],
+  queryKey: ["assets"],
   queryFn: api.getAssets,
 });
 ```

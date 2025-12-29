@@ -263,19 +263,19 @@ Find assets WITHOUT any risks.
 
 ```typescript
 const { data, fetchNextPage, hasNextPage, isLoading } = useMy({
-  resource: 'asset',
+  resource: "asset",
   query: {
     node: {
-      labels: ['Asset'],
+      labels: ["Asset"],
       filters: [
-        { field: 'status', operator: '=', value: 'A' },
-        { field: 'class', operator: '=', value: 'domain' }
-      ]
+        { field: "status", operator: "=", value: "A" },
+        { field: "class", operator: "=", value: "domain" },
+      ],
     },
     limit: 100,
-    orderBy: 'created',
-    descending: true
-  }
+    orderBy: "created",
+    descending: true,
+  },
 });
 
 // Handle pagination
@@ -292,18 +292,20 @@ useEffect(() => {
 const { data } = useGraphQuery({
   query: {
     node: {
-      labels: ['Asset'],
-      filters: [{ field: 'class', operator: '=', value: 'domain' }],
-      relationships: [{
-        label: 'HAS',
-        target: {
-          labels: ['Risk'],
-          filters: [{ field: 'cvss', operator: '>=', value: 9 }]
-        }
-      }]
+      labels: ["Asset"],
+      filters: [{ field: "class", operator: "=", value: "domain" }],
+      relationships: [
+        {
+          label: "HAS",
+          target: {
+            labels: ["Risk"],
+            filters: [{ field: "cvss", operator: ">=", value: 9 }],
+          },
+        },
+      ],
     },
-    limit: 50
+    limit: 50,
   },
-  enabled: !!selectedDomain
+  enabled: !!selectedDomain,
 });
 ```

@@ -96,6 +96,20 @@ logs:
 purge:
 	go run modules/chariot-devops/chariot-utils/user-purge/main.go -stack $(stack) -u $(user) -neo4j-mode delete -keep-user
 
+.PHONY: check-git-version
+check-git-version: ## Verify Git version supports modern .gitattributes
+	@echo "Checking Git version..."
+	@GIT_VERSION=$$(git --version | sed 's/git version //'); \
+	MAJOR=$$(echo $$GIT_VERSION | cut -d. -f1); \
+	MINOR=$$(echo $$GIT_VERSION | cut -d. -f2); \
+	if [ $$MAJOR -lt 2 ] || [ $$MAJOR -eq 2 -a $$MINOR -lt 43 ]; then \
+		echo "⚠️  Git $$GIT_VERSION detected (< 2.43.0)"; \
+		echo "   Some .gitattributes syntax may show warnings"; \
+		echo "   Upgrade recommended: brew install git"; \
+	else \
+		echo "✅ Git $$GIT_VERSION (>= 2.43.0)"; \
+	fi
+
 .PHONY: install-git-hooks
 install-git-hooks: ## Install git hooks to prevent submodule commits in super-repo
 	@echo "Installing git hooks..."
@@ -335,6 +349,7 @@ endif
 		echo "export GOPRIVATE=github.com/praetorian-inc" >> $(PROFILE_FILE); \
 		echo "Added GOPRIVATE to $(PROFILE_FILE)"; \
 	fi
+	@make check-git-version
 	@make submodule-init-robust
 	@make submodule-pull
 	@make install-git-hooks

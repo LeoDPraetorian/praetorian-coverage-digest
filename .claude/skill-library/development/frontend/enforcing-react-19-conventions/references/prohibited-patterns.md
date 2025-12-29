@@ -72,6 +72,7 @@ function Component({ prop }: Props) { ... }
 **4. React Team Discourages It**
 
 From React TypeScript Cheatsheet:
+
 > "We used to recommend React.FC for typing function components but... we now discourage using React.FC."
 
 ### Official Replacement
@@ -147,11 +148,9 @@ Generic forwarded refs were complex:
 
 ```typescript
 // Old - Complex generic typing
-const GenericComponent = forwardRef(
-  <T extends HTMLElement>(props: Props, ref: Ref<T>) => {
-    // ...
-  }
-)
+const GenericComponent = forwardRef(<T extends HTMLElement>(props: Props, ref: Ref<T>) => {
+  // ...
+});
 
 // New - Straightforward
 function GenericComponent<T extends HTMLElement>({
@@ -219,6 +218,7 @@ function DataTable({ data }: { data: Item[] }) {
 ```
 
 **Justification process:**
+
 1. Profile the computation: `console.time('sort')` / `console.timeEnd('sort')`
 2. If >100ms, add `useMemo`
 3. Document profiling results in comment
@@ -238,6 +238,7 @@ function MapComponent() {
 ```
 
 **When third-party lib requires:**
+
 - Stable callback reference (useCallback)
 - Deep equality check (useMemo for objects/arrays)
 - Document library requirement in comment
@@ -249,14 +250,15 @@ function MapComponent() {
 ```typescript
 // ❌ UNNECESSARY - String operations are microseconds
 const userName = useMemo(() => {
-  return user.firstName + ' ' + user.lastName
-}, [user])
+  return user.firstName + " " + user.lastName;
+}, [user]);
 
 // ✅ BETTER - Just compute it
-const userName = `${user.firstName} ${user.lastName}`
+const userName = `${user.firstName} ${user.lastName}`;
 ```
 
 **Memoization overhead > computation cost for:**
+
 - String operations
 - Simple math
 - Array/object access
@@ -267,11 +269,11 @@ const userName = `${user.firstName} ${user.lastName}`
 ```typescript
 // ❌ POINTLESS - timestamp changes every render
 const message = useMemo(() => {
-  return `Updated at ${Date.now()}`
-}, [Date.now()])  // Memo never hits
+  return `Updated at ${Date.now()}`;
+}, [Date.now()]); // Memo never hits
 
 // ✅ BETTER - No memo
-const message = `Updated at ${Date.now()}`
+const message = `Updated at ${Date.now()}`;
 ```
 
 **3. React.memo Without Props Comparison**
@@ -289,6 +291,7 @@ const UserCard = React.memo(({ user }: { user: User }) => {
 ```
 
 **Request profiling evidence:**
+
 1. How often does parent re-render?
 2. How often do props change?
 3. What's the render cost of this component?
@@ -314,6 +317,7 @@ The React Compiler automatically memoizes:
 - Callback functions (like useCallback)
 
 **When compiler is enabled**, manual memoization is redundant except for:
+
 - Third-party library requirements
 - Profiled bottlenecks >100ms
 
@@ -328,6 +332,7 @@ The React Compiler automatically memoizes:
 ### "Memoization Never Hurts"
 
 **False**: Memoization has costs:
+
 - Memory overhead (cache storage)
 - CPU overhead (equality checks)
 - Code complexity (harder to maintain)
@@ -338,6 +343,7 @@ The React Compiler automatically memoizes:
 ### "forwardRef Still Works in React 19"
 
 **Partially true**: React 19 maintains backwards compatibility during transition, but:
+
 - New code should use ref as prop
 - forwardRef will be fully removed in future version
 - Start migration now to avoid breaking changes
@@ -349,22 +355,26 @@ The React Compiler automatically memoizes:
 ### During Code Review
 
 **For React.FC:**
+
 - Automatic BLOCK - no exceptions
 - Suggest function declaration replacement
 - Link to this document
 
 **For forwardRef:**
+
 - Automatic BLOCK - no exceptions
 - Suggest ref as prop pattern
 - Link to React 19 migration guide
 
 **For useMemo/useCallback:**
+
 - REQUEST CHANGE - ask for profiling
 - If profiling provided and justified → APPROVE
 - If no profiling → REQUEST removal
 - Document profiling results in comment
 
 **For React.memo:**
+
 - REQUEST CHANGE - ask for evidence
 - Acceptable for large lists (table rows, grids)
 - Require justification for other cases
@@ -372,20 +382,25 @@ The React Compiler automatically memoizes:
 ### Automated Tools
 
 **ESLint Rules:**
+
 ```json
 {
   "rules": {
-    "@typescript-eslint/ban-types": ["error", {
-      "types": {
-        "React.FC": "Use plain function declarations instead",
-        "React.FunctionComponent": "Use plain function declarations instead"
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        "types": {
+          "React.FC": "Use plain function declarations instead",
+          "React.FunctionComponent": "Use plain function declarations instead"
+        }
       }
-    }]
+    ]
   }
 }
 ```
 
 **Codemod (for migration):**
+
 ```bash
 # Remove React.FC from codebase
 npx codemod react/19/replace-react-fc

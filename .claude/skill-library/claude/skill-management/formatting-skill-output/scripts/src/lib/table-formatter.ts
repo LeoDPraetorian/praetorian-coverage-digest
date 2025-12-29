@@ -9,12 +9,12 @@
 
 // ANSI color codes - fixed values for determinism
 const COLORS = {
-  reset: '\x1b[0m',
-  gray: '\x1b[90m',
-  cyan: '\x1b[36m',
-  red: '\x1b[31m',
-  yellow: '\x1b[33m',
-  green: '\x1b[32m',
+  reset: "\x1b[0m",
+  gray: "\x1b[90m",
+  cyan: "\x1b[36m",
+  red: "\x1b[31m",
+  yellow: "\x1b[33m",
+  green: "\x1b[32m",
 } as const;
 
 // Fixed column widths for deterministic output
@@ -27,13 +27,13 @@ const COLUMN_WIDTHS = {
 
 // Severity symbols - consistent across all output
 const SEVERITY_SYMBOLS = {
-  CRITICAL: '●',
-  WARNING: '▲',
-  INFO: '○',
+  CRITICAL: "●",
+  WARNING: "▲",
+  INFO: "○",
 } as const;
 
-export type Severity = 'CRITICAL' | 'WARNING' | 'INFO';
-export type Source = 'structural' | 'semantic' | 'agent-analysis' | 'gateway';
+export type Severity = "CRITICAL" | "WARNING" | "INFO";
+export type Source = "structural" | "semantic" | "agent-analysis" | "gateway";
 
 export interface Finding {
   severity: Severity;
@@ -52,11 +52,12 @@ export interface FindingCounts {
  * Truncate string to max length with ellipsis.
  * Deterministic: same input always produces same output.
  */
-function truncate(str: string, maxLength: number): string {
+function truncate(str: string | undefined | null, maxLength: number): string {
+  if (!str) return "".padEnd(maxLength);
   if (str.length <= maxLength) {
     return str.padEnd(maxLength);
   }
-  return str.slice(0, maxLength - 1) + '…';
+  return str.slice(0, maxLength - 1) + "…";
 }
 
 /**
@@ -64,11 +65,11 @@ function truncate(str: string, maxLength: number): string {
  */
 function severityOrder(severity: Severity): number {
   switch (severity) {
-    case 'CRITICAL':
+    case "CRITICAL":
       return 0;
-    case 'WARNING':
+    case "WARNING":
       return 1;
-    case 'INFO':
+    case "INFO":
       return 2;
     default:
       return 3;
@@ -109,14 +110,11 @@ function formatHeader(): string {
   const { gray, cyan } = COLORS;
   const w = COLUMN_WIDTHS;
 
-  const topBorder =
-    `${gray}╔${'═'.repeat(w.severity + 2)}╤${'═'.repeat(w.phase + 2)}╤${'═'.repeat(w.issue + 2)}╤${'═'.repeat(w.recommendation + 2)}╗${COLORS.reset}`;
+  const topBorder = `${gray}╔${"═".repeat(w.severity + 2)}╤${"═".repeat(w.phase + 2)}╤${"═".repeat(w.issue + 2)}╤${"═".repeat(w.recommendation + 2)}╗${COLORS.reset}`;
 
-  const headerRow =
-    `${gray}║${cyan} ${'Severity'.padEnd(w.severity + 1)}${gray}│${cyan} ${'Phase'.padEnd(w.phase + 1)}${gray}│${cyan} ${'Issue'.padEnd(w.issue + 1)}${gray}│${cyan} ${'Recommendation'.padEnd(w.recommendation + 1)}${gray}║${COLORS.reset}`;
+  const headerRow = `${gray}║${cyan} ${"Severity".padEnd(w.severity + 1)}${gray}│${cyan} ${"Phase".padEnd(w.phase + 1)}${gray}│${cyan} ${"Issue".padEnd(w.issue + 1)}${gray}│${cyan} ${"Recommendation".padEnd(w.recommendation + 1)}${gray}║${COLORS.reset}`;
 
-  const headerSeparator =
-    `${gray}╟${'─'.repeat(w.severity + 2)}┼${'─'.repeat(w.phase + 2)}┼${'─'.repeat(w.issue + 2)}┼${'─'.repeat(w.recommendation + 2)}╢${COLORS.reset}`;
+  const headerSeparator = `${gray}╟${"─".repeat(w.severity + 2)}┼${"─".repeat(w.phase + 2)}┼${"─".repeat(w.issue + 2)}┼${"─".repeat(w.recommendation + 2)}╢${COLORS.reset}`;
 
   return `${topBorder}\n${headerRow}\n${headerSeparator}`;
 }
@@ -128,7 +126,7 @@ function formatFooter(): string {
   const { gray } = COLORS;
   const w = COLUMN_WIDTHS;
 
-  return `${gray}╚${'═'.repeat(w.severity + 2)}╧${'═'.repeat(w.phase + 2)}╧${'═'.repeat(w.issue + 2)}╧${'═'.repeat(w.recommendation + 2)}╝${COLORS.reset}`;
+  return `${gray}╚${"═".repeat(w.severity + 2)}╧${"═".repeat(w.phase + 2)}╧${"═".repeat(w.issue + 2)}╧${"═".repeat(w.recommendation + 2)}╝${COLORS.reset}`;
 }
 
 /**
@@ -138,7 +136,7 @@ function formatRowSeparator(): string {
   const { gray } = COLORS;
   const w = COLUMN_WIDTHS;
 
-  return `${gray}╟${'─'.repeat(w.severity + 2)}┼${'─'.repeat(w.phase + 2)}┼${'─'.repeat(w.issue + 2)}┼${'─'.repeat(w.recommendation + 2)}╢${COLORS.reset}`;
+  return `${gray}╟${"─".repeat(w.severity + 2)}┼${"─".repeat(w.phase + 2)}┼${"─".repeat(w.issue + 2)}┼${"─".repeat(w.recommendation + 2)}╢${COLORS.reset}`;
 }
 
 /**
@@ -166,7 +164,7 @@ export function formatFindingsTable(findings: Finding[]): string {
 
   lines.push(formatFooter());
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 /**
@@ -181,18 +179,18 @@ export function formatCompletionMessage(counts: FindingCounts): string {
   const semTotal = counts.semantic.critical + counts.semantic.warning + counts.semantic.info;
   const totalCritical = counts.structural.critical + counts.semantic.critical;
 
-  const status = totalCritical > 0 ? 'FAILED' : 'PASSED';
+  const status = totalCritical > 0 ? "FAILED" : "PASSED";
   const statusColor = totalCritical > 0 ? COLORS.red : COLORS.green;
 
   const lines: string[] = [
-    '',
-    '─'.repeat(67),
+    "",
+    "─".repeat(67),
     `  ${statusColor}AUDIT RESULT: ${status}${COLORS.reset}`,
     `  Structural: ${structTotal} issue(s) | Semantic: ${semTotal} issue(s)`,
-    '─'.repeat(67),
+    "─".repeat(67),
   ];
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 /**
@@ -205,8 +203,8 @@ export function countFindings(findings: Finding[]): FindingCounts {
   };
 
   for (const f of findings) {
-    const source = f.source === 'semantic' ? 'semantic' : 'structural';
-    const severity = f.severity.toLowerCase() as 'critical' | 'warning' | 'info';
+    const source = f.source === "semantic" ? "semantic" : "structural";
+    const severity = f.severity.toLowerCase() as "critical" | "warning" | "info";
     counts[source][severity]++;
   }
 

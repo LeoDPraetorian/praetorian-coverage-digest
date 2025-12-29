@@ -1,27 +1,28 @@
 ---
 name: managing-skills
-description: Use when managing skills (create, update, audit, fix, delete, rename, migrate, search, list, sync) - routes to operation-specific library skills with TDD enforcement (RED-GREEN-REFACTOR), handles validation failures (description format, line count >500, broken references, phantom skill references, missing frontmatter, YAML parse errors, Windows path detection, gateway routing inconsistencies), fixes structural issues (allowed-tools format, file organization, TypeScript compilation errors, stale documentation, outdated patterns), and ensures compliance through 21-phase structural audit plus semantic review with auto-fix for deterministic issues, dual-location search (core + library), and progressive disclosure enforcement
+description: Use when managing skills (create, update, audit, fix, delete, rename, migrate, search, list, sync) - routes to specialized library skills
 allowed-tools: Read, Bash, Grep, Glob, TodoWrite, Skill, AskUserQuestion
 ---
 
 # Skill Lifecycle Manager
 
-**Complete skill lifecycle with TDD enforcement, 21-phase structural audit + semantic review, and dual-location search.**
+**Complete skill lifecycle with TDD enforcement, 22-phase structural audit + semantic review, and dual-location search.**
 
 ## Quick Reference
 
-| Operation         | Delegated To       | CLI Location              | Time      |
-| ----------------- | ------------------ | ------------------------- | --------- |
-| **Create**        | `creating-skills`  | Instruction-based         | 15-30 min |
-| **Update**        | `updating-skills`  | `updating-skills/scripts` | 10-20 min |
-| **Delete**        | `deleting-skills`  | Instruction-based         | 10-15 min |
-| **Audit**         | `auditing-skills`  | `auditing-skills/scripts` | 2-5 min   |
-| **Fix**           | `fixing-skills`    | `fixing-skills/scripts`   | 5-15 min  |
-| **Search**        | `searching-skills` | `auditing-skills/scripts` | 1-2 min   |
-| **List**          | `listing-skills`   | Instruction-based         | 1 min     |
-| **Rename**        | `renaming-skills`  | Instruction-based         | 5-10 min  |
-| **Migrate**       | `migrating-skills` | Instruction-based         | 5-10 min  |
-| **Sync Gateways** | `syncing-gateways` | Instruction-based         | 10-20 min |
+| Operation         | Delegated To         | CLI Location              | Time      |
+| ----------------- | -------------------- | ------------------------- | --------- |
+| **Create**        | `creating-skills`    | Instruction-based         | 15-30 min |
+| **Update**        | `updating-skills`    | Instruction-based         | 10-20 min |
+| **Delete**        | `deleting-skills`    | Instruction-based         | 10-15 min |
+| **Audit**         | `auditing-skills`    | `auditing-skills/scripts` | 2-5 min   |
+| **Fix**           | `fixing-skills`      | `fixing-skills/scripts`   | 5-15 min  |
+| **Search**        | `searching-skills`   | Instruction-based         | 1-2 min   |
+| **List**          | `listing-skills`     | Instruction-based         | 1 min     |
+| **Research**      | `researching-skills` | Instruction-based         | 5-10 min  |
+| **Rename**        | `renaming-skills`    | Instruction-based         | 5-10 min  |
+| **Migrate**       | `migrating-skills`   | Instruction-based         | 5-10 min  |
+| **Sync Gateways** | `syncing-gateways`   | Instruction-based         | 10-20 min |
 
 **For detailed operation workflows, see:** [references/operations.md](references/operations.md)
 
@@ -66,21 +67,22 @@ You MUST use Read tool to load them.
 
 ### Delegation Map
 
-| When user says...                 | Delegate to...     | Implementation                                |
-| --------------------------------- | ------------------ | --------------------------------------------- |
-| "create a skill"                  | `creating-skills`  | Instruction-based workflow                    |
-| "create gateway-X --type gateway" | `creating-skills`  | Uses gateway template                         |
-| "update X skill"                  | `updating-skills`  | CLI in `updating-skills/scripts`              |
-| "delete X skill"                  | `deleting-skills`  | Instruction-based workflow                    |
-| "audit X skill"                   | `auditing-skills`  | CLI in `auditing-skills/scripts`              |
-| "audit gateway-X"                 | `auditing-skills`  | All 21 phases (includes gateway phases 17-20) |
-| "fix X skill"                     | `fixing-skills`    | CLI in `fixing-skills/scripts`                |
-| "fix gateway-X --phase N"         | `fixing-skills`    | Gateway-specific fixes                        |
-| "search for skills"               | `searching-skills` | Instruction-based (uses auditing-skills CLI)  |
-| "list all skills"                 | `listing-skills`   | Instruction-based                             |
-| "rename X to Y"                   | `renaming-skills`  | Instruction-based                             |
-| "migrate X to library"            | `migrating-skills` | Instruction-based                             |
-| "sync gateways"                   | `syncing-gateways` | Instruction-based                             |
+| When user says...                 | Delegate to...       | Implementation                                |
+| --------------------------------- | -------------------- | --------------------------------------------- |
+| "create a skill"                  | `creating-skills`    | Instruction-based workflow                    |
+| "create gateway-X --type gateway" | `creating-skills`    | Uses gateway template                         |
+| "update X skill"                  | `updating-skills`    | Instruction-based TDD workflow                |
+| "delete X skill"                  | `deleting-skills`    | Instruction-based workflow                    |
+| "audit X skill"                   | `auditing-skills`    | CLI in `auditing-skills/scripts`              |
+| "audit gateway-X"                 | `auditing-skills`    | All 22 phases (includes gateway phases 17-20) |
+| "fix X skill"                     | `fixing-skills`      | CLI in `fixing-skills/scripts`                |
+| "fix gateway-X --phase N"         | `fixing-skills`      | Gateway-specific fixes                        |
+| "search for skills"               | `searching-skills`   | Instruction-based (manual grep/find)          |
+| "list all skills"                 | `listing-skills`     | Instruction-based                             |
+| "research X"                      | `researching-skills` | Instruction-based workflow                    |
+| "rename X to Y"                   | `renaming-skills`    | Instruction-based                             |
+| "migrate X to library"            | `migrating-skills`   | Instruction-based                             |
+| "sync gateways"                   | `syncing-gateways`   | Instruction-based                             |
 
 ### CLI Ownership
 
@@ -90,7 +92,6 @@ Scripts live in the library skill that owns the functionality:
 | -------------------------- | --------------------------------------------------------------- | ----------------- |
 | `@chariot/auditing-skills` | `skill-library/claude/skill-management/auditing-skills/scripts` | `audit`, `search` |
 | `@chariot/fixing-skills`   | `skill-library/claude/skill-management/fixing-skills/scripts`   | `fix`             |
-| `@chariot/updating-skills` | `skill-library/claude/skill-management/updating-skills/scripts` | `update`          |
 
 **Shared library** (audit-engine, phases, utilities):
 
@@ -145,14 +146,15 @@ This skill routes to 10 specialized operations. Each operation has comprehensive
 **Operation summary:**
 
 - **Create** - Instruction-driven skill creation via `creating-skills`
-- **Update** - Test-guarded changes with context7 refresh support
+- **Update** - Instruction-driven TDD update workflow
 - **Delete** - Safe deletion with reference cleanup (7-phase protocol)
-- **Audit** - 21 structural phases + semantic review by Claude
+- **Audit** - 22 structural phases + semantic review by Claude
 - **Fix** - Three modes (auto-apply, suggest, apply) for compliance
 - **Rename** - Safe renaming with reference updates (7-step protocol)
 - **Migrate** - Move between core and library locations
 - **Search** - Dual-location discovery with scoring algorithm
 - **List** - Display all skills (both core and library)
+- **Research** - Codebase, Context7, and web research for skill creation
 - **Sync Gateways** - Validate gateway-library consistency
 
 ## Gateway Management
@@ -173,12 +175,12 @@ Gateway skills route agents from core to library in the two-tier system. Special
 
 - Full TDD cycle with pressure testing
 - Progressive disclosure organization
-- Compliance validation (all 21 structural phases + semantic review)
+- Compliance validation (all 22 structural phases + semantic review)
 - Reference updates and migration
 
 **Deep Dives (references/):**
 
-- [Operations](references/operations.md) - Complete workflow for all 10 operations
+- [Operations](references/operations.md) - Complete workflow for skill operations
 - [CLI usage](references/cli-usage.md) - Command examples and troubleshooting
 - [TDD methodology](references/tdd-methodology.md)
 - [Progressive disclosure](references/progressive-disclosure.md)
@@ -201,7 +203,7 @@ This skill consolidates:
 ## Key Principles
 
 1. **TDD Always** - Cannot create/update without failing test first
-2. **Hybrid Audit** - 21-phase structural audit + Claude semantic review
+2. **Hybrid Audit** - 22-phase structural audit + Claude semantic review
 3. **Progressive Disclosure** - Lean SKILL.md + detailed references/
 4. **Router Pattern** - `/skill-manager` command delegates here
 5. **Instruction-Driven Creation** - Create via `creating-skills` skill (no TypeScript CLI)
@@ -215,7 +217,7 @@ This skill consolidates:
 | --------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | **creating-skills**               | `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` (LIBRARY)    | Instruction-driven skill creation workflow           |
 | **updating-skills**               | `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` (LIBRARY)    | Test-guarded skill updates with TDD                  |
-| **auditing-skills**               | `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` (LIBRARY)    | 21-phase structural validation                       |
+| **auditing-skills**               | `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` (LIBRARY)    | 22-phase structural validation                       |
 | **fixing-skills**                 | `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")` (LIBRARY)      | Automated compliance remediation                     |
 | **deleting-skills**               | `Read(".claude/skill-library/claude/skill-management/deleting-skills/SKILL.md")` (LIBRARY)    | Safe skill deletion with reference cleanup           |
 | **renaming-skills**               | `Read(".claude/skill-library/claude/skill-management/renaming-skills/SKILL.md")` (LIBRARY)    | Safe skill renaming with reference updates           |

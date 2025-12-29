@@ -9,7 +9,6 @@ https://www.anthropic.com/engineering/multi-agent-research-system
 https://dev.to/bredmond1019/multi-agent-orchestration-running-10-claude-instances-in-parallel-part-3-29da
 https://offnote.substack.com/p/multi-agents-vs-tool-groups-a-layered
 
-
 2️⃣ Prompt Engineering
 
 Links focused on prompt design, best practices, and context management:

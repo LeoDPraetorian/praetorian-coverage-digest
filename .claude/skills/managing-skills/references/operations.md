@@ -88,9 +88,9 @@ Safely removes skills with comprehensive reference cleanup using Claude's native
 
 ---
 
-## Audit (21-Phase Structural + Semantic Review)
+## Audit (22-Phase Structural + Semantic Review)
 
-**Validates skill against 21 structural phases, then Claude performs semantic review.**
+**Validates skill against 22 structural phases, then Claude performs semantic review.**
 
 ```bash
 # Audit single skill (auto-detects location)

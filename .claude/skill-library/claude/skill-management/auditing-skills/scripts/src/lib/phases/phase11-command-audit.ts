@@ -124,9 +124,49 @@ export class Phase11CommandAudit {
   }
 
   /**
-   * Run phase on all skills
+   * Run phase on all skills (backward compatible - parses files)
    */
   static async run(skillsDir: string): Promise<PhaseResult> {
+    // Get all skill directories
+    let entries;
+    try {
+      entries = await fs.readdir(skillsDir, { withFileTypes: true });
+    } catch {
+      return {
+        phaseName: 'Phase 11: Command Example Audit',
+        skillsAffected: 0,
+        issuesFound: 0,
+        issuesFixed: 0,
+        details: ['[ERROR] Could not read skills directory'],
+      };
+    }
+
+    const skillDirs = entries
+      .filter(e => e.isDirectory() && !e.name.startsWith('.') && e.name !== 'lib' && e.name !== 'node_modules')
+      .map(e => e.name);
+
+    const skills: Array<{ name: string; directory: string; content: string }> = [];
+    for (const skillName of skillDirs) {
+      const skillPath = path.join(skillsDir, skillName, 'SKILL.md');
+      try {
+        const content = await fs.readFile(skillPath, 'utf-8');
+        skills.push({
+          name: skillName,
+          directory: path.join(skillsDir, skillName),
+          content,
+        });
+      } catch {
+        continue; // Skip if no SKILL.md
+      }
+    }
+
+    return this.runOnParsedSkills(skills);
+  }
+
+  /**
+   * Run phase on pre-parsed skills (performance optimized)
+   */
+  static async runOnParsedSkills(skills: Array<{ name: string; directory: string; content: string }>): Promise<PhaseResult> {
     const result: PhaseResult = {
       phaseName: 'Phase 11: Command Example Audit',
       skillsAffected: 0,
@@ -135,41 +175,13 @@ export class Phase11CommandAudit {
       details: [],
     };
 
-    // Get all skill directories
-    let entries;
-    try {
-      entries = await fs.readdir(skillsDir, { withFileTypes: true });
-    } catch {
-      result.details.push('[ERROR] Could not read skills directory');
-      return result;
-    }
-
-    const skillDirs = entries
-      .filter(e => e.isDirectory() && !e.name.startsWith('.') && e.name !== 'lib' && e.name !== 'node_modules')
-      .map(e => e.name);
-
-    for (const skillName of skillDirs) {
-      const skillPath = path.join(skillsDir, skillName, 'SKILL.md');
-
-      let content: string;
-      try {
-        content = await fs.readFile(skillPath, 'utf-8');
-      } catch {
-        continue; // Skip if no SKILL.md
-      }
-
-      const skill = {
-        name: skillName,
-        directory: path.join(skillsDir, skillName),
-        content,
-      };
-
+    for (const skill of skills) {
       const issues = await this.validate(skill);
 
       if (issues.length > 0) {
         result.skillsAffected++;
         result.issuesFound += issues.length;
-        result.details.push(`${skillName}:`);
+        result.details.push(`${skill.name}:`);
 
         for (const issue of issues) {
           result.details.push(`  - [${issue.severity}] ${issue.message}`);

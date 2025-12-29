@@ -33,11 +33,11 @@ description: Use when creating skills - guides through TDD workflow (RED-GREEN-R
 
 ### Recommended Todo List
 
-**Create these todos at start** (21 phases + CLI + consolidate + fix + re-audit = 24 steps):
+**Create these todos at start** (22 phases + CLI + consolidate + fix + re-audit = 25 steps):
 
 1. Run CLI audit | 2-13. Phases 1-12 | 14-17. Gateway phases (if applicable) | 18. Consolidate | 19. Fix & re-audit
 
-**Why mandatory:** 21 phases are easy to skip. TodoWrite prevents oversight.
+**Why mandatory:** 22 phases are easy to skip. TodoWrite prevents oversight.
 
 ---
 
@@ -80,6 +80,7 @@ npm run -w @chariot/fixing-skills fix -- <skill-name>
 
 ```markdown
 # References non-existent skill
+
 See the `magic-skill` skill for details.
 
 # Option 1: Remove reference

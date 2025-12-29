@@ -4,10 +4,10 @@ React 19 and Tailwind v4 support for shadcn/ui (February 2025).
 
 ## Quick Reference
 
-| Version | React | Tailwind | CLI Command | Color Format |
-|---------|-------|----------|-------------|--------------|
-| Latest (canary) | 19 | v4 | `npx shadcn@canary init` | OKLCH |
-| Stable (latest) | 18 | v3 | `npx shadcn@latest init` | HSL |
+| Version         | React | Tailwind | CLI Command              | Color Format |
+| --------------- | ----- | -------- | ------------------------ | ------------ |
+| Latest (canary) | 19    | v4       | `npx shadcn@canary init` | OKLCH        |
+| Stable (latest) | 18    | v3       | `npx shadcn@latest init` | HSL          |
 
 ## New Projects
 
@@ -18,6 +18,7 @@ npx shadcn@canary init
 ```
 
 This sets up:
+
 - Tailwind CSS v4 with `@theme` directive
 - OKLCH color format
 - `tw-animate-css` (not tailwindcss-animate)
@@ -37,12 +38,14 @@ Existing projects continue to work. When you add components, they use v3/React 1
 ### 1. Upgrade Tailwind to v4
 
 Follow the official Tailwind upgrade guide:
+
 ```bash
 # Use the official codemod
 npx @tailwindcss/upgrade@next
 ```
 
 This handles:
+
 - Migrating `tailwind.config.ts` to CSS-based config
 - Converting deprecated utility classes
 - Updating import syntax
@@ -60,6 +63,7 @@ npm install tw-animate-css
 ```
 
 Update `globals.css`:
+
 ```css
 /* Remove */
 @plugin 'tailwindcss-animate';
@@ -95,6 +99,7 @@ function Button({ className, ref, ...props }: ButtonProps & { ref?: React.Ref<HT
 ### 4. Update Color Variables (HSL → OKLCH)
 
 **HSL (Tailwind v3):**
+
 ```css
 :root {
   --primary: 221.2 83.2% 53.3%;
@@ -102,6 +107,7 @@ function Button({ className, ref, ...props }: ButtonProps & { ref?: React.Ref<HT
 ```
 
 **OKLCH (Tailwind v4):**
+
 ```css
 @theme {
   --color-primary: oklch(0.6 0.2 250);
@@ -109,6 +115,7 @@ function Button({ className, ref, ...props }: ButtonProps & { ref?: React.Ref<HT
 ```
 
 **OKLCH format:** `oklch(lightness chroma hue)`
+
 - Lightness: 0 (black) to 1 (white)
 - Chroma: 0 (gray) to ~0.4 (saturated)
 - Hue: 0-360 degrees
@@ -124,6 +131,7 @@ Tailwind v4 components use `data-slot` for styling:
 ```
 
 This enables powerful Tailwind selectors:
+
 ```css
 [data-slot="button"]:focus { ... }
 ```
@@ -132,13 +140,13 @@ This enables powerful Tailwind selectors:
 
 ### Deprecations
 
-| Deprecated | Replacement | Notes |
-|------------|-------------|-------|
-| Toast component | Sonner | Better stacking, animations |
-| "Default" style | "new-york" | Only one style now |
-| `tailwindcss-animate` | `tw-animate-css` | March 2025 |
-| `forwardRef` | Direct ref prop | React 19 |
-| HSL colors | OKLCH colors | Tailwind v4 |
+| Deprecated            | Replacement      | Notes                       |
+| --------------------- | ---------------- | --------------------------- |
+| Toast component       | Sonner           | Better stacking, animations |
+| "Default" style       | "new-york"       | Only one style now          |
+| `tailwindcss-animate` | `tw-animate-css` | March 2025                  |
+| `forwardRef`          | Direct ref prop  | React 19                    |
+| HSL colors            | OKLCH colors     | Tailwind v4                 |
 
 ### Non-Breaking
 
@@ -166,16 +174,18 @@ cat components.json | grep "style"
 ### "forwardRef is not a function"
 
 You're mixing React 18 and 19 patterns. Either:
+
 1. Upgrade all components to React 19 patterns
 2. Downgrade to React 18
 
 ### Colors look wrong after Tailwind v4 upgrade
 
 Check if you're mixing HSL and OKLCH:
+
 ```css
 /* Wrong - mixing formats */
---primary: 221.2 83.2% 53.3%;  /* HSL */
---secondary: oklch(0.96 0.01 250);  /* OKLCH */
+--primary: 221.2 83.2% 53.3%; /* HSL */
+--secondary: oklch(0.96 0.01 250); /* OKLCH */
 
 /* Correct - use one format */
 --color-primary: oklch(0.6 0.2 250);
@@ -185,6 +195,7 @@ Check if you're mixing HSL and OKLCH:
 ### Animations not working
 
 Replace tailwindcss-animate:
+
 ```bash
 npm uninstall tailwindcss-animate
 npm install tw-animate-css

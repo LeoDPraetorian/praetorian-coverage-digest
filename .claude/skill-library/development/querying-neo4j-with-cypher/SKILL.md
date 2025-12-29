@@ -345,11 +345,10 @@ RETURN p
 // Node.js driver example
 const session = driver.session();
 try {
-  const result = await session.executeWrite(async tx => {
-    return await tx.run(
-      'MATCH (p:Person) WHERE p.active = true RETURN p LIMIT $limit',
-      { limit: 100 }
-    );
+  const result = await session.executeWrite(async (tx) => {
+    return await tx.run("MATCH (p:Person) WHERE p.active = true RETURN p LIMIT $limit", {
+      limit: 100,
+    });
   });
   // Process results
 } finally {

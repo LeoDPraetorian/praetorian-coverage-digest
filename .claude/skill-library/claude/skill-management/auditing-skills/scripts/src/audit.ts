@@ -7,7 +7,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { SkillAuditor, PHASE_COUNT } from './lib/audit-engine.js';
 import { findSkill, listAllSkills, findSimilarSkills } from './lib/skill-finder.js';
-import { findProjectRoot, getAllSkillDirectories } from '../../../../../../lib/find-project-root.js';
+import { findProjectRoot, getAllSkillDirectories } from '@chariot/lib';
 import { formatAgentDataForAnalysis, renderAgentTableWithScores, extractDomain } from './lib/agent-analyzer.js';
 import {
   formatFindingsTable,
@@ -136,7 +136,7 @@ program
                   severity: issue.severity,
                   phase: phase.phaseName,
                   issue: issue.message,
-                  recommendation: issue.fix || 'See audit output for remediation steps'
+                  recommendation: issue.recommendation || 'See audit output for remediation steps'
                 });
               }
             }

@@ -4,11 +4,11 @@ How to use Vitest's `--changed` flag in CI/CD pipelines.
 
 ## Key Difference: CI vs Local
 
-| Environment | Working Tree | Best Approach |
-|-------------|--------------|---------------|
-| Local dev | Has uncommitted changes | `vitest --changed` (no ref) |
-| Pre-push hook | Clean after commit | `vitest --changed $REMOTE_SHA` |
-| CI pipeline | Detached HEAD, clean | `vitest --changed origin/$TARGET_BRANCH` |
+| Environment   | Working Tree            | Best Approach                            |
+| ------------- | ----------------------- | ---------------------------------------- |
+| Local dev     | Has uncommitted changes | `vitest --changed` (no ref)              |
+| Pre-push hook | Clean after commit      | `vitest --changed $REMOTE_SHA`           |
+| CI pipeline   | Detached HEAD, clean    | `vitest --changed origin/$TARGET_BRANCH` |
 
 ## GitHub Actions
 
@@ -26,12 +26,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Required for git diff
+          fetch-depth: 0 # Required for git diff
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: npm ci
@@ -51,7 +51,7 @@ jobs:
 name: Test on Push
 on:
   push:
-    branches: [main, 'feature/**']
+    branches: [main, "feature/**"]
 
 jobs:
   test:
@@ -120,7 +120,7 @@ Always use `fetch-depth: 0` (full history) or at least enough depth to reach the
 ```yaml
 - uses: actions/checkout@v4
   with:
-    fetch-depth: 0  # Full history
+    fetch-depth: 0 # Full history
 ```
 
 Without this, `git diff` and `--changed` won't have the commits to compare.

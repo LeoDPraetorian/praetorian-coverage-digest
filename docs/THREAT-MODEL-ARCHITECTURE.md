@@ -24,18 +24,18 @@ The MVP delivers four core outputs:
 
 ### Key Design Decisions
 
-| Decision                | Choice                          | Rationale                                                  |
-| ----------------------- | ------------------------------- | ---------------------------------------------------------- |
-| **Business Context First** | Mandatory Phase 0              | Cannot assess risk without understanding WHAT you're protecting and WHY - PASTA Stage 1 |
-| **Scope Selection**     | Interactive prompt              | User must explicitly choose full app vs specific component |
-| **Incremental Support** | Yes (MVP)                       | Support delta analysis on changed files                    |
-| **Methodologies**       | STRIDE + PASTA + DFD principles | Proven frameworks, applied as principles not tools         |
-| **Risk-Based Prioritization** | Phase 0 drives all phases    | Crown jewels, threat actors, and business impact guide technical analysis |
-| **Test Execution**      | Future enhancement              | MVP focuses on planning, execution is v2.0                 |
-| **Output Formats**      | Markdown, JSON, SARIF           | All three supported                                        |
-| **Token Budget**        | Future enhancement              | No artificial limits in MVP                                |
-| **Human-in-the-Loop**   | Required                        | Checkpoints between all phases (including Phase 0)         |
-| **CI/CD Integration**   | Future enhancement              | Focus on interactive use first                             |
+| Decision                      | Choice                          | Rationale                                                                               |
+| ----------------------------- | ------------------------------- | --------------------------------------------------------------------------------------- |
+| **Business Context First**    | Mandatory Phase 0               | Cannot assess risk without understanding WHAT you're protecting and WHY - PASTA Stage 1 |
+| **Scope Selection**           | Interactive prompt              | User must explicitly choose full app vs specific component                              |
+| **Incremental Support**       | Yes (MVP)                       | Support delta analysis on changed files                                                 |
+| **Methodologies**             | STRIDE + PASTA + DFD principles | Proven frameworks, applied as principles not tools                                      |
+| **Risk-Based Prioritization** | Phase 0 drives all phases       | Crown jewels, threat actors, and business impact guide technical analysis               |
+| **Test Execution**            | Future enhancement              | MVP focuses on planning, execution is v2.0                                              |
+| **Output Formats**            | Markdown, JSON, SARIF           | All three supported                                                                     |
+| **Token Budget**              | Future enhancement              | No artificial limits in MVP                                                             |
+| **Human-in-the-Loop**         | Required                        | Checkpoints between all phases (including Phase 0)                                      |
+| **CI/CD Integration**         | Future enhancement              | Focus on interactive use first                                                          |
 
 ### Key Constraints
 
@@ -186,12 +186,10 @@ Before we begin, I need to understand what you'd like to threat model.
 **Please select one:**
 
 1. **Entire Application** - Analyze the complete codebase
-
    - Best for: Initial threat models, comprehensive security review
    - Time estimate: Depends on codebase size
 
 2. **Specific Component(s)** - Focus on particular modules or features
-
    - Best for: Feature-specific review, targeted analysis
    - Please specify paths (e.g., `./modules/chariot/backend`)
 
@@ -505,12 +503,12 @@ Phase 0 implements PASTA Stage 1 ("Define Objectives") - you cannot perform risk
 
 **How This Drives Subsequent Phases**:
 
-| Phase | Uses Business Context For | Example |
-|-------|---------------------------|---------|
-| **Phase 1** (Codebase Mapping) | **Focus**: Prioritize components handling crown jewels<br>**Scope**: Map entry points by business criticality | If crown jewels = "payment_card_data", focus on payment processor components, not marketing email handlers |
-| **Phase 2** (Security Controls) | **Evaluate**: Check for compliance-required controls<br>**Validate**: Encryption for sensitive data types | If compliance = PCI-DSS Level 1, validate Requirement 3 (protect stored card data), Requirement 4 (encrypt transmission) |
-| **Phase 3** (Threat Modeling) | **Apply**: Relevant threat actor profiles<br>**Score**: Use actual business impact data<br>**Prioritize**: Threats to crown jewels | If threat actors = ransomware groups, focus on ransomware tactics. If impact = $365M, use in risk score calculation |
-| **Phase 4** (Test Planning) | **Prioritize**: Tests by business risk score<br>**Include**: Compliance validation tests<br>**Focus**: Crown jewel protection | Tests for payment data protection = Critical priority (crown jewel + compliance). Tests for marketing features = Lower priority |
+| Phase                           | Uses Business Context For                                                                                                          | Example                                                                                                                         |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Phase 1** (Codebase Mapping)  | **Focus**: Prioritize components handling crown jewels<br>**Scope**: Map entry points by business criticality                      | If crown jewels = "payment_card_data", focus on payment processor components, not marketing email handlers                      |
+| **Phase 2** (Security Controls) | **Evaluate**: Check for compliance-required controls<br>**Validate**: Encryption for sensitive data types                          | If compliance = PCI-DSS Level 1, validate Requirement 3 (protect stored card data), Requirement 4 (encrypt transmission)        |
+| **Phase 3** (Threat Modeling)   | **Apply**: Relevant threat actor profiles<br>**Score**: Use actual business impact data<br>**Prioritize**: Threats to crown jewels | If threat actors = ransomware groups, focus on ransomware tactics. If impact = $365M, use in risk score calculation             |
+| **Phase 4** (Test Planning)     | **Prioritize**: Tests by business risk score<br>**Include**: Compliance validation tests<br>**Focus**: Crown jewel protection      | Tests for payment data protection = Critical priority (crown jewel + compliance). Tests for marketing features = Lower priority |
 
 **Checkpoint Template**:
 
@@ -518,6 +516,7 @@ Phase 0 implements PASTA Stage 1 ("Define Objectives") - you cannot perform risk
 ## Phase 0 Complete: Business Context Discovery
 
 ### What I Found:
+
 - **Application**: {One-line business purpose}
 - **Crown Jewels**: {Top 3-5 most sensitive assets}
 - **Threat Actors**: {Relevant attacker profiles}
@@ -525,11 +524,13 @@ Phase 0 implements PASTA Stage 1 ("Define Objectives") - you cannot perform risk
 - **Compliance**: {Applicable regulations and requirements}
 
 ### Key Insights:
+
 - [Business-specific finding that shapes threat modeling approach]
 - [Compliance requirement that determines required controls]
 - [Threat actor profile that guides relevant threats]
 
 ### Questions for You:
+
 - Is this business understanding correct?
 - Any sensitive data types I missed?
 - Any threat actors I should add?
@@ -543,11 +544,11 @@ If approved, Phase 1 will focus on: {Specific components based on crown jewels}
 
 **Scope-Specific Behavior**:
 
-| Scope Type | Phase 0 Approach |
-|------------|------------------|
-| **Full Application** | Complete business context discovery (90 min - 3 hours) |
-| **Specific Component** | Focused discovery for that component only (45 min - 90 min) |
-| **Incremental** | Validate previous Phase 0 + identify business context changes (30 min - 60 min) |
+| Scope Type             | Phase 0 Approach                                                                |
+| ---------------------- | ------------------------------------------------------------------------------- |
+| **Full Application**   | Complete business context discovery (90 min - 3 hours)                          |
+| **Specific Component** | Focused discovery for that component only (45 min - 90 min)                     |
+| **Incremental**        | Validate previous Phase 0 + identify business context changes (30 min - 60 min) |
 
 **Critical Rule**: Phase 0 CANNOT be skipped. Orchestrator enforces execution before Phase 1.
 
@@ -576,6 +577,7 @@ If approved, Phase 1 will focus on: {Specific components based on crown jewels}
 ```
 
 **Phase 0 Inputs Used**:
+
 - Loads: `phase-0/summary.md`, `phase-0/data-classification.json` (crown jewels)
 - Impact: Focus mapping on components handling crown jewels, prioritize entry points by business criticality
 - Example: If Phase 0 identifies "payment card data" as crown jewel, spend 60% of mapping time on payment flows, 40% on rest
@@ -612,6 +614,7 @@ When scope is `incremental`:
 **Goal**: Identify existing security mechanisms and gaps (evaluated against Phase 0 compliance requirements)
 
 **Phase 0 Inputs Used**:
+
 - Loads: `phase-0/summary.md`, `phase-0/compliance-requirements.json`
 - Impact: Evaluate controls against required standards (PCI-DSS, HIPAA, SOC2), identify compliance gaps
 - Example: If Phase 0 identifies PCI-DSS Level 1, validate all 12 requirements, document gaps in `control-gaps.json`
@@ -670,6 +673,7 @@ Task("security-controls-mapper", "Map audit logging")
 - **Phase 2**: summary.md + all control files + control-gaps.json
 
 **Phase 0 Inputs Used**:
+
 - Loads: All Phase 0 files (threat actors, business impact, crown jewels, compliance)
 - Impact: Apply relevant threat actor profiles, use actual business impact data for risk scoring, prioritize threats to crown jewels
 - Example: If Phase 0 identifies ransomware groups + $28.5M breach impact, STRIDE analysis focuses on ransomware tactics (encryption, exfiltration) and scores risks using actual financial data
@@ -760,6 +764,7 @@ interface AbuseCase {
 - **Phase 2**: control-gaps.json
 
 **Phase 0 Inputs Used**:
+
 - Loads: business-impact.json (for test prioritization), compliance-requirements.json (for compliance tests), crown jewels (for focus)
 - Impact: Prioritize tests by business risk score, include compliance validation, focus on crown jewel protection
 - Example: If Phase 0 shows $365M card breach impact + PCI-DSS Level 1, prioritize card data protection tests as CRITICAL and include PCI-DSS requirement validation
@@ -1111,7 +1116,6 @@ interface PhaseHandoff {
 **MVP Components (Phases 0-4)**:
 
 - [x] Create `codebase-mapping` skill ✅
-
   - Location: `.claude/skill-library/security/codebase-mapping/`
   - 396 lines with 3 reference files
   - TDD validated: RED-GREEN-REFACTOR complete
@@ -1119,7 +1123,6 @@ interface PhaseHandoff {
   - Gateway integrated: Added to gateway-security
 
 - [x] Create `codebase-mapper` agent ✅ (Phases 1-6 complete, 7-10 pending)
-
   - Location: `.claude/agents/analysis/codebase-mapper.md`
   - 193 lines (well under 300 limit for analysis type)
   - Type: analysis, Permission: plan, Model: opus
@@ -1322,18 +1325,18 @@ Phase 5: Security Test Execution
 
 ## Changelog
 
-| Date       | Change                                                                                                                                               | Author            |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| Dec 2024   | Initial architecture design                                                                                                                          | Claude (Opus 4.5) |
-| Dec 2024   | Added design decisions, MVP scope, human checkpoints, methodology integration                                                                        | Claude (Opus 4.5) |
-| 2024-12-17 | Created `codebase-mapping` skill (Component 1/15) - 396 lines, TDD validated, pressure tested                                               | Claude (Opus 4.5) |
-| 2024-12-17 | Created `codebase-mapper` agent (Component 2/15) - 193 lines, TDD complete with pressure testing | Claude (Opus 4.5) |
-| 2024-12-17 | Created `threat-modeling-orchestrator` skill (Component 3/15) - 341 lines core skill, orchestrates 4-phase workflow with parallel agents, human checkpoints, state persistence, and structured outputs (MD+JSON+SARIF). TDD phases 1-8 complete, audit passed. | Claude (Sonnet 4.5) |
-| 2024-12-17 | Completed `threat-modeling-orchestrator` pressure testing (Phase 9) - 3/3 tests passed: (1) Skip checkpoints under time/authority pressure, (2) Skip phases under authority/exhaustion, (3) Skip scope selection under sunk cost/pragmatic pressure. Skill is bulletproof. | Claude (Opus 4.5) |
-| 2024-12-17 | Created `/threat-model` command (Component 4/15) - 26 lines, Router Pattern, delegates to `threat-modeling-orchestrator` skill. 8/8 audit checks passed. Entry point now available for threat modeling workflow. | Claude (Opus 4.5) |
-| 2024-12-17 | Created `security-controls-mapping` skill (Component 5/15) - 468 lines Phase 2 methodology skill, maps 10 control categories to STRIDE threats with detection patterns. TDD complete: RED (7 ad-hoc files) → GREEN (12 required files) → REFACTOR (3/3 pressure tests, added EXTREMELY_IMPORTANT block with 8 counter-rationalizations). Gateway integrated. Audit PASSED. | Claude (Sonnet 4.5) |
-| 2024-12-17 | Completed `security-controls-mapper` agent (Component 6/15) - 200 lines Phase 2 executor agent. TDD Phases 1-10 complete: RED (gap documented), Validation (name valid), Type (analysis), Config (629 chars), Generation (200 lines), Content (all 7 sections + EXTREMELY_IMPORTANT), GREEN (explicit skill invocation verified), Skill Verification (process + behavioral compliance), Compliance Audit (11 checks passed), REFACTOR (3/3 pressure tests passed). Agent now production-ready for threat modeling orchestration. | Claude (Opus 4.5) |
-| 2024-12-17 | Created `threat-modeling` skill (Component 7/15) - 401 lines Phase 3 methodology skill combining STRIDE + PASTA + DFD frameworks. Produces 11+ structured output files (threat-model.json, abuse-cases/, attack-trees/, dfd-threats.json, risk-matrix.json, summary.md) for Phase 4 consumption. Risk scoring: Impact (1-4) × Likelihood (1-3) = 1-12. TDD complete: RED (generic threats, no schema) → GREEN (systematic STRIDE, all outputs) → REFACTOR (3/3 pressure tests PASSED on first iteration - no hardening needed). Audit PASSED (0 critical, 0 warnings). Gateway integrated. Skill is bulletproof. | Claude (Sonnet 4.5) |
-| 2024-12-17 | Created `security-test-planning` skill (Component 8/15) - 284 lines Phase 4 methodology skill converting threat models into actionable test plans. Produces 7 required output files (code-review-plan.json, sast/dast/sca-recommendations.json, manual-test-cases.json, test-priorities.json, summary.md). TDD complete: RED (0/7 files correct with ad-hoc schema) → GREEN (7/7 files correct, 100% compliance) → REFACTOR (Test 1 FAILED 3x before hardening, Tests 2-3 PASSED). Added "Dual Deliverables Pattern" (serve VP + orchestrator), "Time Reality for AI" (30 min not 2 hrs), "Interface Contract Law", 8 counter-rationalizations. Audit PASSED (0 critical, 1 warning). Gateway integrated. Skill is bulletproof after hardening. **MVP Phases 1-4 now COMPLETE.** | Claude (Opus 4.5) |
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Author              |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| Dec 2024   | Initial architecture design                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Claude (Opus 4.5)   |
+| Dec 2024   | Added design decisions, MVP scope, human checkpoints, methodology integration                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Claude (Opus 4.5)   |
+| 2024-12-17 | Created `codebase-mapping` skill (Component 1/15) - 396 lines, TDD validated, pressure tested                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Claude (Opus 4.5)   |
+| 2024-12-17 | Created `codebase-mapper` agent (Component 2/15) - 193 lines, TDD complete with pressure testing                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Claude (Opus 4.5)   |
+| 2024-12-17 | Created `threat-modeling-orchestrator` skill (Component 3/15) - 341 lines core skill, orchestrates 4-phase workflow with parallel agents, human checkpoints, state persistence, and structured outputs (MD+JSON+SARIF). TDD phases 1-8 complete, audit passed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Claude (Sonnet 4.5) |
+| 2024-12-17 | Completed `threat-modeling-orchestrator` pressure testing (Phase 9) - 3/3 tests passed: (1) Skip checkpoints under time/authority pressure, (2) Skip phases under authority/exhaustion, (3) Skip scope selection under sunk cost/pragmatic pressure. Skill is bulletproof.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Claude (Opus 4.5)   |
+| 2024-12-17 | Created `/threat-model` command (Component 4/15) - 26 lines, Router Pattern, delegates to `threat-modeling-orchestrator` skill. 8/8 audit checks passed. Entry point now available for threat modeling workflow.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Claude (Opus 4.5)   |
+| 2024-12-17 | Created `security-controls-mapping` skill (Component 5/15) - 468 lines Phase 2 methodology skill, maps 10 control categories to STRIDE threats with detection patterns. TDD complete: RED (7 ad-hoc files) → GREEN (12 required files) → REFACTOR (3/3 pressure tests, added EXTREMELY_IMPORTANT block with 8 counter-rationalizations). Gateway integrated. Audit PASSED.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Claude (Sonnet 4.5) |
+| 2024-12-17 | Completed `security-controls-mapper` agent (Component 6/15) - 200 lines Phase 2 executor agent. TDD Phases 1-10 complete: RED (gap documented), Validation (name valid), Type (analysis), Config (629 chars), Generation (200 lines), Content (all 7 sections + EXTREMELY_IMPORTANT), GREEN (explicit skill invocation verified), Skill Verification (process + behavioral compliance), Compliance Audit (11 checks passed), REFACTOR (3/3 pressure tests passed). Agent now production-ready for threat modeling orchestration.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Claude (Opus 4.5)   |
+| 2024-12-17 | Created `threat-modeling` skill (Component 7/15) - 401 lines Phase 3 methodology skill combining STRIDE + PASTA + DFD frameworks. Produces 11+ structured output files (threat-model.json, abuse-cases/, attack-trees/, dfd-threats.json, risk-matrix.json, summary.md) for Phase 4 consumption. Risk scoring: Impact (1-4) × Likelihood (1-3) = 1-12. TDD complete: RED (generic threats, no schema) → GREEN (systematic STRIDE, all outputs) → REFACTOR (3/3 pressure tests PASSED on first iteration - no hardening needed). Audit PASSED (0 critical, 0 warnings). Gateway integrated. Skill is bulletproof.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Claude (Sonnet 4.5) |
+| 2024-12-17 | Created `security-test-planning` skill (Component 8/15) - 284 lines Phase 4 methodology skill converting threat models into actionable test plans. Produces 7 required output files (code-review-plan.json, sast/dast/sca-recommendations.json, manual-test-cases.json, test-priorities.json, summary.md). TDD complete: RED (0/7 files correct with ad-hoc schema) → GREEN (7/7 files correct, 100% compliance) → REFACTOR (Test 1 FAILED 3x before hardening, Tests 2-3 PASSED). Added "Dual Deliverables Pattern" (serve VP + orchestrator), "Time Reality for AI" (30 min not 2 hrs), "Interface Contract Law", 8 counter-rationalizations. Audit PASSED (0 critical, 1 warning). Gateway integrated. Skill is bulletproof after hardening. **MVP Phases 1-4 now COMPLETE.**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Claude (Opus 4.5)   |
 | 2024-12-18 | **CRITICAL ENHANCEMENT**: Created `business-context-discovery` skill (Component 9/15 - Phase 0) - 331 lines implementing PASTA Stage 1. Addresses critical gap: threat modeling workflow lacked business context discovery, producing technically sound but business-blind models. Skill provides structured interview workflow for discovering business purpose, crown jewels (data classification), threat actor profiling, business impact assessment (FAIR principles), and compliance requirements (SOC2, PCI-DSS, HIPAA, GDPR) BEFORE technical analysis. Produces 6 JSON outputs + summary.md that drive prioritization in ALL subsequent phases. TDD complete: RED (gap proven) → GREEN (structured workflow) → REFACTOR (3/3 pressure tests PASSED on first iteration: Time+Authority+Emergency, Expertise+Pragmatic+Efficiency, Previous Work+Deadline+Stakeholder). Reference files: 5 comprehensive guides (interview-questions, data-classification, threat-actor-profiles, impact-assessment, compliance-mapping). Examples: 2 industry-specific (healthcare, fintech). Audit PASSED (0 critical, 2 warnings). Gateway integrated as Phase 0. **Phase 0 skill complete - integration updates to Phases 1-4 + orchestrator pending for full risk-driven threat modeling.** | Claude (Sonnet 4.5) |
-| 2024-12-18 | **Phase 0 Integration - Task 1**: Updated `threat-modeling-orchestrator` skill (Component 10/15) - 341→435 lines (+94). Integrated Phase 0 into orchestration workflow: (1) Added Phase 0 to Quick Reference (now 5 phases: 0-4), (2) Inserted Step 1.5: Phase 0 invocation after scope selection, (3) Added Phase 0 enforcement rule with 6 "No exceptions" counters, (4) Updated session setup for phase-0/, (5) Updated handoff protocol with Phase 0 summary, (6) Added Phase 0 checkpoint template, (7) Updated session directory structure, (8) Added business-context-discovery to related skills. TDD complete: RED (no Phase 0 invocation) → GREEN (all changes verified) → REFACTOR (3/3 bypass scenarios countered: Time+Authority+Emergency, Expertise+Pragmatic+Sunk Cost, Deadline+Client Service+Efficiency). Audit PASSED (0 critical, 4 INFO). Line count: 435 (safe zone). **Orchestrator now enforces Phase 0 before Phase 1 - bulletproof against bypass attempts. Next: Update Phases 1-4 skills (Tasks 2-5).** | Claude (Opus 4.5) |
+| 2024-12-18 | **Phase 0 Integration - Task 1**: Updated `threat-modeling-orchestrator` skill (Component 10/15) - 341→435 lines (+94). Integrated Phase 0 into orchestration workflow: (1) Added Phase 0 to Quick Reference (now 5 phases: 0-4), (2) Inserted Step 1.5: Phase 0 invocation after scope selection, (3) Added Phase 0 enforcement rule with 6 "No exceptions" counters, (4) Updated session setup for phase-0/, (5) Updated handoff protocol with Phase 0 summary, (6) Added Phase 0 checkpoint template, (7) Updated session directory structure, (8) Added business-context-discovery to related skills. TDD complete: RED (no Phase 0 invocation) → GREEN (all changes verified) → REFACTOR (3/3 bypass scenarios countered: Time+Authority+Emergency, Expertise+Pragmatic+Sunk Cost, Deadline+Client Service+Efficiency). Audit PASSED (0 critical, 4 INFO). Line count: 435 (safe zone). **Orchestrator now enforces Phase 0 before Phase 1 - bulletproof against bypass attempts. Next: Update Phases 1-4 skills (Tasks 2-5).**                                                                                                                                                                                                                                                    | Claude (Opus 4.5)   |

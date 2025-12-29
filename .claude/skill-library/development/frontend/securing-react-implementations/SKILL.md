@@ -24,14 +24,14 @@ Use this skill when:
 
 ## Quick Reference
 
-| Attack Vector | Primary Defense | See Reference |
-|---------------|----------------|---------------|
-| XSS (Cross-Site Scripting) | Input sanitization, avoid `dangerouslySetInnerHTML` | [xss-prevention.md](references/xss-prevention.md) |
-| CSRF (Cross-Site Request Forgery) | CSRF tokens, SameSite cookies | [csrf-protection.md](references/csrf-protection.md) |
-| Injection Attacks | Input validation, parameterized queries | [injection-prevention.md](references/injection-prevention.md) |
-| Authentication Bypass | Secure token storage, proper session management | [authentication-patterns.md](references/authentication-patterns.md) |
-| Authorization Flaws | Server-side validation, RBAC | [authorization-patterns.md](references/authorization-patterns.md) |
-| Sensitive Data Exposure | Encryption, secure storage, no client-side secrets | [data-protection.md](references/data-protection.md) |
+| Attack Vector                     | Primary Defense                                     | See Reference                                                       |
+| --------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------- |
+| XSS (Cross-Site Scripting)        | Input sanitization, avoid `dangerouslySetInnerHTML` | [xss-prevention.md](references/xss-prevention.md)                   |
+| CSRF (Cross-Site Request Forgery) | CSRF tokens, SameSite cookies                       | [csrf-protection.md](references/csrf-protection.md)                 |
+| Injection Attacks                 | Input validation, parameterized queries             | [injection-prevention.md](references/injection-prevention.md)       |
+| Authentication Bypass             | Secure token storage, proper session management     | [authentication-patterns.md](references/authentication-patterns.md) |
+| Authorization Flaws               | Server-side validation, RBAC                        | [authorization-patterns.md](references/authorization-patterns.md)   |
+| Sensitive Data Exposure           | Encryption, secure storage, no client-side secrets  | [data-protection.md](references/data-protection.md)                 |
 
 ## Security Review Workflow
 
@@ -71,6 +71,7 @@ function SearchResults({ query }) {
 ```
 
 **Validation rules:**
+
 - Whitelist allowed characters/patterns
 - Reject malicious patterns (script tags, event handlers)
 - Length limits on all inputs
@@ -108,12 +109,14 @@ function AdminPanel() {
 ```
 
 **Authentication patterns:**
+
 - JWT tokens with secure storage (httpOnly cookies)
 - Token refresh flows
 - Session timeout and renewal
 - Multi-factor authentication (MFA)
 
 **Authorization patterns:**
+
 - Role-based access control (RBAC)
 - Attribute-based access control (ABAC)
 - Server-side permission checks on every request
@@ -127,21 +130,22 @@ function AdminPanel() {
 
 ```typescript
 // ❌ VULNERABLE: API keys in client code
-const API_KEY = 'sk_live_123456789';
+const API_KEY = "sk_live_123456789";
 fetch(`/api/data?key=${API_KEY}`);
 
 // ✅ SECURE: API keys on server only
 // Client sends request to backend
-fetch('/api/data');
+fetch("/api/data");
 
 // Backend includes API key
-app.get('/api/data', (req, res) => {
+app.get("/api/data", (req, res) => {
   const API_KEY = process.env.API_KEY;
   // Use API_KEY here
 });
 ```
 
 **Protection strategies:**
+
 - Environment variables for secrets (server-side only)
 - Encryption for data at rest
 - HTTPS for data in transit
@@ -166,6 +170,7 @@ npm outdated
 ```
 
 **Best practices:**
+
 - Minimal dependencies (smaller attack surface)
 - Regular updates (security patches)
 - Audit new packages before adding
@@ -202,7 +207,7 @@ async function UserProfile({ userId }) {
 #### Actions Security
 
 ```typescript
-'use server';
+"use server";
 
 // ❌ VULNERABLE: No validation
 export async function deleteUser(userId: string) {
@@ -213,12 +218,12 @@ export async function deleteUser(userId: string) {
 export async function deleteUser(userId: string) {
   const session = await auth();
 
-  if (!session?.user?.roles.includes('admin')) {
-    throw new Error('Unauthorized');
+  if (!session?.user?.roles.includes("admin")) {
+    throw new Error("Unauthorized");
   }
 
   if (!isValidUUID(userId)) {
-    throw new Error('Invalid user ID');
+    throw new Error("Invalid user ID");
   }
 
   await db.user.delete({ where: { id: userId } });
@@ -235,32 +240,32 @@ export async function deleteUser(userId: string) {
 // Next.js next.config.js
 const securityHeaders = [
   {
-    key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none';"
+    key: "Content-Security-Policy",
+    value: "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none';",
   },
   {
-    key: 'X-Frame-Options',
-    value: 'DENY'
+    key: "X-Frame-Options",
+    value: "DENY",
   },
   {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff'
+    key: "X-Content-Type-Options",
+    value: "nosniff",
   },
   {
-    key: 'Referrer-Policy',
-    value: 'strict-origin-when-cross-origin'
+    key: "Referrer-Policy",
+    value: "strict-origin-when-cross-origin",
   },
   {
-    key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(), geolocation=()'
-  }
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=()",
+  },
 ];
 
 module.exports = {
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: "/:path*",
         headers: securityHeaders,
       },
     ];
@@ -272,14 +277,14 @@ module.exports = {
 
 ## Recommended Security Libraries
 
-| Library | Purpose | NPM Package |
-|---------|---------|-------------|
-| DOMPurify | HTML sanitization | `dompurify` |
-| helmet | Security headers (Node.js) | `helmet` |
-| validator | Input validation | `validator` |
-| bcrypt | Password hashing | `bcryptjs` |
-| jsonwebtoken | JWT handling | `jsonwebtoken` |
-| csrf | CSRF protection | `csrf` |
+| Library      | Purpose                    | NPM Package    |
+| ------------ | -------------------------- | -------------- |
+| DOMPurify    | HTML sanitization          | `dompurify`    |
+| helmet       | Security headers (Node.js) | `helmet`       |
+| validator    | Input validation           | `validator`    |
+| bcrypt       | Password hashing           | `bcryptjs`     |
+| jsonwebtoken | JWT handling               | `jsonwebtoken` |
+| csrf         | CSRF protection            | `csrf`         |
 
 **See:** [security-libraries.md](references/security-libraries.md)
 
@@ -290,23 +295,23 @@ module.exports = {
 ### Unit Testing Security Logic
 
 ```typescript
-import { render, screen } from '@testing-library/react';
-import { sanitizeInput } from './security';
+import { render, screen } from "@testing-library/react";
+import { sanitizeInput } from "./security";
 
-describe('Security: Input Sanitization', () => {
-  it('should remove script tags', () => {
+describe("Security: Input Sanitization", () => {
+  it("should remove script tags", () => {
     const malicious = '<script>alert("XSS")</script>';
     const sanitized = sanitizeInput(malicious);
 
-    expect(sanitized).not.toContain('<script>');
-    expect(sanitized).not.toContain('alert');
+    expect(sanitized).not.toContain("<script>");
+    expect(sanitized).not.toContain("alert");
   });
 
-  it('should remove event handlers', () => {
+  it("should remove event handlers", () => {
     const malicious = '<img src=x onerror="alert(1)">';
     const sanitized = sanitizeInput(malicious);
 
-    expect(sanitized).not.toContain('onerror');
+    expect(sanitized).not.toContain("onerror");
   });
 });
 ```
@@ -314,10 +319,10 @@ describe('Security: Input Sanitization', () => {
 ### E2E Security Testing
 
 ```typescript
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('should prevent XSS injection', async ({ page }) => {
-  await page.goto('/search');
+test("should prevent XSS injection", async ({ page }) => {
+  await page.goto("/search");
 
   // Attempt XSS injection
   await page.fill('[data-testid="search-input"]', '<script>alert("XSS")</script>');
@@ -325,7 +330,7 @@ test('should prevent XSS injection', async ({ page }) => {
 
   // Verify script doesn't execute
   const alerts = [];
-  page.on('dialog', dialog => {
+  page.on("dialog", (dialog) => {
     alerts.push(dialog.message());
     dialog.dismiss();
   });

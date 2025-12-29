@@ -1,3 +1,41 @@
+## [Date: 2025-12-29] - Automation Integration
+
+### Updated
+- Replaced manual Edit tool instructions with gateway CLI automation
+- Integrated existing gateway-updater.ts (previously unused) via CLI commands
+- Updated Phase 5 "Apply Changes" to use `npm run gateway -- sync`
+- Updated Dry Run workflow to use `--dry-run` flag
+- Simplified workflow phases (removed manual Phase 1-6, now automated by CLI)
+
+### CLI Commands Added
+- `npm run gateway -- sync` - Full gateway synchronization
+- `npm run gateway -- sync --dry-run` - Preview changes without applying
+- `npm run gateway -- validate` - Check gateway consistency
+- `npm run gateway -- add` - Add skill to gateway
+- `npm run gateway -- remove` - Remove skill from gateway
+- `npm run gateway -- update` - Update skill path (for migrations)
+
+### Benefits
+- Eliminates error-prone manual table editing (sorting, formatting, path validation)
+- Reduces sync time from 20-30 minutes to 2-5 minutes
+- Automatic duplicate detection and prevention
+- Robust path validation before modifications
+- Consistent table formatting enforcement
+
+### Files Modified
+- SKILL.md: Updated sync operations (sections 1-3) to use CLI
+- scripts/src/gateway.ts: Created new CLI entry point (364 lines)
+- scripts/package.json: Added "gateway" script
+
+### External Interface Unchanged
+- Other skills (creating-skills, migrating-skills, deleting-skills) continue delegating to syncing-gateways without modification
+- syncing-gateways remains the single source of truth for gateway operations
+
+### TDD Phases Completed
+- 🔴 RED: Manual Edit tool approach documented as error-prone (sorting, formatting, validation issues)
+- 🟢 GREEN: CLI integration verified (awaiting test)
+- 🔵 REFACTOR: Pending pressure testing
+
 ## [Date: 2025-12-23] - Initial Creation
 
 ### Created

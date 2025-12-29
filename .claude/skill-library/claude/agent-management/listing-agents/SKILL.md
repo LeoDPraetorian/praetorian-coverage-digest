@@ -152,6 +152,7 @@ cd "$REPO_ROOT"
    ```
 
 2. **Read and format:**
+
    ```markdown
    ## Development Agents (16)
 

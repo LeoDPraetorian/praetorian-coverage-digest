@@ -5,6 +5,7 @@ Advanced data loading patterns for TanStack Router including `beforeLoad` vs `lo
 ## Overview
 
 TanStack Router provides two hooks for loading data:
+
 - **`beforeLoad`**: Sequential execution, blocks downstream routes, ideal for auth/redirects/context injection
 - **`loader`**: Parallel execution, independent per route, ideal for data fetching
 
@@ -16,15 +17,15 @@ Understanding when to use each is critical for performance and correctness.
 
 ### Execution Model Comparison
 
-| Aspect | `beforeLoad` | `loader` |
-|--------|--------------|----------|
-| **Execution** | Sequential, blocks all downstream routes | Parallel across all routes |
-| **Purpose** | Auth checks, redirects, context injection | Data fetching for specific route |
-| **Blocking Behavior** | Blocks ALL child loaders until complete | Independent, doesn't block others |
-| **Performance Impact** | Slow beforeLoad delays entire route tree | Isolated to single route |
-| **Best for** | Lightweight, critical preconditions | Heavy data loading operations |
-| **Return Value** | Merged into context for child routes | Available via `useLoaderData()` |
-| **Error Handling** | Can redirect on auth failure | Can throw to error boundary |
+| Aspect                 | `beforeLoad`                              | `loader`                          |
+| ---------------------- | ----------------------------------------- | --------------------------------- |
+| **Execution**          | Sequential, blocks all downstream routes  | Parallel across all routes        |
+| **Purpose**            | Auth checks, redirects, context injection | Data fetching for specific route  |
+| **Blocking Behavior**  | Blocks ALL child loaders until complete   | Independent, doesn't block others |
+| **Performance Impact** | Slow beforeLoad delays entire route tree  | Isolated to single route          |
+| **Best for**           | Lightweight, critical preconditions       | Heavy data loading operations     |
+| **Return Value**       | Merged into context for child routes      | Available via `useLoaderData()`   |
+| **Error Handling**     | Can redirect on auth failure              | Can throw to error boundary       |
 
 ### When to Use beforeLoad
 
@@ -39,23 +40,23 @@ Use `beforeLoad` for:
 **Example - Auth Guard:**
 
 ```typescript
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/_authenticated')({
+export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ context }) => {
     // Fast auth check
     if (!context.auth.isAuthenticated) {
       throw redirect({
-        to: '/login',
+        to: "/login",
         search: { redirect: location.href },
-      })
+      });
     }
 
     // Inject user into context for child routes
-    const user = await context.auth.getUser()
-    return { user }
+    const user = await context.auth.getUser();
+    return { user };
   },
-})
+});
 ```
 
 ### When to Use loader
@@ -103,37 +104,37 @@ Data returned from `beforeLoad` is **merged into context** and available to chil
 
 ```typescript
 // Parent route: /dashboard
-export const Route = createFileRoute('/dashboard')({
+export const Route = createFileRoute("/dashboard")({
   beforeLoad: () => {
-    return { dashboardSettings: { theme: 'dark', layout: 'grid' } }
+    return { dashboardSettings: { theme: "dark", layout: "grid" } };
   },
-})
+});
 
 // Child route: /dashboard/assets
-export const Route = createFileRoute('/dashboard/assets')({
+export const Route = createFileRoute("/dashboard/assets")({
   beforeLoad: ({ context }) => {
     // Access parent's injected context
-    console.log(context.dashboardSettings.theme) // 'dark'
+    console.log(context.dashboardSettings.theme); // 'dark'
 
     // Add more context for deeper children
-    return { assetFilters: { status: 'active' } }
+    return { assetFilters: { status: "active" } };
   },
   loader: ({ context }) => {
     // Both parent and current beforeLoad context available
-    const { dashboardSettings, assetFilters } = context
-    return fetchAssets(assetFilters)
+    const { dashboardSettings, assetFilters } = context;
+    return fetchAssets(assetFilters);
   },
-})
+});
 
 // Grandchild route: /dashboard/assets/$assetId
-export const Route = createFileRoute('/dashboard/assets/$assetId')({
+export const Route = createFileRoute("/dashboard/assets/$assetId")({
   loader: ({ context, params }) => {
     // All ancestor context available
-    console.log(context.dashboardSettings) // Available
-    console.log(context.assetFilters) // Available
-    return fetchAsset(params.assetId)
+    console.log(context.dashboardSettings); // Available
+    console.log(context.assetFilters); // Available
+    return fetchAsset(params.assetId);
   },
-})
+});
 ```
 
 ### Root Context with createRootRouteWithContext
@@ -142,18 +143,18 @@ Share services and configuration across all routes:
 
 ```typescript
 // In __root.tsx
-import { createRootRouteWithContext } from '@tanstack/react-router'
-import { QueryClient } from '@tanstack/react-query'
+import { createRootRouteWithContext } from "@tanstack/react-router";
+import { QueryClient } from "@tanstack/react-query";
 
 interface RouterContext {
-  auth: AuthService
-  queryClient: QueryClient
-  analytics: AnalyticsService
+  auth: AuthService;
+  queryClient: QueryClient;
+  analytics: AnalyticsService;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: Root,
-})
+});
 
 // In router.tsx
 const router = createRouter({
@@ -163,16 +164,16 @@ const router = createRouter({
     queryClient,
     analytics: analyticsService,
   },
-})
+});
 
 // In any child route
-export const Route = createFileRoute('/assets')({
+export const Route = createFileRoute("/assets")({
   loader: ({ context }) => {
     // Root context always available
-    context.analytics.track('page_view')
-    return context.queryClient.ensureQueryData(assetsOptions)
+    context.analytics.track("page_view");
+    return context.queryClient.ensureQueryData(assetsOptions);
   },
-})
+});
 ```
 
 ---
@@ -184,6 +185,7 @@ When your loader depends on search params, use `loaderDeps` to properly cache da
 ### Why loaderDeps?
 
 Without `loaderDeps`, the router doesn't know your loader depends on search params, leading to:
+
 - Incorrect cache keys (data not refetched when search changes)
 - Stale data shown when navigating with different search params
 - Broken preloading (can't preload with specific search values)
@@ -191,16 +193,16 @@ Without `loaderDeps`, the router doesn't know your loader depends on search para
 ### Basic Pattern
 
 ```typescript
-import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
+import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 
 const searchSchema = z.object({
   page: z.number().default(1),
-  filter: z.enum(['all', 'active', 'inactive']).default('all'),
-  search: z.string().default(''),
-})
+  filter: z.enum(["all", "active", "inactive"]).default("all"),
+  search: z.string().default(""),
+});
 
-export const Route = createFileRoute('/assets')({
+export const Route = createFileRoute("/assets")({
   validateSearch: searchSchema,
 
   // Extract search params as loader dependencies
@@ -216,9 +218,9 @@ export const Route = createFileRoute('/assets')({
       page: deps.page,
       filter: deps.filter,
       search: deps.search,
-    })
+    });
   },
-})
+});
 ```
 
 ### Subset of Search Params
@@ -230,11 +232,11 @@ const searchSchema = z.object({
   page: z.number().default(1),
   pageSize: z.number().default(20),
   sortBy: z.string().optional(),
-  sortOrder: z.enum(['asc', 'desc']).default('asc'),
-  uiMode: z.enum(['grid', 'list']).default('grid'),  // UI-only
-})
+  sortOrder: z.enum(["asc", "desc"]).default("asc"),
+  uiMode: z.enum(["grid", "list"]).default("grid"), // UI-only
+});
 
-export const Route = createFileRoute('/assets')({
+export const Route = createFileRoute("/assets")({
   validateSearch: searchSchema,
 
   // Only include params that affect data fetching
@@ -247,9 +249,9 @@ export const Route = createFileRoute('/assets')({
   }),
 
   loader: async ({ deps }) => {
-    return fetchAssets(deps)
+    return fetchAssets(deps);
   },
-})
+});
 ```
 
 ### Computed Dependencies
@@ -259,9 +261,8 @@ Transform search params before using as loader deps:
 ```typescript
 loaderDeps: ({ search }) => ({
   // Normalize date range
-  dateRange: search.startDate && search.endDate
-    ? { start: search.startDate, end: search.endDate }
-    : null,
+  dateRange:
+    search.startDate && search.endDate ? { start: search.startDate, end: search.endDate } : null,
 
   // Combine filter fields
   filters: {
@@ -269,7 +270,7 @@ loaderDeps: ({ search }) => ({
     severity: search.severity,
     assignee: search.assignee,
   },
-})
+});
 ```
 
 ---
@@ -282,13 +283,13 @@ When navigating to nested routes, all loaders run in parallel automatically:
 
 ```typescript
 // Parent: /dashboard
-loader: () => fetchDashboardStats()  // Runs in parallel
+loader: () => fetchDashboardStats(); // Runs in parallel
 
 // Child: /dashboard/assets
-loader: () => fetchAssets()          // Runs in parallel
+loader: () => fetchAssets(); // Runs in parallel
 
 // Grandchild: /dashboard/assets/$assetId
-loader: ({ params }) => fetchAsset(params.assetId)  // Runs in parallel
+loader: ({ params }) => fetchAsset(params.assetId); // Runs in parallel
 ```
 
 All three loaders start simultaneously, greatly reducing load time compared to waterfalls.
@@ -298,7 +299,7 @@ All three loaders start simultaneously, greatly reducing load time compared to w
 Fetch multiple data sources in a single loader:
 
 ```typescript
-export const Route = createFileRoute('/assets/$assetId')({
+export const Route = createFileRoute("/assets/$assetId")({
   loader: async ({ params, context }) => {
     // All queries start simultaneously
     await Promise.all([
@@ -306,9 +307,9 @@ export const Route = createFileRoute('/assets/$assetId')({
       context.queryClient.ensureQueryData(risksQueryOptions(params.assetId)),
       context.queryClient.ensureQueryData(attributesQueryOptions(params.assetId)),
       context.queryClient.prefetchQuery(relatedAssetsOptions(params.assetId)),
-    ])
+    ]);
   },
-})
+});
 ```
 
 ### Promise.allSettled for Optional Data
@@ -318,18 +319,18 @@ Use `allSettled` when some data is optional (don't fail if one query fails):
 ```typescript
 loader: async ({ params, context }) => {
   const results = await Promise.allSettled([
-    context.queryClient.ensureQueryData(assetOptions(params.assetId)),        // Critical
-    context.queryClient.prefetchQuery(analyticsOptions(params.assetId)),     // Optional
+    context.queryClient.ensureQueryData(assetOptions(params.assetId)), // Critical
+    context.queryClient.prefetchQuery(analyticsOptions(params.assetId)), // Optional
     context.queryClient.prefetchQuery(recommendationsOptions(params.assetId)), // Optional
-  ])
+  ]);
 
   // Critical data must succeed
-  if (results[0].status === 'rejected') {
-    throw new Error('Failed to load asset')
+  if (results[0].status === "rejected") {
+    throw new Error("Failed to load asset");
   }
 
   // Optional data failures are ok (components will show loading state)
-}
+};
 ```
 
 ### Avoid Waterfalls with Dependent Data
@@ -338,37 +339,39 @@ loader: async ({ params, context }) => {
 
 ```typescript
 loader: async ({ params }) => {
-  const asset = await fetchAsset(params.assetId)  // Wait...
-  const owner = await fetchUser(asset.ownerId)    // Then wait again...
-  const team = await fetchTeam(owner.teamId)      // More waiting...
-  return { asset, owner, team }
-}
+  const asset = await fetchAsset(params.assetId); // Wait...
+  const owner = await fetchUser(asset.ownerId); // Then wait again...
+  const team = await fetchTeam(owner.teamId); // More waiting...
+  return { asset, owner, team };
+};
 ```
 
 **✅ GOOD - Parallel with query options:**
 
 ```typescript
 // Define query options that encode dependencies
-const assetOptions = (id: string) => queryOptions({
-  queryKey: ['assets', id],
-  queryFn: () => fetchAsset(id),
-})
+const assetOptions = (id: string) =>
+  queryOptions({
+    queryKey: ["assets", id],
+    queryFn: () => fetchAsset(id),
+  });
 
-const ownerOptions = (assetId: string) => queryOptions({
-  queryKey: ['owner', assetId],
-  queryFn: async () => {
-    const asset = await queryClient.getQueryData(assetOptions(assetId).queryKey)
-    return fetchUser(asset.ownerId)
-  },
-})
+const ownerOptions = (assetId: string) =>
+  queryOptions({
+    queryKey: ["owner", assetId],
+    queryFn: async () => {
+      const asset = await queryClient.getQueryData(assetOptions(assetId).queryKey);
+      return fetchUser(asset.ownerId);
+    },
+  });
 
 loader: async ({ params, context }) => {
   // Asset loads first, owner uses cached asset data
   await Promise.all([
     context.queryClient.ensureQueryData(assetOptions(params.assetId)),
     context.queryClient.ensureQueryData(ownerOptions(params.assetId)),
-  ])
-}
+  ]);
+};
 ```
 
 ---
@@ -384,11 +387,12 @@ Both prime the TanStack Query cache, but with different semantics:
 ```typescript
 loader: async ({ params, context }) => {
   // Blocks navigation until data is loaded
-  await context.queryClient.ensureQueryData(assetQueryOptions(params.assetId))
-}
+  await context.queryClient.ensureQueryData(assetQueryOptions(params.assetId));
+};
 ```
 
 **Characteristics:**
+
 - Returns the data (can be awaited)
 - Only fetches if cache is empty or stale (respects `staleTime`)
 - Blocks route transition until complete
@@ -401,15 +405,16 @@ loader: async ({ params, context }) => {
 ```typescript
 loader: async ({ params, context }) => {
   // Critical data
-  await context.queryClient.ensureQueryData(assetQueryOptions(params.assetId))
+  await context.queryClient.ensureQueryData(assetQueryOptions(params.assetId));
 
   // Background data (doesn't block)
-  context.queryClient.prefetchQuery(analyticsQueryOptions(params.assetId))
-  context.queryClient.prefetchQuery(relatedAssetsOptions(params.assetId))
-}
+  context.queryClient.prefetchQuery(analyticsQueryOptions(params.assetId));
+  context.queryClient.prefetchQuery(relatedAssetsOptions(params.assetId));
+};
 ```
 
 **Characteristics:**
+
 - Returns `void` (fire-and-forget)
 - Always fetches (ignores `staleTime`)
 - Doesn't block route transition
@@ -423,12 +428,12 @@ loader: async ({ params, context }) => {
   await Promise.all([
     context.queryClient.ensureQueryData(assetOptions(params.assetId)),
     context.queryClient.ensureQueryData(risksOptions(params.assetId)),
-  ])
+  ]);
 
   // Fire-and-forget for nice-to-have
-  context.queryClient.prefetchQuery(analyticsOptions(params.assetId))
-  context.queryClient.prefetchQuery(relatedOptions(params.assetId))
-}
+  context.queryClient.prefetchQuery(analyticsOptions(params.assetId));
+  context.queryClient.prefetchQuery(relatedOptions(params.assetId));
+};
 ```
 
 Component sees critical data immediately, optional data loads in background.

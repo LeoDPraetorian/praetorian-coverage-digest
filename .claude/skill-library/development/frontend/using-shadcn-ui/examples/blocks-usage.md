@@ -40,11 +40,13 @@ export function Hero() {
 ```
 
 **Dependencies:**
+
 ```bash
 npx shadcn@latest add button
 ```
 
 **Usage:**
+
 ```typescript
 import { Hero } from "@/components/hero"
 
@@ -127,6 +129,7 @@ export function Pricing() {
 ```
 
 **Dependencies:**
+
 ```bash
 npx shadcn@latest add card button badge
 ```
@@ -180,6 +183,7 @@ export function Features() {
 ```
 
 **Dependencies:**
+
 ```bash
 npx shadcn@latest add card
 npm install lucide-react

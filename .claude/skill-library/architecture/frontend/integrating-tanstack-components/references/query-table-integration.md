@@ -91,18 +91,18 @@ import {
   SortingState,
   ColumnFiltersState,
   PaginationState,
-} from '@tanstack/react-table'
+} from "@tanstack/react-table";
 
 function ClientSideTable() {
-  const { data } = useQuery({ queryKey: ['users'], queryFn: fetchAllUsers })
+  const { data } = useQuery({ queryKey: ["users"], queryFn: fetchAllUsers });
 
   // Table manages state internally
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
-  })
+  });
 
   const table = useReactTable({
     data: data ?? [],
@@ -116,7 +116,7 @@ function ClientSideTable() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-  })
+  });
 }
 ```
 
@@ -125,24 +125,25 @@ function ClientSideTable() {
 ```typescript
 function ServerSideTable() {
   // Table state drives Query params
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
-  })
+  });
 
   // Query includes table state in key
   const { data, isLoading } = useQuery({
-    queryKey: ['users', { sorting, columnFilters, pagination }],
-    queryFn: () => fetchUsers({
-      sort: sorting[0]?.id,
-      order: sorting[0]?.desc ? 'desc' : 'asc',
-      filters: columnFilters,
-      page: pagination.pageIndex,
-      pageSize: pagination.pageSize,
-    }),
-  })
+    queryKey: ["users", { sorting, columnFilters, pagination }],
+    queryFn: () =>
+      fetchUsers({
+        sort: sorting[0]?.id,
+        order: sorting[0]?.desc ? "desc" : "asc",
+        filters: columnFilters,
+        page: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+      }),
+  });
 
   const table = useReactTable({
     data: data?.rows ?? [],
@@ -161,7 +162,7 @@ function ServerSideTable() {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
-  })
+  });
 }
 ```
 
@@ -203,27 +204,25 @@ const deleteMutation = useMutation({
   mutationFn: deleteUser,
   onMutate: async (userId) => {
     // Cancel outgoing refetches
-    await queryClient.cancelQueries({ queryKey: ['users'] })
+    await queryClient.cancelQueries({ queryKey: ["users"] });
 
     // Snapshot current value
-    const previousUsers = queryClient.getQueryData<User[]>(['users'])
+    const previousUsers = queryClient.getQueryData<User[]>(["users"]);
 
     // Optimistically remove from cache
-    queryClient.setQueryData<User[]>(['users'], (old) =>
-      old?.filter(user => user.id !== userId)
-    )
+    queryClient.setQueryData<User[]>(["users"], (old) => old?.filter((user) => user.id !== userId));
 
-    return { previousUsers }
+    return { previousUsers };
   },
   onError: (err, userId, context) => {
     // Rollback on error
-    queryClient.setQueryData(['users'], context?.previousUsers)
+    queryClient.setQueryData(["users"], context?.previousUsers);
   },
   onSettled: () => {
     // Refetch to ensure consistency
-    queryClient.invalidateQueries({ queryKey: ['users'] })
+    queryClient.invalidateQueries({ queryKey: ["users"] });
   },
-})
+});
 ```
 
 ### Inline Editing with Mutation
@@ -331,33 +330,33 @@ function TableWithEmptyState() {
 function DynamicColumnsTable() {
   // Fetch column configuration
   const { data: columnConfig } = useQuery({
-    queryKey: ['table-config'],
+    queryKey: ["table-config"],
     queryFn: fetchTableConfig,
     staleTime: Infinity, // Column config rarely changes
-  })
+  });
 
   // Fetch data
   const { data } = useQuery({
-    queryKey: ['users'],
+    queryKey: ["users"],
     queryFn: fetchUsers,
     enabled: !!columnConfig, // Wait for column config
-  })
+  });
 
   // Generate columns from config
   const columns = useMemo(() => {
-    if (!columnConfig) return []
-    return columnConfig.map(col => ({
+    if (!columnConfig) return [];
+    return columnConfig.map((col) => ({
       accessorKey: col.field,
       header: col.label,
       cell: col.format ? ({ getValue }) => formatValue(getValue(), col.format) : undefined,
-    }))
-  }, [columnConfig])
+    }));
+  }, [columnConfig]);
 
   const table = useReactTable({
     data: data ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
-  })
+  });
 }
 ```
 
@@ -388,24 +387,24 @@ const columns: ColumnDef<User>[] = [
 
 ```typescript
 // Route handles URL state
-export const Route = createFileRoute('/users')({
+export const Route = createFileRoute("/users")({
   validateSearch: (search): TableFilters => ({
     page: Number(search.page) || 1,
     pageSize: Number(search.pageSize) || 10,
     sort: search.sort as string,
-    order: search.order as 'asc' | 'desc',
+    order: search.order as "asc" | "desc",
   }),
   loaderDeps: ({ search }) => search,
   loader: ({ context: { queryClient }, deps }) =>
     queryClient.ensureQueryData(usersQueryOptions(deps)),
-})
+});
 
 function UsersTable() {
-  const search = Route.useSearch()
-  const navigate = Route.useNavigate()
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
 
   // Query driven by URL state
-  const { data } = useSuspenseQuery(usersQueryOptions(search))
+  const { data } = useSuspenseQuery(usersQueryOptions(search));
 
   const table = useReactTable({
     data: data.rows,
@@ -415,28 +414,29 @@ function UsersTable() {
     manualPagination: true,
     pageCount: data.pageCount,
     state: {
-      sorting: search.sort ? [{ id: search.sort, desc: search.order === 'desc' }] : [],
+      sorting: search.sort ? [{ id: search.sort, desc: search.order === "desc" }] : [],
       pagination: { pageIndex: search.page - 1, pageSize: search.pageSize },
     },
     onSortingChange: (updater) => {
-      const next = typeof updater === 'function' ? updater([]) : updater
+      const next = typeof updater === "function" ? updater([]) : updater;
       navigate({
         search: {
           ...search,
           sort: next[0]?.id,
-          order: next[0]?.desc ? 'desc' : 'asc',
+          order: next[0]?.desc ? "desc" : "asc",
         },
-      })
+      });
     },
     onPaginationChange: (updater) => {
-      const next = typeof updater === 'function'
-        ? updater({ pageIndex: search.page - 1, pageSize: search.pageSize })
-        : updater
+      const next =
+        typeof updater === "function"
+          ? updater({ pageIndex: search.page - 1, pageSize: search.pageSize })
+          : updater;
       navigate({
         search: { ...search, page: next.pageIndex + 1, pageSize: next.pageSize },
-      })
+      });
     },
-  })
+  });
 }
 ```
 

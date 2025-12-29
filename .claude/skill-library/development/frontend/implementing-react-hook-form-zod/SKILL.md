@@ -285,6 +285,7 @@ const onSubmit = async (data) => {
 - **Conditional Validation**: [zod-schemas-guide.md](references/zod-schemas-guide.md#conditional-validation)
 
 **Key Points**:
+
 - Use `field.id` as key (not array index) for useFieldArray
 - Use `trigger()` for partial validation in multi-step forms
 - Use discriminated unions for conditional validation
@@ -342,6 +343,7 @@ function ProfileForm() {
 ## Performance Optimization
 
 **Key strategies:**
+
 - Use `mode: "onSubmit"` for best performance
 - Prefer `register` over `Controller` when possible
 - Watch specific fields, not all values: `watch("email")` not `watch()`
@@ -353,6 +355,7 @@ function ProfileForm() {
 ## Accessibility Best Practices
 
 **Essential patterns:**
+
 - Use `aria-invalid` and `aria-describedby` on inputs
 - Add `role="alert"` to error messages
 - Focus first error field on validation failure

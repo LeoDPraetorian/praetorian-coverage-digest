@@ -11,11 +11,13 @@ Claude applies these fixes directly using Edit tool. No human confirmation neede
 **When:** PermissionMode doesn't match agent type
 
 **Process:**
+
 1. Read agent `type:` field
 2. Check expected permissionMode:
    - `architecture`, `quality`, `analysis` → `plan` (read-only)
    - All others (`development`, `testing`, `orchestrator`) → `default`
 3. If mismatch, update with Edit tool:
+
    ```yaml
    # Before (security risk)
    type: architecture
@@ -35,6 +37,7 @@ Claude applies these fixes directly using Edit tool. No human confirmation neede
 **When:** Missing required tools or forbidden tools present
 
 **Process:**
+
 1. Read agent `type:` and `tools:` fields
 2. Check required tools by type:
    - `development` → Must have: `Edit`, `Write`, `Bash`
@@ -44,6 +47,7 @@ Claude applies these fixes directly using Edit tool. No human confirmation neede
 4. Add missing required tools or remove forbidden tools with Edit tool
 
 **Example fix:**
+
 ```yaml
 # Before (quality agent with Edit/Write)
 type: quality
@@ -63,6 +67,7 @@ tools: Read, Glob, Grep, TodoWrite
 **When:** Agent embeds >200 chars of TDD/debugging/verification patterns
 
 **Process:**
+
 1. Search agent body for embedded workflow patterns:
    - TDD workflow (RED-GREEN-REFACTOR keywords)
    - Debugging steps (Reproduce-Isolate-Fix-Verify keywords)
@@ -73,19 +78,25 @@ tools: Read, Glob, Grep, TodoWrite
    - Or add to frontmatter `skills:` field (if no protocol)
 
 **Example fix:**
+
 ```markdown
 # Before (embedded TDD workflow in agent)
+
 ## Development Workflow
+
 When implementing features:
+
 1. Write failing test first (RED)
 2. Write minimal code to pass (GREEN)
 3. Refactor while tests pass (REFACTOR)
-[... 15 more lines ...]
+   [... 15 more lines ...]
 
 # After (delegates to skill)
+
 ### Tier 3: Triggered by Task Type
-| Trigger | Read Path |
-|---------|-----------|
+
+| Trigger               | Read Path                                     |
+| --------------------- | --------------------------------------------- |
 | Implementing features | `.claude/skills/developing-with-tdd/SKILL.md` |
 ```
 
@@ -98,6 +109,7 @@ When implementing features:
 **When:** Agent has `skills:` frontmatter but no Tiered Skill Loading Protocol section
 
 **Process:**
+
 1. Check if agent has `skills:` in frontmatter
 2. If yes but no "## Skill Loading Protocol" section found:
    - Generate complete protocol with Tier 1/2/3 structure
@@ -106,12 +118,14 @@ When implementing features:
    - Insert before "## See Also" or at end of file
 
 **Template:**
-```markdown
+
+````markdown
 ## Skill Loading Protocol
 
 ### Tier 1: Always Load (Session Start)
 
 Core skills in frontmatter:
+
 - `verifying-before-completion` - Final validation before claiming complete
 - `calibrating-time-estimates` - Prevent 10-24x time overestimates
 - `gateway-frontend` - Progressive loading of React/TypeScript patterns
@@ -121,18 +135,20 @@ Core skills in frontmatter:
 **When task requires ≥2 steps** (uses TodoWrite or detects multi-phase workflow):
 
 Read `.claude/skills/using-todowrite/SKILL.md` for:
+
 - Mandatory TodoWrite usage for ≥2 step workflows
 - Prevents skipped steps in multi-phase work
 
 ### Tier 3: Triggered by Task Type
 
-| Trigger | Read Path |
-|---------|-----------|
+| Trigger                           | Read Path       |
+| --------------------------------- | --------------- |
 | [Add task-specific triggers here] | [Path to skill] |
 
 ## Anti-Bypass
 
 **Common rationalizations that indicate you're about to skip required skills:**
+
 - "This is simple, don't need TodoWrite" → WRONG, ≥2 steps always needs tracking
 - "Just a quick fix" → WRONG, verify before claiming complete
 - "This will only take a minute" → WRONG, calibrate time estimates
@@ -140,6 +156,7 @@ Read `.claude/skills/using-todowrite/SKILL.md` for:
 **Output Format:**
 
 All agent responses must include:
+
 ```json
 {
   "status": "success|in_progress|blocked",
@@ -148,7 +165,9 @@ All agent responses must include:
   "next_steps": ["What to do next"]
 }
 ```
-```
+````
+
+````
 
 **Generation logic:**
 1. Extract all skills from frontmatter `skills:` field
@@ -191,7 +210,7 @@ Skills you must use...
 # After (consolidated - clean)
 ## Skill Loading Protocol
 [Single source of truth]
-```
+````
 
 **Why automated:** Structural patterns are clear to detect. These deletions often recover 100-300 lines.
 
@@ -202,6 +221,7 @@ Skills you must use...
 **When:** Skill paths point to renamed/moved/deleted skills
 
 **Process:**
+
 1. Extract all library skill paths from agent body:
    ```bash
    grep -oE '\.claude/skill-library/[^)]+/SKILL\.md' agent.md
@@ -218,11 +238,14 @@ Skills you must use...
 4. Apply path corrections with Edit tool
 
 **Example fix:**
+
 ```markdown
 # Before (outdated path)
+
 Read('.claude/skill-library/development/frontend/frontend-tanstack-query/SKILL.md')
 
 # After (correct path)
+
 Read('.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md')
 ```
 
@@ -233,6 +256,7 @@ Read('.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md')
 ## Summary
 
 All 6 Claude-Automated phases share these characteristics:
+
 - **No user confirmation** - Claude applies directly
 - **Clear correct outcome** - Only one right answer
 - **Semantic understanding required** - Can't be pure regex/CLI

@@ -1,11 +1,11 @@
 /**
  * Compliance Orchestrator
- * Coordinates audit and fix operations across all 21 phases
+ * Coordinates audit and fix operations across all 22 phases
  */
 
 import { SkillAuditor } from './audit-engine.js';
 import type { FixOptions, ValidatorResult } from './shared/types.js';
-import { findSkillPath } from '../../../../../../../lib/find-project-root.js';
+import { findSkillPath } from '@chariot/lib';
 
 export class ComplianceOrchestrator {
   private auditor: SkillAuditor;

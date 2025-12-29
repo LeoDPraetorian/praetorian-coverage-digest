@@ -95,29 +95,26 @@ const mutation = useMutation({
   mutationFn: updateAsset,
   onMutate: async (updatedAsset) => {
     // Cancel outgoing refetches (so they don't overwrite optimistic update)
-    await queryClient.cancelQueries({ queryKey: ['assets', updatedAsset.id] })
+    await queryClient.cancelQueries({ queryKey: ["assets", updatedAsset.id] });
 
     // Snapshot previous value for rollback
-    const previousAsset = queryClient.getQueryData(['assets', updatedAsset.id])
+    const previousAsset = queryClient.getQueryData(["assets", updatedAsset.id]);
 
     // Optimistically update cache
-    queryClient.setQueryData(['assets', updatedAsset.id], updatedAsset)
+    queryClient.setQueryData(["assets", updatedAsset.id], updatedAsset);
 
     // Return context with rollback data
-    return { previousAsset }
+    return { previousAsset };
   },
   onError: (err, updatedAsset, context) => {
     // Rollback on error
-    queryClient.setQueryData(
-      ['assets', updatedAsset.id],
-      context.previousAsset
-    )
+    queryClient.setQueryData(["assets", updatedAsset.id], context.previousAsset);
   },
   onSettled: (updatedAsset) => {
     // Always refetch to ensure consistency
-    queryClient.invalidateQueries({ queryKey: ['assets', updatedAsset.id] })
+    queryClient.invalidateQueries({ queryKey: ["assets", updatedAsset.id] });
   },
-})
+});
 ```
 
 **See:** [query-best-practices.md](query-best-practices.md#optimistic-updates) for advanced patterns.
@@ -246,30 +243,30 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       onError: (error) => {
-        console.error('Query error:', error)
-        toast.error('Failed to load data')
+        console.error("Query error:", error);
+        toast.error("Failed to load data");
       },
     },
     mutations: {
       onError: (error) => {
-        console.error('Mutation error:', error)
-        toast.error('Failed to save data')
+        console.error("Mutation error:", error);
+        toast.error("Failed to save data");
       },
     },
   },
-})
+});
 
 // Per-query error handling
 const { data, error } = useQuery({
-  queryKey: ['assets'],
+  queryKey: ["assets"],
   queryFn: fetchAssets,
   onError: (error) => {
     // Handle specific error
     if (error.status === 404) {
-      navigate('/not-found')
+      navigate("/not-found");
     }
   },
-})
+});
 ```
 
 ---
@@ -279,11 +276,11 @@ const { data, error } = useQuery({
 ```typescript
 // Auto-refetch every 30 seconds
 const { data } = useQuery({
-  queryKey: ['assets', 'live'],
+  queryKey: ["assets", "live"],
   queryFn: fetchAssets,
   refetchInterval: 30000, // 30 seconds
   refetchIntervalInBackground: false, // Stop polling when tab is inactive
-})
+});
 ```
 
 ---
@@ -324,15 +321,15 @@ function App() {
 ```typescript
 // BAD: Object identity changes every render
 useQuery({
-  queryKey: ['assets', { status, filters }], // ⚠️ New object every time
+  queryKey: ["assets", { status, filters }], // ⚠️ New object every time
   queryFn: fetchAssets,
-})
+});
 
 // GOOD: Stable primitive values
 useQuery({
-  queryKey: ['assets', status, filters.search, filters.sortBy],
+  queryKey: ["assets", status, filters.search, filters.sortBy],
   queryFn: fetchAssets,
-})
+});
 ```
 
 ### ❌ Don't Violate gcTime >= staleTime Rule

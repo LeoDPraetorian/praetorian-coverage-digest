@@ -1,12 +1,14 @@
 ---
 name: searching-skills
-description: Use when finding skills by keyword - searches both core and library locations with fuzzy matching
-allowed-tools: Bash, Grep, Read, TodoWrite
+description: Use when finding skills by keyword - searches both core (.claude/skills/) and library (.claude/skill-library/) locations with fuzzy matching, scoring algorithm (exact > substring > fuzzy), and optional CLI (npm run search)
+allowed-tools: Bash, Grep, Read, TodoWrite, Glob
 ---
 
 # Searching Skills
 
 **Keyword-based skill discovery across core and library locations.**
+
+> **You MUST use TodoWrite** before starting to track all search workflow steps.
 
 ---
 
@@ -40,15 +42,15 @@ Searches for skills by keyword across:
 
 **Simple search:**
 
-```bash
+```typescript
 Grep {
   pattern: "keyword",
   path: ".claude",
   output_mode: "files_with_matches"
 }
 
-# Filter for SKILL.md files
-# Show skill name from path
+// Filter for SKILL.md files
+// Show skill name from path
 ```
 
 **Enhanced search with scoring:**
@@ -70,8 +72,6 @@ test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 ```
 
-**See:** [Repository Root Navigation](references/patterns/repo-root-detection.md)
-
 **⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
 
 **Cannot proceed without navigating to repo root** ✅
@@ -80,11 +80,13 @@ cd "$REPO_ROOT"
 
 ## Workflow
 
+Follow these steps to search for skills by keyword with scoring and result formatting:
+
 ### Step 1: Get Search Query
 
 If user provided query, use it. Otherwise, ask:
 
-```
+```typescript
 Question: What are you searching for?
 Header: Search Query
 Options:
@@ -95,11 +97,15 @@ Options:
 
 ### Step 2: Search Core Skills
 
-```bash
-# Search core skill names
-ls .claude/skills/ | grep -i "keyword"
+**Search core skill names:**
 
-# Search core descriptions
+```bash
+ls .claude/skills/ | grep -i "keyword"
+```
+
+**Search core descriptions:**
+
+```typescript
 Grep {
   pattern: "keyword",
   path: ".claude/skills",
@@ -111,11 +117,18 @@ Grep {
 
 ### Step 3: Search Library Skills
 
-```bash
-# Search library skill names
-find .claude/skill-library -name "*keyword*" -type d
+**Search library skill names:**
 
-# Search library descriptions
+```typescript
+Glob {
+  pattern: "**/*keyword*/SKILL.md",
+  path: ".claude/skill-library"
+}
+```
+
+**Search library descriptions:**
+
+```typescript
 Grep {
   pattern: "keyword",
   path: ".claude/skill-library",
@@ -136,7 +149,7 @@ For each match:
 
 ### Step 5: Format Output
 
-```
+```text
 Search Results for "{keyword}":
 
 [CORE] skill-name (Score: 100)
@@ -158,7 +171,7 @@ Found {count} matches
 
 **Search: "react"**
 
-```
+```text
 [LIB] creating-skills (Score: 30)
   Description mentions React in examples
 
@@ -171,7 +184,7 @@ Found {count} matches
 
 **Search: "test"**
 
-```
+```text
 [CORE] testing-skills-with-subagents (Score: 100)
 [LIB] frontend-unit-test-engineer (Score: 50)
 [LIB] backend-tester (Score: 50)

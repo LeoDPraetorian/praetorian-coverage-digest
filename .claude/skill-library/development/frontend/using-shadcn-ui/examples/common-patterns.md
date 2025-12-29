@@ -75,19 +75,19 @@ export function SonnerExample() {
 
 ```typescript
 // Success
-toast.success("Operation completed!")
+toast.success("Operation completed!");
 
 // Error
-toast.error("Something went wrong")
+toast.error("Something went wrong");
 
 // Warning
-toast.warning("Please check your input")
+toast.warning("Please check your input");
 
 // Info
-toast.info("New updates available")
+toast.info("New updates available");
 
 // Loading (returns ID for dismissal)
-const toastId = toast.loading("Processing...")
+const toastId = toast.loading("Processing...");
 // Later: toast.dismiss(toastId)
 ```
 
@@ -99,14 +99,14 @@ toast.promise(saveData(), {
   loading: "Saving...",
   success: "Data saved successfully!",
   error: "Failed to save data",
-})
+});
 
 // With data transformation
 toast.promise(fetchUser(id), {
   loading: "Loading user...",
   success: (data) => `Welcome, ${data.name}!`,
   error: (err) => `Error: ${err.message}`,
-})
+});
 ```
 
 ### With Actions (Undo Pattern)
@@ -118,7 +118,7 @@ toast("File deleted", {
     label: "Undo",
     onClick: () => restoreFile(),
   },
-})
+});
 
 // With cancel button
 toast("Confirm action", {
@@ -130,7 +130,7 @@ toast("Confirm action", {
     label: "Cancel",
     onClick: () => console.log("Cancelled"),
   },
-})
+});
 ```
 
 ### Custom Duration & Position

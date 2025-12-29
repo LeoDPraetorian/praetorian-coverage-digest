@@ -39,10 +39,10 @@ Claude's text generation is **inherently non-deterministic**. Same instructions 
 
 ## Quick Reference
 
-| Consumer Skill | JSON Schema | Output Type |
-|----------------|-------------|-------------|
-| auditing-skills | `SemanticFindingsSchema` | Combined audit table |
-| syncing-gateways | `GatewayFindingsSchema` | Gateway sync results |
+| Consumer Skill   | JSON Schema              | Output Type          |
+| ---------------- | ------------------------ | -------------------- |
+| auditing-skills  | `SemanticFindingsSchema` | Combined audit table |
+| syncing-gateways | `GatewayFindingsSchema`  | Gateway sync results |
 
 ---
 
@@ -53,7 +53,10 @@ Claude's text generation is **inherently non-deterministic**. Same instructions 
 **Step 1: Import the formatter in your CLI**
 
 ```typescript
-import { formatFindingsTable, Finding } from '../../../formatting-skill-output/scripts/src/lib/table-formatter';
+import {
+  formatFindingsTable,
+  Finding,
+} from "../../../formatting-skill-output/scripts/src/lib/table-formatter";
 ```
 
 **Step 2: Have Claude output JSON (in SKILL.md instructions)**
@@ -62,14 +65,14 @@ import { formatFindingsTable, Finding } from '../../../formatting-skill-output/s
 Output findings as JSON only. Do NOT output tables or prose.
 
 {
-  "findings": [
-    {
-      "severity": "WARNING",
-      "phase": "Semantic: Gateway Membership",
-      "issue": "Frontend skill missing from gateway-frontend",
-      "recommendation": "Add to gateway-frontend routing table"
-    }
-  ]
+"findings": [
+{
+"severity": "WARNING",
+"phase": "Semantic: Gateway Membership",
+"issue": "Frontend skill missing from gateway-frontend",
+"recommendation": "Add to gateway-frontend routing table"
+}
+]
 }
 ```
 
@@ -78,7 +81,7 @@ Output findings as JSON only. Do NOT output tables or prose.
 ```typescript
 const allFindings: Finding[] = [
   ...structuralFindings,
-  ...semanticFindings.map(f => ({ ...f, source: 'semantic' as const }))
+  ...semanticFindings.map((f) => ({ ...f, source: "semantic" as const })),
 ];
 
 console.log(formatFindingsTable(allFindings));
@@ -103,16 +106,16 @@ echo '{"findings": [...]}' | npm run -w @chariot/formatting-skill-output format
 
 ```typescript
 interface SemanticFinding {
-  severity: 'CRITICAL' | 'WARNING' | 'INFO';
+  severity: "CRITICAL" | "WARNING" | "INFO";
   criterion:
-    | 'Description Quality'
-    | 'Skill Categorization'
-    | 'Gateway Membership'
-    | 'Tool Appropriateness'
-    | 'Content Density'
-    | 'External Documentation';
-  issue: string;      // max 100 chars
-  recommendation: string;  // max 100 chars
+    | "Description Quality"
+    | "Skill Categorization"
+    | "Gateway Membership"
+    | "Tool Appropriateness"
+    | "Content Density"
+    | "External Documentation";
+  issue: string; // max 100 chars
+  recommendation: string; // max 100 chars
 }
 ```
 
@@ -133,6 +136,7 @@ The CLI produces a deterministic ANSI-formatted table:
 ```
 
 **Guarantees:**
+
 - Fixed column widths (14, 28, 60, 60 chars)
 - Sorted by severity (CRITICAL → WARNING → INFO)
 - Consistent truncation with ellipsis
@@ -152,9 +156,9 @@ The CLI produces a deterministic ANSI-formatted table:
 Output semantic findings as JSON only:
 
 {
-  "findings": [
-    { "severity": "...", "criterion": "...", "issue": "...", "recommendation": "..." }
-  ]
+"findings": [
+{ "severity": "...", "criterion": "...", "issue": "...", "recommendation": "..." }
+]
 }
 
 Do NOT output tables. The CLI will format the combined output.
@@ -163,20 +167,20 @@ Do NOT output tables. The CLI will format the combined output.
 **In audit.ts:**
 
 ```typescript
-import { formatFindingsTable } from '../../../formatting-skill-output/scripts/src/lib/table-formatter';
+import { formatFindingsTable } from "../../../formatting-skill-output/scripts/src/lib/table-formatter";
 
 // After getting semantic JSON from Claude
 const semanticFindings = JSON.parse(semanticJson);
 
 const allFindings = [
   ...structuralFindings,
-  ...semanticFindings.findings.map(f => ({
+  ...semanticFindings.findings.map((f) => ({
     severity: f.severity,
     phase: `Semantic: ${f.criterion}`,
     issue: f.issue,
     recommendation: f.recommendation,
-    source: 'semantic' as const
-  }))
+    source: "semantic" as const,
+  })),
 ];
 
 console.log(formatFindingsTable(allFindings));
@@ -191,6 +195,7 @@ console.log(formatFindingsTable(allFindings));
 Formats an array of findings into a deterministic ANSI table.
 
 **Parameters:**
+
 - `findings` - Array of Finding objects
 
 **Returns:** Formatted table string with ANSI color codes
@@ -200,6 +205,7 @@ Formats an array of findings into a deterministic ANSI table.
 Formats the completion summary message.
 
 **Parameters:**
+
 - `counts` - Object with critical, warning, info counts for structural and semantic
 
 **Returns:** Formatted completion message
@@ -214,10 +220,10 @@ Validates and parses JSON input against the schema.
 
 ## Related Skills
 
-| Skill | Relationship |
-|-------|--------------|
-| `auditing-skills` | Primary consumer - semantic review findings |
-| `syncing-gateways` | Consumer - gateway sync results |
+| Skill              | Relationship                                |
+| ------------------ | ------------------------------------------- |
+| `auditing-skills`  | Primary consumer - semantic review findings |
+| `syncing-gateways` | Consumer - gateway sync results             |
 
 ---
 

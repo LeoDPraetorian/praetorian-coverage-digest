@@ -69,6 +69,97 @@ Read(".claude/skill-library/testing/behavior-vs-implementation-testing/SKILL.md"
 
 </EXTREMELY_IMPORTANT>
 
+## Mandatory Skills by Role
+
+**Load mandatory skills based on your role before starting work.**
+
+### Role Filter
+
+| Your Role           | Mandatory Sections                                                    |
+| ------------------- | --------------------------------------------------------------------- |
+| **Test Lead**       | ALL ROLES + PLANNING SKILLS                                           |
+| **Frontend Tester** | ALL ROLES + also invoke `gateway-frontend` for React-specific testing |
+| **Backend Tester**  | ALL ROLES + also invoke `gateway-backend` for Go-specific testing     |
+
+**Note:** All skills remain available to any role via the routing tables below. The table shows what you MUST load upfront—not what you're limited to.
+
+---
+
+### ALL ROLES (Everyone Must Read)
+
+**1. Testing Anti-Patterns (BLOCKING)**
+
+`.claude/skill-library/testing/testing-anti-patterns/SKILL.md`
+
+BLOCKS PRs for anti-patterns: mock behavior testing, incomplete mocks, test-only methods, over-mocking. **Essential for understanding what patterns are invalid.**
+
+**2. Behavior vs Implementation Testing**
+
+`.claude/skill-library/testing/behavior-vs-implementation-testing/SKILL.md`
+
+Test behaviors (what users see), not implementation details. Prevents brittle tests that break on refactors. **Required to understand HOW to test correctly.**
+
+**3. Condition-Based Waiting**
+
+`.claude/skill-library/testing/condition-based-waiting/SKILL.md`
+
+Proper async handling - waitFor() with conditions, NOT setTimeout(). Prevents flaky tests in CI. **Required to avoid timing-based failures.**
+
+**4. Test Infrastructure Discovery**
+
+`.claude/skill-library/testing/test-infrastructure-discovery/SKILL.md`
+
+Discover existing fixtures, utilities, and patterns before writing tests. Prevents recreating existing tools. **Required before implementing any tests.**
+
+---
+
+### PLANNING SKILLS (Mandatory: Test Lead)
+
+**5. Test Metrics Reality Check**
+
+`.claude/skill-library/testing/verifying-test-metrics-reality/SKILL.md`
+
+Verify coverage numbers reflect reality - production files exist, assertions are meaningful. **Required for test-lead when analyzing coverage gaps as input to planning.**
+
+**6. Verifying Test File Existence**
+
+`.claude/skill-library/testing/verifying-test-file-existence/SKILL.md`
+
+Verify both test files AND corresponding production files exist before planning. **Required for test-lead to avoid planning tests for non-existent code.**
+
+---
+
+### Workflow by Role
+
+#### Test Lead Workflow
+
+1. Invoke `gateway-testing`
+2. Read ALL ROLES skills (4 skills)
+3. Read PLANNING SKILLS (2 skills)
+4. Analyze coverage gaps (coverage is INPUT to planning)
+5. Create test plan using `writing-plans` skill
+6. Hand off to testers with plan location
+
+#### Frontend Tester Workflow
+
+1. Invoke `gateway-testing` (general patterns)
+2. Invoke `gateway-frontend` (React-specific patterns)
+3. Read ALL ROLES skills from BOTH gateways
+4. **Locate the test plan**: `ls docs/plans/*-test-plan.md`
+5. Implement tests according to plan
+6. Return to test-lead for validation
+
+#### Backend Tester Workflow
+
+1. Invoke `gateway-testing` (general patterns)
+2. Invoke `gateway-backend` (Go-specific patterns)
+3. Read ALL ROLES skills from BOTH gateways
+4. **Locate the test plan**: `ls docs/plans/*-test-plan.md`
+5. Implement tests according to plan
+6. Return to test-lead for validation
+
+---
+
 ## Frontend Test Engineers (READ THIS FIRST)
 
 **CRITICAL: If testing React/TypeScript code, you MUST ALSO invoke `gateway-frontend`.**
@@ -94,25 +185,9 @@ skill: "gateway-frontend"   # React-specific patterns
 **After invoking both gateways:**
 
 1. Read mandatory skills from BOTH gateways
-2. Read task-specific skills using paths from the gateways
-3. Begin implementation
-
-## Mandatory for All Testing Work
-
-**Regardless of task type, you MUST Read these skills before implementing any tests.**
-
-| Skill                         | Path                                                                        | Why Mandatory                                                                         |
-| ----------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Testing Anti-Patterns         | `.claude/skill-library/testing/testing-anti-patterns/SKILL.md`              | Avoid mock behavior testing, incomplete mocks, API contract guessing (Anti-Pattern 6) |
-| Behavior vs Implementation    | `.claude/skill-library/testing/behavior-vs-implementation-testing/SKILL.md` | Test behaviors, not internals - prevents brittle tests that break on refactors        |
-| Condition-Based Waiting       | `.claude/skill-library/testing/condition-based-waiting/SKILL.md`            | Proper async handling - prevents flaky tests in CI                                    |
-| Test Infrastructure Discovery | `.claude/skill-library/testing/test-infrastructure-discovery/SKILL.md`      | Discover existing fixtures and patterns - prevents recreating existing tools          |
-
-**Workflow:**
-
-1. Read ALL mandatory skills above (in any order)
-2. Then load task-specific skills from the routing tables below
-3. Begin implementation following discovered patterns
+2. Locate the test plan from test-lead
+3. Implement tests according to plan
+4. Return to test-lead for validation
 
 ## How to Use
 
@@ -210,25 +285,31 @@ Each skill is organized by domain for easy discovery.
 
 ## Quick Reference
 
-| Need                    | Read This Skill                                                                   |
-| ----------------------- | --------------------------------------------------------------------------------- |
-| REST API tests          | `.claude/skill-library/testing/api-testing-patterns/SKILL.md`                     |
-| CLI tool tests          | `.claude/skill-library/testing/cli-testing-patterns/SKILL.md`                     |
-| Domain assertions       | `.claude/skill-library/testing/backend/acceptance-test-assertors/SKILL.md`        |
-| Test organization       | `.claude/skill-library/testing/backend/acceptance-test-suite/SKILL.md`            |
-| Behavior-focused tests  | `.claude/skill-library/testing/behavior-vs-implementation-testing/SKILL.md`       |
-| Async/wait patterns     | `.claude/skill-library/testing/condition-based-waiting/SKILL.md`                  |
-| Mocking strategies      | `.claude/skill-library/testing/testing-anti-patterns/SKILL.md`                    |
-| Performance tests       | `.claude/skill-library/testing/performance-testing/SKILL.md`                      |
-| Code complexity metrics | `.claude/skill-library/development/analyzing-cyclomatic-complexity/SKILL.md`      |
-| Pre-push hook testing   | `.claude/skill-library/testing/frontend/vitest-prepush-testing/SKILL.md`          |
-| Test integrity review   | `.claude/skill-library/testing/frontend/verifying-vitest-test-integrity/SKILL.md` |
+**⭐ = Mandatory for ALL ROLES | 📋 = Mandatory for TEST LEAD (Planning)**
+
+| Need                       | Read This Skill                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------- |
+| ⭐ Avoid anti-patterns     | `.claude/skill-library/testing/testing-anti-patterns/SKILL.md`                    |
+| ⭐ Behavior-focused tests  | `.claude/skill-library/testing/behavior-vs-implementation-testing/SKILL.md`       |
+| ⭐ Async/wait patterns     | `.claude/skill-library/testing/condition-based-waiting/SKILL.md`                  |
+| ⭐ Discover infrastructure | `.claude/skill-library/testing/test-infrastructure-discovery/SKILL.md`            |
+| 📋 Coverage reality check  | `.claude/skill-library/testing/verifying-test-metrics-reality/SKILL.md`           |
+| 📋 File existence check    | `.claude/skill-library/testing/verifying-test-file-existence/SKILL.md`            |
+| REST API tests             | `.claude/skill-library/testing/api-testing-patterns/SKILL.md`                     |
+| CLI tool tests             | `.claude/skill-library/testing/cli-testing-patterns/SKILL.md`                     |
+| Domain assertions          | `.claude/skill-library/testing/backend/acceptance-test-assertors/SKILL.md`        |
+| Test organization          | `.claude/skill-library/testing/backend/acceptance-test-suite/SKILL.md`            |
+| Performance tests          | `.claude/skill-library/testing/performance-testing/SKILL.md`                      |
+| Code complexity metrics    | `.claude/skill-library/development/analyzing-cyclomatic-complexity/SKILL.md`      |
+| Pre-push hook testing      | `.claude/skill-library/testing/frontend/vitest-prepush-testing/SKILL.md`          |
+| Test integrity review      | `.claude/skill-library/testing/frontend/verifying-vitest-test-integrity/SKILL.md` |
 
 ## When to Use This Gateway
 
 Use this gateway skill when:
 
 - Starting testing work (unit, integration, E2E, performance)
+- Planning test strategy (test-lead)
 - Unsure which testing skill to use
 - Need overview of available testing resources
 - Want to discover relevant patterns for your test task
@@ -237,12 +318,23 @@ For specific implementations, always load the individual skill rather than worki
 
 ## Common Testing Workflows
 
-### Scenario: Writing API Tests for a New Endpoint
+### Scenario: Test Lead Creating Test Plan
 
-1. Read `test-infrastructure-discovery` to find existing test utilities
-2. Read `api-testing-patterns` for request/response patterns
-3. Read `testing-anti-patterns` to avoid common mistakes
-4. Implement tests following discovered patterns
+1. Read ALL ROLES mandatory skills (4 skills)
+2. Read PLANNING mandatory skills (2 skills)
+3. Run coverage analysis to identify gaps
+4. Read `test-infrastructure-discovery` to document available utilities
+5. Create test plan with `writing-plans` skill
+6. Hand off to appropriate tester
+
+### Scenario: Frontend Tester Implementing Tests
+
+1. Also invoke `gateway-frontend` for React patterns
+2. Read mandatory skills from BOTH gateways
+3. Locate test plan: `ls docs/plans/*-test-plan.md`
+4. Read plan and understand requirements
+5. Implement tests following plan's approach
+6. Return to test-lead for validation
 
 ### Scenario: Debugging Flaky Tests
 
@@ -284,11 +376,33 @@ Read `testing-anti-patterns` which covers incomplete mocks, mock behavior testin
 
 Read `verifying-test-metrics-reality` to verify you're measuring actual coverage, not just test file counts.
 
+### "Where's the test plan?"
+
+Test plans from test-lead are saved to `docs/plans/YYYY-MM-DD-<feature>-test-plan.md`. Run:
+
+```bash
+ls docs/plans/*-test-plan.md
+```
+
 ## Quick Decision Guide
 
-**What are you testing?**
+**What are you doing?**
 
 ```
+Planning tests? (test-lead role)
+├── Read ALL ROLES mandatory (4 skills)
+├── Read PLANNING mandatory (2 skills)
+├── Analyze coverage gaps
+├── Use writing-plans to create test plan
+└── Hand off to testers
+
+Implementing tests?
+├── Locate test plan first: ls docs/plans/*-test-plan.md
+├── Read ALL ROLES mandatory (4 skills)
+├── Follow plan's testing approach
+├── Use infrastructure documented in plan
+└── Return to test-lead for validation
+
 Frontend (React/TypeScript)?
 ├── FIRST: Also invoke gateway-frontend (has React-specific testing skills)
 ├── Component tests → frontend-testing-patterns (via gateway-frontend)
@@ -298,6 +412,7 @@ Frontend (React/TypeScript)?
 └── Form testing → frontend-interactive-form-testing (via gateway-frontend)
 
 Backend (Go/Python)?
+├── Also invoke gateway-backend for Go patterns
 ├── API tests → api-testing-patterns
 ├── CLI tests → cli-testing-patterns
 ├── Acceptance tests → acceptance-test-suite
@@ -334,3 +449,11 @@ Debugging issues?
 **Verifying Vitest Test Integrity**: `.claude/skill-library/testing/frontend/verifying-vitest-test-integrity/SKILL.md`
 
 - Use when reviewing test files added or modified in the current branch, conducting PR reviews of test changes, or verifying new unit tests follow best practices - detects test-production logic duplication anti-pattern where tests contain copies of production logic instead of importing and testing the actual code.
+
+## Related Gateways
+
+| Gateway      | Invoke With                | Use For                                     |
+| ------------ | -------------------------- | ------------------------------------------- |
+| Frontend     | `skill: "gateway-frontend"`| React-specific testing (Playwright, RTL)    |
+| Backend      | `skill: "gateway-backend"` | Go-specific testing, AWS mocking            |
+| Security     | `skill: "gateway-security"`| Security testing patterns                   |

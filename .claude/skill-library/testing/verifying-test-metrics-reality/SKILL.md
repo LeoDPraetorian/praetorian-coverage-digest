@@ -173,6 +173,7 @@ These are the most frequent mistakes agents make when reporting test metrics, al
 **Scenario**: Agent completes test implementation and reports "Created 15 test files with 150 tests, all passing."
 
 **Problem**: Doesn't mention:
+
 - How many production files exist
 - What percentage is covered
 - Whether test files match real production files
@@ -198,6 +199,7 @@ These are the most frequent mistakes agents make when reporting test metrics, al
 **Problem**: Ambiguous language makes stakeholders think 6 production files have coverage when really only 6 test files exist (which might not even have corresponding production files).
 
 **Solution**: Always be explicit:
+
 - "Production files with test coverage: X"
 - "Test files created: Y"
 - "Total production files: Z"
@@ -247,6 +249,7 @@ find src/sections/settings -name "*.test.tsx"
 ```
 
 Output:
+
 ```text
 src/sections/settings/__tests__/Settings.test.tsx
 src/sections/settings/__tests__/SettingsGeneral.test.tsx
@@ -299,6 +302,7 @@ Output: 13.3%
 "Tested 6 of 45 Settings production files (13% coverage). Created 6 test files, all have corresponding production code. All 266 tests passing. Next: focus on SettingsProfile, SettingsTeam, SettingsBilling (high-priority components)."
 
 **Key difference**: The correct report shows:
+
 1. What was tested (6 specific production files)
 2. What's left (39 production files untested)
 3. Real coverage (13%, not 100%)
@@ -363,6 +367,7 @@ When creating PRs, use this template:
 **Tests passing**: M tests, 100% pass rate
 
 ### Coverage details
+
 - Component A: ✅ Tested (unit + integration)
 - Component B: ✅ Tested (unit only)
 - Component C: ⏳ Not yet tested
@@ -383,12 +388,14 @@ Common issues you may encounter when implementing the Reality Check Protocol and
 **Cause**: Test file structure doesn't mirror production structure.
 
 **Solution**: Use this pattern:
+
 ```text
 src/components/UserProfile.tsx
 src/components/__tests__/UserProfile.test.tsx
 ```
 
 Or:
+
 ```text
 src/components/UserProfile.tsx
 src/components/UserProfile.test.tsx
@@ -489,11 +496,13 @@ Real-world examples demonstrating the consequences of skipping the Reality Check
 **Core truth**: Test count means nothing without knowing what's tested.
 
 **Protocol**: Before reporting metrics, spend 5 minutes verifying:
+
 1. Test files have corresponding production files
 2. Calculate coverage from production files (not test files)
 3. Report coverage percentage, not just test count
 
 **Red flag phrases that trigger this skill**:
+
 - "X tests passing"
 - "100% pass rate"
 - "Created Y test files"

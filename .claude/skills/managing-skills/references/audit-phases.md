@@ -4,7 +4,7 @@ Complete reference for all compliance validation phases.
 
 ## Overview
 
-The audit validates skills against structural, semantic, and operational requirements across 21 phases. Some phases are auto-fixable, others require manual intervention. See [Adding New Phases](#adding-new-phases) for the checklist when extending.
+The audit validates skills against structural, semantic, and operational requirements across 22 phases. Some phases are auto-fixable, others require manual intervention. See [Adding New Phases](#adding-new-phases) for the checklist when extending.
 
 **After structural audit completes, Claude performs semantic review.** See [Post-Audit Semantic Review](#post-audit-semantic-review).
 
@@ -12,7 +12,11 @@ The audit validates skills against structural, semantic, and operational require
 
 ### Auto-Fixable (Deterministic)
 
-Phases 2, 4, 5, 6, 7, 10, 12, 14a-c, 16, 18 - can be automatically fixed
+Phases 2, 4, 5, 6, 7, 10, 12, 14a, 16, 18 - can be automatically fixed via CLI
+
+### Validation-Only (No Auto-Fix)
+
+Phases 14b, 14c - detect issues but auto-fix is error-prone
 
 ### Semantic (Deferred)
 
@@ -293,30 +297,34 @@ Phases 17-20 - only apply to gateway-\* skills
 
 ---
 
-### Phase 14: Visual/Style ✅ Auto-fixable
+### Phase 14: Visual/Style (Mixed)
 
 **Contains sub-phases 14a, 14b, 14c that run together when using `--phase 14`.**
 
-#### Phase 14a: Table Formatting
+#### Phase 14a: Table Formatting ✅ Auto-fixable
 
-**Validates:** Markdown tables follow consistent formatting
+**Validates:** Markdown tables are formatted with Prettier
 
 **Requirements:**
 
+- Tables formatted according to Prettier markdown rules
 - Consistent column alignment
 - Proper header separators
-- No broken table structures
 
-#### Phase 14b: Code Block Quality
+**Auto-fix:** Runs `prettier --write` on the skill file
+
+#### Phase 14b: Code Block Quality ⚠️ Validation-only
 
 **Validates:** Code blocks have language identifiers
 
 **Requirements:**
 
-- All code blocks specify language (`typescript, `bash, etc.)
-- No bare ``` blocks without language
+- All code blocks specify language (\`typescript, \`bash, etc.)
+- No bare \`\`\` blocks without language
 
-#### Phase 14c: Header Hierarchy
+**Why no auto-fix:** Auto-detecting programming languages from code snippets is unreliable and could introduce incorrect language tags
+
+#### Phase 14c: Header Hierarchy ⚠️ Validation-only
 
 **Validates:** Headers follow proper nesting
 
@@ -325,7 +333,7 @@ Phases 17-20 - only apply to gateway-\* skills
 - No skipped heading levels (h1 → h3 without h2)
 - Consistent structure throughout document
 
-**Auto-fix:** Formatting corrections applied automatically
+**Why no auto-fix:** Restructuring headers risks breaking document organization and content flow
 
 ---
 
@@ -357,6 +365,7 @@ Phases 17-20 - only apply to gateway-\* skills
 
 - Converts backslashes to forward slashes
 - Preserves path semantics
+- CLI: `npm run fix -- <skill-name> --phase 16`
 
 **Why this matters:**
 
@@ -394,8 +403,9 @@ Phases 17-20 - only apply to gateway-\* skills
 
 **Auto-fix:**
 
-- Expands skill names to full paths
+- Expands skill names to full `.claude/skill-library/.../SKILL.md` paths
 - Sorts entries alphabetically
+- CLI: `npm run fix -- <skill-name> --phase 18`
 
 **Applies to:** `gateway-*` skills only
 
@@ -438,6 +448,34 @@ Phases 17-20 - only apply to gateway-\* skills
 - Line numbers become stale as code evolves
 
 **Why deferred:** Requires judgment on reference context
+
+---
+
+### Phase 22: Context7 Staleness ⚠️ Semantic
+
+**Validates:** Context7-sourced documentation is up-to-date
+
+**Requirements:**
+
+- Checks for `.local/context7-source.json` metadata file
+- Validates `fetchedAt` date is within 30 days
+- Returns WARNING if documentation is stale (>30 days old)
+
+**Applies to:** Library skills created with context7 data (e.g., `using-tanstack-query`, `using-shadcn-ui`)
+
+**Why WARNING, not CRITICAL:**
+
+- Stale docs may still be mostly accurate
+- Doesn't prevent skill from loading
+- Users should refresh but skill remains functional
+
+**Recommendation when stale:**
+
+```bash
+npm run update -- <skill-name> --refresh-context7 --context7-data /path/to/new.json
+```
+
+**Why deferred:** Requires judgment on whether to refresh immediately or continue with existing docs
 
 ---
 
@@ -534,7 +572,7 @@ Semantic issue, requires manual review
 
 ## Adding New Phases
 
-When adding a new audit phase (e.g., Phase 22), follow this checklist:
+When adding a new audit phase (e.g., Phase 23), follow this checklist:
 
 ### 1. Implementation (Required)
 
@@ -545,12 +583,9 @@ When adding a new audit phase (e.g., Phase 22), follow this checklist:
 
 ### 2. Registration (Required)
 
-- [ ] Import phase in `scripts/src/lib/audit-engine.ts`
-- [ ] Add to `runFull()` method's phase execution list
-- [ ] Add to `runFullForSingleSkill()` method
-- [ ] Add to `phaseRunners` in `runSinglePhaseForSkill()`
-- [ ] Add to `validateSingleSkill()` if applicable
-- [ ] **Update `PHASE_COUNT` constant** (single source of truth for CLI validation)
+- [ ] Import phase in `scripts/src/lib/phase-registry.ts`
+- [ ] Add to `PHASE_REGISTRY` array with appropriate metadata
+- [ ] `PHASE_COUNT` will auto-calculate from registry (no manual update needed)
 
 ### 3. Fix Support (If Auto-Fixable)
 
@@ -564,15 +599,16 @@ When adding a new audit phase (e.g., Phase 22), follow this checklist:
 - [ ] Create detailed reference: `references/phase-{NN}-{name}.md`
 - [ ] Update SKILL.md table if phase count in description (now dynamic via PHASE_COUNT)
 
-### Why PHASE_COUNT Matters
+### Why PHASE_REGISTRY Matters
 
-The `PHASE_COUNT` constant in `audit-engine.ts` is the **single source of truth** for:
+The `PHASE_REGISTRY` in `phase-registry.ts` is the **single source of truth** for all phases.
 
-- CLI validation (`--phase` argument range checking)
-- CLI help text (`Audit specific phase (1-N)`)
-- Error messages
+`PHASE_COUNT` is **automatically calculated** from the registry:
+```typescript
+export const PHASE_COUNT = Math.max(...PHASE_REGISTRY.map(p => p.number));
+```
 
-When you add Phase 22, update `PHASE_COUNT = 22` and all CLI validation automatically adjusts. No need to hunt for hardcoded references.
+When you add a new phase (e.g., Phase 23), just add it to `PHASE_REGISTRY`. The count updates automatically, and CLI validation adjusts without any manual changes.
 
 ### Phase Numbering Convention
 
@@ -581,7 +617,8 @@ When you add Phase 22, update `PHASE_COUNT = 22` and all CLI validation automati
 - Phases 15-16: Additional structural validation
 - Phases 17-20: Gateway-specific validation
 - Phase 21: Line number references
-- New phases: Append sequentially (22, 23, etc.)
+- Phase 22: Context7 staleness
+- New phases: Append sequentially (23, 24, etc.)
 
 Never renumber existing phases - this breaks historical audit references and documentation.
 
@@ -589,7 +626,7 @@ Never renumber existing phases - this breaks historical audit references and doc
 
 ## Post-Audit Semantic Review
 
-**After the structural audit (Phases 1-21) completes, Claude MUST perform semantic review.**
+**After the structural audit (Phases 1-22) completes, Claude MUST perform semantic review.**
 
 The structural audit catches what code can detect. But code cannot reason about:
 
@@ -667,6 +704,49 @@ After reviewing structural audit output, Claude performs these checks:
 - Are there redundant examples or repetitive explanations?
 - Is progressive disclosure being used appropriately?
 
+#### 6. Section Organization
+
+**Ask yourself:**
+
+- Does the skill have required sections?
+  - Quick Reference (summary table)
+  - When to Use (triggers)
+  - Workflow/How to Use (main content)
+  - Related Skills (cross-references)
+- Is the section order logical?
+- Are any critical sections missing?
+
+**Example issue:** Skill is missing "Related Skills" section - users can't discover similar/complementary skills.
+
+**Fix:** Add `## Related Skills` section with links to similar skills.
+
+#### 7. Visual Readability
+
+**Ask yourself:**
+
+- Are there wall-of-text paragraphs (>5-6 lines without breaks)?
+- Are key terms properly emphasized with **bold** or `code`?
+- Are comma-separated lists that should be bullet points?
+- Is there adequate whitespace between sections?
+- Do callouts use consistent format (`> **Note:**`)?
+
+**Example issue:** Paragraph at line 45 is 8 lines of dense text without breaks.
+
+**Fix:** Break into shorter paragraphs, add bullet points for lists, emphasize key terms.
+
+#### 8. Example Quality
+
+**Ask yourself:**
+
+- Do code examples have language tags (```typescript, ```bash)?
+- Are before/after examples paired properly?
+- Are examples self-contained (can be understood without external context)?
+- Do examples match the skill's actual purpose?
+
+**Example issue:** Code example shows React pattern but skill is about Go backend.
+
+**Fix:** Replace with relevant example or clarify context.
+
 ### Reporting Semantic Issues
 
 After semantic review, report findings in this format:
@@ -718,4 +798,4 @@ Semantic issues cannot be auto-fixed. After identifying issues:
 - [Fix Workflow](fix-workflow.md)
 - [Create Workflow](create-workflow.md)
 - [Update Workflow](update-workflow.md)
-- [Semantic Review Reference](semantic-review.md)
+- [Semantic Review Reference](#post-audit-semantic-review)

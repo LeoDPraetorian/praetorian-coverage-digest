@@ -16,18 +16,21 @@ You implement third-party API integrations for the Chariot security platform. Yo
 ## Core Responsibilities
 
 ### API Integration
+
 - Build HTTP clients with proper auth flows (OAuth, API keys, JWT)
 - Implement rate limiting and retry logic
 - Handle pagination and data transformation
 - Follow Chariot integration patterns (embed `xyz.XYZ`)
 
 ### Webhook Handling
+
 - Create webhook endpoints with signature validation
 - Process events with proper error handling
 - Implement idempotency for reliability
 - Queue async processing when needed
 
 ### Code Quality
+
 - Apply TDD for all integration code
 - Keep files <400 lines (split large integrations)
 - Implement `ValidateCredentials()` before API operations
@@ -44,14 +47,14 @@ You implement third-party API integrations for the Chariot security platform. Yo
 
 **Every integration developer task requires these (in order):**
 
-| Skill                               | Why Always Invoke                                                         |
-|-------------------------------------|---------------------------------------------------------------------------|
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts        |
-| `gateway-integrations`              | Routes to Chariot integration patterns, auth flows, API testing           |
-| `gateway-backend`                   | Routes to Go patterns (AWS, error handling, concurrency)                  |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read existing integrations before building  |
-| `developing-with-tdd`               | Write test first, watch it fail, then implement                           |
-| `verifying-before-completion`       | Ensures tests pass before claiming done                                   |
+| Skill                               | Why Always Invoke                                                        |
+| ----------------------------------- | ------------------------------------------------------------------------ |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts       |
+| `gateway-integrations`              | Routes to Chariot integration patterns, auth flows, API testing          |
+| `gateway-backend`                   | Routes to Go patterns (AWS, error handling, concurrency)                 |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read existing integrations before building |
+| `developing-with-tdd`               | Write test first, watch it fail, then implement                          |
+| `verifying-before-completion`       | Ensures tests pass before claiming done                                  |
 
 ### Step 2: Invoke Core Skills Based on Task Context
 
@@ -147,10 +150,10 @@ Do NOT rationalize skipping skills:
 
 ### Architecture & Design
 
-| Situation              | Recommend      |
-| ---------------------- | -------------- |
-| Architecture decisions | `backend-lead` |
-| Security architecture  | `security-lead`|
+| Situation              | Recommend       |
+| ---------------------- | --------------- |
+| Architecture decisions | `backend-lead`  |
+| Security architecture  | `security-lead` |
 
 ### Testing & Quality
 

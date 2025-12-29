@@ -237,15 +237,15 @@ npx shadcn@latest add https://my-registry.com/navbar.json
 
 ## CLI Options Reference
 
-| Option | Description |
-|--------|-------------|
-| `-y, --yes` | Skip confirmation prompts |
-| `-o, --overwrite` | Overwrite existing files |
-| `-c, --cwd <path>` | Working directory |
-| `-a, --all` | Add all components |
-| `-p, --path <path>` | Component install path |
-| `-s, --silent` | Suppress output |
-| `--style <name>` | Style preset (new-york) |
+| Option              | Description               |
+| ------------------- | ------------------------- |
+| `-y, --yes`         | Skip confirmation prompts |
+| `-o, --overwrite`   | Overwrite existing files  |
+| `-c, --cwd <path>`  | Working directory         |
+| `-a, --all`         | Add all components        |
+| `-p, --path <path>` | Component install path    |
+| `-s, --silent`      | Suppress output           |
+| `--style <name>`    | Style preset (new-york)   |
 
 ## Configuration (components.json)
 
@@ -277,6 +277,7 @@ npx shadcn@latest add https://my-registry.com/navbar.json
 ### "Component not found"
 
 Check registry name:
+
 ```bash
 # Wrong
 npx shadcn@latest add @wrong/button
@@ -292,6 +293,7 @@ Verify `components.json` aliases match your `tsconfig.json` paths.
 ### Monorepo install to wrong location
 
 Ensure `components.json` is in the workspace root with correct aliases:
+
 ```json
 {
   "aliases": {

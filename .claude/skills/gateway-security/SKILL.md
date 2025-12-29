@@ -72,12 +72,12 @@ skill: "gateway-security"; // Core skills work with Skill tool
 
 ### Role Filter
 
-| Your Role               | Mandatory Sections                                                        |
-|-------------------------|---------------------------------------------------------------------------|
-| **Security Lead/Architect** | ALL ROLES + THREAT MODELING + DEFENSE PATTERNS                        |
-| **Security Reviewer**   | ALL ROLES + SECURITY REVIEW                                               |
-| **Developer**           | ALL ROLES + SECURITY IMPLEMENTATION                                       |
-| **Tester**              | ALL ROLES (security testing skills come from `gateway-testing`)           |
+| Your Role                   | Mandatory Sections                                              |
+| --------------------------- | --------------------------------------------------------------- |
+| **Security Lead/Architect** | ALL ROLES + THREAT MODELING + DEFENSE PATTERNS                  |
+| **Security Reviewer**       | ALL ROLES + SECURITY REVIEW                                     |
+| **Developer**               | ALL ROLES + SECURITY IMPLEMENTATION                             |
+| **Tester**                  | ALL ROLES (security testing skills come from `gateway-testing`) |
 
 **Note:** All skills remain available to any role via the routing tables below. The table shows what you MUST load upfront—not what you're limited to.
 
@@ -202,50 +202,63 @@ Each skill is organized by domain for easy discovery.
 ## Authentication & Authorization
 
 **Auth Implementation Patterns**: `.claude/skill-library/security/auth-implementation-patterns/SKILL.md`
+
 - JWT tokens, OAuth flows, session management, role-based access control (RBAC)
 
 **Authorization Testing**: `.claude/skill-library/security/authorization-testing/SKILL.md`
+
 - Testing access controls, privilege escalation checks, permission boundaries
 
 ## Secrets & Credentials
 
 **Secrets Management**: `.claude/skill-library/security/secrets-management/SKILL.md`
+
 - Credential storage, secret rotation, secure configuration, vault patterns
 
 **Secret Scanner**: `.claude/skill-library/security/secret-scanner/SKILL.md`
+
 - Detecting hardcoded secrets, credential scanning, pre-commit hooks
 
 ## Cryptography
 
 **Discover Cryptography**: `.claude/skill-library/security/discover-cryptography/SKILL.md`
+
 - Encryption patterns, key management, hashing algorithms, cryptographic best practices
 
 ## Defense Patterns
 
 **Defense in Depth**: `.claude/skill-library/security/defense-in-depth/SKILL.md`
+
 - Layered security, principle of least privilege, attack surface reduction, zero trust
 
 ## Threat Modeling
 
 **Business Context Discovery** (Phase 0): `.claude/skill-library/security/business-context-discovery/SKILL.md`
+
 - Discovers business context, data classification, threat actors, compliance requirements, and security objectives before technical analysis - PASTA Stage 1
 
 **Codebase Sizing** (Phase 1.0): `.claude/skill-library/security/codebase-sizing/SKILL.md`
+
 - Assesses codebase size before Phase 1, counts files per component, categorizes as small/medium/large, outputs sizing-report.json with parallelization strategy
 
 **Codebase Mapping** (Phase 1): `.claude/skill-library/security/codebase-mapping/SKILL.md`
+
 - Systematic codebase analysis for threat modeling, identifies architecture, components, data flows, entry points, trust boundaries
 
 **Security Controls Mapping** (Phase 2): `.claude/skill-library/security/security-controls-mapping/SKILL.md`
+
 - Maps security controls to STRIDE categories, identifies authentication, authorization, validation, cryptography, logging controls and gaps
 
 **Threat Modeling** (Phase 3): `.claude/skill-library/security/threat-modeling/SKILL.md`
+
 - Combines STRIDE, PASTA, and DFD principles to identify threats, generate abuse cases, create attack trees, and produce risk-scored threat intelligence
 
 **CVSS Scoring** (Phase 3 Scoring): `.claude/skill-library/security/cvss-scoring/SKILL.md`
+
 - Scores threats with CVSS 3.1/4.0, guides version selection, Base metric assessment for theoretical threats, Temporal/Threat scoring, Environmental metrics from Phase 0 business context
 
 **Security Test Planning** (Phase 4): `.claude/skill-library/security/security-test-planning/SKILL.md`
+
 - Converts threat models into prioritized code review targets, SAST/DAST/SCA recommendations, and threat-driven manual test cases
 
 ## Usage Examples
@@ -281,25 +294,26 @@ Each skill is organized by domain for easy discovery.
 
 **⭐ = Mandatory for ALL ROLES | 🛡️ = Mandatory for THREAT MODELING | 🔍 = Mandatory for SECURITY REVIEW | 🔒 = Mandatory for SECURITY IMPLEMENTATION**
 
-| Need                          | Skill Path                                                                 |
-| ----------------------------- | -------------------------------------------------------------------------- |
-| ⭐ Defense patterns           | `.claude/skill-library/security/defense-in-depth/SKILL.md`                 |
-| ⭐ Auth/RBAC basics           | `.claude/skill-library/security/auth-implementation-patterns/SKILL.md`     |
-| 🛡️ Business context (Phase 0) | `.claude/skill-library/security/business-context-discovery/SKILL.md`       |
-| 🛡️ Codebase sizing (Phase 1.0)| `.claude/skill-library/security/codebase-sizing/SKILL.md`                  |
-| 🛡️ Codebase mapping (Phase 1) | `.claude/skill-library/security/codebase-mapping/SKILL.md`                 |
-| 🛡️ Controls mapping (Phase 2) | `.claude/skill-library/security/security-controls-mapping/SKILL.md`        |
-| 🛡️ Threat modeling (Phase 3)  | `.claude/skill-library/security/threat-modeling/SKILL.md`                  |
-| 🛡️ CVSS scoring (Phase 3)     | `.claude/skill-library/security/cvss-scoring/SKILL.md`                     |
-| 🛡️ Test planning (Phase 4)    | `.claude/skill-library/security/security-test-planning/SKILL.md`           |
-| 🔍 Authorization testing      | `.claude/skill-library/security/authorization-testing/SKILL.md`            |
-| 🔍 Secret scanner             | `.claude/skill-library/security/secret-scanner/SKILL.md`                   |
-| 🔒 Secrets management         | `.claude/skill-library/security/secrets-management/SKILL.md`               |
-| 🔒 Cryptography               | `.claude/skill-library/security/discover-cryptography/SKILL.md`            |
+| Need                           | Skill Path                                                             |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| ⭐ Defense patterns            | `.claude/skill-library/security/defense-in-depth/SKILL.md`             |
+| ⭐ Auth/RBAC basics            | `.claude/skill-library/security/auth-implementation-patterns/SKILL.md` |
+| 🛡️ Business context (Phase 0)  | `.claude/skill-library/security/business-context-discovery/SKILL.md`   |
+| 🛡️ Codebase sizing (Phase 1.0) | `.claude/skill-library/security/codebase-sizing/SKILL.md`              |
+| 🛡️ Codebase mapping (Phase 1)  | `.claude/skill-library/security/codebase-mapping/SKILL.md`             |
+| 🛡️ Controls mapping (Phase 2)  | `.claude/skill-library/security/security-controls-mapping/SKILL.md`    |
+| 🛡️ Threat modeling (Phase 3)   | `.claude/skill-library/security/threat-modeling/SKILL.md`              |
+| 🛡️ CVSS scoring (Phase 3)      | `.claude/skill-library/security/cvss-scoring/SKILL.md`                 |
+| 🛡️ Test planning (Phase 4)     | `.claude/skill-library/security/security-test-planning/SKILL.md`       |
+| 🔍 Authorization testing       | `.claude/skill-library/security/authorization-testing/SKILL.md`        |
+| 🔍 Secret scanner              | `.claude/skill-library/security/secret-scanner/SKILL.md`               |
+| 🔒 Secrets management          | `.claude/skill-library/security/secrets-management/SKILL.md`           |
+| 🔒 Cryptography                | `.claude/skill-library/security/discover-cryptography/SKILL.md`        |
 
 ## When to Use This Gateway
 
 Use this gateway skill when:
+
 - Designing security architecture or threat modeling
 - Implementing authentication or authorization features
 - Working with secrets, credentials, or API keys

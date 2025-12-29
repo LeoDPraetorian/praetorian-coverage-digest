@@ -25,6 +25,7 @@ function Provider({ children }) {
 ```
 
 **When to still use manual memoization:**
+
 - Interop with libraries that compare callback/object identity (virtualization libs, map layers)
 - Performance-critical paths confirmed through profiling
 - When explicit clarity is preferred
@@ -41,11 +42,7 @@ function Provider({ children }) {
   const [count, setCount] = useState(0);
 
   // New object on every render! ⚠️
-  return (
-    <Context.Provider value={{ count, setCount }}>
-      {children}
-    </Context.Provider>
-  );
+  return <Context.Provider value={{ count, setCount }}>{children}</Context.Provider>;
 }
 ```
 
@@ -67,6 +64,7 @@ function Provider({ children }) {
 ```
 
 **When to memoize:**
+
 - Always, unless value is a primitive (string, number, boolean)
 - Objects, arrays, functions in context value
 
@@ -77,9 +75,9 @@ function Provider({ children }) {
 ```tsx
 // ❌ BAD: Single context with mixed update frequencies
 type AppContext = {
-  user: User;              // Changes rarely
-  theme: Theme;            // Changes rarely
-  notifications: number;   // Changes frequently!
+  user: User; // Changes rarely
+  theme: Theme; // Changes rarely
+  notifications: number; // Changes frequently!
 };
 
 // All components re-render when notifications change
@@ -108,17 +106,15 @@ function Provider({ children }) {
   // Actions don't depend on state, so they never change
   const actions = useMemo(
     () => ({
-      increment: () => setState(s => s + 1),
-      decrement: () => setState(s => s - 1),
+      increment: () => setState((s) => s + 1),
+      decrement: () => setState((s) => s - 1),
     }),
     []
   );
 
   return (
     <StateContext.Provider value={state}>
-      <ActionsContext.Provider value={actions}>
-        {children}
-      </ActionsContext.Provider>
+      <ActionsContext.Provider value={actions}>{children}</ActionsContext.Provider>
     </StateContext.Provider>
   );
 }
@@ -177,9 +173,7 @@ function App() {
 
   return (
     <div>
-      <button onClick={() => setUnrelatedState(x => x + 1)}>
-        Trigger Parent Re-render
-      </button>
+      <button onClick={() => setUnrelatedState((x) => x + 1)}>Trigger Parent Re-render</button>
       <UserProfile /> {/* Doesn't re-render */}
     </div>
   );
@@ -210,7 +204,7 @@ function Provider({ children }) {
 
 ```tsx
 // Wrap your app with Profiler
-import { Profiler } from 'react';
+import { Profiler } from "react";
 
 function onRenderCallback(
   id, // "App"
@@ -225,10 +219,11 @@ function onRenderCallback(
 
 <Profiler id="App" onRender={onRenderCallback}>
   <App />
-</Profiler>
+</Profiler>;
 ```
 
 **Use DevTools:**
+
 - Click "Profiler" tab
 - Click record button
 - Interact with your app
@@ -245,7 +240,7 @@ function useWhyDidYouUpdate(name: string, props: Record<string, any>) {
       const allKeys = Object.keys({ ...previousProps.current, ...props });
       const changedProps: Record<string, any> = {};
 
-      allKeys.forEach(key => {
+      allKeys.forEach((key) => {
         if (previousProps.current?.[key] !== props[key]) {
           changedProps[key] = {
             from: previousProps.current?.[key],
@@ -255,7 +250,7 @@ function useWhyDidYouUpdate(name: string, props: Record<string, any>) {
       });
 
       if (Object.keys(changedProps).length > 0) {
-        console.log('[why-did-you-update]', name, changedProps);
+        console.log("[why-did-you-update]", name, changedProps);
       }
     }
 
@@ -266,7 +261,7 @@ function useWhyDidYouUpdate(name: string, props: Record<string, any>) {
 // Usage
 function MyComponent() {
   const context = useMyContext();
-  useWhyDidYouUpdate('MyComponent', context);
+  useWhyDidYouUpdate("MyComponent", context);
   // ...
 }
 ```
@@ -281,7 +276,7 @@ function Provider({ children }) {
 
   // Debug: Log when value reference changes
   useEffect(() => {
-    console.log('Context value changed');
+    console.log("Context value changed");
   }, [value]);
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
@@ -307,10 +302,7 @@ function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  const value = useMemo(
-    () => ({ user, login, logout }),
-    [user, login, logout]
-  );
+  const value = useMemo(() => ({ user, login, logout }), [user, login, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
@@ -329,10 +321,8 @@ function NotificationsProvider({ children }) {
   // Actions memoized once
   const actions = useMemo(
     () => ({
-      add: (notification: Notification) =>
-        setNotifications(prev => [...prev, notification]),
-      remove: (id: string) =>
-        setNotifications(prev => prev.filter(n => n.id !== id)),
+      add: (notification: Notification) => setNotifications((prev) => [...prev, notification]),
+      remove: (id: string) => setNotifications((prev) => prev.filter((n) => n.id !== id)),
       clear: () => setNotifications([]),
     }),
     []
@@ -365,19 +355,19 @@ type FormState = {
 };
 
 type FormAction =
-  | { type: 'setValue'; field: string; value: any }
-  | { type: 'setError'; field: string; error: string }
-  | { type: 'setTouched'; field: string }
-  | { type: 'reset' };
+  | { type: "setValue"; field: string; value: any }
+  | { type: "setError"; field: string; error: string }
+  | { type: "setTouched"; field: string }
+  | { type: "reset" };
 
 function formReducer(state: FormState, action: FormAction): FormState {
   switch (action.type) {
-    case 'setValue':
+    case "setValue":
       return {
         ...state,
         values: { ...state.values, [action.field]: action.value },
       };
-    case 'setError':
+    case "setError":
       return {
         ...state,
         errors: { ...state.errors, [action.field]: action.error },
@@ -400,13 +390,13 @@ function FormProvider({ children }) {
 
 **Consider alternatives when:**
 
-| Scenario | Alternative | Reason |
-|----------|-------------|--------|
-| State updates >10 times/second | Zustand | Fine-grained subscriptions |
-| Need DevTools | Zustand/Redux | Built-in debugging |
-| Managing server state | TanStack Query | Caching, invalidation, refetching |
-| Complex middleware | Redux | Extensive middleware ecosystem |
-| Large app, many contexts | Zustand | Simpler API, less boilerplate |
+| Scenario                       | Alternative    | Reason                            |
+| ------------------------------ | -------------- | --------------------------------- |
+| State updates >10 times/second | Zustand        | Fine-grained subscriptions        |
+| Need DevTools                  | Zustand/Redux  | Built-in debugging                |
+| Managing server state          | TanStack Query | Caching, invalidation, refetching |
+| Complex middleware             | Redux          | Extensive middleware ecosystem    |
+| Large app, many contexts       | Zustand        | Simpler API, less boilerplate     |
 
 ### Context vs Zustand Performance (2025 Benchmarks)
 
@@ -420,7 +410,7 @@ const AppContext = createContext({ user, theme, notifications });
 // Zustand: Only subscribed slices trigger re-renders
 const useStore = create((set) => ({
   user: null,
-  theme: 'light',
+  theme: "light",
   notifications: [],
 }));
 
@@ -435,6 +425,7 @@ const user = useStore((state) => state.user);
 Before shipping Context:
 
 **React 19+ with Compiler:**
+
 - [ ] Using React 19+ with Compiler enabled (auto-memoization)
 - [ ] Frequently-changing state is in separate context
 - [ ] Actions are split from state (if applicable)
@@ -443,6 +434,7 @@ Before shipping Context:
 - [ ] Considered alternatives (Zustand for complex cases)
 
 **React 18 or without Compiler:**
+
 - [ ] Context value is memoized with `useMemo`
 - [ ] Callbacks in context are memoized with `useCallback`
 - [ ] Frequently-changing state is in separate context
@@ -454,7 +446,7 @@ Before shipping Context:
 ## Benchmarking Context Performance
 
 ```tsx
-import { Profiler, ProfilerOnRenderCallback } from 'react';
+import { Profiler, ProfilerOnRenderCallback } from "react";
 
 const onRender: ProfilerOnRenderCallback = (
   id,
@@ -467,9 +459,9 @@ const onRender: ProfilerOnRenderCallback = (
   console.table({
     id,
     phase,
-    'actualDuration (ms)': actualDuration.toFixed(2),
-    'baseDuration (ms)': baseDuration.toFixed(2),
-    'optimization %': (((baseDuration - actualDuration) / baseDuration) * 100).toFixed(2),
+    "actualDuration (ms)": actualDuration.toFixed(2),
+    "baseDuration (ms)": baseDuration.toFixed(2),
+    "optimization %": (((baseDuration - actualDuration) / baseDuration) * 100).toFixed(2),
   });
 };
 
@@ -477,10 +469,11 @@ const onRender: ProfilerOnRenderCallback = (
   <YourProvider>
     <YourApp />
   </YourProvider>
-</Profiler>
+</Profiler>;
 ```
 
 **Acceptable performance:**
+
 - Mount: <50ms for simple context, <200ms for complex
 - Update: <16ms (60fps), <8ms (120fps)
 

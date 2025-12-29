@@ -426,12 +426,19 @@ export class Phase14bCodeBlockQuality {
    */
   static async run(skillsDir: string): Promise<PhaseResult> {
     const skillPaths = await SkillParser.findAllSkills(skillsDir);
+    const skills = await Promise.all(skillPaths.map(p => SkillParser.parseSkillFile(p)));
+    return this.runOnParsedSkills(skills);
+  }
+
+  /**
+   * Run Phase 14b audit on pre-parsed skills (performance optimized)
+   */
+  static async runOnParsedSkills(skills: SkillFile[]): Promise<PhaseResult> {
     let skillsAffected = 0;
     let issuesFound = 0;
     const details: string[] = [];
 
-    for (const skillPath of skillPaths) {
-      const skill = await SkillParser.parseSkillFile(skillPath);
+    for (const skill of skills) {
       const issues = this.validate(skill);
 
       // Only count as affected if there are warnings or criticals

@@ -4,6 +4,8 @@
 
 Claude Code agents face a paradox: the more capable an agent becomes, the less effective it is. Every line of instruction, every example, every anti-pattern list consumes tokens that could be used for actual work. Anthropic's research shows that "token usage alone explains 80% of performance variance" in agent tasks—yet the natural instinct when an agent misbehaves is to add more instructions, creating a vicious cycle of bloat.
 
+**Anthropic's official guidance is explicit**: ["Keep SKILL.md body under 500 lines for optimal performance"](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices). This isn't a suggestion—it's a performance threshold. Beyond 500 lines, Claude's attention degrades, critical instructions get diluted, and the agent becomes less reliable. The same principle applies to agent prompts: every token beyond the minimum necessary reduces the context available for actual work.
+
 This manifests in three critical ways:
 
 ### 1. Selection Accuracy Degrades with Agent Proliferation
@@ -126,7 +128,7 @@ Information loads in tiers, not all at once:
                   ▼
 ┌─────────────────────────────────────────┐
 │ Gateway Loaded (~500-1,000 tokens)      │
-│ • Mandatory skill paths                 │
+│ • Mandatory skills by role (paths)      │
 │ • Task routing tables                   │
 │ • Quick Decision Guide                  │
 └─────────────────┬───────────────────────┘
@@ -226,7 +228,7 @@ skill: "gateway-[domain]"
 - **gateway-[domain]**: Routes to mandatory + task-specific library skills
 
 The gateway provides:
-1. **Mandatory library skills** - Read ALL skills in "Mandatory for All Work"
+1. **Mandatory library skills by role** - Read ALL skills in "Mandatory Skills by Role" for your role (always include "ALL ROLES")
 2. **Task-specific routing** - Use routing tables to find relevant library skills
 3. **Quick Decision Guide** - Follow the decision tree
 
@@ -386,7 +388,7 @@ Agents exceeding maximums fail audit. Extract content to skills.
 | 6 | Escalation Protocol | ❌ | Clear stopping conditions, agent recommendations |
 | 7 | Body References | ✅ | Phantom skill detection (referenced but don't exist) |
 | 8 | Skill Coverage | ❌ | Recommended skills based on agent type |
-| 9 | Skill Loading Protocol | ❌ | Tiered loading documented, brief anti-bypass |
+| 9 | Skill Loading Protocol | ❌ | Tiered loading documented (gateway-mediated, role-based mandatory skills), brief anti-bypass |
 
 ### Validation Commands
 

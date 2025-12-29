@@ -469,6 +469,7 @@ Accessible label automatically linked to the input.
 ```
 
 **Optional attributes**:
+
 ```typescript
 <FieldLabel required>Email Address</FieldLabel>
 ```
@@ -501,6 +502,7 @@ Displays validation errors from any Standard Schema-compatible validator (Zod, Y
 ```
 
 **Standard Schema Integration**:
+
 ```typescript
 // FieldError automatically handles Standard Schema error formats
 type StandardSchemaError = {
@@ -678,6 +680,7 @@ const { fields, append, remove } = useFieldArray({
 ### Migration from Form to Field
 
 **Before (Form component)**:
+
 ```typescript
 <Form {...form}>
   <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -700,6 +703,7 @@ const { fields, append, remove } = useFieldArray({
 ```
 
 **After (Field primitives)**:
+
 ```typescript
 <form onSubmit={handleSubmit(onSubmit)}>
   <Field>
@@ -716,6 +720,7 @@ const { fields, append, remove } = useFieldArray({
 ```
 
 **Key differences**:
+
 - ✅ **Less nesting** - No Form wrapper, FormItem, FormControl
 - ✅ **More explicit** - Direct Controller usage
 - ✅ **Standard Schema support** - FieldError accepts any error format

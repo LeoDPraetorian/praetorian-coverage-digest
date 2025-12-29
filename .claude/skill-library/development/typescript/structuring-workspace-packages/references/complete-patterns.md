@@ -50,6 +50,7 @@ Complete provider and consumer package patterns for TypeScript npm workspaces.
 ```
 
 **Key points:**
+
 - `type: "module"` for ESM
 - `main` and `types` point to dist/
 - `exports` field with subpath exports
@@ -80,6 +81,7 @@ Complete provider and consumer package patterns for TypeScript npm workspaces.
 ```
 
 **Key points:**
+
 - `moduleResolution: "bundler"` for tsx/modern tooling
 - `declaration: true` to generate .d.ts files
 - `declarationMap: true` for IDE navigation
@@ -102,7 +104,7 @@ export {
   formatFindingsTable,
   formatCompletionMessage,
   countFindings,
-} from './lib/table-formatter.js';
+} from "./lib/table-formatter.js";
 
 // Re-export from schemas (JSON validation and conversion)
 export {
@@ -111,13 +113,14 @@ export {
   type SemanticFindingsJson,
   validateSemanticFindings,
   semanticFindingsToFindings,
-} from './lib/schemas.js';
+} from "./lib/schemas.js";
 
 // Re-export from utils
-export { findRepoRoot, getClaudeDir } from './lib/utils.js';
+export { findRepoRoot, getClaudeDir } from "./lib/utils.js";
 ```
 
 **Key points:**
+
 - Use `.js` extension in imports (TypeScript resolves to .ts)
 - Export types with `type` keyword for clarity
 - Re-export everything consumers might need
@@ -147,6 +150,7 @@ export { findRepoRoot, getClaudeDir } from './lib/utils.js';
 ```
 
 **Key points:**
+
 - `"@org/shared-lib": "*"` uses local workspace version
 - The `*` tells npm to use whatever version is available locally
 
@@ -172,6 +176,7 @@ export { findRepoRoot, getClaudeDir } from './lib/utils.js';
 ```
 
 **Key points:**
+
 - `moduleResolution: "bundler"` must match provider
 - `noEmit: true` if only running with tsx (not building)
 
@@ -206,6 +211,7 @@ console.log(formatFindingsTable(findings));
 ```
 
 **Key points:**
+
 - Named imports, NOT namespace imports
 - Can use barrel or subpath imports
 - Types imported with `type` keyword
@@ -219,10 +225,7 @@ console.log(formatFindingsTable(findings));
   "name": "@org/monorepo",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "packages/*",
-    "tools/*"
-  ],
+  "workspaces": ["packages/*", "tools/*"],
   "scripts": {
     "build": "npm run build -ws --if-present",
     "build:shared": "npm run build -w @org/shared-lib",
@@ -236,6 +239,7 @@ console.log(formatFindingsTable(findings));
 ```
 
 **Key points:**
+
 - `workspaces` array defines package locations
 - `-w @org/package` runs command in specific workspace
 - `-ws` runs command across all workspaces
@@ -245,24 +249,26 @@ console.log(formatFindingsTable(findings));
 From today's refactoring of `@chariot/auditing-skills` and `@chariot/formatting-skill-output`:
 
 **Before (anti-pattern):**
+
 ```typescript
-import * as formatter from '../../../formatting-skill-output/scripts/src/lib/table-formatter.js';
-import * as schemas from '../../../formatting-skill-output/scripts/src/lib/schemas.js';
+import * as formatter from "../../../formatting-skill-output/scripts/src/lib/table-formatter.js";
+import * as schemas from "../../../formatting-skill-output/scripts/src/lib/schemas.js";
 type Finding = formatter.Finding;
 ```
 
 **After (correct pattern):**
+
 ```typescript
 import {
   formatFindingsTable,
   countFindings,
   formatCompletionMessage,
   type Finding,
-} from '@chariot/formatting-skill-output/lib/table-formatter';
+} from "@chariot/formatting-skill-output/lib/table-formatter";
 
 import {
   validateSemanticFindings,
   semanticFindingsToFindings,
   type SemanticFindingsJson,
-} from '@chariot/formatting-skill-output/lib/schemas';
+} from "@chariot/formatting-skill-output/lib/schemas";
 ```

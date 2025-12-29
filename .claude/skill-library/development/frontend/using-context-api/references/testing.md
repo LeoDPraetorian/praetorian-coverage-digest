@@ -17,17 +17,17 @@
 ### Custom Render with Provider
 
 ```tsx
-import { render, RenderOptions } from '@testing-library/react';
-import { ReactElement } from 'react';
-import { ThemeProvider } from './ThemeContext';
+import { render, RenderOptions } from "@testing-library/react";
+import { ReactElement } from "react";
+import { ThemeProvider } from "./ThemeContext";
 
 type CustomRenderOptions = RenderOptions & {
-  initialTheme?: 'light' | 'dark';
+  initialTheme?: "light" | "dark";
 };
 
 function customRender(
   ui: ReactElement,
-  { initialTheme = 'light', ...options }: CustomRenderOptions = {}
+  { initialTheme = "light", ...options }: CustomRenderOptions = {}
 ) {
   function Wrapper({ children }: { children: React.ReactNode }) {
     return <ThemeProvider initialTheme={initialTheme}>{children}</ThemeProvider>;
@@ -36,36 +36,36 @@ function customRender(
   return render(ui, { wrapper: Wrapper, ...options });
 }
 
-export * from '@testing-library/react';
+export * from "@testing-library/react";
 export { customRender as render };
 ```
 
 **Usage:**
 
 ```tsx
-import { render, screen } from './test-utils';
+import { render, screen } from "./test-utils";
 
-test('renders with theme', () => {
-  render(<ThemedButton />, { initialTheme: 'dark' });
-  expect(screen.getByRole('button')).toHaveClass('dark');
+test("renders with theme", () => {
+  render(<ThemedButton />, { initialTheme: "dark" });
+  expect(screen.getByRole("button")).toHaveClass("dark");
 });
 ```
 
 ### Testing Context Hook Directly
 
 ```tsx
-import { renderHook } from '@testing-library/react';
-import { ReactNode } from 'react';
-import { ThemeProvider, useTheme } from './ThemeContext';
+import { renderHook } from "@testing-library/react";
+import { ReactNode } from "react";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 
-test('useTheme returns theme value', () => {
+test("useTheme returns theme value", () => {
   const wrapper = ({ children }: { children: ReactNode }) => (
     <ThemeProvider>{children}</ThemeProvider>
   );
 
   const { result } = renderHook(() => useTheme(), { wrapper });
 
-  expect(result.current.theme).toBe('light');
+  expect(result.current.theme).toBe("light");
 });
 ```
 
@@ -74,10 +74,10 @@ test('useTheme returns theme value', () => {
 ### Test Initial State
 
 ```tsx
-import { render, screen } from '@testing-library/react';
-import { ThemeProvider, useTheme } from './ThemeContext';
+import { render, screen } from "@testing-library/react";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 
-test('provides initial theme', () => {
+test("provides initial theme", () => {
   function TestComponent() {
     const { theme } = useTheme();
     return <div>Theme: {theme}</div>;
@@ -89,18 +89,18 @@ test('provides initial theme', () => {
     </ThemeProvider>
   );
 
-  expect(screen.getByText('Theme: light')).toBeInTheDocument();
+  expect(screen.getByText("Theme: light")).toBeInTheDocument();
 });
 ```
 
 ### Test State Updates
 
 ```tsx
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { ThemeProvider, useTheme } from './ThemeContext';
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 
-test('toggles theme when action is called', async () => {
+test("toggles theme when action is called", async () => {
   const user = userEvent.setup();
 
   function TestComponent() {
@@ -119,18 +119,18 @@ test('toggles theme when action is called', async () => {
     </ThemeProvider>
   );
 
-  expect(screen.getByText('Theme: light')).toBeInTheDocument();
+  expect(screen.getByText("Theme: light")).toBeInTheDocument();
 
-  await user.click(screen.getByRole('button', { name: /toggle/i }));
+  await user.click(screen.getByRole("button", { name: /toggle/i }));
 
-  expect(screen.getByText('Theme: dark')).toBeInTheDocument();
+  expect(screen.getByText("Theme: dark")).toBeInTheDocument();
 });
 ```
 
 ### Test with Initial Props
 
 ```tsx
-test('uses initial theme from props', () => {
+test("uses initial theme from props", () => {
   function TestComponent() {
     const { theme } = useTheme();
     return <div>Theme: {theme}</div>;
@@ -142,7 +142,7 @@ test('uses initial theme from props', () => {
     </ThemeProvider>
   );
 
-  expect(screen.getByText('Theme: dark')).toBeInTheDocument();
+  expect(screen.getByText("Theme: dark")).toBeInTheDocument();
 });
 ```
 
@@ -151,26 +151,26 @@ test('uses initial theme from props', () => {
 ### Test Component Receives Context
 
 ```tsx
-import { render, screen } from './test-utils';
-import { ThemedButton } from './ThemedButton';
+import { render, screen } from "./test-utils";
+import { ThemedButton } from "./ThemedButton";
 
-test('button receives theme from context', () => {
-  render(<ThemedButton />, { initialTheme: 'dark' });
+test("button receives theme from context", () => {
+  render(<ThemedButton />, { initialTheme: "dark" });
 
-  const button = screen.getByRole('button');
-  expect(button).toHaveClass('dark');
+  const button = screen.getByRole("button");
+  expect(button).toHaveClass("dark");
 });
 ```
 
 ### Test Component Updates on Context Change
 
 ```tsx
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { ThemeProvider } from './ThemeContext';
-import { ThemedButton } from './ThemedButton';
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { ThemeProvider } from "./ThemeContext";
+import { ThemedButton } from "./ThemedButton";
 
-test('button updates when theme changes', async () => {
+test("button updates when theme changes", async () => {
   const user = userEvent.setup();
 
   function TestApp() {
@@ -184,12 +184,12 @@ test('button updates when theme changes', async () => {
 
   render(<TestApp />);
 
-  const themedButton = screen.getByRole('button', { name: /themed/i });
-  expect(themedButton).toHaveClass('light');
+  const themedButton = screen.getByRole("button", { name: /themed/i });
+  expect(themedButton).toHaveClass("light");
 
-  await user.click(screen.getByRole('button', { name: /toggle/i }));
+  await user.click(screen.getByRole("button", { name: /toggle/i }));
 
-  expect(themedButton).toHaveClass('dark');
+  expect(themedButton).toHaveClass("dark");
 });
 ```
 
@@ -198,59 +198,53 @@ test('button updates when theme changes', async () => {
 ### Test Hook Returns Correct Value
 
 ```tsx
-import { renderHook } from '@testing-library/react';
-import { ThemeProvider, useTheme } from './ThemeContext';
+import { renderHook } from "@testing-library/react";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 
-test('useTheme returns theme and toggleTheme', () => {
-  const wrapper = ({ children }) => (
-    <ThemeProvider>{children}</ThemeProvider>
-  );
+test("useTheme returns theme and toggleTheme", () => {
+  const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
 
   const { result } = renderHook(() => useTheme(), { wrapper });
 
-  expect(result.current.theme).toBe('light');
-  expect(typeof result.current.toggleTheme).toBe('function');
+  expect(result.current.theme).toBe("light");
+  expect(typeof result.current.toggleTheme).toBe("function");
 });
 ```
 
 ### Test Hook Updates
 
 ```tsx
-import { renderHook, act } from '@testing-library/react';
-import { ThemeProvider, useTheme } from './ThemeContext';
+import { renderHook, act } from "@testing-library/react";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 
-test('useTheme toggles theme', () => {
-  const wrapper = ({ children }) => (
-    <ThemeProvider>{children}</ThemeProvider>
-  );
+test("useTheme toggles theme", () => {
+  const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
 
   const { result } = renderHook(() => useTheme(), { wrapper });
 
-  expect(result.current.theme).toBe('light');
+  expect(result.current.theme).toBe("light");
 
   act(() => {
     result.current.toggleTheme();
   });
 
-  expect(result.current.theme).toBe('dark');
+  expect(result.current.theme).toBe("dark");
 });
 ```
 
 ### Test Hook Throws Without Provider
 
 ```tsx
-import { renderHook } from '@testing-library/react';
-import { useTheme } from './ThemeContext';
+import { renderHook } from "@testing-library/react";
+import { useTheme } from "./ThemeContext";
 
-test('useTheme throws error without provider', () => {
+test("useTheme throws error without provider", () => {
   // Suppress console.error for this test
-  const spy = jest.spyOn(console, 'error').mockImplementation();
+  const spy = jest.spyOn(console, "error").mockImplementation();
 
   const { result } = renderHook(() => useTheme());
 
-  expect(result.error).toEqual(
-    Error('useTheme must be used within ThemeProvider')
-  );
+  expect(result.error).toEqual(Error("useTheme must be used within ThemeProvider"));
 
   spy.mockRestore();
 });
@@ -261,15 +255,15 @@ test('useTheme throws error without provider', () => {
 ### Test Loading State
 
 ```tsx
-import { render, screen, waitFor } from '@testing-library/react';
-import { UserProvider, useUser } from './UserContext';
+import { render, screen, waitFor } from "@testing-library/react";
+import { UserProvider, useUser } from "./UserContext";
 
-test('shows loading state while fetching user', async () => {
+test("shows loading state while fetching user", async () => {
   function TestComponent() {
     const { user, fetchUser } = useUser();
 
     useEffect(() => {
-      fetchUser('123');
+      fetchUser("123");
     }, [fetchUser]);
 
     if (user.loading) return <div>Loading...</div>;
@@ -284,7 +278,7 @@ test('shows loading state while fetching user', async () => {
     </UserProvider>
   );
 
-  expect(screen.getByText('Loading...')).toBeInTheDocument();
+  expect(screen.getByText("Loading...")).toBeInTheDocument();
 
   await waitFor(() => {
     expect(screen.getByText(/User:/)).toBeInTheDocument();
@@ -295,16 +289,16 @@ test('shows loading state while fetching user', async () => {
 ### Test Error State
 
 ```tsx
-import { render, screen, waitFor } from '@testing-library/react';
-import { UserProvider, useUser } from './UserContext';
-import { server } from './mocks/server';
-import { rest } from 'msw';
+import { render, screen, waitFor } from "@testing-library/react";
+import { UserProvider, useUser } from "./UserContext";
+import { server } from "./mocks/server";
+import { rest } from "msw";
 
-test('shows error when fetch fails', async () => {
+test("shows error when fetch fails", async () => {
   // Mock API error
   server.use(
-    rest.get('/api/users/:id', (req, res, ctx) => {
-      return res(ctx.status(500), ctx.json({ message: 'Server error' }));
+    rest.get("/api/users/:id", (req, res, ctx) => {
+      return res(ctx.status(500), ctx.json({ message: "Server error" }));
     })
   );
 
@@ -312,7 +306,7 @@ test('shows error when fetch fails', async () => {
     const { user, fetchUser } = useUser();
 
     useEffect(() => {
-      fetchUser('123');
+      fetchUser("123");
     }, [fetchUser]);
 
     if (user.error) return <div>Error: {user.error.message}</div>;
@@ -336,12 +330,12 @@ test('shows error when fetch fails', async () => {
 ### Test Nested Contexts
 
 ```tsx
-import { render, screen } from '@testing-library/react';
-import { ThemeProvider } from './ThemeContext';
-import { UserProvider } from './UserContext';
-import { App } from './App';
+import { render, screen } from "@testing-library/react";
+import { ThemeProvider } from "./ThemeContext";
+import { UserProvider } from "./UserContext";
+import { App } from "./App";
 
-test('app works with multiple contexts', () => {
+test("app works with multiple contexts", () => {
   render(
     <ThemeProvider>
       <UserProvider>
@@ -350,15 +344,15 @@ test('app works with multiple contexts', () => {
     </ThemeProvider>
   );
 
-  expect(screen.getByRole('main')).toBeInTheDocument();
+  expect(screen.getByRole("main")).toBeInTheDocument();
 });
 ```
 
 ### Test Context Interaction
 
 ```tsx
-test('user profile uses theme from context', () => {
-  const mockUser = { id: '1', name: 'Alice' };
+test("user profile uses theme from context", () => {
+  const mockUser = { id: "1", name: "Alice" };
 
   render(
     <ThemeProvider initialTheme="dark">
@@ -368,9 +362,9 @@ test('user profile uses theme from context', () => {
     </ThemeProvider>
   );
 
-  const profile = screen.getByTestId('user-profile');
-  expect(profile).toHaveClass('dark');
-  expect(profile).toHaveTextContent('Alice');
+  const profile = screen.getByTestId("user-profile");
+  expect(profile).toHaveClass("dark");
+  expect(profile).toHaveTextContent("Alice");
 });
 ```
 
@@ -379,7 +373,7 @@ test('user profile uses theme from context', () => {
 ### Mock Provider for Isolated Tests
 
 ```tsx
-import { createContext, useContext } from 'react';
+import { createContext, useContext } from "react";
 
 // Real context
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -396,9 +390,9 @@ export function MockUserProvider({
 }
 
 // Usage in tests
-test('renders user profile', () => {
+test("renders user profile", () => {
   const mockValue = {
-    user: { id: '1', name: 'Alice' },
+    user: { id: "1", name: "Alice" },
     login: jest.fn(),
     logout: jest.fn(),
   };
@@ -409,29 +403,29 @@ test('renders user profile', () => {
     </MockUserProvider>
   );
 
-  expect(screen.getByText('Alice')).toBeInTheDocument();
+  expect(screen.getByText("Alice")).toBeInTheDocument();
 });
 ```
 
 ### Mock Context Value
 
 ```tsx
-import { useUser } from './UserContext';
+import { useUser } from "./UserContext";
 
-jest.mock('./UserContext', () => ({
+jest.mock("./UserContext", () => ({
   useUser: jest.fn(),
 }));
 
-test('renders with mocked context', () => {
+test("renders with mocked context", () => {
   (useUser as jest.Mock).mockReturnValue({
-    user: { id: '1', name: 'Alice' },
+    user: { id: "1", name: "Alice" },
     login: jest.fn(),
     logout: jest.fn(),
   });
 
   render(<UserProfile />);
 
-  expect(screen.getByText('Alice')).toBeInTheDocument();
+  expect(screen.getByText("Alice")).toBeInTheDocument();
 });
 ```
 
@@ -440,10 +434,10 @@ test('renders with mocked context', () => {
 ### Test Re-render Count
 
 ```tsx
-import { render } from '@testing-library/react';
-import { ThemeProvider, useTheme } from './ThemeContext';
+import { render } from "@testing-library/react";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 
-test('consumer re-renders only when context changes', () => {
+test("consumer re-renders only when context changes", () => {
   let renderCount = 0;
 
   function Consumer() {
@@ -475,7 +469,7 @@ test('consumer re-renders only when context changes', () => {
 ### Test Memoization
 
 ```tsx
-test('context value is memoized', () => {
+test("context value is memoized", () => {
   const valueRefs: any[] = [];
 
   function Consumer() {
@@ -506,12 +500,12 @@ test('context value is memoized', () => {
 ### Test Full User Flow
 
 ```tsx
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { AuthProvider } from './AuthContext';
-import { App } from './App';
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { AuthProvider } from "./AuthContext";
+import { App } from "./App";
 
-test('user can log in and see protected content', async () => {
+test("user can log in and see protected content", async () => {
   const user = userEvent.setup();
 
   render(
@@ -521,16 +515,16 @@ test('user can log in and see protected content', async () => {
   );
 
   // Initially not authenticated
-  expect(screen.getByText('Login')).toBeInTheDocument();
+  expect(screen.getByText("Login")).toBeInTheDocument();
 
   // Fill login form
-  await user.type(screen.getByLabelText('Email'), 'alice@example.com');
-  await user.type(screen.getByLabelText('Password'), 'password123');
-  await user.click(screen.getByRole('button', { name: /login/i }));
+  await user.type(screen.getByLabelText("Email"), "alice@example.com");
+  await user.type(screen.getByLabelText("Password"), "password123");
+  await user.click(screen.getByRole("button", { name: /login/i }));
 
   // After login
   await waitFor(() => {
-    expect(screen.getByText('Welcome, Alice')).toBeInTheDocument();
+    expect(screen.getByText("Welcome, Alice")).toBeInTheDocument();
   });
 });
 ```
@@ -540,11 +534,11 @@ test('user can log in and see protected content', async () => {
 ### Snapshot Provider Structure
 
 ```tsx
-import { render } from '@testing-library/react';
-import { ThemeProvider } from './ThemeContext';
-import { App } from './App';
+import { render } from "@testing-library/react";
+import { ThemeProvider } from "./ThemeContext";
+import { App } from "./App";
 
-test('matches snapshot', () => {
+test("matches snapshot", () => {
   const { container } = render(
     <ThemeProvider>
       <App />
@@ -587,9 +581,7 @@ export function renderWithProviders(ui: ReactElement, options = {}) {
     return (
       <ThemeProvider>
         <UserProvider>
-          <FeatureFlagsProvider>
-            {children}
-          </FeatureFlagsProvider>
+          <FeatureFlagsProvider>{children}</FeatureFlagsProvider>
         </UserProvider>
       </ThemeProvider>
     );
@@ -605,15 +597,15 @@ export function renderWithProviders(ui: ReactElement, options = {}) {
 // test-utils/factories.ts
 export function createMockUser(overrides = {}): User {
   return {
-    id: '1',
-    name: 'Alice',
-    email: 'alice@example.com',
+    id: "1",
+    name: "Alice",
+    email: "alice@example.com",
     ...overrides,
   };
 }
 
 // Usage
-const mockUser = createMockUser({ name: 'Bob' });
+const mockUser = createMockUser({ name: "Bob" });
 ```
 
 ### Pattern 3: Custom Matchers
@@ -631,7 +623,7 @@ expect.extend({
 });
 
 // Usage
-expect(button).toHaveTheme('dark');
+expect(button).toHaveTheme("dark");
 ```
 
 ## Coverage Goals

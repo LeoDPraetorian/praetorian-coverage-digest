@@ -163,21 +163,21 @@ praetorian-annotate/
 
 export interface AnnotationTask {
   // Identity
-  id: string;                      // UUID v4
-  version: number;                 // Schema version (1)
+  id: string; // UUID v4
+  version: number; // Schema version (1)
 
   // Classification
-  type: 'element' | 'region';      // Annotation type
-  category: TaskCategory;          // Bug, enhancement, security, etc.
-  priority: TaskPriority;          // Low, medium, high, critical
-  status: TaskStatus;              // Pending, in_progress, done, failed
+  type: "element" | "region"; // Annotation type
+  category: TaskCategory; // Bug, enhancement, security, etc.
+  priority: TaskPriority; // Low, medium, high, critical
+  status: TaskStatus; // Pending, in_progress, done, failed
 
   // Content
-  comment: string;                 // User's description
+  comment: string; // User's description
 
   // Location
-  url: string;                     // Full URL including path
-  pathname: string;                // Just the path
+  url: string; // Full URL including path
+  pathname: string; // Just the path
   viewport: {
     width: number;
     height: number;
@@ -189,10 +189,10 @@ export interface AnnotationTask {
     selector: SelectorInfo;
     tagName: string;
     boundingRect: BoundingRect;
-    computedStyles: Record<string, string>;  // Relevant styles only
+    computedStyles: Record<string, string>; // Relevant styles only
     attributes: Record<string, string>;
-    innerText?: string;            // Truncated to 500 chars
-    innerHTML?: string;            // Truncated to 1000 chars
+    innerText?: string; // Truncated to 500 chars
+    innerHTML?: string; // Truncated to 1000 chars
   };
 
   // Region context (type: 'region')
@@ -205,17 +205,17 @@ export interface AnnotationTask {
 
   // Screenshots
   screenshots: {
-    element?: string;              // Relative path: screenshots/task-001-element.png
-    context?: string;              // Relative path: screenshots/task-001-context.png
-    full?: string;                 // Relative path: screenshots/task-001-full.png
+    element?: string; // Relative path: screenshots/task-001-element.png
+    context?: string; // Relative path: screenshots/task-001-context.png
+    full?: string; // Relative path: screenshots/task-001-full.png
   };
 
   // Metadata
-  createdAt: string;               // ISO 8601
-  updatedAt: string;               // ISO 8601
-  processedAt?: string;            // When agent processed
-  processedBy?: string;            // Which agent processed
-  error?: string;                  // Error message if failed
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+  processedAt?: string; // When agent processed
+  processedBy?: string; // Which agent processed
+  error?: string; // Error message if failed
 
   // Browser context
   browser: {
@@ -226,16 +226,16 @@ export interface AnnotationTask {
 
 export interface SelectorInfo {
   // Primary selectors (in priority order)
-  testId?: string;                 // data-testid attribute (most stable)
-  css: string;                     // Generated CSS selector
-  xpath: string;                   // Generated XPath
+  testId?: string; // data-testid attribute (most stable)
+  css: string; // Generated CSS selector
+  xpath: string; // Generated XPath
 
   // Fallback info
-  id?: string;                     // Element ID if present
-  classNames: string[];            // Class list
+  id?: string; // Element ID if present
+  classNames: string[]; // Class list
 
   // Confidence score (0-100)
-  confidence: number;              // How stable is this selector?
+  confidence: number; // How stable is this selector?
 }
 
 export interface BoundingRect {
@@ -250,15 +250,15 @@ export interface BoundingRect {
 }
 
 export type TaskCategory =
-  | 'bug'           // UI bug, misalignment, broken functionality
-  | 'enhancement'   // Improvement suggestion
-  | 'security'      // Security concern (future extension)
-  | 'a11y'          // Accessibility issue (future extension)
-  | 'performance';  // Performance concern (future extension)
+  | "bug" // UI bug, misalignment, broken functionality
+  | "enhancement" // Improvement suggestion
+  | "security" // Security concern (future extension)
+  | "a11y" // Accessibility issue (future extension)
+  | "performance"; // Performance concern (future extension)
 
-export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
+export type TaskPriority = "low" | "medium" | "high" | "critical";
 
-export type TaskStatus = 'pending' | 'in_progress' | 'done' | 'failed' | 'cancelled';
+export type TaskStatus = "pending" | "in_progress" | "done" | "failed" | "cancelled";
 ```
 
 ### Configuration Schema
@@ -272,13 +272,13 @@ export interface AnnotationConfig {
   projectPath: string;
 
   // Preferences
-  screenshotQuality: 'low' | 'medium' | 'high';
+  screenshotQuality: "low" | "medium" | "high";
   captureFullPage: boolean;
   defaultCategory: TaskCategory;
   defaultPriority: TaskPriority;
 
   // Selector preferences
-  preferTestIds: boolean;          // Prefer data-testid over CSS
+  preferTestIds: boolean; // Prefer data-testid over CSS
 
   // Connection
   lastConnected: string;
@@ -299,11 +299,7 @@ export interface AnnotationConfig {
   "version": "1.0.0",
   "description": "Visual annotations for AI-assisted frontend development",
 
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "storage"
-  ],
+  "permissions": ["activeTab", "scripting", "storage"],
 
   "host_permissions": [
     "http://localhost:*/*",
@@ -323,11 +319,7 @@ export interface AnnotationConfig {
 
   "content_scripts": [
     {
-      "matches": [
-        "http://localhost:*/*",
-        "https://localhost:*/*",
-        "http://127.0.0.1:*/*"
-      ],
+      "matches": ["http://localhost:*/*", "https://localhost:*/*", "http://127.0.0.1:*/*"],
       "js": ["content/index.js"],
       "css": ["content/styles.css"],
       "run_at": "document_end"
@@ -352,15 +344,15 @@ export interface AnnotationConfig {
 ```typescript
 // src/content/annotator.ts
 
-import { CommentMode } from './modes/comment';
-import { RectangleMode } from './modes/rectangle';
-import { TaskBar } from './ui/task-bar';
-import { Toolbar } from './ui/toolbar';
-import { TaskStore } from '../shared/task-store';
-import { KeyboardHandler } from './utils/keyboard';
+import { CommentMode } from "./modes/comment";
+import { RectangleMode } from "./modes/rectangle";
+import { TaskBar } from "./ui/task-bar";
+import { Toolbar } from "./ui/toolbar";
+import { TaskStore } from "../shared/task-store";
+import { KeyboardHandler } from "./utils/keyboard";
 
 export class Annotator {
-  private mode: 'idle' | 'comment' | 'rectangle' = 'idle';
+  private mode: "idle" | "comment" | "rectangle" = "idle";
   private commentMode: CommentMode;
   private rectangleMode: RectangleMode;
   private taskBar: TaskBar;
@@ -382,36 +374,35 @@ export class Annotator {
 
     // Setup keyboard shortcuts
     this.keyboard = new KeyboardHandler({
-      'c': () => this.setMode('comment'),
-      'r': () => this.setMode('rectangle'),
-      'Escape': () => this.setMode('idle'),
+      c: () => this.setMode("comment"),
+      r: () => this.setMode("rectangle"),
+      Escape: () => this.setMode("idle"),
     });
   }
 
   private createShadowRoot(): ShadowRoot {
-    const host = document.createElement('div');
-    host.id = 'chariot-annotation-root';
+    const host = document.createElement("div");
+    host.id = "chariot-annotation-root";
     document.body.appendChild(host);
-    return host.attachShadow({ mode: 'closed' });
+    return host.attachShadow({ mode: "closed" });
   }
 
-  private setMode(mode: 'idle' | 'comment' | 'rectangle') {
+  private setMode(mode: "idle" | "comment" | "rectangle") {
     // Deactivate current mode
-    if (this.mode === 'comment') this.commentMode.deactivate();
-    if (this.mode === 'rectangle') this.rectangleMode.deactivate();
+    if (this.mode === "comment") this.commentMode.deactivate();
+    if (this.mode === "rectangle") this.rectangleMode.deactivate();
 
     // Activate new mode
     this.mode = mode;
-    if (mode === 'comment') this.commentMode.activate();
-    if (mode === 'rectangle') this.rectangleMode.activate();
+    if (mode === "comment") this.commentMode.activate();
+    if (mode === "rectangle") this.rectangleMode.activate();
 
     // Update toolbar state
     this.toolbar.setActiveMode(mode);
 
     // Update cursor
     document.body.style.cursor =
-      mode === 'comment' ? 'crosshair' :
-      mode === 'rectangle' ? 'crosshair' : '';
+      mode === "comment" ? "crosshair" : mode === "rectangle" ? "crosshair" : "";
   }
 
   async initialize() {
@@ -426,7 +417,7 @@ export class Annotator {
     this.toolbar.render();
     this.keyboard.attach();
 
-    console.log('[Praetorian] Annotation tool initialized');
+    console.log("[Praetorian] Annotation tool initialized");
   }
 
   destroy() {
@@ -445,13 +436,13 @@ annotator.initialize();
 ```typescript
 // src/content/modes/comment.ts
 
-import { AnnotationTask, SelectorInfo } from '../../shared/types';
-import { generateSelector } from '../capture/selector';
-import { captureScreenshot } from '../capture/screenshot';
-import { extractContext } from '../capture/context';
-import { Overlay } from '../ui/overlay';
-import { CommentBox } from '../ui/comment-box';
-import { TaskStore } from '../../shared/task-store';
+import { AnnotationTask, SelectorInfo } from "../../shared/types";
+import { generateSelector } from "../capture/selector";
+import { captureScreenshot } from "../capture/screenshot";
+import { extractContext } from "../capture/context";
+import { Overlay } from "../ui/overlay";
+import { CommentBox } from "../ui/comment-box";
+import { TaskStore } from "../../shared/task-store";
 
 export class CommentMode {
   private shadowRoot: ShadowRoot;
@@ -470,15 +461,15 @@ export class CommentMode {
 
   activate() {
     this.isActive = true;
-    document.addEventListener('mousemove', this.onMouseMove);
-    document.addEventListener('click', this.onClick, true);
+    document.addEventListener("mousemove", this.onMouseMove);
+    document.addEventListener("click", this.onClick, true);
     this.overlay.show();
   }
 
   deactivate() {
     this.isActive = false;
-    document.removeEventListener('mousemove', this.onMouseMove);
-    document.removeEventListener('click', this.onClick, true);
+    document.removeEventListener("mousemove", this.onMouseMove);
+    document.removeEventListener("click", this.onClick, true);
     this.overlay.hide();
     this.commentBox.hide();
     this.hoveredElement = null;
@@ -537,10 +528,10 @@ export class CommentMode {
     const task: Partial<AnnotationTask> = {
       id: crypto.randomUUID(),
       version: 1,
-      type: 'element',
+      type: "element",
       category: category as any,
       priority: priority as any,
-      status: 'pending',
+      status: "pending",
       comment,
       url: window.location.href,
       pathname: window.location.pathname,
@@ -577,17 +568,17 @@ export class CommentMode {
     this.commentBox.hide();
 
     // Show success feedback
-    this.showFeedback('Task created!');
+    this.showFeedback("Task created!");
   };
 
   private isOwnElement(el: HTMLElement): boolean {
-    return el.closest('#praetorian-annotate-root') !== null;
+    return el.closest("#praetorian-annotate-root") !== null;
   }
 
   private showFeedback(message: string) {
     // Brief toast notification
-    const toast = document.createElement('div');
-    toast.className = 'praetorian-toast';
+    const toast = document.createElement("div");
+    toast.className = "praetorian-toast";
     toast.textContent = message;
     this.shadowRoot.appendChild(toast);
     setTimeout(() => toast.remove(), 2000);
@@ -600,18 +591,18 @@ export class CommentMode {
 ```typescript
 // src/content/capture/selector.ts
 
-import { SelectorInfo } from '../../shared/types';
+import { SelectorInfo } from "../../shared/types";
 
 export function generateSelector(element: HTMLElement): SelectorInfo {
   const selectors: SelectorInfo = {
-    css: '',
-    xpath: '',
+    css: "",
+    xpath: "",
     classNames: Array.from(element.classList),
     confidence: 0,
   };
 
   // Priority 1: data-testid (most stable, designed for testing)
-  const testId = element.getAttribute('data-testid');
+  const testId = element.getAttribute("data-testid");
   if (testId) {
     selectors.testId = testId;
     selectors.css = `[data-testid="${testId}"]`;
@@ -630,7 +621,7 @@ export function generateSelector(element: HTMLElement): SelectorInfo {
   }
 
   // Priority 3: Unique aria-label
-  const ariaLabel = element.getAttribute('aria-label');
+  const ariaLabel = element.getAttribute("aria-label");
   if (ariaLabel) {
     const selector = `[aria-label="${ariaLabel}"]`;
     if (document.querySelectorAll(selector).length === 1) {
@@ -663,18 +654,18 @@ export function generateSelector(element: HTMLElement): SelectorInfo {
 function isAutoGeneratedId(id: string): boolean {
   // Common patterns for auto-generated IDs
   const patterns = [
-    /^:r[0-9a-z]+:$/,           // React useId()
-    /^[a-f0-9]{8,}$/i,          // UUID-like
-    /^[a-z]+-\d+$/,             // prefix-number
-    /^__[a-z]+_\d+$/,           // __prefix_number
-    /^ember\d+$/,               // Ember
-    /^ng-/,                     // Angular
+    /^:r[0-9a-z]+:$/, // React useId()
+    /^[a-f0-9]{8,}$/i, // UUID-like
+    /^[a-z]+-\d+$/, // prefix-number
+    /^__[a-z]+_\d+$/, // __prefix_number
+    /^ember\d+$/, // Ember
+    /^ng-/, // Angular
   ];
-  return patterns.some(p => p.test(id));
+  return patterns.some((p) => p.test(id));
 }
 
 function findUniqueClassCombination(element: HTMLElement): string | null {
-  const classes = Array.from(element.classList).filter(c => !isUtilityClass(c));
+  const classes = Array.from(element.classList).filter((c) => !isUtilityClass(c));
 
   // Try single class first
   for (const cls of classes) {
@@ -700,12 +691,12 @@ function findUniqueClassCombination(element: HTMLElement): string | null {
 function isUtilityClass(cls: string): boolean {
   // Tailwind and common utility class patterns
   const patterns = [
-    /^(p|m|w|h|min|max)-/,      // Spacing/sizing
+    /^(p|m|w|h|min|max)-/, // Spacing/sizing
     /^(flex|grid|block|hidden)/, // Display
-    /^(text|font|bg|border)-/,  // Typography/colors
-    /^(hover|focus|active):/,   // State variants
+    /^(text|font|bg|border)-/, // Typography/colors
+    /^(hover|focus|active):/, // State variants
   ];
-  return patterns.some(p => p.test(cls));
+  return patterns.some((p) => p.test(cls));
 }
 
 function generateStructuralSelector(element: HTMLElement): string {
@@ -718,9 +709,7 @@ function generateStructuralSelector(element: HTMLElement): string {
     // Add nth-child if needed
     const parent = current.parentElement;
     if (parent) {
-      const siblings = Array.from(parent.children).filter(
-        el => el.tagName === current!.tagName
-      );
+      const siblings = Array.from(parent.children).filter((el) => el.tagName === current!.tagName);
       if (siblings.length > 1) {
         const index = siblings.indexOf(current) + 1;
         selector += `:nth-child(${index})`;
@@ -731,7 +720,7 @@ function generateStructuralSelector(element: HTMLElement): string {
     current = current.parentElement;
   }
 
-  return path.join(' > ');
+  return path.join(" > ");
 }
 
 function generateXPath(element: HTMLElement): string {
@@ -743,9 +732,7 @@ function generateXPath(element: HTMLElement): string {
 
     const parent = current.parentElement;
     if (parent) {
-      const siblings = Array.from(parent.children).filter(
-        el => el.tagName === current!.tagName
-      );
+      const siblings = Array.from(parent.children).filter((el) => el.tagName === current!.tagName);
       if (siblings.length > 1) {
         const index = siblings.indexOf(current) + 1;
         selector += `[${index}]`;
@@ -756,17 +743,17 @@ function generateXPath(element: HTMLElement): string {
     current = current.parentElement;
   }
 
-  return '//' + path.join('/');
+  return "//" + path.join("/");
 }
 
 function generateXPathFromCSS(css: string): string {
   // Basic CSS to XPath conversion for simple selectors
-  if (css.startsWith('#')) {
+  if (css.startsWith("#")) {
     return `//*[@id="${css.slice(1)}"]`;
   }
-  if (css.startsWith('.')) {
-    const classes = css.split('.').filter(Boolean);
-    const conditions = classes.map(c => `contains(@class, "${c}")`).join(' and ');
+  if (css.startsWith(".")) {
+    const classes = css.split(".").filter(Boolean);
+    const conditions = classes.map((c) => `contains(@class, "${c}")`).join(" and ");
     return `//*[${conditions}]`;
   }
   return `//*`;
@@ -778,12 +765,12 @@ function generateXPathFromCSS(css: string): string {
 ```typescript
 // src/content/capture/screenshot.ts
 
-import html2canvas from 'html2canvas';
+import html2canvas from "html2canvas";
 
 export interface ScreenshotResult {
-  element: string;    // Base64 PNG - cropped to element
-  context: string;    // Base64 PNG - element + surrounding area
-  full?: string;      // Base64 PNG - full page (optional)
+  element: string; // Base64 PNG - cropped to element
+  context: string; // Base64 PNG - element + surrounding area
+  full?: string; // Base64 PNG - full page (optional)
 }
 
 export async function captureScreenshot(
@@ -825,12 +812,12 @@ export async function captureScreenshot(
   });
 
   const result: ScreenshotResult = {
-    element: elementCanvas.toDataURL('image/png'),
-    context: contextCanvas.toDataURL('image/png'),
+    element: elementCanvas.toDataURL("image/png"),
+    context: contextCanvas.toDataURL("image/png"),
   };
 
   if (options.captureFull) {
-    result.full = fullCanvas.toDataURL('image/png');
+    result.full = fullCanvas.toDataURL("image/png");
   }
 
   return result;
@@ -840,15 +827,21 @@ function cropCanvas(
   source: HTMLCanvasElement,
   region: { x: number; y: number; width: number; height: number }
 ): HTMLCanvasElement {
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = region.width;
   canvas.height = region.height;
 
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext("2d")!;
   ctx.drawImage(
     source,
-    region.x, region.y, region.width, region.height,
-    0, 0, region.width, region.height
+    region.x,
+    region.y,
+    region.width,
+    region.height,
+    0,
+    0,
+    region.width,
+    region.height
   );
 
   return canvas;
@@ -869,21 +862,19 @@ export class FileSystemManager {
     try {
       // Prompt user to select project directory
       this.rootHandle = await window.showDirectoryPicker({
-        mode: 'readwrite',
-        startIn: 'documents',
+        mode: "readwrite",
+        startIn: "documents",
       });
 
       // Create .praetorian-annotations directory
-      this.annotationsHandle = await this.rootHandle.getDirectoryHandle(
-        '.praetorian-annotations',
-        { create: true }
-      );
+      this.annotationsHandle = await this.rootHandle.getDirectoryHandle(".praetorian-annotations", {
+        create: true,
+      });
 
       // Create screenshots subdirectory
-      this.screenshotsHandle = await this.annotationsHandle.getDirectoryHandle(
-        'screenshots',
-        { create: true }
-      );
+      this.screenshotsHandle = await this.annotationsHandle.getDirectoryHandle("screenshots", {
+        create: true,
+      });
 
       // Initialize files if needed
       await this.initializeFiles();
@@ -893,11 +884,11 @@ export class FileSystemManager {
 
       return true;
     } catch (err) {
-      if ((err as Error).name === 'AbortError') {
+      if ((err as Error).name === "AbortError") {
         // User cancelled
         return false;
       }
-      console.error('[Praetorian] Connection failed:', err);
+      console.error("[Praetorian] Connection failed:", err);
       throw err;
     }
   }
@@ -915,33 +906,40 @@ export class FileSystemManager {
   private async initializeFiles(): Promise<void> {
     // Initialize tasks.json if not exists
     try {
-      await this.annotationsHandle!.getFileHandle('tasks.json');
+      await this.annotationsHandle!.getFileHandle("tasks.json");
     } catch {
-      await this.writeFile('tasks.json', '[]');
+      await this.writeFile("tasks.json", "[]");
     }
 
     // Initialize tasks.md
     try {
-      await this.annotationsHandle!.getFileHandle('tasks.md');
+      await this.annotationsHandle!.getFileHandle("tasks.md");
     } catch {
-      await this.writeFile('tasks.md', this.getInitialMarkdown());
+      await this.writeFile("tasks.md", this.getInitialMarkdown());
     }
 
     // Initialize config.json
     try {
-      await this.annotationsHandle!.getFileHandle('config.json');
+      await this.annotationsHandle!.getFileHandle("config.json");
     } catch {
-      await this.writeFile('config.json', JSON.stringify({
-        version: 1,
-        projectName: this.rootHandle!.name,
-        screenshotQuality: 'high',
-        captureFullPage: false,
-        defaultCategory: 'bug',
-        defaultPriority: 'medium',
-        preferTestIds: true,
-        lastConnected: new Date().toISOString(),
-        connectionCount: 1,
-      }, null, 2));
+      await this.writeFile(
+        "config.json",
+        JSON.stringify(
+          {
+            version: 1,
+            projectName: this.rootHandle!.name,
+            screenshotQuality: "high",
+            captureFullPage: false,
+            defaultCategory: "bug",
+            defaultPriority: "medium",
+            preferTestIds: true,
+            lastConnected: new Date().toISOString(),
+            connectionCount: 1,
+          },
+          null,
+          2
+        )
+      );
     }
   }
 
@@ -968,8 +966,8 @@ Modes:
   }
 
   private async updateGitignore(): Promise<void> {
-    const gitignorePath = '.gitignore';
-    const entry = '.praetorian-annotations/screenshots/';
+    const gitignorePath = ".gitignore";
+    const entry = ".praetorian-annotations/screenshots/";
 
     try {
       const fileHandle = await this.rootHandle!.getFileHandle(gitignorePath);
@@ -977,7 +975,7 @@ Modes:
       const content = await file.text();
 
       if (!content.includes(entry)) {
-        const newContent = content.trimEnd() + '\n\n# Praetorian Annotate\n' + entry + '\n';
+        const newContent = content.trimEnd() + "\n\n# Praetorian Annotate\n" + entry + "\n";
         const writable = await fileHandle.createWritable();
         await writable.write(newContent);
         await writable.close();
@@ -1002,8 +1000,8 @@ Modes:
 
   async saveScreenshot(taskId: string, type: string, dataUrl: string): Promise<string> {
     const filename = `${taskId}-${type}.png`;
-    const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
-    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "");
+    const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
 
     const fileHandle = await this.screenshotsHandle!.getFileHandle(filename, { create: true });
     const writable = await fileHandle.createWritable();
@@ -1020,9 +1018,9 @@ Modes:
 ```typescript
 // src/shared/task-store.ts
 
-import { AnnotationTask } from './types';
-import { FileSystemManager } from './file-system';
-import { ScreenshotResult } from '../content/capture/screenshot';
+import { AnnotationTask } from "./types";
+import { FileSystemManager } from "./file-system";
+import { ScreenshotResult } from "../content/capture/screenshot";
 
 export class TaskStore {
   private fs: FileSystemManager;
@@ -1041,7 +1039,7 @@ export class TaskStore {
   }
 
   async loadTasks(): Promise<AnnotationTask[]> {
-    const content = await this.fs.readFile('tasks.json');
+    const content = await this.fs.readFile("tasks.json");
     this.tasks = JSON.parse(content);
     return this.tasks;
   }
@@ -1049,13 +1047,21 @@ export class TaskStore {
   async addTask(task: AnnotationTask, screenshots: ScreenshotResult): Promise<void> {
     // Save screenshots
     if (screenshots.element) {
-      task.screenshots.element = await this.fs.saveScreenshot(task.id, 'element', screenshots.element);
+      task.screenshots.element = await this.fs.saveScreenshot(
+        task.id,
+        "element",
+        screenshots.element
+      );
     }
     if (screenshots.context) {
-      task.screenshots.context = await this.fs.saveScreenshot(task.id, 'context', screenshots.context);
+      task.screenshots.context = await this.fs.saveScreenshot(
+        task.id,
+        "context",
+        screenshots.context
+      );
     }
     if (screenshots.full) {
-      task.screenshots.full = await this.fs.saveScreenshot(task.id, 'full', screenshots.full);
+      task.screenshots.full = await this.fs.saveScreenshot(task.id, "full", screenshots.full);
     }
 
     // Add to list
@@ -1065,13 +1071,17 @@ export class TaskStore {
     await this.save();
   }
 
-  async updateTaskStatus(taskId: string, status: AnnotationTask['status'], error?: string): Promise<void> {
-    const task = this.tasks.find(t => t.id === taskId);
+  async updateTaskStatus(
+    taskId: string,
+    status: AnnotationTask["status"],
+    error?: string
+  ): Promise<void> {
+    const task = this.tasks.find((t) => t.id === taskId);
     if (task) {
       task.status = status;
       task.updatedAt = new Date().toISOString();
       if (error) task.error = error;
-      if (status === 'done' || status === 'failed') {
+      if (status === "done" || status === "failed") {
         task.processedAt = new Date().toISOString();
       }
       await this.save();
@@ -1080,17 +1090,17 @@ export class TaskStore {
 
   private async save(): Promise<void> {
     // Save JSON
-    await this.fs.writeFile('tasks.json', JSON.stringify(this.tasks, null, 2));
+    await this.fs.writeFile("tasks.json", JSON.stringify(this.tasks, null, 2));
 
     // Update markdown
-    await this.fs.writeFile('tasks.md', this.generateMarkdown());
+    await this.fs.writeFile("tasks.md", this.generateMarkdown());
   }
 
   private generateMarkdown(): string {
-    const pending = this.tasks.filter(t => t.status === 'pending');
-    const inProgress = this.tasks.filter(t => t.status === 'in_progress');
-    const done = this.tasks.filter(t => t.status === 'done');
-    const failed = this.tasks.filter(t => t.status === 'failed');
+    const pending = this.tasks.filter((t) => t.status === "pending");
+    const inProgress = this.tasks.filter((t) => t.status === "in_progress");
+    const done = this.tasks.filter((t) => t.status === "done");
+    const failed = this.tasks.filter((t) => t.status === "failed");
 
     let md = `# Praetorian Annotations
 
@@ -1098,36 +1108,41 @@ export class TaskStore {
 
 ## Pending (${pending.length})
 
-${pending.length === 0 ? '_No pending tasks_\n' : pending.map(t => this.taskToMarkdown(t)).join('\n')}
+${pending.length === 0 ? "_No pending tasks_\n" : pending.map((t) => this.taskToMarkdown(t)).join("\n")}
 
 ## In Progress (${inProgress.length})
 
-${inProgress.length === 0 ? '_None_\n' : inProgress.map(t => this.taskToMarkdown(t)).join('\n')}
+${inProgress.length === 0 ? "_None_\n" : inProgress.map((t) => this.taskToMarkdown(t)).join("\n")}
 
 ## Done (${done.length})
 
-${done.length === 0 ? '_None_\n' : done.map(t => this.taskToMarkdown(t)).join('\n')}
+${done.length === 0 ? "_None_\n" : done.map((t) => this.taskToMarkdown(t)).join("\n")}
 
-${failed.length > 0 ? `## Failed (${failed.length})\n\n${failed.map(t => this.taskToMarkdown(t)).join('\n')}` : ''}
+${failed.length > 0 ? `## Failed (${failed.length})\n\n${failed.map((t) => this.taskToMarkdown(t)).join("\n")}` : ""}
 `;
 
     return md;
   }
 
   private taskToMarkdown(task: AnnotationTask): string {
-    const priority = task.priority === 'critical' ? '🔴' :
-                     task.priority === 'high' ? '🟠' :
-                     task.priority === 'medium' ? '🟡' : '🟢';
+    const priority =
+      task.priority === "critical"
+        ? "🔴"
+        : task.priority === "high"
+          ? "🟠"
+          : task.priority === "medium"
+            ? "🟡"
+            : "🟢";
 
     return `### ${priority} ${task.comment}
 
 - **ID**: \`${task.id}\`
 - **Category**: ${task.category}
 - **URL**: ${task.pathname}
-- **Selector**: \`${task.element?.selector.css || 'N/A'}\`
-- **Screenshot**: ${task.screenshots.context || 'N/A'}
+- **Selector**: \`${task.element?.selector.css || "N/A"}\`
+- **Screenshot**: ${task.screenshots.context || "N/A"}
 - **Created**: ${task.createdAt}
-${task.error ? `- **Error**: ${task.error}` : ''}
+${task.error ? `- **Error**: ${task.error}` : ""}
 `;
   }
 
@@ -1136,7 +1151,7 @@ ${task.error ? `- **Error**: ${task.error}` : ''}
   }
 
   getPendingTasks(): AnnotationTask[] {
-    return this.tasks.filter(t => t.status === 'pending');
+    return this.tasks.filter((t) => t.status === "pending");
   }
 }
 ```
@@ -1163,6 +1178,7 @@ Process pending UI annotations from `.praetorian-annotations/`.
 /annotate [mode]
 
 **Modes:**
+
 - `step` (default) - Process one task at a time with approval
 - `batch` - Group related tasks by file/component
 - `yolo` - Process all tasks autonomously
@@ -1211,13 +1227,14 @@ For each pending task:
    - Record any errors encountered
 
 ## Example
-
 ```
+
 /annotate step
 
 > Found 3 pending tasks in .praetorian-annotations/tasks.json
 >
 > Task 1/3: "Button misaligned on mobile"
+>
 > - URL: /settings
 > - Selector: [data-testid="save-button"]
 > - Screenshot: screenshots/abc123-context.png
@@ -1226,6 +1243,7 @@ For each pending task:
 > Fix: Add responsive margin class
 >
 > Apply this fix? [y/n]
+
 ```
 
 ## Error Handling
@@ -1242,7 +1260,7 @@ If selector not found in codebase:
 
 ### Processing Skill
 
-```markdown
+````markdown
 ---
 name: processing-visual-annotations
 description: Process visual annotations with DOM context and screenshots
@@ -1255,14 +1273,16 @@ allowed-tools: Read, Edit, Write, Bash, Task, Glob, Grep
 
 ```typescript
 // Read task list
-const tasksJson = await Read('.praetorian-annotations/tasks.json');
+const tasksJson = await Read(".praetorian-annotations/tasks.json");
 const tasks: AnnotationTask[] = JSON.parse(tasksJson);
-const pending = tasks.filter(t => t.status === 'pending');
+const pending = tasks.filter((t) => t.status === "pending");
 ```
+````
 
 ## Screenshot Analysis
 
 Screenshots provide visual context:
+
 - `{id}-element.png` - Cropped to the annotated element
 - `{id}-context.png` - Element with surrounding area (100px padding)
 
@@ -1287,12 +1307,12 @@ ls ui/src/sections/settings/
 
 ## Fix Categories
 
-| Category | Agent | Approach |
-|----------|-------|----------|
-| bug | frontend-developer | Direct fix with Edit tool |
-| enhancement | frontend-developer | Implement improvement |
-| security | frontend-security-reviewer | Security analysis first |
-| a11y | uiux-designer | Accessibility review first |
+| Category    | Agent                      | Approach                   |
+| ----------- | -------------------------- | -------------------------- |
+| bug         | frontend-developer         | Direct fix with Edit tool  |
+| enhancement | frontend-developer         | Implement improvement      |
+| security    | frontend-security-reviewer | Security analysis first    |
+| a11y        | uiux-designer              | Accessibility review first |
 
 ## Status Updates
 
@@ -1300,10 +1320,10 @@ After processing each task:
 
 ```typescript
 // Update in tasks.json
-task.status = 'done'; // or 'failed'
+task.status = "done"; // or 'failed'
 task.updatedAt = new Date().toISOString();
 task.processedAt = new Date().toISOString();
-task.processedBy = 'frontend-developer';
+task.processedBy = "frontend-developer";
 task.error = undefined; // or error message
 ```
 
@@ -1314,7 +1334,8 @@ task.error = undefined; // or error message
 3. **Test first** - Run existing tests before changes
 4. **Visual verify** - Check screenshot matches fix intent
 5. **One task at a time** - Don't batch unrelated fixes
-```
+
+````
 
 ---
 
@@ -1426,7 +1447,7 @@ export class CommentBox {
     this.currentElement = null;
   }
 }
-```
+````
 
 ### Styles (Shadow DOM Isolated)
 
@@ -1440,7 +1461,7 @@ export class CommentBox {
   border-radius: 8px;
   padding: 12px;
   width: 300px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
   color: #e0e0e0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
@@ -1558,7 +1579,7 @@ export class CommentBox {
   background: #1a1a1a;
   border-top: 1px solid #333;
   padding: 8px 16px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 12px;
   color: #e0e0e0;
   z-index: 2147483645;
@@ -1579,9 +1600,15 @@ export class CommentBox {
   border-radius: 50%;
 }
 
-.praetorian-task-status.pending { background: #f59e0b; }
-.praetorian-task-status.done { background: #10b981; }
-.praetorian-task-status.failed { background: #ef4444; }
+.praetorian-task-status.pending {
+  background: #f59e0b;
+}
+.praetorian-task-status.done {
+  background: #10b981;
+}
+.praetorian-task-status.failed {
+  background: #ef4444;
+}
 
 /* Toast */
 .praetorian-toast {
@@ -1593,18 +1620,30 @@ export class CommentBox {
   padding: 8px 16px;
   border-radius: 4px;
   font-size: 13px;
-  animation: praetorian-toast-in 0.2s ease, praetorian-toast-out 0.2s ease 1.8s forwards;
+  animation:
+    praetorian-toast-in 0.2s ease,
+    praetorian-toast-out 0.2s ease 1.8s forwards;
   z-index: 2147483647;
 }
 
 @keyframes praetorian-toast-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes praetorian-toast-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 /* Toolbar */
@@ -1713,20 +1752,20 @@ export class CommentBox {
 
 ```typescript
 interface SecurityAnnotation extends AnnotationTask {
-  category: 'security';
+  category: "security";
   securityType:
-    | 'xss_concern'        // Potential XSS vector
-    | 'auth_issue'         // Auth/authz concern
-    | 'input_validation'   // Missing validation
-    | 'sensitive_data'     // Data exposure
-    | 'csrf_concern'       // CSRF risk
-    | 'injection_risk';    // Injection vulnerability
+    | "xss_concern" // Potential XSS vector
+    | "auth_issue" // Auth/authz concern
+    | "input_validation" // Missing validation
+    | "sensitive_data" // Data exposure
+    | "csrf_concern" // CSRF risk
+    | "injection_risk"; // Injection vulnerability
 
   // Additional context
-  eventHandlers?: string[];        // onclick, onsubmit
-  inputType?: string;              // text, password, hidden
-  formAction?: string;             // Form submission URL
-  cookieAccess?: boolean;          // JS cookie access
+  eventHandlers?: string[]; // onclick, onsubmit
+  inputType?: string; // text, password, hidden
+  formAction?: string; // Form submission URL
+  cookieAccess?: boolean; // JS cookie access
 }
 ```
 
@@ -1736,13 +1775,13 @@ Routes to: `frontend-security-reviewer` agent
 
 ```typescript
 interface PentestAnnotation extends AnnotationTask {
-  category: 'pentest';
+  category: "pentest";
   findingType:
-    | 'information_disclosure'
-    | 'authentication_bypass'
-    | 'authorization_flaw'
-    | 'injection_point'
-    | 'sensitive_endpoint';
+    | "information_disclosure"
+    | "authentication_bypass"
+    | "authorization_flaw"
+    | "injection_point"
+    | "sensitive_endpoint";
 
   // Pentest context
   requestInfo?: {
@@ -1787,15 +1826,15 @@ Creates GitHub issues directly from annotations.
 
 ## Technology Stack
 
-| Component | Technology | Rationale |
-|-----------|------------|-----------|
-| Extension Framework | Manifest V3 | Chrome's current standard |
-| Build Tool | Vite | Fast builds, good DX |
-| Language | TypeScript | Type safety |
-| Screenshot | html2canvas | Reliable DOM rendering |
-| Styling | CSS (Shadow DOM) | Isolation from page styles |
-| File Storage | File System Access API | Direct project access |
-| State | In-memory + file sync | Simple, no external deps |
+| Component           | Technology             | Rationale                  |
+| ------------------- | ---------------------- | -------------------------- |
+| Extension Framework | Manifest V3            | Chrome's current standard  |
+| Build Tool          | Vite                   | Fast builds, good DX       |
+| Language            | TypeScript             | Type safety                |
+| Screenshot          | html2canvas            | Reliable DOM rendering     |
+| Styling             | CSS (Shadow DOM)       | Isolation from page styles |
+| File Storage        | File System Access API | Direct project access      |
+| State               | In-memory + file sync  | Simple, no external deps   |
 
 ---
 

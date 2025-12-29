@@ -11,12 +11,12 @@
 
 The Chariot UI uses a **four-tier state management architecture** optimized for different state characteristics:
 
-| Tier | Solution | Use Case | Token Count |
-|------|----------|----------|-------------|
-| **Server State** | TanStack Query 5.90.8 | API data, caching, mutations | 516+ usages |
-| **Global Client State** | React Context (13 contexts) | Auth, theme, drawers, modals | Primary |
-| **Complex Local State** | Zustand + Immer | Query Builder feature only | 1 store |
-| **Reducer Pattern** | useReducer | GraphStateProvider only | 1 usage |
+| Tier                    | Solution                    | Use Case                     | Token Count |
+| ----------------------- | --------------------------- | ---------------------------- | ----------- |
+| **Server State**        | TanStack Query 5.90.8       | API data, caching, mutations | 516+ usages |
+| **Global Client State** | React Context (13 contexts) | Auth, theme, drawers, modals | Primary     |
+| **Complex Local State** | Zustand + Immer             | Query Builder feature only   | 1 store     |
+| **Reducer Pattern**     | useReducer                  | GraphStateProvider only      | 1 usage     |
 
 **Key Principle**: Use the simplest solution that meets requirements. TanStack Query handles server state; Context handles cross-cutting concerns; Zustand reserved for exceptional complexity.
 
@@ -39,13 +39,15 @@ TanStack Query is the **primary and mandatory** choice for:
 ### Current Implementation
 
 **Global Configuration** (`queryclient.ts:4-6`):
+
 ```typescript
 export const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: mToMs(5) } },  // 5 minute staleTime
+  defaultOptions: { queries: { staleTime: mToMs(5) } }, // 5 minute staleTime
 });
 ```
 
 **Usage Statistics**:
+
 - 516+ total hook usages across codebase
 - 48 occurrences in `/src/hooks/` alone
 - Custom hooks: `useAssets`, `useRisks`, `useSeeds`, `useJobs`, etc.
@@ -54,51 +56,51 @@ export const queryClient = new QueryClient({
 
 ```typescript
 // Entity-based keys (hierarchical)
-['assets']                          // All assets
-['assets', { status: 'active' }]    // Filtered
-['assets', assetId]                 // Single entity
-['assets', assetId, 'risks']        // Nested relationship
-
-// User-scoped keys (impersonation safety)
-['assets', userId, filters]         // Include user for cache isolation
+["assets"][("assets", { status: "active" })][("assets", assetId)][("assets", assetId, "risks")][ // All assets // Filtered // Single entity // Nested relationship
+  // User-scoped keys (impersonation safety)
+  ("assets", userId, filters)
+]; // Include user for cache isolation
 ```
 
 ### Standard Patterns
 
 **Query Pattern**:
+
 ```typescript
 const { data, isLoading, error } = useQuery({
-  queryKey: ['resource', userId, filters],
+  queryKey: ["resource", userId, filters],
   queryFn: () => api.getResource(userId, filters),
-  staleTime: 30000,  // Override default when needed
+  staleTime: 30000, // Override default when needed
 });
 ```
 
 **Mutation with Invalidation**:
+
 ```typescript
 const { mutate } = useMutation({
   mutationFn: api.updateResource,
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['resource'] });
+    queryClient.invalidateQueries({ queryKey: ["resource"] });
   },
 });
 ```
 
 **Optimistic Update**:
+
 ```typescript
 const { mutate } = useMutation({
   mutationFn: api.updateResource,
   onMutate: async (variables) => {
-    await queryClient.cancelQueries({ queryKey: ['resource'] });
-    const previous = queryClient.getQueryData(['resource']);
-    queryClient.setQueryData(['resource'], variables);
+    await queryClient.cancelQueries({ queryKey: ["resource"] });
+    const previous = queryClient.getQueryData(["resource"]);
+    queryClient.setQueryData(["resource"], variables);
     return { previous };
   },
   onError: (_err, _vars, context) => {
-    queryClient.setQueryData(['resource'], context.previous);
+    queryClient.setQueryData(["resource"], context.previous);
   },
   onSettled: () => {
-    queryClient.invalidateQueries({ queryKey: ['resource'] });
+    queryClient.invalidateQueries({ queryKey: ["resource"] });
   },
 });
 ```
@@ -125,26 +127,27 @@ React Context is the **primary choice** for client-side state that needs to be:
 
 ### The 12 Contexts in Chariot UI
 
-| Context | Location | Purpose | Lines |
-|---------|----------|---------|-------|
-| **GlobalStateContext** | `state/global.state.tsx` | Modals, drawer stack, keyboard listeners | ~1048 |
-| **AuthContext** | `state/auth.tsx` | Authentication, impersonation, JWT | ~654 |
-| **ThemeContext** | `app/ThemeContext.tsx` | Light/dark/system toggle | ~99 |
-| **QueryBuilderContext** | `queryBuilder/state/` | Filter options for Query Builder | Provider |
-| **GraphStateProvider** | `nodeGraph/core/` | Graph visualization UI state | ~660 |
-| **GraphDataProvider** | `nodeGraph/core/` | Graph data management | Provider |
-| **GraphInstanceProvider** | `nodeGraph/core/` | Graph instance references | Provider |
-| **PathGraphProvider** | `queryBuilder/pathGraph/` | Path graph visualization | Provider |
-| **CellFiltersContext** | `asset/components/cells/` | Asset table cell filters | Scoped |
-| **CellFiltersContext** | `vulnerabilities/components/` | Vulnerability table cell filters | Scoped |
-| **AttackContext** | `attacks/attackPaths/` | Attack path visualization | Scoped |
-| **JobProgressContext** | `hooks/useJobProgress.tsx` | Job progress tracking | Scoped |
+| Context                   | Location                      | Purpose                                  | Lines    |
+| ------------------------- | ----------------------------- | ---------------------------------------- | -------- |
+| **GlobalStateContext**    | `state/global.state.tsx`      | Modals, drawer stack, keyboard listeners | ~1048    |
+| **AuthContext**           | `state/auth.tsx`              | Authentication, impersonation, JWT       | ~654     |
+| **ThemeContext**          | `app/ThemeContext.tsx`        | Light/dark/system toggle                 | ~99      |
+| **QueryBuilderContext**   | `queryBuilder/state/`         | Filter options for Query Builder         | Provider |
+| **GraphStateProvider**    | `nodeGraph/core/`             | Graph visualization UI state             | ~660     |
+| **GraphDataProvider**     | `nodeGraph/core/`             | Graph data management                    | Provider |
+| **GraphInstanceProvider** | `nodeGraph/core/`             | Graph instance references                | Provider |
+| **PathGraphProvider**     | `queryBuilder/pathGraph/`     | Path graph visualization                 | Provider |
+| **CellFiltersContext**    | `asset/components/cells/`     | Asset table cell filters                 | Scoped   |
+| **CellFiltersContext**    | `vulnerabilities/components/` | Vulnerability table cell filters         | Scoped   |
+| **AttackContext**         | `attacks/attackPaths/`        | Attack path visualization                | Scoped   |
+| **JobProgressContext**    | `hooks/useJobProgress.tsx`    | Job progress tracking                    | Scoped   |
 
 ### GlobalStateContext Deep Dive
 
 **Location**: `state/global.state.tsx`
 
 **Manages**:
+
 - Modal states (12 different modals)
 - Drawer stack with navigation (agent, asset, vulnerability, seed, etc.)
 - Keyboard listeners with priority stack
@@ -153,22 +156,24 @@ React Context is the **primary choice** for client-side state that needs to be:
 - Query results drawer state
 
 **Key Pattern - URL-Synced Drawers**:
+
 ```typescript
 // Drawer state is read from URL params
-const drawerOrder = JSON.parse(searchParams.get('drawerOrder') || '[]');
-const assetDrawerKey = searchParams.get('assetDrawerKey') || '';
+const drawerOrder = JSON.parse(searchParams.get("drawerOrder") || "[]");
+const assetDrawerKey = searchParams.get("assetDrawerKey") || "";
 
 // Updates modify URL for deep linking
 function handleOpenAssetDrawer(asset?: PartialAsset) {
   handleSetSearchParams({
-    drawerType: 'asset',
-    tabKeys: ['assetDrawerTab', 'assetDrawerSubTab'],
+    drawerType: "asset",
+    tabKeys: ["assetDrawerTab", "assetDrawerSubTab"],
     resource: asset,
   });
 }
 ```
 
 **Why This Pattern**:
+
 - Drawers are navigable via browser back/forward
 - Deep linking works out of the box
 - No stale state on page refresh
@@ -179,6 +184,7 @@ function handleOpenAssetDrawer(asset?: PartialAsset) {
 **Location**: `state/auth.tsx`
 
 **Manages**:
+
 - Cognito authentication state
 - JWT token management
 - Impersonation (Praetorian users switching accounts)
@@ -186,11 +192,12 @@ function handleOpenAssetDrawer(asset?: PartialAsset) {
 - SSO integration
 
 **Key Pattern - Tenant Isolation**:
+
 ```typescript
 function startImpersonation(memberId: string) {
-  setCurrentTenant(memberId);      // Sync to storage
-  dispatchTenantChange();           // Notify hooks
-  queryClient.clear();              // Clear cache
+  setCurrentTenant(memberId); // Sync to storage
+  dispatchTenantChange(); // Notify hooks
+  queryClient.clear(); // Clear cache
   navigate(generatePath(`:userId/${route}`, { userId: encode(memberId) }));
 }
 ```
@@ -270,12 +277,13 @@ Zustand is **only appropriate** when you have:
 **Lines**: ~800 lines
 
 **State Shape**:
+
 ```typescript
 interface QueryBuilderState {
   // Core query structure
-  blocks: EntityBlock[];                    // Entity blocks with filters
-  relationshipDividers: RelationshipDivider[];  // Connections between blocks
-  pathOptions: PathOptions;                 // Graph path configuration
+  blocks: EntityBlock[]; // Entity blocks with filters
+  relationshipDividers: RelationshipDivider[]; // Connections between blocks
+  pathOptions: PathOptions; // Graph path configuration
 
   // Context from React (filter options)
   context: QueryBuilderContextData | null;
@@ -287,17 +295,19 @@ interface QueryBuilderState {
   // Saved query management
   currentLoadedQueryId: string | null;
   loadedQueryData: SavedQuery | null;
-  lastSavedState: SavedQueryState | null;   // For change detection
+  lastSavedState: SavedQueryState | null; // For change detection
 
   // UI state
   selectedUsernames: string[];
-  activeTab: 'queries' | 'guide';
+  activeTab: "queries" | "guide";
   isSidebarCollapsed: boolean;
   sidebarWidth: number;
   expandedFolders: QueryFolderType[];
 
   // Actions
-  actions: { /* 30+ action methods */ };
+  actions: {
+    /* 30+ action methods */
+  };
 }
 ```
 
@@ -312,21 +322,21 @@ interface QueryBuilderState {
 ### Zustand + Immer Pattern
 
 ```typescript
-import { immer } from 'zustand/middleware/immer';
-import { createWithEqualityFn } from 'zustand/traditional';
+import { immer } from "zustand/middleware/immer";
+import { createWithEqualityFn } from "zustand/traditional";
 
 export const useQueryBuilderStore = createWithEqualityFn<QueryBuilderState>()(
-  immer(set => ({
+  immer((set) => ({
     blocks: [],
 
     actions: {
       addFilter: (blockId: string, groupId: string) =>
-        set(state => {
+        set((state) => {
           // Immer allows "mutable" syntax
-          const block = state.blocks.find(b => b.id === blockId);
+          const block = state.blocks.find((b) => b.id === blockId);
           if (!block) return;
 
-          const group = block.filterGroups.find(g => g.id === groupId);
+          const group = block.filterGroups.find((g) => g.id === groupId);
           if (!group) return;
 
           group.filters.push({
@@ -343,18 +353,18 @@ export const useQueryBuilderStore = createWithEqualityFn<QueryBuilderState>()(
 
 ```typescript
 markAsSaved: (savedState: SavedQueryState) =>
-  set(state => {
+  set((state) => {
     // CRITICAL: Deep clone to prevent reference leaks
     const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
     state.lastSavedState = {
-      blocks: clone(savedState.blocks),              // Must clone!
+      blocks: clone(savedState.blocks), // Must clone!
       relationshipDividers: clone(savedState.relationshipDividers),
       selectedUsernames: [...savedState.selectedUsernames],
       interGroupOperators: [...savedState.interGroupOperators],
       pathOptions: { ...savedState.pathOptions },
     };
-  })
+  });
 ```
 
 ### Context Injection Pattern
@@ -410,6 +420,7 @@ useReducer is appropriate for:
 4. **Complex interactions**: Selection, clustering, visibility all interact
 
 **State Structure**:
+
 ```typescript
 interface GraphState {
   selection: {
@@ -441,27 +452,29 @@ interface GraphState {
 ```
 
 **Action Types**:
+
 ```typescript
 type GraphStateAction =
-  | { type: 'SELECT_NODES'; payload: { nodes: Set<string> } }
-  | { type: 'SELECT_CLUSTER'; payload: { cluster: string; nodes: Set<string> } }
-  | { type: 'CLEAR_SELECTION' }
-  | { type: 'SET_ASSET_KEY'; payload: { assetKey: string | null } }
-  | { type: 'SET_ENTITY_TYPE'; payload: { entityType: GraphEntityType } }
-  | { type: 'SET_SELECTED_TYPES'; payload: { selectedTypes: GraphEntityType[] } }
-  | { type: 'SET_VISIBILITY'; payload: { state: VisibilityState } }
-  | { type: 'SET_WEIGHT'; payload: { name: string; weight: number } }
-  | { type: 'SET_CLUSTERS'; payload: { clusters: Cluster[] } }
-  | { type: 'SET_GRAPH_REF'; payload: { graphRef: Graph | null } }
-  | { type: 'SET_INITIAL_LOAD'; payload: { isInitialLoad: boolean } }
-  | { type: 'SET_SHOW_OUTDATED_WARNING'; payload: { show: boolean } };
+  | { type: "SELECT_NODES"; payload: { nodes: Set<string> } }
+  | { type: "SELECT_CLUSTER"; payload: { cluster: string; nodes: Set<string> } }
+  | { type: "CLEAR_SELECTION" }
+  | { type: "SET_ASSET_KEY"; payload: { assetKey: string | null } }
+  | { type: "SET_ENTITY_TYPE"; payload: { entityType: GraphEntityType } }
+  | { type: "SET_SELECTED_TYPES"; payload: { selectedTypes: GraphEntityType[] } }
+  | { type: "SET_VISIBILITY"; payload: { state: VisibilityState } }
+  | { type: "SET_WEIGHT"; payload: { name: string; weight: number } }
+  | { type: "SET_CLUSTERS"; payload: { clusters: Cluster[] } }
+  | { type: "SET_GRAPH_REF"; payload: { graphRef: Graph | null } }
+  | { type: "SET_INITIAL_LOAD"; payload: { isInitialLoad: boolean } }
+  | { type: "SET_SHOW_OUTDATED_WARNING"; payload: { show: boolean } };
 ```
 
 **Reducer Pattern**:
+
 ```typescript
 const graphStateReducer = (state: GraphState, action: GraphStateAction): GraphState => {
   switch (action.type) {
-    case 'SELECT_NODES':
+    case "SELECT_NODES":
       return {
         ...state,
         selection: {
@@ -470,7 +483,7 @@ const graphStateReducer = (state: GraphState, action: GraphStateAction): GraphSt
         },
       };
 
-    case 'CLEAR_SELECTION':
+    case "CLEAR_SELECTION":
       return {
         ...state,
         selection: {
@@ -546,17 +559,17 @@ Is it server data (API response)?
 
 ### State Type Classification
 
-| State Type | Example | Solution |
-|------------|---------|----------|
-| **Server State** | Assets, Risks, Jobs | TanStack Query |
-| **Auth State** | JWT, user info, impersonation | AuthContext |
-| **Theme State** | Light/dark mode | ThemeContext |
-| **Modal State** | Open/close, form data | GlobalStateContext |
-| **Drawer State** | Which drawer, active tab | GlobalStateContext + URL |
-| **Form State** | Input values, validation | useState or react-hook-form |
-| **Complex Form** | Query Builder blocks/filters | Zustand + Immer |
-| **Graph UI State** | Selection, visibility | useReducer + Context |
-| **Table Filters** | Column filters, sorting | URL params + derived state |
+| State Type         | Example                       | Solution                    |
+| ------------------ | ----------------------------- | --------------------------- |
+| **Server State**   | Assets, Risks, Jobs           | TanStack Query              |
+| **Auth State**     | JWT, user info, impersonation | AuthContext                 |
+| **Theme State**    | Light/dark mode               | ThemeContext                |
+| **Modal State**    | Open/close, form data         | GlobalStateContext          |
+| **Drawer State**   | Which drawer, active tab      | GlobalStateContext + URL    |
+| **Form State**     | Input values, validation      | useState or react-hook-form |
+| **Complex Form**   | Query Builder blocks/filters  | Zustand + Immer             |
+| **Graph UI State** | Selection, visibility         | useReducer + Context        |
+| **Table Filters**  | Column filters, sorting       | URL params + derived state  |
 
 ### Why NOT More Zustand?
 
@@ -648,12 +661,12 @@ When context becomes too complex:
 
 ## Appendix: File Locations
 
-| Pattern | Location |
-|---------|----------|
-| QueryClient config | `src/queryclient.ts` |
-| Global state context | `src/state/global.state.tsx` |
-| Auth context | `src/state/auth.tsx` |
-| Theme context | `src/app/ThemeContext.tsx` |
-| Zustand store | `src/sections/insights/queryBuilder/state/queryBuilderStore.ts` |
-| GraphStateProvider | `src/components/nodeGraph/core/GraphStateProvider.tsx` |
-| Custom hooks | `src/hooks/use*.ts` |
+| Pattern              | Location                                                        |
+| -------------------- | --------------------------------------------------------------- |
+| QueryClient config   | `src/queryclient.ts`                                            |
+| Global state context | `src/state/global.state.tsx`                                    |
+| Auth context         | `src/state/auth.tsx`                                            |
+| Theme context        | `src/app/ThemeContext.tsx`                                      |
+| Zustand store        | `src/sections/insights/queryBuilder/state/queryBuilderStore.ts` |
+| GraphStateProvider   | `src/components/nodeGraph/core/GraphStateProvider.tsx`          |
+| Custom hooks         | `src/hooks/use*.ts`                                             |

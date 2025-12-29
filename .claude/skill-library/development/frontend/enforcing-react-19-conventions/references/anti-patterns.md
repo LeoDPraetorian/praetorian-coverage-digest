@@ -51,6 +51,7 @@ function App() {
 ```
 
 **Why key prop:**
+
 - React unmounts and remounts component when key changes
 - All state resets automatically
 - No manual synchronization needed
@@ -93,6 +94,7 @@ function SearchResults({ query }: { query: string }) {
 ```
 
 **Why derived state:**
+
 - Single source of truth (results)
 - No synchronization bugs
 - Computed on-demand during render
@@ -142,18 +144,19 @@ function UserProfile({ userId }: { userId: string }) {
 ```
 
 **The difference:**
+
 - **Invalid**: Synchronously copying prop → state (use derived state or key prop instead)
 - **Valid**: Asynchronously fetching data based on prop (but TanStack Query is better)
 
 ## Quick Reference Table
 
-| Scenario | Wrong Approach | Right Approach |
-|----------|----------------|----------------|
-| **Reset component state when prop changes** | `useEffect(() => setState(initialValue), [prop])` | Use key prop: `<Component key={prop} />` |
-| **Compute value from state/props** | `useEffect(() => setDerived(compute(state)), [state])` | Derive directly: `const derived = useMemo(() => compute(state), [state])` |
-| **Fetch data based on prop** | `useEffect(() => fetch().then(setState), [prop])` | Use TanStack Query with `queryKey: [prop]` |
+| Scenario                                    | Wrong Approach                                                     | Right Approach                                                               |
+| ------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| **Reset component state when prop changes** | `useEffect(() => setState(initialValue), [prop])`                  | Use key prop: `<Component key={prop} />`                                     |
+| **Compute value from state/props**          | `useEffect(() => setDerived(compute(state)), [state])`             | Derive directly: `const derived = useMemo(() => compute(state), [state])`    |
+| **Fetch data based on prop**                | `useEffect(() => fetch().then(setState), [prop])`                  | Use TanStack Query with `queryKey: [prop]`                                   |
 | **Update state when multiple props change** | `useEffect(() => setState(combine(propA, propB)), [propA, propB])` | Derive: `const value = useMemo(() => combine(propA, propB), [propA, propB])` |
-| **Clear state when prop changes** | `useEffect(() => setState(null), [prop])` | Use key prop or initialize from prop |
+| **Clear state when prop changes**           | `useEffect(() => setState(null), [prop])`                          | Use key prop or initialize from prop                                         |
 
 ## Edge Cases and Gotchas
 
@@ -230,15 +233,18 @@ When refactoring existing code:
 ## Why This Matters
 
 **Performance:**
+
 - Eliminates unnecessary re-renders from synchronization
 - Reduces component complexity
 
 **Correctness:**
+
 - Prevents stale state bugs
 - Single source of truth pattern
 - Clearer data flow
 
 **Maintainability:**
+
 - Less code to maintain
 - Easier to reason about
 - Follows React team recommendations

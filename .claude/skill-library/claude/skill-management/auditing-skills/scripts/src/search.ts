@@ -48,7 +48,11 @@ program
           ? chalk.green('[CORE]')
           : chalk.cyan('[LIB]');
 
-        console.log(chalk.green(`${index + 1}. ${skill.name} ${locationBadge} (Score: ${skill.score})`));
+        const stalenessWarning = skill.stalenessWarning
+          ? chalk.yellow(` ${skill.stalenessWarning}`)
+          : '';
+
+        console.log(chalk.green(`${index + 1}. ${skill.name} ${locationBadge} (Score: ${skill.score})${stalenessWarning}`));
         console.log(`   Location: ${skill.location}`);
         console.log(`   Path: ${skill.path}`);
         console.log(`   Matches: ${skill.matchReasons.join(', ')}`);

@@ -51,12 +51,12 @@ npx vitest --changed $REMOTE_SHA --run
 
 ## Quick Reference
 
-| Scenario | Base Reference | Command |
-|----------|----------------|---------|
+| Scenario                | Base Reference        | Command                              |
+| ----------------------- | --------------------- | ------------------------------------ |
 | Push to existing branch | Remote SHA from stdin | `vitest --changed $remote_sha --run` |
-| Push new branch | `origin/main` | `vitest --changed origin/main --run` |
-| Delete branch | Skip | No tests needed |
-| Manual testing | Target branch | `vitest --changed origin/main --run` |
+| Push new branch         | `origin/main`         | `vitest --changed origin/main --run` |
+| Delete branch           | Skip                  | No tests needed                      |
+| Manual testing          | Target branch         | `vitest --changed origin/main --run` |
 
 ---
 
@@ -109,10 +109,10 @@ refs/heads/feature/new-branch abc123 refs/heads/feature/new-branch 0000000000000
 
 ### Special SHA Values
 
-| SHA | Meaning |
-|-----|---------|
+| SHA                    | Meaning                                                 |
+| ---------------------- | ------------------------------------------------------- |
 | 40 zeros (`000...000`) | Branch doesn't exist on remote (new branch or deletion) |
-| Normal SHA | Commit exists on remote |
+| Normal SHA             | Commit exists on remote                                 |
 
 ---
 
@@ -209,6 +209,7 @@ git diff --name-only origin/main..HEAD
 **Cause:** Using `--changed` without a git reference after committing.
 
 **Fix:** Pass a base reference:
+
 ```bash
 # Instead of:
 vitest --changed --run
@@ -222,6 +223,7 @@ vitest --changed origin/main --run
 **Cause:** Running hook manually without piping stdin.
 
 **Fix:** Simulate stdin when testing:
+
 ```bash
 echo "refs/heads/main abc123 refs/heads/main def456" | .husky/pre-push
 ```
@@ -231,6 +233,7 @@ echo "refs/heads/main abc123 refs/heads/main def456" | .husky/pre-push
 **Cause:** Remote branch doesn't exist locally.
 
 **Fix:** Fetch first or use fallback:
+
 ```bash
 git fetch origin
 # Or in hook, add fallback to origin/master or HEAD~1
@@ -243,6 +246,7 @@ git fetch origin
 **Behavior:** Only tests that import changed modules (directly or transitively) will run.
 
 **Verify:** Check what files changed vs what tests ran:
+
 ```bash
 git diff --name-only origin/main..HEAD
 npx vitest --changed origin/main --run --reporter=verbose
@@ -257,7 +261,7 @@ npx vitest --changed origin/main --run --reporter=verbose
 ```json
 {
   "scripts": {
-    "test:changed": "vitest --changed --run"  // BROKEN
+    "test:changed": "vitest --changed --run" // BROKEN
   }
 }
 ```
@@ -271,6 +275,7 @@ Git may send multiple lines (e.g., pushing multiple branches). The `while read` 
 ### 3. Don't use --changed in CI pipelines
 
 CI typically checks out a specific commit without local changes. Use explicit refs:
+
 ```bash
 # CI: Compare against target branch
 vitest --changed origin/$TARGET_BRANCH --run

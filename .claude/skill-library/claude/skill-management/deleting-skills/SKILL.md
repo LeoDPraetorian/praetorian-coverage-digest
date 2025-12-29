@@ -31,16 +31,16 @@ Use this skill when:
 
 ## Quick Reference
 
-| Phase              | Purpose                       | Time  | Checkpoint            |
-| ------------------ | ----------------------------- | ----- | --------------------- |
-| **1. Validate**    | Verify skill exists           | 1 min | Skill found           |
-| **2. Discover**    | Find all references           | 3 min | References documented |
-| **3. Analyze**     | Show impact to user           | 2 min | Impact clear          |
-| **4. Confirm**     | User approval before deletion | 1 min | Confirmed             |
-| **5. Remove**      | Delete skill directory        | 1 min | Directory removed     |
-| **6. Gateway**     | Sync gateway routing tables   | 3 min | Gateways synced       |
-| **7. Cleanup**     | Remove non-gateway references | 5 min | References cleaned    |
-| **8. Verify**      | Ensure no orphaned references | 2 min | Clean verified        |
+| Phase           | Purpose                       | Time  | Checkpoint            |
+| --------------- | ----------------------------- | ----- | --------------------- |
+| **1. Validate** | Verify skill exists           | 1 min | Skill found           |
+| **2. Discover** | Find all references           | 3 min | References documented |
+| **3. Analyze**  | Show impact to user           | 2 min | Impact clear          |
+| **4. Confirm**  | User approval before deletion | 1 min | Confirmed             |
+| **5. Remove**   | Delete skill directory        | 1 min | Directory removed     |
+| **6. Gateway**  | Sync gateway routing tables   | 3 min | Gateways synced       |
+| **7. Cleanup**  | Remove non-gateway references | 5 min | References cleaned    |
+| **8. Verify**   | Ensure no orphaned references | 2 min | Clean verified        |
 
 **Total**: 18 minutes
 
@@ -56,7 +56,7 @@ test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 ```
 
-**See:** [Repository Root Navigation](references/patterns/repo-root-detection.md)
+**See:** [Repository Root Navigation](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
 
 **⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
 

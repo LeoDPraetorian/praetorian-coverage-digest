@@ -164,17 +164,17 @@ Combine rarely-changing and frequently-changing values in same context causes un
 ```typescript
 // ❌ BAD: Everything updates when liveData changes
 const AppContext = createContext({
-  user,           // Changes on login/logout
-  theme,          // Changes rarely
-  notifications,  // Changes every few minutes
-  liveData        // Changes every second!
+  user, // Changes on login/logout
+  theme, // Changes rarely
+  notifications, // Changes every few minutes
+  liveData, // Changes every second!
 });
 
 // ✅ GOOD: Split by update frequency
-const UserContext = createContext(user);           // Rarely
-const ThemeContext = createContext(theme);         // Rarely
-const NotificationsContext = createContext(notifications);  // Occasionally
-const LiveDataContext = createContext(liveData);   // Frequently
+const UserContext = createContext(user); // Rarely
+const ThemeContext = createContext(theme); // Rarely
+const NotificationsContext = createContext(notifications); // Occasionally
+const LiveDataContext = createContext(liveData); // Frequently
 ```
 
 **Result**: Components only re-render when relevant context changes.
@@ -275,18 +275,18 @@ npm install --save-dev rollup-plugin-visualizer
 
 ```typescript
 // vite.config.ts
-import { visualizer } from 'rollup-plugin-visualizer';
+import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig({
   plugins: [
     react(),
     visualizer({
-      filename: './dist/stats.html',
+      filename: "./dist/stats.html",
       open: true,
       gzipSize: true,
-      brotliSize: true
-    })
-  ]
+      brotliSize: true,
+    }),
+  ],
 });
 ```
 
@@ -307,15 +307,15 @@ npm install --save-dev webpack-bundle-analyzer
 
 ```javascript
 // webpack.config.js
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
 module.exports = {
   plugins: [
     new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      openAnalyzer: true
-    })
-  ]
+      analyzerMode: "static",
+      openAnalyzer: true,
+    }),
+  ],
 };
 ```
 
@@ -324,6 +324,7 @@ module.exports = {
 **1. Large dependencies:**
 
 Identify heavy libraries that could be:
+
 - Code-split (loaded on-demand)
 - Replaced with lighter alternatives
 - Tree-shaken more aggressively
@@ -342,9 +343,10 @@ Fix by ensuring consistent versions in package.json.
 **3. Unused code:**
 
 Dead code still in bundle indicates:
+
 - Missing sideEffects: false in package.json
 - Barrel exports preventing tree-shaking
-- Incorrect imports (import * instead of named imports)
+- Incorrect imports (import \* instead of named imports)
 
 ### Tree-Shaking Verification
 
@@ -352,15 +354,15 @@ Verify tree-shaking works correctly:
 
 ```typescript
 // ❌ BAD: Imports entire library
-import _ from 'lodash';
+import _ from "lodash";
 const result = _.uniq(array);
 
 // ✅ GOOD: Named import (tree-shakable)
-import { uniq } from 'lodash-es';
+import { uniq } from "lodash-es";
 const result = uniq(array);
 
 // ✅ BETTER: Direct path import
-import uniq from 'lodash-es/uniq';
+import uniq from "lodash-es/uniq";
 const result = uniq(array);
 ```
 
@@ -368,17 +370,17 @@ const result = uniq(array);
 
 ```json
 {
-  "sideEffects": false  // Tells bundler all modules are pure
+  "sideEffects": false // Tells bundler all modules are pure
 }
 ```
 
 ### Target Bundle Sizes (2025)
 
-| App Type | Initial Bundle | Route Chunks |
-|----------|---------------|--------------|
-| **Small app** | < 100KB | < 50KB |
-| **Medium app** | < 250KB | < 100KB |
-| **Large app (Chariot)** | < 500KB | < 150KB |
+| App Type                | Initial Bundle | Route Chunks |
+| ----------------------- | -------------- | ------------ |
+| **Small app**           | < 100KB        | < 50KB       |
+| **Medium app**          | < 250KB        | < 100KB      |
+| **Large app (Chariot)** | < 500KB        | < 150KB      |
 
 **Chariot-specific**: Aim for <400KB initial bundle with lazy-loaded sections.
 

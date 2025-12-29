@@ -97,11 +97,11 @@ skills: frontend-tanstack-query
 
 ### Common Skill Routing
 
-| Task          | Skill to Read                                                                                    |
-| ------------- | ------------------------------------------------------------------------------------------------ |
-| Data fetching | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`                    |
-| Global state  | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md`    |
-| Performance   | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md` |
+| Task          | Skill to Read                                                                        |
+| ------------- | ------------------------------------------------------------------------------------ |
+| Data fetching | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`        |
+| Global state  | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md` |
+| Performance   | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`   |
 
 **Workflow**:
 
@@ -151,11 +151,11 @@ Find routing table, extract paths for common tasks.
 **Example from gateway-frontend**:
 
 ```markdown
-| Skill                             | Path                                                                                          |
-| --------------------------------- | --------------------------------------------------------------------------------------------- |
-| frontend-tanstack                 | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`                 |
-| using-zustand-state-management | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md` |
-| implementing-react-hook-form-zod      | `.claude/skill-library/development/frontend/implementing-react-hook-form-zod/SKILL.md`            |
+| Skill                            | Path                                                                                   |
+| -------------------------------- | -------------------------------------------------------------------------------------- |
+| frontend-tanstack                | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          |
+| using-zustand-state-management   | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md`   |
+| implementing-react-hook-form-zod | `.claude/skill-library/development/frontend/implementing-react-hook-form-zod/SKILL.md` |
 ```
 
 ---
@@ -173,11 +173,11 @@ Find routing table, extract paths for common tasks.
 **Example**:
 
 ```markdown
-| Task          | Skill to Read                                                                                 |
-| ------------- | --------------------------------------------------------------------------------------------- |
-| Data fetching | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`                 |
-| Global state  | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md` |
-| Forms         | `.claude/skill-library/development/frontend/implementing-react-hook-form-zod/SKILL.md`            |
+| Task          | Skill to Read                                                                          |
+| ------------- | -------------------------------------------------------------------------------------- |
+| Data fetching | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          |
+| Global state  | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md`   |
+| Forms         | `.claude/skill-library/development/frontend/implementing-react-hook-form-zod/SKILL.md` |
 ```
 
 ---
@@ -257,31 +257,34 @@ skills: gateway-frontend, developing-with-tdd
 
 **When agents describe what they do, include matching process skills:**
 
-| Body Trigger Pattern           | Skill to Include              | When Mentioned                                      |
-| ------------------------------ | ----------------------------- | --------------------------------------------------- |
-| "brainstorm", "explore ideas"  | `brainstorming`               | Agent explores alternatives or refines ideas        |
-| "debug", "investigate issues"  | `debugging-systematically`    | Agent troubleshoots or finds root causes            |
-| "TDD", "test-driven", "tests"  | `developing-with-tdd`         | Agent implements with tests-first workflow          |
-| "plan", "break down tasks"     | `writing-plans`               | Agent creates implementation plans                  |
-| "parallel", "concurrent"       | `dispatching-parallel-agents` | Agent spawns multiple agents concurrently           |
-| "security review", "threats"   | `gateway-security`            | Agent performs security analysis                    |
-| "todo", "track progress"       | `using-todowrite`             | Agent manages multi-step workflows                  |
-| "refactor", "eliminate dupes"  | `adhering-to-dry`             | Agent reduces code duplication                      |
-| "scope", "requirements only"   | `adhering-to-yagni`           | Agent maintains strict scope discipline             |
-| "state management", "React"    | `gateway-frontend`            | Agent works with frontend state patterns            |
-| "API", "backend services"      | `gateway-backend`             | Agent develops backend services                     |
-| "verify", "validation"         | `verifying-before-completion` | Agent performs final checks before completion       |
+| Body Trigger Pattern          | Skill to Include              | When Mentioned                                |
+| ----------------------------- | ----------------------------- | --------------------------------------------- |
+| "brainstorm", "explore ideas" | `brainstorming`               | Agent explores alternatives or refines ideas  |
+| "debug", "investigate issues" | `debugging-systematically`    | Agent troubleshoots or finds root causes      |
+| "TDD", "test-driven", "tests" | `developing-with-tdd`         | Agent implements with tests-first workflow    |
+| "plan", "break down tasks"    | `writing-plans`               | Agent creates implementation plans            |
+| "parallel", "concurrent"      | `dispatching-parallel-agents` | Agent spawns multiple agents concurrently     |
+| "security review", "threats"  | `gateway-security`            | Agent performs security analysis              |
+| "todo", "track progress"      | `using-todowrite`             | Agent manages multi-step workflows            |
+| "refactor", "eliminate dupes" | `adhering-to-dry`             | Agent reduces code duplication                |
+| "scope", "requirements only"  | `adhering-to-yagni`           | Agent maintains strict scope discipline       |
+| "state management", "React"   | `gateway-frontend`            | Agent works with frontend state patterns      |
+| "API", "backend services"     | `gateway-backend`             | Agent develops backend services               |
+| "verify", "validation"        | `verifying-before-completion` | Agent performs final checks before completion |
 
 **Examples**:
 
 ```markdown
 # Agent that "debugs frontend issues"
+
 skills: debugging-systematically, gateway-frontend
 
 # Agent that "implements features with TDD"
+
 skills: developing-with-tdd, gateway-backend
 
 # Agent that "orchestrates parallel tasks"
+
 skills: dispatching-parallel-agents, using-todowrite, writing-plans
 ```
 

@@ -14,22 +14,22 @@ Standards for organizing code within TypeScript/React files. Complements the fil
 
 ```typescript
 // 1. React core imports
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 // 2. Local UI components (@/components/ui)
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 
 // 3. Platform utilities and hooks (@/utils, @/hooks)
-import { cn } from '@/utils/cn';
-import { useAuth } from '@/hooks/useAuth';
-import { formatDate } from '@/utils/date';
+import { cn } from "@/utils/cn";
+import { useAuth } from "@/hooks/useAuth";
+import { formatDate } from "@/utils/date";
 
 // 4. Types and interfaces
-import type { Asset } from '@/types/asset';
-import type { User } from '@/types/user';
+import type { Asset } from "@/types/asset";
+import type { User } from "@/types/user";
 ```
 
 **Rules**:
@@ -70,12 +70,12 @@ import type { Asset } from '@/types/asset';
 
 **These are NOT guidelines - they are HARD LIMITS:**
 
-| File Type  | Hard Limit | Consider Split At | Action Required        |
-| ---------- | ---------- | ----------------- | ---------------------- |
-| Components | 300 lines  | 200 lines         | Extract hooks/utils    |
-| Functions  | 30 lines   | 20 lines          | Break into subfuncs    |
-| Hooks      | 50 lines   | 40 lines          | Split concerns         |
-| Utilities  | 100 lines  | 80 lines          | Create separate files  |
+| File Type  | Hard Limit | Consider Split At | Action Required       |
+| ---------- | ---------- | ----------------- | --------------------- |
+| Components | 300 lines  | 200 lines         | Extract hooks/utils   |
+| Functions  | 30 lines   | 20 lines          | Break into subfuncs   |
+| Hooks      | 50 lines   | 40 lines          | Split concerns        |
+| Utilities  | 100 lines  | 80 lines          | Create separate files |
 
 **Components: 300 Line Hard Limit**
 
@@ -149,10 +149,10 @@ Break functions exceeding 30 lines into smaller, focused functions:
 const processAssets = (assets: Asset[]) => {
   // Validation (10 lines)
   if (!assets || !Array.isArray(assets)) return [];
-  const validAssets = assets.filter(a => a.id && a.name);
+  const validAssets = assets.filter((a) => a.id && a.name);
 
   // Transformation (15 lines)
-  const enriched = validAssets.map(asset => ({
+  const enriched = validAssets.map((asset) => ({
     ...asset,
     displayName: formatDisplayName(asset),
     riskScore: calculateRisk(asset),
@@ -167,7 +167,7 @@ const processAssets = (assets: Asset[]) => {
   }, {});
 
   // Sorting (10 lines)
-  Object.keys(grouped).forEach(key => {
+  Object.keys(grouped).forEach((key) => {
     grouped[key].sort((a, b) => b.riskScore - a.riskScore);
   });
 
@@ -177,7 +177,7 @@ const processAssets = (assets: Asset[]) => {
 // ✅ RIGHT - Split into focused functions
 const validateAssets = (assets: Asset[]): Asset[] => {
   if (!assets || !Array.isArray(assets)) return [];
-  return assets.filter(a => a.id && a.name);
+  return assets.filter((a) => a.id && a.name);
 };
 
 const enrichAsset = (asset: Asset) => ({
@@ -187,16 +187,19 @@ const enrichAsset = (asset: Asset) => ({
 });
 
 const groupByType = (assets: Asset[]) => {
-  return assets.reduce((acc, asset) => {
-    const key = asset.type;
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(asset);
-    return acc;
-  }, {} as Record<string, Asset[]>);
+  return assets.reduce(
+    (acc, asset) => {
+      const key = asset.type;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(asset);
+      return acc;
+    },
+    {} as Record<string, Asset[]>
+  );
 };
 
 const sortByRisk = (grouped: Record<string, Asset[]>) => {
-  Object.values(grouped).forEach(group => {
+  Object.values(grouped).forEach((group) => {
     group.sort((a, b) => b.riskScore - a.riskScore);
   });
   return grouped;
@@ -403,15 +406,15 @@ export const AssetCard: React.FC<AssetCardProps> = ({ asset, onSelect }) => {
 
 **Hook Order Within Component**:
 
-| Order | Hook Type         | Examples                     | Why First/Last                      |
-| ----- | ----------------- | ---------------------------- | ----------------------------------- |
-| 1     | Global state      | useAuthStore, useTheme       | Foundational context                |
-| 2     | API hooks         | useQuery, useMutation        | Data fetching dependencies          |
-| 3     | Local state       | useState, useReducer         | Component-specific state            |
-| 4     | Computed values   | useMemo, derived values      | Depends on state above              |
-| 5     | Effects           | useEffect, useLayoutEffect   | React after state/computed defined  |
-| 6     | Event handlers    | onClick, onChange handlers   | Use state/computed/effects above    |
-| 7     | Render            | JSX return                   | Uses everything above               |
+| Order | Hook Type       | Examples                   | Why First/Last                     |
+| ----- | --------------- | -------------------------- | ---------------------------------- |
+| 1     | Global state    | useAuthStore, useTheme     | Foundational context               |
+| 2     | API hooks       | useQuery, useMutation      | Data fetching dependencies         |
+| 3     | Local state     | useState, useReducer       | Component-specific state           |
+| 4     | Computed values | useMemo, derived values    | Depends on state above             |
+| 5     | Effects         | useEffect, useLayoutEffect | React after state/computed defined |
+| 6     | Event handlers  | onClick, onChange handlers | Use state/computed/effects above   |
+| 7     | Render          | JSX return                 | Uses everything above              |
 
 **Common Violations**:
 
@@ -488,18 +491,13 @@ export const Component = () => {
 ```json
 {
   "rules": {
-    "import/order": ["error", {
-      "groups": [
-        "builtin",
-        "external",
-        "internal",
-        "parent",
-        "sibling",
-        "index",
-        "type"
-      ],
-      "newlines-between": "always"
-    }],
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "type"],
+        "newlines-between": "always"
+      }
+    ],
     "max-lines": ["warn", 300],
     "max-lines-per-function": ["warn", 30]
   }

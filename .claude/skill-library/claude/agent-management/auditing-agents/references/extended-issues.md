@@ -164,6 +164,7 @@ Define when to stop and which agent to recommend
 **Symptom:**
 
 Agent has `skills:` in frontmatter but lacks REQUIRED Skill Loading Protocol components:
+
 - Missing Tiered Skill Loading Protocol section (Tier 1/2/3 structure)
 - Missing Anti-Bypass section
 - Missing `skills_read` field in output format JSON
@@ -198,14 +199,18 @@ Use Read() for ALL skills. Do NOT use Skill tool. Do NOT rely on training data.
 
 ### Tier 1: Always Read (Every Task)
 ```
+
 Read('.claude/skills/gateway-{domain}/SKILL.md')
 Read('.claude/skills/developing-with-tdd/SKILL.md')
+
 ```
 
 ### Tier 2: Multi-Step Tasks
 If task has ≥2 steps:
 ```
+
 Read('.claude/skills/using-todowrite/SKILL.md')
+
 ```
 
 ### Tier 3: Triggered by Task Type
@@ -222,6 +227,7 @@ Add this section immediately after Skill Loading Protocol:
 ## Anti-Bypass
 
 Do NOT rationalize skipping skill reads:
+
 - 'Simple task' → Tier 1 skills always apply
 - 'I already know this' → Training data is stale
 - 'No time' → Reading skills prevents bugs
@@ -769,11 +775,11 @@ Agents accumulate multiple deprecated patterns that duplicate modern protocol co
 
 **Example (frontend-architect vs frontend-developer):**
 
-| Agent | Lines | Has Protocol | Has `<EXTREMELY_IMPORTANT>` | Has "Mandatory Skills" | Has "Rationalization Table" | Duplicate Triggers |
-|-------|-------|--------------|----------------------------|------------------------|---------------------------|-------------------|
-| **frontend-developer** (gold standard) | 130 | ✅ | ❌ | ❌ | ❌ | ❌ |
-| **frontend-architect** (before cleanup) | 512 | ✅ | ✅ (77 lines) | ✅ (144 lines) | ✅ (14 lines) | ✅ (41 lines) |
-| **frontend-architect** (after cleanup) | 236 | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Agent                                   | Lines | Has Protocol | Has `<EXTREMELY_IMPORTANT>` | Has "Mandatory Skills" | Has "Rationalization Table" | Duplicate Triggers |
+| --------------------------------------- | ----- | ------------ | --------------------------- | ---------------------- | --------------------------- | ------------------ |
+| **frontend-developer** (gold standard)  | 130   | ✅           | ❌                          | ❌                     | ❌                          | ❌                 |
+| **frontend-architect** (before cleanup) | 512   | ✅           | ✅ (77 lines)               | ✅ (144 lines)         | ✅ (14 lines)               | ✅ (41 lines)      |
+| **frontend-architect** (after cleanup)  | 236   | ✅           | ❌                          | ❌                     | ❌                          | ❌                 |
 
 **Detection Method:**
 
@@ -798,50 +804,64 @@ grep -n '## Architecture-Specific Skill Routing' agent.md
 
 ```markdown
 # Before (512 lines with duplication)
+
 ---
-name: frontend-architect
----
+
+## name: frontend-architect
 
 <EXTREMELY_IMPORTANT>
 You MUST invoke mandatory skills...
 **brainstorming:**
+
 - Trigger: Before ANY architecture
 - Invocation: skill: "brainstorming"
-...
-</EXTREMELY_IMPORTANT>
+  ...
+  </EXTREMELY_IMPORTANT>
 
 ## Skill Loading Protocol
+
 ### Tier 1: Always Read
+
 ...
 
 ## Skill References (Load On-Demand via Gateway)
+
 [Duplicate trigger table]
 ...
 
 ## Mandatory Skills (Must Use)
+
 **brainstorming:**
 [Duplicate explanation]
 ...
 
 ## Rationalization Table
+
 [Duplicate Anti-Bypass content]
 ...
 
 # After (236 lines, clean)
----
-name: frontend-architect
+
 ---
 
+## name: frontend-architect
+
 ## Skill Loading Protocol
+
 ### Tier 1: Always Read
+
 ### Tier 2: Multi-Step Tasks
+
 ### Tier 3: Triggered by Task Type
 
 ## Anti-Bypass
+
 [Concise rationalization warnings]
 
 ## [Platform] Rules
+
 ## Output Format
+
 ## Escalation
 ```
 
@@ -892,6 +912,7 @@ This phase validates that all library skill paths referenced in agent bodies act
 **The Problem:**
 
 Agents reference library skills using full paths in:
+
 - Read() calls in Tier 3 trigger tables
 - Documentation and examples
 - Skill routing sections
@@ -900,14 +921,14 @@ When skills are renamed or moved, these paths become invalid, but agents aren't 
 
 **Common Renamed Skills (not yet in deprecation registry):**
 
-| Old Path | New Path | Status |
-|----------|----------|--------|
-| `frontend-tanstack-query` | `using-tanstack-query` | Renamed ✅ |
-| `frontend-tanstack-table` | `using-tanstack-table` | Renamed ✅ |
-| `frontend-tanstack-router` | `using-tanstack-router` | Renamed ✅ |
-| `frontend-react-hook-form-zod` | May be removed | Needs verification |
-| `frontend-shadcn-ui` | May be removed | Needs verification |
-| `frontend-architecture` | May be removed/renamed | Needs verification |
+| Old Path                       | New Path                | Status             |
+| ------------------------------ | ----------------------- | ------------------ |
+| `frontend-tanstack-query`      | `using-tanstack-query`  | Renamed ✅         |
+| `frontend-tanstack-table`      | `using-tanstack-table`  | Renamed ✅         |
+| `frontend-tanstack-router`     | `using-tanstack-router` | Renamed ✅         |
+| `frontend-react-hook-form-zod` | May be removed          | Needs verification |
+| `frontend-shadcn-ui`           | May be removed          | Needs verification |
+| `frontend-architecture`        | May be removed/renamed  | Needs verification |
 
 **Detection Method:**
 
@@ -932,15 +953,18 @@ done
 
 ```markdown
 # Before (invalid path)
+
 | TanStack Query patterns | `.claude/skill-library/development/frontend/state/frontend-tanstack-query/SKILL.md` |
 
 # After (correct path)
+
 | TanStack Query patterns | `.claude/skill-library/development/frontend/state/using-tanstack-query/SKILL.md` |
 ```
 
 **Fix Procedure:**
 
 1. **For renamed skills:**
+
    ```bash
    # Find correct location
    find .claude/skill-library -name "using-tanstack-query" -type d
@@ -952,6 +976,7 @@ done
    ```
 
 2. **For removed skills:**
+
    ```bash
    # Check deprecation registry
    cat .claude/skill-library/lib/deprecation-registry.json | grep "skill-name"
@@ -984,6 +1009,7 @@ Agents will fail at runtime when trying to read non-existent skills. Broken skil
 **Symptom:** Agent is missing skills that would improve its effectiveness based on type, domain, or content triggers.
 
 **Severity:**
+
 - ⚠️ **WARNING** for universal skills (`verifying-before-completion`, `calibrating-time-estimates`) - MANDATORY for all agents
 - ⚠️ INFO for type/domain skills (suggestions, not blocking)
 
@@ -996,7 +1022,6 @@ name: backend-developer
 type: development
 skills: gateway-backend, adhering-to-yagni
 ---
-
 # ⚠️ WARNING: Missing verifying-before-completion (MANDATORY for all agents)
 # ⚠️ WARNING: Missing calibrating-time-estimates (MANDATORY for all agents)
 # ⚠️ INFO: Missing developing-with-tdd (required for development agents)
@@ -1102,21 +1127,21 @@ fi
 
 **Type → Required Skills Mapping:**
 
-| Agent Type    | Required Skills                                          |
-| ------------- | -------------------------------------------------------- |
+| Agent Type    | Required Skills                                               |
+| ------------- | ------------------------------------------------------------- |
 | `development` | `developing-with-tdd`, `adhering-to-yagni`, `adhering-to-dry` |
-| `quality`     | `analyzing-cyclomatic-complexity` (Tier 3)               |
-| `testing`     | `developing-with-tdd`                                    |
-| `All types`   | `verifying-before-completion`, `calibrating-time-estimates` |
+| `quality`     | `analyzing-cyclomatic-complexity` (Tier 3)                    |
+| `testing`     | `developing-with-tdd`                                         |
+| `All types`   | `verifying-before-completion`, `calibrating-time-estimates`   |
 
 **Domain → Gateway Mapping:**
 
-| Agent Name Contains | Recommended Gateway  |
-| ------------------- | -------------------- |
-| `frontend`, `react`, `ui` | `gateway-frontend`   |
-| `backend`, `go`, `api`    | `gateway-backend`    |
-| `test`              | `gateway-testing`    |
-| `security`          | `gateway-security`   |
+| Agent Name Contains       | Recommended Gateway |
+| ------------------------- | ------------------- |
+| `frontend`, `react`, `ui` | `gateway-frontend`  |
+| `backend`, `go`, `api`    | `gateway-backend`   |
+| `test`                    | `gateway-testing`   |
+| `security`                | `gateway-security`  |
 
 **Fix Pattern:**
 
@@ -1127,7 +1152,6 @@ name: backend-developer
 type: development
 skills: gateway-backend, adhering-to-yagni
 ---
-
 # After (with recommended skills added)
 ---
 name: backend-developer
@@ -1193,32 +1217,38 @@ Poorly formatted markdown tables cause:
 **Common Table Formatting Issues:**
 
 1. **Inconsistent Column Counts**
+
    ```markdown
-   | Phase | Name | Status
-   |---|---|
-   | 1 | Check | Pass | Extra |
+   | Phase | Name  | Status |
+   | ----- | ----- | ------ | ----- |
+   | 1     | Check | Pass   | Extra |
    ```
+
    Header has 3 columns, separator has 2, data row has 4 - inconsistent!
 
 2. **Malformed Header Separators**
+
    ```markdown
    | Phase | Name | Status |
-   | - | - | - |
+   | ----- | ---- | ------ |
    ```
+
    Should use at least three dashes: `|---|---|---|`
 
 3. **Missing Trailing Pipes**
+
    ```markdown
-   | Phase | Name | Status
-   |---|---|---|
+   | Phase | Name | Status |
+   | ----- | ---- | ------ |
    ```
+
    Header row missing trailing pipe (though some parsers accept this)
 
 4. **Inconsistent Pipe Alignment**
    ```markdown
-   |Phase|Name|Status|
-   | --- | --- | --- |
-   |1|Check| Pass |
+   | Phase | Name  | Status |
+   | ----- | ----- | ------ |
+   | 1     | Check | Pass   |
    ```
    Mixing styles makes tables hard to read in source
 
@@ -1264,28 +1294,31 @@ for table in tables:
 
 ```markdown
 # Before (inconsistent)
-| Tool | Purpose | Required
-|---|---|---|
-| Read | File access | Yes |
-| Write | File creation | Yes | Sometimes |
+
+| Tool  | Purpose       | Required |
+| ----- | ------------- | -------- | --------- |
+| Read  | File access   | Yes      |
+| Write | File creation | Yes      | Sometimes |
 ```
 
 **Issue 2: Malformed Separator**
 
 ```markdown
 # Before (too short)
-| Phase | Name | Status |
-| - | - | - |
-| 1 | Check | Pass |
+
+| Phase | Name  | Status |
+| ----- | ----- | ------ |
+| 1     | Check | Pass   |
 ```
 
 **Issue 3: Mixed Formatting**
 
 ```markdown
 # Before (inconsistent spacing)
-|Phase|Name|Status|
-| --- | --- | --- |
-|1  | Check|Pass   |
+
+| Phase | Name  | Status |
+| ----- | ----- | ------ |
+| 1     | Check | Pass   |
 ```
 
 **Fix Patterns:**
@@ -1294,26 +1327,30 @@ for table in tables:
 
 ```markdown
 # Before (inconsistent - 3/3/4 columns)
-| Tool | Purpose | Required
-|---|---|---|
-| Read | File access | Yes | Sometimes |
+
+| Tool | Purpose     | Required |
+| ---- | ----------- | -------- | --------- |
+| Read | File access | Yes      | Sometimes |
 
 # After (consistent - 4/4/4 columns)
-| Tool | Purpose | Required | Notes |
-|---|---|---|---|
-| Read | File access | Yes | Sometimes |
+
+| Tool | Purpose     | Required | Notes     |
+| ---- | ----------- | -------- | --------- |
+| Read | File access | Yes      | Sometimes |
 ```
 
 **Pattern 2: Fix Separator Format**
 
 ```markdown
 # Before (separator too short)
+
 | Phase | Name | Status |
-| - | - | - |
+| ----- | ---- | ------ |
 
 # After (proper separator with 3+ dashes)
+
 | Phase | Name | Status |
-|---|---|---|
+| ----- | ---- | ------ |
 ```
 
 **Pattern 3: Standardize Alignment**
@@ -1322,24 +1359,28 @@ Choose one style and stick with it:
 
 ```markdown
 # Style 1: Compact (acceptable)
-| Phase | Name | Status |
-|---|---|---|
-| 1 | Check | Pass |
+
+| Phase | Name  | Status |
+| ----- | ----- | ------ |
+| 1     | Check | Pass   |
 
 # Style 2: Padded (preferred for readability)
-| Phase | Name   | Status |
-|-------|--------|--------|
-| 1     | Check  | Pass   |
+
+| Phase | Name  | Status |
+| ----- | ----- | ------ |
+| 1     | Check | Pass   |
 
 # Style 3: Minimum spacing (acceptable)
-| Phase | Name | Status |
-|---|---|---|
-| 1 | Check | Pass |
+
+| Phase | Name  | Status |
+| ----- | ----- | ------ |
+| 1     | Check | Pass   |
 ```
 
 **Manual Check Procedure:**
 
 1. **Find all tables in agent file:**
+
    ```bash
    grep -n '^\|' .claude/agents/{category}/{agent-name}.md
    ```
@@ -1355,6 +1396,7 @@ Choose one style and stick with it:
    - ⚠️ **WARNING**: Formatting inconsistencies found
 
 4. **Example output:**
+
    ```
    Phase 16: Markdown Table Formatting
    Tables found: 5
@@ -1380,6 +1422,7 @@ Choose one style and stick with it:
 **Why Manual?**
 
 Table parsing requires context-aware analysis:
+
 - Distinguishing table blocks from inline pipes
 - Handling edge cases (escaped pipes, code blocks)
 - Evaluating whether trailing pipes are required (parser-dependent)
@@ -1436,57 +1479,64 @@ When agents embed detailed patterns, workflows, or methodologies that already ex
 
 **Common Duplication Patterns:**
 
-| Embedded Content | Should Reference Skill |
-|-----------------|----------------------|
-| TDD workflow (RED-GREEN-REFACTOR) | `developing-with-tdd` |
-| Debugging steps (Reproduce-Isolate-Fix-Verify) | `debugging-systematically` |
-| Verification checklists | `verifying-before-completion` |
-| Refactoring guidance | `adhering-to-dry` |
-| Scope discipline | `adhering-to-yagni` |
-| Time estimation rules | `calibrating-time-estimates` |
-| Planning workflow | `writing-plans` |
-| Brainstorming process | `brainstorming` |
-| React patterns | `using-modern-react-patterns` |
-| State management patterns | `using-zustand-state-management` |
-| Testing patterns | `frontend-testing-patterns` |
+| Embedded Content                               | Should Reference Skill           |
+| ---------------------------------------------- | -------------------------------- |
+| TDD workflow (RED-GREEN-REFACTOR)              | `developing-with-tdd`            |
+| Debugging steps (Reproduce-Isolate-Fix-Verify) | `debugging-systematically`       |
+| Verification checklists                        | `verifying-before-completion`    |
+| Refactoring guidance                           | `adhering-to-dry`                |
+| Scope discipline                               | `adhering-to-yagni`              |
+| Time estimation rules                          | `calibrating-time-estimates`     |
+| Planning workflow                              | `writing-plans`                  |
+| Brainstorming process                          | `brainstorming`                  |
+| React patterns                                 | `using-modern-react-patterns`    |
+| State management patterns                      | `using-zustand-state-management` |
+| Testing patterns                               | `frontend-testing-patterns`      |
 
 **Detection Method:**
 
 Phase 17 uses reasoning-based analysis (manual check by Claude):
 
 a. **Read agent body sections and identify instructional content:**
-   - Patterns, workflows, methodologies (>100 chars)
-   - Step-by-step processes or rules
-   - Technical guidance or best practices
+
+- Patterns, workflows, methodologies (>100 chars)
+- Step-by-step processes or rules
+- Technical guidance or best practices
 
 b. **For each substantial section, reason about skill coverage:**
-   - Does this explain a pattern that a skill likely covers?
-   - Use common duplication targets list above as reference
+
+- Does this explain a pattern that a skill likely covers?
+- Use common duplication targets list above as reference
 
 c. **Search for matching skills:**
-   ```bash
-   REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-   REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-   cd "$REPO_ROOT/.claude"
-   npm run -w @chariot/auditing-skills search -- "QUERY"
-   ```
+
+```bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$REPO_ROOT/.claude"
+npm run -w @chariot/auditing-skills search -- "QUERY"
+```
 
 d. **Read candidate skill SKILL.md files to confirm overlap:**
-   - Does the skill cover the same workflow/pattern?
-   - Is the agent content a subset of what the skill provides?
+
+- Does the skill cover the same workflow/pattern?
+- Is the agent content a subset of what the skill provides?
 
 e. **Report duplications with:**
-   - Section location (line numbers)
-   - Overlapping skill path
-   - Fix suggestion (delete + add Tier 3 trigger)
+
+- Section location (line numbers)
+- Overlapping skill path
+- Fix suggestion (delete + add Tier 3 trigger)
 
 **Example Issue:**
 
 ```markdown
 # Agent body with embedded TDD workflow (WRONG)
+
 ## Development Workflow
 
 When implementing features, follow TDD:
+
 1. Write a failing test first (RED phase)
 2. Write minimal code to make it pass (GREEN phase)
 3. Refactor while keeping tests green (REFACTOR phase)
@@ -1501,17 +1551,22 @@ This duplicates content from `developing-with-tdd` skill.
 
 ```markdown
 # Before (embedded TDD workflow - 50+ lines)
+
 ## Development Workflow
+
 When implementing features, follow TDD:
+
 1. Write a failing test first (RED phase)
 2. Write minimal code to make it pass (GREEN phase)
 3. Refactor while keeping tests green (REFACTOR phase)
-...
+   ...
 
 # After (Tier 3 skill reference - 2 lines)
+
 ### Tier 3: Triggered by Task Type
-| Trigger | Read Path |
-|---------|-----------|
+
+| Trigger               | Read Path                                     |
+| --------------------- | --------------------------------------------- |
 | Implementing features | `.claude/skills/developing-with-tdd/SKILL.md` |
 ```
 
@@ -1522,8 +1577,9 @@ When implementing features, follow TDD:
 3. **Add skill to Tier 3** (if not already present):
    ```markdown
    ### Tier 3: Triggered by Task Type
-   | Trigger | Read Path |
-   |---------|-----------|
+
+   | Trigger                           | Read Path                            |
+   | --------------------------------- | ------------------------------------ |
    | [task that triggers this content] | `.claude/skill-library/.../SKILL.md` |
    ```
 4. **Verify skill is accessible** via appropriate gateway
@@ -1532,6 +1588,7 @@ When implementing features, follow TDD:
 **Why Manual?**
 
 This is a reasoning/judgment task that requires:
+
 - **Semantic understanding**: What does the content "mean"?
 - **Comparison**: Is it truly duplicated vs agent-specific context?
 - **Skill knowledge**: Which skills cover which patterns?
@@ -1544,6 +1601,7 @@ Cannot be automated with simple pattern matching - requires Claude's reasoning c
 The lean agent pattern (<300 lines) depends on agents being coordinators that delegate to skills, not bloated files that duplicate skill content. Content duplication is a primary cause of agent bloat:
 
 **Empirical example:**
+
 - `frontend-developer` (gold standard): 130 lines, no embedded patterns
 - Bloated agent with duplications: 400+ lines, same functionality
 

@@ -163,17 +163,77 @@ export class Phase18RoutingTableFormat {
   }
 
   /**
-   * Run Phase 18 audit on all skills
+   * Fix routing table paths by expanding skill names to full paths
+   * Returns number of paths expanded
+   */
+  static async fix(skill: SkillFile, dryRun: boolean = false): Promise<number> {
+    if (!this.isGatewaySkill(skill)) {
+      return 0; // Only fix gateway skills
+    }
+
+    const { findSkill } = await import('../skill-finder.js');
+    const tableRows = this.extractTableRows(skill.content);
+    let pathsExpanded = 0;
+    let content = skill.content;
+
+    // Process each data row
+    for (const row of tableRows) {
+      if (!this.isDataRow(row)) {
+        continue; // Skip header and separator rows
+      }
+
+      // Check if row needs fixing (doesn't have full path)
+      if (!this.hasFullPath(row.content)) {
+        // Extract potential skill name from row
+        // Common patterns: "skill-name", "`skill-name`", "some-skill"
+        const skillNameMatch = row.content.match(/[a-z][a-z0-9-]+(?:-[a-z0-9]+)+/i);
+
+        if (skillNameMatch) {
+          const skillName = skillNameMatch[0];
+          const foundSkill = findSkill(skillName);
+
+          if (foundSkill) {
+            // Replace skill name with full path
+            const fullPath = foundSkill.path.replace(
+              /.*\/(\.claude\/skill-library\/.*)$/,
+              '$1'
+            );
+
+            // Replace in content (only this specific row occurrence)
+            content = content.replace(row.content, row.content.replace(skillName, fullPath));
+            pathsExpanded++;
+          }
+        }
+      }
+    }
+
+    // Write changes if not dry run and paths were expanded
+    if (!dryRun && pathsExpanded > 0) {
+      const fs = await import('fs/promises');
+      await fs.writeFile(skill.path, content, 'utf-8');
+    }
+
+    return pathsExpanded;
+  }
+
+  /**
+   * Run Phase 18 audit on all skills (backward compatible - parses files)
    */
   static async run(skillsDir: string): Promise<PhaseResult> {
     const skillPaths = await SkillParser.findAllSkills(skillsDir);
+    const skills = await Promise.all(skillPaths.map(p => SkillParser.parseSkillFile(p)));
+    return this.runOnParsedSkills(skills);
+  }
+
+  /**
+   * Run Phase 18 audit on pre-parsed skills (performance optimized)
+   */
+  static async runOnParsedSkills(skills: SkillFile[]): Promise<PhaseResult> {
     let skillsAffected = 0;
     let issuesFound = 0;
     const details: string[] = [];
 
-    for (const skillPath of skillPaths) {
-      const skill = await SkillParser.parseSkillFile(skillPath);
-
+    for (const skill of skills) {
       // Only audit gateway skills
       if (!this.isGatewaySkill(skill)) {
         continue;

@@ -24,13 +24,13 @@ Standards for organizing code **within** files (complements directory organizati
 
 **Quick Reference**:
 
-| Aspect | Standard | Example |
-|--------|----------|---------|
-| Import groups | 4 groups with blank lines | React → UI → Utils → Types |
-| Component limit | 300 lines (hard) | Extract hooks at 200 lines |
-| Function limit | 30 lines (hard) | Break into subfunctions |
-| Hook limit | 50 lines (hard) | Split by concern |
-| Hook order | Specific sequence | Global → API → Local → Computed → Effects |
+| Aspect          | Standard                  | Example                                   |
+| --------------- | ------------------------- | ----------------------------------------- |
+| Import groups   | 4 groups with blank lines | React → UI → Utils → Types                |
+| Component limit | 300 lines (hard)          | Extract hooks at 200 lines                |
+| Function limit  | 30 lines (hard)           | Break into subfunctions                   |
+| Hook limit      | 50 lines (hard)           | Split by concern                          |
+| Hook order      | Specific sequence         | Global → API → Local → Computed → Effects |
 
 ## When to Use
 

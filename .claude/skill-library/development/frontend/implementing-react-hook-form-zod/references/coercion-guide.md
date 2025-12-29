@@ -9,6 +9,7 @@ Modern approach to converting form input types with Zod.
 HTML forms always submit strings. `z.coerce` automatically converts these strings to the desired type **before validation**, making form handling simpler.
 
 **When to use:**
+
 - Form inputs (convert "42" → 42)
 - Query parameters (URL strings → numbers/booleans)
 - Environment variables (string → typed values)
@@ -79,10 +80,7 @@ schema.parse({ age: "" });
 
 ```typescript
 const schema = z.object({
-  age: z
-    .string()
-    .min(1, "Age is required")
-    .pipe(z.coerce.number().min(18, "Must be 18+")),
+  age: z.string().min(1, "Age is required").pipe(z.coerce.number().min(18, "Must be 18+")),
 });
 
 // "" → Fails at string.min(1) ✅
@@ -91,6 +89,7 @@ const schema = z.object({
 ```
 
 **How .pipe() works**:
+
 1. Input validated against first schema (`z.string().min(1)`)
 2. If valid, output piped to second schema (`z.coerce.number()`)
 
@@ -137,10 +136,7 @@ const formSchema = z.object({
   name: z.string().min(1, "Name required"),
 
   // Number with empty string handling
-  age: z
-    .string()
-    .min(1, "Age required")
-    .pipe(z.coerce.number().min(18, "Must be 18+")),
+  age: z.string().min(1, "Age required").pipe(z.coerce.number().min(18, "Must be 18+")),
 
   // Boolean (checkbox)
   subscribe: z.coerce.boolean(),
@@ -200,27 +196,29 @@ const dbSchema = z.object({
 
 ## z.coerce vs z.preprocess
 
-| Feature | z.coerce | z.preprocess |
-|---------|----------|--------------|
-| **Use case** | Simple type conversion | Complex transformations |
-| **Verbosity** | Concise (`z.coerce.number()`) | Verbose (function required) |
-| **Tree-shaking** | Better optimization | Less optimized |
-| **When to use** | Form inputs, query params | Custom logic needed |
+| Feature          | z.coerce                      | z.preprocess                |
+| ---------------- | ----------------------------- | --------------------------- |
+| **Use case**     | Simple type conversion        | Complex transformations     |
+| **Verbosity**    | Concise (`z.coerce.number()`) | Verbose (function required) |
+| **Tree-shaking** | Better optimization           | Less optimized              |
+| **When to use**  | Form inputs, query params     | Custom logic needed         |
 
 ### Use z.coerce for:
+
 ```typescript
-z.coerce.number()  // String → Number
-z.coerce.boolean() // String → Boolean
-z.coerce.date()    // String → Date
+z.coerce.number(); // String → Number
+z.coerce.boolean(); // String → Boolean
+z.coerce.date(); // String → Date
 ```
 
 ### Use z.preprocess for:
+
 ```typescript
 // Complex transformation
 z.preprocess(
-  (val) => typeof val === "string" ? val.split(",").map(Number) : val,
+  (val) => (typeof val === "string" ? val.split(",").map(Number) : val),
   z.array(z.number())
-)
+);
 ```
 
 ---

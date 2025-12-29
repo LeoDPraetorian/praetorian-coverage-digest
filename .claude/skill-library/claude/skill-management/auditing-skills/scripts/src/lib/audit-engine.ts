@@ -3,9 +3,16 @@
  * Runs all audit phases including script organization, bash→TypeScript migration, reference audit, command audit, CLI error handling, and state externalization
  */
 
+import { PHASE_REGISTRY, PHASE_COUNT, getPhaseKey, findPhasesByNumber } from './phase-registry.js';
+import { SkillParser } from './utils/skill-parser.js';
+import type { FixOptions, ValidatorResult, PhaseResult, SkillFile } from './types.js';
+import chalk from 'chalk';
+import Table from 'cli-table3';
+
+// Import phase classes needed for fixPhase methods
 import { Phase1DescriptionFormat } from './phases/phase1-description-format.js';
 import { Phase2AllowedTools } from './phases/phase2-allowed-tools.js';
-import { Phase3WordCount } from './phases/phase3-word-count.js';
+import { Phase3LineCount } from './phases/phase3-line-count.js';
 import { Phase4BrokenLinks } from './phases/phase4-broken-links.js';
 import { Phase5OrganizeFiles } from './phases/phase5-organize-files.js';
 import { Phase6ScriptOrganization } from './phases/phase6-script-organization.js';
@@ -19,26 +26,11 @@ import { Phase13StateExternalization } from './phases/phase13-state-externalizat
 import { Phase14aTableFormatting } from './phases/phase14a-table-formatting.js';
 import { Phase14bCodeBlockQuality } from './phases/phase14b-code-block-quality.js';
 import { Phase14cHeaderHierarchy } from './phases/phase14c-header-hierarchy.js';
-import { Phase15OrphanDetection } from './phases/phase15-orphan-detection.js';
 import { Phase16WindowsPaths } from './phases/phase16-windows-paths.js';
-import { Phase17GatewayStructure } from './phases/phase17-gateway-structure.js';
 import { Phase18RoutingTableFormat } from './phases/phase18-routing-table-format.js';
-import { Phase19PathResolution } from './phases/phase19-path-resolution.js';
-import { Phase20CoverageCheck } from './phases/phase20-coverage-check.js';
-import { Phase21LineNumberReferences } from './phases/phase21-line-number-references.js';
-import { SkillParser } from './utils/skill-parser.js';
-import type { FixOptions, ValidatorResult, PhaseResult } from './types.js';
-import chalk from 'chalk';
-import Table from 'cli-table3';
 
-/**
- * Total number of audit phases - used for CLI validation and documentation
- * When adding a new phase, update this constant and the phaseRunners in runSinglePhaseForSkill()
- * Note: Phase 14 has sub-phases (14a, 14b, 14c) for visual/style auditing
- * Phases 17-20 are gateway-specific validation phases
- * Phase 21 is line number reference detection
- */
-export const PHASE_COUNT = 21;
+// Re-export PHASE_COUNT for CLI usage
+export { PHASE_COUNT };
 
 export class SkillAuditor {
   constructor(
@@ -47,79 +39,35 @@ export class SkillAuditor {
   ) {}
 
   /**
-   * Run full audit (all 21 phases)
+   * Parse all skills once (performance optimization)
+   * Used by runFull() to avoid O(N×M) complexity
+   */
+  private async parseAllSkills(): Promise<SkillFile[]> {
+    const skillPaths = await SkillParser.findAllSkills(this.skillsDir);
+    return Promise.all(skillPaths.map(p => SkillParser.parseSkillFile(p)));
+  }
+
+  /**
+   * Run full audit (all phases registered in PHASE_REGISTRY)
+   * Performance: O(N) - parses each skill once, then validates across all phases
    */
   async runFull() {
-    console.log(chalk.gray('Running Phase 1: Description Format...'));
-    const phase1 = await Phase1DescriptionFormat.run(this.skillsDir);
+    console.log(chalk.gray('Parsing all skills...'));
+    const skills = await this.parseAllSkills();
+    console.log(chalk.gray(`Parsed ${skills.length} skills. Running ${PHASE_REGISTRY.length} phases...`));
 
-    console.log(chalk.gray('Running Phase 2: Allowed-Tools Field...'));
-    const phase2 = await Phase2AllowedTools.run(this.skillsDir);
+    const phases: PhaseResult[] = [];
 
-    console.log(chalk.gray('Running Phase 3: Word Count...'));
-    const phase3 = await Phase3WordCount.run(this.skillsDir);
+    for (const phaseDef of PHASE_REGISTRY) {
+      const phaseKey = getPhaseKey(phaseDef);
+      console.log(chalk.gray(`Running Phase ${phaseKey}: ${phaseDef.name}...`));
 
-    console.log(chalk.gray('Running Phase 4: Broken Links...'));
-    const phase4 = await Phase4BrokenLinks.run(this.skillsDir);
+      const result = phaseDef.requiresSkillsDir
+        ? await phaseDef.phase.runOnParsedSkills(skills, this.skillsDir)
+        : await phaseDef.phase.runOnParsedSkills(skills);
 
-    console.log(chalk.gray('Running Phase 5: File Organization...'));
-    const phase5 = await Phase5OrganizeFiles.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 6: Script Organization...'));
-    const phase6 = await Phase6ScriptOrganization.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 7: Output Directory Pattern...'));
-    const phase7 = await Phase7OutputDirectory.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 8: TypeScript Project Structure...'));
-    const phase8 = await Phase8TypeScriptStructure.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 9: Bash→TypeScript Migration...'));
-    const phase9 = await Phase9BashTypeScriptMigration.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 10: Reference Audit...'));
-    const phase10 = await Phase10ReferenceAudit.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 11: Command Example Audit...'));
-    const phase11 = await Phase11CommandAudit.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 12: CLI Error Handling...'));
-    const phase12 = await Phase12CliErrorHandling.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 13: State Externalization...'));
-    const phase13 = await Phase13StateExternalization.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 14a: Table Formatting...'));
-    const phase14a = await Phase14aTableFormatting.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 14b: Code Block Quality...'));
-    const phase14b = await Phase14bCodeBlockQuality.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 14c: Header Hierarchy...'));
-    const phase14c = await Phase14cHeaderHierarchy.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 15: Orphan Detection...'));
-    const phase15 = await Phase15OrphanDetection.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 16: Windows Path Detection...'));
-    const phase16 = await Phase16WindowsPaths.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 17: Gateway Structure...'));
-    const phase17 = await Phase17GatewayStructure.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 18: Routing Table Format...'));
-    const phase18 = await Phase18RoutingTableFormat.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 19: Path Resolution...'));
-    const phase19 = await Phase19PathResolution.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 20: Coverage Check...'));
-    const phase20 = await Phase20CoverageCheck.run(this.skillsDir);
-
-    console.log(chalk.gray('Running Phase 21: Line Number References...'));
-    const phase21 = await Phase21LineNumberReferences.run(this.skillsDir);
-
-    const phases = [phase1, phase2, phase3, phase4, phase5, phase6, phase7, phase8, phase9, phase10, phase11, phase12, phase13, phase14a, phase14b, phase14c, phase15, phase16, phase17, phase18, phase19, phase20, phase21];
+      phases.push(result);
+    }
 
     const criticalCount = phases.reduce(
       (sum, p) => sum + p.details.filter(d => d.includes('[CRITICAL]')).length,
@@ -157,82 +105,13 @@ export class SkillAuditor {
   }
 
   /**
-   * Run full audit for a single skill (all 21 phases)
+   * Run full audit for a single skill (all phases registered in PHASE_REGISTRY)
    */
   async runFullForSingleSkill(skillName: string) {
     const skillPath = `${this.skillsDir}/${skillName}/SKILL.md`;
 
     if (!this.quiet) console.log(chalk.gray(`Parsing skill: ${skillName}...`));
     const skill = await SkillParser.parseSkillFile(skillPath);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 1: Description Format...'));
-    const phase1Issues = Phase1DescriptionFormat.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 2: Allowed-Tools Field...'));
-    const phase2Issues = Phase2AllowedTools.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 3: Word Count...'));
-    const phase3Issues = await Phase3WordCount.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 4: Broken Links...'));
-    const phase4Issues = await Phase4BrokenLinks.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 5: File Organization...'));
-    const phase5Issues = await Phase5OrganizeFiles.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 6: Script Organization...'));
-    const phase6Issues = await Phase6ScriptOrganization.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 7: Output Directory Pattern...'));
-    const phase7Issues = await Phase7OutputDirectory.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 8: TypeScript Project Structure...'));
-    const phase8Issues = Phase8TypeScriptStructure.validate(skill, true); // Single-skill mode
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 9: Bash→TypeScript Migration...'));
-    const phase9Issues = await Phase9BashTypeScriptMigration.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 10: Reference Audit...'));
-    const phase10Issues = await Phase10ReferenceAudit.validate(skill, this.skillsDir);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 11: Command Example Audit...'));
-    const phase11Issues = await Phase11CommandAudit.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 12: CLI Error Handling...'));
-    const phase12Issues = await Phase12CliErrorHandling.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 13: State Externalization...'));
-    const phase13Issues = Phase13StateExternalization.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 14a: Table Formatting...'));
-    const phase14aIssues = Phase14aTableFormatting.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 14b: Code Block Quality...'));
-    const phase14bIssues = Phase14bCodeBlockQuality.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 14c: Header Hierarchy...'));
-    const phase14cIssues = Phase14cHeaderHierarchy.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 15: Orphan Detection...'));
-    const phase15Issues = await Phase15OrphanDetection.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 16: Windows Path Detection...'));
-    const phase16Issues = Phase16WindowsPaths.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 17: Gateway Structure...'));
-    const phase17Issues = Phase17GatewayStructure.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 18: Routing Table Format...'));
-    const phase18Issues = Phase18RoutingTableFormat.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 19: Path Resolution...'));
-    const phase19Issues = Phase19PathResolution.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 20: Coverage Check...'));
-    const phase20Issues = Phase20CoverageCheck.validate(skill);
-
-    if (!this.quiet) console.log(chalk.gray('Running Phase 21: Line Number References...'));
-    const phase21Issues = Phase21LineNumberReferences.validate(skill);
 
     // Format results as phase results for consistency
     const formatPhaseResult = (phaseName: string, issues: any[]) => {
@@ -250,31 +129,19 @@ export class SkillAuditor {
       };
     };
 
-    const phases = [
-      formatPhaseResult('Phase 1: Description Format', phase1Issues),
-      formatPhaseResult('Phase 2: Allowed-Tools Field', phase2Issues),
-      formatPhaseResult('Phase 3: Word Count', phase3Issues),
-      formatPhaseResult('Phase 4: Broken Links', phase4Issues),
-      formatPhaseResult('Phase 5: File Organization', phase5Issues),
-      formatPhaseResult('Phase 6: Script Organization', phase6Issues),
-      formatPhaseResult('Phase 7: Output Directory Pattern', phase7Issues),
-      formatPhaseResult('Phase 8: TypeScript Project Structure', phase8Issues),
-      formatPhaseResult('Phase 9: Bash→TypeScript Migration', phase9Issues),
-      formatPhaseResult('Phase 10: Reference Audit', phase10Issues),
-      formatPhaseResult('Phase 11: Command Example Audit', phase11Issues),
-      formatPhaseResult('Phase 12: CLI Error Handling', phase12Issues),
-      formatPhaseResult('Phase 13: State Externalization', phase13Issues),
-      formatPhaseResult('Phase 14a: Table Formatting', phase14aIssues),
-      formatPhaseResult('Phase 14b: Code Block Quality', phase14bIssues),
-      formatPhaseResult('Phase 14c: Header Hierarchy', phase14cIssues),
-      formatPhaseResult('Phase 15: Orphan Detection', phase15Issues),
-      formatPhaseResult('Phase 16: Windows Path Detection', phase16Issues),
-      formatPhaseResult('Phase 17: Gateway Structure', phase17Issues),
-      formatPhaseResult('Phase 18: Routing Table Format', phase18Issues),
-      formatPhaseResult('Phase 19: Path Resolution', phase19Issues),
-      formatPhaseResult('Phase 20: Coverage Check', phase20Issues),
-      formatPhaseResult('Phase 21: Line Number References', phase21Issues),
-    ];
+    const phases = [];
+
+    for (const phaseDef of PHASE_REGISTRY) {
+      const phaseKey = getPhaseKey(phaseDef);
+      if (!this.quiet) console.log(chalk.gray(`Running Phase ${phaseKey}: ${phaseDef.name}...`));
+
+      const issues = phaseDef.requiresSkillsDir
+        ? await phaseDef.phase.validate(skill, this.skillsDir)
+        : await phaseDef.phase.validate(skill);
+
+      const phaseResult = formatPhaseResult(`Phase ${phaseKey}: ${phaseDef.name}`, issues);
+      phases.push(phaseResult);
+    }
 
     const criticalCount = phases.reduce(
       (sum, p) => sum + p.details.filter(d => d.includes('[CRITICAL]')).length,
@@ -320,45 +187,37 @@ export class SkillAuditor {
     console.log(chalk.gray(`Parsing skill: ${skillName}...`));
     const skill = await SkillParser.parseSkillFile(skillPath);
 
-    const phaseRunners: Record<number, { name: string; run: () => Promise<any[]> | any[] }> = {
-      1: { name: 'Phase 1: Description Format', run: () => Phase1DescriptionFormat.validate(skill) },
-      2: { name: 'Phase 2: Allowed-Tools Field', run: () => Phase2AllowedTools.validate(skill) },
-      3: { name: 'Phase 3: Word Count', run: () => Phase3WordCount.validate(skill) },
-      4: { name: 'Phase 4: Broken Links', run: () => Phase4BrokenLinks.validate(skill) },
-      5: { name: 'Phase 5: File Organization', run: () => Phase5OrganizeFiles.validate(skill) },
-      6: { name: 'Phase 6: Script Organization', run: () => Phase6ScriptOrganization.validate(skill) },
-      7: { name: 'Phase 7: Output Directory Pattern', run: () => Phase7OutputDirectory.validate(skill) },
-      8: { name: 'Phase 8: TypeScript Project Structure', run: () => Phase8TypeScriptStructure.validate(skill, true) }, // Single-skill mode
-      9: { name: 'Phase 9: Bash→TypeScript Migration', run: () => Phase9BashTypeScriptMigration.validate(skill) },
-      10: { name: 'Phase 10: Reference Audit', run: () => Phase10ReferenceAudit.validate(skill, this.skillsDir) },
-      11: { name: 'Phase 11: Command Example Audit', run: () => Phase11CommandAudit.validate(skill) },
-      12: { name: 'Phase 12: CLI Error Handling', run: () => Phase12CliErrorHandling.validate(skill) },
-      13: { name: 'Phase 13: State Externalization', run: () => Phase13StateExternalization.validate(skill) },
-      // Phase 14 runs all visual/style sub-phases (14a, 14b, 14c)
-      14: { name: 'Phase 14: Visual/Style (14a-c)', run: () => [
-        ...Phase14aTableFormatting.validate(skill),
-        ...Phase14bCodeBlockQuality.validate(skill),
-        ...Phase14cHeaderHierarchy.validate(skill),
-      ]},
-      15: { name: 'Phase 15: Orphan Detection', run: () => Phase15OrphanDetection.validate(skill) },
-      16: { name: 'Phase 16: Windows Path Detection', run: () => Phase16WindowsPaths.validate(skill) },
-      17: { name: 'Phase 17: Gateway Structure', run: () => Phase17GatewayStructure.validate(skill) },
-      18: { name: 'Phase 18: Routing Table Format', run: () => Phase18RoutingTableFormat.validate(skill) },
-      19: { name: 'Phase 19: Path Resolution', run: () => Phase19PathResolution.validate(skill) },
-      20: { name: 'Phase 20: Coverage Check', run: () => Phase20CoverageCheck.validate(skill) },
-      21: { name: 'Phase 21: Line Number References', run: () => Phase21LineNumberReferences.validate(skill) },
-    };
+    const matchingPhases = findPhasesByNumber(phaseNumber);
 
-    const runner = phaseRunners[phaseNumber];
-    if (!runner) {
+    if (matchingPhases.length === 0) {
       throw new Error(`Invalid phase number: ${phaseNumber}. Must be 1-${PHASE_COUNT}.`);
     }
 
-    console.log(chalk.gray(`Running ${runner.name}...`));
-    const issues = await runner.run();
+    // Collect all issues from phases with this number (handles sub-phases like 14a, 14b, 14c)
+    const allIssues: any[] = [];
+    let phaseName = '';
+
+    for (const phaseDef of matchingPhases) {
+      const phaseKey = getPhaseKey(phaseDef);
+      if (!phaseName) {
+        phaseName = matchingPhases.length > 1
+          ? `Phase ${phaseNumber}: ${matchingPhases.map(p => p.name).join(', ')}`
+          : `Phase ${phaseKey}: ${phaseDef.name}`;
+      }
+
+      console.log(chalk.gray(`Running Phase ${phaseKey}: ${phaseDef.name}...`));
+
+      const issues = phaseDef.requiresSkillsDir
+        ? await phaseDef.phase.validate(skill, this.skillsDir)
+        : await phaseDef.phase.validate(skill);
+
+      allIssues.push(...issues);
+    }
+
+    const issues = allIssues;
 
     const phase = {
-      phaseName: runner.name,
+      phaseName,
       skillsAffected: issues.length > 0 ? 1 : 0,
       issuesFound: issues.length,
       issuesFixed: 0,
@@ -648,6 +507,156 @@ ${options.dryRun ? chalk.yellow('(Dry run - no changes made)') : chalk.green('Ch
   }
 
   /**
+   * Auto-fix Phase 14a issues (table formatting with Prettier)
+   */
+  async fixPhase14a(options: FixOptions) {
+    const targetInfo = options.skillName ? ` for ${options.skillName}` : '';
+    console.log(chalk.gray(`Analyzing Phase 14a issues${targetInfo}...`));
+
+    let skillsAffected = 0;
+    let issuesFound = 0;
+    let issuesFixed = 0;
+
+    const skillPaths = await SkillParser.findAllSkills(this.skillsDir);
+    const targetSkills = options.skillName
+      ? skillPaths.filter((p) => p.includes(`/${options.skillName}/`))
+      : skillPaths;
+
+    for (const skillPath of targetSkills) {
+      const skill = await SkillParser.parseSkillFile(skillPath);
+      const issues = Phase14aTableFormatting.validate(skill);
+
+      if (issues.some((i) => i.autoFixable)) {
+        skillsAffected++;
+        issuesFound += issues.filter((i) => i.autoFixable).length;
+
+        if (!options.dryRun) {
+          const fixed = await Phase14aTableFormatting.fix(skill, false);
+          issuesFixed += fixed;
+        }
+      }
+    }
+
+    const summary = `
+${chalk.bold('Phase 14a: Table Formatting (Prettier)')}${targetInfo}
+${'='.repeat(50)}
+
+Skills affected: ${skillsAffected}
+Issues found: ${issuesFound}
+Issues fixed: ${options.dryRun ? 0 : issuesFixed}
+
+${options.dryRun ? chalk.yellow('(Dry run - no changes made)') : chalk.green('Changes applied')}
+`;
+
+    return {
+      summary,
+      phase14a: { skillsAffected, issuesFound, issuesFixed },
+    };
+  }
+
+  /**
+   * Auto-fix Phase 16 issues (Windows path detection)
+   */
+  async fixPhase16(options: FixOptions) {
+    const targetInfo = options.skillName ? ` for ${options.skillName}` : '';
+    console.log(chalk.gray(`Analyzing Phase 16 issues${targetInfo}...`));
+
+    let skillsAffected = 0;
+    let issuesFound = 0;
+    let issuesFixed = 0;
+
+    const skillPaths = await SkillParser.findAllSkills(this.skillsDir);
+    const targetSkills = options.skillName
+      ? skillPaths.filter((p) => p.includes(`/${options.skillName}/`))
+      : skillPaths;
+
+    for (const skillPath of targetSkills) {
+      const skill = await SkillParser.parseSkillFile(skillPath);
+      const issues = Phase16WindowsPaths.validate(skill);
+
+      if (issues.some((i) => i.autoFixable)) {
+        skillsAffected++;
+        issuesFound += issues.filter((i) => i.autoFixable).length;
+
+        if (!options.dryRun) {
+          const fixed = await Phase16WindowsPaths.fix(skill, false);
+          issuesFixed += fixed;
+        }
+      }
+    }
+
+    const summary = `
+${chalk.bold('Phase 16: Windows Path Detection')}${targetInfo}
+${'='.repeat(50)}
+
+Skills affected: ${skillsAffected}
+Issues found: ${issuesFound}
+Issues fixed: ${options.dryRun ? 0 : issuesFixed}
+
+${options.dryRun ? chalk.yellow('(Dry run - no changes made)') : chalk.green('Changes applied')}
+`;
+
+    return {
+      summary,
+      phase16: { skillsAffected, issuesFound, issuesFixed },
+    };
+  }
+
+  /**
+   * Auto-fix Phase 18 issues (routing table format)
+   */
+  async fixPhase18(options: FixOptions) {
+    const targetInfo = options.skillName ? ` for ${options.skillName}` : '';
+    console.log(chalk.gray(`Analyzing Phase 18 issues${targetInfo}...`));
+
+    let skillsAffected = 0;
+    let issuesFound = 0;
+    let issuesFixed = 0;
+
+    const skillPaths = await SkillParser.findAllSkills(this.skillsDir);
+    const targetSkills = options.skillName
+      ? skillPaths.filter((p) => p.includes(`/${options.skillName}/`))
+      : skillPaths;
+
+    for (const skillPath of targetSkills) {
+      const skill = await SkillParser.parseSkillFile(skillPath);
+
+      // Only process gateway skills
+      if (!skill.name.startsWith('gateway-')) {
+        continue;
+      }
+
+      const issues = Phase18RoutingTableFormat.validate(skill);
+
+      if (issues.some((i) => i.autoFixable)) {
+        skillsAffected++;
+        issuesFound += issues.filter((i) => i.autoFixable).length;
+
+        if (!options.dryRun) {
+          const fixed = await Phase18RoutingTableFormat.fix(skill, false);
+          issuesFixed += fixed;
+        }
+      }
+    }
+
+    const summary = `
+${chalk.bold('Phase 18: Routing Table Format')}${targetInfo}
+${'='.repeat(50)}
+
+Skills affected: ${skillsAffected}
+Issues found: ${issuesFound}
+Issues fixed: ${options.dryRun ? 0 : issuesFixed}
+
+${options.dryRun ? chalk.yellow('(Dry run - no changes made)') : chalk.green('Changes applied')}
+`;
+
+    return {
+      summary,
+      phase18: { skillsAffected, issuesFound, issuesFixed },
+    };
+  }
+
+  /**
    * Validate a single skill file
    */
   async validateSingleSkill(skillPath: string): Promise<ValidatorResult> {
@@ -655,7 +664,7 @@ ${options.dryRun ? chalk.yellow('(Dry run - no changes made)') : chalk.green('Ch
 
     const phase1Issues = Phase1DescriptionFormat.validate(skill);
     const phase2Issues = Phase2AllowedTools.validate(skill);
-    const phase3Issues = await Phase3WordCount.validate(skill);
+    const phase3Issues = await Phase3LineCount.validate(skill);
     const phase4Issues = await Phase4BrokenLinks.validate(skill);
     const phase5Issues = await Phase5OrganizeFiles.validate(skill);
     const phase6Issues = await Phase6ScriptOrganization.validate(skill);

@@ -1,22 +1,38 @@
 /**
  * Suggest Mode for Skill Manager Fix
  *
- * Detects ALL fixes (deterministic + semantic) and outputs them as
+ * Detects ALL fixes (deterministic + hybrid + semantic) and outputs them as
  * suggestions. Nothing is auto-applied - Claude presents each fix
  * for user to Accept/Skip.
+ *
+ * Hybrid phases (4, 10, 19) return both deterministic fixes AND ambiguous cases
+ * that need Claude reasoning.
  */
 
 import { dirname } from 'path';
 import { SkillAuditor } from './audit-engine.js';
 import { SkillParser } from './utils/skill-parser.js';
-import type { FixSuggestionOutput, SemanticSuggestion, Issue } from './types.js';
+import type {
+  FixSuggestionOutput,
+  SemanticSuggestion,
+  Issue,
+  AmbiguousCase,
+  Phase4AmbiguousCase,
+  Phase10AmbiguousCase,
+  Phase19AmbiguousCase,
+  SuggestionOption
+} from './types.js';
 import { SUGGESTION_PATTERNS, buildApplyCommand } from './suggestion-patterns.js';
+import { Phase4BrokenLinks } from './phases/phase4-broken-links.js';
+import { Phase10ReferenceAudit } from './phases/phase10-reference-audit.js';
+import { Phase19PathResolution } from './phases/phase19-path-resolution.js';
 
 /**
  * Run fix in suggest mode:
- * 1. Detect deterministic fixes (phases 2, 4, 5, 6, 7, 10, 12) via dry-run
- * 2. Generate semantic suggestions (phases 1, 3, 9, 11, 13)
- * 3. Return ALL as structured JSON for Claude to present
+ * 1. Detect deterministic fixes (phases 2, 5, 6, 7, 12) via dry-run
+ * 2. Run hybrid phases (4, 10, 19) - get deterministic fixes + ambiguous cases
+ * 3. Generate semantic suggestions (phases 1, 3, 9, 11, 13)
+ * 4. Return ALL as structured JSON for Claude to present
  */
 export async function runSuggestMode(
   skillPath: string,
@@ -29,6 +45,9 @@ export async function runSuggestMode(
 
   const allSuggestions: SemanticSuggestion[] = [];
 
+  // Parse skill once for reuse
+  const skill = await SkillParser.parseSkillFile(skillPath);
+
   // ALWAYS use dry-run to detect issues without applying
   const fixOptions = {
     dryRun: true,  // Never auto-apply in suggest mode
@@ -37,7 +56,7 @@ export async function runSuggestMode(
     skillName,
   };
 
-  // Step 1: Detect deterministic fixes (without applying)
+  // Step 1: Detect PURELY DETERMINISTIC fixes (phases 2, 5, 6, 7, 12)
   try {
     // Phase 2: Allowed tools
     const result2 = await auditor.fixPhase2(fixOptions);
@@ -47,19 +66,6 @@ export async function runSuggestMode(
         'phase2-allowed-tools',
         'Allowed-tools field needs updating',
         result2.phase2.details,
-        skillName
-      );
-      if (suggestion) allSuggestions.push(suggestion);
-    }
-
-    // Phase 4: Broken links
-    const result4 = await auditor.fixPhase4(fixOptions);
-    if (result4.phase4.issuesFound > 0) {
-      const suggestion = generateDeterministicSuggestion(
-        4,
-        'phase4-broken-links',
-        'Broken links detected',
-        result4.phase4.details,
         skillName
       );
       if (suggestion) allSuggestions.push(suggestion);
@@ -104,19 +110,6 @@ export async function runSuggestMode(
       if (suggestion) allSuggestions.push(suggestion);
     }
 
-    // Phase 10: Deprecated references
-    const result10 = await auditor.fixPhase10(fixOptions);
-    if (result10.phase10.issuesFound > 0) {
-      const suggestion = generateDeterministicSuggestion(
-        10,
-        'phase10-deprecated-refs',
-        'Deprecated references found',
-        result10.phase10.details,
-        skillName
-      );
-      if (suggestion) allSuggestions.push(suggestion);
-    }
-
     // Phase 12: CLI error handling
     const result12 = await auditor.fixPhase12(fixOptions);
     if (result12.phase12.issuesFound > 0) {
@@ -133,10 +126,60 @@ export async function runSuggestMode(
     console.error('Warning: Some deterministic checks failed', error);
   }
 
-  // Step 2: Run audit to identify semantic issues
-  const skill = await SkillParser.parseSkillFile(skillPath);
+  // Step 2: Run HYBRID phases (4, 10, 19) - deterministic + ambiguous cases
+  try {
+    // Phase 4: Broken links (HYBRID)
+    const result4 = await Phase4BrokenLinks.fixHybrid(skill, true);
+    if (result4.fixedCount > 0) {
+      // Deterministic fixes available
+      allSuggestions.push({
+        id: 'phase4-broken-links-auto',
+        phase: 4,
+        title: 'Broken Links (Auto-fixable)',
+        explanation: `${result4.fixedCount} broken link(s) can be auto-fixed (files exist elsewhere)`,
+        options: [
+          { key: 'accept', label: 'Accept', description: 'Auto-fix path corrections' },
+          { key: 'skip', label: 'Skip', description: 'Keep broken links' }
+        ],
+        applyCommand: buildApplyCommand(skillName, 'phase4-broken-links', false),
+      });
+    }
+    // Ambiguous cases need Claude reasoning
+    for (const ambiguous of result4.ambiguousCases) {
+      allSuggestions.push(convertAmbiguousToSuggestion(ambiguous, skillName));
+    }
 
-  // Generate semantic suggestions for phases 1, 3, 9, 11, 13
+    // Phase 10: Reference audit (HYBRID)
+    const result10 = await Phase10ReferenceAudit.fixHybrid(skillPath, parentDir, true);
+    if (result10.fixedCount > 0) {
+      // Deterministic fixes available (from registry)
+      allSuggestions.push({
+        id: 'phase10-deprecated-refs-auto',
+        phase: 10,
+        title: 'Deprecated References (Auto-fixable)',
+        explanation: `${result10.fixedCount} deprecated reference(s) can be auto-fixed (found in registry)`,
+        options: [
+          { key: 'accept', label: 'Accept', description: 'Auto-fix from deprecation registry' },
+          { key: 'skip', label: 'Skip', description: 'Keep deprecated references' }
+        ],
+        applyCommand: buildApplyCommand(skillName, 'phase10-deprecated-refs', false),
+      });
+    }
+    // Ambiguous cases (fuzzy matches) need Claude reasoning
+    for (const ambiguous of result10.ambiguousCases) {
+      allSuggestions.push(convertAmbiguousToSuggestion(ambiguous, skillName));
+    }
+
+    // Phase 19: Path resolution (HYBRID - gateway skills only)
+    const result19 = await Phase19PathResolution.suggestFixes(skill);
+    for (const ambiguous of result19) {
+      allSuggestions.push(convertAmbiguousToSuggestion(ambiguous, skillName));
+    }
+  } catch (error) {
+    console.error('Warning: Some hybrid checks failed', error);
+  }
+
+  // Step 3: Generate SEMANTIC suggestions (phases 1, 3, 9, 11, 13)
   const phase1Suggestion = await generatePhase1Suggestion(skill, skillName);
   if (phase1Suggestion) allSuggestions.push(phase1Suggestion);
 
@@ -274,48 +317,44 @@ async function generatePhase1Suggestion(
 }
 
 /**
- * Phase 3: Word count suggestions
+ * Phase 3: Line count suggestions (Anthropic recommends <500 lines)
+ * Thresholds: <350 safe, 350-450 caution, 450-500 warning, >500 critical
  */
 async function generatePhase3Suggestion(
-  skill: { name: string; wordCount: number; skillType: string },
+  skill: { name: string; lineCount: number },
   skillName: string
 ): Promise<SemanticSuggestion | null> {
-  const { wordCount, skillType } = skill;
+  const { lineCount } = skill;
 
-  // Target ranges by skill type
-  const targets: Record<string, { min: number; max: number }> = {
-    'reasoning': { min: 1000, max: 2000 },
-    'tool-wrapper': { min: 200, max: 600 },
-    'hybrid': { min: 600, max: 1200 },
-  };
+  // Unified thresholds from Anthropic best practices
+  const CRITICAL_LIMIT = 500;
+  const WARNING_THRESHOLD = 450;
 
-  const target = targets[skillType] || targets['reasoning'];
-
-  if (wordCount > target.max * 1.25) {
+  if (lineCount > CRITICAL_LIMIT) {
     const pattern = SUGGESTION_PATTERNS['phase3-too-long'];
     return {
-      id: 'phase3-wordcount',
+      id: 'phase3-linecount',
       phase: 3,
       title: pattern.title,
-      explanation: pattern.explanationTemplate(wordCount, target.max, skillType),
-      currentValue: `${wordCount} words`,
-      suggestedValue: `Extract sections to references/ to reach ~${target.max} words`,
+      explanation: pattern.explanationTemplate(lineCount, CRITICAL_LIMIT),
+      currentValue: `${lineCount} lines`,
+      suggestedValue: `Extract sections to references/ to get under ${CRITICAL_LIMIT} lines`,
       options: pattern.options,
-      applyCommand: buildApplyCommand(skillName, 'phase3-wordcount', false),
+      applyCommand: buildApplyCommand(skillName, 'phase3-linecount', false),
     };
   }
 
-  if (wordCount < target.min * 0.5) {
-    const pattern = SUGGESTION_PATTERNS['phase3-too-short'];
+  if (lineCount > WARNING_THRESHOLD) {
+    const pattern = SUGGESTION_PATTERNS['phase3-approaching-limit'];
     return {
-      id: 'phase3-wordcount',
+      id: 'phase3-linecount',
       phase: 3,
       title: pattern.title,
-      explanation: pattern.explanationTemplate(wordCount, target.min, skillType),
-      currentValue: `${wordCount} words`,
-      suggestedValue: `Add more content to reach ~${target.min} words`,
+      explanation: pattern.explanationTemplate(lineCount, CRITICAL_LIMIT),
+      currentValue: `${lineCount} lines`,
+      suggestedValue: `Plan extraction before adding more content`,
       options: pattern.options,
-      applyCommand: buildApplyCommand(skillName, 'phase3-wordcount', false),
+      applyCommand: buildApplyCommand(skillName, 'phase3-linecount', false),
     };
   }
 
@@ -338,6 +377,7 @@ async function generatePhase9Suggestion(
     frontmatter: { name: skill.name, description: '' },
     content: '',
     wordCount: 0,
+    lineCount: 0,
     skillType: 'reasoning',
   });
 
@@ -454,4 +494,68 @@ function generateImprovedDescription(current: string, skillType: string): string
   }
 
   return improved;
+}
+
+/**
+ * Convert an ambiguous case from a hybrid phase to a semantic suggestion
+ * for Claude to present to the user
+ */
+function convertAmbiguousToSuggestion(
+  ambiguous: AmbiguousCase,
+  skillName: string
+): SemanticSuggestion {
+  // Generate title based on phase and type
+  const titles: Record<string, string> = {
+    'broken-link-missing': 'Broken Link - File Not Found',
+    'phantom-reference-fuzzy': 'Phantom Reference - Did You Mean?',
+    'broken-gateway-path': 'Broken Gateway Path',
+  };
+
+  // Convert HybridFixOption[] to SuggestionOption[]
+  const options: SuggestionOption[] = ambiguous.options.map(opt => ({
+    key: opt.key as 'accept' | 'skip' | 'custom',
+    label: opt.label,
+    description: opt.description,
+  }));
+
+  // Build explanation with context
+  let explanation = ambiguous.context;
+
+  // Add phase-specific details
+  if (ambiguous.phase === 4) {
+    const p4 = ambiguous as Phase4AmbiguousCase;
+    if (p4.surroundingContext) {
+      explanation += `\n\nContext: "${p4.surroundingContext}"`;
+    }
+    if (p4.similarFiles.length > 0) {
+      explanation += `\n\nSimilar files found: ${p4.similarFiles.slice(0, 3).join(', ')}`;
+    }
+  } else if (ambiguous.phase === 10) {
+    const p10 = ambiguous as Phase10AmbiguousCase;
+    if (p10.fuzzyMatches.length > 0) {
+      const matchList = p10.fuzzyMatches
+        .slice(0, 3)
+        .map(m => `${m.name} (${Math.round(m.score * 100)}%)`)
+        .join(', ');
+      explanation += `\n\nSimilar matches: ${matchList}`;
+    }
+  } else if (ambiguous.phase === 19) {
+    const p19 = ambiguous as Phase19AmbiguousCase;
+    if (p19.fuzzyMatches.length > 0) {
+      const matchList = p19.fuzzyMatches
+        .slice(0, 3)
+        .map(m => `${m.name} (${Math.round(m.score * 100)}%)`)
+        .join(', ');
+      explanation += `\n\nSimilar skills: ${matchList}`;
+    }
+  }
+
+  return {
+    id: `phase${ambiguous.phase}-${ambiguous.type}`,
+    phase: ambiguous.phase,
+    title: titles[ambiguous.type] || `Phase ${ambiguous.phase} Issue`,
+    explanation,
+    options,
+    applyCommand: buildApplyCommand(skillName, `phase${ambiguous.phase}-${ambiguous.type}`, true),
+  };
 }

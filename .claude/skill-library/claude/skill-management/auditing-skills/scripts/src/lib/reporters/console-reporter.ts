@@ -37,12 +37,12 @@ export class ConsoleReporter {
     console.log('');
 
     // Phase results table
-    console.log(chalk.blue.bold('All 21 Phases:\n'));
+    console.log(chalk.blue.bold('All 22 Phases:\n'));
 
     const phaseNames: Record<number, string> = {
       1: 'Description Format',
       2: 'Allowed-Tools',
-      3: 'Word Count',
+      3: 'Line Count',
       4: 'Broken Links',
       5: 'File Organization',
       6: 'Script Organization',
@@ -121,7 +121,7 @@ export class ConsoleReporter {
     output += `  ${chalk.red('🔴 CRITICAL')}: ${result.totalCritical || 0}\n`;
     output += `  ${chalk.yellow('⚠️ WARNING')}: ${result.totalWarnings || 0}\n`;
     output += `  ${chalk.blue('ℹ️ INFO')}: ${result.totalInfo || 0}\n\n`;
-    output += chalk.blue.bold('All 21 Phases:\n\n');
+    output += chalk.blue.bold('All 22 Phases:\n\n');
     output += tableOutput + '\n\n';
 
     // Quick actions

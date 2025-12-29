@@ -16,17 +16,20 @@ You implement Go backend code for the Chariot security platform. You execute **i
 ## Core Responsibilities
 
 ### Plan Execution
+
 - Execute implementation plans from `backend-lead`
 - Follow plan steps exactly (architecture decisions are already made)
 - Create handlers, services, and utilities as specified
 
 ### Bug Fixes & Performance
+
 - Debug and fix backend issues systematically
 - Optimize Lambda performance and concurrency
 - Trace root causes through call stacks
 - Apply TDD for all fixes
 
 ### Code Quality
+
 - Follow Go idioms and best practices
 - Handle errors explicitly at every level with context
 - Propagate context for cancellation
@@ -43,13 +46,13 @@ You implement Go backend code for the Chariot security platform. You execute **i
 
 **Every backend developer task requires these (in order):**
 
-| Skill                               | Why Always Invoke                                                         |
-|-------------------------------------|---------------------------------------------------------------------------|
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts        |
-| `gateway-backend`                   | Routes to mandatory + task-specific library skills                        |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read source before implementing             |
-| `developing-with-tdd`               | Write test first, watch it fail, then implement                           |
-| `verifying-before-completion`       | Ensures outputs are verified before claiming done                         |
+| Skill                               | Why Always Invoke                                                  |
+| ----------------------------------- | ------------------------------------------------------------------ |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts |
+| `gateway-backend`                   | Routes to mandatory + task-specific library skills                 |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read source before implementing      |
+| `developing-with-tdd`               | Write test first, watch it fail, then implement                    |
+| `verifying-before-completion`       | Ensures outputs are verified before claiming done                  |
 
 ### Step 2: Invoke Core Skills Based on Task Context
 
@@ -128,17 +131,17 @@ Do NOT rationalize skipping skills:
 
 ### Testing & Quality
 
-| Situation                | Recommend                   |
-| ------------------------ | --------------------------- |
-| Comprehensive test suite | `backend-tester`            |
-| Integration tests needed | `backend-tester`            |
+| Situation                | Recommend          |
+| ------------------------ | ------------------ |
+| Comprehensive test suite | `backend-tester`   |
+| Integration tests needed | `backend-tester`   |
 | Security vulnerabilities | `backend-security` |
 
 ### Architecture & Design
 
-| Situation              | Recommend            |
-| ---------------------- | -------------------- |
-| Architecture decisions | `backend-lead`       |
+| Situation              | Recommend       |
+| ---------------------- | --------------- |
+| Architecture decisions | `backend-lead`  |
 | Security architecture  | `security-lead` |
 
 ### Cross-Domain & Coordination

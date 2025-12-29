@@ -16,13 +16,14 @@ shadcn/ui is a collection of re-usable, accessible React components built on Rad
 
 ## Version Compatibility (2025)
 
-| Environment | Command | Notes |
-|-------------|---------|-------|
-| **New projects (React 19 + Tailwind v4)** | `npx shadcn@canary init` | Uses OKLCH colors, tw-animate-css |
-| **Existing projects (React 18 + Tailwind v3)** | `npx shadcn@latest init` | Non-breaking, still supported |
-| **Upgrade existing** | Follow official guide | See [Version Compatibility](references/version-compatibility.md) |
+| Environment                                    | Command                  | Notes                                                            |
+| ---------------------------------------------- | ------------------------ | ---------------------------------------------------------------- |
+| **New projects (React 19 + Tailwind v4)**      | `npx shadcn@canary init` | Uses OKLCH colors, tw-animate-css                                |
+| **Existing projects (React 18 + Tailwind v3)** | `npx shadcn@latest init` | Non-breaking, still supported                                    |
+| **Upgrade existing**                           | Follow official guide    | See [Version Compatibility](references/version-compatibility.md) |
 
 **Key 2024-2025 Changes:**
+
 - **Tailwind v4**: OKLCH colors, `@theme` directive, `data-slot` attributes
 - **React 19**: `forwardRef` removed from primitives, ref is now a prop
 - **Deprecations**: Toast → Sonner, tailwindcss-animate → tw-animate-css, "Default" style removed
@@ -36,6 +37,7 @@ shadcn/ui introduced significant customization and flexibility improvements:
 ### npx shadcn create
 
 Create fully customized projects with `npx shadcn create`:
+
 - **Component library**: Choose between Radix UI or Base UI
 - **Visual styles**: 5 new styles (Vega, Nova, Maia, Lyra, Mira)
 - **Icons**: Select from multiple icon libraries
@@ -47,6 +49,7 @@ Create fully customized projects with `npx shadcn create`:
 ### Base UI Component Library
 
 Every component rebuilt for Base UI while maintaining full compatibility:
+
 - Same API and abstraction layer
 - Works with existing Radix components
 - Full type safety maintained
@@ -54,6 +57,7 @@ Every component rebuilt for Base UI while maintaining full compatibility:
 ### New Field Components
 
 Form field components work with all component libraries:
+
 - Compatible with Radix, Base UI, and React Aria
 - Unified form abstraction
 - Consistent validation patterns
@@ -61,6 +65,7 @@ Form field components work with all component libraries:
 ### Registry Directory
 
 Published registry directory for browsing and pulling code:
+
 - Community registries
 - Custom component collections
 - Namespace support (`@acme/button`)
@@ -108,6 +113,7 @@ npx shadcn@latest add button navigation-menu sidebar
 ```
 
 **Key patterns:**
+
 - Root layouts with Navigation Menu and Sidebar components
 - Loading states with Skeleton components
 - Error boundaries with Alert components
@@ -128,6 +134,7 @@ npx shadcn@latest add table button dropdown-menu
 ```
 
 **Key patterns:**
+
 - Data tables with sorting and pagination
 - Server-side operations for large datasets
 - Row selection with Checkbox components
@@ -137,6 +144,7 @@ npx shadcn@latest add table button dropdown-menu
 **Full guide:** [TanStack Table Integration](references/tanstack-table-integration.md)
 
 **Official resources:**
+
 - [shadcn/ui Data Table](https://ui.shadcn.com/docs/components/data-table)
 - [shadcn/ui TanStack Router Setup](https://ui.shadcn.com/docs/installation/tanstack-router)
 
@@ -180,15 +188,15 @@ npx shadcn@latest add https://example.com/registry/navbar.json
 
 ### Component Categories
 
-| Category         | Common Use Cases       | Key Components                              |
-| ---------------- | ---------------------- | ------------------------------------------- |
-| **Forms**        | User input, validation | Input, Form, Select, Checkbox, Field        |
-| **Overlays**     | Modals, popovers       | Dialog, Popover, Tooltip, Sheet             |
-| **Navigation**   | Menus, sidebars        | Sidebar, Dropdown Menu, Navigation Menu     |
-| **Feedback**     | Notifications          | Sonner (toast), Alert, Progress, Skeleton   |
-| **Data Display** | Tables, charts, cards  | Table, Card, Badge, Avatar, Chart           |
-| **Layout**       | Containers, panels     | Separator, Resizable, Scroll Area           |
-| **New (2025)**   | Enhanced inputs        | Spinner, Kbd, Button Group, Input Group     |
+| Category         | Common Use Cases       | Key Components                            |
+| ---------------- | ---------------------- | ----------------------------------------- |
+| **Forms**        | User input, validation | Input, Form, Select, Checkbox, Field      |
+| **Overlays**     | Modals, popovers       | Dialog, Popover, Tooltip, Sheet           |
+| **Navigation**   | Menus, sidebars        | Sidebar, Dropdown Menu, Navigation Menu   |
+| **Feedback**     | Notifications          | Sonner (toast), Alert, Progress, Skeleton |
+| **Data Display** | Tables, charts, cards  | Table, Card, Badge, Avatar, Chart         |
+| **Layout**       | Containers, panels     | Separator, Resizable, Scroll Area         |
+| **New (2025)**   | Enhanced inputs        | Spinner, Kbd, Button Group, Input Group   |
 
 **Full reference:** [Component Categories](references/component-categories.md)
 
@@ -197,11 +205,11 @@ npx shadcn@latest add https://example.com/registry/navbar.json
 shadcn/ui uses a `cn` utility for class merging:
 
 ```typescript
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 ```
 
@@ -420,21 +428,21 @@ const buttonVariants = cva("...", {
       success: "bg-green-600 text-white hover:bg-green-700",
     },
   },
-})
+});
 ```
 
 **Full guide:** [Customization](examples/customization.md)
 
 ## Common Mistakes
 
-| Mistake                       | Fix                                                          |
-| ----------------------------- | ------------------------------------------------------------ |
-| Installing as npm package     | Run `npx shadcn@latest add [component]` - it copies code     |
-| Using deprecated Toast        | Use Sonner instead: `npx shadcn@latest add sonner`           |
-| HSL colors in Tailwind v4     | Use OKLCH format: `oklch(0.6 0.2 250)`                       |
-| Using "Default" style         | Use "new-york" - Default style is deprecated                 |
-| Importing from `shadcn`       | Import from `@/components/ui/[component]`                    |
-| Skipping shadcnblocks.com     | Don't build common sections from scratch - use ready blocks  |
+| Mistake                   | Fix                                                         |
+| ------------------------- | ----------------------------------------------------------- |
+| Installing as npm package | Run `npx shadcn@latest add [component]` - it copies code    |
+| Using deprecated Toast    | Use Sonner instead: `npx shadcn@latest add sonner`          |
+| HSL colors in Tailwind v4 | Use OKLCH format: `oklch(0.6 0.2 250)`                      |
+| Using "Default" style     | Use "new-york" - Default style is deprecated                |
+| Importing from `shadcn`   | Import from `@/components/ui/[component]`                   |
+| Skipping shadcnblocks.com | Don't build common sections from scratch - use ready blocks |
 
 ## Workflow Summary
 
@@ -470,20 +478,20 @@ Works seamlessly with: Next.js, Remix, Astro, Vite + React, Laravel, React Hook 
 
 ## Examples & References
 
-| Topic | Location |
-|-------|----------|
-| **TanStack Integration** | |
-| TanStack Router | [references/tanstack-router-integration.md](references/tanstack-router-integration.md) |
-| TanStack Table | [references/tanstack-table-integration.md](references/tanstack-table-integration.md) |
-| **Component References** | |
-| Component categories | [references/component-categories.md](references/component-categories.md) |
-| Version compatibility | [references/version-compatibility.md](references/version-compatibility.md) |
-| CLI features | [references/cli-features.md](references/cli-features.md) |
-| shadcnblocks catalog | [references/shadcnblocks-categories.md](references/shadcnblocks-categories.md) |
-| **Code Examples** | |
-| Basic components | [examples/basic-components.md](examples/basic-components.md) |
-| Forms | [examples/forms.md](examples/forms.md) |
-| Dialogs | [examples/dialogs.md](examples/dialogs.md) |
-| Block usage | [examples/blocks-usage.md](examples/blocks-usage.md) |
-| Customization | [examples/customization.md](examples/customization.md) |
-| Common patterns | [examples/common-patterns.md](examples/common-patterns.md) |
+| Topic                    | Location                                                                               |
+| ------------------------ | -------------------------------------------------------------------------------------- |
+| **TanStack Integration** |                                                                                        |
+| TanStack Router          | [references/tanstack-router-integration.md](references/tanstack-router-integration.md) |
+| TanStack Table           | [references/tanstack-table-integration.md](references/tanstack-table-integration.md)   |
+| **Component References** |                                                                                        |
+| Component categories     | [references/component-categories.md](references/component-categories.md)               |
+| Version compatibility    | [references/version-compatibility.md](references/version-compatibility.md)             |
+| CLI features             | [references/cli-features.md](references/cli-features.md)                               |
+| shadcnblocks catalog     | [references/shadcnblocks-categories.md](references/shadcnblocks-categories.md)         |
+| **Code Examples**        |                                                                                        |
+| Basic components         | [examples/basic-components.md](examples/basic-components.md)                           |
+| Forms                    | [examples/forms.md](examples/forms.md)                                                 |
+| Dialogs                  | [examples/dialogs.md](examples/dialogs.md)                                             |
+| Block usage              | [examples/blocks-usage.md](examples/blocks-usage.md)                                   |
+| Customization            | [examples/customization.md](examples/customization.md)                                 |
+| Common patterns          | [examples/common-patterns.md](examples/common-patterns.md)                             |

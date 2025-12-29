@@ -24,12 +24,12 @@ Use this skill when:
 
 React state management follows a **four-tier architecture** based on the **"simplest tool for the job"** principle:
 
-| Tier | Solution        | Use Case                      | Token Count |
-| ---- | --------------- | ----------------------------- | ----------- |
-| 1    | TanStack Query  | Server state (API data)       | Primary     |
-| 2    | React Context   | Global client state           | 12 contexts |
-| 3    | Zustand + Immer | Complex feature state         | Rare        |
-| 4    | useReducer      | State machines                | Specialized |
+| Tier | Solution        | Use Case                | Token Count |
+| ---- | --------------- | ----------------------- | ----------- |
+| 1    | TanStack Query  | Server state (API data) | Primary     |
+| 2    | React Context   | Global client state     | 12 contexts |
+| 3    | Zustand + Immer | Complex feature state   | Rare        |
+| 4    | useReducer      | State machines          | Specialized |
 
 **Core Principle**: Start with the simplest solution. Only escalate to more complex tools when simpler ones don't meet requirements.
 
@@ -117,13 +117,13 @@ export const queryClient = new QueryClient({
 
 ```typescript
 // Drawer state read from URL
-const drawerOrder = JSON.parse(searchParams.get('drawerOrder') || '[]');
+const drawerOrder = JSON.parse(searchParams.get("drawerOrder") || "[]");
 
 // Updates modify URL for deep linking
 function handleOpenDrawer(resource) {
   handleSetSearchParams({
-    drawerType: 'asset',
-    tabKeys: ['drawerTab'],
+    drawerType: "asset",
+    tabKeys: ["drawerTab"],
     resource,
   });
 }
@@ -164,8 +164,8 @@ function handleOpenDrawer(resource) {
 **Pattern** (Zustand + Immer):
 
 ```typescript
-import { immer } from 'zustand/middleware/immer';
-import { createWithEqualityFn } from 'zustand/traditional';
+import { immer } from "zustand/middleware/immer";
+import { createWithEqualityFn } from "zustand/traditional";
 
 export const useStore = createWithEqualityFn<State>()(
   immer((set) => ({
@@ -228,18 +228,18 @@ const { blocks, actions } = useStore();
 
 ```typescript
 type GraphStateAction =
-  | { type: 'SELECT_NODES'; payload: { nodes: Set<string> } }
-  | { type: 'CLEAR_SELECTION' }
-  | { type: 'SET_ENTITY_TYPE'; payload: { entityType: GraphEntityType } };
+  | { type: "SELECT_NODES"; payload: { nodes: Set<string> } }
+  | { type: "CLEAR_SELECTION" }
+  | { type: "SET_ENTITY_TYPE"; payload: { entityType: GraphEntityType } };
 
 const graphStateReducer = (state: GraphState, action: GraphStateAction): GraphState => {
   switch (action.type) {
-    case 'SELECT_NODES':
+    case "SELECT_NODES":
       return {
         ...state,
         selection: { ...state.selection, nodes: action.payload.nodes },
       };
-    case 'CLEAR_SELECTION':
+    case "CLEAR_SELECTION":
       return {
         ...state,
         selection: { nodes: new Set(), cluster: null, assetKey: null },

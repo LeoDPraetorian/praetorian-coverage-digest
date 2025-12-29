@@ -7,6 +7,7 @@ Complete guide for integrating shadcn/ui components with TanStack Router for typ
 TanStack Router is a fully type-safe router for React with built-in caching, first-class search-param APIs, and client-side cache integration. When combined with shadcn/ui, it provides a powerful foundation for modern React applications.
 
 **Official Documentation:**
+
 - [shadcn/ui TanStack Router Installation](https://ui.shadcn.com/docs/installation/tanstack-router)
 - [TanStack Router Docs](https://tanstack.com/router/latest/docs/framework/react/overview)
 - [How to Integrate Shadcn/ui](https://tanstack.com/router/latest/docs/framework/react/how-to/integrate-shadcn-ui)
@@ -431,12 +432,12 @@ import { Link } from '@tanstack/react-router'
 Use loaders for data fetching to enable prefetching and caching:
 
 ```typescript
-export const Route = createFileRoute('/posts')({
+export const Route = createFileRoute("/posts")({
   loader: async () => {
-    return await fetchPosts()
+    return await fetchPosts();
   },
   component: Posts,
-})
+});
 ```
 
 ### 3. Implement Error Boundaries

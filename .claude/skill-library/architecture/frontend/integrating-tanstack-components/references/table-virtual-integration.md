@@ -8,12 +8,12 @@ TanStack Virtual provides **virtualization** - rendering only visible rows to th
 
 ## When to Use Virtualization
 
-| Dataset Size | Recommendation |
-|--------------|----------------|
-| < 500 rows | No virtualization needed |
-| 500-5,000 rows | Consider virtualization |
-| 5,000-100,000 rows | **Virtualization required** |
-| 100,000+ rows | Virtualization + server-side pagination |
+| Dataset Size       | Recommendation                          |
+| ------------------ | --------------------------------------- |
+| < 500 rows         | No virtualization needed                |
+| 500-5,000 rows     | Consider virtualization                 |
+| 5,000-100,000 rows | **Virtualization required**             |
+| 100,000+ rows      | Virtualization + server-side pagination |
 
 ## Core Integration Pattern
 
@@ -432,15 +432,15 @@ const rowVirtualizer = useVirtualizer({
   estimateSize: () => 48, // ✅ OK - primitive
   getScrollElement: () => containerRef.current, // ✅ OK - ref
   rangeExtractor: (range) => customExtract(range), // ❌ New function every render
-})
+});
 
 // GOOD: Stable function references
-const rangeExtractor = useCallback((range) => customExtract(range), [])
+const rangeExtractor = useCallback((range) => customExtract(range), []);
 const rowVirtualizer = useVirtualizer({
   estimateSize: () => 48,
   getScrollElement: () => containerRef.current,
   rangeExtractor, // ✅ Stable reference
-})
+});
 ```
 
 ## Integration with Sorting/Filtering

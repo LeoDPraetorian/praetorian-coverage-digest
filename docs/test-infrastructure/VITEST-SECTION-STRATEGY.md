@@ -37,12 +37,14 @@ Based on analysis of `modules/chariot/ui/src/sections/`:
 **Script Pattern**: `test:sections:{directoryName}`
 
 **Rationale**: Provide a script for EVERY section, regardless of size
+
 - Consistency across codebase
 - Predictable naming convention
 - Easy to discover (matches directory structure)
 - Scales as sections grow
 
 **Scripts Created**:
+
 ```json
 "test:sections:asset"              // 7 tests  - Asset management
 "test:sections:agents"             // Unknown  - Agent management
@@ -65,12 +67,14 @@ Based on analysis of `modules/chariot/ui/src/sections/`:
 **Rationale**: Large subsections within insights/ deserve dedicated scripts for faster iteration
 
 **Scripts Created**:
+
 ```json
 "test:querybuilder"  // ~15 tests - Query builder (subset of insights)
 "test:metrics"       //  ~6 tests - Metrics dashboard (subset of insights)
 ```
 
 **Why both `test:sections:insights` AND `test:querybuilder`?**
+
 - `test:sections:insights` - Runs ALL insights tests (25 files, ~8-10 seconds)
 - `test:querybuilder` - Runs ONLY query builder (~2-3 seconds for focused work)
 - Developer chooses based on scope of changes
@@ -82,6 +86,7 @@ Based on analysis of `modules/chariot/ui/src/sections/`:
 **Rationale**: Cross-cutting concerns that span multiple sections
 
 **Scripts Created**:
+
 ```json
 "test:components"  // All reusable UI components
 "test:hooks"       // All custom React hooks
@@ -94,6 +99,7 @@ Based on analysis of `modules/chariot/ui/src/sections/`:
 **Rationale**: Parallel execution across multiple CI runners
 
 **Scripts Created**:
+
 ```json
 "test:shard:1"  // 1/4 of all tests
 "test:shard:2"  // 2/4 of all tests
@@ -103,13 +109,13 @@ Based on analysis of `modules/chariot/ui/src/sections/`:
 
 ## Decision Criteria Matrix
 
-| Criteria | Rationale | Example |
-|----------|-----------|---------|
-| **Has tests?** | Only create script if directory contains test files | ✅ jobs (14 tests) → create script |
-| **Match directory name** | Use exact directory name for predictability | ✅ `asset` not `assets` |
-| **All sections included** | No arbitrary omissions - comprehensive coverage | ✅ Even 1-test sections get scripts |
-| **Alphabetical order** | Easy to scan in package.json | ✅ agents → asset → customer... |
-| **Subsection shortcuts** | High-traffic subsections get convenience aliases | ✅ `test:querybuilder` for quick iteration |
+| Criteria                  | Rationale                                           | Example                                    |
+| ------------------------- | --------------------------------------------------- | ------------------------------------------ |
+| **Has tests?**            | Only create script if directory contains test files | ✅ jobs (14 tests) → create script         |
+| **Match directory name**  | Use exact directory name for predictability         | ✅ `asset` not `assets`                    |
+| **All sections included** | No arbitrary omissions - comprehensive coverage     | ✅ Even 1-test sections get scripts        |
+| **Alphabetical order**    | Easy to scan in package.json                        | ✅ agents → asset → customer...            |
+| **Subsection shortcuts**  | High-traffic subsections get convenience aliases    | ✅ `test:querybuilder` for quick iteration |
 
 ## Why Include Sections with Only 1 Test?
 
@@ -142,11 +148,13 @@ test:shard:{n}                        // CI/CD parallelization
 ### Examples of Correct Naming
 
 ✅ **Correct**:
+
 - `test:sections:asset` (matches `src/sections/asset/`)
 - `test:sections:customerDrawer` (matches `src/sections/customerDrawer/`)
 - `test:querybuilder` (convenience for `src/sections/insights/queryBuilder/`)
 
 ❌ **Wrong** (Initial mistakes):
+
 - `test:sections:assets` (directory is `asset` not `assets`)
 - Missing `test:sections:jobs` (arbitrary omission)
 - Missing `test:sections:technology` (inconsistent)
@@ -181,12 +189,13 @@ test:shard:{n}                        // CI/CD parallelization
 
     // CI/CD sharding
     "test:shard:1": "...",
-    "test:shard:2": "...",
+    "test:shard:2": "..."
   }
 }
 ```
 
 **Benefits**:
+
 - Clear visual separation
 - Easy to find scripts by category
 - Alphabetical within categories
@@ -196,15 +205,15 @@ test:shard:{n}                        // CI/CD parallelization
 
 Based on test counts:
 
-| Section | Test Files | Est. Duration | Recommendation |
-|---------|------------|---------------|----------------|
-| settings | 29 | ~8-12s | ⚠️ May want to split further |
-| insights | 25 | ~8-10s | ✅ Has subsection shortcuts (querybuilder, metrics) |
-| vulnerabilities | 19 | ~5-7s | ✅ Good size |
-| jobs | 14 | ~4-5s | ✅ Good size |
-| asset | 7 | ~2-3s | ✅ Fast |
-| seeds | 4 | ~1-2s | ✅ Very fast |
-| others | 1 each | <1s | ✅ Instant |
+| Section         | Test Files | Est. Duration | Recommendation                                      |
+| --------------- | ---------- | ------------- | --------------------------------------------------- |
+| settings        | 29         | ~8-12s        | ⚠️ May want to split further                        |
+| insights        | 25         | ~8-10s        | ✅ Has subsection shortcuts (querybuilder, metrics) |
+| vulnerabilities | 19         | ~5-7s         | ✅ Good size                                        |
+| jobs            | 14         | ~4-5s         | ✅ Good size                                        |
+| asset           | 7          | ~2-3s         | ✅ Fast                                             |
+| seeds           | 4          | ~1-2s         | ✅ Very fast                                        |
+| others          | 1 each     | <1s           | ✅ Instant                                          |
 
 **Insight**: Settings (29 tests) might benefit from further subsection scripts if developers frequently work on specific settings features.
 
@@ -265,11 +274,13 @@ After this reorganization, update:
 ## Summary
 
 **Previous (Flawed)**:
+
 - 5 section scripts (arbitrary)
 - Missing jobs, technology, agents, customerManagement, etc.
 - Naming inconsistencies
 
 **Current (Systematic)**:
+
 - 12 section scripts (comprehensive)
 - Covers ALL sections with tests
 - Alphabetically organized

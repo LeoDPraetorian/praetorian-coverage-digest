@@ -66,18 +66,18 @@ interface GraphState {
 
 ```typescript
 type GraphStateAction =
-  | { type: 'SELECT_NODES'; payload: { nodes: Set<string> } }
-  | { type: 'SELECT_CLUSTER'; payload: { cluster: string; nodes: Set<string> } }
-  | { type: 'CLEAR_SELECTION' }
-  | { type: 'SET_ASSET_KEY'; payload: { assetKey: string | null } }
-  | { type: 'SET_ENTITY_TYPE'; payload: { entityType: GraphEntityType } }
-  | { type: 'SET_SELECTED_TYPES'; payload: { selectedTypes: GraphEntityType[] } }
-  | { type: 'SET_VISIBILITY'; payload: { state: VisibilityState } }
-  | { type: 'SET_WEIGHT'; payload: { name: string; weight: number } }
-  | { type: 'SET_CLUSTERS'; payload: { clusters: Cluster[] } }
-  | { type: 'SET_GRAPH_REF'; payload: { graphRef: Graph | null } }
-  | { type: 'SET_INITIAL_LOAD'; payload: { isInitialLoad: boolean } }
-  | { type: 'SET_SHOW_OUTDATED_WARNING'; payload: { show: boolean } };
+  | { type: "SELECT_NODES"; payload: { nodes: Set<string> } }
+  | { type: "SELECT_CLUSTER"; payload: { cluster: string; nodes: Set<string> } }
+  | { type: "CLEAR_SELECTION" }
+  | { type: "SET_ASSET_KEY"; payload: { assetKey: string | null } }
+  | { type: "SET_ENTITY_TYPE"; payload: { entityType: GraphEntityType } }
+  | { type: "SET_SELECTED_TYPES"; payload: { selectedTypes: GraphEntityType[] } }
+  | { type: "SET_VISIBILITY"; payload: { state: VisibilityState } }
+  | { type: "SET_WEIGHT"; payload: { name: string; weight: number } }
+  | { type: "SET_CLUSTERS"; payload: { clusters: Cluster[] } }
+  | { type: "SET_GRAPH_REF"; payload: { graphRef: Graph | null } }
+  | { type: "SET_INITIAL_LOAD"; payload: { isInitialLoad: boolean } }
+  | { type: "SET_SHOW_OUTDATED_WARNING"; payload: { show: boolean } };
 ```
 
 **Why discriminated union**: TypeScript enforces that payload matches action type. Compile-time safety.
@@ -85,12 +85,9 @@ type GraphStateAction =
 ### Reducer Function
 
 ```typescript
-const graphStateReducer = (
-  state: GraphState,
-  action: GraphStateAction
-): GraphState => {
+const graphStateReducer = (state: GraphState, action: GraphStateAction): GraphState => {
   switch (action.type) {
-    case 'SELECT_NODES':
+    case "SELECT_NODES":
       return {
         ...state,
         selection: {
@@ -99,7 +96,7 @@ const graphStateReducer = (
         },
       };
 
-    case 'CLEAR_SELECTION':
+    case "CLEAR_SELECTION":
       return {
         ...state,
         selection: {
@@ -109,7 +106,7 @@ const graphStateReducer = (
         },
       };
 
-    case 'SELECT_CLUSTER':
+    case "SELECT_CLUSTER":
       return {
         ...state,
         selection: {
@@ -119,7 +116,7 @@ const graphStateReducer = (
         },
       };
 
-    case 'SET_ENTITY_TYPE':
+    case "SET_ENTITY_TYPE":
       return {
         ...state,
         entity: {
@@ -196,27 +193,27 @@ export const GraphStateProvider: FC<{ children: ReactNode }> = ({ children }) =>
 
 ```typescript
 type LoadingState =
-  | { status: 'idle' }
-  | { status: 'loading' }
-  | { status: 'success'; data: Data }
-  | { status: 'error'; error: Error };
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: Data }
+  | { status: "error"; error: Error };
 
 type LoadingAction =
-  | { type: 'FETCH_START' }
-  | { type: 'FETCH_SUCCESS'; payload: Data }
-  | { type: 'FETCH_ERROR'; payload: Error }
-  | { type: 'RESET' };
+  | { type: "FETCH_START" }
+  | { type: "FETCH_SUCCESS"; payload: Data }
+  | { type: "FETCH_ERROR"; payload: Error }
+  | { type: "RESET" };
 
 const loadingReducer = (state: LoadingState, action: LoadingAction): LoadingState => {
   switch (action.type) {
-    case 'FETCH_START':
-      return { status: 'loading' };
-    case 'FETCH_SUCCESS':
-      return { status: 'success', data: action.payload };
-    case 'FETCH_ERROR':
-      return { status: 'error', error: action.payload };
-    case 'RESET':
-      return { status: 'idle' };
+    case "FETCH_START":
+      return { status: "loading" };
+    case "FETCH_SUCCESS":
+      return { status: "success", data: action.payload };
+    case "FETCH_ERROR":
+      return { status: "error", error: action.payload };
+    case "RESET":
+      return { status: "idle" };
     default:
       return state;
   }
@@ -236,13 +233,13 @@ interface FormState {
 }
 
 type FormAction =
-  | { type: 'SET_FIELD'; payload: { field: string; value: any } }
-  | { type: 'SET_ERROR'; payload: { field: string; error: string } }
-  | { type: 'TOUCH_FIELD'; payload: { field: string } }
-  | { type: 'SUBMIT_START' }
-  | { type: 'SUBMIT_SUCCESS' }
-  | { type: 'SUBMIT_ERROR'; payload: Record<string, string> }
-  | { type: 'RESET' };
+  | { type: "SET_FIELD"; payload: { field: string; value: any } }
+  | { type: "SET_ERROR"; payload: { field: string; error: string } }
+  | { type: "TOUCH_FIELD"; payload: { field: string } }
+  | { type: "SUBMIT_START" }
+  | { type: "SUBMIT_SUCCESS" }
+  | { type: "SUBMIT_ERROR"; payload: Record<string, string> }
+  | { type: "RESET" };
 ```
 
 **When appropriate**: Multi-step forms with validation, conditional fields, cross-field dependencies.
@@ -256,7 +253,7 @@ type FormAction =
 ```typescript
 // ✅ GOOD - memoized
 const setNodes = useCallback((nodes: Set<string>) => {
-  dispatch({ type: 'SELECT_NODES', payload: { nodes } });
+  dispatch({ type: "SELECT_NODES", payload: { nodes } });
 }, []);
 ```
 
@@ -264,11 +261,14 @@ const setNodes = useCallback((nodes: Set<string>) => {
 
 ```typescript
 // ✅ GOOD - prevents re-renders
-const value = useMemo(() => ({
-  selection: state.selection,
-  setNodes,
-  clearSelection,
-}), [state.selection, setNodes, clearSelection]);
+const value = useMemo(
+  () => ({
+    selection: state.selection,
+    setNodes,
+    clearSelection,
+  }),
+  [state.selection, setNodes, clearSelection]
+);
 
 // ❌ BAD - creates new object every render
 const value = {
@@ -307,11 +307,11 @@ return state;
 For deeply nested state, Immer can simplify reducers:
 
 ```typescript
-import { produce } from 'immer';
+import { produce } from "immer";
 
 const reducer = produce((draft, action) => {
   switch (action.type) {
-    case 'UPDATE_NESTED':
+    case "UPDATE_NESTED":
       // Direct mutation with Immer
       draft.deeply.nested.value = action.payload;
       break;
@@ -330,8 +330,10 @@ const reducer = produce((draft, action) => {
 const [state, dispatch] = useReducer(
   (state, action) => {
     switch (action.type) {
-      case 'TOGGLE': return { isOpen: !state.isOpen };
-      default: return state;
+      case "TOGGLE":
+        return { isOpen: !state.isOpen };
+      default:
+        return state;
     }
   },
   { isOpen: false }
@@ -368,15 +370,15 @@ Consider Zustand instead.
 
 ## Comparison: useReducer vs Zustand
 
-| Feature          | useReducer + Context | Zustand           |
-| ---------------- | -------------------- | ----------------- |
-| **Boilerplate**  | More (Provider, etc) | Less              |
-| **State machine**| Natural fit          | Possible          |
-| **Global state** | Needs Context        | Built-in          |
-| **Middleware**   | Manual               | Built-in          |
-| **DevTools**     | Manual               | Built-in          |
-| **TypeScript**   | Excellent            | Excellent         |
-| **Learning curve**| Standard React      | Small library API |
+| Feature            | useReducer + Context | Zustand           |
+| ------------------ | -------------------- | ----------------- |
+| **Boilerplate**    | More (Provider, etc) | Less              |
+| **State machine**  | Natural fit          | Possible          |
+| **Global state**   | Needs Context        | Built-in          |
+| **Middleware**     | Manual               | Built-in          |
+| **DevTools**       | Manual               | Built-in          |
+| **TypeScript**     | Excellent            | Excellent         |
+| **Learning curve** | Standard React       | Small library API |
 
 **Recommendation**: Use useReducer + Context for state machines. Use Zustand for complex global state that isn't a state machine.
 

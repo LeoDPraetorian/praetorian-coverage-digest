@@ -358,3 +358,36 @@ Agent skipped researching-skills phase during using-context-api skill creation, 
 - Rationalization table documents 7 common excuses with rebuttals
 - Checkpoint prevents proceeding without research
 - File remains under 500-line limit (499 lines)
+
+## [Date: 2025-12-28] - Fix Line Count and Improve Discoverability
+
+### Changed
+- **Phase 3 Line Count**: Reduced from 554 lines to 471 lines (passed <500 limit)
+  - Extracted validation checklist and anti-patterns to `references/validation-and-anti-patterns.md`
+  - Extracted location and category selection to `references/location-and-category-selection.md`
+  - Consolidated Phase 2-3 in main SKILL.md with reference link
+- **Description Quality**: Enhanced discoverability by adding key terms
+  - Before: "Use when creating new skills - guides through location selection, skill type, template generation, and research integration"
+  - After: "Use when creating new skills with TDD - guides through RED-GREEN-REFACTOR phases, progressive disclosure, location selection, and research integration"
+  - Added: "TDD", "RED-GREEN-REFACTOR", "progressive disclosure"
+- **Phase 4 Broken Links**: Fixed broken reference to repo-root-detection.md
+  - Before: `references/patterns/repo-root-detection.md` (local path, doesn't exist)
+  - After: `../../../../skills/managing-skills/references/patterns/repo-root-detection.md` (correct parent path)
+
+### Reason
+- **RED failure** (Phase 3): SKILL.md exceeded 500-line hard limit (554 lines)
+- **RED failure** (Semantic): Description missing key discoverability terms for TDD workflow
+- **RED failure** (Phase 4): Broken link prevented navigation to repo-root pattern
+
+### Technical Details
+- Method: Full fixing workflow (deterministic + Claude-automated + hybrid)
+- Backup: `.local/20251228-230758-pre-fix.bak`
+- Audit result: PASSED WITH WARNINGS (no critical issues)
+- Remaining warnings: Phase 14b-c validation-only (code block quality, header hierarchy)
+
+### Files Changed
+- `SKILL.md` - Line 3 (description), lines 47, 160-162 (broken link fix, content extraction)
+- `references/validation-and-anti-patterns.md` - Created (extracted from SKILL.md)
+- `references/location-and-category-selection.md` - Created (extracted from SKILL.md)
+
+---

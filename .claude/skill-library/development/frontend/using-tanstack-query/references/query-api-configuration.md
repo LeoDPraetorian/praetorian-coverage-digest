@@ -51,18 +51,18 @@ This ensures cached data remains available when it goes stale, allowing TanStack
 ```typescript
 // ✅ GOOD: gcTime >= staleTime
 useQuery({
-  queryKey: ['user', userId],
+  queryKey: ["user", userId],
   queryFn: fetchUser,
-  staleTime: 30 * 1000,   // 30 seconds
-  gcTime: 5 * 60 * 1000,  // 5 minutes (10x staleTime)
+  staleTime: 30 * 1000, // 30 seconds
+  gcTime: 5 * 60 * 1000, // 5 minutes (10x staleTime)
 });
 
 // ❌ BAD: gcTime < staleTime
 useQuery({
-  queryKey: ['user', userId],
+  queryKey: ["user", userId],
   queryFn: fetchUser,
-  staleTime: 10 * 60 * 1000,  // 10 minutes
-  gcTime: 5 * 60 * 1000,       // 5 minutes - cache evicted before stale!
+  staleTime: 10 * 60 * 1000, // 10 minutes
+  gcTime: 5 * 60 * 1000, // 5 minutes - cache evicted before stale!
 });
 ```
 
@@ -78,14 +78,14 @@ Data never becomes stale automatically, but **manual operations still work**:
 
 ```typescript
 const { data } = useQuery({
-  queryKey: ['user-preferences'],
+  queryKey: ["user-preferences"],
   queryFn: fetchPreferences,
-  staleTime: Infinity,  // Never auto-refetch
+  staleTime: Infinity, // Never auto-refetch
 });
 
 // These WILL trigger refetch:
-queryClient.invalidateQueries({ queryKey: ['user-preferences'] })  // ✅ Works
-refetch()  // ✅ Works
+queryClient.invalidateQueries({ queryKey: ["user-preferences"] }); // ✅ Works
+refetch(); // ✅ Works
 ```
 
 **Use when:** Data rarely changes but you still need manual refresh capability (user settings, profile data).
@@ -96,14 +96,14 @@ Data is **completely static** - prevents ALL refetches including manual operatio
 
 ```typescript
 const { data } = useQuery({
-  queryKey: ['app-constants'],
+  queryKey: ["app-constants"],
   queryFn: fetchConstants,
-  staleTime: 'static' as const,  // Truly immutable
+  staleTime: "static" as const, // Truly immutable
 });
 
 // These will NOT trigger refetch:
-queryClient.invalidateQueries({ queryKey: ['app-constants'] })  // ❌ Ignored
-refetch()  // ❌ Returns cached data
+queryClient.invalidateQueries({ queryKey: ["app-constants"] }); // ❌ Ignored
+refetch(); // ❌ Returns cached data
 ```
 
 **Even `refetchOnMount: 'always'` is ignored** when `staleTime: 'static'`.
@@ -112,13 +112,13 @@ refetch()  // ❌ Returns cached data
 
 #### Comparison Table
 
-| Operation | `staleTime: Infinity` | `staleTime: 'static'` |
-|-----------|----------------------|----------------------|
-| Auto-refetch (window focus, reconnect) | ❌ Never | ❌ Never |
-| `invalidateQueries()` | ✅ Triggers refetch | ❌ Ignored |
-| `refetch()` | ✅ Refetches | ❌ Returns cached |
-| `refetchOnMount: 'always'` | ✅ Refetches | ❌ Ignored |
-| Manual `queryClient.fetchQuery()` | ✅ Refetches | ❌ Returns cached |
+| Operation                              | `staleTime: Infinity` | `staleTime: 'static'` |
+| -------------------------------------- | --------------------- | --------------------- |
+| Auto-refetch (window focus, reconnect) | ❌ Never              | ❌ Never              |
+| `invalidateQueries()`                  | ✅ Triggers refetch   | ❌ Ignored            |
+| `refetch()`                            | ✅ Refetches          | ❌ Returns cached     |
+| `refetchOnMount: 'always'`             | ✅ Refetches          | ❌ Ignored            |
+| Manual `queryClient.fetchQuery()`      | ✅ Refetches          | ❌ Returns cached     |
 
 **Source:** [useQuery API Reference](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery)
 
@@ -133,30 +133,32 @@ TanStack Query v5 provides helper functions for creating type-safe, reusable que
 Co-locates `queryKey` and `queryFn` with full type inference:
 
 ```typescript
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions } from "@tanstack/react-query";
 
 // Define reusable query configuration
-export const todoOptions = (id: number) => queryOptions({
-  queryKey: ['todos', id],
-  queryFn: () => fetchTodo(id),
-  staleTime: 5000,
-})
+export const todoOptions = (id: number) =>
+  queryOptions({
+    queryKey: ["todos", id],
+    queryFn: () => fetchTodo(id),
+    staleTime: 5000,
+  });
 
 // Use in components
 function TodoDetail({ id }: { id: number }) {
-  const { data } = useQuery(todoOptions(id))
+  const { data } = useQuery(todoOptions(id));
   // data is automatically typed as Todo
 }
 
 // Use with prefetch
-await queryClient.prefetchQuery(todoOptions(123))
+await queryClient.prefetchQuery(todoOptions(123));
 
 // Type-safe cache access
-const todo = queryClient.getQueryData(todoOptions(123).queryKey)
+const todo = queryClient.getQueryData(todoOptions(123).queryKey);
 // TypeScript infers: Todo | undefined (no manual type parameter!)
 ```
 
 **Benefits:**
+
 - Type inference works automatically
 - Share queries across components, prefetch, and cache operations
 - Query keys tagged with return type information
@@ -169,28 +171,29 @@ const todo = queryClient.getQueryData(todoOptions(123).queryKey)
 Separate helper for infinite queries with type safety:
 
 ```typescript
-import { infiniteQueryOptions } from '@tanstack/react-query'
+import { infiniteQueryOptions } from "@tanstack/react-query";
 
 // Define reusable infinite query configuration
 export const projectsOptions = infiniteQueryOptions({
-  queryKey: ['projects'],
+  queryKey: ["projects"],
   queryFn: ({ pageParam }) => fetchProjects(pageParam),
   initialPageParam: 0,
   getNextPageParam: (lastPage) => lastPage.nextCursor,
   getPreviousPageParam: (firstPage) => firstPage.prevCursor,
-})
+});
 
 // Use in components
 function ProjectsList() {
-  const { data, fetchNextPage } = useInfiniteQuery(projectsOptions)
+  const { data, fetchNextPage } = useInfiniteQuery(projectsOptions);
   // data.pages is automatically typed
 }
 
 // Use with prefetch
-await queryClient.prefetchInfiniteQuery(projectsOptions)
+await queryClient.prefetchInfiniteQuery(projectsOptions);
 ```
 
 **When to use which:**
+
 - `queryOptions` - For `useQuery`, `useSuspenseQuery`
 - `infiniteQueryOptions` - For `useInfiniteQuery`, `useSuspenseInfiniteQuery`
 

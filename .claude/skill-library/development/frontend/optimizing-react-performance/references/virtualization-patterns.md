@@ -6,12 +6,12 @@ Virtualization renders only the visible portion of a large list, dramatically im
 
 ## When to Virtualize
 
-| List Size | Recommendation         | Reasoning                                      |
-| --------- | ---------------------- | ---------------------------------------------- |
+| List Size | Recommendation         | Reasoning                                                  |
+| --------- | ---------------------- | ---------------------------------------------------------- |
 | < 100     | ❌ No virtualization   | Browser handles efficiently, added complexity not worth it |
-| 100-500   | ⚠️ Consider pagination | Profile first, pagination may be simpler |
-| 500-1000  | ⚠️ Profile first       | Depends on row complexity and device |
-| > 1000    | ✅ **Virtualize**      | Clear performance benefit at this scale |
+| 100-500   | ⚠️ Consider pagination | Profile first, pagination may be simpler                   |
+| 500-1000  | ⚠️ Profile first       | Depends on row complexity and device                       |
+| > 1000    | ✅ **Virtualize**      | Clear performance benefit at this scale                    |
 
 **Profiling tip**: Use React DevTools Profiler. If list rendering >50ms, consider virtualization even below 1000 items.
 
@@ -65,7 +65,7 @@ function VirtualizedAssetList({ assets }: { assets: Asset[] }) {
 Returns the **estimated** size of each item. For fixed-size items, return exact value:
 
 ```typescript
-estimateSize: () => 60 // All rows are 60px
+estimateSize: () => 60; // All rows are 60px
 ```
 
 For variable-size items, return best estimate. Virtualizer will measure actual sizes after render.
@@ -75,6 +75,7 @@ For variable-size items, return best estimate. Virtualizer will measure actual s
 Number of items to render outside viewport. Higher values = smoother scrolling but more DOM nodes.
 
 **Recommendations**:
+
 - Desktop: 5-10
 - Mobile: 3-5 (fewer resources)
 - Very fast scrolling: 15-20
@@ -84,8 +85,9 @@ Number of items to render outside viewport. Higher values = smoother scrolling b
 Returns the scrollable container. Use `() => parentRef.current` for most cases.
 
 For window scrolling:
+
 ```typescript
-getScrollElement: () => window
+getScrollElement: () => window;
 ```
 
 ## Variable Height Items
@@ -204,13 +206,13 @@ Programmatically scroll to specific items:
 ```typescript
 // Scroll to index 100
 virtualizer.scrollToIndex(100, {
-  align: 'start', // 'start' | 'center' | 'end' | 'auto'
-  behavior: 'smooth' // 'auto' | 'smooth'
+  align: "start", // 'start' | 'center' | 'end' | 'auto'
+  behavior: "smooth", // 'auto' | 'smooth'
 });
 
 // Scroll to offset
 virtualizer.scrollToOffset(5000, {
-  behavior: 'smooth'
+  behavior: "smooth",
 });
 ```
 
@@ -401,10 +403,10 @@ High overscan values hurt performance by rendering unnecessary items:
 
 ```typescript
 // ❌ BAD: Renders 100 extra items
-overscan: 100
+overscan: 100;
 
 // ✅ GOOD: Renders 10 extra items
-overscan: 10
+overscan: 10;
 ```
 
 ### 4. Not Handling Empty State
@@ -422,6 +424,7 @@ if (items.length === 0) {
 ## Performance Tips
 
 1. **Memoize row components** - Prevent re-renders of unchanged rows:
+
 ```typescript
 const Row = React.memo(({ item }: { item: Item }) => (
   <div>{item.name}</div>

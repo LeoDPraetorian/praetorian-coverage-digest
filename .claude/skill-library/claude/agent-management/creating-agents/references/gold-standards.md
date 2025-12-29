@@ -32,6 +32,7 @@
 **Updated 2025-12-24**: frontend-developer uses the Claude 4.5+ tiered loading pattern. This is the template for ALL new agents.
 
 **Key Features**:
+
 - Tiered Skill Loading Protocol
 - Read() for all skills (not Skill tool)
 - Brief Anti-Bypass (3 points, no aggressive language)
@@ -66,10 +67,10 @@ color: green
 **2. Clear Skill Reference Table**:
 
 ```markdown
-| Task              | Skill to Read                                                                                     |
-| ----------------- | ------------------------------------------------------------------------------------------------- |
-| File organization | `.claude/skill-library/architecture/frontend/enforcing-information-architecture/SKILL.md`         |
-| Data fetching     | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`                     |
+| Task              | Skill to Read                                                                             |
+| ----------------- | ----------------------------------------------------------------------------------------- |
+| File organization | `.claude/skill-library/architecture/frontend/enforcing-information-architecture/SKILL.md` |
+| Data fetching     | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`             |
 
 ...
 ```
@@ -428,6 +429,7 @@ description: Use when...\n\n<example>...
 **An agent is gold standard quality when**:
 
 ### Claude 4.5+ Pattern (RECOMMENDED)
+
 - [ ] Size: <150 lines (leaner is better)
 - [ ] Pattern: Tiered Skill Loading Protocol
 - [ ] Skills: Read() calls for all skills (not Skill tool)
@@ -436,6 +438,7 @@ description: Use when...\n\n<example>...
 - [ ] Trigger Tables: Workflow + Technology specific
 
 ### Core Requirements (All Agents)
+
 - [ ] Description: 2-3 examples, <1024 chars, single-line
 - [ ] Frontmatter: All fields correct, alphabetized
 - [ ] Core Responsibilities: 3-5 clear items

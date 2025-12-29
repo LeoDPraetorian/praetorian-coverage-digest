@@ -13,7 +13,7 @@ All notable changes to the orchestrating-feature-development skill will be docum
 ### Added
 - **Phase 0: Setup** - Create feature directory with semantic naming (YYYY-MM-DD-{feature-name})
 - **Phase 5: Code Review (NEW)** - Parallel code + security reviewers with explicit feedback loop (MAX 1 RETRY)
-- **Phase 7: Test Assessment (NEW)** - Quality gate using test-assessor with feedback loop (MAX 1 RETRY)
+- **Phase 7: Test Assessment (NEW)** - Quality gate using test-lead with feedback loop (MAX 1 RETRY)
 - **Feedback Loop Pattern**: MAX 1 RETRY then escalate to user (no infinite loops)
 - **Parallel Execution Rules**: MANDATORY for independent agents in single Task message
 - **Feature Directory Structure**: Centralized outputs to `.claude/features/YYYY-MM-DD-{name}/`
@@ -99,3 +99,38 @@ Consider adding explicit counter in Step 8: "CRITICAL: This step is MANDATORY re
 - Skill successfully prevents auto-proceed to Phase 4 when needs_review status present
 - Mandatory AskUserQuestion ensures user sees critical issues
 - Authority/urgency pressures do not provide bypass mechanism in current implementation
+
+## 2025-12-29 - Add Phase 6: Test Planning
+
+**Change**: Inserted new Phase 6 (Test Planning), renumbered subsequent phases
+
+**Phases Updated**:
+- Phase 6: Test Planning (NEW) - test-lead creates test-plan.md
+- Phase 7: Testing (was Phase 6) - testers follow test-plan.md
+- Phase 8: Test Validation (was Phase 7) - test-lead validates against plan
+- Phase 9: Completion (was Phase 8)
+
+**Rationale**:
+- Context propagation: All prior artifacts flow into test planning
+- Goal-driven testing: Tests verify feature meets original goals
+- Security integration: Security scenarios become explicit test cases
+- Proactive quality: Define "what good looks like" BEFORE testing
+- Symmetry: lead plans → implementer builds → lead validates (matches architecture pipeline)
+
+**Files Modified**:
+- SKILL.md: Added Phase 6, updated Quick Reference, workflow diagram, directory structure
+- references/phase-6-test-planning.md: NEW - test planning workflow
+- references/phase-7-testing.md: Renamed from phase-6, added test-plan.md input
+- references/phase-8-test-validation.md: Renamed from phase-7, changed to validation mode
+- references/phase-5-code-review.md: Updated next phase references
+
+**Test Plan Inputs** (Phase 6):
+- design.md (feature goals)
+- plan.md (acceptance criteria)
+- architecture.md (component structure, verification points)
+- security-assessment.md (security test scenarios)
+- implementation-log.md (actual implementation)
+
+**Test Plan Output**:
+- test-plan.md with coverage targets, required tests, security test cases, acceptance criteria tests, anti-patterns to avoid
+

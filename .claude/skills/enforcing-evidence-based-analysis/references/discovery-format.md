@@ -38,30 +38,30 @@ Standardizes how you document APIs/interfaces you've actually read, making it cl
 \`\`\`typescript
 // QUOTED FROM SOURCE (lines 72-77):
 return {
-  navigation: {
-    goToNextStep: () => void,
-    goToPreviousStep: () => void,
-    goToStep: (stepId: string) => void,
-  },
-  progress: {
-    currentStep: number,
-    totalSteps: number,
-    percentComplete: number,
-  },
-  validation: {
-    isValid: boolean,
-    errors: Record<string, string>,
-    validate: () => boolean,
-  },
-  formData: TFormData,
+navigation: {
+goToNextStep: () => void,
+goToPreviousStep: () => void,
+goToStep: (stepId: string) => void,
+},
+progress: {
+currentStep: number,
+totalSteps: number,
+percentComplete: number,
+},
+validation: {
+isValid: boolean,
+errors: Record<string, string>,
+validate: () => boolean,
+},
+formData: TFormData,
 }
 \`\`\`
 
 **My Planned Usage:**
 \`\`\`typescript
 const wizard = useWizard<AssetFormData>({
-  steps: ASSET_STEPS,
-  initialData: INITIAL_DATA,
+steps: ASSET_STEPS,
+initialData: INITIAL_DATA,
 });
 
 // Access nested properties (correct)
@@ -83,23 +83,23 @@ wizard.progress.currentStep;
 \`\`\`typescript
 // QUOTED FROM SOURCE (lines 15-22):
 interface WizardStep<T> {
-  id: string;
-  title: string;        // NOT 'label'
-  order: number;        // REQUIRED
-  validate: (data: T) => boolean;  // Returns boolean, NOT string
-  shouldSkip?: (data: T) => boolean;
+id: string;
+title: string; // NOT 'label'
+order: number; // REQUIRED
+validate: (data: T) => boolean; // Returns boolean, NOT string
+shouldSkip?: (data: T) => boolean;
 }
 \`\`\`
 
 **My Planned Usage:**
 \`\`\`typescript
 const ASSET_STEPS: WizardStep<AssetFormData>[] = [
-  {
-    id: 'icon',
-    title: 'Choose Icon',    // ✅ 'title' not 'label'
-    order: 1,                 // ✅ included
-    validate: (data) => !!data.icon,  // ✅ returns boolean
-  },
+{
+id: 'icon',
+title: 'Choose Icon', // ✅ 'title' not 'label'
+order: 1, // ✅ included
+validate: (data) => !!data.icon, // ✅ returns boolean
+},
 ];
 \`\`\`
 

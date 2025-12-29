@@ -25,16 +25,16 @@ Use this skill when:
 
 ## Quick Reference
 
-| Task | Hook/Pattern | Key Config |
-|------|-------------|------------|
-| **Basic table** | `useReactTable({ data, columns })` | `getCoreRowModel` |
-| **Pagination** | `getPaginationRowModel()` | `pageSize`, `pageIndex`, `pageCount` |
-| **Server pagination** | `manualPagination: true` | Custom `pageCount`, fetch on page change |
-| **Sorting** | `getSortedRowModel()` | `enableSorting`, `onSortingChange` |
-| **Filtering** | `getFilteredRowModel()` | `columnFilters`, `globalFilter` |
-| **Row selection** | `getRowSelectionModel()` | `rowSelection` state, `enableRowSelection` |
-| **Virtualization** | `useVirtualizer` from `@tanstack/react-virtual` | `count`, `getScrollElement`, `estimateSize` |
-| **Column defs** | `columnHelper.accessor()` | `id`, `accessorKey`, `cell`, `header` |
+| Task                  | Hook/Pattern                                    | Key Config                                  |
+| --------------------- | ----------------------------------------------- | ------------------------------------------- |
+| **Basic table**       | `useReactTable({ data, columns })`              | `getCoreRowModel`                           |
+| **Pagination**        | `getPaginationRowModel()`                       | `pageSize`, `pageIndex`, `pageCount`        |
+| **Server pagination** | `manualPagination: true`                        | Custom `pageCount`, fetch on page change    |
+| **Sorting**           | `getSortedRowModel()`                           | `enableSorting`, `onSortingChange`          |
+| **Filtering**         | `getFilteredRowModel()`                         | `columnFilters`, `globalFilter`             |
+| **Row selection**     | `getRowSelectionModel()`                        | `rowSelection` state, `enableRowSelection`  |
+| **Virtualization**    | `useVirtualizer` from `@tanstack/react-virtual` | `count`, `getScrollElement`, `estimateSize` |
+| **Column defs**       | `columnHelper.accessor()`                       | `id`, `accessorKey`, `cell`, `header`       |
 
 ## Core Concepts
 
@@ -195,12 +195,12 @@ const table = useReactTable({
   state: {
     sorting,
   },
-})
+});
 
 // Fetch data when sorting changes
 useEffect(() => {
-  fetchAssets({ sorting })
-}, [sorting])
+  fetchAssets({ sorting });
+}, [sorting]);
 ```
 
 ### Filtering
@@ -374,14 +374,14 @@ const columns = [
 ```typescript
 // BAD: Mutating data array
 const handleDelete = (id: string) => {
-  const index = data.findIndex(item => item.id === id)
-  data.splice(index, 1) // ⚠️ Mutation breaks reactivity
-}
+  const index = data.findIndex((item) => item.id === id);
+  data.splice(index, 1); // ⚠️ Mutation breaks reactivity
+};
 
 // GOOD: Create new array
 const handleDelete = (id: string) => {
-  setData(prev => prev.filter(item => item.id !== id))
-}
+  setData((prev) => prev.filter((item) => item.id !== id));
+};
 ```
 
 ### ❌ Don't Use `any` for Column Types
@@ -402,14 +402,14 @@ const table = useReactTable({
   data,
   columns,
   // ⚠️ Missing getCoreRowModel - table won't work!
-})
+});
 
 // GOOD: Always include
 const table = useReactTable({
   data,
   columns,
   getCoreRowModel: getCoreRowModel(), // ✅
-})
+});
 ```
 
 **See:** [references/table-common-errors.md](references/table-common-errors.md) for complete list.
@@ -465,11 +465,13 @@ const assetColumns = [
 ## Progressive Disclosure
 
 **Quick Start (this file):**
+
 - Essential table patterns
 - Pagination and sorting
 - Common integrations
 
 **Deep Dives (references/):**
+
 - [table-server-side-patterns.md](references/table-server-side-patterns.md) - Server pagination/sorting/filtering
 - [table-query-integration.md](references/table-query-integration.md) - TanStack Query integration
 - [table-performance-virtualization.md](references/table-performance-virtualization.md) - Virtualization for large datasets

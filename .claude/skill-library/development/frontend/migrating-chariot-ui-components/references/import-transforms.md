@@ -8,10 +8,10 @@ Detailed rules for transforming imports during component migration.
 
 ```typescript
 // Before
-import { Button } from '@praetorian-chariot/ui';
+import { Button } from "@praetorian-chariot/ui";
 
 // After
-import { Button } from '@/components/Button';
+import { Button } from "@/components/Button";
 ```
 
 ---
@@ -20,12 +20,12 @@ import { Button } from '@/components/Button';
 
 ```typescript
 // Before
-import { Button, Modal, Dropdown } from '@praetorian-chariot/ui';
+import { Button, Modal, Dropdown } from "@praetorian-chariot/ui";
 
 // After
-import { Button } from '@/components/Button';
-import { Modal } from '@/components/Modal';
-import { Dropdown } from '@/components/Dropdown';
+import { Button } from "@/components/Button";
+import { Modal } from "@/components/Modal";
+import { Dropdown } from "@/components/Dropdown";
 ```
 
 ---
@@ -36,11 +36,11 @@ When only some components have been migrated:
 
 ```typescript
 // Before
-import { Button, Dropdown, Tag } from '@praetorian-chariot/ui';
+import { Button, Dropdown, Tag } from "@praetorian-chariot/ui";
 
 // After (if Button migrated, Dropdown and Tag not yet)
-import { Button } from '@/components/Button';
-import { Dropdown, Tag } from '@praetorian-chariot/ui';
+import { Button } from "@/components/Button";
+import { Dropdown, Tag } from "@praetorian-chariot/ui";
 ```
 
 ---
@@ -51,10 +51,10 @@ Types should migrate with their component:
 
 ```typescript
 // Before
-import type { ButtonProps } from '@praetorian-chariot/ui';
+import type { ButtonProps } from "@praetorian-chariot/ui";
 
 // After
-import type { ButtonProps } from '@/components/Button';
+import type { ButtonProps } from "@/components/Button";
 ```
 
 ---
@@ -63,11 +63,11 @@ import type { ButtonProps } from '@/components/Button';
 
 ```typescript
 // Before
-import { Balloon, Confetti } from '@praetorian-chariot/ui';
+import { Balloon, Confetti } from "@praetorian-chariot/ui";
 
 // After
-import { Balloon } from '@/components/icons/Balloon';
-import { Confetti } from '@/components/icons/Confetti';
+import { Balloon } from "@/components/icons/Balloon";
+import { Confetti } from "@/components/icons/Confetti";
 ```
 
 ---
@@ -78,8 +78,8 @@ If the deprecated library uses barrel files:
 
 ```typescript
 // In chariot-ui-components/src/components/index.ts
-export * from './Button';
-export * from './Modal';
+export * from "./Button";
+export * from "./Modal";
 ```
 
 Each exported component needs individual migration. Do NOT recreate barrel files in local components unless they already exist.
@@ -106,14 +106,14 @@ export default Button;
 
 When copying component source, transform these patterns:
 
-| Original Pattern            | Local Pattern                         |
-| --------------------------- | ------------------------------------- |
-| `from "./Button"`           | `from "@/components/Button"`          |
-| `from "./ui/Modal"`         | `from "@/components/ui/Modal"`        |
-| `from "../icons/IconName"`  | `from "@/components/icons/IconName"`  |
-| `from "../utils/someUtil"`  | `from "@/utils/someUtil"`             |
-| `from "tailwind-merge"`     | `from "tailwind-merge"` (unchanged)   |
-| `from "react"`              | `from "react"` (unchanged)            |
+| Original Pattern           | Local Pattern                        |
+| -------------------------- | ------------------------------------ |
+| `from "./Button"`          | `from "@/components/Button"`         |
+| `from "./ui/Modal"`        | `from "@/components/ui/Modal"`       |
+| `from "../icons/IconName"` | `from "@/components/icons/IconName"` |
+| `from "../utils/someUtil"` | `from "@/utils/someUtil"`            |
+| `from "tailwind-merge"`    | `from "tailwind-merge"` (unchanged)  |
+| `from "react"`             | `from "react"` (unchanged)           |
 
 ---
 
@@ -123,7 +123,7 @@ If component imports CSS:
 
 ```typescript
 // Before (in chariot-ui-components)
-import './Button.css';
+import "./Button.css";
 
 // After - check if CSS is needed or if Tailwind handles it
 // Often can be removed if using Tailwind classes

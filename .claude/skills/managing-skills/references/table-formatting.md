@@ -6,7 +6,7 @@ This is a **cross-cutting concern** that applies to:
 
 - `creating-skills` - Format tables during creation
 - `updating-skills` - Format tables during updates
-- `auditing-skills` - Validate table formatting (Phase 14g)
+- `auditing-skills` - Validate table formatting (Phase 14a)
 - `fixing-skills` - Auto-fix table formatting (Tier 1: Deterministic)
 
 ---
@@ -37,11 +37,11 @@ npx prettier --check ".claude/skills/my-skill/**/*.md"
 
 ### Audit Phase Integration
 
-**Phase 14g: Table Formatting Validation**
+**Phase 14a: Table Formatting Validation**
 
 | Aspect   | Details                                  |
 | -------- | ---------------------------------------- |
-| Phase    | 14g (sub-phase of Reference Validation)  |
+| Phase    | 14a (sub-phase of Visual/Style)          |
 | Tier     | 1 (Deterministic)                        |
 | Severity | WARNING (auto-fixable)                   |
 | Check    | `npx prettier --check --parser markdown` |
@@ -74,7 +74,7 @@ npx prettier --write --parser markdown --prose-wrap preserve <file>
 
 ### Integration with fixing-skills
 
-When `fixing-skills` detects Phase 14g failures:
+When `fixing-skills` detects Phase 14a failures:
 
 1. Categorize as Tier 1 (Deterministic)
 2. Apply fix automatically: `npx prettier --write`
@@ -180,16 +180,16 @@ After applying edits:
 npx prettier --write --parser markdown {skill-path}/SKILL.md
 ```
 
-### In auditing-skills (Phase 14g)
+### In auditing-skills (Phase 14a)
 
 Add to structural validation:
 
 ```typescript
 // In audit-engine.ts
-async function validatePhase14g(skillPath: string): Promise<PhaseResult> {
+async function validatePhase14a(skillPath: string): Promise<PhaseResult> {
   const result = await exec(`npx prettier --check --parser markdown "${skillPath}"`);
   return {
-    phase: "14g",
+    phase: "14a",
     status: result.exitCode === 0 ? "pass" : "warn",
     message:
       result.exitCode === 0
@@ -207,7 +207,7 @@ Add to deterministic fixes:
 // In fix.ts
 const TIER1_FIXES = {
   // ... existing fixes
-  "14g": async (skillPath: string) => {
+  "14a": async (skillPath: string) => {
     await exec(`npx prettier --write --parser markdown "${skillPath}"`);
     return { fixed: true, message: "Table formatting fixed with Prettier" };
   },
@@ -274,5 +274,5 @@ Ensure:
 ## Related References
 
 - [Progressive Disclosure](progressive-disclosure.md) - When to extract tables to references
-- [Phase Categorization](patterns/phase-categorization.md) - How Phase 14g fits in audit
+- [Phase Categorization](patterns/phase-categorization.md) - How Phase 14a fits in audit
 - [Fix Workflow](fix-workflow.md) - How Tier 1 fixes are applied

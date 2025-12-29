@@ -40,6 +40,7 @@ This command updates both the main repository and all submodules to their latest
 #### For Main Repository Changes
 
 **Create branches from `chariot-development-platform`** when making changes to:
+
 - Root-level configuration files
 - Documentation (this file, CLAUDE.md, etc.)
 - GitHub Actions workflows
@@ -59,6 +60,7 @@ git push origin feature/update-ci-pipeline
 #### For Module-Specific Changes
 
 **Create branches from the individual submodule repositories** when making changes to:
+
 - Code within any `modules/` directory
 - Module-specific tests, documentation, or configuration
 
@@ -77,13 +79,13 @@ git push origin feature/add-new-scanner
 
 ### 4. Pull Request Guidelines
 
-| Change Type | Branch Location | PR Target | Example |
-|-------------|----------------|-----------|---------|
-| Main repo config/docs | `chariot-development-platform` | `chariot-development-platform` | CI/CD updates, root docs |
-| Chariot platform code | `modules/chariot` | `chariot` repository | Backend API, frontend UI |
-| UI components | `modules/chariot-ui-components` | `chariot-ui-components` repository | React components |
-| Aegis CLI | `modules/aegiscli` | `aegiscli` repository | CLI tool updates |
-| Nebula scanner | `modules/nebula` | `nebula` repository | Scanner logic |
+| Change Type           | Branch Location                 | PR Target                          | Example                  |
+| --------------------- | ------------------------------- | ---------------------------------- | ------------------------ |
+| Main repo config/docs | `chariot-development-platform`  | `chariot-development-platform`     | CI/CD updates, root docs |
+| Chariot platform code | `modules/chariot`               | `chariot` repository               | Backend API, frontend UI |
+| UI components         | `modules/chariot-ui-components` | `chariot-ui-components` repository | React components         |
+| Aegis CLI             | `modules/aegiscli`              | `aegiscli` repository              | CLI tool updates         |
+| Nebula scanner        | `modules/nebula`                | `nebula` repository                | Scanner logic            |
 
 ### 5. Updating Submodule References
 
@@ -104,6 +106,7 @@ git push origin main
 ### 6. Common Workflows
 
 #### Working on Chariot Platform Features
+
 ```bash
 cd modules/chariot
 git checkout -b feature/new-asset-discovery
@@ -114,6 +117,7 @@ git push origin feature/new-asset-discovery
 ```
 
 #### Updating Project Documentation
+
 ```bash
 # From main repository root
 git checkout -b docs/update-setup-guide
@@ -124,6 +128,7 @@ git push origin docs/update-setup-guide
 ```
 
 #### Adding New Dependencies to Multiple Modules
+
 ```bash
 # Update each module individually
 cd modules/chariot
@@ -154,11 +159,13 @@ git push origin deps/update-submodule-refs
 ## Troubleshooting
 
 ### Submodule Out of Sync
+
 ```bash
 git submodule update --remote --merge
 ```
 
 ### Submodule Conflicts
+
 ```bash
 cd modules/problematic-module
 git status
@@ -168,6 +175,7 @@ git commit -m "Resolve submodule conflicts"
 ```
 
 ### Reset Submodule to Main Repo's Expected Version
+
 ```bash
 git submodule update --init --recursive
 ```

@@ -8,21 +8,21 @@ React Query automatically maintains object references when data hasn't changed, 
 
 ```tsx
 // First fetch returns: { id: 1, name: "Asset", status: "active" }
-const firstData = queryClient.getQueryData(['asset', 1])
+const firstData = queryClient.getQueryData(["asset", 1]);
 
 // Refetch returns same data
 // React Query detects no changes and REUSES the same object reference
-const secondData = queryClient.getQueryData(['asset', 1])
+const secondData = queryClient.getQueryData(["asset", 1]);
 
-firstData === secondData // true - same reference!
+firstData === secondData; // true - same reference!
 ```
 
 **When structural sharing applies:**
 
 ```tsx
 // ✅ Modified field gets new reference, unchanged fields reuse old
-const oldData = { id: 1, name: "Asset", metadata: { tags: ['a', 'b'] } }
-const newData = { id: 1, name: "Updated", metadata: { tags: ['a', 'b'] } }
+const oldData = { id: 1, name: "Asset", metadata: { tags: ["a", "b"] } };
+const newData = { id: 1, name: "Updated", metadata: { tags: ["a", "b"] } };
 
 // After refetch:
 // - newData.name !== oldData.name (changed)
@@ -33,10 +33,10 @@ const newData = { id: 1, name: "Updated", metadata: { tags: ['a', 'b'] } }
 
 ```tsx
 useQuery({
-  queryKey: ['data'],
+  queryKey: ["data"],
   queryFn: fetchData,
   structuralSharing: false, // Disable optimization
-})
+});
 ```
 
 **Source:** [React Query Render Optimizations](https://tanstack.com/query/v5/docs/framework/react/guides/render-optimizations)
@@ -50,16 +50,16 @@ useQuery({
 ```tsx
 // ❌ WRONG - Disables proxy-based tracking
 const { data, ...rest } = useQuery({
-  queryKey: ['todos'],
+  queryKey: ["todos"],
   queryFn: fetchTodos,
-})
+});
 // Component re-renders on ANY property change (isFetching, isStale, etc.)
 
 // ✅ CORRECT - Only destructure what you need
 const { data, isPending, error } = useQuery({
-  queryKey: ['todos'],
+  queryKey: ["todos"],
   queryFn: fetchTodos,
-})
+});
 // Component only re-renders when data, isPending, or error change
 ```
 

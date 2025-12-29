@@ -108,19 +108,12 @@ workspace-root/
 
 ```typescript
 // Core exports
-export {
-  functionA,
-  functionB,
-  type TypeA,
-} from './lib/module-a.js';
+export { functionA, functionB, type TypeA } from "./lib/module-a.js";
 
-export {
-  functionC,
-  type TypeB,
-} from './lib/module-b.js';
+export { functionC, type TypeB } from "./lib/module-b.js";
 
 // Shared types
-export type { CommonType } from './lib/types.js';
+export type { CommonType } from "./lib/types.js";
 ```
 
 ### Consumer package.json
@@ -162,9 +155,7 @@ export type { CommonType } from './lib/types.js';
   "name": "@org/workspace",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": ["packages/*"],
   "scripts": {
     "build": "npm run build -ws --if-present",
     "test": "npm run test -ws --if-present",
@@ -221,5 +212,5 @@ Allows: `import { x } from '@org/pkg/lib/anything'`
 2. **One barrel per package** - Single index.ts for main exports
 3. **Subpaths for internal modules** - When consumers need direct access
 4. **Wildcards sparingly** - Explicit exports are easier to maintain
-5. **Tests outside src/** - Keep __tests__/ at package root
+5. **Tests outside src/** - Keep **tests**/ at package root
 6. **Gitignore dist/** - Generated files shouldn't be committed

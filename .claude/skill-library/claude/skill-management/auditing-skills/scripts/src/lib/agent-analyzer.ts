@@ -8,7 +8,7 @@
 import { readdirSync, readFileSync, statSync, existsSync } from 'fs';
 import { join, basename } from 'path';
 import matter from 'gray-matter';
-import { findProjectRoot } from '../../../../../../../lib/find-project-root.js';
+import { findProjectRoot } from '@chariot/lib';
 import chalk from 'chalk';
 import Table from 'cli-table3';
 

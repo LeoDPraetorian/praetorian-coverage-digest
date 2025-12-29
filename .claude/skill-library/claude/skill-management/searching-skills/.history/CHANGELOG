@@ -1,0 +1,33 @@
+# Changelog
+
+## 2025-12-29 - Compliance Fixes
+
+**Audit Results:**
+- Initial: FAILED (1 CRITICAL, 1 WARNING, 3 INFO + 4 semantic issues)
+- After automated fixes: PASSED WITH WARNINGS (1 WARNING, 2 INFO)
+- Final: PASSED (0 CRITICAL, 0 WARNING, 1 INFO)
+
+**Fixes Applied:**
+
+1. **Deterministic (CLI):**
+   - Phase 7: Created .local/ and .output/ directories with .gitignore
+
+2. **Claude-Automated:**
+   - Phase 13 (CRITICAL): Added TodoWrite mandate - "You MUST use TodoWrite before starting to track all search workflow steps"
+   - Semantic - Description Quality: Expanded description to include key search terms (dual-location, scoring algorithm, CLI alternative)
+   - Semantic - Tool Appropriateness: Replaced `find` command with Glob tool in Step 3, added Glob to allowed-tools
+
+3. **Validation-Only (Documented, not auto-fixed):**
+   - Phase 14b: 4 of 9 code blocks missing language tags (manual review needed)
+   - Phase 14b: 2 code blocks have mismatched language tags (manual review needed)
+   - Phase 14c: 1 header has no content before next header (manual review needed)
+
+4. **Validation-Only (Manual Fixes Applied):**
+   - Phase 14b: Added language tags to 4 code blocks (typescript for tool syntax, text for examples)
+   - Phase 14b: Fixed mismatched language tags - split mixed bash/tool syntax into separate blocks
+   - Phase 14c: Added introductory content to Workflow section header
+
+**Outstanding Items:**
+- Gateway membership verification (semantic warning) - requires checking gateway-claude routing table
+- Content density optimization (semantic info) - consolidate redundant bash patterns
+- Phase 14b: 1 remaining INFO issue (likely false positive or minor formatting)

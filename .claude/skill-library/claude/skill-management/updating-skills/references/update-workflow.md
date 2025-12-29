@@ -66,12 +66,12 @@ wc -l {skill-path}/SKILL.md
 
 ### 3.2 Determine Strategy
 
-| Current Lines | Adding Lines | Strategy |
-|---------------|--------------|----------|
-| <350 | <30 | Inline edit (Phase 4b) |
-| <400 | <50 | Inline with caution |
-| >400 | Any | Extract to references (Phase 4a) |
-| Any | >50 | Extract to references |
+| Current Lines | Adding Lines | Strategy                         |
+| ------------- | ------------ | -------------------------------- |
+| <350          | <30          | Inline edit (Phase 4b)           |
+| <400          | <50          | Inline with caution              |
+| >400          | Any          | Extract to references (Phase 4a) |
+| Any           | >50          | Extract to references            |
 
 ---
 
@@ -90,11 +90,13 @@ wc -l {skill-path}/SKILL.md
    - Existing verbose sections → Move to references
 
 2. **Create reference file**:
+
    ```bash
    mkdir -p {skill-path}/references
    ```
 
 3. **Write content**:
+
    ```
    Write {
      file_path: "{skill-path}/references/{topic}.md",
@@ -103,6 +105,7 @@ wc -l {skill-path}/SKILL.md
    ```
 
 4. **Update SKILL.md with link**:
+
    ```markdown
    ## {Section}
 
@@ -126,6 +129,7 @@ wc -l {skill-path}/SKILL.md
 1. **Identify section to change**
 
 2. **Apply minimal edit**:
+
    ```
    Edit {
      file_path: "{skill-path}/SKILL.md",
@@ -157,14 +161,17 @@ Add to `.history/CHANGELOG` with format:
 ## [YYYY-MM-DD] - Brief description
 
 ### Changed
+
 - What changed
 - Why it changed
 
 ### Reason
+
 - RED failure that prompted update
 - Gap being filled
 
 ### Impact
+
 - What this enables
 - Who benefits
 ```
@@ -215,6 +222,7 @@ If >500, STOP and extract content to references.
 ### 7.3 Fix Issues
 
 If audit fails, fix deterministically:
+
 - Block scalars → Single-line
 - Broken links → Fix paths
 - Table formatting → `npx prettier --write`
@@ -261,6 +269,7 @@ ls {referenced-file}
 ### Extracting Verbose Sections
 
 Good candidates:
+
 - Examples (>10 examples)
 - Troubleshooting (>5 issues)
 - Detailed procedures

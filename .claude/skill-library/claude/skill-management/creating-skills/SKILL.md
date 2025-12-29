@@ -1,6 +1,6 @@
 ---
 name: creating-skills
-description: Use when creating new skills - guides through location selection, skill type, template generation, and research integration
+description: Use when creating new skills with TDD - guides through RED-GREEN-REFACTOR phases, progressive disclosure, location selection, and research integration
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion, Task, Skill
 ---
 
@@ -44,7 +44,7 @@ test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 ```
 
-**See:** [Repository Root Navigation](references/patterns/repo-root-detection.md)
+**See:** [Repository Root Navigation](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
 
 **⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
 
@@ -114,6 +114,7 @@ Ask: "Does this failure accurately capture why we need this skill?"
 For complete naming conventions (gerund form, kebab-case, what to avoid), see [Anthropic Best Practices - Naming Conventions](../../../../skills/managing-skills/references/anthropic-best-practices.md#naming-conventions).
 
 **Quick validation:**
+
 - Format: kebab-case (lowercase, hyphens only)
 - Style: Gerund form preferred (`creating-skills`, not `create-skill`)
 - Pattern: `^[a-z][a-z0-9-]*$`
@@ -148,7 +149,7 @@ if [[ "$SKILL_NAME" =~ ^gateway- ]] || [[ "$FLAGS" == *"--type gateway"* ]]; the
 fi
 ```
 
-**Gateway validation**: Name must match `gateway-{domain}` pattern (e.g., `gateway-frontend`, `gateway-analytics`). Reject `gateway` alone or `gateway-foo-bar-baz`.
+**Gateway validation**: Name must match `gateway-{domain}` pattern (e.g., `gateway-frontend`). Reject `gateway` alone or `gateway-foo-bar-baz`.
 
 **If gateway detected**: Use **[references/gateway-creation.md](references/gateway-creation.md)** for complete gateway creation workflow (location, template, validation phases 17-20).
 
@@ -156,54 +157,9 @@ fi
 
 ---
 
-## Phase 2: Location Selection
+## Phase 2-3: Location and Category Selection
 
-**Note**: Gateways skip this phase - they're always created in Core. See [references/gateway-creation.md](references/gateway-creation.md).
-
-Ask the user via AskUserQuestion:
-
-```
-Question: Where should this skill be created?
-
-Options:
-1. Core Skills (.claude/skills/)
-   - High-frequency, always-loaded
-   - Limited to ~25 skills (15K token budget)
-   - Auto-discovered by Claude Code
-
-2. Skill Library (.claude/skill-library/)
-   - Specialized, on-demand loading
-   - No token budget impact
-   - Loaded via gateway routing
-```
-
-**Decision factors**:
-
-- Used in every conversation? → Core
-- Domain-specific (frontend, testing, etc.)? → Library
-- Referenced by multiple agents? → Consider Core
-
-## Phase 3: Category Selection (Library Only)
-
-**Note**: Gateways skip this phase - they don't belong to library categories. See [references/gateway-creation.md](references/gateway-creation.md).
-
-If library selected, discover available categories:
-
-```bash
-# List available library categories
-ls -d .claude/skill-library/*/ .claude/skill-library/*/*/ 2>/dev/null | \
-  sed 's|.claude/skill-library/||' | sort -u
-```
-
-Common categories:
-
-- `development/frontend/` - React, TypeScript, UI patterns
-- `development/backend/` - Go, APIs, infrastructure
-- `testing/` - Unit, integration, E2E testing
-- `claude/` - Claude Code specific (agents, commands, MCP)
-- `operations/` - DevOps, deployment, monitoring
-
-Ask user to select or create new category.
+For detailed location selection (Core vs Library) and category selection guidance, see **[Location and Category Selection](references/location-and-category-selection.md)**.
 
 ## Phase 4: Skill Type Selection
 
@@ -286,12 +242,14 @@ For complete progressive disclosure patterns, see [Progressive Disclosure](../..
 **When referencing code examples in SKILL.md:**
 
 ❌ **NEVER use static line numbers** - they become outdated with every code change:
+
 ```markdown
 ❌ BAD: `file.go:123-127`
 ❌ BAD: See line 154 in nuclei.go
 ```
 
 ✅ **USE durable patterns** - stable across refactors:
+
 ```markdown
 ✅ GOOD: `file.go` - `func (t *Type) MethodName(...)`
 ✅ GOOD: `file.go (between Match() and Invoke() methods)`
@@ -299,6 +257,7 @@ For complete progressive disclosure patterns, see [Progressive Disclosure](../..
 ```
 
 **Why this matters:**
+
 - Line numbers drift with every insert/deletion/refactor
 - Method signatures are stable and grep-friendly: `rg "func.*MethodName"`
 - Phase 21 audit will flag line number references as compliance failures
@@ -328,6 +287,7 @@ mkdir -p {skill-path}/.history
 ```
 
 Create `.history/CHANGELOG` with "Initial Creation" entry including:
+
 - RED failure documentation
 - Category (library-category or core)
 - Skill type (process/library/integration/tool-wrapper)
@@ -495,51 +455,13 @@ cd "$REPO_ROOT/.claude" && npm run audit -- {skill-name}
 
 ---
 
-## Validation Checklist
+## Validation and Anti-Patterns
 
-Before completing, verify:
+Before completing skill creation, review the validation checklist and common anti-patterns.
 
-- [ ] Name is kebab-case
-- [ ] Skill doesn't already exist
-- [ ] Directory structure created correctly
-- [ ] SKILL.md has proper frontmatter (name, description, allowed-tools)
-- [ ] Description starts with "Use when"
-- [ ] Description is <120 characters
-- [ ] At least one reference file created
-- [ ] Gateway updated (if library skill)
-
-## Error Handling
-
-**If creation fails:** `rm -rf {skill-path}` to clean up partial directories.
+**See:** [Validation and Anti-Patterns](references/validation-and-anti-patterns.md)
 
 ---
-
-## Anti-Patterns
-
-### ❌ Don't Copy-Paste Without Context or Skip Research
-
-Don't fill templates with placeholder text. Use `researching-skills` to find real patterns (see Phase 6 rationalization table).
-
-### ❌ Don't Exceed Line Limits (MANDATORY)
-
-**🚨 CRITICAL: SKILL.md MUST be <500 lines**
-
-- **Target**: 300-500 lines for SKILL.md
-- **Always use references/** for detailed documentation (no line limit)
-- **Always use progressive disclosure pattern** from the start
-- **Plan content distribution** during Phase 5 (Generation), not after
-
-**If you create a skill >500 lines:**
-
-1. You violated the creation workflow
-2. You must immediately restructure with progressive disclosure
-3. See `.claude/skills/managing-skills/references/progressive-disclosure.md`
-
-**Real example**: `designing-frontend-architecture` skill has 293-line SKILL.md + 7 reference files (16KB total content). This is the standard.
-
-### ❌ Don't Include Time-Sensitive Information
-
-Avoid info that becomes outdated. Document current method prominently, collapse deprecated patterns in `<details>` tags.
 
 ## Related Skills
 

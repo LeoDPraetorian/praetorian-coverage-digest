@@ -5,10 +5,12 @@
 This example demonstrates how to test React components and hooks that use TanStack Query v5 for server state management. All patterns use MSW (Mock Service Worker) for API mocking and Vitest for test execution.
 
 **Related examples:**
+
 - [MSW Setup](msw-setup.md) - Complete MSW server configuration
 - [Factory Pattern](factory-pattern.md) - Test data generation with Fishery
 
 **Related references:**
+
 - [TanStack Query Testing](../references/tanstack-query-testing.md) - Detailed testing strategies
 - [MSW Integration](../references/msw-integration.md) - MSW patterns and best practices
 - [React Hooks Testing](../references/react-hooks-testing.md) - Hook testing patterns
@@ -120,24 +122,24 @@ export function createQueryWrapper() {
 
 ```typescript
 // src/hooks/useAssets.ts
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from "@tanstack/react-query";
 
 interface Asset {
-  id: string
-  name: string
-  status: 'active' | 'inactive'
+  id: string;
+  name: string;
+  status: "active" | "inactive";
 }
 
 export function useAssets() {
   return useQuery({
-    queryKey: ['assets'],
+    queryKey: ["assets"],
     queryFn: async () => {
-      const response = await fetch('/api/assets')
-      if (!response.ok) throw new Error('Failed to fetch assets')
-      return response.json() as Promise<Asset[]>
+      const response = await fetch("/api/assets");
+      if (!response.ok) throw new Error("Failed to fetch assets");
+      return response.json() as Promise<Asset[]>;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
-  })
+  });
 }
 ```
 
@@ -145,96 +147,96 @@ export function useAssets() {
 
 ```typescript
 // src/hooks/useAssets.test.ts
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
-import { useAssets } from './useAssets'
-import { createQueryWrapper } from '../test-utils/query-test-utils'
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, waitFor } from "@testing-library/react";
+import { useAssets } from "./useAssets";
+import { createQueryWrapper } from "../test-utils/query-test-utils";
 
-describe('useAssets', () => {
+describe("useAssets", () => {
   beforeEach(() => {
     // Reset any mocked fetch between tests
-    vi.restoreAllMocks()
-  })
+    vi.restoreAllMocks();
+  });
 
-  it('fetches assets successfully', async () => {
+  it("fetches assets successfully", async () => {
     // Arrange: Mock successful API response
     const mockAssets = [
-      { id: '1', name: 'Asset 1', status: 'active' },
-      { id: '2', name: 'Asset 2', status: 'inactive' },
-    ]
+      { id: "1", name: "Asset 1", status: "active" },
+      { id: "2", name: "Asset 2", status: "inactive" },
+    ];
 
     global.fetch = vi.fn(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve(mockAssets),
       } as Response)
-    )
+    );
 
-    const { wrapper } = createQueryWrapper()
+    const { wrapper } = createQueryWrapper();
 
     // Act: Render hook
-    const { result } = renderHook(() => useAssets(), { wrapper })
+    const { result } = renderHook(() => useAssets(), { wrapper });
 
     // Assert: Initially pending
-    expect(result.current.isPending).toBe(true)
-    expect(result.current.data).toBeUndefined()
+    expect(result.current.isPending).toBe(true);
+    expect(result.current.data).toBeUndefined();
 
     // Assert: Eventually successful
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data).toEqual(mockAssets)
-    expect(result.current.error).toBeNull()
-  })
+    expect(result.current.data).toEqual(mockAssets);
+    expect(result.current.error).toBeNull();
+  });
 
-  it('handles API errors', async () => {
+  it("handles API errors", async () => {
     // Arrange: Mock failed API response
     global.fetch = vi.fn(() =>
       Promise.resolve({
         ok: false,
         status: 500,
       } as Response)
-    )
+    );
 
-    const { wrapper } = createQueryWrapper()
+    const { wrapper } = createQueryWrapper();
 
     // Act: Render hook
-    const { result } = renderHook(() => useAssets(), { wrapper })
+    const { result } = renderHook(() => useAssets(), { wrapper });
 
     // Assert: Eventually in error state
-    await waitFor(() => expect(result.current.isError).toBe(true))
+    await waitFor(() => expect(result.current.isError).toBe(true));
 
-    expect(result.current.error?.message).toBe('Failed to fetch assets')
-    expect(result.current.data).toBeUndefined()
-  })
+    expect(result.current.error?.message).toBe("Failed to fetch assets");
+    expect(result.current.data).toBeUndefined();
+  });
 
-  it('uses cached data on subsequent renders', async () => {
+  it("uses cached data on subsequent renders", async () => {
     // Arrange: Mock API
-    const mockAssets = [{ id: '1', name: 'Asset 1', status: 'active' }]
+    const mockAssets = [{ id: "1", name: "Asset 1", status: "active" }];
     const fetchSpy = vi.fn(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve(mockAssets),
       } as Response)
-    )
-    global.fetch = fetchSpy
+    );
+    global.fetch = fetchSpy;
 
-    const { wrapper, queryClient } = createQueryWrapper()
+    const { wrapper, queryClient } = createQueryWrapper();
 
     // Act: First render
-    const { result, rerender } = renderHook(() => useAssets(), { wrapper })
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    const { result, rerender } = renderHook(() => useAssets(), { wrapper });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     // Clear mock call history
-    fetchSpy.mockClear()
+    fetchSpy.mockClear();
 
     // Act: Rerender within staleTime
-    rerender()
+    rerender();
 
     // Assert: No new fetch (data is fresh)
-    expect(fetchSpy).not.toHaveBeenCalled()
-    expect(result.current.data).toEqual(mockAssets)
-  })
-})
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(result.current.data).toEqual(mockAssets);
+  });
+});
 ```
 
 **Key patterns:**
@@ -254,110 +256,110 @@ describe('useAssets', () => {
 
 ```typescript
 // src/test-utils/msw-server.ts
-import { http, HttpResponse } from 'msw'
-import { setupServer } from 'msw/node'
+import { http, HttpResponse } from "msw";
+import { setupServer } from "msw/node";
 
 // Define default handlers for common endpoints
 export const handlers = [
-  http.get('/api/assets', () => {
+  http.get("/api/assets", () => {
     return HttpResponse.json([
-      { id: '1', name: 'Test Asset 1', status: 'active' },
-      { id: '2', name: 'Test Asset 2', status: 'inactive' },
-    ])
+      { id: "1", name: "Test Asset 1", status: "active" },
+      { id: "2", name: "Test Asset 2", status: "inactive" },
+    ]);
   }),
 
-  http.get('/api/assets/:id', ({ params }) => {
+  http.get("/api/assets/:id", ({ params }) => {
     return HttpResponse.json({
       id: params.id,
       name: `Asset ${params.id}`,
-      status: 'active',
-    })
+      status: "active",
+    });
   }),
-]
+];
 
 // Create server instance
-export const server = setupServer(...handlers)
+export const server = setupServer(...handlers);
 ```
 
 ### Test Suite with MSW
 
 ```typescript
 // src/hooks/useAssets.test.ts
-import { describe, it, expect, beforeAll, afterEach, afterAll } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
-import { http, HttpResponse } from 'msw'
-import { server } from '../test-utils/msw-server'
-import { useAssets } from './useAssets'
-import { createQueryWrapper } from '../test-utils/query-test-utils'
+import { describe, it, expect, beforeAll, afterEach, afterAll } from "vitest";
+import { renderHook, waitFor } from "@testing-library/react";
+import { http, HttpResponse } from "msw";
+import { server } from "../test-utils/msw-server";
+import { useAssets } from "./useAssets";
+import { createQueryWrapper } from "../test-utils/query-test-utils";
 
-describe('useAssets with MSW', () => {
+describe("useAssets with MSW", () => {
   // Start server before all tests
-  beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
+  beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 
   // Reset handlers after each test
-  afterEach(() => server.resetHandlers())
+  afterEach(() => server.resetHandlers());
 
   // Clean up after all tests
-  afterAll(() => server.close())
+  afterAll(() => server.close());
 
-  it('fetches assets from API', async () => {
-    const { wrapper } = createQueryWrapper()
-    const { result } = renderHook(() => useAssets(), { wrapper })
+  it("fetches assets from API", async () => {
+    const { wrapper } = createQueryWrapper();
+    const { result } = renderHook(() => useAssets(), { wrapper });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data).toHaveLength(2)
-    expect(result.current.data?.[0].name).toBe('Test Asset 1')
-  })
+    expect(result.current.data).toHaveLength(2);
+    expect(result.current.data?.[0].name).toBe("Test Asset 1");
+  });
 
-  it('handles server errors', async () => {
+  it("handles server errors", async () => {
     // Override default handler for this test
     server.use(
-      http.get('/api/assets', () => {
-        return new HttpResponse(null, { status: 500 })
+      http.get("/api/assets", () => {
+        return new HttpResponse(null, { status: 500 });
       })
-    )
+    );
 
-    const { wrapper } = createQueryWrapper()
-    const { result } = renderHook(() => useAssets(), { wrapper })
+    const { wrapper } = createQueryWrapper();
+    const { result } = renderHook(() => useAssets(), { wrapper });
 
-    await waitFor(() => expect(result.current.isError).toBe(true))
-    expect(result.current.error?.message).toBe('Failed to fetch assets')
-  })
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.error?.message).toBe("Failed to fetch assets");
+  });
 
-  it('handles network timeouts', async () => {
+  it("handles network timeouts", async () => {
     server.use(
-      http.get('/api/assets', async () => {
+      http.get("/api/assets", async () => {
         // Simulate timeout by never resolving
-        await new Promise(() => {})
-        return new HttpResponse(null)
+        await new Promise(() => {});
+        return new HttpResponse(null);
       })
-    )
+    );
 
-    const { wrapper } = createQueryWrapper()
-    const { result } = renderHook(() => useAssets(), { wrapper })
+    const { wrapper } = createQueryWrapper();
+    const { result } = renderHook(() => useAssets(), { wrapper });
 
     // Still pending after reasonable wait
-    await new Promise(resolve => setTimeout(resolve, 100))
-    expect(result.current.isPending).toBe(true)
-  })
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(result.current.isPending).toBe(true);
+  });
 
-  it('handles invalid JSON responses', async () => {
+  it("handles invalid JSON responses", async () => {
     server.use(
-      http.get('/api/assets', () => {
-        return new HttpResponse('Invalid JSON', {
+      http.get("/api/assets", () => {
+        return new HttpResponse("Invalid JSON", {
           status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        })
+          headers: { "Content-Type": "application/json" },
+        });
       })
-    )
+    );
 
-    const { wrapper } = createQueryWrapper()
-    const { result } = renderHook(() => useAssets(), { wrapper })
+    const { wrapper } = createQueryWrapper();
+    const { result } = renderHook(() => useAssets(), { wrapper });
 
-    await waitFor(() => expect(result.current.isError).toBe(true))
-  })
-})
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+});
 ```
 
 **Why use MSW over `vi.fn()`:**
@@ -380,31 +382,31 @@ describe('useAssets with MSW', () => {
 
 ```typescript
 // src/hooks/useCreateAsset.ts
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface CreateAssetInput {
-  name: string
-  status: 'active' | 'inactive'
+  name: string;
+  status: "active" | "inactive";
 }
 
 export function useCreateAsset() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (input: CreateAssetInput) => {
-      const response = await fetch('/api/assets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/assets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
-      })
-      if (!response.ok) throw new Error('Failed to create asset')
-      return response.json()
+      });
+      if (!response.ok) throw new Error("Failed to create asset");
+      return response.json();
     },
     onSuccess: () => {
       // Invalidate assets list to trigger refetch
-      queryClient.invalidateQueries({ queryKey: ['assets'] })
+      queryClient.invalidateQueries({ queryKey: ["assets"] });
     },
-  })
+  });
 }
 ```
 
@@ -412,119 +414,117 @@ export function useCreateAsset() {
 
 ```typescript
 // src/hooks/useCreateAsset.test.ts
-import { describe, it, expect, beforeAll, afterEach, afterAll } from 'vitest'
-import { renderHook, waitFor, act } from '@testing-library/react'
-import { http, HttpResponse } from 'msw'
-import { server } from '../test-utils/msw-server'
-import { useCreateAsset } from './useCreateAsset'
-import { createQueryWrapper } from '../test-utils/query-test-utils'
+import { describe, it, expect, beforeAll, afterEach, afterAll } from "vitest";
+import { renderHook, waitFor, act } from "@testing-library/react";
+import { http, HttpResponse } from "msw";
+import { server } from "../test-utils/msw-server";
+import { useCreateAsset } from "./useCreateAsset";
+import { createQueryWrapper } from "../test-utils/query-test-utils";
 
 // Add mutation handler to server
 beforeAll(() => {
-  server.listen()
+  server.listen();
   server.use(
-    http.post('/api/assets', async ({ request }) => {
-      const body = await request.json() as { name: string; status: string }
+    http.post("/api/assets", async ({ request }) => {
+      const body = (await request.json()) as { name: string; status: string };
       return HttpResponse.json({
-        id: '999',
+        id: "999",
         ...body,
-      })
+      });
     })
-  )
-})
+  );
+});
 
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
-describe('useCreateAsset', () => {
-  it('creates asset successfully', async () => {
-    const { wrapper } = createQueryWrapper()
-    const { result } = renderHook(() => useCreateAsset(), { wrapper })
+describe("useCreateAsset", () => {
+  it("creates asset successfully", async () => {
+    const { wrapper } = createQueryWrapper();
+    const { result } = renderHook(() => useCreateAsset(), { wrapper });
 
     // Initially idle
-    expect(result.current.isPending).toBe(false)
-    expect(result.current.data).toBeUndefined()
+    expect(result.current.isPending).toBe(false);
+    expect(result.current.data).toBeUndefined();
 
     // Trigger mutation
     act(() => {
-      result.current.mutate({ name: 'New Asset', status: 'active' })
-    })
+      result.current.mutate({ name: "New Asset", status: "active" });
+    });
 
     // Pending during mutation
-    expect(result.current.isPending).toBe(true)
+    expect(result.current.isPending).toBe(true);
 
     // Wait for success
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(result.current.data).toEqual({
-      id: '999',
-      name: 'New Asset',
-      status: 'active',
-    })
-  })
+      id: "999",
+      name: "New Asset",
+      status: "active",
+    });
+  });
 
-  it('handles mutation errors', async () => {
+  it("handles mutation errors", async () => {
     server.use(
-      http.post('/api/assets', () => {
-        return new HttpResponse(null, { status: 400 })
+      http.post("/api/assets", () => {
+        return new HttpResponse(null, { status: 400 });
       })
-    )
+    );
 
-    const { wrapper } = createQueryWrapper()
-    const { result } = renderHook(() => useCreateAsset(), { wrapper })
+    const { wrapper } = createQueryWrapper();
+    const { result } = renderHook(() => useCreateAsset(), { wrapper });
 
     act(() => {
-      result.current.mutate({ name: 'New Asset', status: 'active' })
-    })
+      result.current.mutate({ name: "New Asset", status: "active" });
+    });
 
-    await waitFor(() => expect(result.current.isError).toBe(true))
-    expect(result.current.error?.message).toBe('Failed to create asset')
-  })
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.error?.message).toBe("Failed to create asset");
+  });
 
-  it('invalidates assets query on success', async () => {
-    const { wrapper, queryClient } = createQueryWrapper()
+  it("invalidates assets query on success", async () => {
+    const { wrapper, queryClient } = createQueryWrapper();
 
     // Prefill cache with existing assets
-    queryClient.setQueryData(['assets'], [
-      { id: '1', name: 'Existing Asset', status: 'active' },
-    ])
+    queryClient.setQueryData(["assets"], [{ id: "1", name: "Existing Asset", status: "active" }]);
 
-    const { result } = renderHook(() => useCreateAsset(), { wrapper })
+    const { result } = renderHook(() => useCreateAsset(), { wrapper });
 
     // Spy on invalidateQueries
-    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
+    const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
     act(() => {
-      result.current.mutate({ name: 'New Asset', status: 'active' })
-    })
+      result.current.mutate({ name: "New Asset", status: "active" });
+    });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     // Verify invalidation was called
-    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['assets'] })
-  })
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["assets"] });
+  });
 
-  it('resets mutation state', async () => {
-    const { wrapper } = createQueryWrapper()
-    const { result } = renderHook(() => useCreateAsset(), { wrapper })
+  it("resets mutation state", async () => {
+    const { wrapper } = createQueryWrapper();
+    const { result } = renderHook(() => useCreateAsset(), { wrapper });
 
     // Trigger mutation
     act(() => {
-      result.current.mutate({ name: 'New Asset', status: 'active' })
-    })
+      result.current.mutate({ name: "New Asset", status: "active" });
+    });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     // Reset mutation
     act(() => {
-      result.current.reset()
-    })
+      result.current.reset();
+    });
 
     // Back to idle state
-    expect(result.current.status).toBe('idle')
-    expect(result.current.data).toBeUndefined()
-  })
-})
+    expect(result.current.status).toBe("idle");
+    expect(result.current.data).toBeUndefined();
+  });
+});
 ```
 
 **Key patterns:**
@@ -713,59 +713,59 @@ describe('AssetList', () => {
 
 ```typescript
 // src/hooks/useToggleAssetStatus.ts
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Asset {
-  id: string
-  name: string
-  status: 'active' | 'inactive'
+  id: string;
+  name: string;
+  status: "active" | "inactive";
 }
 
 export function useToggleAssetStatus() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (assetId: string) => {
       const response = await fetch(`/api/assets/${assetId}/toggle`, {
-        method: 'PATCH',
-      })
-      if (!response.ok) throw new Error('Failed to toggle status')
-      return response.json()
+        method: "PATCH",
+      });
+      if (!response.ok) throw new Error("Failed to toggle status");
+      return response.json();
     },
 
     // Optimistic update: Apply change immediately
     onMutate: async (assetId) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['assets'] })
+      await queryClient.cancelQueries({ queryKey: ["assets"] });
 
       // Snapshot previous value for rollback
-      const previousAssets = queryClient.getQueryData<Asset[]>(['assets'])
+      const previousAssets = queryClient.getQueryData<Asset[]>(["assets"]);
 
       // Optimistically update cache
-      queryClient.setQueryData<Asset[]>(['assets'], (old = []) =>
-        old.map(asset =>
+      queryClient.setQueryData<Asset[]>(["assets"], (old = []) =>
+        old.map((asset) =>
           asset.id === assetId
-            ? { ...asset, status: asset.status === 'active' ? 'inactive' : 'active' }
+            ? { ...asset, status: asset.status === "active" ? "inactive" : "active" }
             : asset
         )
-      )
+      );
 
       // Return context for rollback
-      return { previousAssets }
+      return { previousAssets };
     },
 
     // Rollback on error
     onError: (err, assetId, context) => {
       if (context?.previousAssets) {
-        queryClient.setQueryData(['assets'], context.previousAssets)
+        queryClient.setQueryData(["assets"], context.previousAssets);
       }
     },
 
     // Always refetch to ensure consistency
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['assets'] })
+      queryClient.invalidateQueries({ queryKey: ["assets"] });
     },
-  })
+  });
 }
 ```
 
@@ -773,130 +773,122 @@ export function useToggleAssetStatus() {
 
 ```typescript
 // src/hooks/useToggleAssetStatus.test.ts
-import { describe, it, expect, beforeAll, afterEach, afterAll } from 'vitest'
-import { renderHook, waitFor, act } from '@testing-library/react'
-import { http, HttpResponse } from 'msw'
-import { server } from '../test-utils/msw-server'
-import { useToggleAssetStatus } from './useToggleAssetStatus'
-import { createQueryWrapper } from '../test-utils/query-test-utils'
+import { describe, it, expect, beforeAll, afterEach, afterAll } from "vitest";
+import { renderHook, waitFor, act } from "@testing-library/react";
+import { http, HttpResponse } from "msw";
+import { server } from "../test-utils/msw-server";
+import { useToggleAssetStatus } from "./useToggleAssetStatus";
+import { createQueryWrapper } from "../test-utils/query-test-utils";
 
 beforeAll(() => {
-  server.listen()
+  server.listen();
   server.use(
-    http.patch('/api/assets/:id/toggle', ({ params }) => {
+    http.patch("/api/assets/:id/toggle", ({ params }) => {
       return HttpResponse.json({
         id: params.id,
-        name: 'Test Asset',
-        status: 'inactive', // Toggled
-      })
+        name: "Test Asset",
+        status: "inactive", // Toggled
+      });
     })
-  )
-})
+  );
+});
 
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
-describe('useToggleAssetStatus - Optimistic Updates', () => {
-  it('applies optimistic update immediately', async () => {
-    const { wrapper, queryClient } = createQueryWrapper()
+describe("useToggleAssetStatus - Optimistic Updates", () => {
+  it("applies optimistic update immediately", async () => {
+    const { wrapper, queryClient } = createQueryWrapper();
 
     // Prefill cache
-    queryClient.setQueryData(['assets'], [
-      { id: '1', name: 'Asset 1', status: 'active' },
-    ])
+    queryClient.setQueryData(["assets"], [{ id: "1", name: "Asset 1", status: "active" }]);
 
-    const { result } = renderHook(() => useToggleAssetStatus(), { wrapper })
+    const { result } = renderHook(() => useToggleAssetStatus(), { wrapper });
 
     // Trigger mutation
     act(() => {
-      result.current.mutate('1')
-    })
+      result.current.mutate("1");
+    });
 
     // Check optimistic update applied immediately (before server response)
-    const cachedAssets = queryClient.getQueryData<any[]>(['assets'])
-    expect(cachedAssets?.[0].status).toBe('inactive')
+    const cachedAssets = queryClient.getQueryData<any[]>(["assets"]);
+    expect(cachedAssets?.[0].status).toBe("inactive");
 
     // Wait for mutation to complete
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
-  })
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
 
-  it('rolls back optimistic update on error', async () => {
-    const { wrapper, queryClient } = createQueryWrapper()
+  it("rolls back optimistic update on error", async () => {
+    const { wrapper, queryClient } = createQueryWrapper();
 
     // Prefill cache
-    const originalAssets = [
-      { id: '1', name: 'Asset 1', status: 'active' },
-    ]
-    queryClient.setQueryData(['assets'], originalAssets)
+    const originalAssets = [{ id: "1", name: "Asset 1", status: "active" }];
+    queryClient.setQueryData(["assets"], originalAssets);
 
     // Mock server error
     server.use(
-      http.patch('/api/assets/:id/toggle', () => {
-        return new HttpResponse(null, { status: 500 })
+      http.patch("/api/assets/:id/toggle", () => {
+        return new HttpResponse(null, { status: 500 });
       })
-    )
+    );
 
-    const { result } = renderHook(() => useToggleAssetStatus(), { wrapper })
+    const { result } = renderHook(() => useToggleAssetStatus(), { wrapper });
 
     // Trigger mutation
     act(() => {
-      result.current.mutate('1')
-    })
+      result.current.mutate("1");
+    });
 
     // Check optimistic update applied
-    let cachedAssets = queryClient.getQueryData<any[]>(['assets'])
-    expect(cachedAssets?.[0].status).toBe('inactive')
+    let cachedAssets = queryClient.getQueryData<any[]>(["assets"]);
+    expect(cachedAssets?.[0].status).toBe("inactive");
 
     // Wait for error
-    await waitFor(() => expect(result.current.isError).toBe(true))
+    await waitFor(() => expect(result.current.isError).toBe(true));
 
     // Check rollback occurred
-    cachedAssets = queryClient.getQueryData<any[]>(['assets'])
-    expect(cachedAssets?.[0].status).toBe('active') // Rolled back
-  })
+    cachedAssets = queryClient.getQueryData<any[]>(["assets"]);
+    expect(cachedAssets?.[0].status).toBe("active"); // Rolled back
+  });
 
-  it('invalidates cache after successful mutation', async () => {
-    const { wrapper, queryClient } = createQueryWrapper()
+  it("invalidates cache after successful mutation", async () => {
+    const { wrapper, queryClient } = createQueryWrapper();
 
-    queryClient.setQueryData(['assets'], [
-      { id: '1', name: 'Asset 1', status: 'active' },
-    ])
+    queryClient.setQueryData(["assets"], [{ id: "1", name: "Asset 1", status: "active" }]);
 
-    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
+    const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
-    const { result } = renderHook(() => useToggleAssetStatus(), { wrapper })
+    const { result } = renderHook(() => useToggleAssetStatus(), { wrapper });
 
     act(() => {
-      result.current.mutate('1')
-    })
+      result.current.mutate("1");
+    });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     // Verify invalidation called
-    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['assets'] })
-  })
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["assets"] });
+  });
 
-  it('cancels ongoing queries during optimistic update', async () => {
-    const { wrapper, queryClient } = createQueryWrapper()
+  it("cancels ongoing queries during optimistic update", async () => {
+    const { wrapper, queryClient } = createQueryWrapper();
 
-    queryClient.setQueryData(['assets'], [
-      { id: '1', name: 'Asset 1', status: 'active' },
-    ])
+    queryClient.setQueryData(["assets"], [{ id: "1", name: "Asset 1", status: "active" }]);
 
-    const cancelSpy = vi.spyOn(queryClient, 'cancelQueries')
+    const cancelSpy = vi.spyOn(queryClient, "cancelQueries");
 
-    const { result } = renderHook(() => useToggleAssetStatus(), { wrapper })
+    const { result } = renderHook(() => useToggleAssetStatus(), { wrapper });
 
     act(() => {
-      result.current.mutate('1')
-    })
+      result.current.mutate("1");
+    });
 
     // Verify cancelQueries called to prevent race conditions
-    expect(cancelSpy).toHaveBeenCalledWith({ queryKey: ['assets'] })
+    expect(cancelSpy).toHaveBeenCalledWith({ queryKey: ["assets"] });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
-  })
-})
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+});
 ```
 
 **Key patterns:**
@@ -921,24 +913,28 @@ describe('useToggleAssetStatus - Optimistic Updates', () => {
 ### ✅ DO
 
 **Test Infrastructure:**
+
 - Create reusable test utilities (`createTestQueryClient`, `renderWithClient`)
 - Use MSW for consistent, realistic API mocking
 - Disable retries in tests (`retry: false`)
 - Silence expected errors in test QueryClient
 
 **Test Coverage:**
+
 - Test all query states: `isPending`, `isSuccess`, `isError`
 - Test mutation lifecycle: idle → pending → success/error
 - Test optimistic updates AND rollback scenarios
 - Test cache invalidation and refetch behavior
 
 **Test Patterns:**
+
 - Use `waitFor` for async state transitions
 - Use `act()` when triggering mutations
 - Mock at network boundary (fetch/MSW), not hooks
 - Prefill cache when testing with existing data
 
 **Assertions:**
+
 - Check `result.current` for hook state
 - Inspect `queryClient.getQueryData()` for cache state
 - Verify callbacks with spies (`vi.spyOn`)
@@ -946,12 +942,14 @@ describe('useToggleAssetStatus - Optimistic Updates', () => {
 ### ❌ DON'T
 
 **Anti-Patterns:**
+
 - Don't mock TanStack Query internals (`useQuery`, `useMutation`)
 - Don't test implementation details (internal state)
 - Don't use real API calls in unit tests
 - Don't forget to clean up between tests (`afterEach`)
 
 **Common Mistakes:**
+
 - Forgetting `retry: false` (causes flaky timing)
 - Not using `waitFor` for async (race conditions)
 - Mocking hooks instead of network (misses integration bugs)
@@ -981,20 +979,24 @@ For optimistic updates:
 ## Related Resources
 
 **Skills:**
+
 - `using-tanstack-query` - Complete TanStack Query v5 patterns
 - `frontend-testing-patterns` - General React testing strategies
 
 **Examples:**
+
 - [MSW Setup](msw-setup.md) - Complete MSW server configuration
 - [Factory Pattern](factory-pattern.md) - Test data generation
 
 **References:**
+
 - [TanStack Query Testing](../references/tanstack-query-testing.md) - Detailed testing strategies
 - [MSW Integration](../references/msw-integration.md) - MSW patterns and best practices
 - [React Hooks Testing](../references/react-hooks-testing.md) - Hook testing patterns
 - [Test Isolation](../references/test-isolation.md) - Cleanup and lifecycle management
 
 **Official Docs:**
+
 - [TanStack Query Testing Guide](https://tanstack.com/query/latest/docs/react/guides/testing)
 - [MSW Documentation](https://mswjs.io/)
 - [Vitest API Reference](https://vitest.dev/api/)

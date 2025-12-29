@@ -11,23 +11,27 @@
 **Examples:**
 
 ❌ **Violates Rule:**
+
 ```markdown
 "The useWizard hook returns navigation, progress, and validation objects"
 ```
-*No source quoted - this is from memory/patterns*
+
+_No source quoted - this is from memory/patterns_
 
 ✅ **Follows Rule:**
+
 ```markdown
 "The useWizard hook returns nested objects (lines 72-77 of useWizard.ts):
 \`\`\`typescript
 return {
-  navigation: { ... },
-  progress: { ... },
-  validation: { ... },
+navigation: { ... },
+progress: { ... },
+validation: { ... },
 }
 \`\`\`"
 ```
-*Source quoted with line numbers - verified*
+
+_Source quoted with line numbers - verified_
 
 ### Rule 2: Memory is Suspect
 
@@ -36,6 +40,7 @@ return {
 **Why:** Your knowledge cutoff is 18 months ago. Libraries change. APIs evolve.
 
 **Trigger phrases that indicate memory-based claims:**
+
 - "I think..."
 - "It probably..."
 - "Usually it..."
@@ -47,9 +52,11 @@ return {
 **Example:**
 
 ❌ **Memory-based:**
+
 > "I think WizardStep has a `label` property for the step title"
 
 ✅ **Source-verified:**
+
 > "WizardStep uses `title` property (not `label`), verified at types.ts:17"
 
 ### Rule 3: Patterns Are Assumptions
@@ -58,19 +65,21 @@ return {
 
 **Common pattern assumptions:**
 
-| Assumption | Reality |
-|------------|---------|
-| "Most React hooks return flat objects" | Many return nested structures |
-| "Validation usually returns strings" | Some return booleans, objects, or arrays |
-| "Step interfaces have `label`" | Some use `title`, `name`, or `heading` |
-| "Config objects are passed as single param" | Some destructure into multiple params |
+| Assumption                                  | Reality                                  |
+| ------------------------------------------- | ---------------------------------------- |
+| "Most React hooks return flat objects"      | Many return nested structures            |
+| "Validation usually returns strings"        | Some return booleans, objects, or arrays |
+| "Step interfaces have `label`"              | Some use `title`, `name`, or `heading`   |
+| "Config objects are passed as single param" | Some destructure into multiple params    |
 
 **Example:**
 
 ❌ **Pattern assumption:**
+
 > "Following common React patterns, useWizard likely returns `{ currentStep, goNext, goPrev }`"
 
 ✅ **Source-verified:**
+
 > "useWizard returns nested object with `navigation.goToNextStep()` (verified at useWizard.ts:72-77)"
 
 ### Rule 4: Read Before Write
@@ -87,37 +96,42 @@ return {
 **Example:**
 
 ❌ **Write without reading:**
+
 ```markdown
 Update AssetModal.tsx to use the new BaseEntityWizardModal component.
 
 Changes:
+
 - Import BaseEntityWizardModal
 - Pass entityConfig prop
 - ...
 ```
-*Didn't read AssetModal first - might not understand current structure*
+
+_Didn't read AssetModal first - might not understand current structure_
 
 ✅ **Read before write:**
+
 ```markdown
 **Current Implementation** (AssetModal.tsx, lines 45-80):
 \`\`\`typescript
 export function AssetModal() {
-  const wizard = useWizard({ ... });
-  // ...existing pattern
+const wizard = useWizard({ ... });
+// ...existing pattern
 }
 \`\`\`
 
 **Proposed Change:**
 \`\`\`typescript
 export function AssetModal() {
-  return <BaseEntityWizardModal
-    entityConfig={assetConfig}
-    // ...
-  />
+return <BaseEntityWizardModal
+entityConfig={assetConfig}
+// ...
+/>
 }
 \`\`\`
 ```
-*Read current code first, showed exact change*
+
+_Read current code first, showed exact change_
 
 ## Additional Rules
 
@@ -132,13 +146,14 @@ export function AssetModal() {
 **DO:** Check actual export statements in the file
 
 **Example:**
+
 ```typescript
 // File might export as:
-export function useWizard() { }  // Named export
+export function useWizard() {} // Named export
 // or
-export default useWizard;  // Default export
+export default useWizard; // Default export
 // or
-module.exports = { useWizard };  // CommonJS
+module.exports = { useWizard }; // CommonJS
 
 // READ THE FILE to see which pattern is used
 ```
@@ -156,6 +171,7 @@ module.exports = { useWizard };  // CommonJS
 ## When Rules Apply
 
 **Always apply before:**
+
 - Writing implementation plans
 - Describing how systems work
 - Proposing code changes
@@ -163,6 +179,7 @@ module.exports = { useWizard };  // CommonJS
 - Documenting APIs
 
 **Even apply when:**
+
 - "Quick analysis" requested
 - Time pressure exists
 - You're "confident" you know the API
@@ -191,6 +208,7 @@ module.exports = { useWizard };  // CommonJS
 **Every claim about code must be traceable to actual source.**
 
 If challenged "where did you see that?", you must be able to answer with:
+
 - Exact file path
 - Line numbers
 - Quoted code

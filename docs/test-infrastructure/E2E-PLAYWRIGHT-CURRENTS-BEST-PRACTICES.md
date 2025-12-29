@@ -31,13 +31,13 @@ Best practices for configuring Playwright E2E tests with GitHub Actions CI and C
 
 ### Orchestration vs Native Sharding
 
-| Aspect | Native Sharding | Currents Orchestration |
-|--------|-----------------|------------------------|
-| Test Distribution | Static matrix assignment | Dynamic, intelligent balancing |
-| Performance | Baseline (100%) | Up to 40% faster |
-| Runner Re-runs | Select "Re-run failed jobs" | Must select "Re-run all jobs" |
-| Configuration | Matrix strategy in YAML | `pwc-p` command invocation |
-| Load Balancing | Manual shard sizing | Automatic optimization |
+| Aspect            | Native Sharding             | Currents Orchestration         |
+| ----------------- | --------------------------- | ------------------------------ |
+| Test Distribution | Static matrix assignment    | Dynamic, intelligent balancing |
+| Performance       | Baseline (100%)             | Up to 40% faster               |
+| Runner Re-runs    | Select "Re-run failed jobs" | Must select "Re-run all jobs"  |
+| Configuration     | Matrix strategy in YAML     | `pwc-p` command invocation     |
+| Load Balancing    | Manual shard sizing         | Automatic optimization         |
 
 ---
 
@@ -46,10 +46,10 @@ Best practices for configuring Playwright E2E tests with GitHub Actions CI and C
 ### Recommended `playwright.config.ts`
 
 ```typescript
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: './src/tests',
+  testDir: "./src/tests",
 
   // Enable test-level parallelization for better shard distribution
   fullyParallel: true,
@@ -67,9 +67,7 @@ export default defineConfig({
   // Reporter configuration
   // CI: blob for shard merging + list for logs
   // Local: HTML for interactive viewing
-  reporter: process.env.CI
-    ? [['blob'], ['list']]
-    : [['html', { open: 'never' }], ['list']],
+  reporter: process.env.CI ? [["blob"], ["list"]] : [["html", { open: "never" }], ["list"]],
 
   timeout: 60000,
 
@@ -79,14 +77,14 @@ export default defineConfig({
 
   use: {
     // Support both HTTP (CI) and HTTPS (local)
-    baseURL: process.env.BASE_URL || 'https://localhost:3000',
+    baseURL: process.env.BASE_URL || "https://localhost:3000",
 
     // Capture traces on first retry for debugging
-    trace: 'on-first-retry',
+    trace: "on-first-retry",
 
     // Screenshots and video only on failure to save resources
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
 
     // Required for local HTTPS with self-signed certs
     ignoreHTTPSErrors: true,
@@ -94,8 +92,8 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
     },
   ],
 });
@@ -103,13 +101,13 @@ export default defineConfig({
 
 ### Key Configuration Options
 
-| Option | Recommended Value | Why |
-|--------|-------------------|-----|
-| `fullyParallel` | `true` | Enables test-level distribution across shards |
-| `workers` | `2` in CI | GitHub Actions has 2 CPU cores |
-| `retries` | `2` in CI, `0` locally | Handle flaky tests without masking bugs |
-| `forbidOnly` | `true` in CI | Prevent accidental `.only` commits |
-| `reporter` | `blob` in CI | Enables report merging across shards |
+| Option          | Recommended Value      | Why                                           |
+| --------------- | ---------------------- | --------------------------------------------- |
+| `fullyParallel` | `true`                 | Enables test-level distribution across shards |
+| `workers`       | `2` in CI              | GitHub Actions has 2 CPU cores                |
+| `retries`       | `2` in CI, `0` locally | Handle flaky tests without masking bugs       |
+| `forbidOnly`    | `true` in CI           | Prevent accidental `.only` commits            |
+| `reporter`      | `blob` in CI           | Enables report merging across shards          |
 
 ---
 
@@ -122,6 +120,7 @@ npm install -D @currents/playwright
 ```
 
 Requires:
+
 - Node.js 14.0.0+
 - Playwright 1.22.2+
 - For fixtures: @currents/playwright 1.7.0+
@@ -129,20 +128,18 @@ Requires:
 ### Configuration File (`currents.config.ts`)
 
 ```typescript
-import { CurrentsConfig } from '@currents/playwright';
+import { CurrentsConfig } from "@currents/playwright";
 
 const config: CurrentsConfig = {
   // Required: From Currents dashboard
-  recordKey: process.env.CURRENTS_RECORD_KEY ?? '',
-  projectId: process.env.CURRENTS_PROJECT_ID ?? '',
+  recordKey: process.env.CURRENTS_RECORD_KEY ?? "",
+  projectId: process.env.CURRENTS_PROJECT_ID ?? "",
 
   // Required for CI: Coordinates parallel runs
   ciBuildId: process.env.CURRENTS_CI_BUILD_ID,
 
   // Optional: Tag runs for filtering in dashboard
-  tag: process.env.GITHUB_REF_NAME
-    ? [process.env.GITHUB_REF_NAME]
-    : [],
+  tag: process.env.GITHUB_REF_NAME ? [process.env.GITHUB_REF_NAME] : [],
 
   // Enable for debugging
   disableVideoUpload: false,
@@ -157,19 +154,19 @@ export default config;
 
 ### Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `CURRENTS_RECORD_KEY` | Yes | Secret key from Currents dashboard |
-| `CURRENTS_PROJECT_ID` | Yes | Project ID from Currents dashboard |
-| `CURRENTS_CI_BUILD_ID` | Yes (CI) | Unique build identifier |
-| `GITHUB_REF_NAME` | No | Branch name for tagging |
+| Variable               | Required | Description                        |
+| ---------------------- | -------- | ---------------------------------- |
+| `CURRENTS_RECORD_KEY`  | Yes      | Secret key from Currents dashboard |
+| `CURRENTS_PROJECT_ID`  | Yes      | Project ID from Currents dashboard |
+| `CURRENTS_CI_BUILD_ID` | Yes (CI) | Unique build identifier            |
+| `GITHUB_REF_NAME`      | No       | Branch name for tagging            |
 
 ### Commands
 
-| Command | Purpose |
-|---------|---------|
-| `pwc` | Run with Currents reporter (uses native sharding) |
-| `pwc-p` | Run with Currents orchestration (recommended) |
+| Command | Purpose                                           |
+| ------- | ------------------------------------------------- |
+| `pwc`   | Run with Currents reporter (uses native sharding) |
+| `pwc-p` | Run with Currents orchestration (recommended)     |
 
 ```bash
 # Basic orchestration run
@@ -185,18 +182,15 @@ For full Currents features (code coverage, actions), integrate fixtures:
 
 ```typescript
 // src/fixtures/fixtures.ts
-import { test as base } from '@playwright/test';
+import { test as base } from "@playwright/test";
 import {
   CurrentsFixtures,
   CurrentsWorkerFixtures,
   fixtures as currentsFixtures,
-} from '@currents/playwright';
+} from "@currents/playwright";
 
 // Extend with Currents fixtures
-const testWithCurrents = base.extend<
-  CurrentsFixtures,
-  CurrentsWorkerFixtures
->({
+const testWithCurrents = base.extend<CurrentsFixtures, CurrentsWorkerFixtures>({
   ...currentsFixtures.baseFixtures,
 });
 
@@ -260,8 +254,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: e2e/package-lock.json
 
       # Cache Playwright browsers
@@ -354,7 +348,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install Playwright
         run: npm install -D @playwright/test
@@ -379,12 +373,12 @@ jobs:
 
 ### Required GitHub Secrets
 
-| Secret | Description |
-|--------|-------------|
-| `CURRENTS_RECORD_KEY` | Currents.dev record key |
-| `CURRENTS_PROJECT_ID` | Currents.dev project ID |
-| `E2E_TEST_USER_EMAIL` | Test user email |
-| `E2E_TEST_USER_PASSWORD` | Test user password |
+| Secret                     | Description                  |
+| -------------------------- | ---------------------------- |
+| `CURRENTS_RECORD_KEY`      | Currents.dev record key      |
+| `CURRENTS_PROJECT_ID`      | Currents.dev project ID      |
+| `E2E_TEST_USER_EMAIL`      | Test user email              |
+| `E2E_TEST_USER_PASSWORD`   | Test user password           |
 | `E2E_TEST_USER_MFA_SECRET` | TOTP secret (if MFA enabled) |
 
 ---
@@ -412,7 +406,7 @@ run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal 
 strategy:
   fail-fast: false
   matrix:
-    machine: [1, 2, 3]  # Just specify count
+    machine: [1, 2, 3] # Just specify count
 
 # Currents handles distribution automatically
 run: npx pwc-p --key $KEY --project-id $ID --ci-build-id $BUILD_ID
@@ -420,10 +414,10 @@ run: npx pwc-p --key $KEY --project-id $ID --ci-build-id $BUILD_ID
 
 ### `fullyParallel` Impact
 
-| Setting | Behavior | Best For |
-|---------|----------|----------|
-| `true` | Tests distributed individually | Even load distribution |
-| `false` | Tests distributed by file | Files with dependencies |
+| Setting | Behavior                       | Best For                |
+| ------- | ------------------------------ | ----------------------- |
+| `true`  | Tests distributed individually | Even load distribution  |
+| `false` | Tests distributed by file      | Files with dependencies |
 
 **Recommendation**: Use `fullyParallel: true` for best shard balance.
 
@@ -441,13 +435,13 @@ async function globalSetup() {
   const page = await context.newPage();
 
   // Perform login
-  await page.goto('/login');
-  await page.fill('#email', process.env.TEST_USER_EMAIL);
-  await page.fill('#password', process.env.TEST_USER_PASSWORD);
+  await page.goto("/login");
+  await page.fill("#email", process.env.TEST_USER_EMAIL);
+  await page.fill("#password", process.env.TEST_USER_PASSWORD);
   await page.click('button[type="submit"]');
 
   // Save storage state
-  await context.storageState({ path: '.auth/user.json' });
+  await context.storageState({ path: ".auth/user.json" });
   await browser.close();
 }
 ```
@@ -464,6 +458,7 @@ use: {
 ### Multi-Machine Considerations
 
 In sharded runs, each machine runs global setup independently. This is fine if:
+
 - Credentials are passed via environment variables
 - Login is idempotent (can run multiple times)
 
@@ -476,13 +471,14 @@ For slow logins, consider caching auth state as an artifact.
 ### Blob Reporter (CI)
 
 The blob reporter captures comprehensive test data for merging:
+
 - Test results and outcomes
 - Traces and screenshots
 - Video recordings
 - Console output
 
 ```typescript
-reporter: process.env.CI ? [['blob'], ['list']] : [['html']]
+reporter: process.env.CI ? [["blob"], ["list"]] : [["html"]];
 ```
 
 ### Merging Reports
@@ -495,11 +491,11 @@ npx playwright merge-reports --reporter html ./all-blob-reports
 
 ### Artifact Retention
 
-| Artifact | Retention | Purpose |
-|----------|-----------|---------|
-| Blob reports | 7 days | Report merging |
-| HTML report | 14 days | Human review |
-| Test results | 7 days | Debugging failures |
+| Artifact     | Retention | Purpose            |
+| ------------ | --------- | ------------------ |
+| Blob reports | 7 days    | Report merging     |
+| HTML report  | 14 days   | Human review       |
+| Test results | 7 days    | Debugging failures |
 
 ---
 
@@ -508,11 +504,13 @@ npx playwright merge-reports --reporter html ./all-blob-reports
 ### Tests Pass Locally, Fail in CI
 
 **Causes:**
+
 - Resource constraints (2 CPU cores in GitHub Actions)
 - Network timing differences
 - Missing system dependencies
 
 **Solutions:**
+
 - Reduce workers: `workers: 2`
 - Add explicit waits: `await page.waitForLoadState('networkidle')`
 - Install system deps: `npx playwright install-deps chromium`
@@ -522,17 +520,20 @@ npx playwright merge-reports --reporter html ./all-blob-reports
 **Cause:** Each shard runs independently, can't share files.
 
 **Solution:**
+
 - Run global setup on each machine (idempotent login)
 - Or cache auth state as artifact and download
 
 ### Timeout Errors
 
 **Causes:**
+
 - Slow CI environment
 - Network latency
 - Resource contention
 
 **Solutions:**
+
 ```typescript
 // Increase timeouts
 timeout: 60000,
@@ -547,6 +548,7 @@ await page.goto('/', { timeout: 30000 });
 **Cause:** Vite preview doesn't serve HTTPS by default.
 
 **Solution:** Use HTTP in CI:
+
 ```yaml
 - run: npx serve -s build -l 3000 &
 
@@ -557,12 +559,14 @@ env:
 ### Flaky Tests
 
 **Causes:**
+
 - Race conditions
 - Unstable selectors
 - State contamination
 - Network unpredictability
 
 **Solutions:**
+
 1. Use explicit waits instead of arbitrary timeouts
 2. Use stable selectors (`data-testid`)
 3. Ensure test isolation
@@ -627,11 +631,13 @@ env:
 ### Artifact Security
 
 Artifacts may contain sensitive data:
+
 - User credentials in traces
 - Access tokens
 - Application source code
 
 **Best Practices:**
+
 - Set appropriate retention periods
 - Don't upload artifacts from forked PRs (they can't access secrets anyway)
 - Consider encrypting sensitive artifacts
@@ -639,6 +645,7 @@ Artifacts may contain sensitive data:
 ### Forked PRs
 
 Workflows from forked PRs don't have access to secrets:
+
 - Artifact upload steps may fail
 - Consider skip conditions for forks
 
@@ -647,17 +654,20 @@ Workflows from forked PRs don't have access to secrets:
 ## Sources
 
 ### Official Documentation
+
 - [Playwright CI Setup](https://playwright.dev/docs/ci-intro)
 - [Playwright Sharding](https://playwright.dev/docs/test-sharding)
 - [Playwright Parallelism](https://playwright.dev/docs/test-parallel)
 
 ### Currents.dev Documentation
+
 - [Currents GitHub Actions](https://docs.currents.dev/getting-started/ci-setup/github-actions/playwright-github-actions)
 - [Currents Orchestration](https://docs.currents.dev/guides/ci-optimization/playwright-orchestration)
 - [Currents Configuration](https://docs.currents.dev/resources/reporters/currents-playwright/configuration)
 - [Currents Fixtures](https://docs.currents.dev/resources/reporters/currents-playwright/playwright-fixtures)
 
 ### Community Resources
+
 - [Currents Demo Repository](https://github.com/currents-dev/playwright-gh-actions-demo)
 - [Avoiding Flaky Tests](https://betterstack.com/community/guides/testing/avoid-flaky-playwright-tests/)
 - [Playwright Storage State Issues](https://github.com/microsoft/playwright/issues/27012)
@@ -667,6 +677,7 @@ Workflows from forked PRs don't have access to secrets:
 ## Chariot Implementation
 
 Our implementation can be found in:
+
 - `modules/chariot/ui/e2e/playwright.config.ts`
 - `modules/chariot/ui/e2e/currents.config.ts`
 - `modules/chariot/.github/workflows/e2e-tests.yml`

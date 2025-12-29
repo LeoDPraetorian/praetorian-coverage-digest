@@ -13,47 +13,47 @@ TanStack libraries are designed for TypeScript-first development. This reference
 ```typescript
 // Define search params type
 interface UserSearchParams {
-  page: number
-  pageSize: number
-  sort?: string
-  order?: 'asc' | 'desc'
-  filter?: string
+  page: number;
+  pageSize: number;
+  sort?: string;
+  order?: "asc" | "desc";
+  filter?: string;
 }
 
-export const Route = createFileRoute('/users')({
+export const Route = createFileRoute("/users")({
   validateSearch: (search: Record<string, unknown>): UserSearchParams => ({
     page: Number(search.page) || 1,
     pageSize: Number(search.pageSize) || 25,
-    sort: typeof search.sort === 'string' ? search.sort : undefined,
-    order: search.order === 'desc' ? 'desc' : 'asc',
-    filter: typeof search.filter === 'string' ? search.filter : undefined,
+    sort: typeof search.sort === "string" ? search.sort : undefined,
+    order: search.order === "desc" ? "desc" : "asc",
+    filter: typeof search.filter === "string" ? search.filter : undefined,
   }),
-})
+});
 
 // Usage - fully typed
 function UsersPage() {
-  const search = Route.useSearch() // Type: UserSearchParams
-  const navigate = Route.useNavigate()
+  const search = Route.useSearch(); // Type: UserSearchParams
+  const navigate = Route.useNavigate();
 
   // TypeScript enforces correct shape
   navigate({
     search: { page: 2 }, // ✅ Valid
     // search: { page: 'two' } // ❌ Type error
-  })
+  });
 }
 ```
 
 ### Typed Route Params
 
 ```typescript
-export const Route = createFileRoute('/users/$userId')({
+export const Route = createFileRoute("/users/$userId")({
   parseParams: (params) => ({
     userId: params.userId, // Type: string
   }),
-})
+});
 
 function UserPage() {
-  const { userId } = Route.useParams() // Type: { userId: string }
+  const { userId } = Route.useParams(); // Type: { userId: string }
 }
 ```
 
@@ -61,22 +61,22 @@ function UserPage() {
 
 ```typescript
 interface UserLoaderData {
-  user: User
-  permissions: string[]
+  user: User;
+  permissions: string[];
 }
 
-export const Route = createFileRoute('/users/$userId')({
+export const Route = createFileRoute("/users/$userId")({
   loader: async ({ params }): Promise<UserLoaderData> => {
     const [user, permissions] = await Promise.all([
       fetchUser(params.userId),
       fetchPermissions(params.userId),
-    ])
-    return { user, permissions }
+    ]);
+    return { user, permissions };
   },
-})
+});
 
 function UserPage() {
-  const data = Route.useLoaderData() // Type: UserLoaderData
+  const data = Route.useLoaderData(); // Type: UserLoaderData
 }
 ```
 
@@ -85,35 +85,35 @@ function UserPage() {
 ### queryOptions Type Safety
 
 ```typescript
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions } from "@tanstack/react-query";
 
 // Response type
 interface UsersResponse {
-  users: User[]
+  users: User[];
   pagination: {
-    total: number
-    page: number
-    pageSize: number
-  }
+    total: number;
+    page: number;
+    pageSize: number;
+  };
 }
 
 // Query options factory with full type inference
 export const usersQueryOptions = (params: UserSearchParams) =>
   queryOptions({
-    queryKey: ['users', params] as const,
+    queryKey: ["users", params] as const,
     queryFn: async (): Promise<UsersResponse> => {
-      const response = await fetch(`/api/users?${new URLSearchParams(params as any)}`)
-      if (!response.ok) throw new Error('Failed to fetch users')
-      return response.json()
+      const response = await fetch(`/api/users?${new URLSearchParams(params as any)}`);
+      if (!response.ok) throw new Error("Failed to fetch users");
+      return response.json();
     },
-  })
+  });
 
 // Usage - data type is inferred
 function UsersPage() {
-  const { data } = useQuery(usersQueryOptions({ page: 1, pageSize: 25 }))
+  const { data } = useQuery(usersQueryOptions({ page: 1, pageSize: 25 }));
   // data type: UsersResponse | undefined
 
-  const { data: users } = useSuspenseQuery(usersQueryOptions({ page: 1, pageSize: 25 }))
+  const { data: users } = useSuspenseQuery(usersQueryOptions({ page: 1, pageSize: 25 }));
   // users type: UsersResponse (never undefined with Suspense)
 }
 ```
@@ -122,40 +122,40 @@ function UsersPage() {
 
 ```typescript
 interface CreateUserInput {
-  name: string
-  email: string
-  role: 'admin' | 'user'
+  name: string;
+  email: string;
+  role: "admin" | "user";
 }
 
 interface CreateUserResponse {
-  id: string
-  name: string
-  email: string
-  role: 'admin' | 'user'
-  createdAt: string
+  id: string;
+  name: string;
+  email: string;
+  role: "admin" | "user";
+  createdAt: string;
 }
 
 const createUserMutation = useMutation({
   mutationFn: async (input: CreateUserInput): Promise<CreateUserResponse> => {
-    const response = await fetch('/api/users', {
-      method: 'POST',
+    const response = await fetch("/api/users", {
+      method: "POST",
       body: JSON.stringify(input),
-    })
-    return response.json()
+    });
+    return response.json();
   },
   onSuccess: (data) => {
     // data type: CreateUserResponse
-    console.log(`Created user ${data.id}`)
+    console.log(`Created user ${data.id}`);
   },
-})
+});
 
 // Usage
 createUserMutation.mutate({
-  name: 'John',
-  email: 'john@example.com',
-  role: 'user', // ✅ Type checked
+  name: "John",
+  email: "john@example.com",
+  role: "user", // ✅ Type checked
   // role: 'superadmin' // ❌ Type error
-})
+});
 ```
 
 ## Table Column Types
@@ -163,53 +163,53 @@ createUserMutation.mutate({
 ### Typed Column Definitions
 
 ```typescript
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
 interface User {
-  id: string
-  name: string
-  email: string
-  status: 'active' | 'inactive'
-  createdAt: Date
+  id: string;
+  name: string;
+  email: string;
+  status: "active" | "inactive";
+  createdAt: Date;
 }
 
 // Option 1: ColumnDef array
 const columns: ColumnDef<User>[] = [
   {
-    accessorKey: 'name',
-    header: 'Name',
+    accessorKey: "name",
+    header: "Name",
     cell: (info) => info.getValue(), // getValue() returns string
   },
   {
-    accessorKey: 'status',
-    header: 'Status',
+    accessorKey: "status",
+    header: "Status",
     cell: (info) => {
-      const status = info.getValue<User['status']>() // Explicit type
-      return status === 'active' ? 'Active' : 'Inactive'
+      const status = info.getValue<User["status"]>(); // Explicit type
+      return status === "active" ? "Active" : "Inactive";
     },
   },
-]
+];
 
 // Option 2: Column helper (better type inference)
-const columnHelper = createColumnHelper<User>()
+const columnHelper = createColumnHelper<User>();
 
 const columns = [
-  columnHelper.accessor('name', {
-    header: 'Name',
+  columnHelper.accessor("name", {
+    header: "Name",
     cell: (info) => info.getValue(), // Type inferred as string
   }),
-  columnHelper.accessor('status', {
-    header: 'Status',
+  columnHelper.accessor("status", {
+    header: "Status",
     cell: (info) => {
-      const status = info.getValue() // Type inferred as 'active' | 'inactive'
-      return status === 'active' ? 'Active' : 'Inactive'
+      const status = info.getValue(); // Type inferred as 'active' | 'inactive'
+      return status === "active" ? "Active" : "Inactive";
     },
   }),
-  columnHelper.accessor('createdAt', {
-    header: 'Created',
+  columnHelper.accessor("createdAt", {
+    header: "Created",
     cell: (info) => info.getValue().toLocaleDateString(), // Type inferred as Date
   }),
-]
+];
 ```
 
 ### Typed Cell Renderers
@@ -283,70 +283,73 @@ function VirtualList({ users }: { users: User[] }) {
 ```typescript
 // types.ts
 export interface User {
-  id: string
-  name: string
-  email: string
-  status: 'active' | 'inactive'
+  id: string;
+  name: string;
+  email: string;
+  status: "active" | "inactive";
 }
 
 export interface UserSearchParams {
-  page: number
-  pageSize: number
-  sort?: keyof User
-  order?: 'asc' | 'desc'
+  page: number;
+  pageSize: number;
+  sort?: keyof User;
+  order?: "asc" | "desc";
 }
 
 export interface UsersResponse {
-  users: User[]
+  users: User[];
   pagination: {
-    total: number
-    page: number
-    pageSize: number
-    totalPages: number
-  }
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  };
 }
 
 // queries.ts
 export const usersQueryOptions = (params: UserSearchParams) =>
   queryOptions({
-    queryKey: ['users', params] as const,
+    queryKey: ["users", params] as const,
     queryFn: (): Promise<UsersResponse> => fetchUsers(params),
-  })
+  });
 
 // routes/users.tsx
-export const Route = createFileRoute('/users')({
+export const Route = createFileRoute("/users")({
   validateSearch: (search): UserSearchParams => ({
     page: Number(search.page) || 1,
     pageSize: Number(search.pageSize) || 25,
     sort: isValidSortKey(search.sort) ? search.sort : undefined,
-    order: search.order === 'desc' ? 'desc' : 'asc',
+    order: search.order === "desc" ? "desc" : "asc",
   }),
   loaderDeps: ({ search }) => search,
   loader: ({ context: { queryClient }, deps }) =>
     queryClient.ensureQueryData(usersQueryOptions(deps)),
-})
+});
 
 // Type guard
 function isValidSortKey(value: unknown): value is keyof User {
-  return typeof value === 'string' && ['id', 'name', 'email', 'status'].includes(value)
+  return typeof value === "string" && ["id", "name", "email", "status"].includes(value);
 }
 
 // Component
 function UsersPage() {
-  const search = Route.useSearch() // UserSearchParams
-  const { data } = useSuspenseQuery(usersQueryOptions(search)) // UsersResponse
+  const search = Route.useSearch(); // UserSearchParams
+  const { data } = useSuspenseQuery(usersQueryOptions(search)); // UsersResponse
 
-  const columns = useMemo<ColumnDef<User>[]>(() => [
-    { accessorKey: 'name', header: 'Name' },
-    { accessorKey: 'email', header: 'Email' },
-    { accessorKey: 'status', header: 'Status' },
-  ], [])
+  const columns = useMemo<ColumnDef<User>[]>(
+    () => [
+      { accessorKey: "name", header: "Name" },
+      { accessorKey: "email", header: "Email" },
+      { accessorKey: "status", header: "Status" },
+    ],
+    []
+  );
 
   const table = useReactTable({
     data: data.users,
     columns,
     getCoreRowModel: getCoreRowModel(),
-  })
+  });
 
   // Full type safety throughout
 }

@@ -20,6 +20,7 @@ const UserCard = React.memo(({ user, onUpdate }) => {
 ```
 
 **Problems:**
+
 - Verbose boilerplate
 - Easy to get dependency arrays wrong
 - Maintenance burden
@@ -36,6 +37,7 @@ function UserCard({ user, onUpdate }) {
 ```
 
 **Benefits:**
+
 - Clean, readable code
 - React Compiler handles optimization
 - No dependency arrays to maintain
@@ -97,6 +99,7 @@ function Component({ data }) {
 ```
 
 **When useMemo IS still needed:**
+
 - Truly expensive operations (>100ms)
 - External library integrations requiring stable references
 - Preventing infinite useEffect loops
@@ -182,10 +185,10 @@ export default defineConfig({
   plugins: [
     react({
       babel: {
-        plugins: [['babel-plugin-react-compiler', { target: '19' }]]
-      }
-    })
-  ]
+        plugins: [["babel-plugin-react-compiler", { target: "19" }]],
+      },
+    }),
+  ],
 });
 ```
 
@@ -194,11 +197,13 @@ export default defineConfig({
 **Don't rush:** Existing `useMemo`/`useCallback`/`React.memo` won't break anything. Remove gradually during refactoring.
 
 **Remove when:**
+
 - Component is simple presentational UI
 - Calculation is cheap (<10ms)
 - No external library dependencies
 
 **Keep when:**
+
 - Calculation >100ms
 - External libraries require stable references
 - Preventing useEffect infinite loops
@@ -206,11 +211,13 @@ export default defineConfig({
 ### Phase 3: Add Concurrent Features
 
 **Add `useTransition` for:**
+
 - Search and filter operations
 - Tab switching
 - Data-heavy updates
 
 **Add `useDeferredValue` for:**
+
 - Third-party components you can't modify
 - Props from parent you can't wrap in transition
 

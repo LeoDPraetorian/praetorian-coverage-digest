@@ -90,7 +90,7 @@ npx shadcn@latest add button card dialog dropdown-menu input form
 Then import as needed:
 
 ```typescript
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 ```

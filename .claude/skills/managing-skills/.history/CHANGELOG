@@ -280,3 +280,51 @@ All notable changes to this skill.
 - **2025-11-30**: Suggest mode now outputs ALL fixes (deterministic + semantic) as suggestions. Nothing is auto-applied - Claude presents each one for Accept/Skip, user controls what gets applied. Deterministic fixes (phases 2,4,5,6,7,10,12) are detected via dry-run and presented as suggestions with applyCommand.
 - **2025-11-30**: Add context7 integration for library/framework skills - skill type selection, --context7-data flag, --refresh-context7 for updates, auto-generated API references and patterns
 - **2025-11-30**: Documentation audit - fixed phase names, backup path docs, Phase 11 classification, list output docs, and removed references to non-existent skills
+
+## [2025-12-28] - Align Reference Documentation with Phase Implementation Fixes
+
+**Updated: references/audit-phases.md**
+
+- Fixed auto-fixable phases list (line 15):
+  - Changed: "Phases 2, 4, 5, 6, 7, 10, 12, 14a-c, 16, 18"
+  - To: "Phases 2, 4, 5, 6, 7, 10, 12, 14a, 16, 18"
+- Added new category "Validation-Only (No Auto-Fix)" for phases 14b, 14c
+- Updated Phase 14 section:
+  - 14a: ✅ Auto-fixable via Prettier (`prettier --write`)
+  - 14b: ⚠️ Validation-only (language detection is unreliable)
+  - 14c: ⚠️ Validation-only (header restructuring risks content damage)
+- Updated Phase 16: Added CLI command note
+- Updated Phase 18: Added CLI command note and clearer path expansion description
+
+**Updated: references/table-formatting.md**
+
+- Corrected phase naming: All "Phase 14g" → "Phase 14a" (14g was a typo)
+- Updated code examples to use correct phase identifier
+- Verified Prettier workflow documentation is accurate
+
+**Why This Matters:**
+- Documentation now accurately reflects which phases are auto-fixable via CLI
+- Clear distinction between auto-fixable (14a) and validation-only (14b, 14c) phases
+- Users can now correctly use `npm run fix -- <skill> --phase 14a` for table formatting
+## 2025-12-28
+
+**Updated phase categorization to match implementation:**
+
+- Deterministic phases: 2, 5, 6, 7, 12, 14a, 16, 18
+  - Added: 6 (script organization), 12 (CLI error handling), 16 (Windows paths)
+  - Removed: 14b, 14c (moved to Validation-Only)
+  
+- Hybrid phases: 4, 10, 19 (with Levenshtein fuzzy matching)
+  - Removed: 6, 12, 14f (6, 12 are deterministic; 14f removed)
+  - Added detailed fuzzy matching descriptions:
+    - Phase 4: >40% similarity for file matching
+    - Phase 10: >60% similarity for skill/agent matching
+    - Phase 19: >50% similarity for gateway path matching
+    
+- Added Validation-Only category: 14b, 14c
+  
+- Claude-Automated: Added Phase 22 (Context7 staleness)
+
+**Changed:** Overview table, deterministic section, hybrid section, quick reference
+
+**Reason:** Documentation incorrectly listed phases 6, 12 as hybrid and 14b, 14c as deterministic. Actual implementation shows they are deterministic and validation-only respectively.

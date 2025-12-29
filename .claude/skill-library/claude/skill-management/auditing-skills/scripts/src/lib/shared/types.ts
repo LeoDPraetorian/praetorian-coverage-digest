@@ -17,6 +17,7 @@ export interface SkillFile {
   frontmatter: SkillFrontmatter;
   content: string;
   wordCount: number;
+  lineCount: number;  // Added for Phase 3 (Anthropic recommends <500 lines)
 }
 
 export type IssueSeverity = 'CRITICAL' | 'WARNING' | 'INFO';

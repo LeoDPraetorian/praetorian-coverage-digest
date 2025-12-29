@@ -13,50 +13,43 @@ For large datasets (>10,000 rows), server-side operations are essential. This re
 ```typescript
 // API response shape
 interface PaginatedResponse<T> {
-  data: T[]
+  data: T[];
   pagination: {
-    page: number
-    pageSize: number
-    totalPages: number
-    totalRows: number
-  }
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    totalRows: number;
+  };
 }
 
 // Query options with pagination
-export const usersQueryOptions = (params: {
-  page: number
-  pageSize: number
-}) =>
+export const usersQueryOptions = (params: { page: number; pageSize: number }) =>
   queryOptions({
-    queryKey: ['users', 'list', params],
+    queryKey: ["users", "list", params],
     queryFn: async () => {
-      const response = await fetch(
-        `/api/users?page=${params.page}&pageSize=${params.pageSize}`
-      )
-      return response.json() as Promise<PaginatedResponse<User>>
+      const response = await fetch(`/api/users?page=${params.page}&pageSize=${params.pageSize}`);
+      return response.json() as Promise<PaginatedResponse<User>>;
     },
-  })
+  });
 ```
 
 ### With Router Integration
 
 ```typescript
-export const Route = createFileRoute('/users')({
+export const Route = createFileRoute("/users")({
   validateSearch: (search) => ({
     page: Math.max(1, Number(search.page) || 1),
-    pageSize: [10, 25, 50, 100].includes(Number(search.pageSize))
-      ? Number(search.pageSize)
-      : 25,
+    pageSize: [10, 25, 50, 100].includes(Number(search.pageSize)) ? Number(search.pageSize) : 25,
   }),
   loaderDeps: ({ search }) => search,
   loader: ({ context: { queryClient }, deps }) =>
     queryClient.ensureQueryData(usersQueryOptions(deps)),
-})
+});
 
 function UsersTable() {
-  const search = Route.useSearch()
-  const navigate = Route.useNavigate()
-  const { data } = useSuspenseQuery(usersQueryOptions(search))
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const { data } = useSuspenseQuery(usersQueryOptions(search));
 
   const table = useReactTable({
     data: data.data,
@@ -72,32 +65,33 @@ function UsersTable() {
       },
     },
     onPaginationChange: (updater) => {
-      const next = typeof updater === 'function'
-        ? updater({ pageIndex: search.page - 1, pageSize: search.pageSize })
-        : updater
+      const next =
+        typeof updater === "function"
+          ? updater({ pageIndex: search.page - 1, pageSize: search.pageSize })
+          : updater;
       navigate({
         search: { ...search, page: next.pageIndex + 1, pageSize: next.pageSize },
-      })
+      });
     },
-  })
+  });
 }
 ```
 
 ## Server-Side Sorting
 
 ```typescript
-export const Route = createFileRoute('/users')({
+export const Route = createFileRoute("/users")({
   validateSearch: (search) => ({
     page: Number(search.page) || 1,
     pageSize: Number(search.pageSize) || 25,
     sortBy: search.sortBy as string | undefined,
-    sortOrder: search.sortOrder === 'desc' ? 'desc' : 'asc',
+    sortOrder: search.sortOrder === "desc" ? "desc" : "asc",
   }),
-})
+});
 
 function UsersTable() {
-  const search = Route.useSearch()
-  const navigate = Route.useNavigate()
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
 
   const table = useReactTable({
     data: data.data,
@@ -105,23 +99,21 @@ function UsersTable() {
     getCoreRowModel: getCoreRowModel(),
     manualSorting: true,
     state: {
-      sorting: search.sortBy
-        ? [{ id: search.sortBy, desc: search.sortOrder === 'desc' }]
-        : [],
+      sorting: search.sortBy ? [{ id: search.sortBy, desc: search.sortOrder === "desc" }] : [],
     },
     onSortingChange: (updater) => {
-      const next = typeof updater === 'function' ? updater([]) : updater
-      const newSort = next[0]
+      const next = typeof updater === "function" ? updater([]) : updater;
+      const newSort = next[0];
       navigate({
         search: {
           ...search,
           page: 1, // Reset to page 1 when sorting changes
           sortBy: newSort?.id,
-          sortOrder: newSort?.desc ? 'desc' : 'asc',
+          sortOrder: newSort?.desc ? "desc" : "asc",
         },
-      })
+      });
     },
-  })
+  });
 }
 ```
 
@@ -264,27 +256,23 @@ function UsersPage() {
 
 ```typescript
 function UsersTable() {
-  const queryClient = useQueryClient()
-  const search = Route.useSearch()
-  const { data } = useSuspenseQuery(usersQueryOptions(search))
+  const queryClient = useQueryClient();
+  const search = Route.useSearch();
+  const { data } = useSuspenseQuery(usersQueryOptions(search));
 
   // Prefetch next page
   useEffect(() => {
     if (search.page < data.pagination.totalPages) {
-      queryClient.prefetchQuery(
-        usersQueryOptions({ ...search, page: search.page + 1 })
-      )
+      queryClient.prefetchQuery(usersQueryOptions({ ...search, page: search.page + 1 }));
     }
-  }, [search, data.pagination.totalPages, queryClient])
+  }, [search, data.pagination.totalPages, queryClient]);
 
   // Prefetch previous page
   useEffect(() => {
     if (search.page > 1) {
-      queryClient.prefetchQuery(
-        usersQueryOptions({ ...search, page: search.page - 1 })
-      )
+      queryClient.prefetchQuery(usersQueryOptions({ ...search, page: search.page - 1 }));
     }
-  }, [search, queryClient])
+  }, [search, queryClient]);
 }
 ```
 

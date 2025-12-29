@@ -23,6 +23,7 @@ Every skill test receives one of three results:
 1. **Explicit Invocation** (varies by skill type)
 
    **For CORE skills** (located in `.claude/skills/`):
+
    ```
    Agent output contains: skill: "{skill-name}"
    OR
@@ -30,6 +31,7 @@ Every skill test receives one of three results:
    ```
 
    **For LIBRARY skills** (located in `.claude/skill-library/`):
+
    ```
    Agent output contains: Read(".claude/skill-library/.../SKILL.md")
    OR
@@ -242,6 +244,7 @@ Following the skill's patterns:
 ```
 
 **Why PASS**:
+
 - ✅ Explicit loading: `Read(".../frontend-tanstack/SKILL.md")`
 - ✅ Methodology followed: Used patterns from the skill
 - ✅ Evidence: Query implementation matches skill's recommended patterns
@@ -257,18 +260,19 @@ I'll implement data fetching with TanStack Query.
 ```
 
 **Why FAIL**:
+
 - ❌ No skill loading (no Read tool call for skill)
 - ❌ Methodology violated: Didn't follow platform patterns
 - ❌ Evidence contradicts skill requirements
 
 ### Identifying Library vs Core Skills
 
-| Indicator | Core Skill | Library Skill |
-|-----------|------------|---------------|
-| Path contains | `.claude/skills/` | `.claude/skill-library/` |
-| Invoked via | `skill: "name"` | `Read("full/path")` |
-| In agent frontmatter | Yes (listed in `skills:`) | No (accessed via gateway) |
-| Discovered via | Skill tool directly | Gateway routing → Read tool |
+| Indicator            | Core Skill                | Library Skill               |
+| -------------------- | ------------------------- | --------------------------- |
+| Path contains        | `.claude/skills/`         | `.claude/skill-library/`    |
+| Invoked via          | `skill: "name"`           | `Read("full/path")`         |
+| In agent frontmatter | Yes (listed in `skills:`) | No (accessed via gateway)   |
+| Discovered via       | Skill tool directly       | Gateway routing → Read tool |
 
 ### Gateway-Routed Library Skills
 

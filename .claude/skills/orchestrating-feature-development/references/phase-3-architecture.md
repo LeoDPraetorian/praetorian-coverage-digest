@@ -5,6 +5,7 @@ Make design decisions by spawning domain lead + security-lead agents in parallel
 ## Purpose
 
 Resolve architectural questions before implementation by:
+
 - Analyzing existing codebase patterns (domain lead)
 - Assessing security implications (security-lead)
 - Choosing appropriate designs with quality gates
@@ -14,6 +15,7 @@ Resolve architectural questions before implementation by:
 ## Why Parallel Lead + Security?
 
 **Domain Lead** (frontend-lead or backend-lead) focuses on:
+
 - Component hierarchy and structure
 - State management patterns
 - API integration approaches
@@ -22,6 +24,7 @@ Resolve architectural questions before implementation by:
 - Invokes `brainstorming` and `writing-plans` for their domain
 
 **Security Lead** focuses on:
+
 - Authentication/authorization requirements
 - Input validation needs
 - Data protection considerations
@@ -37,11 +40,11 @@ Resolve architectural questions before implementation by:
 
 Based on feature domain from plan:
 
-| Feature Type | Lead Agent(s) | Security Agent | Total |
-|--------------|---------------|----------------|-------|
-| Frontend only | `frontend-lead` | `security-lead` | 2 |
-| Backend only | `backend-lead` | `security-lead` | 2 |
-| Full-stack | `frontend-lead` + `backend-lead` | `security-lead` | 3 |
+| Feature Type  | Lead Agent(s)                    | Security Agent  | Total |
+| ------------- | -------------------------------- | --------------- | ----- |
+| Frontend only | `frontend-lead`                  | `security-lead` | 2     |
+| Backend only  | `backend-lead`                   | `security-lead` | 2     |
+| Full-stack    | `frontend-lead` + `backend-lead` | `security-lead` | 3     |
 
 **Note**: Security-lead is ALWAYS included regardless of feature type.
 
@@ -164,36 +167,47 @@ Combine outputs from all agents:
 # Architecture for {feature-name}
 
 ## Component Architecture
+
 {from frontend-lead/backend-lead}
 
 ## State Management
+
 {from frontend-lead}
 
 ## API Design
+
 {from backend-lead, if applicable}
 
 ## File Organization
+
 {from domain leads}
 
 ## Security Requirements
+
 {from security-lead}
 
 ### Authentication
+
 {if applicable}
 
 ### Authorization
+
 {RBAC requirements, etc.}
 
 ### Input Validation
+
 {validation requirements}
 
 ### Data Protection
+
 {encryption, handling requirements}
 
 ## Implementation Tasks
+
 {merged from all leads}
 
 ## Security Test Requirements
+
 {from security-lead}
 ```
 
@@ -204,17 +218,23 @@ Save security assessment to: `.claude/features/{id}/security-assessment.md`
 
 ```typescript
 AskUserQuestion({
-  questions: [{
-    question: "Architecture phase complete. Review the proposed architecture before implementation?",
-    header: "Architecture",
-    multiSelect: false,
-    options: [
-      { label: "Approve", description: "Proceed to implementation" },
-      { label: "Request changes", description: "Modify architecture before proceeding" },
-      { label: "Review files", description: "Show me architecture.md and security-assessment.md" }
-    ]
-  }]
-})
+  questions: [
+    {
+      question:
+        "Architecture phase complete. Review the proposed architecture before implementation?",
+      header: "Architecture",
+      multiSelect: false,
+      options: [
+        { label: "Approve", description: "Proceed to implementation" },
+        { label: "Request changes", description: "Modify architecture before proceeding" },
+        {
+          label: "Review files",
+          description: "Show me architecture.md and security-assessment.md",
+        },
+      ],
+    },
+  ],
+});
 ```
 
 **Do NOT proceed without human approval.**
@@ -261,6 +281,7 @@ TodoWrite: Mark "Phase 4: Implementation" as in_progress
 ## Exit Criteria
 
 ✅ Proceed to Phase 4 when:
+
 - Architecture documented in `architecture.md`
 - Security assessment documented in `security-assessment.md`
 - ALL agents returned `status: "complete"`
@@ -269,6 +290,7 @@ TodoWrite: Mark "Phase 4: Implementation" as in_progress
 - TodoWrite marked complete
 
 ❌ Do NOT proceed if:
+
 - Any agent returned `status: "blocked"` (must resolve first)
 - Human has not approved
 - Architecture missing security requirements
@@ -286,6 +308,7 @@ Task(subagent_type: "security-lead", description: "Security assessment...", ...)
 ```
 
 **Outputs:**
+
 - `.claude/features/{id}/architecture.md` (frontend decisions)
 - `.claude/features/{id}/backend-architecture.md` (backend decisions)
 - `.claude/features/{id}/security-assessment.md` (security requirements)
@@ -301,6 +324,7 @@ Task(subagent_type: "security-lead", description: "Security assessment...", ...)
 ### "Security-lead raises concerns about domain lead's design"
 
 **Expected behavior**. Security concerns should:
+
 1. Be documented in security-assessment.md
 2. Inform implementation requirements
 3. Be addressed in Phase 5 (Code Review) by security reviewers
@@ -312,6 +336,7 @@ Task(subagent_type: "security-lead", description: "Security assessment...", ...)
 ### "Architecture decisions are too vague"
 
 **Solution**: Re-spawn domain lead with explicit instruction:
+
 ```
 Previous architecture was too vague. Be specific:
 - Exact file paths for new components

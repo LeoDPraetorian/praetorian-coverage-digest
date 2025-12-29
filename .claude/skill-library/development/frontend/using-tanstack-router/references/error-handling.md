@@ -5,6 +5,7 @@ Comprehensive error handling patterns for TanStack Router including `notFoundCom
 ## Overview
 
 TanStack Router provides multiple mechanisms for handling error states:
+
 - **`notFoundComponent`**: Renders when route doesn't match or `notFound()` is thrown
 - **`errorComponent`**: Renders when loader/component throws an error
 - **`pendingComponent`**: Renders while loader is fetching data
@@ -72,8 +73,8 @@ Controls how 404 errors bubble up to find a handler:
 ```typescript
 const router = createRouter({
   routeTree,
-  notFoundMode: 'fuzzy',
-})
+  notFoundMode: "fuzzy",
+});
 ```
 
 - Searches for nearest parent route with `notFoundComponent`
@@ -103,8 +104,8 @@ export const Route = createFileRoute('/settings/_layout')({
 ```typescript
 const router = createRouter({
   routeTree,
-  notFoundMode: 'root',
-})
+  notFoundMode: "root",
+});
 ```
 
 - Always uses root route's `notFoundComponent`
@@ -145,7 +146,7 @@ function AssetDetails() {
 
 ```typescript
 loader: async ({ params }) => {
-  const asset = await fetchAsset(params.assetId)
+  const asset = await fetchAsset(params.assetId);
 
   if (!asset) {
     throw notFound({
@@ -153,11 +154,11 @@ loader: async ({ params }) => {
         message: `Asset ${params.assetId} not found`,
         timestamp: new Date().toISOString(),
       },
-    })
+    });
   }
 
-  return { asset }
-}
+  return { asset };
+};
 ```
 
 Access message in `notFoundComponent`:
@@ -577,10 +578,10 @@ Throw `notFound()` instead of generic errors for 404s:
 
 ```typescript
 // ✅ GOOD
-if (!asset) throw notFound()
+if (!asset) throw notFound();
 
 // ❌ BAD
-if (!asset) throw new Error('Not found')
+if (!asset) throw new Error("Not found");
 ```
 
 ### 5. Set pendingMinMs for Fast Routes
@@ -588,7 +589,7 @@ if (!asset) throw new Error('Not found')
 Avoid loading flicker on fast routes:
 
 ```typescript
-pendingMinMs: 300  // Only show if >300ms
+pendingMinMs: 300; // Only show if >300ms
 ```
 
 ---

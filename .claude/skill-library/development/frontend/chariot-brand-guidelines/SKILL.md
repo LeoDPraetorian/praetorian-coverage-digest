@@ -142,6 +142,7 @@ To access Chariot's official brand identity and style resources, use this skill.
 Theme classes automatically handle light/dark mode switching by referencing CSS variables that change based on the active theme. Hardcoded color values like `bg-gray-900` or `text-white` will NOT adapt to theme changes and will break the user experience.
 
 **✅ CORRECT:**
+
 ```tsx
 <div className="bg-layer0 text-default">
   <Card className="bg-layer1 border-default">
@@ -152,6 +153,7 @@ Theme classes automatically handle light/dark mode switching by referencing CSS 
 ```
 
 **❌ WRONG:**
+
 ```tsx
 <div className="bg-white text-black dark:bg-gray-900 dark:text-white">
   <Card className="bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
@@ -162,6 +164,7 @@ Theme classes automatically handle light/dark mode switching by referencing CSS 
 ```
 
 **Why This Matters:**
+
 - Theme classes use CSS variables that change automatically with theme
 - No need for `dark:` variants (eliminates duplicate styling)
 - Future theme changes update everywhere automatically
@@ -172,20 +175,21 @@ Theme classes automatically handle light/dark mode switching by referencing CSS 
 
 Use these theme classes instead of hardcoded Tailwind colors:
 
-| Purpose | Theme Class | NOT This |
-|---------|-------------|----------|
-| Primary background | `bg-layer0` | `bg-white`, `bg-gray-900` |
-| Card background | `bg-layer1` | `bg-gray-100`, `bg-gray-800` |
-| Nested background | `bg-layer2` | `bg-gray-200`, `bg-gray-700` |
-| Primary text | `text-default` | `text-black`, `text-white` |
-| Secondary text | `text-secondary` | `text-gray-500`, `text-gray-400` |
-| Borders | `border-default` | `border-gray-200`, `border-gray-700` |
-| Header background | `bg-header` | `bg-gray-900` |
-| Brand purple (buttons) | `bg-brand` | `bg-purple-600` |
-| Success state | `text-success` | `text-green-600` |
-| Error state | `text-error` | `text-red-600` |
+| Purpose                | Theme Class      | NOT This                             |
+| ---------------------- | ---------------- | ------------------------------------ |
+| Primary background     | `bg-layer0`      | `bg-white`, `bg-gray-900`            |
+| Card background        | `bg-layer1`      | `bg-gray-100`, `bg-gray-800`         |
+| Nested background      | `bg-layer2`      | `bg-gray-200`, `bg-gray-700`         |
+| Primary text           | `text-default`   | `text-black`, `text-white`           |
+| Secondary text         | `text-secondary` | `text-gray-500`, `text-gray-400`     |
+| Borders                | `border-default` | `border-gray-200`, `border-gray-700` |
+| Header background      | `bg-header`      | `bg-gray-900`                        |
+| Brand purple (buttons) | `bg-brand`       | `bg-purple-600`                      |
+| Success state          | `text-success`   | `text-green-600`                     |
+| Error state            | `text-error`     | `text-red-600`                       |
 
 **Reference Implementation:**
+
 - All theme classes are defined in `ui/src/index.css` as CSS variables
 - Tailwind config extends these as utility classes
 - See existing components for usage examples

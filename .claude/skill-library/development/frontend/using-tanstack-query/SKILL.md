@@ -25,17 +25,17 @@ Use this skill when:
 
 ## Quick Reference
 
-| Task | Hook/Pattern | Key Config |
-|------|-------------|------------|
-| **Fetch data** | `useQuery({ queryKey, queryFn })` | `staleTime`, `gcTime`, `refetchOnWindowFocus` |
-| **Mutate data** | `useMutation({ mutationFn })` | `onSuccess`, `onError`, `onSettled` |
-| **Infinite scroll** | `useInfiniteQuery({ queryKey, queryFn, getNextPageParam })` | `hasNextPage`, `fetchNextPage`, `isFetchingNextPage` |
-| **Invalidate cache** | `queryClient.invalidateQueries({ queryKey })` | Exact match or prefix match |
-| **Optimistic update** | `mutate(..., { onMutate, onError })` | Manual cache updates with rollback |
-| **Dependent query** | `useQuery({ enabled: !!userId })` | Query runs only when condition true |
-| **Prefetch** | `queryClient.prefetchQuery({ queryKey, queryFn })` | Prime cache before component mounts |
-| **Set query data** | `queryClient.setQueryData(queryKey, data)` | Manually update cache |
-| **Type-safe config** | `queryOptions(...)` / `infiniteQueryOptions(...)` | Reusable query definitions with type inference |
+| Task                  | Hook/Pattern                                                | Key Config                                           |
+| --------------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
+| **Fetch data**        | `useQuery({ queryKey, queryFn })`                           | `staleTime`, `gcTime`, `refetchOnWindowFocus`        |
+| **Mutate data**       | `useMutation({ mutationFn })`                               | `onSuccess`, `onError`, `onSettled`                  |
+| **Infinite scroll**   | `useInfiniteQuery({ queryKey, queryFn, getNextPageParam })` | `hasNextPage`, `fetchNextPage`, `isFetchingNextPage` |
+| **Invalidate cache**  | `queryClient.invalidateQueries({ queryKey })`               | Exact match or prefix match                          |
+| **Optimistic update** | `mutate(..., { onMutate, onError })`                        | Manual cache updates with rollback                   |
+| **Dependent query**   | `useQuery({ enabled: !!userId })`                           | Query runs only when condition true                  |
+| **Prefetch**          | `queryClient.prefetchQuery({ queryKey, queryFn })`          | Prime cache before component mounts                  |
+| **Set query data**    | `queryClient.setQueryData(queryKey, data)`                  | Manually update cache                                |
+| **Type-safe config**  | `queryOptions(...)` / `infiniteQueryOptions(...)`           | Reusable query definitions with type inference       |
 
 ### Recommended Tooling
 
@@ -61,28 +61,23 @@ Query keys uniquely identify cached data and determine invalidation scope.
 
 ```typescript
 // ✅ GOOD: Stable, hierarchical keys
-['assets']                          // All assets
-['assets', { status: 'active' }]    // Filtered assets
-['assets', assetId]                 // Single asset
-['assets', assetId, 'risks']        // Nested resource
-
-// ❌ BAD: Unstable keys (cause unnecessary refetches)
-['assets', new Date()]              // Changes every render
-['assets', Math.random()]           // Non-deterministic
-['assets', { status, ...filters }]  // Object identity changes
+["assets"][("assets", { status: "active" })][("assets", assetId)][("assets", assetId, "risks")][ // All assets // Filtered assets // Single asset // Nested resource
+  // ❌ BAD: Unstable keys (cause unnecessary refetches)
+  ("assets", new Date())
+][("assets", Math.random())][("assets", { status, ...filters })]; // Changes every render // Non-deterministic // Object identity changes
 ```
 
 **Invalidation patterns:**
 
 ```typescript
 // Invalidate all asset queries (including filtered/nested)
-queryClient.invalidateQueries({ queryKey: ['assets'] })
+queryClient.invalidateQueries({ queryKey: ["assets"] });
 
 // Invalidate only exact match
 queryClient.invalidateQueries({
-  queryKey: ['assets', assetId],
-  exact: true
-})
+  queryKey: ["assets", assetId],
+  exact: true,
+});
 ```
 
 **See:** [references/query-keys-design.md](references/query-keys-design.md) for advanced patterns.
@@ -95,13 +90,13 @@ queryClient.invalidateQueries({
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,      // 5 minutes (when data becomes stale)
-      gcTime: 1000 * 60 * 10,         // 10 minutes (when unused data is garbage collected)
-      refetchOnWindowFocus: false,    // Disable aggressive refetching
-      retry: 1,                       // Retry once on failure
+      staleTime: 1000 * 60 * 5, // 5 minutes (when data becomes stale)
+      gcTime: 1000 * 60 * 10, // 10 minutes (when unused data is garbage collected)
+      refetchOnWindowFocus: false, // Disable aggressive refetching
+      retry: 1, // Retry once on failure
     },
   },
-})
+});
 ```
 
 **Key terms:**
@@ -158,6 +153,7 @@ Use `useInfiniteQuery` with `initialPageParam` and `getNextPageParam` for pagina
 - **Suspense** - React 19 integration with `useSuspenseQuery`
 
 **See also:**
+
 - [Suspense Integration](references/query-suspense-integration.md) for React 19 patterns
 - [Common Patterns](references/query-common-patterns.md) for additional patterns
 
@@ -208,51 +204,57 @@ test('useAssets returns asset data', async () => {
 ### Query Not Refetching
 
 **Check:**
+
 1. Is data marked as stale? (exceeded `staleTime`)
 2. Is `refetchOnWindowFocus` disabled?
 3. Is query disabled with `enabled: false`?
 4. Is component still mounted?
 
 **Debug:**
+
 ```typescript
 useQuery({
-  queryKey: ['assets'],
+  queryKey: ["assets"],
   queryFn: fetchAssets,
-  onSuccess: (data) => console.log('Refetch successful:', data),
-  onError: (error) => console.log('Refetch failed:', error),
-})
+  onSuccess: (data) => console.log("Refetch successful:", data),
+  onError: (error) => console.log("Refetch failed:", error),
+});
 ```
 
 ### Cache Not Invalidating
 
 **Check:**
+
 1. Does `invalidateQueries` key match query key?
 2. Are you using prefix match (default) or exact match?
 3. Is query currently active (mounted)?
 
 **Debug:**
+
 ```typescript
 // Log all cached queries
-console.log(queryClient.getQueryCache().getAll())
+console.log(queryClient.getQueryCache().getAll());
 
 // Check specific query state
-console.log(queryClient.getQueryState(['assets']))
+console.log(queryClient.getQueryState(["assets"]));
 ```
 
 ### Memory Leaks
 
 **Check:**
+
 1. Is `gcTime` set too high? (unused data stays cached)
 2. Are you clearing cache on unmount? (usually not needed)
 3. Are infinite queries accumulating pages?
 
 **Fix:**
+
 ```typescript
 // Clear cache on logout
-queryClient.clear()
+queryClient.clear();
 
 // Reset specific query
-queryClient.resetQueries({ queryKey: ['assets'] })
+queryClient.resetQueries({ queryKey: ["assets"] });
 ```
 
 **See:** [references/query-top-errors.md](references/query-top-errors.md) for error reference.
@@ -264,10 +266,10 @@ queryClient.resetQueries({ queryKey: ['assets'] })
 ```typescript
 // Select specific fields to avoid re-renders on unrelated changes
 const { data: assetName } = useQuery({
-  queryKey: ['assets', assetId],
+  queryKey: ["assets", assetId],
   queryFn: fetchAsset,
   select: (data) => data.name, // Component only re-renders when name changes
-})
+});
 ```
 
 ### Prefetch on Hover
@@ -299,11 +301,13 @@ function AssetCard({ assetId }) {
 ## Progressive Disclosure
 
 **Quick Start (this file):**
+
 - Essential hooks and patterns
 - Common configurations
 - Anti-patterns
 
 **Deep Dives (references/):**
+
 - [query-api-configuration.md](references/query-api-configuration.md) - Complete QueryClient config
 - [query-best-practices.md](references/query-best-practices.md) - Production patterns
 - [query-common-patterns.md](references/query-common-patterns.md) - Recipe collection

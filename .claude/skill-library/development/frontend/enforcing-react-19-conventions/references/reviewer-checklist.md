@@ -13,11 +13,13 @@ Copy this checklist into your PR review or code review notes. Check off each ite
 These patterns **MUST be fixed** before merging. Block the PR if found.
 
 ### Component Definitions
+
 - [ ] No `React.FC` or `React.FunctionComponent` types
 - [ ] No `forwardRef` usage (React 19: ref is a regular prop)
 - [ ] All components use plain function declarations
 
 ### State Management
+
 - [ ] No synchronous setState in `useEffect` for prop-derived state
   - Check for: `useEffect(() => setState(prop), [prop])`
   - Should use: key prop or derived state
@@ -26,6 +28,7 @@ These patterns **MUST be fixed** before merging. Block the PR if found.
   - Should use: `const value = useStore((state) => state.value)`
 
 ### Data Fetching
+
 - [ ] No data fetching in `useEffect` (must use TanStack Query)
   - Check for: `useEffect(() => fetch(...).then(setState), [])`
   - Should use: `useQuery({ queryKey, queryFn })`
@@ -37,6 +40,7 @@ These patterns **MUST be fixed** before merging. Block the PR if found.
 These patterns require **justification or profiling evidence**. Request changes if not justified.
 
 ### Performance Optimization
+
 - [ ] Any `useMemo` has profiling justification
   - Ask: "Have you profiled this? What's the computation cost?"
   - Accept if: >100ms computation time with evidence
@@ -48,6 +52,7 @@ These patterns require **justification or profiling evidence**. Request changes 
   - Accept if: Large lists, profiled re-render cost, or props rarely change
 
 ### Data Fetching
+
 - [ ] No manual loading/error state when using TanStack Query
   - Check for: `const [isLoading, setIsLoading] = useState(false)` alongside `useQuery`
   - Should use: `const { isLoading, error } = useQuery(...)`
@@ -59,12 +64,14 @@ These patterns require **justification or profiling evidence**. Request changes 
 These patterns **MUST be present** for the feature to work correctly. Verify they exist.
 
 ### Component Structure
+
 - [ ] All components use function declarations
   - Example: `function Component({ prop }: Props) { ... }`
 - [ ] Components with refs use ref as regular prop
   - Example: `function Input({ ref }: { ref?: RefObject<HTMLInputElement> })`
 
 ### Data Fetching
+
 - [ ] All API calls use TanStack Query
   - For fetching: `useQuery({ queryKey, queryFn })`
   - For mutations: `useMutation({ mutationFn })`
@@ -76,12 +83,14 @@ These patterns **MUST be present** for the feature to work correctly. Verify the
   - Check: `onSuccess: () => queryClient.invalidateQueries({ queryKey })`
 
 ### State Management
+
 - [ ] All Zustand store access uses selectors
   - Example: `const value = useStore((state) => state.value)`
 - [ ] Multiple Zustand selectors use shallow equality (if selecting objects)
   - Example: `useStore((state) => ({ a: state.a, b: state.b }), shallow)`
 
 ### State Reset Patterns
+
 - [ ] Key prop used when component state depends on prop
   - Example: `<UserForm key={userId} userId={userId} />`
 - [ ] Key prop present for modal/dialog content that needs reset
@@ -94,6 +103,7 @@ These patterns **MUST be present** for the feature to work correctly. Verify the
 Use these template comments when requesting changes:
 
 ### React.FC Found
+
 ```
 ❌ BLOCK: Please remove `React.FC` and use a plain function declaration:
 
@@ -107,6 +117,7 @@ See: [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.a
 ```
 
 ### forwardRef Found
+
 ```
 ❌ BLOCK: Please remove `forwardRef` and use ref as a regular prop (React 19):
 
@@ -118,6 +129,7 @@ function Component({ prop, ref }: Props & { ref?: RefObject<HTMLDivElement> }) {
 ```
 
 ### useEffect setState Found
+
 ```
 ❌ BLOCK: Please remove synchronous setState from useEffect. Use key prop or derived state:
 
@@ -131,6 +143,7 @@ See: [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-a
 ```
 
 ### Zustand Without Selector Found
+
 ```
 ❌ BLOCK: Please use Zustand selectors to prevent unnecessary re-renders:
 
@@ -144,6 +157,7 @@ return <div>{count}</div>
 ```
 
 ### Data Fetching in useEffect Found
+
 ```
 ❌ BLOCK: Please use TanStack Query instead of manual data fetching:
 
@@ -160,6 +174,7 @@ const { data: users, isLoading } = useQuery({
 ```
 
 ### useMemo Without Justification
+
 ```
 ⚠️ REQUEST CHANGE: Please provide profiling evidence for this `useMemo`, or remove it:
 
@@ -176,6 +191,7 @@ If no profiling evidence, please remove the memo.
 ```
 
 ### React.memo Without Evidence
+
 ```
 ⚠️ REQUEST CHANGE: Please provide evidence for this `React.memo`, or remove it:
 
@@ -256,6 +272,7 @@ PR can be approved when:
 ## React 19 Code Review
 
 ### Prohibited Patterns (BLOCK PR)
+
 - [ ] No `React.FC` or `React.FunctionComponent`
 - [ ] No `forwardRef` usage
 - [ ] No synchronous setState in useEffect
@@ -263,11 +280,13 @@ PR can be approved when:
 - [ ] No Zustand without selectors
 
 ### Warning Patterns (REQUEST CHANGE)
+
 - [ ] `useMemo`/`useCallback` justified with profiling
 - [ ] `React.memo` has performance evidence
 - [ ] No manual loading/error state with TanStack Query
 
 ### Required Patterns (VERIFY PRESENT)
+
 - [ ] Function declarations for components
 - [ ] TanStack Query for all API calls
 - [ ] Zustand selectors for all store access

@@ -10,12 +10,12 @@ Enforce correct patterns for cross-package imports in npm workspace monorepos to
 
 ## Quick Reference
 
-| Anti-Pattern | Problem | Solution |
-|--------------|---------|----------|
-| Relative path imports | Breaks when files move | Workspace dependencies |
-| Namespace imports | CJS interop issues | Named imports |
-| Missing exports field | Can't use subpath imports | Add exports to package.json |
-| moduleResolution: "node" | Doesn't understand exports | Use "bundler" for tsx |
+| Anti-Pattern             | Problem                    | Solution                    |
+| ------------------------ | -------------------------- | --------------------------- |
+| Relative path imports    | Breaks when files move     | Workspace dependencies      |
+| Namespace imports        | CJS interop issues         | Named imports               |
+| Missing exports field    | Can't use subpath imports  | Add exports to package.json |
+| moduleResolution: "node" | Doesn't understand exports | Use "bundler" for tsx       |
 
 **For complete patterns and examples, see [references/complete-patterns.md](references/complete-patterns.md)**
 
@@ -45,21 +45,21 @@ Use this skill when:
 
 ```typescript
 // WRONG: Fragile, breaks when files move
-import * as formatter from '../../../other-package/scripts/src/lib/formatter.js';
+import * as formatter from "../../../other-package/scripts/src/lib/formatter.js";
 
 // RIGHT: Uses workspace dependency
-import { formatTable } from '@org/other-package/lib/formatter';
+import { formatTable } from "@org/other-package/lib/formatter";
 ```
 
 ### ❌ Namespace Imports
 
 ```typescript
 // WRONG: CJS interop issues, poor tree-shaking
-import * as schemas from '@org/package/lib/schemas';
+import * as schemas from "@org/package/lib/schemas";
 schemas.validate(data);
 
 // RIGHT: Named imports
-import { validate } from '@org/package/lib/schemas';
+import { validate } from "@org/package/lib/schemas";
 validate(data);
 ```
 
@@ -139,6 +139,7 @@ When fixing existing code with anti-patterns:
 **Cause**: Exports field points to dist/ but dist/ doesn't exist.
 
 **Solution**: Build the provider package first:
+
 ```bash
 npm run -w @org/provider build
 ```
@@ -148,6 +149,7 @@ npm run -w @org/provider build
 **Cause**: Missing subpath export in package.json exports field.
 
 **Solution**: Add the subpath to exports:
+
 ```json
 {
   "exports": {
@@ -164,6 +166,7 @@ npm run -w @org/provider build
 **Cause**: `types` condition not first in exports, or declaration files not generated.
 
 **Solution**:
+
 1. Ensure `"types"` is FIRST in each export condition
 2. Ensure `"declaration": true` in provider tsconfig
 3. Rebuild: `npm run build`

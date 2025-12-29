@@ -1,7 +1,7 @@
 ---
 name: using-modern-react-patterns
-description: 'Use when designing, implementing, or reviewing ANY React code, especially before using optimization patterns (useMemo, useCallback, React.memo), state management, or component patterns - agents must consult this skill because React 19 has fundamental changes: React Compiler handles automatic memoization (useMemo/useCallback often unnecessary), many manual optimization patterns are now obsolete or harmful - covers React 19 features (Actions, useOptimistic, useActionState), migration from old patterns, and understanding when manual optimization is actually needed versus when React Compiler handles it automatically'
-allowed-tools: 'Read, Write, Edit, Bash, Grep'
+description: "Use when designing, implementing, or reviewing ANY React code, especially before using optimization patterns (useMemo, useCallback, React.memo), state management, or component patterns - agents must consult this skill because React 19 has fundamental changes: React Compiler handles automatic memoization (useMemo/useCallback often unnecessary), many manual optimization patterns are now obsolete or harmful - covers React 19 features (Actions, useOptimistic, useActionState), migration from old patterns, and understanding when manual optimization is actually needed versus when React Compiler handles it automatically"
+allowed-tools: "Read, Write, Edit, Bash, Grep"
 ---
 
 # React Modernization
@@ -155,6 +155,7 @@ From [React Hooks ESLint documentation](https://react.dev/reference/eslint-plugi
 > "Synchronous setState calls trigger re-renders before the browser can paint, causing performance issues and visual jank. React has to render twice: once to apply the state update, then again after effects run."
 
 **What the rule prohibits:**
+
 - ❌ Resetting state to defaults when props change
 - ❌ Deriving state from props in effects
 - ❌ Transforming data in effects
@@ -182,6 +183,7 @@ function ProfilePage({ userId }) {
 ```
 
 **Why this is wrong:**
+
 - Triggers two renders: one for userId change, another for setComment
 - Creates cascading renders (performance issue)
 - Visual jank (component flickers during state reset)
@@ -200,6 +202,7 @@ function ProfilePage({ userId }) {
 ```
 
 **Why this works:**
+
 - React creates a new component instance when key changes
 - All state resets automatically (no manual setState)
 - Single render (no cascading updates)
@@ -229,6 +232,7 @@ function CapabilityDrawer({ capability }) {
 ```
 
 **Why this is wrong:**
+
 - Synchronous setState (not in async callback)
 - Triggers re-render after effect runs
 - Cascading renders when capability changes
@@ -253,6 +257,7 @@ function CapabilityDrawer({ capability }) {
 ```
 
 **Why this works:**
+
 - No state for derived data (calculated during render)
 - Single source of truth (capability prop)
 - Only user edits stored in state
@@ -283,6 +288,7 @@ useEffect(() => {
 ```
 
 **The key difference:**
+
 - **Async callback**: setState happens after a promise resolves (valid use case)
 - **Synchronous derivation**: setState happens immediately in effect body (invalid)
 
@@ -293,6 +299,7 @@ In the invalid example, even though `data` came from an async operation (`useQue
 **Only these scenarios justify setState in useEffect:**
 
 1. **Async operations** (fetch, timers, subscriptions)
+
 ```typescript
 useEffect(() => {
   const timer = setTimeout(() => setState(value), 1000);
@@ -301,6 +308,7 @@ useEffect(() => {
 ```
 
 2. **DOM measurements from refs**
+
 ```typescript
 useEffect(() => {
   const height = elementRef.current?.offsetHeight;
@@ -309,28 +317,30 @@ useEffect(() => {
 ```
 
 3. **Event listeners**
+
 ```typescript
 useEffect(() => {
   const handler = () => setState(newValue);
-  window.addEventListener('resize', handler);
-  return () => window.removeEventListener('resize', handler);
+  window.addEventListener("resize", handler);
+  return () => window.removeEventListener("resize", handler);
 }, []);
 ```
 
 **NOT valid:**
+
 - ❌ Resetting state when props change (use key prop)
 - ❌ Deriving state from props (calculate directly during render)
 - ❌ Transforming prop data (calculate during render)
 
 ### Quick Reference
 
-| Pattern | ❌ Wrong Approach | ✅ Correct Approach |
-|---------|------------------|---------------------|
-| **Reset state on prop change** | `useEffect(() => setState(initial), [prop])` | `key={prop}` on component |
-| **Derive from props** | `useEffect(() => setState(transform(prop)), [prop])` | `const val = transform(prop)` (direct calculation) |
-| **Transform data** | Store in state, update in effect | Calculate during render |
-| **User edits + defaults** | Single state with effect | Two states: defaults (calculated) + edits (state) |
-| **Expensive calculation (>100ms)** | Recalculate on every render | `useMemo(() => expensive(data), [data])` |
+| Pattern                            | ❌ Wrong Approach                                    | ✅ Correct Approach                                |
+| ---------------------------------- | ---------------------------------------------------- | -------------------------------------------------- |
+| **Reset state on prop change**     | `useEffect(() => setState(initial), [prop])`         | `key={prop}` on component                          |
+| **Derive from props**              | `useEffect(() => setState(transform(prop)), [prop])` | `const val = transform(prop)` (direct calculation) |
+| **Transform data**                 | Store in state, update in effect                     | Calculate during render                            |
+| **User edits + defaults**          | Single state with effect                             | Two states: defaults (calculated) + edits (state)  |
+| **Expensive calculation (>100ms)** | Recalculate on every render                          | `useMemo(() => expensive(data), [data])`           |
 
 ## Reference Files
 
@@ -341,9 +351,11 @@ useEffect(() => {
 ## Related Skills
 
 **React 19 Trilogy** (these skills work together):
+
 - **`optimizing-react-performance`** - Deep dive into React Compiler, virtualization, concurrent features (useTransition, useDeferredValue), profiling. Use when solving performance problems.
 - **`enforcing-react-19-conventions`** - PR review checklist with BLOCK/REQUEST CHANGE/VERIFY workflow for React patterns. Use during code reviews to enforce Chariot conventions.
 
 **Other Related Skills:**
+
 - **`frontend-tanstack`** - TanStack Query patterns and best practices
 - **`using-zustand-state-management`** - Complete Zustand usage guide

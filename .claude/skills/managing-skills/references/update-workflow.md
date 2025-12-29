@@ -115,7 +115,7 @@ npm run audit -- skill-name
 - Word count still appropriate
 - No broken links introduced
 - File organization maintained
-- All 21 phases still pass
+- All 22 phases still pass
 
 **If audit shows word count warning (>500 lines), proceed to Step 7.**
 

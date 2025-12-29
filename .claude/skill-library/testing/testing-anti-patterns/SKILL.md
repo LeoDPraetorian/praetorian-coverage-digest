@@ -10,7 +10,6 @@ allowed-tools: "Read, Bash, Grep, Glob"
 
 Tests must verify real behavior, not mock behavior. Mocks are a means to isolate, not the thing being tested.
 
-
 **Important:** You MUST use TodoWrite before starting to track all workflow steps.
 **Core principle:** Test what the code does, not what the mocks do.
 

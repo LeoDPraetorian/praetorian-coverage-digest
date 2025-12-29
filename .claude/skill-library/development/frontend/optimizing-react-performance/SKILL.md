@@ -189,11 +189,13 @@ function WebSocketConnection({ config }: { config: WSConfig }) {
 Virtualization renders only visible list items, dramatically improving performance for large datasets (>1000 items). Use TanStack Virtual (`@tanstack/react-virtual`) for headless virtualization that gives you full control over markup and styling.
 
 **When to virtualize:**
+
 - Lists with >1000 items: Always virtualize
 - 500-1000 items: Profile first
 - <500 items: Usually not needed
 
 **For complete virtualization guide, see [Virtualization Patterns](references/virtualization-patterns.md)**:
+
 - Basic pattern with `useVirtualizer`
 - Variable height items
 - Horizontal and grid virtualization
@@ -287,7 +289,7 @@ function FilteredRiskTable({ risks }: { risks: Risk[] }) {
 2. **React 19 enhancement**: `useDeferredValue` now accepts an `initialValue` option. When provided, it returns `initialValue` for the initial render, then schedules a re-render with the deferred value:
 
 ```typescript
-const deferredValue = useDeferredValue(value, { initialValue: '' });
+const deferredValue = useDeferredValue(value, { initialValue: "" });
 ```
 
 ---
@@ -343,6 +345,7 @@ function NavigationLink({ to, children }) {
 React Server Components render on the server without sending JavaScript to the client, achieving 40-60% bundle size reduction in large apps. This is one of the most significant performance features in modern React.
 
 **Key concepts:**
+
 - **Server components** (default): Data fetching, non-interactive UI, zero client JS
 - **Client components** (`"use client"`): Interactivity, hooks, event handlers
 - **Hybrid strategy**: Keep heavy UI server-side, mark only interactive parts as client
@@ -352,6 +355,7 @@ React Server Components render on the server without sending JavaScript to the c
 **Critical warning**: Improper Suspense boundaries (too granular) can make performance worse by causing layout shifts.
 
 **For complete RSC guide, see [React Server Components](references/react-server-components.md)**:
+
 - Server vs Client component decision matrix
 - `"use client"` and `"use server"` directives
 - Streaming patterns with multiple Suspense boundaries
@@ -378,11 +382,13 @@ React Context can cause performance issues when overused. Key optimizations:
 With React Compiler, many manual optimization patterns are now obsolete. Write clean code and let the compiler handle memoization.
 
 **Key changes:**
+
 - Remove excessive `useMemo`/`useCallback` (compiler handles it)
 - Stop wrapping everything in `React.memo`
 - Don't split components just for memoization
 
 **Common mistakes to avoid:**
+
 - Over-using memoization hooks with compiler enabled
 - Virtualizing small lists (<500 items)
 - Not using `useTransition` for non-urgent updates
@@ -430,6 +436,7 @@ function onRenderCallback(
 ### Bundle Analysis
 
 Use bundle analyzers to identify optimization opportunities:
+
 - **Vite**: `rollup-plugin-visualizer` - Visual treemap of bundle
 - **Webpack**: `webpack-bundle-analyzer` - Interactive bundle visualization
 
@@ -496,10 +503,12 @@ Production-ready performance analysis requires advanced techniques beyond basic 
 ### Related Skills
 
 **React 19 Trilogy** (these skills work together):
+
 - **using-modern-react-patterns**: React 19 migration guide, new features (Actions, useOptimistic), "You Might Not Need an Effect" patterns. Use when upgrading React or learning modern patterns.
 - **enforcing-react-19-conventions**: PR review checklist with BLOCK/REQUEST CHANGE/VERIFY workflow. Use during code reviews to enforce Chariot conventions.
 
 **Other Related Skills:**
+
 - **chariot-component-library**: Optimized component usage
 - **react-security-dashboards**: Real-time data performance
 - **react-testing-patterns**: Performance testing

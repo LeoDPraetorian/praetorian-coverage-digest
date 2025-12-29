@@ -153,5 +153,5 @@ See [Setup Reference](references/setup-workflow.md) for detailed instructions.
 ## Related
 
 - [Progressive Disclosure](../progressive-disclosure.md) - Complete guide to content organization
-- [Phase 3: Word Count](../phase-03-word-count.md) - Word count by skill type (reasoning/tool-wrapper/hybrid)
+- [Skill Compliance Contract](../skill-compliance-contract.md) - Complete validation rules
 - [File Organization](../file-organization.md) - Directory structure requirements

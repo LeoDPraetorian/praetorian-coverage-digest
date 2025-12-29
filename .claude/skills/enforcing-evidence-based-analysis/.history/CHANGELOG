@@ -1,45 +1,32 @@
 # Changelog - enforcing-evidence-based-analysis
 
-## [Initial Creation] - 2025-12-28
+## 2025-12-28 - Compliance Fixes (Audit-Driven)
 
-### RED Phase - Gap Proven
+**Context:** Full audit revealed 3 CRITICAL and 3 INFO issues. Applied complete fix workflow.
 
-**Failure scenario:** Frontend-lead agent created 48KB implementation plan for wizard modal DRY refactoring. Agent claimed to have "analyzed 10 files" and provided detailed TypeScript types. However, every single API call was wrong because agent ASSUMED API shapes based on "common React patterns" instead of READING actual source files (useWizard.ts, types.ts, etc.).
+**Fixes Applied:**
 
-**Verified failure:**
-- Independent verification by 3 AI reviewers confirmed plan wouldn't compile
-- useWizard returns nested objects, not flat properties (assumed wrong)
-- WizardStep uses `title` not `label`, requires `order` property (assumed wrong)
-- useWizardFooterConfig takes 8 props, not wizard object (assumed wrong)
+1. **Phase 7: Output Directory (CLI - Deterministic)**
+   - Added `.local/` directory for runtime artifacts
 
-**Impact:** 48KB of confident-sounding hallucination that would waste hours of implementation time.
+2. **Phase 13: State Externalization (Claude-Automated)**
+   - Added TodoWrite mandate at skill introduction
+   - Directive: "You MUST use TodoWrite before starting analysis or planning tasks to track which files you've verified and which claims need evidence"
 
-**ROOT CAUSE:** No skill enforces "read source files before making claims about their contents."
+3. **Phase 3: Word Count (Claude-Automated)**
+   - Extracted "Evidence-Based Protocol" to `references/protocol.md`
+   - Extracted "Why This Matters" (wizard failure case study) to `references/why-this-matters.md`
+   - Condensed "Common Rationalizations" table to bullet summary
+   - Removed "Progressive Disclosure" section (redundant with references)
+   - Result: 906 words → 573 words (under 600-word limit)
 
-### Skill Created
+4. **Gateway Membership (Claude-Automated - Semantic)**
+   - Added skill to `gateway-claude` under new "Core Workflow Skills" section
+   - Grouped with: `verifying-before-completion`, `developing-with-tdd`, `debugging-systematically`
+   - Rationale: Frequently invoked during planning/development workflows
 
-- **Location:** Core (.claude/skills/)
-- **Type:** Process/Pattern
-- **Category:** N/A (core skill)
-- **Purpose:** Prevent hallucination during research/planning by requiring source file verification before making claims about APIs, interfaces, or code structure
+**Audit Results:**
+- Before: 2 CRITICAL, 3 INFO
+- After: 0 CRITICAL, 1 WARNING (word count target suggestion)
 
-### Key Features
-
-1. **Two-phase protocol:** Discovery (read & quote source) → Planning (use verified findings)
-2. **Anti-hallucination rules:** "No quotes = No claims", "Patterns are assumptions"
-3. **Required assumptions section:** Forces transparency about verified vs assumed
-4. **Complementary to verifying-before-completion:** Inputs (this) + Outputs (that) = complete verification
-5. **Progressive disclosure:** 205-line SKILL.md + detailed references/
-
-### Files Created
-
-- SKILL.md (205 lines - well under 500 limit)
-- references/ directory (populated in Phase 6)
-- examples/ directory
-- .history/CHANGELOG (this file)
-
-### Next Steps
-
-- Phase 6: Research & populate reference files
-- Phase 8: GREEN - Verify skill prevents hallucination
-- Phase 9: REFACTOR - Pressure test with time/authority/sunk-cost scenarios
+**Method:** Full fixing workflow (deterministic → Claude-automated → semantic)

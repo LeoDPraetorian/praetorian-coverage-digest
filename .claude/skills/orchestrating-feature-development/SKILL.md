@@ -6,7 +6,7 @@ allowed-tools: Skill, Task, TodoWrite, Read, Write, Bash, AskUserQuestion
 
 # Feature Development Orchestration
 
-Systematically guides feature development through eight phases with parallel agent execution, explicit feedback loops, and structured feature directories.
+Systematically guides feature development through nine phases with parallel agent execution, explicit feedback loops, and structured feature directories.
 
 ## When to Use This Skill
 
@@ -27,17 +27,18 @@ Use this skill when you need to:
 
 ## Quick Reference
 
-| Phase | Agents | Execution | Checkpoint |
-|-------|--------|-----------|------------|
-| 0: Setup | - | Create feature directory | - |
-| 1: Brainstorming | brainstorming skill | Sequential | 🛑 Human |
-| 2: Planning | writing-plans skill | Sequential | 🛑 Human |
-| 3: Architecture | frontend-lead + security-lead | **PARALLEL** | 🛑 Human |
-| 4: Implementation | frontend-developer | Sequential | - |
-| 5: Code Review | frontend-reviewer + frontend-security | **PARALLEL** | 1 retry → escalate |
-| 6: Testing | frontend-tester (unit + integration + e2e) | **PARALLEL** | - |
-| 7: Test Assessment | test-assessor | Sequential | 1 retry → escalate |
-| 8: Completion | - | Final verification | - |
+| Phase              | Agents                                     | Execution                | Checkpoint         |
+| ------------------ | ------------------------------------------ | ------------------------ | ------------------ |
+| 0: Setup           | -                                          | Create feature directory | -                  |
+| 1: Brainstorming   | brainstorming skill                        | Sequential               | 🛑 Human           |
+| 2: Planning        | writing-plans skill                        | Sequential               | 🛑 Human           |
+| 3: Architecture    | frontend-lead + security-lead              | **PARALLEL**             | 🛑 Human           |
+| 4: Implementation  | frontend-developer                         | Sequential               | -                  |
+| 5: Code Review     | frontend-reviewer + frontend-security      | **PARALLEL**             | 1 retry → escalate |
+| 6: Test Planning   | test-lead                                  | Sequential               | -                  |
+| 7: Testing         | frontend-tester (unit + integration + e2e) | **PARALLEL**             | -                  |
+| 8: Test Validation | test-lead                                  | Sequential               | 1 retry → escalate |
+| 9: Completion      | -                                          | Final verification       | -                  |
 
 ## Table of Contents
 
@@ -48,8 +49,9 @@ Use this skill when you need to:
 - **[Phase 3: Architecture](references/phase-3-architecture.md)** - Parallel leads + security assessment
 - **[Phase 4: Implementation](references/phase-4-implementation.md)** - Code development via developer agents
 - **[Phase 5: Code Review](references/phase-5-code-review.md)** - Parallel reviewers with feedback loop
-- **[Phase 6: Testing](references/phase-6-testing.md)** - Parallel test modes (unit + integration + e2e)
-- **[Phase 7: Test Assessment](references/phase-7-test-assessment.md)** - Quality gate with feedback loop
+- **[Phase 6: Test Planning](references/phase-6-test-planning.md)** - test-lead creates test plan
+- **[Phase 7: Testing](references/phase-7-testing.md)** - Parallel test modes following plan
+- **[Phase 8: Test Validation](references/phase-8-test-validation.md)** - test-lead validates against plan
 
 ### Supporting Documentation
 
@@ -63,72 +65,80 @@ Use this skill when you need to:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 0: Setup                                                          │
-│  Create: .claude/features/YYYY-MM-DD-{semantic-name}/                    │
+│  Phase 0: Setup                                                         │
+│  Create: .claude/features/YYYY-MM-DD-{semantic-name}/                   │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 1: Brainstorming                                                  │
-│  Tool: Skill("brainstorming")                                            │
-│  Output: design.md                                                       │
-│  🛑 Human Checkpoint                                                     │
+│  Phase 1: Brainstorming                                                 │
+│  Tool: Skill("brainstorming")                                           │
+│  Output: design.md                                                      │
+│  Human Checkpoint                                                       │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 2: Planning                                                       │
-│  Tool: Skill("writing-plans")                                            │
-│  Output: plan.md                                                         │
-│  🛑 Human Checkpoint                                                     │
+│  Phase 2: Planning                                                      │
+│  Tool: Skill("writing-plans")                                           │
+│  Output: plan.md                                                        │
+│  Human Checkpoint                                                       │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 3: Architecture (PARALLEL)                                        │
-│  Agents: frontend-lead + security-lead (single Task message)             │
-│  Output: architecture.md, security-assessment.md                         │
-│  🛑 Human Checkpoint                                                     │
+│  Phase 3: Architecture (PARALLEL)                                       │
+│  Agents: frontend-lead + security-lead (single Task message)            │
+│  Output: architecture.md, security-assessment.md                        │
+│  Human Checkpoint                                                       │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 4: Implementation                                                 │
-│  Agent: frontend-developer (+ backend-developer if full-stack)           │
-│  Input: architecture.md + security-assessment.md                         │
-│  Output: Code files + implementation-log.md                              │
+│  Phase 4: Implementation                                                │
+│  Agent: frontend-developer (+ backend-developer if full-stack)          │
+│  Input: architecture.md + security-assessment.md                        │
+│  Output: Code files + implementation-log.md                             │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 5: Code Review (PARALLEL, MAX 1 RETRY)                            │
-│  Agents: frontend-reviewer + frontend-security                  │
-│  Output: review.md, security-review.md                                   │
-│  Loop: If CHANGES_REQUESTED → developer fixes → re-review ONCE           │
-│  Escalate: If still failing → AskUserQuestion                            │
+│  Phase 5: Code Review (PARALLEL, MAX 1 RETRY)                           │
+│  Agents: frontend-reviewer + frontend-security                          │
+│  Output: review.md, security-review.md                                  │
+│  Loop: If CHANGES_REQUESTED → developer fixes → re-review ONCE          │
+│  Escalate: If still failing → AskUserQuestion                           │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 6: Testing (PARALLEL - all 3 modes)                               │
-│  Agents: frontend-tester × 3 (unit, integration, e2e)                    │
-│  Output: test files + test-summary-*.md                                  │
+│  Phase 6: Test Planning                                                 │
+│  Agent: test-lead (creates test plan)                                   │
+│  Output: test-plan.md                                                   │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 7: Test Assessment (MAX 1 RETRY)                                  │
-│  Agent: test-assessor                                                    │
-│  Output: test-assessment.md                                              │
-│  Loop: If quality < 70 → tester fixes → re-assess ONCE                   │
-│  Escalate: If still failing → AskUserQuestion                            │
+│  Phase 7: Testing (PARALLEL - all 3 modes)                              │
+│  Agents: frontend-tester × 3 (unit, integration, e2e)                   │
+│  Input: test-plan.md (follow plan requirements)                         │
+│  Output: test files + test-summary-*.md                                 │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 8: Completion                                                     │
-│  Final verification: npm run build, npx tsc --noEmit, npm test           │
-│  Update metadata.json status: "complete"                                 │
+│  Phase 8: Test Validation (MAX 1 RETRY)                                 │
+│  Agent: test-lead (validates against plan)                              │
+│  Output: test-validation.md                                             │
+│  Loop: If plan not met → tester fixes → re-validate ONCE                │
+│  Escalate: If still failing → AskUserQuestion                           │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 9: Completion                                                    │
+│  Final verification: npm run build, npx tsc --noEmit, npm test          │
+│  Update metadata.json status: "complete"                                │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -146,10 +156,12 @@ mkdir -p "${FEATURE_DIR}"
 ```
 
 **Semantic naming rules:**
+
 - 2-4 words describing the feature, lowercase with hyphens
 - Examples: `asset-filtering`, `dark-mode-toggle`, `settings-refactor`
 
 **Initialize metadata.json:**
+
 ```json
 {
   "feature_id": "2025-12-28-asset-filtering",
@@ -163,8 +175,9 @@ mkdir -p "${FEATURE_DIR}"
     "architecture": { "status": "pending" },
     "implementation": { "status": "pending" },
     "review": { "status": "pending", "retry_count": 0 },
+    "test_planning": { "status": "pending" },
     "testing": { "status": "pending" },
-    "assessment": { "status": "pending", "retry_count": 0 },
+    "validation": { "status": "pending", "retry_count": 0 },
     "completion": { "status": "pending" }
   }
 }
@@ -193,6 +206,7 @@ await Task("security-lead", ...)
 ### Human Checkpoints are MANDATORY
 
 After phases 1, 2, and 3, you MUST:
+
 1. Use AskUserQuestion to confirm approval
 2. Do NOT proceed without approval
 3. Record approval in metadata.json
@@ -204,6 +218,7 @@ After ONE retry cycle, escalate to user via AskUserQuestion. Do NOT loop indefin
 ### Agent Handoffs Must Be Structured
 
 All Task agents must return JSON with:
+
 ```json
 {
   "status": "complete|blocked|needs_review",
@@ -219,11 +234,11 @@ All Task agents must return JSON with:
 
 ## Agent Matrix by Feature Type
 
-| Type | Leads (Phase 3) | Developers (Phase 4) | Reviewers (Phase 5) | Testers (Phase 6) |
-|------|-----------------|----------------------|---------------------|-------------------|
-| Frontend | frontend-lead + security-lead | frontend-developer | frontend-reviewer + frontend-security | frontend-tester ×3 |
-| Backend | backend-lead + security-lead | backend-developer | backend-reviewer + backend-security | backend-tester ×3 |
-| Full-stack | All 4 leads | Both developers | All 4 reviewers | All 6 testers |
+| Type       | Leads (Phase 3)               | Developers (Phase 4) | Reviewers (Phase 5)                   | Planner (Phase 6) | Testers (Phase 7)  | Validator (Phase 8) |
+| ---------- | ----------------------------- | -------------------- | ------------------------------------- | ----------------- | ------------------ | ------------------- |
+| Frontend   | frontend-lead + security-lead | frontend-developer   | frontend-reviewer + frontend-security | test-lead         | frontend-tester ×3 | test-lead           |
+| Backend    | backend-lead + security-lead  | backend-developer    | backend-reviewer + backend-security   | test-lead         | backend-tester ×3  | test-lead           |
+| Full-stack | All 4 leads                   | Both developers      | All 4 reviewers                       | test-lead         | All 6 testers      | test-lead           |
 
 **Rule**: Match agents to feature domain. Full-stack features spawn ALL agents in parallel.
 
@@ -240,10 +255,11 @@ All Task agents must return JSON with:
 ├── implementation-log.md      # Phase 4: developer output
 ├── review.md                  # Phase 5: frontend-reviewer output
 ├── security-review.md         # Phase 5: security-reviewer output
-├── test-summary-unit.md       # Phase 6: unit test output
-├── test-summary-integration.md # Phase 6: integration test output
-├── test-summary-e2e.md        # Phase 6: e2e test output
-└── test-assessment.md         # Phase 7: test-assessor output
+├── test-plan.md               # Phase 6: test-lead test plan
+├── test-summary-unit.md       # Phase 7: unit test output
+├── test-summary-integration.md # Phase 7: integration test output
+├── test-summary-e2e.md        # Phase 7: e2e test output
+└── test-validation.md         # Phase 8: test-lead validation
 ```
 
 ## Troubleshooting
@@ -255,23 +271,27 @@ All Task agents must return JSON with:
 ### "Reviewer returned CHANGES_REQUESTED twice"
 
 **Solution**: After 1 retry, escalate to user:
+
 ```typescript
 AskUserQuestion({
-  questions: [{
-    question: "Reviews still failing after retry. How to proceed?",
-    header: "Review",
-    options: [
-      { label: "Show me the issues", description: "Review feedback details" },
-      { label: "Proceed anyway", description: "Accept current state" },
-      { label: "Cancel feature", description: "Stop development" }
-    ]
-  }]
-})
+  questions: [
+    {
+      question: "Reviews still failing after retry. How to proceed?",
+      header: "Review",
+      options: [
+        { label: "Show me the issues", description: "Review feedback details" },
+        { label: "Proceed anyway", description: "Accept current state" },
+        { label: "Cancel feature", description: "Stop development" },
+      ],
+    },
+  ],
+});
 ```
 
 ### "How do I handle full-stack features?"
 
 **Solution**: Spawn ALL domain agents in parallel:
+
 - Phase 3: frontend-lead + backend-lead + security-lead (3 agents)
 - Phase 4: frontend-developer + backend-developer (2 agents)
 - Phase 5: All 4 reviewers in parallel
@@ -292,8 +312,10 @@ See [Troubleshooting](references/troubleshooting.md) for more scenarios.
 
 Feature development is complete when:
 
-- ✅ All 8 phases marked "complete" in metadata.json
+- ✅ All 9 phases marked "complete" in metadata.json
 - ✅ All reviewers returned verdict: APPROVED
-- ✅ Test assessment quality_score >= 70
+- ✅ Test plan created with coverage targets
+- ✅ All tests from plan implemented
+- ✅ Test validation confirms plan adherence and quality_score >= 70
 - ✅ Final verification passed (build, lint, tests)
 - ✅ User approves final result

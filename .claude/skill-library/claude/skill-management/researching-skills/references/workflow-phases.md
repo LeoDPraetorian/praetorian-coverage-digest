@@ -145,7 +145,7 @@ Create complete skill structure from research data.
 
 ```
 skill-name/
-├── SKILL.md              # 300-600 lines
+├── SKILL.md              # Keep under 500 lines
 ├── references/           # Detailed documentation
 │   ├── api-reference.md
 │   ├── patterns.md

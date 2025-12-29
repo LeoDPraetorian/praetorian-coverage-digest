@@ -315,16 +315,23 @@ export class Phase1DescriptionFormat {
   }
 
   /**
-   * Run Phase 1 audit on all skills
+   * Run Phase 1 audit on all skills (backward compatible - parses files)
    */
   static async run(skillsDir: string): Promise<PhaseResult> {
     const skillPaths = await SkillParser.findAllSkills(skillsDir);
+    const skills = await Promise.all(skillPaths.map(p => SkillParser.parseSkillFile(p)));
+    return this.runOnParsedSkills(skills);
+  }
+
+  /**
+   * Run Phase 1 audit on pre-parsed skills (performance optimized)
+   */
+  static async runOnParsedSkills(skills: SkillFile[]): Promise<PhaseResult> {
     let skillsAffected = 0;
     let issuesFound = 0;
     const details: string[] = [];
 
-    for (const skillPath of skillPaths) {
-      const skill = await SkillParser.parseSkillFile(skillPath);
+    for (const skill of skills) {
       const issues = this.validate(skill);
 
       if (issues.length > 0) {

@@ -51,70 +51,70 @@ grep "true" modules/chariot/backend/pkg/query/allowed_columns.go | wc -l
 
 ```typescript
 interface GraphQuery {
-  node: Node;                    // Root node to match (required)
-  limit?: number;                // Max results (default varies, max 10000)
-  orderBy?: string;              // Sort field (must be in allowedColumns)
-  descending?: boolean;          // Sort direction
-  page?: number;                 // Pagination offset
+  node: Node; // Root node to match (required)
+  limit?: number; // Max results (default varies, max 10000)
+  orderBy?: string; // Sort field (must be in allowedColumns)
+  descending?: boolean; // Sort direction
+  page?: number; // Pagination offset
 }
 
 interface Node {
-  labels?: string[];             // Entity types: ["Asset"], ["Risk"]
-  filters?: Filter[];            // Conditions on this node
-  relationships?: Relationship[];// Connected entities
-  alias?: string;                // Reference name for complex filters
+  labels?: string[]; // Entity types: ["Asset"], ["Risk"]
+  filters?: Filter[]; // Conditions on this node
+  relationships?: Relationship[]; // Connected entities
+  alias?: string; // Reference name for complex filters
 }
 
 interface Relationship {
-  label: string | string[];      // Relationship type(s)
-  source?: Node;                 // Incoming (use ONE of source/target)
-  target?: Node;                 // Outgoing (use ONE of source/target)
-  filters?: Filter[];            // Conditions on relationship
-  optional?: boolean;            // LEFT JOIN behavior
-  length?: number;               // Variable-length path (max hops)
-  not_exists?: boolean;          // Negative pattern matching
+  label: string | string[]; // Relationship type(s)
+  source?: Node; // Incoming (use ONE of source/target)
+  target?: Node; // Outgoing (use ONE of source/target)
+  filters?: Filter[]; // Conditions on relationship
+  optional?: boolean; // LEFT JOIN behavior
+  length?: number; // Variable-length path (max hops)
+  not_exists?: boolean; // Negative pattern matching
 }
 
 interface Filter {
-  field: string;                 // Column (MUST be in allowedColumns)
-  operator: string;              // Comparison operator
-  value: any;                    // Value(s) to compare
-  not?: boolean;                 // Negate condition
-  alias?: string;                // Target specific node
+  field: string; // Column (MUST be in allowedColumns)
+  operator: string; // Comparison operator
+  value: any; // Value(s) to compare
+  not?: boolean; // Negate condition
+  alias?: string; // Target specific node
 }
 ```
 
 ### Filter Operators
 
-| Operator       | Description              | Example Value        |
-| -------------- | ------------------------ | -------------------- |
-| `=`            | Exact match              | `"A"`                |
-| `CONTAINS`     | Case-insensitive substr  | `"prod"`             |
-| `<` `<=`       | Less than (or equal)     | `7`                  |
-| `>` `>=`       | Greater than (or equal)  | `0.5`                |
-| `STARTS WITH`  | Prefix match             | `"api."`             |
-| `ENDS WITH`    | Suffix match             | `".com"`             |
-| `IN`           | Value in array           | `["ipv4", "domain"]` |
-| `IS NOT NULL`  | Field exists             | `null`               |
-| `IS NULL`      | Field missing            | `null`               |
-| `OR`           | Logical OR (nested)      | `[Filter, Filter]`   |
-| `AND`          | Logical AND (nested)     | `[Filter, Filter]`   |
+| Operator      | Description             | Example Value        |
+| ------------- | ----------------------- | -------------------- |
+| `=`           | Exact match             | `"A"`                |
+| `CONTAINS`    | Case-insensitive substr | `"prod"`             |
+| `<` `<=`      | Less than (or equal)    | `7`                  |
+| `>` `>=`      | Greater than (or equal) | `0.5`                |
+| `STARTS WITH` | Prefix match            | `"api."`             |
+| `ENDS WITH`   | Suffix match            | `".com"`             |
+| `IN`          | Value in array          | `["ipv4", "domain"]` |
+| `IS NOT NULL` | Field exists            | `null`               |
+| `IS NULL`     | Field missing           | `null`               |
+| `OR`          | Logical OR (nested)     | `[Filter, Filter]`   |
+| `AND`         | Logical AND (nested)    | `[Filter, Filter]`   |
 
 **See:** [references/filter-operators.md](references/filter-operators.md) for detailed examples.
 
 ### Common Labels (Entity Types)
 
-| Label            | Description                        |
-| ---------------- | ---------------------------------- |
-| `Asset`          | Domains, IPs, external resources   |
-| `Risk`           | Security vulnerabilities/findings  |
-| `Seed`           | Discovery starting points          |
-| `Attribute`      | Asset properties/metadata          |
-| `Technology`     | Software/technology stack          |
-| `Vulnerability`  | CVE definitions                    |
-| `Port`           | Network ports                      |
-| `Webpage`        | Web pages                          |
-| `WebApplication` | Web applications                   |
+| Label            | Description                       |
+| ---------------- | --------------------------------- |
+| `Asset`          | Domains, IPs, external resources  |
+| `Risk`           | Security vulnerabilities/findings |
+| `Seed`           | Discovery starting points         |
+| `Attribute`      | Asset properties/metadata         |
+| `Technology`     | Software/technology stack         |
+| `Vulnerability`  | CVE definitions                   |
+| `Port`           | Network ports                     |
+| `Webpage`        | Web pages                         |
+| `WebApplication` | Web applications                  |
 
 ---
 
@@ -123,62 +123,64 @@ interface Filter {
 ### useMy Hook
 
 ```typescript
-import { useMy } from '@/hooks/useMy';
+import { useMy } from "@/hooks/useMy";
 
 // Simple key-based query
 const { data } = useMy({
-  resource: 'asset',
-  query: '#asset#example.com'
+  resource: "asset",
+  query: "#asset#example.com",
 });
 
 // Graph query with filters
 const { data } = useMy({
-  resource: 'asset',
+  resource: "asset",
   query: {
     node: {
-      labels: ['Asset'],
+      labels: ["Asset"],
       filters: [
-        { field: 'status', operator: '=', value: 'A' },
-        { field: 'class', operator: '=', value: 'domain' }
-      ]
-    }
-  }
+        { field: "status", operator: "=", value: "A" },
+        { field: "class", operator: "=", value: "domain" },
+      ],
+    },
+  },
 });
 
 // Paginated results
 const { data, fetchNextPage, hasNextPage } = useMy({
-  resource: 'risk',
+  resource: "risk",
   query: {
     node: {
-      labels: ['Risk'],
-      filters: [{ field: 'cvss', operator: '>=', value: 7 }]
+      labels: ["Risk"],
+      filters: [{ field: "cvss", operator: ">=", value: 7 }],
     },
     limit: 50,
-    orderBy: 'cvss',
-    descending: true
-  }
+    orderBy: "cvss",
+    descending: true,
+  },
 });
 ```
 
 ### useGraphQuery Hook
 
 ```typescript
-import { useGraphQuery } from '@/hooks/useGraphQuery';
+import { useGraphQuery } from "@/hooks/useGraphQuery";
 
 const { data } = useGraphQuery({
   query: {
     node: {
-      labels: ['Asset'],
-      relationships: [{
-        label: 'HAS',
-        target: {
-          labels: ['Risk'],
-          filters: [{ field: 'cvss', operator: '>=', value: 9 }]
-        }
-      }]
+      labels: ["Asset"],
+      relationships: [
+        {
+          label: "HAS",
+          target: {
+            labels: ["Risk"],
+            filters: [{ field: "cvss", operator: ">=", value: 9 }],
+          },
+        },
+      ],
     },
-    limit: 100
-  }
+    limit: 100,
+  },
 });
 ```
 
@@ -191,13 +193,13 @@ const { data } = useGraphQuery({
 ```typescript
 const query = {
   node: {
-    labels: ['Asset'],
+    labels: ["Asset"],
     filters: [
-      { field: 'status', operator: '=', value: 'A' },
-      { field: 'class', operator: '=', value: 'domain' }
-    ]
+      { field: "status", operator: "=", value: "A" },
+      { field: "class", operator: "=", value: "domain" },
+    ],
   },
-  limit: 100
+  limit: 100,
 };
 ```
 
@@ -206,15 +208,15 @@ const query = {
 ```typescript
 const query = {
   node: {
-    labels: ['Risk'],
+    labels: ["Risk"],
     filters: [
-      { field: 'status', operator: '=', value: 'T' },
-      { field: 'cvss', operator: '>=', value: 7 }
-    ]
+      { field: "status", operator: "=", value: "T" },
+      { field: "cvss", operator: ">=", value: 7 },
+    ],
   },
-  orderBy: 'cvss',
+  orderBy: "cvss",
   descending: true,
-  limit: 50
+  limit: 50,
 };
 ```
 
@@ -223,16 +225,18 @@ const query = {
 ```typescript
 const query = {
   node: {
-    labels: ['Asset'],
-    filters: [{ field: 'class', operator: '=', value: 'domain' }],
-    relationships: [{
-      label: 'HAS',
-      target: {
-        labels: ['Risk'],
-        filters: [{ field: 'cvss', operator: '>=', value: 7 }]
-      }
-    }]
-  }
+    labels: ["Asset"],
+    filters: [{ field: "class", operator: "=", value: "domain" }],
+    relationships: [
+      {
+        label: "HAS",
+        target: {
+          labels: ["Risk"],
+          filters: [{ field: "cvss", operator: ">=", value: 7 }],
+        },
+      },
+    ],
+  },
 };
 ```
 
@@ -241,15 +245,17 @@ const query = {
 ```typescript
 const query = {
   node: {
-    labels: ['Asset'],
-    filters: [{
-      operator: 'OR',
-      value: [
-        { field: 'class', operator: '=', value: 'domain' },
-        { field: 'class', operator: '=', value: 'ipv4' }
-      ]
-    }]
-  }
+    labels: ["Asset"],
+    filters: [
+      {
+        operator: "OR",
+        value: [
+          { field: "class", operator: "=", value: "domain" },
+          { field: "class", operator: "=", value: "ipv4" },
+        ],
+      },
+    ],
+  },
 };
 ```
 
@@ -258,13 +264,15 @@ const query = {
 ```typescript
 const query = {
   node: {
-    labels: ['Asset'],
-    relationships: [{
-      label: 'HAS',
-      target: { labels: ['Attribute'] },
-      optional: true  // Returns assets even without attributes
-    }]
-  }
+    labels: ["Asset"],
+    relationships: [
+      {
+        label: "HAS",
+        target: { labels: ["Attribute"] },
+        optional: true, // Returns assets even without attributes
+      },
+    ],
+  },
 };
 ```
 
@@ -276,27 +284,27 @@ const query = {
 
 ### Common Errors
 
-| Error                                 | Cause                             | Solution                                     |
-| ------------------------------------- | --------------------------------- | -------------------------------------------- |
-| `invalid filter column: X`            | Field not in allowedColumns       | `grep -w "X" .../allowed_columns.go`         |
-| `invalid sort column: X`              | orderBy field not in allowedColumns | Same as above                              |
-| `invalid label: X`                    | Label not alphanumeric            | Use valid entity type                        |
-| `exactly one of source or target...`  | Relationship misconfigured        | Use either `source` OR `target`, not both    |
-| `response too large`                  | Results exceed 6MB                | Reduce `limit` or add more filters           |
+| Error                                | Cause                               | Solution                                  |
+| ------------------------------------ | ----------------------------------- | ----------------------------------------- |
+| `invalid filter column: X`           | Field not in allowedColumns         | `grep -w "X" .../allowed_columns.go`      |
+| `invalid sort column: X`             | orderBy field not in allowedColumns | Same as above                             |
+| `invalid label: X`                   | Label not alphanumeric              | Use valid entity type                     |
+| `exactly one of source or target...` | Relationship misconfigured          | Use either `source` OR `target`, not both |
+| `response too large`                 | Results exceed 6MB                  | Reduce `limit` or add more filters        |
 
 ### Debugging Query Issues
 
 ```typescript
 // 1. Log the query being sent
-console.log('Query:', JSON.stringify(query, null, 2));
+console.log("Query:", JSON.stringify(query, null, 2));
 
 // 2. Verify fields exist
 // Run in terminal: grep -w "fieldname" modules/chariot/backend/pkg/query/allowed_columns.go
 
 // 3. Test with minimal query first
 const minimalQuery = {
-  node: { labels: ['Asset'] },
-  limit: 10
+  node: { labels: ["Asset"] },
+  limit: 10,
 };
 ```
 
@@ -316,13 +324,13 @@ Before executing a graph query:
 
 ## Source Files
 
-| File                                              | Purpose                    |
-| ------------------------------------------------- | -------------------------- |
+| File                                                   | Purpose                |
+| ------------------------------------------------------ | ---------------------- |
 | `modules/chariot/backend/pkg/query/allowed_columns.go` | Field whitelist (200+) |
-| `modules/chariot/backend/pkg/query/query.go`      | Query structs              |
-| `modules/tabularium/pkg/model/filters/filter.go`  | Filter operators           |
-| `modules/chariot/ui/src/hooks/useMy.ts`           | useMy hook                 |
-| `modules/chariot/ui/src/hooks/useGraphQuery.ts`   | useGraphQuery hook         |
+| `modules/chariot/backend/pkg/query/query.go`           | Query structs          |
+| `modules/tabularium/pkg/model/filters/filter.go`       | Filter operators       |
+| `modules/chariot/ui/src/hooks/useMy.ts`                | useMy hook             |
+| `modules/chariot/ui/src/hooks/useGraphQuery.ts`        | useGraphQuery hook     |
 
 ---
 

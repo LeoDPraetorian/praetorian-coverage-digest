@@ -142,6 +142,7 @@ Agent complete when:
 **Why**: Core skills require Skill tool to invoke via `skill: "name"` syntax. Without it, agent is broken at runtime.
 
 **Check before saving**:
+
 ```bash
 # If skills exist
 if agent has skills: field with values; then

@@ -236,7 +236,7 @@ Use this skill when:
 
 - [references/commands.md](references/commands.md)
 
-```
+````
 
 ---
 
@@ -281,7 +281,7 @@ Use when external documentation is straightforward and limited.
 - **useOptimistic**: https://react.dev/reference/react/useOptimistic
 - **useEffectEvent**: https://react.dev/reference/react/useEffectEvent
 - **You Might Not Need an Effect**: https://react.dev/learn/you-might-not-need-an-effect
-```
+````
 
 **Place at end of SKILL.md** before any existing "## References" section.
 
@@ -344,16 +344,19 @@ For comprehensive official documentation links, see [references/links-to-officia
 ### Guidelines
 
 **Keep links current:**
+
 - Include version information when relevant
 - Link to stable documentation (not experimental/beta unless noted)
 - Prefer official docs over third-party tutorials
 
 **Organize by relevance:**
+
 - Most important/frequently referenced links first
 - Group related links together (Core, Advanced, Community)
 - Use clear section headers
 
 **Don't duplicate:**
+
 - External docs go in "Related Resources"
 - Internal references go in "References"
 - Keep them separate
@@ -361,11 +364,15 @@ For comprehensive official documentation links, see [references/links-to-officia
 ### Examples
 
 **Skills with brief lists:**
+
 - `using-modern-react-patterns` - 6 React 19 links in SKILL.md
 - `optimizing-react-performance` - 7 key links in SKILL.md
 
 **Skills with comprehensive files:**
+
 - `implementing-react-hook-form-zod` - 50+ links in references/links-to-official-docs.md
 - Complex integration skills with multiple service documentation
+
+```
 
 ```

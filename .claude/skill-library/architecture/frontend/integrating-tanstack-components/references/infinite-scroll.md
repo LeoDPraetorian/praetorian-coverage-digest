@@ -258,17 +258,22 @@ function BidirectionalInfiniteList() {
 
 ```typescript
 // Prefetch when 80% through current data
-useEffect(() => {
-  const virtualItems = rowVirtualizer.getVirtualItems()
-  const lastItem = virtualItems[virtualItems.length - 1]
+useEffect(
+  () => {
+    const virtualItems = rowVirtualizer.getVirtualItems();
+    const lastItem = virtualItems[virtualItems.length - 1];
 
-  if (!lastItem) return
+    if (!lastItem) return;
 
-  const threshold = Math.floor(allItems.length * 0.8)
-  if (lastItem.index >= threshold && hasNextPage && !isFetchingNextPage) {
-    fetchNextPage()
-  }
-}, [/* deps */])
+    const threshold = Math.floor(allItems.length * 0.8);
+    if (lastItem.index >= threshold && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  },
+  [
+    /* deps */
+  ]
+);
 ```
 
 ### Stable Row Keys

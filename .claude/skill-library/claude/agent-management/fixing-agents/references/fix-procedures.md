@@ -15,6 +15,7 @@ Mechanical transformations with one correct answer. Claude applies using Edit to
 **Issue**: `description: |` or `description: >` breaks agent discovery
 
 **Fix**:
+
 ```
 Edit {
   old_string: "description: |\n  Use when...",
@@ -29,6 +30,7 @@ Edit {
 **Issue**: Frontmatter name ≠ filename
 
 **Fix**:
+
 ```
 Edit {
   old_string: "name: wrong-name",
@@ -43,6 +45,7 @@ Edit {
 **Issue**: Fields not in canonical order
 
 **Fix**: Reorder to:
+
 1. name
 2. description
 3. type
@@ -57,6 +60,7 @@ Edit {
 **Issue**: Tables not properly formatted
 
 **Fix**:
+
 ```bash
 npx prettier --write --parser markdown {agent-file}.md
 ```
@@ -72,6 +76,7 @@ Require Claude reasoning but have clear outcomes.
 **Issue**: permissionMode doesn't match agent type
 
 **Fix**:
+
 - architecture → `permissionMode: plan`
 - quality → `permissionMode: plan`
 - analysis → `permissionMode: plan`
@@ -84,11 +89,13 @@ Require Claude reasoning but have clear outcomes.
 **Fix**: Add/remove based on agent type requirements
 
 **Required by type:**
+
 - All: Read, TodoWrite
 - development: Write, Edit, Bash
 - testing: Bash
 
 **Forbidden by type:**
+
 - architecture: Write, Edit (read-only)
 - quality: Write, Edit (review-only)
 
@@ -101,6 +108,7 @@ Require Claude reasoning but have clear outcomes.
 **Category**: Deterministic (automated fix with Edit tool)
 
 **Fix Steps**:
+
 1. Read current `tools:` field value
 2. Add `Skill` in correct alphabetical position
 3. Use Edit tool with exact old_string → new_string pattern
@@ -109,12 +117,13 @@ Require Claude reasoning but have clear outcomes.
 AskUserQuestion, Bash, BashOutput, Edit, Glob, Grep, KillBash, MultiEdit, Read, Skill, TodoWrite, WebFetch, WebSearch, Write
 
 **Example**:
+
 ```typescript
 Edit({
-  file_path: '.claude/agents/{type}/{name}.md',
-  old_string: 'tools: Bash, Glob, Grep, Read, TodoWrite, Write',
-  new_string: 'tools: Bash, Glob, Grep, Read, Skill, TodoWrite, Write'
-})
+  file_path: ".claude/agents/{type}/{name}.md",
+  old_string: "tools: Bash, Glob, Grep, Read, TodoWrite, Write",
+  new_string: "tools: Bash, Glob, Grep, Read, Skill, TodoWrite, Write",
+});
 ```
 
 **Why Critical**: Core skills in frontmatter require Skill tool to invoke via `skill: "name"` syntax. Without Skill tool, agent cannot execute skill invocations → broken at runtime.
@@ -130,6 +139,7 @@ Edit({
 **Issue**: Agent with `skills:` frontmatter lacks Tiered Skill Loading Protocol
 
 **Fix**: Add section with:
+
 - Tier 1: Always Read (universal + gateway + core)
 - Tier 2: Multi-Step Tasks (TodoWrite if ≥2 steps)
 - Tier 3: Triggered by Task Type (domain-specific tables)
@@ -196,6 +206,7 @@ With agent name for verification.
 **Symptom**: "old_string not found"
 
 **Causes**:
+
 - File changed since last read
 - Whitespace mismatch
 - Line ending differences

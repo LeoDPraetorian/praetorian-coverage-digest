@@ -1,5 +1,27 @@
 # Skill Architecture
 
+**Complete architectural documentation for the two-tier progressive loading skill system.**
+
+## Table of Contents
+
+1. [The Problem](#the-problem)
+2. [The Solution: Two-Tier Progressive Loading](#the-solution-two-tier-progressive-loading)
+3. [Two-Tier System](#two-tier-system)
+4. [Gateway Skills](#gateway-skills)
+5. [Router Skills](#router-skills)
+6. [CLI Infrastructure](#cli-infrastructure)
+7. [Skill Discovery](#skill-discovery)
+8. [Skill Anatomy](#skill-anatomy)
+9. [Quality Gates](#quality-gates)
+10. [TDD Workflow](#tdd-workflow)
+11. [Token Budget](#token-budget)
+12. [Context Engineering Principles](#context-engineering-principles)
+13. [Directory Structure Reference](#directory-structure-reference)
+14. [FAQ](#faq)
+15. [References](#references)
+
+---
+
 ## The Problem
 
 Claude Code faces a fundamental tension between capability and context. Anthropic's research reveals that "token usage alone explains 80% of performance variance" in agent tasks, yet Claude Code imposes a hard limit of ~15,000 characters for skill metadata—enough for only ~70 skills before truncation. With 160 skills in our system, a naive approach leaves critical capabilities like developing-with-tdd and debugging-systematically completely invisible to Claude. The challenge isn't just fitting more skills; it's achieving both discoverability (Claude knows skills exist) and depth (skills contain comprehensive guidance) **without consuming the context window that agents need for actual work**.
@@ -9,6 +31,7 @@ Claude Code faces a fundamental tension between capability and context. Anthropi
 We implemented a two-tier progressive loading architecture that achieves 0-token discovery cost for ~126 specialized skills while maintaining instant access to 34 high-frequency skills. Core skills live in `.claude/skills/` and consume the 15K budget (~3,400 chars total). Eight gateway skills act as domain entry points, each consuming ~100 characters but providing routing to dozens of library skills. Library skills in `.claude/skill-library/` have zero discovery cost—they load on-demand via the Read tool only when needed. This mirrors Anthropic's context engineering principle: "Good context engineering means finding the smallest possible set of high-signal tokens that maximize the likelihood of some desired outcome." The result: 160 skills accessible while using only 23% of the discovery budget.
 
 **Current totals:**
+
 - **Core skills**: 34 (in `.claude/skills/`)
 - **Library skills**: ~126 (in `.claude/skill-library/`)
 - **Total**: ~160 skills
@@ -21,14 +44,15 @@ We implemented a two-tier progressive loading architecture that achieves 0-token
 
 Core skills are auto-discovered by Claude Code's Skill tool and consume the 15K discovery budget. They include:
 
-| Category | Count | Purpose |
-|----------|-------|---------|
-| Workflow skills | 18 | TDD, debugging, verification, planning |
-| Gateway skills | 8 | Route to library skills by domain |
-| Router skills | 4 | Lifecycle management (agents, skills, commands, MCPs) |
-| Orchestration skills | 4 | Multi-agent coordination, session persistence |
+| Category             | Count | Purpose                                               |
+| -------------------- | ----- | ----------------------------------------------------- |
+| Workflow skills      | 18    | TDD, debugging, verification, planning                |
+| Gateway skills       | 8     | Route to library skills by domain                     |
+| Router skills        | 4     | Lifecycle management (agents, skills, commands, MCPs) |
+| Orchestration skills | 4     | Multi-agent coordination, session persistence         |
 
 **Invocation**: Use the Skill tool
+
 ```
 skill: "developing-with-tdd"
 skill: "gateway-frontend"
@@ -55,6 +79,7 @@ Library skills have **zero discovery cost**—they load on-demand via the Read t
 ```
 
 **Invocation**: Use the Read tool with the full path
+
 ```
 Read(".claude/skill-library/development/frontend/using-tanstack-query/SKILL.md")
 ```
@@ -62,44 +87,64 @@ Read(".claude/skill-library/development/frontend/using-tanstack-query/SKILL.md")
 ## Gateway Skills
 
 Gateways are routing indices that help agents discover library skills. Each gateway:
+
 - Consumes ~100 characters in the discovery budget
 - Lists library skills with their full paths
 - Provides usage guidance and decision trees
 
 ### Available Gateways
 
-| Gateway | Domain | Routes To |
-|---------|--------|-----------|
-| `gateway-frontend` | React, TypeScript, state management | ~25 library skills |
-| `gateway-backend` | Go, AWS, infrastructure | ~20 library skills |
-| `gateway-testing` | API, E2E, mocking, performance | ~25 library skills |
-| `gateway-claude` | Agent, skill, command, MCP management | ~30 library skills |
-| `gateway-security` | Auth, secrets, cryptography, defense | ~12 library skills |
-| `gateway-integrations` | Third-party APIs (Jira, HackerOne, etc.) | ~8 library skills |
-| `gateway-mcp-tools` | MCP wrappers (Linear, CLI, Context7) | ~8 library skills |
-| `gateway-capabilities` | VQL, Nuclei templates, scanner integration | ~4 library skills |
+| Gateway                | Domain                                     | Routes To          |
+| ---------------------- | ------------------------------------------ | ------------------ |
+| `gateway-frontend`     | React, TypeScript, state management        | ~25 library skills |
+| `gateway-backend`      | Go, AWS, infrastructure                    | ~20 library skills |
+| `gateway-testing`      | API, E2E, mocking, performance             | ~25 library skills |
+| `gateway-claude`       | Agent, skill, command, MCP management      | ~30 library skills |
+| `gateway-security`     | Auth, secrets, cryptography, defense       | ~12 library skills |
+| `gateway-integrations` | Third-party APIs (Jira, HackerOne, etc.)   | ~8 library skills  |
+| `gateway-mcp-tools`    | MCP wrappers (Linear, CLI, Context7)       | ~8 library skills  |
+| `gateway-capabilities` | VQL, Nuclei templates, scanner integration | ~4 library skills  |
 
 ### Gateway Workflow
 
 1. **Invoke gateway**: `skill: "gateway-frontend"`
-2. **Find skill in routing table**: Gateway lists available skills with paths
-3. **Load skill via Read**: `Read(".claude/skill-library/development/frontend/using-tanstack-query/SKILL.md")`
-4. **Follow skill instructions**: Each skill is self-contained
+2. **Identify Role**: Gateway checks user's role (Developer, Architect, Tester, etc.)
+3. **Load Mandatory Skills**: Gateway defines specific library skills mandatory for that role
+4. **Load Task Skills**: Gateway lists available skills for specific tasks
+5. **Follow skill instructions**: Each skill is self-contained
+
+### Mandatory Skills by Role
+
+Gateways now enforce **Role-Based Context Loading**. Instead of every agent hardcoding a list of mandatory skills, the agent invokes the gateway, and the gateway dictates what is mandatory based on the agent's role.
+
+**Example from `gateway-frontend`:**
+
+| Your Role          | Mandatory Sections                             |
+| ------------------ | ---------------------------------------------- |
+| **Developer**      | ALL ROLES + UI STYLING                         |
+| **Lead/Architect** | ALL ROLES + UI STYLING + ARCHITECTURE PATTERNS |
+| **Reviewer**       | ALL ROLES + UI STYLING                         |
+
+This ensures:
+
+- **Consistency**: All "Developers" load the same core standards
+- **Maintenance**: Update mandatory skills in ONE place (the gateway), not 50 agents
+- **Efficiency**: Architects don't load testing minutiae; Testers don't load CSS frameworks
 
 ### Common Anti-Patterns
 
 ```typescript
 // ❌ WRONG: Using Skill tool for library skills
-skill: "using-tanstack-query"  // FAILS - library skills are NOT in Skill tool
+skill: "using-tanstack-query"; // FAILS - library skills are NOT in Skill tool
 
 // ❌ WRONG: Guessing paths
-Read(".claude/skill-library/using-tanstack-query/...")  // FAILS - wrong path
+Read(".claude/skill-library/using-tanstack-query/..."); // FAILS - wrong path
 
 // ❌ WRONG: Using skill name instead of full path
-Read("using-tanstack-query")  // FAILS - must be full path
+Read("using-tanstack-query"); // FAILS - must be full path
 
 // ✅ CORRECT: Full path from gateway
-Read(".claude/skill-library/development/frontend/using-tanstack-query/SKILL.md")
+Read(".claude/skill-library/development/frontend/using-tanstack-query/SKILL.md");
 ```
 
 ## Router Skills
@@ -108,12 +153,12 @@ Router skills manage lifecycle operations for infrastructure components. They're
 
 ### Available Routers
 
-| Router | Domain | Operations |
-|--------|--------|------------|
-| `managing-skills` | Skill lifecycle | create, update, audit, fix, delete, rename, migrate, search, list, sync |
-| `managing-agents` | Agent lifecycle | create, update, test, audit, fix, rename, search, list |
-| `managing-commands` | Command lifecycle | create, audit, fix, list |
-| `managing-mcp-wrappers` | MCP wrapper lifecycle | create, verify-red, generate, verify-green, update, audit, fix, test |
+| Router                  | Domain                | Operations                                                              |
+| ----------------------- | --------------------- | ----------------------------------------------------------------------- |
+| `managing-skills`       | Skill lifecycle       | create, update, audit, fix, delete, rename, migrate, search, list, sync |
+| `managing-agents`       | Agent lifecycle       | create, update, test, audit, fix, rename, search, list                  |
+| `managing-commands`     | Command lifecycle     | create, audit, fix, list                                                |
+| `managing-mcp-wrappers` | MCP wrapper lifecycle | create, verify-red, generate, verify-green, update, audit, fix, test    |
 
 ### Router Architecture
 
@@ -133,13 +178,13 @@ CLI execution + Claude interpretation
 
 Router skills delegate to library skills that own CLI implementations:
 
-| Package | Location | Commands |
-|---------|----------|----------|
+| Package                    | Location                                                        | Commands          |
+| -------------------------- | --------------------------------------------------------------- | ----------------- |
 | `@chariot/auditing-skills` | `skill-library/claude/skill-management/auditing-skills/scripts` | `audit`, `search` |
-| `@chariot/fixing-skills` | `skill-library/claude/skill-management/fixing-skills/scripts` | `fix` |
-| `@chariot/updating-skills` | `skill-library/claude/skill-management/updating-skills/scripts` | `update` |
-| `@chariot/auditing-agents` | `skill-library/claude/agent-management/auditing-agents/scripts` | `audit-critical` |
-| `@chariot/fixing-agents` | `skill-library/claude/agent-management/fixing-agents/scripts` | `fix` |
+| `@chariot/fixing-skills`   | `skill-library/claude/skill-management/fixing-skills/scripts`   | `fix`             |
+| `@chariot/updating-skills` | `skill-library/claude/skill-management/updating-skills/scripts` | `update`          |
+| `@chariot/auditing-agents` | `skill-library/claude/agent-management/auditing-agents/scripts` | `audit-critical`  |
+| `@chariot/fixing-agents`   | `skill-library/claude/agent-management/fixing-agents/scripts`   | `fix`             |
 
 ### Running CLI Commands
 
@@ -179,6 +224,7 @@ cd "$REPO_ROOT/.claude" && npm run search -- "query"
 ```
 
 **Key distinction:**
+
 - `[CORE]` skills → Use Skill tool: `skill: "name"`
 - `[LIB]` skills → Use Read tool: `Read("path")`
 
@@ -207,9 +253,9 @@ skill-name/
 
 ```yaml
 ---
-name: skill-name                    # kebab-case, matches directory
-description: Use when [trigger]...  # Third-person, <120 chars
-allowed-tools: Read, Write, Bash    # Tool restrictions (optional)
+name: skill-name # kebab-case, matches directory
+description: Use when [trigger]... # Third-person, <120 chars
+allowed-tools: Read, Write, Bash # Tool restrictions (optional)
 ---
 ```
 
@@ -230,12 +276,12 @@ description: Creates skills with TDD validation
 
 ### Line Count Targets
 
-| Skill Type | Target | Maximum |
-|------------|--------|---------|
-| Process | 200-400 | 500 |
-| Library | 400-600 | 800 |
-| Integration | 300-500 | 700 |
-| Tool Wrapper | 200-300 | 500 |
+| Skill Type   | Target  | Maximum |
+| ------------ | ------- | ------- |
+| Process      | 200-400 | 500     |
+| Library      | 400-600 | 800     |
+| Integration  | 300-500 | 700     |
+| Tool Wrapper | 200-300 | 500     |
 
 **If skill exceeds 500 lines**: Extract content to `references/` directory using progressive disclosure.
 
@@ -247,41 +293,41 @@ Skills must pass compliance validation across 21 phases:
 
 **Standard Phases (1-13, 16)**
 
-| Phase | Name | Fix Type | Description |
-|-------|------|----------|-------------|
-| 1 | Description Format | Claude | "Use when" trigger, <120 chars, no block scalars |
-| 2 | Allowed-Tools Field | Auto | Comma-separated, valid tool names |
-| 3 | Word Count | Claude | SKILL.md <500 lines |
-| 4 | Broken Links | Hybrid | All references/ paths resolve |
-| 5 | File Organization | Auto | SKILL.md + references/ structure |
-| 6 | Script Organization | Hybrid | scripts/ with src/, package.json |
-| 7 | Output Directory Pattern | Auto | .output/ for CLI, .local/ for temp |
-| 8 | TypeScript Structure | Human | tsc compiles, all tests pass |
-| 9 | Bash-TypeScript Migration | Human | No bash scripts (except POSIX wrappers) |
-| 10 | Reference Audit | Hybrid | All skill/agent references exist |
-| 11 | Command Example Audit | Claude | cd uses portable REPO_ROOT pattern |
-| 12 | CLI Error Handling | Hybrid | Proper exit codes, user-friendly errors |
-| 13 | State Externalization | Claude | TodoWrite for multi-step operations |
-| 16 | Windows Path Detection | Auto | No hardcoded Unix paths |
+| Phase | Name                      | Fix Type | Description                                      |
+| ----- | ------------------------- | -------- | ------------------------------------------------ |
+| 1     | Description Format        | Claude   | "Use when" trigger, <120 chars, no block scalars |
+| 2     | Allowed-Tools Field       | Auto     | Comma-separated, valid tool names                |
+| 3     | Word Count                | Claude   | SKILL.md <500 lines                              |
+| 4     | Broken Links              | Hybrid   | All references/ paths resolve                    |
+| 5     | File Organization         | Auto     | SKILL.md + references/ structure                 |
+| 6     | Script Organization       | Hybrid   | scripts/ with src/, package.json                 |
+| 7     | Output Directory Pattern  | Auto     | .output/ for CLI, .local/ for temp               |
+| 8     | TypeScript Structure      | Human    | tsc compiles, all tests pass                     |
+| 9     | Bash-TypeScript Migration | Human    | No bash scripts (except POSIX wrappers)          |
+| 10    | Reference Audit           | Hybrid   | All skill/agent references exist                 |
+| 11    | Command Example Audit     | Claude   | cd uses portable REPO_ROOT pattern               |
+| 12    | CLI Error Handling        | Hybrid   | Proper exit codes, user-friendly errors          |
+| 13    | State Externalization     | Claude   | TodoWrite for multi-step operations              |
+| 16    | Windows Path Detection    | Auto     | No hardcoded Unix paths                          |
 
 **Visual/Style Phases (14a-c, 15, 21)**
 
-| Phase | Name | Fix Type | Description |
-|-------|------|----------|-------------|
-| 14a | Table Formatting | Auto | Markdown tables have headers, separators |
-| 14b | Code Block Quality | Auto | Code blocks have language tags |
-| 14c | Header Hierarchy | Auto | Single H1, no skipped levels |
-| 15 | Orphan Detection | Hybrid | Library skills referenced in gateway |
-| 21 | Line Number References | Claude | No static line numbers |
+| Phase | Name                   | Fix Type | Description                              |
+| ----- | ---------------------- | -------- | ---------------------------------------- |
+| 14a   | Table Formatting       | Auto     | Markdown tables have headers, separators |
+| 14b   | Code Block Quality     | Auto     | Code blocks have language tags           |
+| 14c   | Header Hierarchy       | Auto     | Single H1, no skipped levels             |
+| 15    | Orphan Detection       | Hybrid   | Library skills referenced in gateway     |
+| 21    | Line Number References | Claude   | No static line numbers                   |
 
 **Gateway-Only Phases (17-20)**
 
-| Phase | Name | Fix Type | Description |
-|-------|------|----------|-------------|
-| 17 | Gateway Structure | Claude | Has routing table, correct frontmatter |
-| 18 | Routing Table Format | Auto | Consistent markdown format |
-| 19 | Path Resolution | Hybrid | All library paths resolve |
-| 20 | Coverage Check | Human | Library skills in at least one gateway |
+| Phase | Name                 | Fix Type | Description                            |
+| ----- | -------------------- | -------- | -------------------------------------- |
+| 17    | Gateway Structure    | Claude   | Has routing table, correct frontmatter |
+| 18    | Routing Table Format | Auto     | Consistent markdown format             |
+| 19    | Path Resolution      | Hybrid   | All library paths resolve              |
+| 20    | Coverage Check       | Human    | Library skills in at least one gateway |
 
 ### Fix Categories
 
@@ -333,19 +379,19 @@ The skill manager enforces Test-Driven Development for all skill creation and up
 
 ### Discovery vs Execution
 
-| State | What's Loaded | When | Limit |
-|-------|---------------|------|-------|
-| Discovery | Frontmatter only | Always | ~15,000 chars |
-| Execution | Full SKILL.md | When invoked | Context window (200K) |
+| State     | What's Loaded    | When         | Limit                 |
+| --------- | ---------------- | ------------ | --------------------- |
+| Discovery | Frontmatter only | Always       | ~15,000 chars         |
+| Execution | Full SKILL.md    | When invoked | Context window (200K) |
 
 ### Budget Math
 
-| Tier | Count | Avg Description | Total Budget |
-|------|-------|-----------------|--------------|
-| Core Skills | 26 | ~100 chars | ~2,600 |
-| Gateway Skills | 8 | ~100 chars | ~800 |
-| Library Skills | ~126 | N/A | **0** |
-| **Total** | **~160** | | **~3,400** |
+| Tier           | Count    | Avg Description | Total Budget |
+| -------------- | -------- | --------------- | ------------ |
+| Core Skills    | 26       | ~100 chars      | ~2,600       |
+| Gateway Skills | 8        | ~100 chars      | ~800         |
+| Library Skills | ~126     | N/A             | **0**        |
+| **Total**      | **~160** |                 | **~3,400**   |
 
 With optimized descriptions, we use ~23% of the 15K budget, leaving room for growth.
 
@@ -368,6 +414,7 @@ Our architecture follows Anthropic's context engineering best practices:
 ### Minimal High-Signal Tokens
 
 Gateways contain just:
+
 - A description for discovery (~100 tokens)
 - A routing table of paths (~200 tokens)
 
@@ -382,15 +429,26 @@ This is more efficient than loading 15+ full skill descriptions.
 ### Semantic Navigation via Metadata
 
 The nested path structure provides semantic information:
+
 ```
 .claude/skill-library/development/frontend/state/using-tanstack-query/
 ```
 
 Claude can infer the skill relates to frontend state management without reading its contents.
 
+### Role-Based Context Loading
+
+Gateways act as intelligent context filters. By defining "Mandatory Skills by Role," we ensure agents only load what is strictly necessary for their function.
+
+- **Frontend Developer Agent** → Invokes `gateway-frontend` → Loads `optimizing-react-performance`
+- **Frontend Architect Agent** → Invokes `gateway-frontend` → Loads `frontend-architecture-patterns`
+
+This prevents context pollution where an Architect agent is distracted by low-level implementation details, or a Junior Developer agent misses critical performance standards.
+
 ### Sub-Agent Isolation
 
 Domain-specific agents with auto-loaded gateway skills:
+
 - Start with clean context
 - Load only relevant skills
 - Do focused work
@@ -402,40 +460,41 @@ Domain-specific agents with auto-loaded gateway skills:
 
 ```
 .claude/skills/
-├── adhering-to-dry/              # DRY principle enforcement
-├── adhering-to-yagni/            # Scope discipline
-├── brainstorming/                # Collaborative design
-├── calibrating-time-estimates/   # Time estimation
-├── creating-mcp-wrappers/        # MCP wrapper creation
-├── debugging-strategies/         # Debugging techniques
-├── debugging-systematically/     # 4-phase debugging
-├── developing-with-subagents/    # Subagent orchestration
-├── developing-with-tdd/          # TDD enforcement
-├── dispatching-parallel-agents/  # Parallel execution
-├── engineering-prompts/          # Prompt optimization
-├── executing-plans/              # Plan execution
-├── gateway-backend/              # Backend routing
-├── gateway-capabilities/         # Capabilities routing
-├── gateway-claude/               # Claude infra routing
-├── gateway-frontend/             # Frontend routing
-├── gateway-integrations/         # Integration routing
-├── gateway-mcp-tools/            # MCP tools routing
-├── gateway-security/             # Security routing
-├── gateway-testing/              # Testing routing
-├── managing-agents/              # Agent lifecycle router
-├── managing-commands/            # Command lifecycle router
-├── managing-mcp-wrappers/        # MCP lifecycle router
-├── managing-skills/              # Skill lifecycle router
-├── orchestrating-feature-development/  # Feature orchestration
-├── orchestrating-multi-agent-workflows/  # Workflow coordination
-├── persisting-progress-across-sessions/  # Cross-session state
-├── testing-skills-with-subagents/  # Skill pressure testing
-├── threat-modeling-orchestrator/   # Security modeling
-├── tracing-root-causes/          # Root cause analysis
-├── using-skills/                 # Skill navigator
-├── using-todowrite/              # TodoWrite guidance
-├── verifying-before-completion/  # Verification checklist
-└── writing-plans/                # Implementation planning
+├── adhering-to-dry/                        # DRY principle enforcement
+├── adhering-to-yagni/                      # Scope discipline
+├── brainstorming/                          # Collaborative design
+├── calibrating-time-estimates/             # Time estimation
+├── creating-mcp-wrappers/                  # MCP wrapper creation
+├── debugging-strategies/                   # Debugging techniques
+├── debugging-systematically/               # 4-phase debugging
+├── developing-with-subagents/              # Subagent orchestration
+├── developing-with-tdd/                    # TDD enforcement
+├── dispatching-parallel-agents/            # Parallel execution
+├── enforcing-evidence-based-analysis/      # Evidence-based reasoning
+├── engineering-prompts/                    # Prompt optimization
+├── executing-plans/                        # Plan execution
+├── gateway-backend/                        # Backend routing
+├── gateway-capabilities/                   # Capabilities routing
+├── gateway-claude/                         # Claude infra routing
+├── gateway-frontend/                       # Frontend routing
+├── gateway-integrations/                   # Integration routing
+├── gateway-mcp-tools/                      # MCP tools routing
+├── gateway-security/                       # Security routing
+├── gateway-testing/                        # Testing routing
+├── managing-agents/                        # Agent lifecycle router
+├── managing-commands/                      # Command lifecycle router
+├── managing-mcp-wrappers/                  # MCP lifecycle router
+├── managing-skills/                        # Skill lifecycle router
+├── orchestrating-feature-development/      # Feature orchestration
+├── orchestrating-multi-agent-workflows/    # Workflow coordination
+├── persisting-progress-across-sessions/    # Cross-session state
+├── testing-skills-with-subagents/          # Skill pressure testing
+├── threat-modeling-orchestrator/           # Security modeling
+├── tracing-root-causes/                    # Root cause analysis
+├── using-skills/                           # Skill navigator
+├── using-todowrite/                        # TodoWrite guidance
+├── verifying-before-completion/            # Verification checklist
+└── writing-plans/                          # Implementation planning
 ```
 
 ### Library Skills (`.claude/skill-library/`)
@@ -443,32 +502,36 @@ Domain-specific agents with auto-loaded gateway skills:
 ```
 .claude/skill-library/
 ├── claude/
-│   ├── agent-management/         # 8 agent lifecycle skills
-│   ├── skill-management/         # 12 skill lifecycle skills
-│   ├── mcp-tools/                # 8 MCP wrapper skills
-│   ├── plugins/                  # Plugin management skills
-│   ├── hooks/                    # Git hook skills
-│   └── marketplaces/             # Distribution skills
+│   ├── agent-management/                    # 8 agent lifecycle skills
+│   ├── skill-management/                    # 12 skill lifecycle skills
+│   ├── mcp-tools/                           # 8 MCP wrapper skills
+│   ├── skills/                              # 1 meta skill
+│   ├── plugins/                             # 3 plugin management skills
+│   ├── hooks/                               # 1 git hook skill
+│   ├── marketplaces/                        # 1 distribution skill
+│   └── writing-linear-epics-stories/        # 1 project management skill
 ├── development/
-│   ├── frontend/                 # 16 React/TypeScript skills
-│   ├── backend/                  # 3 Go/AWS skills
-│   ├── capabilities/             # 4 VQL/scanner skills
-│   ├── integrations/             # 7 third-party API skills
-│   ├── typescript/               # 4 TypeScript skills
-│   └── shell/                    # 2 Bash/YAML skills
+│   ├── frontend/                            # 16 React/TypeScript skills
+│   ├── backend/                             # 3 Go/AWS skills
+│   ├── capabilities/                        # 4 VQL/scanner skills
+│   ├── integrations/                        # 7 third-party API skills
+│   ├── typescript/                          # 4 TypeScript skills
+│   ├── shell/                               # 2 Bash/YAML skills
+│   ├── analyzing-cyclomatic-complexity/     # 1 code quality skill
+│   ├── error-handling-patterns/             # 1 error handling skill
+│   └── querying-neo4j-with-cypher/          # 1 database skill
 ├── testing/
-│   ├── frontend/                 # 11 React testing skills
-│   ├── backend/                  # 4 Go testing skills
-│   └── (root)                    # 8 general testing skills
-├── security/                     # 11 security skills
-├── infrastructure/               # 3 cloud skills
+│   ├── frontend/                            # 11 React testing skills
+│   ├── backend/                             # 4 Go testing skills
+│   └── (root)                               # 10 general testing skills
+├── security/                                # 11 security skills
+├── infrastructure/                          # 3 cloud/infra skills
 ├── architecture/
-│   ├── frontend/                 # 3 frontend arch skills
-│   └── backend/                  # 1 backend arch skill
-├── documents/                    # 4 document processing skills
-├── workflow/                     # 7 git/review skills
-├── quality/                      # 1 UI/UX skill
-└── ai/                           # 1 LLM evaluation skill
+│   └── frontend/                            # 3 frontend architecture skills
+├── documents/                               # 4 document processing skills
+├── workflow/                                # 7 git/review skills
+├── quality/                                 # 1 UI/UX skill
+└── ai/                                      # 1 LLM evaluation skill
 ```
 
 ## FAQ
@@ -480,6 +543,7 @@ Multiple plugins could still hit the 70-skill limit collectively. Plugin changes
 ### Why gateways instead of just search?
 
 Gateways provide:
+
 - **Discoverability**: Claude sees `gateway-frontend` in tools
 - **Curated paths**: No guessing—gateway lists what's available
 - **Context-aware selection**: Claude chooses gateway based on task
