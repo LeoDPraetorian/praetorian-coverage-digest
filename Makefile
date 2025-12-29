@@ -110,50 +110,90 @@ submodule-init: ## Initialize all submodules
 
 
 .PHONY: submodule-init-robust
-submodule-init-robust: ## Initialize submodules with retry logic, progress tracking, and error handling
+submodule-init-robust: ## Initialize submodules with retry logic, progress tracking, and graceful permission handling
 	@echo "🚀 Initializing submodules with robust error handling and progress tracking..."
 	@echo "📊 Repository sizes: chariot(2GB), chariot-aegis-capabilities(813MB)"
 	@echo "Note: Using sequential downloads for large repositories (2GB+ total)"
+	@echo "ℹ️  Submodules without access will be skipped automatically"
 	@echo ""
-	@for i in 1 2 3; do \
-		echo "🔄 Attempt $$i: Initializing submodules..."; \
-		SUBMODULES=$$(git config --file .gitmodules --get-regexp path | awk '{ print $$2 }' | sort); \
-		TOTAL=$$(echo "$$SUBMODULES" | wc -l | tr -d ' '); \
-		COUNT=0; \
-		SUCCESS=true; \
-		for submodule in $$SUBMODULES; do \
-			COUNT=$$((COUNT + 1)); \
-			REPO_NAME=$$(basename $$submodule); \
-			echo "📦 [$$COUNT/$$TOTAL] Initializing $$REPO_NAME..."; \
-			if git submodule update --init --recursive --progress "$$submodule"; then \
-				echo "✅ [$$COUNT/$$TOTAL] $$REPO_NAME completed"; \
-			else \
-				echo "❌ [$$COUNT/$$TOTAL] $$REPO_NAME failed"; \
-				SUCCESS=false; \
-				break; \
-			fi; \
-			echo ""; \
-		done; \
-		if [ "$$SUCCESS" = "true" ]; then \
-			echo "🎉 All $$TOTAL submodules initialized successfully!"; \
-			break; \
+	@SUBMODULES=$$(git config --file .gitmodules --get-regexp path | awk '{ print $$2 }' | sort); \
+	TOTAL=$$(echo "$$SUBMODULES" | wc -l | tr -d ' '); \
+	COUNT=0; \
+	SUCCEEDED=""; \
+	SKIPPED=""; \
+	for submodule in $$SUBMODULES; do \
+		COUNT=$$((COUNT + 1)); \
+		REPO_NAME=$$(basename $$submodule); \
+		echo "📦 [$$COUNT/$$TOTAL] Initializing $$REPO_NAME..."; \
+		ERROR_OUTPUT=$$(git submodule update --init --recursive --progress "$$submodule" 2>&1); \
+		EXIT_CODE=$$?; \
+		if [ $$EXIT_CODE -eq 0 ]; then \
+			echo "✅ [$$COUNT/$$TOTAL] $$REPO_NAME completed"; \
+			SUCCEEDED="$$SUCCEEDED $$REPO_NAME"; \
 		else \
-			echo "❌ Attempt $$i failed, waiting 10 seconds before retry..."; \
-			sleep 10; \
-			if [ $$i -eq 3 ]; then \
-				echo "💥 All attempts failed. Manual intervention required."; \
-				echo "Try running: make submodule-fix"; \
-				exit 1; \
+			if echo "$$ERROR_OUTPUT" | grep -qE "(Permission denied|authentication failed|Repository not found|could not read Username|403|401)"; then \
+				echo "⚠️  [$$COUNT/$$TOTAL] $$REPO_NAME skipped (no access)"; \
+				SKIPPED="$$SKIPPED $$REPO_NAME"; \
+			else \
+				echo "❌ [$$COUNT/$$TOTAL] $$REPO_NAME failed with error:"; \
+				echo "$$ERROR_OUTPUT" | tail -3; \
+				echo "⏸️  Retrying $$REPO_NAME in 5 seconds..."; \
+				sleep 5; \
+				if git submodule update --init --recursive --progress "$$submodule" 2>&1; then \
+					echo "✅ [$$COUNT/$$TOTAL] $$REPO_NAME completed on retry"; \
+					SUCCEEDED="$$SUCCEEDED $$REPO_NAME"; \
+				else \
+					echo "⚠️  [$$COUNT/$$TOTAL] $$REPO_NAME skipped after retry failure"; \
+					SKIPPED="$$SKIPPED $$REPO_NAME"; \
+				fi; \
 			fi; \
 		fi; \
-	done
+		echo ""; \
+	done; \
+	echo ""; \
+	echo "📊 Initialization Summary:"; \
+	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
+	SUCCEEDED_COUNT=$$(echo "$$SUCCEEDED" | wc -w | tr -d ' '); \
+	SKIPPED_COUNT=$$(echo "$$SKIPPED" | wc -w | tr -d ' '); \
+	echo "✅ Succeeded: $$SUCCEEDED_COUNT submodules"; \
+	if [ $$SUCCEEDED_COUNT -gt 0 ]; then \
+		echo "$$SUCCEEDED" | tr ' ' '\n' | grep -v '^$$' | sed 's/^/   • /'; \
+	fi; \
+	if [ $$SKIPPED_COUNT -gt 0 ]; then \
+		echo ""; \
+		echo "⚠️  Skipped: $$SKIPPED_COUNT submodules (no access)"; \
+		echo "$$SKIPPED" | tr ' ' '\n' | grep -v '^$$' | sed 's/^/   • /'; \
+		echo ""; \
+		echo "💡 This is expected if you don't have access to all repositories."; \
+		echo "   You can still work with the accessible submodules."; \
+	fi; \
+	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
+	if [ $$SUCCEEDED_COUNT -gt 0 ]; then \
+		echo "🎉 Setup can continue with $$SUCCEEDED_COUNT accessible submodules!"; \
+	else \
+		echo "❌ No submodules were accessible. Check your GitHub authentication."; \
+		exit 1; \
+	fi
 
 .PHONY: submodule-pull
-submodule-pull: ## Pull latest changes from all submodules (including nested)
+submodule-pull: ## Pull latest changes from all submodules (skips inaccessible repos)
 	@echo "Pulling latest changes from all submodules (including nested)..."
-	@git submodule foreach --recursive 'git fetch && git checkout main && git pull origin main' || true
+	@echo "ℹ️  Submodules without access will be skipped automatically"
+	@echo ""
+	@git submodule foreach --recursive ' \
+		REPO=$$(basename "$$path"); \
+		echo "🔄 Updating $$REPO..."; \
+		if git fetch 2>&1 | grep -qE "(Permission denied|authentication failed|403|401)"; then \
+			echo "⚠️  $$REPO skipped (no access)"; \
+		elif git fetch && git checkout main && git pull origin main; then \
+			echo "✅ $$REPO updated"; \
+		else \
+			echo "⚠️  $$REPO skipped (error)"; \
+		fi; \
+		echo ""; \
+	' || true
 	@echo "✅ Submodule pull completed"
-	@echo "⚠️  Note: Warnings about nested submodules with missing URLs are expected and safe to ignore"
+	@echo "⚠️  Note: Skipped repositories are expected if you don't have full access"
 
 .PHONY: submodule-status
 submodule-status: ## Show status of all submodules (including nested)
@@ -165,18 +205,19 @@ submodule-update: submodule-init-robust submodule-pull submodule-status ## Compl
 	@echo "Submodule update completed"
 
 .PHONY: submodule-fix
-submodule-fix: ## Fix corrupted or failed submodules
+submodule-fix: ## Fix corrupted or failed submodules (skips inaccessible repos)
 	@echo "🔧 Attempting to fix submodule issues..."
-	@echo "🧹 Cleaning submodule directories..."
-	git submodule foreach --recursive 'git clean -xfd'
+	@echo "🧹 Cleaning submodule directories (ignoring errors)..."
+	@git submodule foreach --recursive 'git clean -xfd' || true
 	@echo "🔄 Resetting submodule state (ignoring failures)..."
-	git submodule foreach --recursive 'git reset --hard HEAD || true'
+	@git submodule foreach --recursive 'git reset --hard HEAD' || true
 	@echo "📤 Deinitializing all submodules..."
-	git submodule deinit --all --force
-	@echo "📥 Re-initializing submodules with force (sequential for large repos)..."
+	@git submodule deinit --all --force || true
+	@echo "📥 Re-initializing accessible submodules..."
 	@echo "Note: This may take 10-15 minutes for 2GB+ of repositories"
-	git submodule update --init --recursive --force --progress --jobs 1
-	@echo "✅ Submodule fix completed"
+	@echo "ℹ️  Submodules without access will be skipped automatically"
+	@echo ""
+	@$(MAKE) submodule-init-robust
 
 .PHONY: help
 help: ## Show this help message

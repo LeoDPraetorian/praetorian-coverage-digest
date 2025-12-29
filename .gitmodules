@@ -67,3 +67,6 @@
 [submodule "modules/msp-definitions"]
 	path = modules/msp-definitions
 	url = https://github.com/praetorian-inc/msp-definitions
+[submodule "modules/fingerprintx"]
+	path = modules/fingerprintx
+	url = https://github.com/praetorian-inc/fingerprintx

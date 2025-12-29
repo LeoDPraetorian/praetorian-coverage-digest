@@ -72,12 +72,13 @@ This gateway provides access to skills for building offensive security capabilit
 
 ## Quick Reference
 
-| Task                      | Skill Path                                                                                 |
-| ------------------------- | ------------------------------------------------------------------------------------------ |
-| VQL artifact development  | `.claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md`     |
-| Nuclei template creation  | `.claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md`    |
-| Scanner integration       | `.claude/skill-library/development/capabilities/capabilities-scanner-integration/SKILL.md` |
-| Janus chain orchestration | `.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md`        |
+| Task                       | Skill Path                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------ |
+| VQL artifact development   | `.claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md`     |
+| Nuclei template creation   | `.claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md`    |
+| Scanner integration        | `.claude/skill-library/development/capabilities/capabilities-scanner-integration/SKILL.md` |
+| Janus chain orchestration  | `.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md`        |
+| Fingerprintx plugin dev    | `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md`     |
 
 ## When to Use
 
@@ -90,6 +91,7 @@ Use this gateway when:
 - Testing security capabilities end-to-end
 - Writing custom detection logic for attack surface management
 - Automating security assessment workflows
+- Creating fingerprintx service fingerprinting plugins
 
 ## How to Use
 
@@ -103,6 +105,7 @@ Match your task to the appropriate capability skill:
 - **Nuclei Templates** → Load `capabilities-nuclei-templates`
 - **Scanner Integration** → Load `capabilities-scanner-integration`
 - **Janus Chains** → Load `capabilities-janus-chains`
+- **Fingerprintx Plugins** → Load `writing-fingerprintx-modules`
 
 ### Step 2: Load the Specific Skill
 
@@ -175,6 +178,20 @@ Covers:
 - Parallel and sequential execution patterns
 - Error recovery and retry logic
 - Resource cleanup and lifecycle management
+
+### Fingerprintx Plugin Development
+
+**Path**: `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md`
+
+Covers:
+
+- Plugin interface implementation (5 methods)
+- Type system integration (types.go, plugin_list.go)
+- Two-phase detection strategy (detect then enrich)
+- Wire protocol parsing (binary and text)
+- CPE generation for vulnerability tracking
+- Network I/O patterns with pluginutils
+- Priority and PortPriority configuration
 
 ## Chariot Capability Architecture
 

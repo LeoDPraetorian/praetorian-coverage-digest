@@ -5,6 +5,7 @@ use (
 	./modules/chariot-aegis-capabilities/aegis-registry
 	./modules/chariot/acceptance
 	./modules/chariot/backend
+	./modules/fingerprintx
 	./modules/janus
 	./modules/janus-framework
 	./modules/nebula
