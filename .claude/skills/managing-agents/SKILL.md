@@ -38,31 +38,40 @@ Discovery?
 
 ---
 
-## <EXTREMELY_IMPORTANT>
+## Common Anti-Patterns
 
-### Common Anti-Patterns
+❌ **WRONG**: Create agent without TDD
+✅ **RIGHT**: Read creating-agents → Follow RED-GREEN-REFACTOR
 
-```
-❌ WRONG: Create agent without TDD
-✅ RIGHT: Read creating-agents → Follow RED-GREEN-REFACTOR
+❌ **WRONG**: Create agent with Tier 1/2/3 structure
+✅ **RIGHT**: Use Step 1/2/3 structure per gold standard
 
-❌ WRONG: Edit agent without audit first
-✅ RIGHT: Read auditing-agents → Fix issues → Re-audit
+❌ **WRONG**: Use Read() for all skills
+✅ **RIGHT**: Skill tool for core, Read for library (two-tier)
 
-❌ WRONG: Skip backup before fixes
-✅ RIGHT: Read fixing-agents → Creates backup automatically
+❌ **WRONG**: Output with skills_read array
+✅ **RIGHT**: Output with skills_invoked + library_skills_read
 
-❌ WRONG: Agent >300 lines "because it's complex"
-✅ RIGHT: Read updating-agents → Extract to references
+❌ **WRONG**: 3 brief Anti-Bypass points
+✅ **RIGHT**: 5-6 detailed points with explanations
 
-❌ WRONG: Use block scalars in description
-✅ RIGHT: Single-line with \n escapes
+❌ **WRONG**: Target <150 lines for all agents
+✅ **RIGHT**: 150-280 lines depending on agent type
 
-❌ WRONG: Agent has skills but no Skill tool
-✅ RIGHT: Read agent-compliance-contract.md → Section 12
-```
+❌ **WRONG**: Edit agent without audit first
+✅ **RIGHT**: Read auditing-agents → Fix issues → Re-audit
 
-</EXTREMELY_IMPORTANT>
+❌ **WRONG**: Skip backup before fixes
+✅ **RIGHT**: Read fixing-agents → Creates backup automatically
+
+❌ **WRONG**: Agent >300 lines "because it's complex"
+✅ **RIGHT**: Type-specific targets (Architecture: 150-200, Development: 150-180, Testing: 200-280)
+
+❌ **WRONG**: Use block scalars in description
+✅ **RIGHT**: Single-line with \n escapes
+
+❌ **WRONG**: Agent has skills but no Skill tool
+✅ **RIGHT**: Read agent-compliance-contract.md → Section 12
 
 ---
 
@@ -87,7 +96,7 @@ Discovery?
 
 **Audit failing**: Run Phase 0 CLI first, then manual phases. See auditing-agents.
 
-**Agent >300 lines**: Extract to references. See updating-agents for extraction workflow.
+**Agent exceeds type-specific target**: Extract to references. See updating-agents for extraction workflow. Targets: Architecture 150-200, Development 150-180, Testing 200-280.
 
 **TDD skipped**: Creating/updating agents enforce TDD. Cannot bypass.
 

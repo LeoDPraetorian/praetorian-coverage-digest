@@ -1,0 +1,35 @@
+# Changelog - workflow-manual-checks.md
+
+## 2025-12-29
+
+### Changed
+- **CRITICAL FIX**: Phase 9 completely rewritten to validate ACTUAL gold standard patterns
+- Changed Phase 9 purpose from "Tiered Skill Loading Protocol" to "Step 1/2/3 Skill Loading Protocol"
+- Added Phase 9 Step 2: Check for two-tier skill system documentation (Skill tool + Read tool)
+- Updated Phase 9 Step 3: Check for Step 1/2/3 structure (NOT Tier 1/2/3)
+- Updated Phase 9 Step 5: Check for skills_invoked + library_skills_read (two arrays)
+- Added Phase 9 Step 6: Check for Core Responsibilities section with 2-4 subsections
+- Updated Phase 9 results to include errors for all incorrect patterns
+
+### Why
+Phase 9 was checking for WRONG patterns:
+- Checked for "Tier 1/2/3" - WRONG (gold standard uses Step 1/2/3)
+- Checked for single "skills_read" array - WRONG (gold standard uses two arrays)
+- Did not check for two-tier skill system documentation - MISSING
+- Did not check for Core Responsibilities section - MISSING
+
+This would cause correctly-structured agents (matching gold standard) to fail audit, while incorrectly-structured agents would pass.
+
+### Impact
+- Phase 9 now validates the actual gold standard agent pattern
+- Agents matching frontend-lead, frontend-tester, security-lead will pass
+- Agents using old Tier 1/2/3 pattern will correctly fail
+- Core Responsibilities section is now validated
+- Two-tier skill system documentation is now validated
+
+### Line Count
+- Before: 1465 lines
+- After: 1487 lines (+22 lines of correct validation)
+
+### Verification
+All checks in Phase 9 are now aligned with actual gold standard agents in `.claude/agents/`.

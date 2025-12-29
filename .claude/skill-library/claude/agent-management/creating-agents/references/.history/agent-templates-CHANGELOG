@@ -1,0 +1,35 @@
+# Changelog - agent-templates.md
+
+## 2025-12-29
+
+### Changed
+- **CRITICAL FIX**: Rewritten to match actual gold standard agents
+- Changed Skill Loading Protocol from "Tier 1/2/3" to "Step 1/2/3"
+- Added Core Responsibilities section template (2-4 subsections)
+- Fixed two-tier skill system documentation (Skill tool for core, Read for library)
+- Updated output format to use skills_invoked + library_skills_read (two arrays)
+- Expanded Anti-Bypass from 3 brief points to 5-6 detailed points with explanations
+- Updated line count targets to realistic ranges by agent type (150-280 lines)
+- Added 4 gold standard agent references (frontend-lead, frontend-tester, security-lead, frontend-developer)
+- Enhanced type-specific customizations with detailed guidance per agent type
+- Added comprehensive examples for Architecture, Development, Testing, and Quality agents
+
+### Why
+The template had DRIFTED from actual gold standard agents and contained WRONG information:
+- Instructed "Use Read() for ALL skills" (WRONG - two-tier system)
+- Showed single "skills_read" array (WRONG - should be skills_invoked + library_skills_read)
+- Referenced unrealistic line count target (<150 lines)
+- Missing Core Responsibilities section
+- Insufficient Anti-Bypass guidance
+
+This caused all new agents created from the template to not match the gold standard pattern.
+
+### Impact
+- New agents created using this template will now match gold standard structure
+- Agents will properly document the two-tier skill loading system
+- Output formats will use correct JSON structure
+- Line count expectations align with reality
+
+### Line Count
+- Before: 180 lines
+- After: 306 lines (+126 lines of corrected guidance)

@@ -1,3 +1,31 @@
+## [2025-12-29] - Update Fix Patterns to Match Current Gold Standards
+
+### Changed
+- **Skill Loading Protocol terminology** - Changed from "Tier 1/2/3" to "Step 1/2/3" in SKILL.md and fix-procedures.md
+- **Two-tier intro added** - Documented core vs library skill access in fix-procedures.md Skill Loading Protocol section
+- **Anti-Bypass expanded** - Updated from 3 brief points to 5-6 detailed points with explanations in claude-automated-fixes.md Phase 9
+- **Output format updated** - Changed from `skills_read` to `skills_invoked` + `library_skills_read` in fix-procedures.md and claude-automated-fixes.md
+
+### Added
+- **Core Responsibilities fix pattern** - New section in fix-procedures.md and claude-automated-fixes.md Phase 8
+- **Phase 8 template** - Structure with 2-4 subsections and examples by agent type (development, architecture, testing, quality)
+- **Output Format section** - Complete fix pattern showing old vs new format in fix-procedures.md
+- **Edit patterns table entry** - Added Core Responsibilities and Output Format rows to SKILL.md table
+
+### Reason
+- **Gold standard drift** - Fix patterns referenced outdated terminology not matching current agent templates
+- **Missing fix patterns** - No documented procedure for adding Core Responsibilities or updating output formats
+- **Two-tier system incomplete** - Skill Loading Protocol fix didn't document core vs library skill distinction
+- **Anti-Bypass insufficient** - 3 brief points not detailed enough to prevent agent bypass attempts
+
+### Impact
+- **Fixes now match gold standards** - All fix patterns aligned with current frontend-developer.md and other reference agents
+- **Complete coverage** - All structural sections (Core Responsibilities, Skill Loading Protocol, Output Format) now have fix patterns
+- **Two-tier clarity** - Agents created/fixed will properly document core vs library skill access methods
+- **Better anti-bypass** - More detailed explanations reduce agent rationalization attempts
+
+---
+
 ## [2025-12-27] - PHASE 3 FIX: Add "Missing Skill Tool" procedure to fix-procedures.md
 
 ### Added

@@ -6,7 +6,7 @@ Detailed procedures for the 5 instruction-based manual checks that Claude perfor
 
 ## Phase 9: Skill Loading Protocol
 
-**Purpose**: Verify agent has Tiered Skill Loading Protocol.
+**Purpose**: Verify agent has Step 1/2/3 Skill Loading Protocol with two-tier skill system.
 
 **Verification Steps**:
 
@@ -16,39 +16,61 @@ Detailed procedures for the 5 instruction-based manual checks that Claude perfor
    grep '## Skill Loading Protocol' .claude/agents/{type}/{name}.md
    ```
 
-2. Verify 3 tiers present:
+2. Verify two-tier skill system documented:
 
    ```bash
-   grep -E '### Tier [123]' .claude/agents/{type}/{name}.md
+   # Must document both Skill tool (core) and Read tool (library)
+   grep 'Skill tool' .claude/agents/{type}/{name}.md
+   grep 'Read tool' .claude/agents/{type}/{name}.md
    ```
 
-3. Verify Anti-Bypass section:
+3. Verify Step 1/2/3 structure present:
+
+   ```bash
+   grep -E '### Step [123]' .claude/agents/{type}/{name}.md
+   ```
+
+   Expected output shows all three steps:
+   - `### Step 1: Always Invoke First`
+   - `### Step 2: Invoke Core Skills Based on Task Context`
+   - `### Step 3: Load Library Skills from Gateway`
+
+4. Verify Anti-Bypass section:
 
    ```bash
    grep '## Anti-Bypass' .claude/agents/{type}/{name}.md
    ```
 
-4. Verify output includes skills_read:
+5. Verify output format has BOTH skill arrays:
 
    ```bash
-   grep 'skills_read' .claude/agents/{type}/{name}.md
+   grep 'skills_invoked' .claude/agents/{type}/{name}.md
+   grep 'library_skills_read' .claude/agents/{type}/{name}.md
    ```
 
-5. Verify Tier 2 TodoWrite requirement (MANDATORY for ALL agents):
+6. Verify Core Responsibilities section exists:
 
    ```bash
-   # Check Tier 2 section mentions TodoWrite/using-todowrite
-   grep -A 5 '### Tier 2' .claude/agents/{type}/{name}.md | grep -iE 'todowrite|using-todowrite'
-
-   # Check language says "≥2 steps" not "≥3 steps"
-   grep -A 5 '### Tier 2' .claude/agents/{type}/{name}.md | grep '≥2 steps'
+   grep '## Core Responsibilities' .claude/agents/{type}/{name}.md
    ```
+
+   Then verify it has 2-4 subsections (### headers):
+
+   ```bash
+   # Count subsections under Core Responsibilities
+   sed -n '/## Core Responsibilities/,/## [^#]/p' .claude/agents/{type}/{name}.md | grep -c '^### '
+   ```
+
+   Should return 2-4.
 
 **Results**:
 
-- ✅ PASS: Tiered Skill Loading Protocol present and complete, Tier 2 has TodoWrite with ≥2 steps
+- ✅ PASS: Step 1/2/3 structure present, two-tier system documented, Core Responsibilities with 2-4 subsections, output has both arrays
 - ⚠️ WARNING: Missing protocol (agent has skills: but no loading protocol)
-- ❌ ERROR: Tier 2 missing TodoWrite or uses wrong threshold (≥3 steps instead of ≥2 steps)
+- ❌ ERROR: Uses Tier 1/2/3 instead of Step 1/2/3
+- ❌ ERROR: Missing two-tier skill system documentation
+- ❌ ERROR: Output has single skills_read array instead of skills_invoked + library_skills_read
+- ❌ ERROR: Missing Core Responsibilities section
 - N/A: Agent has no skills: field
 
 ---
@@ -797,19 +819,20 @@ a. **Check MANDATORY universal skills (ALL agents):**
 
 **Universal Skills (MANDATORY for ALL agents):**
 
-- `verifying-before-completion` - Final validation before claiming complete
 - `calibrating-time-estimates` - Prevent 10-24x time overestimates
+- `enforcing-evidence-based-analysis` - Prevents hallucinations - read source before implementing
+- `verifying-before-completion` - Final validation before claiming complete
 
-**These are NOT optional.** Every agent MUST have both skills in frontmatter or Tier 1.
+**These are NOT optional.** Every agent MUST have all three skills in frontmatter AND Step 1.
 
 **Verification:**
 
 ```bash
 # Check for MANDATORY universal skills
-for skill in verifying-before-completion calibrating-time-estimates; do
+for skill in calibrating-time-estimates enforcing-evidence-based-analysis verifying-before-completion; do
   if ! grep -q "$skill" .claude/agents/{category}/{agent-name}.md; then
     echo "⚠️ WARNING: Missing MANDATORY universal skill: $skill"
-    echo "   All agents must have this skill in frontmatter or Tier 1"
+    echo "   All agents must have this skill in frontmatter AND Step 1"
   fi
 done
 ```
@@ -820,10 +843,11 @@ b. **Report Phase 13 result:**
 Phase 13: Skill Gap Analysis (MANDATORY Universal Skills Only)
 
 MANDATORY universal skills (ALL agents):
-⚠️ WARNING: Missing verifying-before-completion (MANDATORY for all agents)
 ⚠️ WARNING: Missing calibrating-time-estimates (MANDATORY for all agents)
+⚠️ WARNING: Missing enforcing-evidence-based-analysis (MANDATORY for all agents)
+⚠️ WARNING: Missing verifying-before-completion (MANDATORY for all agents)
 
-Result: WARNING (2 mandatory skills missing)
+Result: WARNING (3 mandatory skills missing)
 ```
 
 OR
@@ -832,18 +856,19 @@ OR
 Phase 13: Skill Gap Analysis (MANDATORY Universal Skills Only)
 
 MANDATORY universal skills (ALL agents):
-✅ verifying-before-completion - present
 ✅ calibrating-time-estimates - present
+✅ enforcing-evidence-based-analysis - present
+✅ verifying-before-completion - present
 
 Result: PASS
 ```
 
 **Fix guidance:**
 
-Add `verifying-before-completion` and `calibrating-time-estimates` to:
+Add `calibrating-time-estimates`, `enforcing-evidence-based-analysis`, and `verifying-before-completion` to:
 
 1. Frontmatter `skills:` field, AND
-2. Tier 1 of Skill Loading Protocol section
+2. Step 1 of Skill Loading Protocol section
 
 **Why WARNING severity?** These skills are MANDATORY for all agents - they prevent incomplete work and time estimation errors.
 

@@ -1,0 +1,41 @@
+# Changelog - gold-standards.md
+
+## 2025-12-29
+
+### Changed
+- **CRITICAL FIX**: Completely rewritten to document ACTUAL patterns from gold standard agents
+- Changed from single gold standard (frontend-developer) to four exemplars (frontend-lead, frontend-tester, security-lead, frontend-developer)
+- Corrected Skill Loading Protocol from "Tier 1/2/3" to "Step 1/2/3"
+- Fixed two-tier skill system documentation (was "Read() for all skills", now correctly "Skill tool for core, Read for library")
+- Corrected output format from single "skills_read" array to "skills_invoked" + "library_skills_read"
+- Fixed Anti-Bypass guidance from "3 brief points" to "5-6 detailed points with explanations"
+- Updated line count targets to realistic ranges (150-280 lines by type, not universal <150)
+- Added comprehensive anti-patterns section calling out incorrect claims
+- Added concrete examples FROM actual gold standard agent files (with line numbers)
+
+### Why
+The reference file had DRIFTED and contained FACTUALLY INCORRECT information:
+- Claimed "Use Read() for ALL skills (not Skill tool)" - COMPLETELY WRONG
+- Showed single "skills_read" array - WRONG (actual is two arrays)
+- Said "Brief Anti-Bypass (3 points, no aggressive language)" - WRONG (actual is 5-6 detailed)
+- Referenced only "frontend-developer (129 lines)" as gold standard - outdated/incomplete
+- Used "Tiered Skill Loading Protocol" terminology - WRONG (actual uses "Step 1/2/3")
+
+This caused developers to create agents that don't match the actual gold standard pattern.
+
+### Impact
+- Documentation now matches reality
+- Developers will understand the two-tier skill system correctly
+- Anti-patterns section prevents repeating incorrect patterns
+- Examples are cited from actual agent files with line numbers for verification
+
+### Line Count
+- Before: 457 lines
+- After: 516 lines (+59 lines of correct documentation)
+
+### Verification
+All claims in this file are now verifiable against the actual agent files:
+- frontend-lead.md (151 lines)
+- frontend-tester.md (277 lines)
+- security-lead.md (185 lines)
+- frontend-developer.md (160 lines)

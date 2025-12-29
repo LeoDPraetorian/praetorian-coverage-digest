@@ -96,15 +96,15 @@ cd "$REPO_ROOT"
 
 **CRITICAL**: Use [agent-templates.md](references/agent-templates.md) as ONLY valid structure.
 
-**Claude 4.5+ pattern** (target: <150 lines):
+**Gold standard patterns** (type-specific line counts: 150-280 lines):
 
-- Tiered Skill Loading Protocol
-- Read() for ALL skills (not Skill tool)
-- Anti-Bypass (3 brief points)
-- skills_read array in output
-- Trigger tables (Workflow + Technology)
+- **Step 1/2/3 Skill Loading Protocol** (NOT Tier 1/2/3)
+- **Two-tier skill system**: Skill tool for core skills, Read for library skills
+- **Core Responsibilities section**: 2-4 subsections defining agent duties
+- **Anti-Bypass**: 5-6 detailed points with explanations
+- **Output format**: skills_invoked + library_skills_read arrays (two separate)
 
-**Gold standard**: frontend-developer (129 lines)
+**Gold standards**: frontend-lead (151 lines), frontend-tester (277 lines), security-lead (185 lines), frontend-developer (160 lines)
 
 **Analysis**: See [gold-standards.md](references/gold-standards.md)
 
@@ -127,13 +127,17 @@ Agent complete when:
 
 1. ✅ RED documented (failing test)
 2. ✅ Uses agent-templates.md structure
-3. ✅ <150 lines (most agents)
-4. ✅ 2-3 examples in description
-5. ✅ **Skill tool present** (if `skills:` field has values) - Section 12
-6. ✅ GREEN passed (test works)
-7. ✅ Audit passed (compliance)
-8. ✅ REFACTOR passed (pressure tests)
-9. ✅ TodoWrite complete
+3. ✅ Type-appropriate line count (Architecture: 150-200, Development: 150-180, Testing: 200-280)
+4. ✅ Core Responsibilities section with 2-4 subsections
+5. ✅ Step 1/2/3 Skill Loading Protocol (NOT Tier 1/2/3)
+6. ✅ Two-tier skill system documented (Skill tool for core, Read for library)
+7. ✅ Output format has skills_invoked + library_skills_read (two arrays)
+8. ✅ 2-3 examples in description
+9. ✅ **Skill tool present** (if `skills:` field has values) - Section 12
+10. ✅ GREEN passed (test works)
+11. ✅ Audit passed (compliance)
+12. ✅ REFACTOR passed (pressure tests)
+13. ✅ TodoWrite complete
 
 ### Frontmatter Validation (Before Phase 7 GREEN)
 

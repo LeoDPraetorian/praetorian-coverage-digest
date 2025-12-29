@@ -64,7 +64,8 @@ See [workflow-manual-checks.md](references/workflow-manual-checks.md) for Phases
 - Phase 2: Frontmatter organization
 - Phase 3: Tool validation
 - Phase 4: Gateway enforcement
-- Phase 5-18: Additional quality checks
+- Phase 9: Skill Loading Protocol (Step 1/2/3 structure, two-tier system, Core Responsibilities, output format)
+- Phase 10-18: Additional quality checks
 
 **Step 3: Consolidate Results**
 

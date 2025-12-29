@@ -1,3 +1,30 @@
+- **2025-12-29**: Update Anti-Patterns to Match Current Gold Standards
+
+### Changed
+- **Removed deprecated pattern** - Deleted `<EXTREMELY_IMPORTANT>` wrapper block (deprecated per Phase 14 checks)
+- **Added correct patterns** - 5 new anti-patterns for gold standard compliance:
+  - "Create agent with Tier 1/2/3 structure" → Use Step 1/2/3
+  - "Use Read() for all skills" → Two-tier system (Skill tool for core, Read for library)
+  - "Output with skills_read array" → Use skills_invoked + library_skills_read
+  - "3 brief Anti-Bypass points" → Use 5-6 detailed points with explanations
+  - "Target <150 lines for all agents" → Use type-specific targets (150-280)
+- **Updated existing pattern** - "Agent >300 lines" → Type-specific targets with ranges
+- **Format change** - Changed from code block to plain text with markdown formatting
+
+### Reason
+- **Deprecated wrapper** - `<EXTREMELY_IMPORTANT>` blocks are Phase 14 deprecated pattern
+- **Pattern drift** - Anti-patterns section didn't reflect current gold standards (Step vs Tier, dual arrays, etc.)
+- **Incomplete guidance** - Missing critical patterns that would cause new agents to be created incorrectly
+- **Misleading line counts** - Single 300-line threshold doesn't reflect actual gold standard targets by type
+
+### Impact
+- **Correct guidance** - Router now describes what library skills actually enforce
+- **Complete coverage** - All major gold standard patterns now have anti-pattern entries
+- **Type-aware sizing** - Line count guidance matches actual gold standard ranges (150-280 by type)
+- **No deprecated patterns** - Removed Phase 14 deprecated block, follows lean agent pattern
+
+---
+
 - **2025-12-27**: ANTI-PATTERN: Add Skill tool requirement to Common Anti-Patterns section
 
 ### Added

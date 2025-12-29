@@ -184,73 +184,111 @@ Edit {
 
 **Format tables**: Run `npx prettier --write` after edits. See [Table Formatting](../../../skills/managing-agents/references/table-formatting.md)
 
-### 3.3 Special Case: Updating Skill Loading Protocol (4.5+)
+### 3.3 Special Case: Updating Skill Loading Protocol
 
 **If updating the Skill Loading Protocol section**, ensure:
 
-#### 3.3.1 Tiered Structure Present
+#### 3.3.1 Two-Tier Skill System Documented
 
-The agent MUST have a Skill Loading Protocol section with three tiers:
+The agent MUST document the two-tier skill loading system:
 
 ```markdown
 ## Skill Loading Protocol
 
-Use Read() for ALL skills. Do NOT use Skill tool. Do NOT rely on training data.
+- **Core skills** (in `.claude/skills/`): Invoke via Skill tool → `skill: "skill-name"`
+- **Library skills** (in `.claude/skill-library/`): Load via Read tool → `Read("path/from/gateway")`
 
-### Tier 1: Always Read (Every Task)
-
-[Core skills loaded before any work]
-
-### Tier 2: Multi-Step Tasks
-
-[TodoWrite skill if ≥2 steps]
-
-### Tier 3: Triggered by Task Type
-
-[Trigger tables mapping tasks to skill paths]
-
-## Anti-Bypass
-
-[3 bullet points, not extensive lists]
+**Library skill paths come FROM the gateway—do NOT hardcode them.**
 ```
 
-#### 3.3.2 Use Direct Language (Not Aggressive)
+#### 3.3.2 Step 1/2/3 Structure Present
 
-| Avoid (causes overtriggering) | Use instead            |
-| ----------------------------- | ---------------------- |
-| 'MUST', 'CRITICAL', 'ALWAYS'  | 'Use', 'Call', 'Do'    |
-| 'You are REQUIRED to...'      | 'You should...'        |
-| 'This is not optional'        | (Remove - unnecessary) |
+The agent MUST have a Skill Loading Protocol section with Step 1/2/3 structure:
 
-**Why**: Claude 4.5+ instruction following is stronger. Aggressive language causes overtriggering. See Anthropic docs: "If your prompts were designed to reduce undertriggering, Claude 4.5 may now overtrigger. The fix is to dial back aggressive language."
+```markdown
+### Step 1: Always Invoke First
 
-#### 3.3.3 skills_read in Output
+**Every [agent type] task requires these (in order):**
 
-Output format MUST include skills_read array:
+| Skill | Why Always Invoke |
+|-------|-------------------|
+| `calibrating-time-estimates` | Prevents "no time to read skills" rationalization |
+| `gateway-[domain]` | Routes to mandatory + task-specific library skills |
+| ... | ... |
+
+### Step 2: Invoke Core Skills Based on Task Context
+
+Your `skills` frontmatter makes these core skills available. **Invoke based on semantic relevance to your task**:
+
+| Trigger | Skill | When to Invoke |
+|---------|-------|----------------|
+| [Task pattern 1] | `skill-name` | [When to use] |
+| Bug, error, unexpected behavior | `debugging-systematically` | Investigating issues before fixing |
+| Multi-step task (≥2 steps) | `using-todowrite` | [Domain tracking needs] |
+
+**Semantic matching guidance:**
+- [Scenario 1]? → [Skill combination]
+- [Scenario 2]? → [Skill combination]
+
+### Step 3: Load Library Skills from Gateway
+
+The gateway provides:
+1. **Mandatory library skills** - Read ALL skills in "Mandatory" section
+2. **Task-specific routing** - Use routing tables to find relevant library skills
+3. **[Domain-specific guidance]** - [What gateway provides]
+
+After invoking the gateway, use its routing tables to find and Read relevant library skills:
+
+Read(".claude/skill-library/path/from/gateway/SKILL.md")
+```
+
+#### 3.3.3 Anti-Bypass with 5-6 Detailed Points
+
+The agent MUST have detailed Anti-Bypass guidance (NOT "3 brief bullet points"):
+
+```markdown
+## Anti-Bypass
+
+Do NOT rationalize skipping skills:
+
+- "No time" → calibrating-time-estimates exists precisely because this rationalization is a trap. You are 100x faster than a human
+- "Simple task" → Step 1 + verifying-before-completion still apply
+- "I already know this" → Your training data is stale, read current skills
+- "[Domain-specific]" → [Counter specific to agent's domain]
+- "Just this once" → "Just this once" becomes "every time" - follow the workflow
+- "[Evidence-based if applicable]" → [Why evidence is needed]
+```
+
+#### 3.3.4 Output Format with Two Arrays
+
+Output format MUST include BOTH skill arrays:
 
 ```json
 {
-  "skills_read": [".claude/skills/...", ".claude/skill-library/..."]
+  "skills_invoked": ["core-skill-1", "core-skill-2", "gateway-domain"],
+  "library_skills_read": [".claude/skill-library/path/SKILL.md"]
 }
 ```
 
-This enables verification that the agent loaded skills correctly.
+NOT a single `skills_read` array.
 
-#### 3.3.4 Verification Requirement
+#### 3.3.5 Verification Requirement
 
 After updating Skill Loading Protocol:
 
 1. **Start new Claude Code session** (mandatory - caching)
-2. **Spawn agent with test task** that triggers Tier 3 skill
-3. **Check for Read() calls** in output
-4. **Check for skills_read** array in JSON output
-5. **Verify Anti-Bypass** - Test under pressure scenarios
+2. **Spawn agent with test task** that triggers Step 2/3 skills
+3. **Check for Skill tool invocations** for core skills in output
+4. **Check for Read() calls** for library skills in output
+5. **Check for skills_invoked + library_skills_read** arrays in JSON output
+6. **Verify Anti-Bypass** - Test under pressure scenarios
 
 **What to verify**:
 
-- Agent uses Read() tool, not Skill tool
-- Output includes explicit Read() calls to skill paths
-- JSON output contains skills_read array
+- Agent uses Skill tool for core skills: `skill: "skill-name"`
+- Agent uses Read tool for library skills: `Read("path")`
+- Output includes explicit invocations and Read() calls
+- JSON output contains BOTH `skills_invoked` and `library_skills_read` arrays
 - Agent resists bypass under time/authority pressure
 
 ---
@@ -333,7 +371,7 @@ Quick check: `wc -l .claude/agents/{type}/{name}.md` → Must be <300 (or <400 f
 
 **If exceeded**: Extract content to skills.
 
-### 6.3 Universal Tier 1 Skills Check
+### 6.3 Universal Step 1 Skills Check
 
 **MANDATORY for ALL agents** - verify these skills are present:
 
@@ -342,12 +380,12 @@ Quick check: `wc -l .claude/agents/{type}/{name}.md` → Must be <300 (or <400 f
 for skill in verifying-before-completion calibrating-time-estimates; do
   if ! grep -q "$skill" .claude/agents/{type}/{name}.md; then
     echo "⚠️ WARNING: Missing MANDATORY universal skill: $skill"
-    echo "   All agents must have this skill in frontmatter AND Tier 1"
+    echo "   All agents must have this skill in frontmatter AND Step 1"
   fi
 done
 ```
 
-**If either is missing**: Add to frontmatter `skills:` field AND Tier 1 of Skill Loading Protocol.
+**If either is missing**: Add to frontmatter `skills:` field AND Step 1 of Skill Loading Protocol.
 
 ### 6.3.1 Skill Tool Requirement Check
 
@@ -452,8 +490,8 @@ skills: debugging-systematically, gateway-backend, verifying-before-completion
 
 **General**:
 
-- [ ] **MANDATORY**: `verifying-before-completion` in frontmatter AND Tier 1
-- [ ] **MANDATORY**: `calibrating-time-estimates` in frontmatter AND Tier 1
+- [ ] **MANDATORY**: `verifying-before-completion` in frontmatter AND Step 1
+- [ ] **MANDATORY**: `calibrating-time-estimates` in frontmatter AND Step 1
 - [ ] Skills match body content (no trigger patterns without corresponding skill)
 - [ ] Description still valid (if changed)
 - [ ] Tools/skills still alphabetized
@@ -462,12 +500,12 @@ skills: debugging-systematically, gateway-backend, verifying-before-completion
 
 **If Skill Loading Protocol Updated**:
 
-- [ ] Tiered structure present (Tier 1/2/3)
-- [ ] Universal skills in Tier 1 (`verifying-before-completion`, `calibrating-time-estimates`)
-- [ ] Uses direct language (not MUST/CRITICAL/ALWAYS)
-- [ ] Anti-Bypass section has 3 bullet points
-- [ ] Output format includes skills_read array
-- [ ] Will test in fresh session for Read() calls in output
+- [ ] Step 1/2/3 structure present (NOT Tier 1/2/3)
+- [ ] Two-tier skill system documented (Skill tool for core, Read for library)
+- [ ] Universal skills in Step 1 (`verifying-before-completion`, `calibrating-time-estimates`)
+- [ ] Anti-Bypass section has 5-6 detailed points with explanations
+- [ ] Output format includes skills_invoked + library_skills_read arrays (two separate arrays)
+- [ ] Will test in fresh session for Skill tool + Read() calls in output
 
 ---
 

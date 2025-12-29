@@ -104,17 +104,79 @@ When implementing features:
 
 ---
 
+## Phase 8: Core Responsibilities
+
+**When:** Agent lacks "## Core Responsibilities" section defining its primary duties
+
+**Process:**
+
+1. Check if agent has "## Core Responsibilities" section
+2. If missing:
+   - Create section with 2-4 subsections based on agent type
+   - Define specific responsibilities for each area
+   - Insert before "## Skill Loading Protocol" section
+   - Use agent description and type to guide content
+
+**Template Structure:**
+
+```markdown
+## Core Responsibilities
+
+### [Primary Area 1]
+
+- [Specific responsibility 1]
+- [Specific responsibility 2]
+- [Specific responsibility 3]
+
+### [Primary Area 2]
+
+- [Specific responsibility 1]
+- [Specific responsibility 2]
+
+### [Primary Area 3]
+
+- [Specific responsibility 1]
+- [Specific responsibility 2]
+```
+
+**Examples by Agent Type:**
+
+**Development agent:**
+- Plan Execution (follow architect's plans)
+- Bug Fixes & Performance (debug, optimize)
+- Code Quality (standards, patterns, conventions)
+
+**Architecture agent:**
+- Design Review (evaluate existing architecture)
+- Architecture Design (create implementation plans)
+- Pattern Validation (ensure best practices)
+
+**Testing agent:**
+- Test Creation (unit, integration, E2E)
+- Test Maintenance (fix flaky tests, refactor)
+- Coverage Validation (ensure thresholds met)
+
+**Quality agent:**
+- Code Review (validate implementations against plans)
+- Quality Standards (check conventions, patterns)
+- Feedback Delivery (constructive improvement suggestions)
+
+**Why automated:** Template-based with clear patterns per agent type.
+
+---
+
 ## Phase 9: Skill Loading Protocol
 
-**When:** Agent has `skills:` frontmatter but no Tiered Skill Loading Protocol section
+**When:** Agent has `skills:` frontmatter but no Skill Loading Protocol section
 
 **Process:**
 
 1. Check if agent has `skills:` in frontmatter
 2. If yes but no "## Skill Loading Protocol" section found:
-   - Generate complete protocol with Tier 1/2/3 structure
-   - Add Anti-Bypass section
-   - Add skills_read output requirement
+   - Add two-tier intro (core vs library skills)
+   - Generate complete protocol with Step 1/2/3 structure
+   - Add Anti-Bypass section (5-6 detailed points)
+   - Add skills_invoked + library_skills_read output requirement
    - Insert before "## See Also" or at end of file
 
 **Template:**
@@ -122,36 +184,48 @@ When implementing features:
 ````markdown
 ## Skill Loading Protocol
 
-### Tier 1: Always Load (Session Start)
+- **Core skills** (in `.claude/skills/`): Invoke via Skill tool → `skill: "skill-name"`
+- **Library skills** (in `.claude/skill-library/`): Load via Read tool → `Read("path/from/gateway")`
 
-Core skills in frontmatter:
+**Library skill paths come FROM the gateway—do NOT hardcode them.**
 
-- `verifying-before-completion` - Final validation before claiming complete
-- `calibrating-time-estimates` - Prevent 10-24x time overestimates
-- `gateway-frontend` - Progressive loading of React/TypeScript patterns
+### Step 1: Always Invoke First
 
-### Tier 2: Conditional Loading
+**Every [agent-type] task requires these (in order):**
 
-**When task requires ≥2 steps** (uses TodoWrite or detects multi-phase workflow):
+| Skill                               | Why Always Invoke                                                  |
+| ----------------------------------- | ------------------------------------------------------------------ |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts |
+| `gateway-[domain]`                  | Routes to mandatory + task-specific library skills                 |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read source before implementing      |
+| `verifying-before-completion`       | Ensures outputs are verified before claiming done                  |
 
-Read `.claude/skills/using-todowrite/SKILL.md` for:
+### Step 2: Invoke Core Skills Based on Task Context
 
-- Mandatory TodoWrite usage for ≥2 step workflows
-- Prevents skipped steps in multi-phase work
+Your `skills` frontmatter makes these core skills available. **Invoke based on semantic relevance to your task**:
 
-### Tier 3: Triggered by Task Type
+| Trigger                         | Skill                               | When to Invoke                                       |
+| ------------------------------- | ----------------------------------- | ---------------------------------------------------- |
+| [Add task-specific triggers]    | [skill-name]                        | [Description of when to use]                         |
 
-| Trigger                           | Read Path       |
-| --------------------------------- | --------------- |
-| [Add task-specific triggers here] | [Path to skill] |
+### Step 3: Load Library Skills from Gateway
+
+**DO NOT hardcode library skill paths.** Instead, read the gateway skill to discover which library skills apply to your task:
+
+1. You already invoked `gateway-[domain]` in Step 1
+2. The gateway tells you which library skills to load
+3. Use Read tool with paths from gateway: `Read(".claude/skill-library/.../SKILL.md")`
 
 ## Anti-Bypass
 
 **Common rationalizations that indicate you're about to skip required skills:**
 
-- "This is simple, don't need TodoWrite" → WRONG, ≥2 steps always needs tracking
-- "Just a quick fix" → WRONG, verify before claiming complete
-- "This will only take a minute" → WRONG, calibrate time estimates
+- "This is simple, don't need skills" → WRONG. Skills prevent known mistakes. Read them.
+- "Just a quick fix" → WRONG. Quick fixes create long debugging sessions. Verify first.
+- "This will only take a minute" → WRONG. You're 10-24x off. Calibrate estimates.
+- "I already know this pattern" → WRONG. Skills evolve. Read the current version.
+- "Skills are overkill for this" → WRONG. Skills exist because simple things become complex.
+- "Let me just do this one thing first" → WRONG. Check for skills BEFORE doing anything.
 
 **Output Format:**
 
@@ -161,7 +235,8 @@ All agent responses must include:
 {
   "status": "success|in_progress|blocked",
   "summary": "What was accomplished",
-  "skills_read": ["skill-name-1", "skill-name-2"],
+  "skills_invoked": ["core-skill-1", "core-skill-2"],
+  "library_skills_read": [".claude/skill-library/.../SKILL.md"],
   "next_steps": ["What to do next"]
 }
 ```
@@ -170,14 +245,15 @@ All agent responses must include:
 ````
 
 **Generation logic:**
-1. Extract all skills from frontmatter `skills:` field
-2. Add to Tier 1 with brief descriptions
-3. Add Tier 2 for using-todowrite (MANDATORY for all agents)
-4. Create empty Tier 3 table (user adds task-specific triggers)
-5. Add standard Anti-Bypass rationalizations
-6. Add skills_read output format
+1. Add two-tier intro explaining core vs library skills
+2. Extract all skills from frontmatter `skills:` field
+3. Add to Step 1 with brief descriptions (mandatory/always-invoke skills)
+4. Create Step 2 table with semantic triggers (conditional core skills)
+5. Add Step 3 with gateway delegation instructions
+6. Add 5-6 detailed Anti-Bypass points with explanations
+7. Add skills_invoked + library_skills_read output format
 
-**Why automated:** Template-based generation from frontmatter skills.
+**Why automated:** Template-based generation from frontmatter skills with clear structure.
 
 ---
 

@@ -1,309 +1,36 @@
-## [Date: 2025-12-27 - POST-EDIT VALIDATION: Add Skill Tool Requirement Check to Phase 6]
+# Changelog - updating-agents
 
-### Added
-- **Phase 6.3.1** - New "Skill Tool Requirement Check" section in compliance phase
-- **Post-edit validation** - Critical checks that run after making changes, before re-audit
-- **Two scenarios covered**:
-  1. Updated `skills:` field → Check Skill tool present in `tools:` list
-  2. Updated `tools:` field → Verify Skill tool not removed when skills exist
-- **Bash procedures** - Complete validation logic for both scenarios
-- **Error messaging** - Clear output with fix guidance and compliance contract reference
-- **Prevention note** - Explains this catches issues proactively, not during audit
+## 2025-12-29
 
 ### Changed
-- **Phase 6 structure** - Added subsection 6.3.1 between Universal Skills (6.3) and Body Trigger Analysis (6.4)
-- **Validation timing** - Explicit placement "after making changes, before re-audit"
+- **CRITICAL FIX**: Section 3.3 completely rewritten to reflect ACTUAL gold standard patterns
+- Changed from "Tier 1/2/3" to "Step 1/2/3" throughout
+- Added Section 3.3.1: Two-tier skill system documentation (Skill tool for core, Read for library)
+- Rewrote Section 3.3.2: Step 1/2/3 structure with correct table formats
+- Updated Section 3.3.3: Anti-Bypass now correctly specifies 5-6 detailed points (not "3 brief")
+- Added Section 3.3.4: Output format with skills_invoked + library_skills_read (two separate arrays)
+- Updated Section 3.3.5: Verification checks for correct tool usage patterns
+- Fixed Section 6.3 title: "Universal Step 1 Skills Check" (was "Universal Tier 1 Skills Check")
+- Updated Section 6.5 manual checks to reference Step 1/2/3 and correct output format
 
-### Reason
-- **No update-time validation** - Users could update skills without Skill tool or remove Skill tool while skills exist
-- **Prevention gap** - Audit catches issues reactively, but need proactive validation during updates
-- **Two failure modes**: Adding skills without Skill tool, or removing Skill tool while skills exist
-- **Widespread issue** - 4+ existing agents have this problem, prevent worsening via updates
+### Why
+Section 3.3 contained FACTUALLY INCORRECT information that would cause agents to be updated incorrectly:
+- Specified "Tier 1/2/3" structure - WRONG (gold standard uses Step 1/2/3)
+- Said "Use Read() for ALL skills" - WRONG (two-tier: Skill tool for core, Read for library)
+- Specified single "skills_read" array - WRONG (two arrays: skills_invoked + library_skills_read)
+- Said "3 bullet points" for Anti-Bypass - WRONG (should be 5-6 detailed points)
 
-### Impact
-- **Broken agents prevented** - Cannot update agents into broken state (skills without Skill tool)
-- **Early detection** - Catches issue immediately after edit, not during audit
-- **Two-way protection** - Validates both adding skills and removing tools scenarios
-- **Compliance enforcement** - Implements agent-compliance-contract.md Section 12 in update workflow
-- **Full lifecycle complete** - With compliance + audit + fix + create + update, 100% coverage achieved
-
----
-
-## [Date: 2025-12-27 - Add Table Formatting Reminder to Phase 3.2]
-
-### Added
-- **Phase 3.2 (Apply Minimal Edit)** - Added table formatting reminder after edit application
-  - Brief one-liner: "Run `npx prettier --write` after edits"
-  - Links to table-formatting.md reference for requirements
-  - Placed after "Minimal diff" note, before Special Case section
-
-### Reason
-- Users updating agents with improperly formatted tables would fail Phase 14g validation during audit
-- Proactive reminder prevents rework cycles caused by table formatting issues
+This caused developers updating agents to use incorrect patterns that don't match actual gold standard agents.
 
 ### Impact
-- Users see clear reminder to format tables with Prettier immediately after applying edits
-- Reduces audit failures due to table formatting
-- Completes table formatting integration across all agent management skills
+- Developers will now update agents to match the correct gold standard pattern
+- Section 3.3 provides comprehensive guidance aligned with frontend-lead, frontend-tester, security-lead
+- Verification steps check for correct tool usage (Skill tool + Read tool)
+- Manual checklists validate correct structure
 
----
+### Line Count
+- Before: 531 lines
+- After: 569 lines (+38 lines of correct guidance)
 
-## [Date: 2025-12-27 - Add Mandatory Step 0: Repository Root Navigation]
-
-### Added
-- **Step 0: Navigate to Repository Root** - New mandatory step BEFORE Phase 1
-  - Added bash command to navigate to super-repo root
-  - Added link to repo-root-detection.md reference
-  - Added anti-rationalization: "Never assume built-in agent" when file not found
-  - Added checkpoint: "Cannot proceed without navigating to repo root"
-- **Quick Reference table** - Added Step 0 row (30 sec, checkpoint: "In super-repo root")
-
-### Reason
-- **Root cause failure**: Agent tried to update `frontend-architect`, couldn't find file from submodule directory, falsely concluded it was a "built-in Claude Code agent"
-- **Pattern**: Agents operating from submodule directories can't find `.claude/agents/` files
-- **Anti-rationalization**: File exists, agent is just looking in wrong place - never invent "system agent" explanations
-
-### Impact
-- All agent update operations now start by navigating to super-repo root
-- Prevents "file not found" failures caused by wrong working directory
-- Eliminates false conclusions about "built-in" or "system" agents
-- Consistent with repo-root-detection.md reference pattern
-
-### REFACTOR Testing
-- **Change Type**: Critical workflow addition (prevents systematic failures)
-- **REFACTOR Status**: Deferred - same pattern being added to all 9 agent-management skills
-- **Rationale**: Single reference file (repo-root-detection.md) already contains anti-rationalization; skill links to it
-
----
-
-## [Date: 2025-12-26 - Fix Auditing-Agents Invocation]
-
-### Changed
-- **Phase 6.1 Critical Audit** - Changed from `skill: "auditing-agents"` to `Read('.claude/skill-library/claude/agent-management/auditing-agents/SKILL.md')`
-
-### Reason
-- **Two-tier architecture**: `auditing-agents` is a library skill, not a core skill
-- **Skill tool limitation**: Skill tool only works with core skills in `.claude/skills/`, fails on library skills in `.claude/skill-library/`
-- **Runtime failure**: Previous instruction caused "Unknown skill: auditing-agents" error during agent update workflow
-- **Observed in production**: Failure occurred while updating frontend-architect agent (2025-12-26)
-
-### Impact
-- Agent update workflows now correctly load auditing-agents via Read tool
-- Compliance phase (Phase 6) executes without errors
-- Consistent with router pattern used throughout managing-agents and managing-skills
-
-### REFACTOR
-- **Test scenario**: Agent updating security-lead under time/authority/exhaustion pressure (5:45pm, code review at 6pm, tech lead says audit optional)
-- **Pressure types tested**: Time (15 min deadline), Authority (tech lead approval), Exhaustion (3 hours editing), Deferral ("audit later if needed")
-- **Options presented**:
-  - A) Skip audit (authority bypass)
-  - B) Use `skill: "auditing-agents"` (technical shortcut)
-  - C) Use Read with exact path (correct)
-- **Result**: ✅ PASSED - Agent chose Option C, correctly used Read path, rejected both shortcuts
-- **Agent reasoning**: Explicitly understood why Option B would fail (Skill tool doesn't work for library skills), why Option A violates compliance, and that Option C takes only 10 minutes
-- **Rationalizations resisted**: "Tech lead approved it", "Simpler syntax", "Audit later", "I'm exhausted"
-- **Conclusion**: Updated instruction is clear and effective under realistic pressure
-
-# Changelog
-
-All notable changes to this skill.
-
-## [Date: 2025-12-26 - Remove Redundant Two-Tier Compliance Warnings]
-
-### Changed
-- **Removed inline two-tier compliance warning** (former line 366) - Deleted `🚨 CRITICAL` paragraph explaining core vs library skill placement
-- **Removed two-tier compliance checklist item** (former line 374) - Deleted `- [ ] **MANDATORY**: Two-tier compliance...` from Manual Checks
-
-### Reason
-- **Centralization violation**: Two-tier rule is defined in `agent-compliance-contract.md` Section 10 (single source of truth)
-- **Architecture compliance**: All 8 operation skills reference the contract at line 11 via `> **Compliance**: This skill MAINTAINS the [Agent Compliance Contract](...)`
-- **DRY principle**: Inline duplications create drift risk and maintenance burden
-- **Trust the contract**: Operations should rely on centralized contract, not duplicate rules inline
-
-## [Date: 2025-12-25 - Body Trigger Analysis]
-
-### Added
-- **Section 5.5: Body Trigger Analysis** - New compliance check to ensure skills match agent body content
-  - Added trigger pattern table mapping body descriptions to required skills (11 patterns)
-  - Added bash script for automated trigger detection
-  - Added example showing how to verify trigger → skill mapping
-  - Clear guidance: if trigger found but skill missing, add to frontmatter
-
-### Changed
-- **Section 5.4 Manual Checks** - Added checklist item for body content validation
-  - New checkbox: "Skills match body content (no trigger patterns without corresponding skill)"
-
-### Reason
-- Agent bodies often describe workflows ("debug issues", "implement with TDD") without corresponding skills in frontmatter
-- Without matching skills, agents hallucinate workflows instead of following documented patterns
-- Mirrors Body Content → Skill Mapping added to creating-agents skill for consistency
-
-### Impact
-- Agent updaters now systematically check for trigger patterns in agent body during compliance phase
-- Catches skill gaps where agent describes functionality but lacks the skill to execute it
-- Ensures agents have the process skills they claim to use
-
-### REFACTOR Testing
-- **Tests Run**: Reused REFACTOR results from creating-agents skill (same feature, same trigger patterns)
-- **Rationale**: This is the update workflow equivalent of Body Content → Skill Mapping in creating-agents
-- **creating-agents Results**: Both pressure tests PASSED ✅
-  - Time pressure (production emergency + $5k/hour loss) → Agent correctly identified triggers, calculated cost/benefit
-  - Authority pressure (senior architect override) → Agent defended pattern with evidence, distinguished gateway vs process skills
-- **Rationalizations Covered**: "Just skip it", "Gateway is enough", "Extra bureaucracy", "Authority says skip"
-- **Applicability**: Same logic applies to updating agents - checking body triggers during updates uses identical patterns and resists same rationalizations
-
----
-
-## [Date: 2025-12-25 - Universal Tier 1 Skills Enforcement]
-
-### Added
-- **Section 5.3: Universal Tier 1 Skills Check** - New compliance check specifically for mandatory universal skills
-  - Added bash script to verify `verifying-before-completion` and `calibrating-time-estimates` presence
-  - Clear guidance: if missing, add to frontmatter AND Tier 1 of Skill Loading Protocol
-
-### Changed
-- **Section 5.4 (formerly 5.3) Manual Checks** - Updated with explicit universal skill requirements
-  - Added MANDATORY checkboxes for both universal skills in frontmatter AND Tier 1
-  - Added "Universal skills in Tier 1" to Skill Loading Protocol checklist
-
-### Reason
-- Universal skills (`verifying-before-completion`, `calibrating-time-estimates`) prevent fundamental errors across ALL agents
-- When updating agents, it's critical to verify these skills are present - many older agents may lack them
-- Part of coordinated three-skill update (auditing-agents, creating-agents, updating-agents)
-
-### Impact
-- Agent updaters now explicitly check for universal Tier 1 skills during compliance phase
-- Any agent missing these skills should have them added during update
-
----
-
-## [Date: 2025-12-24]
-
-### Changed
-- Section 3.3 completely replaced: "Updating Mandatory Skills Section" → "Updating Skill Loading Protocol (4.5+)"
-- Removed EXTREMELY_IMPORTANT block template and guidance (~110 lines)
-- Added tiered skill loading protocol structure (Tier 1/2/3)
-- Added direct language guidance (avoid aggressive language that causes overtriggering)
-- Added skills_read output format requirement
-- Updated verification steps to check Read() calls instead of Skill tool activation
-- Section 5.3 Manual Checks updated: "If Mandatory Skills Updated" → "If Skill Loading Protocol Updated"
-- Removed EXTREMELY_IMPORTANT block checklist items (7 items)
-- Added tiered loading checklist items (5 items): tiered structure, direct language, Anti-Bypass format, skills_read output, Read() calls verification
-
-### Reason
-- Claude 4.5+ agents use tiered skill loading protocol with Read() calls, not EXTREMELY_IMPORTANT blocks
-- EXTREMELY_IMPORTANT pattern uses aggressive language (MUST, CRITICAL, ALWAYS) that causes Claude 4.5 to overtrigger
-- Anthropic documentation states: "If your prompts were designed to reduce undertriggering, Claude 4.5 may now overtrigger. The fix is to dial back aggressive language."
-- Gold standard (frontend-developer, 129 lines) uses tiered loading successfully
-- Section 3.3 needed to reflect modern Claude 4.5+ pattern, not legacy pattern
-
-### Impact
-- Skill now guides users to update agents with Claude 4.5+ pattern
-- Reduced file size from 413 to 366 lines (47 line reduction total)
-- Section 3.3 now verifies Read() calls and skills_read output instead of Skill tool activation
-- Section 5.3 checklist now validates 4.5+ pattern compliance (tiered loading, direct language, skills_read output)
-
-### REFACTOR Testing
-- **Tests Run**: Time pressure (deploy window + customer demo), Authority pressure (tech lead override + legacy pattern)
-- **Test Results**: Both tests PASSED ✅
-- **Rationalizations Tested**:
-  1. "Deploy and verify tomorrow" → Resisted: Agent cited unacceptable risk for customer demo
-  2. "EXTREMELY_IMPORTANT worked for 6 months" → Resisted: Agent cited Claude 4.5+ overtriggering
-  3. "New pattern only 2 weeks old" → Resisted: Agent cited Anthropic guidance, not speculation
-  4. "Use both patterns" → Resisted: Agent identified contraindication (conflicting instructions)
-  5. "Time pressure" → Resisted: Agent prioritized verification over deploy window
-- **Counter-Rationalizations Added**: None needed - skill resists pressure with current content
-- **Bulletproof Status**: ✅ Confirmed - agents follow Section 3.3 requirements under maximum pressure
-
-## [Date: 2025-12-23]
-
-### Changed
-- Updated terminology from "invoke" to "activate" for Skill tool usage throughout Phase 3.3
-- Section 3.3.1: Changed "You MUST explicitly invoke" to "You MUST explicitly activate"
-- Section 3.3.2: Renamed from "Explicit Invocation Syntax" to "Explicit Activation Syntax"
-- Section 3.3.2: Updated examples from "invoke the skill" to "activate the skill"
-- Section 3.3.4: Updated verification steps to check for "skill activation" language
-
-### Added
-- Clarification note distinguishing: "activate" (Skill tool/core skills) vs "read" (Read tool/library skills) vs "execute" (Bash tool/scripts)
-
-### Reason
-- Align with Anthropic's official documentation (uses "activate", "use", "load" - never "invoke")
-- Align with obra/superpowers pattern (uses "activates", "trigger")
-- Fix conceptual confusion between three different mechanisms: Skill tool activation, Read tool file access, Bash tool script execution
-- Per architectural decision documented in docs/AGENT-SKILL-INVOCATION.md
-
-### REFACTOR
-- Change type: Terminology clarification (not behavioral rule change)
-- Pressure testing: Not required - actual activation mechanism (`skill: "skill-name"`) unchanged
-- Risk assessment: Low - no new bypass opportunities, no workflow logic changes
-- Verification: Agents still show same activation syntax, only language describing it changed
-
-- **2025-12-13 (15:45)**: Enhance EXTREMELY_IMPORTANT block verification requirements with obra/superpowers patterns.
-
-Key changes:
-1. Added "Critical Understanding" section explaining skills: frontmatter does NOT auto-invoke (discovery vs execution cost)
-2. Updated template with obra/superpowers absolute language ("MUST", "not optional", "cannot rationalize")
-3. Added all 5 anti-rationalization patterns with explicit counters
-4. Enhanced verification section (3.3.4) to check BOTH process + behavioral compliance
-5. Added evaluation matrix: PASS, FAIL (silent), FAIL (lip service), FAIL (ignored)
-6. Expanded manual checklist (5.3) with 7 specific checks for Mandatory Skills updates
-7. Added "Why fresh session?" explanation (agent metadata caching)
-8. Added "Common failure" note about behavioral vs process compliance gap
-
-Reason: User feedback revealed agents with updated Mandatory Skills sections weren't consistently showing explicit skill invocation, making verification impossible.
-
-## [Date: 2025-12-25 - Audit Invocation Consistency]
-
-### Changed
-- **Section 5.1: Critical Audit** - Changed from CLI to skill invocation
-  - BEFORE: `cd .claude/skill-library/.../auditing-agents/scripts && npm run --silent audit-critical -- {agent-name}`
-  - AFTER: `skill: "auditing-agents"`
-  - Added explanation: "Invoke auditing-agents skill with the agent name to run Phase 0 (critical validation) plus manual phases 1-18"
-  - Updated error guidance: "If fails: Fix issues, re-run audit skill"
-
-### Reason
-- **Architectural inconsistency**: fixing-agents correctly uses `skill: "auditing-agents"` but updating-agents used CLI directly
-- **Documentation mismatch**: Integration section claimed skill usage but workflow showed CLI
-- **Pattern alignment**: All three agent management skills (creating/updating/fixing) should invoke auditing consistently
-- From AGENT-SKILL-MISMATCHES.md analysis, this was identified as critical issue #1
-
-### Impact
-- updating-agents now matches fixing-agents audit invocation pattern
-- Resolves architectural confusion about when to use CLI vs skill
-- Enables full auditing-agents workflow (Phase 0 + manual phases 1-18) instead of just CLI Phase 0
-- Creates consistent pattern: "when you need to audit an agent, use the auditing-agents skill"
-
-### REFACTOR Testing
-- **Change Type**: Pattern consistency fix (no logic change)
-- **REFACTOR Status**: Skipped - this is alignment with existing working pattern from fixing-agents
-- **Rationale**: fixing-agents already pressure-tested this invocation pattern successfully
-
-## [Date: 2025-12-25 - Add Changelog Phase]
-
-### Added
-- **Phase 5: Update Changelog** - New phase between GREEN and Compliance
-  - Creates/appends to `.history/{name}-CHANGELOG` with date header
-  - Documents what changed, why (RED failure), and verification status
-  - Copied pattern from fixing-agents Step 9 (lines 255-273)
-
-### Changed
-- **Renumbered phases**: Old Phase 5 (Compliance) → Phase 6, Old Phase 6 (REFACTOR) → Phase 7
-- **Quick Reference table**: Added Phase 5 row, updated time totals (22-42 min)
-- **Success Criteria**: Added item 4 "Changelog updated", renumbered remaining items
-
-### Reason
-- **Traceability gap**: Agent updates weren't being documented in changelogs
-- **Inconsistency**: creating-agents has initial changelog (Phase 5), fixing-agents updates changelog (Step 9), but updating-agents had no changelog phase
-- From AGENT-SKILL-MISMATCHES.md analysis, this was identified as critical issue #2
-
-### Impact
-- updating-agents now has complete documentation workflow matching creating-agents and fixing-agents
-- All agent changes are now traceable through `.history/` changelogs
-- Provides audit trail for "what changed, when, and why"
-- Enables regression analysis and change tracking
-
-### REFACTOR Testing
-- **Change Type**: Workflow enhancement (adds new phase)
-- **REFACTOR Status**: Skipped - pattern copied from proven fixing-agents workflow
-- **Rationale**: fixing-agents Step 9 already validated, this is direct port to updating-agents
+### Verification
+All claims in Section 3.3 are now verifiable against actual gold standard agents in `.claude/agents/`.

@@ -1,5 +1,54 @@
 # Changelog - creating-agents
 
+## 2025-12-29 - Add enforcing-evidence-based-analysis to mandatory universal skills
+
+### Changed
+- **agent-templates.md Step 1**: Added `enforcing-evidence-based-analysis` to Step 1 table
+- **agent-templates.md**: Added explicit "MANDATORY universal skills" callout listing all 3
+- **gold-standards.md checklist**: Added checklist item for 3 mandatory universal skills
+
+### Why
+- `enforcing-evidence-based-analysis` prevents hallucinations by requiring agents to read source files before implementing
+- All gold standard agents use this skill in Step 1
+- Now 3 mandatory universal skills: `calibrating-time-estimates`, `enforcing-evidence-based-analysis`, `verifying-before-completion`
+
+### Impact
+- New agents created with this skill will have all 3 mandatory skills in Step 1
+- Gold standard checklist explicitly validates presence of 3 mandatory skills
+- Reduces hallucination issues in newly created agents
+
+---
+
+## 2025-12-29 - Update to Match Current Gold Standards
+
+### Changed
+- **Phase 3 section** - Replaced "Tiered Skill Loading Protocol" with "Step 1/2/3 Skill Loading Protocol"
+- **Two-tier system** - Changed from "Read() for ALL skills" to "Skill tool for core skills, Read for library skills"
+- **Anti-Bypass guidance** - Changed from "3 brief points" to "5-6 detailed points with explanations"
+- **Output format** - Changed from "skills_read array" to "skills_invoked + library_skills_read arrays (two separate)"
+- **Gold standards reference** - Updated from single "frontend-developer (129 lines)" to four exemplars with line counts (151-277 lines)
+- **Line count targets** - Changed from universal "<150 lines" to type-specific (Architecture: 150-200, Development: 150-180, Testing: 200-280)
+
+### Added
+- **Success Criteria #4** - Core Responsibilities section with 2-4 subsections
+- **Success Criteria #5** - Step 1/2/3 Skill Loading Protocol (NOT Tier 1/2/3)
+- **Success Criteria #6** - Two-tier skill system documented
+- **Success Criteria #7** - Output format has skills_invoked + library_skills_read (two arrays)
+
+### Reason
+- **Documentation drift** - Creating-agents SKILL.md referenced outdated patterns not matching actual gold standard agents
+- **Incorrect guidance** - Would cause new agents to be created with wrong structure (Tier vs Step, single array vs two arrays)
+- **Missing requirements** - No check for Core Responsibilities section that all gold standards have
+- **Unrealistic targets** - <150 lines impossible for testing agents (actual: 200-280 lines)
+
+### Impact
+- **New agents match gold standards** - Agents created with this skill will now have correct Step 1/2/3 structure
+- **Complete coverage** - Success criteria now check for all gold standard components (Core Responsibilities, two-tier system, dual arrays)
+- **Type-appropriate sizing** - Line count targets reflect actual gold standard sizes by agent type
+- **Accurate references** - Points to all 4 gold standard exemplars instead of outdated single example
+
+---
+
 ## 2025-12-27 - VALIDATION: Add Skill tool requirement check to Success Criteria
 
 ### Added

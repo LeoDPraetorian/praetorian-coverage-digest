@@ -134,18 +134,84 @@ Edit({
 
 **Gold Standard**: frontend-developer.md line 5
 
+### Core Responsibilities
+
+**Issue**: Agent lacks "## Core Responsibilities" section defining primary duties
+
+**Fix**: Add section with 2-4 subsections based on agent type:
+
+**Structure:**
+```markdown
+## Core Responsibilities
+
+### [Primary Area 1]
+- [Specific responsibility 1]
+- [Specific responsibility 2]
+
+### [Primary Area 2]
+- [Specific responsibility 1]
+- [Specific responsibility 2]
+```
+
+**Insert location**: Before "## Skill Loading Protocol" section
+
+**Examples by type:**
+- Development: Plan Execution, Bug Fixes & Performance, Code Quality
+- Architecture: Design Review, Architecture Design, Pattern Validation
+- Testing: Test Creation, Test Maintenance, Coverage Validation
+- Quality: Code Review, Quality Standards, Feedback Delivery
+
 ### Skill Loading Protocol
 
-**Issue**: Agent with `skills:` frontmatter lacks Tiered Skill Loading Protocol
+**Issue**: Agent with `skills:` frontmatter lacks Skill Loading Protocol
 
 **Fix**: Add section with:
 
-- Tier 1: Always Read (universal + gateway + core)
-- Tier 2: Multi-Step Tasks (TodoWrite if ≥2 steps)
-- Tier 3: Triggered by Task Type (domain-specific tables)
-- Anti-Bypass (3 bullet points)
+**Two-tier intro** (required):
+- **Core skills**: Invoke via Skill tool → `skill: "skill-name"`
+- **Library skills**: Load via Read tool → `Read("path/from/gateway")`
+
+**Three-step structure** (required):
+- Step 1: Always Invoke First (table format with universal + gateway + mandatory skills)
+- Step 2: Invoke Core Skills Based on Task Context (table format with semantic triggers)
+- Step 3: Load Library Skills from Gateway (instruction to read gateway for paths)
+
+**Anti-Bypass section** (required):
+- 5-6 detailed points with explanations (not just 3 brief bullets)
 
 **Template**: See `agent-templates.md`
+
+### Output Format
+
+**Issue**: Agent's output format references outdated `skills_read` field
+
+**Fix**: Update output format to use two-tier skill tracking:
+
+**Old format (incorrect):**
+```json
+{
+  "status": "success|in_progress|blocked",
+  "summary": "What was accomplished",
+  "skills_read": ["skill-name-1", "skill-name-2"],
+  "next_steps": ["What to do next"]
+}
+```
+
+**New format (correct):**
+```json
+{
+  "status": "success|in_progress|blocked",
+  "summary": "What was accomplished",
+  "skills_invoked": ["core-skill-1", "core-skill-2"],
+  "library_skills_read": [".claude/skill-library/.../SKILL.md"],
+  "next_steps": ["What to do next"]
+}
+```
+
+**Why the change:**
+- `skills_invoked` - Core skills accessed via Skill tool (from `.claude/skills/`)
+- `library_skills_read` - Library skills loaded via Read tool (from `.claude/skill-library/`)
+- Reflects the two-tier skill system architecture
 
 ---
 
