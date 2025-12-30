@@ -530,3 +530,19 @@ Other domain gateways you can invoke via Skill tool:
 | Integrations | `skill: "gateway-integrations"` | Third-party APIs, Jira, HackerOne, MS Defender    |
 | Capabilities | `skill: "gateway-capabilities"` | VQL, Nuclei templates, Scanner integration        |
 | Claude       | `skill: "gateway-claude"`       | Skills, Agents, Commands, MCP wrappers            |
+
+**Chariot Brand Guidelines**: `.claude/skill-library/development/frontend/chariot-brand-guidelines/SKILL.md`
+- Applies Chariot's official brand colors and typography for light and dark modes to any sort of artifact. Use it when brand colors or style guidelines, visual formatting, or company design standards apply.
+
+
+**Enforcing React 19 Conventions**: `.claude/skill-library/development/frontend/enforcing-react-19-conventions/SKILL.md`
+- Use when writing or reviewing React code for compliance with React 19 conventions - enforces required patterns (function declarations, TanStack Query, Zustand selectors), flags critical anti-patterns (useEffect setState, React.FC, forwardRef, unnecessary memoization), provides systematic BLOCK/REQUEST CHANGE/VERIFY PRESENT reviewer checklist workflow
+
+
+**Optimizing React Performance**: `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`
+- Use when optimizing React 19 applications - dealing with slow rendering, performance bottlenecks, large datasets, expensive calculations, or when implementing virtualization, code splitting, or concurrent features
+
+
+**Using Modern React Patterns**: `.claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md`
+- "Use when designing, implementing, or reviewing ANY React code, especially before using optimization patterns (useMemo, useCallback, React.memo), state management, or component patterns - agents must consult this skill because React 19 has fundamental changes: React Compiler handles automatic memoization (useMemo/useCallback often unnecessary), many manual optimization patterns are now obsolete or harmful - covers React 19 features (Actions, useOptimistic, useActionState), migration from old patterns, and understanding when manual optimization is actually needed versus when React Compiler handles it automatically"
+

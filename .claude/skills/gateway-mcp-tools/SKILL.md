@@ -173,3 +173,30 @@ For specific implementations, load the individual service skill.
 - **managing-mcp-wrappers**: Wrapper lifecycle management - update/audit/fix existing wrappers (use `/mcp-manager` command)
 - **creating-mcp-wrappers**: Create new wrappers with instruction-driven workflow (use skill above)
 - **Full architecture**: `docs/MCP-TOOLS-ARCHITECTURE.md`
+
+## MCP Tools
+
+**Mcp Tools Chariot**: `.claude/skill-library/claude/mcp-tools/mcp-tools-chariot/SKILL.md`
+- Use when accessing chariot services - provides 2 tools for query, schema. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
+
+
+**Mcp Tools Chrome Devtools**: `.claude/skill-library/claude/mcp-tools/mcp-tools-chrome-devtools/SKILL.md`
+- Use when accessing chrome-devtools services - provides 26 tools for click, close-page, drag, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
+
+**Mcp Tools Context7**: `.claude/skill-library/claude/mcp-tools/mcp-tools-context7/SKILL.md`
+- Use when accessing context7 services - provides 2 tools for get-library-docs, resolve-library-id. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
+
+**Mcp Tools Currents**: `.claude/skill-library/claude/mcp-tools/mcp-tools-currents/SKILL.md`
+- Use when accessing currents services - provides 8 tools for get-projects, get-run-details, get-runs, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
+
+**Mcp Tools Linear**: `.claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md`
+- Use when accessing linear services - provides 19 tools for create-bug, create-comment, create-issue, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
+
+**Mcp Tools Nebula**: `.claude/skill-library/claude/mcp-tools/mcp-tools-nebula/SKILL.md`
+- Use when accessing nebula services - provides 5 tools for access-key-to-account-id, apollo, public-resources, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
+
+**Mcp Tools Praetorian Cli**: `.claude/skill-library/claude/mcp-tools/mcp-tools-praetorian-cli/SKILL.md`
+- Use when accessing praetorian-cli services - provides 15 tools for aegis-list, assets-get, assets-list, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
+
+**Mcp Tools Registry**: `.claude/skill-library/claude/mcp-tools/mcp-tools-registry/SKILL.md`
+- Use when calling any external API or service (Linear, Praetorian CLI, GitHub, Playwright) - provides registry of MCP tool wrappers in .claude/tools/ with TRUE progressive loading achieving 0 tokens at session start (was 71.8k tokens). REQUIRED before implementing API calls. Tools load ONLY when imported.

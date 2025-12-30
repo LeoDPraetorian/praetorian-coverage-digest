@@ -405,3 +405,23 @@ Other domain gateways you can invoke via Skill tool:
 | Testing      | `skill: "gateway-testing"`      | API tests, E2E, Mocking, Performance              |
 | MCP Tools    | `skill: "gateway-mcp-tools"`    | Linear, Praetorian CLI, Context7, Chrome DevTools |
 | Integrations | `skill: "gateway-integrations"` | Third-party APIs, Jira, HackerOne, MS Defender    |
+
+**Business Context Discovery**: `.claude/skill-library/security/business-context-discovery/SKILL.md`
+- Use when starting threat modeling - discovers business context, data classification, threat actors, compliance requirements, and security objectives before technical codebase analysis
+
+
+**Codebase Mapping**: `.claude/skill-library/security/codebase-mapping/SKILL.md`
+- Use when mapping codebases for threat modeling - identifies architecture, components, data flows, entry points, and trust boundaries for any technology stack
+
+
+**Security Controls Mapping**: `.claude/skill-library/security/security-controls-mapping/SKILL.md`
+- Use when mapping security controls for threat modeling - identifies authentication, authorization, validation, cryptography, logging controls and gaps per STRIDE categories
+
+
+**Security Test Planning**: `.claude/skill-library/security/security-test-planning/SKILL.md`
+- Use when generating security test plans - converts threat models into prioritized code review and testing recommendations
+
+
+**Threat Modeling**: `.claude/skill-library/security/threat-modeling/SKILL.md`
+- Use when identifying security threats - combines STRIDE, PASTA, and DFD principles to generate threat models and abuse cases
+

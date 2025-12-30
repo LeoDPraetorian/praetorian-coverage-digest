@@ -457,3 +457,30 @@ Debugging issues?
 | Frontend     | `skill: "gateway-frontend"`| React-specific testing (Playwright, RTL)    |
 | Backend      | `skill: "gateway-backend"` | Go-specific testing, AWS mocking            |
 | Security     | `skill: "gateway-security"`| Security testing patterns                   |
+
+## Testing
+
+**Debugging Chrome Console**: `.claude/skill-library/testing/frontend/debugging-chrome-console/SKILL.md`
+- Autonomous browser debugging workflow. Use when fixing frontend runtime errors - launches Chrome, analyzes console logs, iteratively fixes issues until console is clean.
+
+
+**Frontend E2e Testing Patterns**: `.claude/skill-library/testing/frontend/frontend-e2e-testing-patterns/SKILL.md`
+- Master end-to-end testing with Playwright and Cypress to build reliable test suites that catch bugs, improve confidence, and enable fast deployment. Use when implementing E2E tests, debugging flaky tests, or establishing testing standards.
+
+**Frontend Interactive Form Testing**: `.claude/skill-library/testing/frontend/frontend-interactive-form-testing/SKILL.md`
+- Use when testing React forms with file uploads, button states, and multi-step workflows - provides state transition patterns, prop verification, and interactive workflow testing to catch bugs that simple callback tests miss
+
+**Frontend Testing Patterns**: `.claude/skill-library/testing/frontend/frontend-testing-patterns/SKILL.md`
+- Use when writing unit tests, integration tests, or component tests for Chariot React UI - provides comprehensive testing strategies using Vitest, React Testing Library, and Testing Library User Event following Chariot's established patterns for hooks, components, and user interactions
+
+**Frontend Visual Testing Advanced**: `.claude/skill-library/testing/frontend/frontend-visual-testing-advanced/SKILL.md`
+- Use when testing visual regressions - pixel-perfect screenshots, AI-powered diffs, responsive and cross-browser validation
+
+**React Query Cache Debugging**: `.claude/skill-library/testing/frontend/react-query-cache-debugging/SKILL.md`
+- Use when React Query cache isn't updating after mutations, data doesn't appear after creation, or refresh shows data but component doesn't update - systematic investigation of query keys, invalidation patterns, and cache state before proposing fixes
+
+**Testing Security With E2e Tests**: `.claude/skill-library/testing/frontend/testing-security-with-e2e-tests/SKILL.md`
+- Use when writing E2E security tests for React frontends - XSS, auth flows, authorization, CSRF, input validation
+
+**Vitest Prepush Testing**: `.claude/skill-library/testing/frontend/vitest-prepush-testing/SKILL.md`
+- Use when configuring pre-push hooks with Vitest to test commits being pushed. Fixes the common pitfall where 'vitest --changed' without a git reference finds zero files after commit, making hooks ineffective. Documents stdin parsing, base ref detection, and proper --changed flag usage.

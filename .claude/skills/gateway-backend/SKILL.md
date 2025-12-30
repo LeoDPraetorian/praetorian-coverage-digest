@@ -153,6 +153,24 @@ Each skill is organized by domain for easy discovery.
 
 - Validating integration workflows and multi-step processes
 
+## Go Porting
+
+**Verifying Port Equivalence**: `.claude/skill-library/development/capabilities/verifying-port-equivalence/SKILL.md`
+
+- Side-by-side testing framework for Python-to-Go ports, subprocess harness, comparison logic, macOS arm64 fixes
+
+**Mapping Python Dependencies to Go**: `.claude/skill-library/development/capabilities/mapping-python-dependencies-to-go/SKILL.md`
+
+- Systematic dependency research, web search workflow, Go equivalents for Python packages
+
+**Translating Python Idioms to Go**: `.claude/skill-library/development/capabilities/translating-python-idioms-to-go/SKILL.md`
+
+- Pattern dictionary for Python→Go translation, iter.Seq generators, interface patterns, Go 1.25+ features
+
+**Enforcing Go Capability Architecture**: `.claude/skill-library/development/capabilities/enforcing-go-capability-architecture/SKILL.md`
+
+- File organization for 100+ capabilities, tier-based structure, registry pattern, embedded resources
+
 ## Development Practices
 
 **Bash Defensive Patterns**: `.claude/skill-library/development/shell/bash-defensive-patterns/SKILL.md`
@@ -181,11 +199,11 @@ Each skill is organized by domain for easy discovery.
 
 ## Quick Reference
 
-| Need                    | Skill Path                                                                             |
-| ----------------------- | -------------------------------------------------------------------------------------- |
-| Concurrent Go code      | `.claude/skill-library/development/backend/go-errgroup-concurrency/SKILL.md`           |
-| Burp Suite integration  | `.claude/skill-library/development/backend/burp-integration/SKILL.md`                  |
-| Error handling          | `.claude/skill-library/development/error-handling-patterns/SKILL.md`                   |
+| Need                           | Skill Path                                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------------------------- |
+| Concurrent Go code             | `.claude/skill-library/development/backend/go-errgroup-concurrency/SKILL.md`                |
+| Burp Suite integration         | `.claude/skill-library/development/backend/burp-integration/SKILL.md`                       |
+| Error handling                 | `.claude/skill-library/development/error-handling-patterns/SKILL.md`                        |
 | Code complexity metrics | `.claude/skill-library/development/analyzing-cyclomatic-complexity/SKILL.md`           |
 | Graph database queries  | `.claude/skill-library/development/querying-neo4j-with-cypher/SKILL.md`                |
 | Cloud architecture      | `.claude/skill-library/infrastructure/cloud-advanced-patterns/SKILL.md`                |

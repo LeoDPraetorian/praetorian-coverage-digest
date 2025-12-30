@@ -61,6 +61,118 @@ skill: "gateway-capabilities"  # Core skills work with Skill tool
 
 Single entry point for offensive security capability development within the Chariot platform. This gateway routes to specialized skills in `.claude/skill-library/development/capabilities/` for VQL development, scanner integration, and security tool orchestration.
 
+## Mandatory Skills by Role
+
+**Load mandatory skills based on your role before starting work.**
+
+### Role Filter
+
+| Your Role              | Mandatory Sections                                        |
+| ---------------------- | --------------------------------------------------------- |
+| **Capability Dev**     | ALL ROLES + GO ARCHITECTURE                               |
+| **VQL Developer**      | ALL ROLES + VQL DEVELOPMENT                               |
+| **Template Author**    | ALL ROLES + TEMPLATE DEVELOPMENT                          |
+| **Scanner Integrator** | ALL ROLES + SCANNER INTEGRATION                           |
+| **Tool Porter**        | ALL ROLES + GO ARCHITECTURE + GO PORTING                  |
+| **Lead/Architect**     | ALL ROLES + GO ARCHITECTURE + GO PORTING                  |
+| **Reviewer**           | ALL ROLES + GO ARCHITECTURE                               |
+| **Tester**             | ALL ROLES (also invoke `gateway-testing`)                 |
+
+**Note:** All skills remain available to any role via the routing tables below. The table shows what you MUST load upfront—not what you're limited to.
+
+**For Testers:** You MUST also invoke `gateway-testing` for general testing patterns (mocking, test infrastructure, anti-patterns).
+
+---
+
+### ALL ROLES (Everyone Must Read)
+
+**1. Go Capability Architecture (BLOCKING)**
+
+`.claude/skill-library/development/capabilities/enforcing-go-capability-architecture/SKILL.md`
+
+File structure standards for Go capability/plugin systems. Complexity-based tiers (1-4), interface patterns, registry conventions. **Essential for understanding how capabilities are organized. Blocks PRs with incorrect structure.**
+
+---
+
+### GO ARCHITECTURE (Mandatory: Capability Dev, Tool Porter, Lead, Reviewer)
+
+**2. Standalone Tool Integration**
+
+`.claude/skill-library/development/capabilities/integrating-standalone-capabilities/SKILL.md`
+
+Patterns for wrapping CLI tools (subfinder, httpx, nuclei) and integrating new Go tools. **Required when adding new tools to the Chariot platform.**
+
+---
+
+### GO PORTING (Mandatory: Tool Porter, Lead/Architect)
+
+**3. Python Dependencies to Go**
+
+`.claude/skill-library/development/capabilities/mapping-python-dependencies-to-go/SKILL.md`
+
+Systematic dependency mapping through mandatory web research. Prevents false "no equivalent" claims. **Required before starting any Python→Go port.**
+
+**4. Python Idioms to Go**
+
+`.claude/skill-library/development/capabilities/translating-python-idioms-to-go/SKILL.md`
+
+Pattern dictionary for converting Python classes, decorators, generators, exceptions to idiomatic Go. **Required during active Python→Go translation work.**
+
+---
+
+### VQL DEVELOPMENT (Mandatory: VQL Developer)
+
+**5. VQL Artifact Development**
+
+`.claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md`
+
+VQL artifact structure, Aegis capability definitions, testing and deployment. **Required for all Velociraptor Query Language work.**
+
+---
+
+### TEMPLATE DEVELOPMENT (Mandatory: Template Author)
+
+**6. Nuclei Template Creation**
+
+`.claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md`
+
+Nuclei template YAML syntax, matchers, extractors, testing, metadata. **Required for vulnerability detection template work.**
+
+---
+
+### SCANNER INTEGRATION (Mandatory: Scanner Integrator)
+
+**7. Scanner Integration Patterns**
+
+`.claude/skill-library/development/capabilities/capabilities-scanner-integration/SKILL.md`
+
+Security tool integration, output parsing, error handling, result storage. **Required when integrating new security scanners.**
+
+**8. Janus Chain Orchestration**
+
+`.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md`
+
+Janus framework workflow design, chain composition, state management. **Required when building multi-tool orchestration workflows.**
+
+---
+
+### Workflow
+
+1. Identify your role from the Role Filter table above
+2. Read ALL ROLES skill (1 skill)
+3. Based on your role, also read:
+   - Capability Dev: GO ARCHITECTURE (1 skill)
+   - VQL Developer: VQL DEVELOPMENT (1 skill)
+   - Template Author: TEMPLATE DEVELOPMENT (1 skill)
+   - Scanner Integrator: SCANNER INTEGRATION (2 skills)
+   - Tool Porter: GO ARCHITECTURE + GO PORTING (3 skills)
+   - Lead/Architect: GO ARCHITECTURE + GO PORTING (3 skills)
+   - Reviewer: GO ARCHITECTURE (1 skill)
+   - Tester: invoke `gateway-testing`
+4. Then load task-specific skills from the routing tables below
+
+**Remember:** These are mandatory minimums. Any role can load any skill from the routing tables when relevant to their task.
+
 ## Overview
 
 This gateway provides access to skills for building offensive security capabilities:
@@ -72,13 +184,19 @@ This gateway provides access to skills for building offensive security capabilit
 
 ## Quick Reference
 
-| Task                       | Skill Path                                                                                 |
-| -------------------------- | ------------------------------------------------------------------------------------------ |
-| VQL artifact development   | `.claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md`     |
-| Nuclei template creation   | `.claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md`    |
-| Scanner integration        | `.claude/skill-library/development/capabilities/capabilities-scanner-integration/SKILL.md` |
-| Janus chain orchestration  | `.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md`        |
-| Fingerprintx plugin dev    | `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md`     |
+**⭐ = Mandatory ALL ROLES | 🏗️ = GO ARCHITECTURE | 🔧 = GO PORTING | 📜 = VQL | 📋 = TEMPLATES | 🔌 = SCANNERS**
+
+| Task                           | Skill Path                                                                                            |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| ⭐ Go capability architecture  | `.claude/skill-library/development/capabilities/enforcing-go-capability-architecture/SKILL.md`        |
+| 🏗️ Standalone tool integration | `.claude/skill-library/development/capabilities/integrating-standalone-capabilities/SKILL.md`         |
+| 🔧 Python→Go dependencies      | `.claude/skill-library/development/capabilities/mapping-python-dependencies-to-go/SKILL.md`           |
+| 🔧 Python→Go idioms            | `.claude/skill-library/development/capabilities/translating-python-idioms-to-go/SKILL.md`             |
+| 📜 VQL artifact development    | `.claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md`                |
+| 📋 Nuclei template creation    | `.claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md`               |
+| 🔌 Scanner integration         | `.claude/skill-library/development/capabilities/capabilities-scanner-integration/SKILL.md`            |
+| 🔌 Janus chain orchestration   | `.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md`                   |
+| Fingerprintx plugin dev        | `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md`                |
 
 ## When to Use
 
@@ -92,6 +210,9 @@ Use this gateway when:
 - Writing custom detection logic for attack surface management
 - Automating security assessment workflows
 - Creating fingerprintx service fingerprinting plugins
+- Porting Python security tools to Go
+- Designing Go plugin/capability architectures
+- Mapping Python dependencies to Go equivalents
 
 ## How to Use
 
@@ -106,6 +227,9 @@ Match your task to the appropriate capability skill:
 - **Scanner Integration** → Load `capabilities-scanner-integration`
 - **Janus Chains** → Load `capabilities-janus-chains`
 - **Fingerprintx Plugins** → Load `writing-fingerprintx-modules`
+- **Standalone Tool Integration** → Load `integrating-standalone-capabilities`
+- **Go Plugin Architecture** → Load `enforcing-go-capability-architecture`
+- **Python→Go Porting** → Load `mapping-python-dependencies-to-go` + `translating-python-idioms-to-go`
 
 ### Step 2: Load the Specific Skill
 
@@ -192,6 +316,52 @@ Covers:
 - CPE generation for vulnerability tracking
 - Network I/O patterns with pluginutils
 - Priority and PortPriority configuration
+
+### Integrating Standalone Capabilities
+
+**Path**: `.claude/skill-library/development/capabilities/integrating-standalone-capabilities/SKILL.md`
+
+Covers:
+
+- Wrapping existing CLI tools (subfinder, httpx, nuclei)
+- Integrating new Go tools with simple interface pattern
+- Generating capability wrappers, adapters, parsers
+- Zero Tabularium exposure for tool authors
+- Per-tool customized integration code
+- Alternative to Capability SDK approach
+
+### Go Porting / Python-to-Go Migration
+
+These skills support porting Python security tools to Go for capability development.
+
+**Go Capability Architecture**: `.claude/skill-library/development/capabilities/enforcing-go-capability-architecture/SKILL.md`
+
+Covers:
+
+- File structure standards for Go capability/plugin systems
+- Complexity-based tiers (1-4) for organizing extensible tools
+- Interface patterns and registry conventions
+- Migration strategies between architecture tiers
+
+**Python Dependencies to Go**: `.claude/skill-library/development/capabilities/mapping-python-dependencies-to-go/SKILL.md`
+
+Covers:
+
+- Systematic dependency mapping through mandatory web research
+- Prevents false "no equivalent" claims when porting
+- Go standard library alternatives
+- Third-party Go package discovery
+
+**Python Idioms to Go**: `.claude/skill-library/development/capabilities/translating-python-idioms-to-go/SKILL.md`
+
+Covers:
+
+- Pattern dictionary for converting Python to idiomatic Go
+- Classes → structs with methods
+- Decorators → middleware/wrapper functions
+- Generators → iter.Seq (Go 1.23+)
+- Exceptions → error handling with errgroup
+- Context managers → defer patterns
 
 ## Chariot Capability Architecture
 
@@ -312,6 +482,99 @@ Example searches:
 - `npm run -w @chariot/auditing-skills search -- "janus"`
 - `npm run -w @chariot/auditing-skills search -- "scanner"`
 - `npm run -w @chariot/auditing-skills search -- "capability"`
+
+## Quick Decision Guide
+
+**What are you trying to do?**
+
+```
+Building a new capability?
+├── VQL/Aegis artifact → capabilities-vql-development 📜
+├── Nuclei template → capabilities-nuclei-templates 📋
+├── Integrate existing scanner → capabilities-scanner-integration 🔌
+├── Chain multiple tools → capabilities-janus-chains 🔌
+├── Fingerprint services → writing-fingerprintx-modules
+└── Wrap CLI tool → integrating-standalone-capabilities 🏗️
+
+Porting Python tool to Go?
+├── First: Map dependencies → mapping-python-dependencies-to-go 🔧
+├── During: Translate idioms → translating-python-idioms-to-go 🔧
+└── Structure: Architecture tiers → enforcing-go-capability-architecture ⭐
+
+Designing capability architecture?
+├── File structure decisions → enforcing-go-capability-architecture ⭐
+├── Plugin system design → enforcing-go-capability-architecture ⭐
+├── Integration patterns → integrating-standalone-capabilities 🏗️
+└── Workflow orchestration → capabilities-janus-chains 🔌
+
+Testing capabilities?
+├── General test patterns → invoke gateway-testing
+├── Capability-specific → (see individual skill references)
+└── Integration tests → invoke gateway-testing
+
+Reviewing capability code?
+├── Architecture compliance → enforcing-go-capability-architecture ⭐
+├── Go idioms (if ported) → translating-python-idioms-to-go 🔧
+└── Integration patterns → integrating-standalone-capabilities 🏗️
+```
+
+## Troubleshooting
+
+### "Skill not found" or "Cannot read file"
+
+**Problem:** Read tool returns error when loading a skill path.
+
+**Solutions:**
+
+1. **Verify the path exists** - Copy the EXACT path from this gateway, don't modify it
+2. **Check for typos** - Library paths are long; ensure you copied completely
+3. **Skill may have moved** - Run `npm run search -- "<skill-name>"` from `.claude/` to find current location
+4. **Report broken link** - Use `/skill-manager audit gateway-capabilities` to detect broken paths
+
+### "Which skill should I use?"
+
+**Problem:** Multiple skills seem relevant to your task.
+
+**Solutions:**
+
+1. **Start with ALL ROLES** - Always load `enforcing-go-capability-architecture` first
+2. **Match your role** - Use the Role Filter table to identify mandatory skills
+3. **Use decision tree** - Follow the Quick Decision Guide above
+4. **Layer skills** - It's valid to load multiple skills (e.g., scanner + janus for orchestrated scanning)
+
+### "Porting Python and don't know where to start"
+
+**Problem:** Python→Go port seems overwhelming.
+
+**Solutions:**
+
+1. **Load both porting skills** - `mapping-python-dependencies-to-go` AND `translating-python-idioms-to-go`
+2. **Start with dependencies** - Map all imports/packages BEFORE writing any Go code
+3. **Follow the architecture skill** - Use `enforcing-go-capability-architecture` for structure
+4. **One module at a time** - Don't try to port everything at once
+
+### "I'm still confused about core vs library"
+
+**Quick reference:**
+
+- **Core skills** (~25): In `.claude/skills/` → Use `skill: "name"`
+- **Library skills** (~120): In `.claude/skill-library/` → Use `Read("full/path")`
+- **This gateway**: Core skill that helps you find library skills
+- **Rule**: If path contains `skill-library`, you MUST use Read tool
+
+## Related Gateways
+
+Other domain gateways you can invoke via Skill tool:
+
+| Gateway      | Invoke With                     | Use For                                           |
+| ------------ | ------------------------------- | ------------------------------------------------- |
+| Backend      | `skill: "gateway-backend"`      | Go, AWS Lambda, DynamoDB, Infrastructure          |
+| Frontend     | `skill: "gateway-frontend"`     | React, TypeScript, UI components                  |
+| Testing      | `skill: "gateway-testing"`      | API tests, E2E, Mocking, Performance              |
+| Security     | `skill: "gateway-security"`     | Auth, Secrets, Cryptography, Defense              |
+| Integrations | `skill: "gateway-integrations"` | Third-party APIs, Jira, HackerOne, MS Defender    |
+| MCP Tools    | `skill: "gateway-mcp-tools"`    | Linear, Praetorian CLI, Context7, Chrome DevTools |
+| Claude       | `skill: "gateway-claude"`       | Skills, Agents, Commands, MCP wrappers            |
 
 ## References
 
