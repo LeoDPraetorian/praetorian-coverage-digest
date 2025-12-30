@@ -1,0 +1,61 @@
+# Changelog
+
+## 2025-12-30 - Initial Creation
+
+### RED Phase
+
+**Gap Documented:**
+
+Problem: When agents complete work, they return text responses instead of writing to files. Current behavior:
+1. Agent does analysis ✅
+2. Returns text response ✅
+3. Claims `"artifacts": ["Inline architectural review"]` ❌
+4. No file created ❌
+5. No MANIFEST ❌
+
+This was observed with `frontend-lead` agent in conversation - it invoked skills correctly but didn't persist output to a file.
+
+**Test Scenario:**
+Ask `frontend-lead` to review a plan document.
+
+**Expected behavior with skill:**
+1. Agent discovers or creates `.claude/features/{timestamp}-{slug}/`
+2. Writes `frontend-lead-architecture-review.md`
+3. Updates `MANIFEST.yaml`
+4. Returns `"artifacts": [".claude/features/.../frontend-lead-architecture-review.md"]`
+
+**Actual behavior without skill:**
+- Agent returned inline text
+- Claimed artifact was "the response"
+- No file persistence
+
+### Skill Details
+
+- **Category:** Core
+- **Type:** Process/Pattern
+- **Location:** `.claude/skills/persisting-agent-outputs/`
+- **Line Count:** 333 lines
+- **Target Audience:** ALL agents that produce file outputs
+- **Gateway Integration:** Will be added to all gateways (frontend, backend, testing, security)
+
+### Key Features
+
+1. **Discovery Protocol** - 3-tier priority system for finding/creating feature directories
+2. **File Naming** - Standardized `{agent-name}-{output-type}.md` convention
+3. **MANIFEST.yaml** - Audit trail tracking all agent contributions
+4. **JSON Metadata** - Standardized output format with skills_invoked, artifacts, handoff
+5. **Slug Generation** - Rules for orchestrated vs ad-hoc workflows
+
+### Implementation
+
+- Created directory structure with references/ and examples/
+- Generated SKILL.md with progressive disclosure (333 lines)
+- Created initial changelog
+- Deferred research phase (will populate references/)
+
+### Next Steps
+
+- Phase 6: Research and populate reference files
+- Phase 7: N/A (core skill, no gateway needed)
+- Phase 8: GREEN - Verify skill works with test agent
+- Phase 9: REFACTOR - Pressure test with subagents

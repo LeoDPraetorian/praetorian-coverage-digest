@@ -1,6 +1,6 @@
 ---
 name: using-context-api
-description: Use when implementing React Context API for shared state management in React applications - includes React 19.2+ best practices with hooks, decision trees for when to use Context vs alternatives (Zustand/TanStack Query), performance optimization strategies to prevent re-renders, modern provider patterns with TypeScript, and complete implementation examples for auth, theme, and feature flags
+description: Use when implementing OR REVIEWING React Context API code - covers React 19 Provider syntax change (<Context> replaces <Context.Provider>), use() hook for conditional context consumption, when to use Context vs alternatives (Zustand/TanStack Query), performance optimization to prevent re-renders, TypeScript patterns, and implementation examples for auth, theme, and feature flags
 allowed-tools: Read, Write, Edit, Grep, Glob, TodoWrite
 ---
 
@@ -15,6 +15,8 @@ allowed-tools: Read, Write, Edit, Grep, Glob, TodoWrite
 Use this skill when:
 
 - Implementing global or shared state in React applications
+- **Reviewing code that uses React Context** (Provider syntax, `use()` hook)
+- Verifying correct React 19 Context syntax (`<Context>` vs `<Context.Provider>`)
 - Deciding between Context API vs Zustand vs TanStack Query
 - Migrating from legacy Context patterns to React 19+ patterns
 - Optimizing Context performance (preventing unnecessary re-renders)

@@ -242,7 +242,7 @@ Each skill is organized by domain for easy discovery.
 
 **Frontend TanStack Query**: `.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md`
 
-- TanStack Query v5 (React Query) for server state management - data fetching, caching, mutations, optimistic updates
+- TanStack Query v5 - **implementing, reviewing, or architecting** server state, data fetching patterns, caching strategies, mutations, query key design
 
 **Constructing Graph Queries**: `.claude/skill-library/development/frontend/constructing-graph-queries/SKILL.md`
 
@@ -250,11 +250,11 @@ Each skill is organized by domain for easy discovery.
 
 **Frontend TanStack Table**: `.claude/skill-library/development/frontend/using-tanstack-table/SKILL.md`
 
-- TanStack Table v8 (React Table) for headless table logic - column definitions, pagination, sorting, filtering, row selection, virtualization
+- TanStack Table v8 - **implementing, reviewing, or architecting** column definitions, pagination, sorting, filtering, row selection, virtualization
 
 **Frontend TanStack Router**: `.claude/skill-library/development/frontend/using-tanstack-router/SKILL.md`
 
-- TanStack Router for type-safe file-based routing - route loaders, search params validation, Query integration
+- TanStack Router - **implementing, reviewing, or architecting** type-safe routing, loaders, search params, navigation patterns, React Router migration
 
 **Integrating TanStack Components**: `.claude/skill-library/architecture/frontend/integrating-tanstack-components/SKILL.md`
 
@@ -266,11 +266,11 @@ Each skill is organized by domain for easy discovery.
 
 **Frontend Zustand State Management**: `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md`
 
-- Zustand library for client state management
+- Zustand - **implementing, reviewing, or architecting** store patterns, selectors, TypeScript types, persistence, SSR hydration
 
 **React Context API**: `.claude/skill-library/development/frontend/using-context-api/SKILL.md`
 
-- React Context API for shared state management - React 19+ patterns, when to use vs alternatives (Zustand/TanStack Query), performance optimization, modern implementation examples
+- React Context API - **React 19 Provider syntax** (`<Context>` replaces `<Context.Provider>`), `use()` hook for conditional context, when to use vs Zustand/TanStack Query, performance optimization, TypeScript patterns
 
 ## Testing
 
@@ -338,11 +338,11 @@ skill: "gateway-frontend"   # React-specific patterns (this gateway)
 
 **Frontend TanStack Router**: `.claude/skill-library/development/frontend/using-tanstack-router/SKILL.md`
 
-- TanStack Router for type-safe file-based routing - route loaders, search params validation, Query integration
+- TanStack Router - **implementing, reviewing, or architecting** type-safe routing, loaders, search params, navigation patterns, React Router migration
 
 **Frontend TanStack Table**: `.claude/skill-library/development/frontend/using-tanstack-table/SKILL.md`
 
-- TanStack Table v8 (React Table) for headless table logic - column definitions, pagination, sorting, filtering, row selection, virtualization
+- TanStack Table v8 - **implementing, reviewing, or architecting** column definitions, pagination, sorting, filtering, row selection, virtualization
 
 ## Code Quality Metrics
 
@@ -398,6 +398,7 @@ These foundational skills apply across all frontend development:
 | Server state (API calls)  | `.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md`                |
 | Client state (complex)    | `.claude/skill-library/development/frontend/using-zustand-state-management/SKILL.md`      |
 | Shared state (theme/auth) | `.claude/skill-library/development/frontend/using-context-api/SKILL.md`                   |
+| Context Provider syntax   | `.claude/skill-library/development/frontend/using-context-api/SKILL.md`                   |
 | Browser console debugging | `.claude/skill-library/testing/frontend/debugging-chrome-console/SKILL.md`                |
 | Form handling             | `.claude/skill-library/development/frontend/implementing-react-hook-form-zod/SKILL.md`    |
 | UI animations             | `.claude/skill-library/development/frontend/frontend-animation-designer/SKILL.md`         |
@@ -441,6 +442,7 @@ Managing data/state?
 ├── Routing (loaders, params) → using-tanstack-router
 ├── Router + Query + Table + Virtual together → integrating-tanstack-components
 ├── Client-only state (complex) → using-zustand-state-management
+├── Context Provider syntax (<Context> vs .Provider) → using-context-api
 └── Shared state (theme, auth, flags) → using-context-api
 
 Working with forms?

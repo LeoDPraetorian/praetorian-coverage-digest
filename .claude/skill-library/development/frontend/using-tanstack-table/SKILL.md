@@ -1,6 +1,6 @@
 ---
 name: using-tanstack-table
-description: Use when implementing TanStack Table v8 (React Table) for headless table logic - column definitions, pagination, sorting, filtering, row selection, and virtualization for large datasets in React applications
+description: Use when implementing, REVIEWING, or ARCHITECTING TanStack Table v8 (React Table) - column definitions, pagination, sorting, filtering, row selection, virtualization patterns for large datasets
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
@@ -13,6 +13,8 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 Use this skill when:
 
 - Building data tables with `useReactTable` hook
+- **Reviewing code** that uses TanStack Table (column definitions, state management, performance)
+- **Architecting table features** for complex data display requirements
 - Implementing pagination (client-side or server-side with `manualPagination`)
 - Adding sorting, filtering, or searching to tables
 - Implementing row selection, expansion, or grouping

@@ -84,7 +84,7 @@ We implemented a **thin orchestrator architecture** that keeps agent prompts lea
 
 Claude Code agents are specialized sub-processes that handle complex tasks autonomously. This document defines the architectural patterns, quality standards, and governance rules for all agents in the Chariot platform.
 
-**Gold Standard**: `frontend-developer` (135 lines) - Use as template for all new agents.
+**Gold Standard**: `frontend-lead` (~160 lines) - Use as template for all new agents.
 
 ---
 
@@ -150,19 +150,86 @@ Each agent starts with clean context, does focused work, returns condensed summa
 
 ## Language Guidelines
 
-Claude is trained for precise instruction following. Use direct, normal language.
+### Anthropic's Official Position
 
-| Avoid                                | Use Instead             |
-| ------------------------------------ | ----------------------- |
-| "CRITICAL: You MUST..."              | "Use when..."           |
-| "ALWAYS call..."                     | "Call..."               |
-| "You are REQUIRED to..."             | "You should..."         |
-| "NEVER skip..."                      | "Don't skip..."         |
-| ALL CAPS EMPHASIS                    | Normal case             |
-| Extensive anti-rationalization lists | Brief 3-5 bullet points |
-| "YOU DO NOT HAVE A CHOICE"           | Standard instructions   |
+Anthropic's [Claude 4 Best Practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices) states that Claude is trained for precise instruction following and that aggressive language causes overtriggering. The official guidance recommends using direct, normal language.
 
-**Why**: Aggressive language causes overtriggering. Claude follows instructions precisely—forceful language isn't necessary and degrades performance.
+### Our Empirical Finding: Under-Triggering is the Real Problem
+
+**Testing has proven this guidance insufficient for skill invocation in agents.**
+
+Through systematic pressure testing (see `testing-skills-with-subagents` skill), we discovered that agents using "polite" instruction patterns consistently **under-trigger**—they skip mandatory skill invocations when given realistic tasks that don't explicitly mention skills.
+
+**Evidence (2025-12-30):**
+- `frontend-lead` with aggressive `<EXTREMELY-IMPORTANT>` block: **100% skill invocation**
+- `frontend-reviewer` with polite table-based instructions: **Failed to invoke Step 1 skills** when given realistic task "Review the TanStack migration plan and provide feedback"
+
+The agent returned inline text instead of:
+1. Invoking mandatory skills
+2. Reading library skills from gateway
+3. Writing output to feature directory
+4. Updating MANIFEST.yaml
+
+**Root cause:** "Skill-aware" tests (mentioning skills in prompts) pass because they prime agents to think about skills. Realistic tasks without skill mentions reveal the under-triggering problem.
+
+### What Works: Aggressive Blocking Language
+
+For **mandatory skill invocation**, use aggressive patterns:
+
+| Pattern | Purpose |
+| ------- | ------- |
+| `<EXTREMELY-IMPORTANT>` block | Stops agent before task processing |
+| "STOP. READ THIS FIRST. DO NOT SKIP." | Forces attention before rationalization |
+| "Your VERY FIRST ACTION must be..." | Explicit sequencing requirement |
+| Literal tool call syntax | Shows exact calls, not just names |
+| "IF YOU ARE THINKING [X], YOU ARE ABOUT TO FAIL" | Pre-empts specific rationalizations |
+| "YOU MUST WRITE YOUR OUTPUT TO A FILE" | Prevents text response shortcut |
+
+### What Doesn't Work: Polite Instructions
+
+| Pattern | Why It Fails |
+| ------- | ------------ |
+| Tables listing skills without emphasis | Agent reads task, skips to "obvious" solution |
+| "You should invoke..." | Treated as suggestion, not requirement |
+| Anti-bypass section buried after process | Agent never reaches it |
+| Brief bullet points | Insufficient to override task-focus |
+
+### The Correct Pattern (from frontend-lead)
+
+```markdown
+<EXTREMELY-IMPORTANT>
+# STOP. READ THIS FIRST. DO NOT SKIP.
+
+Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinking about the task. INVOKING SKILLS.
+
+## YOUR FIRST TOOL CALLS MUST BE:
+
+```
+Skill: "enforcing-evidence-based-analysis"
+Skill: "gateway-frontend"
+Skill: "persisting-agent-outputs"
+```
+
+DO THIS NOW. BEFORE ANYTHING ELSE.
+
+## IF YOU ARE THINKING ANY OF THESE, YOU ARE ABOUT TO FAIL:
+
+- "I'll invoke skills after understanding the task" → WRONG. Skills tell you HOW to understand.
+- "This task is simple/obvious" → WRONG. That's what every failed agent thought.
+...
+</EXTREMELY-IMPORTANT>
+```
+
+### When to Use Each Style
+
+| Context | Style | Rationale |
+| ------- | ----- | --------- |
+| Mandatory skill invocation | Aggressive blocking | Prevents under-triggering |
+| Process steps after skills loaded | Normal instructions | Skills provide the discipline |
+| Output format | Normal instructions | No bypass incentive |
+| Escalation protocol | Normal instructions | No bypass incentive |
+
+**Summary:** Anthropic's guidance optimizes for overtriggering prevention. Our testing reveals under-triggering is the dominant failure mode for skill invocation. Use aggressive language where compliance is mandatory.
 
 ---
 
@@ -177,7 +244,7 @@ description: Use when [trigger]... # Single-line, <1024 chars, with examples
 type: development # Category for organization
 permissionMode: default # default|plan|acceptEdits|bypassPermissions
 tools: Read, Write, Edit, Bash # Comma-separated, minimal viable set
-skills: gateway-frontend # Gateway skills only (not library paths)
+skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, debugging-systematically, enforcing-evidence-based-analysis, gateway-frontend, persisting-agent-outputs, using-todowrite, verifying-before-completion # All relevant core skills
 model: sonnet # opus|sonnet|haiku
 color: green # Terminal display color
 ---
@@ -203,110 +270,148 @@ Include 2-4 examples showing user intent → agent selection.
 ### Prompt Template
 
 ```markdown
-# Agent Name
-
-You are [role statement - 1-2 sentences with domain expertise].
+<EXTREMELY-IMPORTANT>
+# STOP. READ THIS FIRST. DO NOT SKIP.
 
 ## Skill Loading Protocol
 
 - **Core skills** (in `.claude/skills/`): Invoke via Skill tool → `skill: "skill-name"`
 - **Library skills** (in `.claude/skill-library/`): Load via Read tool → `Read("path/from/gateway")`
 
-**Library skill paths come FROM the gateway—do not hardcode them.**
-
 ### Step 1: Always Invoke First
 
-Every task requires these (in order):
-```
+Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinking about the task. INVOKING SKILLS.
 
-skill: "calibrating-time-estimates"
-skill: "gateway-[domain]"
+## YOUR FIRST TOOL CALLS MUST BE:
 
-```
+| Skill                               | Why Always Invoke                                                             |
+| ----------------------------------- | ----------------------------------------------------------------------------- |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts            |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - you WILL fail catastrophically without this     |
+| `gateway-[domain]`                  | Routes to mandatory + task-specific library skills                            |
+| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, file naming, MANIFEST |
+| `verifying-before-completion`       | Ensures outputs are verified before claiming done                             |
 
-- **calibrating-time-estimates**: Grounds effort perception before planning
-- **gateway-[domain]**: Routes to mandatory + task-specific library skills
-
-The gateway provides:
-1. **Mandatory library skills by role** - Read ALL skills in "Mandatory Skills by Role" for your role (always include "ALL ROLES")
-2. **Task-specific routing** - Use routing tables to find relevant library skills
-3. **Quick Decision Guide** - Follow the decision tree
+DO THIS NOW. BEFORE ANYTHING ELSE.
 
 ### Step 2: Invoke Core Skills Based on Task Context
 
-Invoke based on semantic relevance to your task:
+Your `skills` frontmatter makes these core skills available. **Invoke based on semantic relevance to your task**:
 
-| Trigger | Skill | When to Invoke |
-|---------|-------|----------------|
-| Writing new code | `skill: "developing-with-tdd"` | Creating components, functions |
-| Writing/refactoring | `skill: "adhering-to-dry"` | Check existing patterns first |
-| Scope creep risk | `skill: "adhering-to-yagni"` | Tempted to add "nice to have" |
-| Bug/error/unexpected | `skill: "debugging-systematically"` | Before fixing |
-| Multi-step (≥2) | `skill: "using-todowrite"` | Complex implementations |
-| Before completion | `skill: "verifying-before-completion"` | Always |
+| Trigger                    | Skill                      | When to Invoke                                                           |
+| -------------------------- | -------------------------- | ------------------------------------------------------------------------ |
+| Code duplication concerns  | `adhering-to-dry`          | Reviewing for patterns, architecting plans, eliminating duplication      |
+| Scope creep risk           | `adhering-to-yagni`        | Adding features that were not requested, ask questions for clarification |
+| Investigating issues       | `debugging-systematically` | Root cause analysis during review                                        |
+| Multi-step task (≥2 steps) | `using-todowrite`          | Anything requiring > 1 task to perform                                   |
 
-**Semantic matching:**
-- Simple typo? → Just `verifying-before-completion`
-- New component with API? → TDD + DRY + gateway routing
-- Debugging issue? → `debugging-systematically` + gateway
+**Semantic matching guidance:**
+
+- Quick question? → `enforcing-evidence-based-analysis` + `verifying-before-completion`
+- Creating implementation plan? → `enforcing-evidence-based-analysis` + `brainstorming` + `adhering-to-dry` + `writing-plans` + `using-todowrite` + gateway task-specific library skills
+- Full system design? → `enforcing-evidence-based-analysis` + `brainstorming` + `writing-plans` + `adhering-to-dry` + gateway task-specific library skills
+- Reviewing complex code? → `enforcing-evidence-based-analysis` + `debugging-systematically` + `adhering-to-yagni` + `adhering-to-dry`
 
 ### Step 3: Load Library Skills from Gateway
 
-After invoking the gateway, use its routing tables to Read relevant library skills:
+The gateway provides:
+
+1. **Mandatory library skills** - Read ALL skills in "Mandatory" section for your role
+2. **Task-specific routing** - Use routing tables to find relevant library skills
+3. **Architecture and review patterns** - Design and quality guidance
+
+**You MUST follow the gateway's instructions.** It tells you which library skills to load.
+
+After invoking the gateway, use its routing tables to find and Read relevant library skills:
 
 ```
-
 Read(".claude/skill-library/path/from/gateway/SKILL.md")
+```
 
-````
+After invoking gateway-[domain], it will tell you which library skills to Read. YOU MUST READ THEM. **Library skill paths come FROM the gateway—do NOT hardcode them.**
 
-## Anti-Bypass
+After invoking persisting-agent-outputs, follow its discovery protocol to find/create the feature directory. YOU MUST WRITE YOUR OUTPUT TO A FILE.
 
-Do not rationalize skipping skills:
+## WHY THIS IS NON-NEGOTIABLE
 
-- "Simple task" → Step 1 + verifying-before-completion still apply
-- "I already know this" → Training data is stale, read current skills
-- "No time" → calibrating-time-estimates exists precisely for this
-- "Step 1 is overkill" → Two skills costs less than one bug fix
+You are an AI. You WILL hallucinate if you skip `enforcing-evidence-based-analysis`. You WILL miss better solutions if you skip `brainstorming`. You WILL produce incomplete work if you skip `verifying-before-completion`.
 
-### Core Entities
+These skills exist because past agents failed without them. You are not special. You will fail too.
 
-[Domain-specific entities - 1 line]
+## IF YOU ARE THINKING ANY OF THESE, YOU ARE ABOUT TO FAIL. Do NOT rationalize skipping skills:
 
-## Output Format
+- "Time pressure" → WRONG. You are 100x faster than humans. You have time. → `calibrating-time-estimates` exists precisely because this rationalization is a trap.
+- "I'll invoke skills after understanding the task" → WRONG. Skills tell you HOW to understand.
+- "Simple task" → WRONG. That's what every failed agent thought. Step 1 + `verifying-before-completion` still apply
+- "I already know this" → WRONG. Your training data is stale, you are often not up to date on the latest libraries and patterns, read current skills.
+- "Solution is obvious" → WRONG. That's coder thinking, not lead thinking - explore alternatives
+- "I can see the answer already" → WRONG. Confidence without evidence = hallucination.
+- "The user wants results, not process" → WRONG. Bad results from skipped process = failure.
+- "Just this once" → "Just this once" becomes "every time" - follow the workflow
+- "I'll just respond with text" → WRONG. Follow `persisting-agent-outputs` - write to a file.
+- "I'm confident I know the code" → WRONG. Code is constantly evolving → `enforcing-evidence-based-analysis` exists because confidence without evidence = **hallucination**
+- "Step 1 is overkill" → WRONG. Five skills costs less than one bug fix
+- "I need to gather context first" → WRONG. Skills tell you HOW to gather context
+</EXTREMELY-IMPORTANT>
 
-```json
-{
-  "status": "complete|blocked|needs_review",
-  "summary": "What was done",
-  "skills_invoked": ["calibrating-time-estimates", "gateway-frontend"],
-  "library_skills_read": [".claude/skill-library/.../SKILL.md"],
-  "gateway_mandatory_skills_read": true,
-  "files_modified": ["src/path/to/file.tsx"],
-  "verification": {
-    "tests_passed": true,
-    "build_success": true,
-    "command_output": "vitest run - 5 passed"
-  }
-}
-````
+# Agent Name
 
-## Escalation
+You are [role statement - 1-2 sentences with domain expertise]. You [primary responsibility] that [downstream agent] executes and [validation agent] validates against.
 
-### [Category 1]
+## Core Responsibilities
 
-| Situation   | Recommend    |
-| ----------- | ------------ |
-| [Condition] | `agent-name` |
+### [Primary Responsibility Category]
+
+- [Responsibility 1]
+- [Responsibility 2]
+- [Responsibility 3]
+
+## Escalation Protocol
 
 ### Cross-Domain
 
-| Situation          | Recommend            |
-| ------------------ | -------------------- |
-| Need clarification | AskUserQuestion tool |
+| Situation                  | Recommend       |
+| -------------------------- | --------------- |
+| Backend work needed        | `backend-lead`  |
+| Security assessment needed | `security-lead` |
+
+### Implementation & Testing
+
+| Situation           | Recommend              |
+| ------------------- | ---------------------- |
+| Implementation work | `[domain]-developer`   |
+| Test suite needed   | `[domain]-tester`      |
+
+### Quality & Security Review
+
+| Situation                | Recommend           |
+| ------------------------ | ------------------- |
+| Code review needed       | `[domain]-reviewer` |
+| Security vulnerabilities | `[domain]-security` |
+
+### Coordination
+
+| Situation              | Recommend               |
+| ---------------------- | ----------------------- |
+| Multi-concern feature  | `[domain]-orchestrator` |
+| You need clarification | AskUserQuestion tool    |
 
 Report: "Blocked: [issue]. Attempted: [what]. Recommend: [agent] for [capability]."
 
+## Output Format
+
+Follow `persisting-agent-outputs` skill for file output, JSON metadata format, and MANIFEST.yaml updates.
+
+**Agent-specific values:**
+
+| Field                | Value                                                |
+| -------------------- | ---------------------------------------------------- |
+| `output_type`        | `"[appropriate-type]"` (e.g., "architecture-plan")   |
+| `handoff.next_agent` | `"[downstream-agent]"` (for next phase)              |
+
+---
+
+**Remember**: Your [outputs] are the contract. The `[relevant-skill]` skill defines the structure—follow it exactly.
 ```
 
 ### Line Count Targets
@@ -671,7 +776,7 @@ What is the description for the frontend-developer agent? Quote it exactly.
 
 - **Agent Manager**: `.claude/skills/managing-agents/SKILL.md`
 - **Agent Management Skills**: `.claude/skill-library/claude/agent-management/`
-- **Gold Standard**: `.claude/agents/development/frontend-developer.md`
+- **Gold Standard**: `.claude/agents/architecture/frontend-lead.md`
 - **Skills Architecture**: `docs/SKILLS-ARCHITECTURE.md`
 
 ### Anthropic Guidance

@@ -38,6 +38,8 @@ Use this skill when:
 5. **Data fetching in useEffect** - Use TanStack Query
 6. **Unnecessary memoization** - React Compiler handles most cases
 
+> **📌 Context API Patterns:** For React 19 Context-specific conventions (`<Context>` vs `<Context.Provider>`, `use()` hook), see **`using-context-api`** skill at `.claude/skill-library/development/frontend/using-context-api/SKILL.md`
+
 ---
 
 ## Prohibited Patterns (BLOCK PR)
@@ -481,6 +483,7 @@ Copy this checklist for every React code review:
 - **`frontend-reviewer`** - General frontend review workflow
 - **`frontend-tanstack`** - TanStack Query patterns and best practices
 - **`using-zustand-state-management`** - Complete Zustand usage guide
+- **`using-context-api`** - **React 19 Context patterns** (Provider syntax, `use()` hook)
 
 ---
 

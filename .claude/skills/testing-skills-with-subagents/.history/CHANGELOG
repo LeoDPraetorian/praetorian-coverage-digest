@@ -1,0 +1,52 @@
+# Changelog - testing-skills-with-subagents
+
+## 2025-12-30 - Two-Phase Testing Protocol
+
+**Problem Discovered:** Current testing methodology fundamentally flawed - tests pass but agents fail in production.
+
+**Root Cause:** Tests are "skill-aware" - they mention skill names in prompts, priming agents to think about them. This creates self-fulfilling prophecies where tests pass but agents fail in production with realistic tasks that don't mention skills.
+
+**Evidence:** frontend-lead agent received "Review the TanStack migration plan and provide feedback" - never invoked Step 1 skills, never wrote file output, returned inline text. Would have PASSED old pressure tests because those tests mentioned the skills.
+
+**Changes:**
+
+1. **Added Two-Phase Testing Protocol:**
+   - Phase 1: Integration Tests (realistic tasks WITHOUT skill mentions)
+   - Phase 2: Pressure Tests (realistic tasks + pressure WITHOUT skill mentions)
+
+2. **Added Output Compliance Verification:**
+   - Skill invocations verification (parse tool calls for Skill:)
+   - Library skills verification (parse tool calls for Read: to skill-library/)
+   - File output verification (parse tool calls for Write:)
+   - Metadata compliance verification (JSON metadata block)
+
+3. **Added Test Scenarios by Agent Type:**
+   - frontend-lead: 'Design architecture for user settings page with dark mode'
+   - frontend-developer: 'Implement pagination for the assets table'
+   - frontend-reviewer: 'Review this PR that refactors the auth context'
+   - frontend-tester: 'Write E2E tests for the login flow'
+   - backend-developer: 'Add API endpoint for asset filtering by status'
+   - test-lead: 'Create test strategy for the new search feature'
+
+4. **Updated Pressure Test Prompts:**
+   - BEFORE (skill-aware): "You need to use debugging-systematically. But we don't have time."
+   - AFTER (realistic): "Production is down. Assets page is broken. Users complaining. Fix it NOW."
+
+5. **Added Failure Criteria:**
+   - Any Step 1 skill from agent definition not invoked
+   - No library skills read (gateway not followed)
+   - Output is text response instead of file
+   - artifacts array contains descriptions instead of file paths
+   - MANIFEST.yaml not updated
+   - JSON metadata block missing or incomplete
+
+6. **Extracted Content to References:**
+   - Created references/pressure-scenarios.md with detailed examples
+   - Reduced main SKILL.md from 526 lines to 466 lines (under 500-line limit)
+
+**Impact:** Tests now reflect realistic usage ("Will you wear your seatbelt when you get in the car?") rather than academic quizzes ("Will you wear your seatbelt if I remind you about seatbelts?").
+
+**TDD Cycle:**
+- RED: Documented that current tests pass despite production failures
+- GREEN: Added integration tests and output compliance verification
+- REFACTOR: Pending - will verify new tests catch actual failures

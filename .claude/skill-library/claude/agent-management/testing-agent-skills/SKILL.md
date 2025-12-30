@@ -318,29 +318,52 @@ Task({
 
 **See `references/evaluation-criteria.md` for detailed criteria.**
 
-#### PASS Criteria ✅ (varies by skill type)
+**CRITICAL: Verify by reading OUTPUT FILES, not agent response summary.**
+
+The agent's response summary is unreliable - agents may claim to have invoked skills without actually doing so. The authoritative record is the **output file's JSON metadata block**.
+
+#### Verification Method
+
+1. **Check if file was created** - Look for `.claude/features/{date}-{slug}/` directory
+2. **Read the output file** - Use `Read` tool on the agent's main output file
+3. **Find JSON metadata block** - Located at the end of the output file
+4. **Verify metadata fields** - Check `skills_invoked` and `library_skills_read` arrays
+
+**Example compliant metadata:**
+
+```json
+{
+  "skills_invoked": ["developing-with-tdd", "gateway-frontend", ...],
+  "library_skills_read": [".claude/skill-library/.../SKILL.md", ...],
+  "feature_directory": ".claude/features/..."
+}
+```
+
+#### PASS Criteria ✅ (verified via output file metadata)
 
 **Core skills** (in `.claude/skills/`):
 
-- Agent explicitly invoked: `skill: "{skill-name}"`
-- Agent followed methodology DESPITE pressure
+- `skills_invoked` array contains the skill name
+- Agent followed methodology DESPITE pressure (visible in output content)
 
 **Library skills** (in `.claude/skill-library/`):
 
-- Agent loaded skill via Read tool: `Read(".claude/skill-library/.../SKILL.md")`
-- OR agent stated: "I'm reading the {skill-name} skill"
+- `library_skills_read` array contains the skill path
 - Agent followed methodology from the loaded skill
 
 #### FAIL Criteria ❌
 
-- Agent didn't invoke/load skill at all
+- No output file created (agent returned inline text only)
+- Output file missing JSON metadata block
+- Skill not listed in `skills_invoked` or `library_skills_read` arrays
 - Agent invoked but violated methodology under pressure
 - Agent rationalized away skill's requirements
 
 #### PARTIAL Criteria ⚠️
 
-- Agent followed methodology implicitly (didn't explicitly invoke/load)
+- Agent followed methodology implicitly (skill not in metadata but behavior correct)
 - Agent acknowledged skill but argued for exceptions
+- Metadata present but incomplete
 
 **Update TodoWrite** with result after each skill.
 

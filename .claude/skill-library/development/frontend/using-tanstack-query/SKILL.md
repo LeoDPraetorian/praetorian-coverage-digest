@@ -1,6 +1,6 @@
 ---
 name: using-tanstack-query
-description: Use when implementing TanStack Query v5 (React Query) for server state management - data fetching, caching, mutations, and optimistic updates in React applications
+description: Use when implementing, REVIEWING, or ARCHITECTING TanStack Query v5 (React Query) - server state management, data fetching patterns, caching strategies, mutations, optimistic updates, query key design
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
@@ -13,6 +13,8 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 Use this skill when:
 
 - Implementing data fetching with `useQuery`, `useMutation`, or `useInfiniteQuery`
+- **Reviewing code** that uses TanStack Query (patterns, anti-patterns, cache strategies)
+- **Architecting data fetching strategy** for a feature or application
 - Configuring cache behavior (gcTime, staleTime, refetch strategies)
 - Designing query keys for stability and invalidation
 - Implementing optimistic updates for instant UI feedback

@@ -1,6 +1,6 @@
 ---
 name: using-zustand-state-management
-description: Use when implementing Zustand state management - store architecture decisions, TypeScript patterns, persistence, selectors, or Next.js SSR hydration
+description: Use when implementing, REVIEWING, or ARCHITECTING Zustand state management - store patterns, selector usage, TypeScript types, persistence middleware, SSR hydration, performance optimization
 allowed-tools: Read, Grep, Bash, TodoWrite
 ---
 
@@ -10,6 +10,23 @@ allowed-tools: Read, Grep, Bash, TodoWrite
 **Last Updated**: 2025-12-08
 **Latest Version**: zustand@5.0.8
 **Dependencies**: React 18+ (React 19 compatible), TypeScript 4.5+
+
+---
+
+## When to Use
+
+Use this skill when:
+
+- Implementing client-side state with Zustand stores
+- **Reviewing code** that uses Zustand (selector patterns, store structure, performance)
+- **Architecting state management** strategy (deciding between Zustand, Context, TanStack Query)
+- Designing store architecture (single vs multiple stores)
+- Ensuring proper selector usage to prevent unnecessary re-renders
+- Implementing persistence middleware for localStorage/sessionStorage
+- Setting up SSR hydration for Next.js
+- Debugging re-render issues related to state subscriptions
+
+**NOT for:** Server state (use TanStack Query), simple shared state (use Context API), or form state (use React Hook Form).
 
 ---
 

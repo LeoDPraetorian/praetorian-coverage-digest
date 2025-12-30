@@ -1,6 +1,6 @@
 ---
 name: using-tanstack-router
-description: Use when implementing TanStack Router for type-safe file-based routing in React - route loaders, search params validation, type-safe navigation, authentication guards, and TanStack Query integration
+description: Use when implementing, REVIEWING, or ARCHITECTING TanStack Router - type-safe file-based routing, route loaders, search params validation, navigation patterns, auth guards, migration from React Router
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
@@ -13,6 +13,8 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 Use this skill when:
 
 - Setting up file-based routing with type safety
+- **Reviewing code** that uses TanStack Router (route patterns, search params, loaders)
+- **Architecting routing strategy** for a feature or migration from React Router
 - Implementing route loaders for data prefetching
 - Validating search params with Zod schemas
 - Building type-safe navigation with `useNavigate` and `Link`

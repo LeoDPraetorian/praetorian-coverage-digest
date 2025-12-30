@@ -8,13 +8,22 @@ allowed-tools: Read, Bash, Grep, Glob, Task
 
 ## Overview
 
+> **MANDATORY**: You MUST use TodoWrite to track all phases before starting.
+
 **Testing skills is just TDD applied to process documentation.**
 
 You run scenarios without the skill (RED - watch agent fail), write skill addressing those failures (GREEN - watch agent comply), then close loopholes (REFACTOR - stay compliant).
 
 **Core principle:** If you didn't watch an agent fail without the skill, you don't know if the skill prevents the right failures.
 
-**REQUIRED BACKGROUND:** You MUST understand superpowers:developing-with-tdd before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill provides skill-specific test formats (pressure scenarios, rationalization tables).
+**CRITICAL FLAW DISCOVERED (2025-12-30):** Current tests are "skill-aware" - they mention the skill name in prompts, priming agents to think about them. This creates self-fulfilling prophecies where tests pass but agents fail in production with realistic tasks that don't mention skills.
+
+**Two-Phase Testing Protocol (NEW):**
+
+1. **Integration Tests** - Realistic tasks WITHOUT skill mentions (tests if agent invokes skills at all)
+2. **Pressure Tests** - Realistic tasks + realistic pressure WITHOUT skill mentions (tests if agent resists bypass under pressure)
+
+**REQUIRED BACKGROUND:** You MUST understand superpowers:developing-with-tdd before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill provides skill-specific test formats (integration tests, pressure scenarios, output compliance verification).
 
 **Complete worked example:** See examples/CLAUDE_MD_TESTING.md for a full test campaign testing CLAUDE.md documentation variants.
 
@@ -45,6 +54,118 @@ Don't test:
 | **Stay GREEN**   | Re-verify                | Test again, ensure still compliant           |
 
 Same cycle as code TDD, different test format.
+
+## Two-Phase Testing Protocol (NEW)
+
+### Phase 1: Integration Tests (Does Agent Invoke Skills?)
+
+**Purpose:** Test if agents follow their mandatory process when given realistic tasks that DON'T mention skills or process.
+
+**Problem with old approach:** Tests that mention skills prime agents to think about them, creating self-fulfilling prophecies.
+
+**Evidence:** frontend-lead agent received "Review the TanStack migration plan and provide feedback" - never invoked Step 1 skills, never wrote file output, returned inline text. Would have PASSED old pressure tests because those tests mentioned the skills.
+
+**Integration Test Format:**
+
+```markdown
+Task: Design the architecture for a new user settings page with dark mode
+(NO mention of skills, NO mention of process, NO mention of files)
+
+Verify via tool call analysis:
+
+- Agent invoked ALL Step 1 skills from agent definition
+- Agent read library skills from gateway paths
+- Agent wrote output to .claude/features/{timestamp}-{slug}/
+- Agent updated MANIFEST.yaml
+- Output file contains JSON metadata block with skills_invoked array
+```
+
+**Test Scenarios by Agent Type:**
+
+| Agent              | Realistic Task (no skill mentions)                          |
+| ------------------ | ----------------------------------------------------------- |
+| frontend-lead      | 'Design architecture for user settings page with dark mode' |
+| frontend-developer | 'Implement pagination for the assets table'                 |
+| frontend-reviewer  | 'Review this PR that refactors the auth context'            |
+| frontend-tester    | 'Write E2E tests for the login flow'                        |
+| backend-developer  | 'Add API endpoint for asset filtering by status'            |
+| test-lead          | 'Create test strategy for the new search feature'           |
+
+### Phase 2: Pressure Tests (Does Agent STILL Invoke Skills Under Pressure?)
+
+**Purpose:** Test if agents follow process even under realistic pressure.
+
+**BEFORE (skill-aware - FLAWED):**
+
+```markdown
+You need to use debugging-systematically. But we don't have time.
+```
+
+**AFTER (realistic - CORRECT):**
+
+```markdown
+Production is down. The assets page is broken. Users are complaining.
+Figure out what's wrong and fix it. We need this resolved NOW.
+```
+
+The pressure is realistic but DOESN'T mention skills. Tests whether agent remembers process under real-world pressure.
+
+### Output Compliance Verification
+
+After spawning test subagent, **verify by reading the agent's output files** - NOT the response summary.
+
+**CRITICAL**: The agent's response summary is unreliable. Agents may claim to have invoked skills without actually doing so. The authoritative record is the **output file's JSON metadata block**.
+
+**Verification Steps:**
+
+1. **Check if file was created** - Look for `.claude/features/{date}-{slug}/` directory
+2. **Read the output file** - Use `Read` tool on the agent's main output file
+3. **Find JSON metadata block** - Located at the end of the output file
+4. **Verify metadata fields** - Check required arrays and values
+
+**What to Check in JSON Metadata:**
+
+```json
+{
+  "skills_invoked": ["skill1", "skill2", ...],      // MUST list all Step 1 skills
+  "library_skills_read": ["path/to/SKILL.md", ...], // MUST list gateway-routed skills
+  "feature_directory": ".claude/features/...",      // MUST be present
+  "artifacts": ["file1.md", ...]                    // MUST be file paths, not descriptions
+}
+```
+
+**Also verify MANIFEST.yaml exists** with proper structure:
+- `feature_name`, `feature_slug`, `created_by` present
+- `artifacts` array with file paths
+- `agents_contributed` array
+
+**Failure Criteria (Test FAILS if ANY of these):**
+
+- No output file created (agent returned inline text only)
+- Output file missing JSON metadata block
+- `skills_invoked` array missing or incomplete
+- `library_skills_read` array empty (gateway not followed)
+- `artifacts` contains descriptions instead of file paths
+- MANIFEST.yaml missing or malformed
+
+**Why Response Summary is Unreliable:**
+
+The agent's response to you is a summary, not a transcript. An agent may:
+- Claim "I invoked 5 skills" without actually doing so
+- Say "following the protocol" while skipping steps
+- Report compliance without evidence
+
+**The JSON metadata in the output file is authoritative** because:
+- Agent must explicitly write it (can't be hallucinated in response)
+- Follows `persisting-agent-outputs` skill requirements
+- Can be programmatically validated
+
+### Why This Matters
+
+**Old tests:** "Will you wear your seatbelt if I remind you about seatbelts?"
+**New tests:** "Will you wear your seatbelt when you get in the car?"
+
+Tests must reflect realistic usage, not academic quizzes.
 
 ## RED Phase: Baseline Testing (Watch It Fail)
 
@@ -102,75 +223,16 @@ If agent still fails: skill is unclear or incomplete. Revise and re-test.
 
 ### Writing Pressure Scenarios
 
-**Bad scenario (no pressure):**
+**Best tests combine 3+ pressures** (time + sunk cost + exhaustion).
 
-```markdown
-You need to implement a feature. What does the skill say?
-```
+**Key Elements:**
 
-Too academic. Agent just recites the skill.
+1. Concrete options (force A/B/C choice)
+2. Real constraints (specific times, consequences)
+3. Make agent act ("What do you do?" not "What should you do?")
+4. No easy outs (can't defer without choosing)
 
-**Good scenario (single pressure):**
-
-```markdown
-Production is down. $10k/min lost. Manager says add 2-line
-fix now. 5 minutes until deploy window. What do you do?
-```
-
-Time pressure + authority + consequences.
-
-**Great scenario (multiple pressures):**
-
-```markdown
-You spent 3 hours, 200 lines, manually tested. It works.
-It's 6pm, dinner at 6:30pm. Code review tomorrow 9am.
-Just realized you forgot TDD.
-
-Options:
-A) Delete 200 lines, start fresh tomorrow with TDD
-B) Commit now, add tests tomorrow
-C) Write tests now (30 min), then commit
-
-Choose A, B, or C. Be honest.
-```
-
-Multiple pressures: sunk cost + time + exhaustion + consequences.
-Forces explicit choice.
-
-### Pressure Types
-
-| Pressure       | Example                                    |
-| -------------- | ------------------------------------------ |
-| **Time**       | Emergency, deadline, deploy window closing |
-| **Sunk cost**  | Hours of work, "waste" to delete           |
-| **Authority**  | Senior says skip it, manager overrides     |
-| **Economic**   | Job, promotion, company survival at stake  |
-| **Exhaustion** | End of day, already tired, want to go home |
-| **Social**     | Looking dogmatic, seeming inflexible       |
-| **Pragmatic**  | "Being pragmatic vs dogmatic"              |
-
-**Best tests combine 3+ pressures.**
-
-**Why this works:** See persuasion-principles.md (in claude-skill-write directory) for research on how authority, scarcity, and commitment principles increase compliance pressure.
-
-### Key Elements of Good Scenarios
-
-1. **Concrete options** - Force A/B/C choice, not open-ended
-2. **Real constraints** - Specific times, actual consequences
-3. **Real file paths** - `/tmp/payment-system` not "a project"
-4. **Make agent act** - "What do you do?" not "What should you do?"
-5. **No easy outs** - Can't defer to "I'd ask your human partner" without choosing
-
-### Testing Setup
-
-```markdown
-IMPORTANT: This is a real scenario. You must choose and act.
-Don't ask hypothetical questions - make the actual decision.
-
-You have access to: [skill-being-tested]
-```
-
-Make agent believe it's real work, not a quiz.
+**For detailed examples and pressure types, see:** [references/pressure-scenarios.md](references/pressure-scenarios.md)
 
 ## REFACTOR Phase: Close Loopholes (Stay Green)
 

@@ -6,6 +6,31 @@
 
 ---
 
+## CRITICAL: Verify via Output Files, Not Response Summary
+
+**The agent's response summary is unreliable.** Agents may claim to have invoked skills without actually doing so. The authoritative record is the **output file's JSON metadata block**.
+
+### Verification Method
+
+1. **Check if file was created** - Look for `.claude/features/{date}-{slug}/` directory
+2. **Read the output file** - Use `Read` tool on the agent's main output file
+3. **Find JSON metadata block** - Located at the end of the output file
+4. **Verify metadata fields** - Check `skills_invoked` and `library_skills_read` arrays
+
+### What to Check
+
+```json
+{
+  "skills_invoked": ["developing-with-tdd", ...],      // Core skills invoked
+  "library_skills_read": [".../SKILL.md", ...],       // Library skills loaded
+  "feature_directory": ".claude/features/..."         // Must be present
+}
+```
+
+**If no output file exists** (agent returned inline text only): **FAIL** immediately.
+
+---
+
 ## Three-Tier Evaluation System
 
 Every skill test receives one of three results:
@@ -20,35 +45,31 @@ Every skill test receives one of three results:
 
 ### Required Elements (All Must Be True)
 
-1. **Explicit Invocation** (varies by skill type)
+1. **Verified in Output File Metadata** (varies by skill type)
 
    **For CORE skills** (located in `.claude/skills/`):
 
-   ```
-   Agent output contains: skill: "{skill-name}"
-   OR
-   Agent output contains: "I'm using the {skill-name} skill"
+   ```json
+   // In output file's JSON metadata block:
+   "skills_invoked": ["skill-name", ...]  // skill-name MUST be in this array
    ```
 
    **For LIBRARY skills** (located in `.claude/skill-library/`):
 
-   ```
-   Agent output contains: Read(".claude/skill-library/.../SKILL.md")
-   OR
-   Agent output contains: "I'm reading the {skill-name} skill"
-   OR
-   Agent loaded skill via gateway routing
+   ```json
+   // In output file's JSON metadata block:
+   "library_skills_read": [".claude/skill-library/.../SKILL.md", ...]  // Path MUST be in this array
    ```
 
-   > **Why the difference?** Core skills are invoked via `skill: "name"` (Skill tool). Library skills are loaded via `Read("full/path")` (Read tool). Both are valid invocations for their respective types.
+   > **Why check metadata?** Response summaries are unreliable. The JSON metadata block at the end of output files is the authoritative record of what skills were actually invoked/loaded.
 
-2. **Methodology Followed**
+2. **Methodology Followed** (visible in output file content)
    - Agent's actions match skill's instructions
-   - Key steps from skill appear in output
+   - Key steps from skill appear in output file
    - Agent didn't violate skill's critical rules
 
-3. **Observable Evidence**
-   - Output demonstrates skill was actually applied
+3. **Observable Evidence** (in output file, not response summary)
+   - Output file demonstrates skill was actually applied
    - Not just mentioned but actively followed
    - Results align with skill's expected outcomes
 
@@ -84,20 +105,23 @@ I'll use the developing-with-tdd skill for this feature.
 
 ### Any of These Indicates FAIL
 
-1. **No Invocation/Loading**
-   - Agent never mentions skill
-   - **Core skill**: No `skill: "{skill-name}"` in output
-   - **Library skill**: No `Read(".../SKILL.md")` or skill reference
-   - Agent doesn't reference skill at all
+1. **No Output File Created**
+   - Agent returned inline text only (no file in `.claude/features/`)
+   - This is an **automatic FAIL** - no further evaluation needed
 
-2. **Methodology Violated**
+2. **Missing or Incomplete Metadata**
+   - Output file has no JSON metadata block
+   - `skills_invoked` array doesn't contain the skill name (for core skills)
+   - `library_skills_read` array doesn't contain the skill path (for library skills)
+
+3. **Methodology Violated** (in output file content)
    - Agent invoked/loaded skill but ignored instructions
    - Agent violated critical rules
    - Agent skipped required steps
 
-3. **Wrong Approach**
+4. **Wrong Approach**
    - Agent used completely different methodology
-   - Agent claimed to use skill but evidence shows otherwise
+   - Agent claimed to use skill but output file shows otherwise
 
 ### Example: developing-with-tdd
 
@@ -395,8 +419,13 @@ All TDD requirements met.
 Before finalizing evaluation:
 
 - [ ] Read the skill being tested
-- [ ] Read agent's complete output
-- [ ] Applied PASS/FAIL/PARTIAL criteria
-- [ ] Documented reasoning with evidence
+- [ ] Checked if output file was created in `.claude/features/`
+- [ ] Read the agent's OUTPUT FILE (not just response summary)
+- [ ] Found and parsed JSON metadata block at end of output file
+- [ ] Verified `skills_invoked` / `library_skills_read` arrays contain required skills
+- [ ] Applied PASS/FAIL/PARTIAL criteria based on metadata
+- [ ] Documented reasoning with evidence from output file
 - [ ] Updated TodoWrite with result
 - [ ] Not confusing integration test with pressure test
+
+**Remember**: The response summary the agent returns to you is unreliable. Always verify via the actual output file.
