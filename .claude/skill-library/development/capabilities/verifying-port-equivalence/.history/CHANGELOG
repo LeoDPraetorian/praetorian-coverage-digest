@@ -1,0 +1,24 @@
+# Changelog
+
+## 2025-12-29 - Initial Creation
+
+**RED Phase Documentation:**
+
+**Gap Identified**: When porting Python projects to Go (garak → Venator), no established workflow for verifying Go implementations match Python behavior.
+
+**Test Without Skill**: Built equivalence framework from scratch, encountered:
+1. Architecture mismatch (Go under Rosetta x86_64, Python packages arm64)
+2. Value mismatches (primary_detector, prompts count, goal strings)
+3. No documented patterns for subprocess wrapper, float epsilon, macOS detection
+
+**Verbatim Failure**: Initial tests 12/16 passing, 4 probe tests failing due to architecture. After arch fix, semantic differences required updating Go to match Python.
+
+**Why Needed**: Future ports (325 remaining capabilities) will need this verification workflow.
+
+**Category**: development/capabilities
+
+**Skill Type**: Process/Pattern - Methodology for equivalence verification
+
+**Location**: Library (.claude/skill-library/development/capabilities/)
+
+**Line Count**: 337 lines (target <500)

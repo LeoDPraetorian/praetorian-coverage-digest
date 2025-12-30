@@ -1,0 +1,32 @@
+# Changelog
+
+## 2025-12-29 - Initial Creation
+
+**RED Phase Documentation:**
+
+**Gap Identified:** The JANUS-RETIREMENT.md document proposes creating a Capability SDK as a separate repository to enable standalone tool execution and Chariot integration. However, there's a simpler alternative: use a Claude skill to generate Chariot integration code for standalone tools on-demand.
+
+**Current Failure Behavior:**
+Without this skill, integrating standalone security tools with Chariot requires:
+- Manual writing of 3-4 Go files (capability.go, adapter.go, parser.go, init.go)
+- Deep understanding of Tabularium Capability interface (~20 methods)
+- Knowledge of how to map tool-specific outputs to Tabularium models
+- Risk of inconsistent patterns across different capability integrations
+- High barrier prevents PS operators from wrapping tools themselves
+
+**Benefits of Skill Approach:**
+- No SDK repository to maintain
+- No version compatibility issues between SDK and tools
+- Per-tool customized adapters (not generic)
+- Claude handles edge cases automatically
+- Zero Tabularium exposure for tool authors
+
+**Category:** development/capabilities (Library skill)
+**Skill Type:** Process/Pattern
+**Line Count:** 379 lines
+
+**Structure Created:**
+- SKILL.md with progressive disclosure
+- references/ for detailed workflows
+- templates/ for code generation templates
+- examples/ for integration examples

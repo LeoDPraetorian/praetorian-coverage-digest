@@ -1,0 +1,61 @@
+# enforcing-go-capability-architecture Changelog
+
+## 2025-12-30 - HTTP Client Standards Section Added
+
+**RED Phase (Gap Identified)**:
+- Problem: As Go capability projects scale (Venator 25+, Chariot backend 66+ HTTP-using files), developers lack standardized HTTP client patterns
+- Without guidance: Developers add external libraries (go-resty, retryablehttp), create per-capability HTTP clients, leading to dependency sprawl and inconsistent error handling
+- Gap: Skill covered file organization, interfaces, registry patterns, but no HTTP client standardization
+
+**GREEN Phase (Implementation)**:
+- Added "HTTP Client Standards" section after "Naming Conventions"
+- Documents stdlib `net/http` + thin wrapper pattern with functional options
+- References two canonical implementations: Chariot backend (`modules/chariot/backend/pkg/lib/web/http.go`) and Venator (`venator/pkg/lib/http/client.go`)
+- Includes requirements checklist (6 items)
+- Provides testing pattern with `net/http/httptest` example
+- Full example usage showing capability integration
+
+**Rationale**:
+- HTTP client usage IS an architectural concern (dependency management, consistency)
+- Pattern applies to ALL Go capability projects (Chariot, Venator, future projects)
+- Keeps skill as single source of truth for "how to build capabilities correctly"
+
+**Impact**: Line count increased from 168 to ~262 lines (still under 500-line hard limit)
+
+## 2025-12-29 - Initial Creation
+
+**RED Phase (Gap Proven)**:
+- Problem: Porting garak (Python LLM scanner with 331 capabilities) to Go requires understanding Go-idiomatic capability architecture
+- Without this skill: Developers apply Python organizational patterns that don't translate to Go
+- Failure documented: Initial approach lacked understanding of complexity-based tiers, consumer-side interfaces, init() self-registration, and go:embed security patterns
+
+**Category**: development/go-porting (Library skill)
+
+**Skill Type**: Process/Pattern
+
+**Research Completed**:
+- HashiCorp go-plugin (RPC-based plugin system)
+- ProjectDiscovery tools (Nuclei, subfinder, httpx) architecture
+- Go interface segregation principle (small interfaces)
+- Go project layout conventions (directories = packages)
+- Registry + factory patterns with init() self-registration
+- go:embed for bundling prompts/templates/data
+- Go testing patterns (table-driven, interface mocking)
+
+**Structure Created**:
+- 423-line SKILL.md (under 500-line limit)
+- code-structure-standards.md reference file
+- Complexity-based tiers (1-4) with thresholds
+- Decision trees for organization choices
+- Migration strategies between tiers
+
+**Key Patterns Documented**:
+- Interface design: Small (1-3 methods), consumer-side definition, composition
+- Registry: Global registry, self-registration via init(), List/Get/Register
+- File organization: One file per capability, base.go for interfaces, registry.go
+- Embedded resources: go:embed patterns, security considerations
+- Testing: Table-driven tests, interface mocking, co-located tests
+
+**Gold Standard Reference**: Venator structure (garak port) with 331 capabilities
+
+**Next Steps**: GREEN phase verification and REFACTOR phase pressure testing

@@ -1,0 +1,32 @@
+# Changelog
+
+## 2025-12-29 - Initial Creation
+
+**Created by**: Claude (via /skill-manager create)
+
+**RED Phase**: When analyzing garak Python code, no reference exists for translating patterns to idiomatic Go. Developers must guess or transliterate, leading to un-idiomatic code.
+
+**Category**: Library skill - `development/go-porting/`
+**Skill Type**: Reference/Library - pattern dictionary
+**Location**: `.claude/skill-library/development/go-porting/translating-python-idioms-to-go/`
+
+**Structure**:
+- SKILL.md: 263 lines (under 500 limit) ✅
+- References: pattern-catalog.md (comprehensive examples)
+- Go 1.25.3 targeted (iter.Seq, improved generics)
+
+**Patterns documented**:
+1. Generators (yield) → iter.Seq
+2. Class inheritance → Interface + embedding
+3. Decorators → Middleware/functional options
+4. try/except → Error handling
+5. async/await → Goroutines + errgroup
+6. @dataclass → Structs
+7. List comprehensions → Loops/generics
+8. Type hints → Native types
+9. Context propagation (Go-specific)
+10. Plugin registration (Go-specific)
+
+**Web research sources included**: Go 1.25 guide, iter.Seq docs, struct embedding, functional options, error handling, concurrency patterns
+
+**Integration**: Phase 2.5 of porting workflow (after dependency mapping, before implementation)

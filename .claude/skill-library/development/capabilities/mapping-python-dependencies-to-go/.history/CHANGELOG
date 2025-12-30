@@ -1,0 +1,74 @@
+# Changelog
+
+## 2025-01-05 - Initial Creation
+
+**Created by**: Claude (via /skill-manager create)
+
+**RED Phase Documentation**:
+
+**Gap**: During garak→venator Python-to-Go porting analysis, initial assessment falsely claimed several dependencies had "no Go equivalent" (litellm, transformers, torch, nltk). After user challenge, web research revealed ALL had mature Go libraries with thousands of stars. This false claim would have derailed the project by suggesting custom implementations for libraries that already exist.
+
+**Failure captured verbatim**:
+```
+Initial: litellm → ❌ None (custom multi-provider needed)
+Actual: litellm → LangChainGo (8.3k⭐), Bifrost (1.4k⭐), gollm (600⭐)
+
+Initial: transformers → ⚠️ Limited (API-only or subprocess)
+Actual: transformers → hugot (ONNX pipelines), go-huggingface (API client)
+
+Initial: torch → ⚠️ Limited (subprocess or gorgonia)
+Actual: torch → gotch (LibTorch bindings + CUDA), gorgonia (pure Go)
+
+Initial: nltk → ⚠️ Partial (basic NLP)
+Actual: nltk → prose (3k⭐ - full tokenization, POS, NER)
+```
+
+**Category**: Library skill - `development/go-porting/`
+**Skill Type**: Process/Pattern - systematic methodology workflow
+**Location**: `.claude/skill-library/development/go-porting/mapping-python-dependencies-to-go/`
+
+**Structure**:
+- SKILL.md: 357 lines (target <500) ✅
+- References: research-methodology.md, output-templates.md, research-rationalizations.md
+- Progressive disclosure: Lean main file, detailed references
+
+**Key Features**:
+- Mandatory web research rule (cannot skip)
+- 5-phase workflow (Extract → Research → Categorize → Document → Blockers)
+- Quality gates checklist
+- Anti-pattern examples from real failure
+- Research rationalization detection table
+
+**Integration**: Phase 2 of go-porting workflow (after architecture analysis, before reference port)
+
+---
+
+## 2025-01-05 - REFACTOR Iteration 1
+
+**Pressure Test Results**:
+
+**Test 1 (Time Pressure)**: ❌ FAILED
+- Agent chose selective research (research "uncertain" only, skip "obvious" ones)
+- Rationalization: "Selective application - use tools where expertise gaps create real risk, trust domain knowledge where it's solid"
+- Violation: Created confidence-based filtering exception
+
+**Test 2 (Authority + Sunk Cost)**: ✅ PASSED
+- Agent defended research findings against tech lead's subprocess preference
+- Cited skill's evidence-based approach and production library benefits
+
+**Test 3 (Exhaustion + Pragmatic)**: ⚠️ PARTIAL
+- Agent chose placeholder status rather than completing research
+- While honest about limitations, deferred mandatory work
+
+**Loophole Identified**: "Trust domain knowledge for obvious ones"
+
+**Counters Added**:
+1. Explicit "No 'Obvious' Exception" section in SKILL.md
+2. Three anti-pattern examples (requests, colorama, numpy)
+3. Reality check showing "obvious" deps (litellm, transformers) had missed equivalents
+4. Strong closing: "Research EVERY dependency means EVERY dependency. ALL means ALL."
+5. Added two new entries to research-rationalizations.md table
+
+**Files Modified**:
+- SKILL.md: Added 11 lines to mandatory research rule section
+- references/research-rationalizations.md: Added 2 rationalizations to table
