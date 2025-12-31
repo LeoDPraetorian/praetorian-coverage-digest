@@ -1,4 +1,4 @@
-# Phase 5: Parallel Code Review
+# Phase 6: Code Review
 
 Review implementation by spawning code reviewer + security reviewer agents in parallel. Includes explicit feedback loop with MAX 1 RETRY before escalating to user.
 
@@ -126,7 +126,7 @@ code_verdict = code_reviewer.verdict
 security_verdict = security_reviewer.verdict
 
 if code_verdict == "APPROVED" and security_verdict == "APPROVED":
-    # SUCCESS - Proceed to Phase 6
+    # SUCCESS - Proceed to Phase 7
     proceed_to_testing()
 elif any_verdict == "BLOCKED":
     # BLOCKER - Escalate immediately
@@ -247,13 +247,13 @@ AskUserQuestion({
 ### Step 7: Mark TodoWrite Complete
 
 ```
-TodoWrite: Mark "Phase 5: Code Review" as completed
-TodoWrite: Mark "Phase 6: Test Planning" as in_progress
+TodoWrite: Mark "Phase 6: Code Review" as completed
+TodoWrite: Mark "Phase 7: Test Planning" as in_progress
 ```
 
 ## Exit Criteria
 
-✅ Proceed to Phase 6 (Test Planning) when:
+✅ Proceed to Phase 7 (Test Planning) when:
 
 - ALL reviewers returned `verdict: "APPROVED"`
 - OR user explicitly approved despite issues
@@ -311,7 +311,7 @@ Task(subagent_type: "backend-security", ...)
 
 ## Related References
 
-- [Phase 4: Implementation](phase-4-implementation.md) - Previous phase
-- [Phase 6: Test Planning](phase-6-test-planning.md) - Next phase
+- [Phase 5: Implementation](phase-5-implementation.md) - Previous phase
+- [Phase 7: Test Planning](phase-7-test-planning.md) - Next phase
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Troubleshooting](troubleshooting.md) - Common issues

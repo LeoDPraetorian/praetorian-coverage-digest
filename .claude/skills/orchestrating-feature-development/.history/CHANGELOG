@@ -2,6 +2,87 @@
 
 All notable changes to the orchestrating-feature-development skill will be documented in this file.
 
+## [Date: 2025-12-30]
+
+### Added - Phase 2: Discovery (MAJOR WORKFLOW ADDITION)
+- **New Phase 2: Discovery** - Parallel pattern analysis using code-pattern-analyzer agents
+- **Workflow expanded from 9 phases to 10 phases** with discovery phase insertion
+- **Phase numbering renumbered**: All phases after Brainstorming shifted by +1
+  - Phase 2: Planning → Phase 3: Planning
+  - Phase 3: Architecture → Phase 4: Architecture
+  - Phase 4: Implementation → Phase 5: Implementation
+  - Phase 5: Code Review → Phase 6: Code Review
+  - Phase 6: Test Planning → Phase 7: Test Planning
+  - Phase 7: Testing → Phase 8: Testing
+  - Phase 8: Test Validation → Phase 9: Test Validation
+  - Phase 9: Completion → Phase 10: Completion
+
+### Changed
+- **Phase 4 (Architecture)**: Now receives discovery reports as input and performs tech debt analysis
+- **Human Checkpoints**: Updated to phases 1, 3, and 4 (was 1, 2, and 3)
+- **metadata.json schema**: Added discovery phase tracking with frontend/backend completion flags
+- **metadata.json schema**: Added architecture phase tech debt tracking fields
+- **Feature Directory Structure**: Added frontend-discovery.md, backend-discovery.md, tech-debt-assessment.md
+- **Agent Matrix**: Added Discovery column showing code-pattern-analyzer ×2 for all feature types
+- **Exit Criteria**: Added discovery reports and tech debt registry requirements
+
+### Discovery Phase Design
+- **Execution**: PARALLEL - frontend and backend analyzers run simultaneously
+- **Agents**: code-pattern-analyzer (frontend focus) + code-pattern-analyzer (backend focus)
+- **Scope**: Frontend analyzer targets modules/*/ui/src/*, backend analyzer targets modules/*/backend/*
+- **Tool**: Uses discovering-reusable-code skill methodology
+- **Outputs**:
+  - frontend-discovery.md - Frontend pattern analysis
+  - backend-discovery.md - Backend pattern analysis
+- **Checkpoint**: NO human checkpoint after discovery (feeds into Architecture phase)
+- **Objective**: Discovery agents report patterns WITHOUT judgment - leads apply judgment in Phase 4
+
+### Architecture Phase Enhancements (Phase 4)
+- **New Inputs**: frontend-discovery.md + backend-discovery.md from Phase 2
+- **New Responsibilities**:
+  1. Read discovery reports
+  2. Analyze pattern quality (good code vs tech debt)
+  3. For each pattern: decide extend or refactor
+  4. Propose refactoring plans for tech debt
+  5. Output tech debt assessment
+- **New Output**: tech-debt-assessment.md documenting tech debt findings
+- **Tech Debt Registry**: Leads populate .claude/tech-debt-registry.md REGARDLESS of human decision
+- **Human Checkpoint Enhanced**: Present tech debt findings with options:
+  - A) Refactor (with plan)
+  - B) Extend anyway (document debt)
+
+### Tech Debt Registry Integration
+- **Location**: .claude/tech-debt-registry.md (repository root)
+- **Populated By**: Lead agents during Architecture phase (Phase 4)
+- **Growth Pattern**: Organic accumulation over time across all features
+- **Format**: Markdown with pattern name, location, identified date, feature ID, issue description, recommendation, status
+
+### Reason
+- **RED Failure**: Current workflow lacks pattern discovery phase, causing implementations to add special-casing (`if newFeature {}`) throughout codebase instead of extending existing patterns
+- **Root Cause**: Developers don't know what reusable patterns exist before designing/implementing
+- **Impact**: Code duplication, inconsistent patterns, tech debt accumulation
+- **Solution**:
+  1. New Discovery phase (Phase 2) performs exhaustive pattern search BEFORE planning
+  2. Parallel execution (frontend + backend) handles large codebase context limits
+  3. Leads receive discovery reports and assess tech debt in Architecture phase
+  4. Tech debt registry grows organically as features discover problematic patterns
+  5. Human decides extend vs refactor at Architecture checkpoint (not after discovery)
+
+### Technical Details
+- SKILL.md: Updated from 321 lines to ~355 lines (under 500-line limit)
+- Quick Reference table: Updated with Phase 2 Discovery row
+- Workflow diagram: Expanded to show Phase 2 with parallel agents
+- Agent Matrix: Added Discovery column showing ×2 agents for all types
+- All phase number references updated throughout document
+- Related Skills: Added discovering-reusable-code reference
+
+### Related Components
+- `.claude/skills/discovering-reusable-code/SKILL.md` - Pattern discovery methodology
+- `.claude/agents/research/code-pattern-analyzer.md` - Discovery agent implementation
+- `.claude/tech-debt-registry.md` - Central tech debt tracking (NEW)
+
+---
+
 ## [Date: 2025-12-28]
 
 ### Changed (MAJOR WORKFLOW REDESIGN)

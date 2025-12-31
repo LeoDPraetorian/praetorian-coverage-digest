@@ -1,4 +1,4 @@
-# Phase 4: Implementation
+# Phase 5: Implementation
 
 Execute the implementation plan by spawning developer agents with architecture context.
 
@@ -178,13 +178,13 @@ go build ./...
 ### Step 6: Mark TodoWrite Complete
 
 ```
-TodoWrite: Mark "Phase 4: Implementation" as completed
-TodoWrite: Mark "Phase 5: Code Review" as in_progress
+TodoWrite: Mark "Phase 5: Implementation" as completed
+TodoWrite: Mark "Phase 6: Code Review" as in_progress
 ```
 
 ## Exit Criteria
 
-✅ Proceed to Phase 5 (Code Review) when:
+✅ Proceed to Phase 6 (Code Review) when:
 
 - All developers returned `status: "complete"`
 - Build passes
@@ -256,7 +256,7 @@ Deviating from these decisions requires user approval.
 
 ## Related References
 
-- [Phase 3: Architecture](phase-3-architecture.md) - Previous phase
-- [Phase 5: Code Review](phase-5-code-review.md) - Next phase
+- [Phase 4: Architecture](phase-4-architecture.md) - Previous phase
+- [Phase 6: Code Review](phase-6-code-review.md) - Next phase
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Troubleshooting](troubleshooting.md) - Common issues

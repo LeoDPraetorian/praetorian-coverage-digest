@@ -10,7 +10,7 @@
 
 The CLI handles all formatting via the shared formatter. Your role is to provide structured data, not formatted output.
 
-After evaluating the 6 criteria, write findings to a temporary JSON file:
+After evaluating the 7 criteria, write findings to a temporary JSON file:
 
 ```bash
 TMPFILE=/tmp/semantic-findings-${SKILL_NAME}.json

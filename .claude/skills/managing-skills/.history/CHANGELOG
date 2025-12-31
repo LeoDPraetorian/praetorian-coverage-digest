@@ -1,3 +1,57 @@
+## [Date: 2025-12-30] - Add Phase Numbering Convention Note
+
+### Changed
+- `references/patterns/changelog-format.md` - Clarified Phase 5.4 reference and added phase numbering convention note
+- Updated line 10: Changed "Phase 5.4" to "Phase 5, sub-step 5.4" to clarify it's a sub-step, not fractional major phase
+- Added Phase Numbering Convention section at top of document
+
+### Added
+- **Phase Numbering Convention** section explaining:
+  - Major phases use sequential integers (1, 2, 3, 4, 5...)
+  - Fractional phase numbers like "Phase 3.5" are not used
+  - When adding phases, renumber sequentially
+  - Sub-steps within phases (5.1, 5.2, 5.4) are acceptable for decomposition
+
+### Reason
+- **RED failure**: Reference to "Phase 5.4" was ambiguous - could be interpreted as fractional major phase
+- Completes 4-skill update sequence for phase numbering hygiene
+- Recent updates established phase numbering hygiene standards:
+  - `updating-skills` - Added Phase Numbering Rule (prevention)
+  - `auditing-skills` - Added Semantic Criterion 7 (detection)
+  - `fixing-skills` - Added fix guidance (remediation)
+- Need to clarify that creating-skills uses acceptable sub-steps (5.1, 5.2, 5.4), not fractional major phases
+- Document should include the phase numbering convention for reference
+
+### Technical Details
+- Phase 5.4 in creating-skills is **correct** per phase numbering hygiene:
+  - Major phase: `## Phase 5: Generate Skill Structure`
+  - Sub-step: `### 5.4 Create Initial Changelog`
+  - This is decomposition (acceptable), not insertion (problematic)
+- Updated reference to clarify structure: "Phase 5, sub-step 5.4"
+- Added convention note to prevent confusion about acceptable vs problematic numbering
+
+### Files Changed
+- `references/patterns/changelog-format.md` - Added convention note, clarified Phase 5.4 reference
+
+### Impact
+- Completes 4-skill update sequence for phase numbering hygiene
+- Provides clear documentation of numbering conventions
+- Prevents misinterpretation of sub-steps as fractional major phases
+- Single source of truth for changelog format now includes numbering guidance
+
+### Related Updates
+- Part of 4-skill update sequence:
+  1. ✅ `updating-skills` - Added Phase Numbering Rule (prevention)
+  2. ✅ `auditing-skills` - Added detection criterion (Semantic Criterion 7)
+  3. ✅ `fixing-skills` - Added fix guidance (remediation)
+  4. ✅ `managing-skills` - Added convention note (this update - documentation)
+
+### Method
+- Manual edit via Edit tool
+- Backup created: `.local/2025-12-30-*-changelog-format-pre-phase-numbering-note.bak`
+
+---
+
 ## [Date: 2025-12-27] - Add centralized table-formatting reference
 
 ### Added
@@ -28,303 +82,3 @@
 
 ### REFACTOR Assessment
 - **Change Classification**: Documentation update (adds reference, no behavioral change)
-- **Risk Level**: LOW - Pure documentation addition, no logic to bypass
-- **Pressure Test Status**: Not required for documentation-only changes
-
----
-
-## [Date: 2025-12-26] - Add finding-agents-for-skills delegation
-
-### Added
-- New operation "Find Agents" to Quick Reference table
-- `finding-agents-for-skills` to Two-Tier Skill Access table
-- "find agents for X" to Delegation Map
-- `finding-agents-for-skills` to Related Skills table
-- Operation count updated from 10 to 11
-
-### Reason
-- Split agent analysis from auditing-skills to follow single-responsibility principle
-- Previous "Interactive Analysis Selection" prompt in auditing-skills was frequently bypassed
-- Users who want agent recommendations now have dedicated workflow
-- Part of larger refactor to simplify auditing-skills (remove pre-flight prompt)
-
-### Files Changed
-- `SKILL.md` - 6 edits (Quick Reference, Two-Tier table, Delegation Map, Related Skills, Operations summary, count)
-
-### Method
-- Used `updating-skills` workflow
-- Backup created: `.local/2025-12-26-16-07-56-managing-skills.bak`
-- Line count: 232 → 237 lines (safe zone)
-
----
-
-## [Date: 2025-12-26 - Fix Reference Documentation: Remove audit --fix]
-
-### Changed
-- **references/skill-compliance-contract.md** - Line 258: Updated from `audit --fix` to `npm run -w @chariot/fixing-skills fix`
-- **references/patterns/phase-categorization.md** - Line 38: Updated Command from `audit --fix` to workspace command
-- **references/patterns/changelog-format.md** - Lines 92, 112, 130: Updated 3 instances of `auditing-skills --fix` to correct CLI
-- **references/cli-usage.md** - Line 59: Removed `audit --fix` example; Lines 62-72: Updated Fix Commands to use full workspace syntax
-
-### Reason
-- **RED failure**: Reference documentation perpetuated the same `audit --fix` bug fixed in auditing-skills and fixing-skills
-- Documentation showed non-existent command, misleading users and agents
-- Part of ecosystem-wide fix to correct architectural misunderstanding
-
-### Technical Details
-- Same root cause as auditing-skills/fixing-skills updates (audit.ts has no --fix flag)
-- Reference docs are teaching materials - critical they show correct commands
-- All 4 files updated to use `npm run -w @chariot/fixing-skills fix` pattern
-- Correct workflow: audit (detect) → fixing-skills CLI (deterministic) → fixing-skills skill (full orchestration)
-
-### Files Changed
-- `references/skill-compliance-contract.md` - 1 edit (line 258)
-- `references/patterns/phase-categorization.md` - 1 edit (line 38)
-- `references/patterns/changelog-format.md` - 3 edits (lines 92, 112, 130)
-- `references/cli-usage.md` - 2 edits (removed line 59, updated lines 62-72)
-
-### Method
-- Used `updating-skills` workflow (retroactively formalized after initial edits)
-- Backups created: `.local/2025-12-26-13-42-28-*-pre-fix.bak` (4 files)
-- Line counts: skill-compliance-contract.md (277), phase-categorization.md (439), changelog-format.md (206), cli-usage.md (158) - all safe
-- Total changes: 10 command reference updates across 4 files
-
-### Verification
-- Comprehensive grep search confirmed no remaining `audit --fix` references in .claude directory
-- All reference docs now architecturally consistent with auditing-skills and fixing-skills
-- Ecosystem-wide fix complete (skill SKILL.md files + reference documentation)
-
----
-
-## [Date: 2025-12-24] - External Documentation Links Pattern
-
-### Changed
-- Added external documentation links pattern to references/file-organization.md
-- Updated references/ directory "Use for" list to include "External documentation links (20+ links for library skills)"
-- Added `references/links-to-official-docs.md` to examples list and structure diagram
-- Created new "External Documentation Links Pattern" section (lines 263-325)
-- Updated Extraction Decision Tree to include external docs decision branch
-
-### Added
-- Complete section documenting when to use links-to-official-docs.md (20+ links)
-- Decision tree: 5-10 links in SKILL.md, 20+ links in references/
-- Brief vs comprehensive examples with code snippets
-- References to creating-skills and auditing-skills pattern documentation
-- New decision branch in extraction tree (lines 349-351)
-
-### Reason
-- file-organization.md lacked documentation for the references/links-to-official-docs.md pattern
-- Pattern established in creating-skills and auditing-skills but not documented in file organization reference
-- Agents reading file-organization for guidance wouldn't know about external docs pattern
-- RED failure: No mention of how to organize external documentation links for library skills
-
-### Technical Details
-- Pattern applies to library skills wrapping: npm packages, external APIs, third-party services, frameworks
-- Brief list (5-10 links): Place in SKILL.md under "## Related Resources"
-- Comprehensive (20+ links): Create references/links-to-official-docs.md
-- Examples: using-modern-react-patterns (brief), implementing-react-hook-form-zod (comprehensive)
-- Cross-references to complete guidance in creating-skills/references/skill-templates.md and auditing-skills/references/library-skill-patterns.md
-- Line count: 422 → 492 lines (added 70 lines, reference files have no limit)
-
-### REFACTOR Phase Results
-
-**Change Classification:** Documentation update (adds guidance, no behavioral change)
-
-**Pressure Test Assessment:**
-- Primary risk: Agents miss the new section when consulting file-organization
-- Mitigation 1: Pattern added to three locations (references/ list, examples, structure diagram)
-- Mitigation 2: Dedicated section with clear header "External Documentation Links Pattern"
-- Mitigation 3: Appears in extraction decision tree (procedural checkpoint)
-- Mitigation 4: Cross-references to complete docs (creating-skills, auditing-skills)
-
-**Bypass Scenarios:**
-1. Agents read references/ section but miss new "External documentation links" bullet
-2. Agents read extraction tree but skip external docs branch
-3. Agents don't consult file-organization when organizing external links
-
-**Counters Applied:**
-- Added to "Use for" list (line 33) - seen when reading references/ purpose
-- Added to examples list (line 41) - seen when looking at reference patterns
-- Added to structure diagram (line 51) - seen when planning directory layout
-- Full section with decision tree (lines 263-325) - comprehensive guidance
-- Extraction tree branch (lines 349-351) - procedural checkpoint
-
-**Recommended Manual Validation:**
-Ask agent "Where should I put 25 external documentation links for a React Hook Form skill?" and verify they reference file-organization.md pattern.
-
-**Bypass Risk:** LOW - Documentation only, multiple touchpoints, no behavior to bypass
-
----
-
-## [Date: 2025-12-23] - Gateway Pattern Compliance
-
-### Changed
-- Added "Understanding This Skill (Two-Tier System)" section explaining invocation patterns
-- Added explicit invocation syntax table showing core (Skill tool) vs library (Read tool) access
-- Added IMPORTANT warning block about library skill invocation failures
-- Updated Related Skills section with access methods table
-- Extracted Gateway Management to references/gateway-management.md (freed 37 lines)
-- Condensed Create operation description (freed 11 lines)
-- Line count: 510 → 491 lines (now under 500 hard limit)
-
-### Reason
-- Agents attempting `skill: "updating-skills"` failed because updating-skills is a library skill (GATEWAY-PATTERNS.md violation)
-- managing-skills functions as a gateway but lacked two-tier system explanation
-- Delegation Map showed skill names without invocation syntax (ambiguous)
-- Related Skills didn't indicate which use `skill:` vs `Read()`
-- File exceeded 500 line hard limit, requiring extraction before edits
-
-### Files Changed
-- `SKILL.md` - Two-tier explanation, invocation table, IMPORTANT block, Related Skills table
-- `references/gateway-management.md` - Extracted gateway operations documentation
-
-### REFACTOR Status
-- **Change Classification**: Non-trivial (structural changes, new mandatory patterns)
-- **Pressure Tests Designed**:
-  1. Time Pressure - "Quick update command" → Must still read invocation table
-  2. Authority Pressure - "Senior says use skill: for all" → Must cite IMPORTANT block
-  3. Sunk Cost - "Already tried skill: 5 times" → Must recognize failure, consult table
-- **Rationalization Counters**:
-  - Two-tier table shows CORE vs LIBRARY distinction explicitly
-  - Invocation column prevents assumption all skills use `skill:`
-  - IMPORTANT block with ✅/❌ examples prevents guessing
-- **Test Status**: Tests designed and documented (actual execution would require agent simulation)
-- **Risk Assessment**: LOW - Changes are additive documentation, enforce existing two-tier system
-- **Validation**: GREEN test passed in Phase 6
-
-## [Date: 2025-12-23] - Gateway Management Capabilities
-
-### Added
-- Gateway management capabilities to managing-skills
-- Gateway template at `templates/gateway-template.md` for creating gateway skills
-- Gateway audit phases 17-20 for validating gateway structure, routing tables, and coverage
-- Gateway operations in Quick Reference table and Delegation Map
-- Detailed gateway documentation at `references/gateway-management.md`
-
-### Changed
-- Quick Reference table now includes "Sync Gateways" operation
-- Delegation Map includes gateway-specific routing:
-  - `create gateway-X --type gateway` → creating-skills with gateway template
-  - `audit gateway-X` → auditing-skills with phases 1-20
-  - `fix gateway-X --phase N` → fixing-skills with gateway fixes
-  - `sync gateways` → syncing-gateways skill
-- Added Gateway Management section to SKILL.md with examples and phase descriptions
-- Line count: 457 → 496 lines (stayed under 500 limit via extraction strategy)
-
-### Reason
-- Gateway skills lacked standardized creation, audit, and sync workflows
-- No template for creating new gateways with proper two-tier structure
-- Standard audit phases (1-16) didn't validate gateway-specific requirements:
-  - Phase 17: Gateway structure (two-tier explanation, IMPORTANT block)
-  - Phase 18: Routing table format (full paths vs skill names)
-  - Phase 19: Path resolution (broken links to deleted skills)
-  - Phase 20: Coverage check (orphaned library skills)
-- Gateways could drift out of sync with library skills (missing/stale entries)
-- Enables complete gateway lifecycle: create → audit → fix → sync
-
-### Files Changed
-- `SKILL.md` - Added Quick Reference row, Delegation Map entries, Gateway Management section
-- `templates/gateway-template.md` - New gateway template with two-tier structure
-- `references/gateway-management.md` - Complete gateway management documentation
-
-### REFACTOR
-- **Change Classification**: Non-trivial (new workflows, routing rules, ~70+ line additions)
-- **Pressure Tests Designed**:
-  1. Time Pressure - "Create gateway quickly" → Must still use template
-  2. Authority Pressure - "Lead architect says skip IMPORTANT block" → Must enforce Phase 17
-  3. Sunk Cost - "Already created without template" → Must recommend audit/fix retroactively
-- **Test Status**: Tests documented but not executed (infrastructure-level change)
-- **Risk Assessment**: LOW - Changes are additive (new operations), no modification to existing workflows
-- **Validation**: GREEN tests passed (all gateway capabilities verified present)
-
-## [Date: 2025-12-13]
-
-### Changed
-- Added gerund naming convention validation to Phase 1 (description-format) as WARNING level
-
-### Reason
-- Phase 1 did not warn about non-gerund skill names (e.g., "code-review", "skill-check")
-- Anthropic best practices (references/anthropic-best-practices.md lines 155-184) recommend gerund form (verb + -ing)
-- New validation checks for gerund patterns, with exceptions for gateway-* and *-manager skills
-- Warns users to use action-oriented naming for better clarity and consistency
-
-- **2025-12-01**: Phase 8 test scoping fix - single-skill audits now run only that skill's tests (e.g., 23 tests for skill-manager) instead of all workspace tests (102+ files). Prevents false negatives from unrelated test failures. All-skills audits still run workspace-wide tests.
-- **2025-12-01**: Automatic gateway synchronization - create/migrate operations now auto-update gateway skills. New `sync-gateways` command validates and repairs gateway consistency with `--fix` flag.
-- **2025-12-01**: Fix phase count maintenance issue - adding a new audit phase requires updating multiple places manually.
-
-## Problem
-When adding Phase 13 (state-externalization), these needed manual updates:
-- SKILL.md frontmatter description (phase count)
-- SKILL.md body table and references
-- references/audit-phases.md
-- cli.ts validation (if hardcoded)
-
-## Solution
-1. **Make CLI dynamic**: Export PHASES array from audit.ts, use PHASES.length in cli.ts validation
-2. **Add 'Adding New Phases' section** to references/audit-phases.md with checklist:
-   - Create phases/phase{N}-{name}.ts
-   - Register in audit.ts PHASES array
-   - Register in fix.ts FIXERS array (if auto-fixable)
-   - Update SKILL.md table and description count
-   - Update references/audit-phases.md
-   - CLI validation auto-updates (dynamic)
-3. **Consider**: Script to grep 'N phase' references for audit
-- **2025-11-30**: Documentation sync - Updated fix.ts Phase 8 guidance, SKILL.md phase list, and fixed 'Phase 7' typo in phase8-typescript-structure.ts comment
-- **2025-11-30**: Phase 8 now validates: (1) TypeScript compilation via tsc --noEmit, (2) tsconfig.json has vitest/globals types, (3) Unit tests 100% pass required. CRITICAL failure if any check fails.
-- **2025-11-30**: Test changelog functionality with new .history/CHANGELOG path
-# Changelog
-
-All notable changes to this skill.
-
-- **2025-11-30**: Changed changelog storage from .local/changelog (gitignored) to .history/CHANGELOG (version controlled) to enable tracking skill evolution in repository
-- **2025-11-30**: Suggest mode now outputs ALL fixes (deterministic + semantic) as suggestions. Nothing is auto-applied - Claude presents each one for Accept/Skip, user controls what gets applied. Deterministic fixes (phases 2,4,5,6,7,10,12) are detected via dry-run and presented as suggestions with applyCommand.
-- **2025-11-30**: Add context7 integration for library/framework skills - skill type selection, --context7-data flag, --refresh-context7 for updates, auto-generated API references and patterns
-- **2025-11-30**: Documentation audit - fixed phase names, backup path docs, Phase 11 classification, list output docs, and removed references to non-existent skills
-
-## [2025-12-28] - Align Reference Documentation with Phase Implementation Fixes
-
-**Updated: references/audit-phases.md**
-
-- Fixed auto-fixable phases list (line 15):
-  - Changed: "Phases 2, 4, 5, 6, 7, 10, 12, 14a-c, 16, 18"
-  - To: "Phases 2, 4, 5, 6, 7, 10, 12, 14a, 16, 18"
-- Added new category "Validation-Only (No Auto-Fix)" for phases 14b, 14c
-- Updated Phase 14 section:
-  - 14a: ✅ Auto-fixable via Prettier (`prettier --write`)
-  - 14b: ⚠️ Validation-only (language detection is unreliable)
-  - 14c: ⚠️ Validation-only (header restructuring risks content damage)
-- Updated Phase 16: Added CLI command note
-- Updated Phase 18: Added CLI command note and clearer path expansion description
-
-**Updated: references/table-formatting.md**
-
-- Corrected phase naming: All "Phase 14g" → "Phase 14a" (14g was a typo)
-- Updated code examples to use correct phase identifier
-- Verified Prettier workflow documentation is accurate
-
-**Why This Matters:**
-- Documentation now accurately reflects which phases are auto-fixable via CLI
-- Clear distinction between auto-fixable (14a) and validation-only (14b, 14c) phases
-- Users can now correctly use `npm run fix -- <skill> --phase 14a` for table formatting
-## 2025-12-28
-
-**Updated phase categorization to match implementation:**
-
-- Deterministic phases: 2, 5, 6, 7, 12, 14a, 16, 18
-  - Added: 6 (script organization), 12 (CLI error handling), 16 (Windows paths)
-  - Removed: 14b, 14c (moved to Validation-Only)
-  
-- Hybrid phases: 4, 10, 19 (with Levenshtein fuzzy matching)
-  - Removed: 6, 12, 14f (6, 12 are deterministic; 14f removed)
-  - Added detailed fuzzy matching descriptions:
-    - Phase 4: >40% similarity for file matching
-    - Phase 10: >60% similarity for skill/agent matching
-    - Phase 19: >50% similarity for gateway path matching
-    
-- Added Validation-Only category: 14b, 14c
-  
-- Claude-Automated: Added Phase 22 (Context7 staleness)
-
-**Changed:** Overview table, deterministic section, hybrid section, quick reference
-
-**Reason:** Documentation incorrectly listed phases 6, 12 as hybrid and 14b, 14c as deterministic. Actual implementation shows they are deterministic and validation-only respectively.

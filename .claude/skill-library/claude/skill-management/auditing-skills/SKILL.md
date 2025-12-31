@@ -1,6 +1,6 @@
 ---
 name: auditing-skills
-description: Use when validating skill compliance - 22-phase audit with fix workflow integration
+description: Use when validating skill compliance - 23-phase audit with fix workflow integration
 allowed-tools: Bash, Read, Grep, TodoWrite, AskUserQuestion
 ---
 
@@ -14,7 +14,7 @@ allowed-tools: Bash, Read, Grep, TodoWrite, AskUserQuestion
 
 ## What This Skill Does
 
-Audits skills across **22 validation phases** (+ 3 sub-phases) organized by fix type. See [Phase Categorization](../../../../skills/managing-skills/references/patterns/phase-categorization.md) for complete breakdown.
+Audits skills across **23 validation phases** (+ 4 sub-phases) organized by fix type. See [Phase Categorization](../../../../skills/managing-skills/references/patterns/phase-categorization.md) for complete breakdown.
 
 **Phase categories (three-tier fix model):**
 
@@ -22,7 +22,7 @@ Audits skills across **22 validation phases** (+ 3 sub-phases) organized by fix 
 - **Hybrid (3 phases):** 4, 10, 19 - CLI + Claude reasoning for ambiguous cases
 - **Claude-Automated (8 phases):** 1, 3, 11, 13, 15, 17, 21, 22 - Claude applies without human input
 - **Human-Required (3 phases):** 8, 9, 20 - genuine human judgment needed
-- **Validation-Only (2 phases):** 14b, 14c - detect issues but no auto-fix (error-prone)
+- **Validation-Only (3 phases):** 14b, 14c, 14d - detect issues but no auto-fix (error-prone)
 - **Gateway-only (4 phases):** 17-20 - apply only to `gateway-*` skills
 
 **Why this matters:** Structural issues prevent skills from loading correctly. Progressive disclosure keeps skills under 500 lines. Semantic issues impact maintainability and usability. Gateway phases ensure the two-tier skill system functions correctly.
@@ -47,9 +47,9 @@ Audits skills across **22 validation phases** (+ 3 sub-phases) organized by fix 
 
 | Command                                 | Purpose                            | Time     |
 | --------------------------------------- | ---------------------------------- | -------- |
-| `npm run audit -- <name>`               | Full 22-phase audit (single skill) | 2-3 min  |
+| `npm run audit -- <name>`               | Full 23-phase audit (single skill) | 2-3 min  |
 | `npm run audit -- <name> --agents-data` | Output JSON for agent analysis     | 1 min    |
-| `npm run audit`                         | Full 22-phase audit (all skills)   | 5-10 min |
+| `npm run audit`                         | Full 23-phase audit (all skills)   | 5-10 min |
 
 **Phase categories:** See [Phase Categorization](../../../../skills/managing-skills/references/patterns/phase-categorization.md) for complete breakdown.
 
@@ -173,7 +173,7 @@ This applies even if the script passed with zero warnings. Semantic review catch
 
 ### Semantic Review Checklist
 
-Evaluate the skill against these 6 criteria (full details in [Post-Audit Semantic Review](#post-audit-semantic-review) section below):
+Evaluate the skill against these 7 criteria (full details in [Post-Audit Semantic Review](#post-audit-semantic-review) section below):
 
 1. **Description Quality (CSO)** - MANDATORY detailed assessment (see section below)
 2. **Skill Categorization** - Is this frontend/backend/testing/security/tooling/claude?
@@ -181,6 +181,7 @@ Evaluate the skill against these 6 criteria (full details in [Post-Audit Semanti
 4. **Tool Appropriateness** - Are allowed-tools appropriate for the skill's purpose?
 5. **Content Density** - If >500 lines, is the length justified?
 6. **External Documentation** - Do library skills link to official docs?
+7. **Phase Numbering Hygiene** - Are major phases numbered sequentially (no fractional phases)?
 
 ### Description Quality Assessment (MANDATORY)
 
@@ -189,6 +190,20 @@ Evaluate the skill against these 6 criteria (full details in [Post-Audit Semanti
 **See:** [Description Quality Assessment](references/description-quality-assessment.md) for the full framework, examples, and JSON output format.
 
 **This is NOT optional.** A skill with poor description = invisible skill.
+
+### Phase Numbering Hygiene Assessment
+
+**Check for fractional major phase numbers** (e.g., Phase 3.5, Phase 5.4) in headings.
+
+**Scan:** SKILL.md and all files under `references/` directory
+
+**Pattern:** `## Phase X.Y` or `## Step X.Y` where X and Y are digits (in headings, not sub-steps)
+
+**Acceptable:** Sub-steps within phases (e.g., `### Step 7.1` under `## Step 7`) represent decomposition, not insertion
+
+**Flag as WARNING:** Fractional major phases should be renumbered sequentially (Phase 3.5→4, Phase 4→5, etc.)
+
+**See:** [Phase Numbering Hygiene](references/phase-numbering-hygiene.md) for detection logic, examples, and output format.
 
 ### Output Format
 

@@ -2,6 +2,120 @@
 
 All notable changes to the auditing-skills skill.
 
+## [2025-12-30] - Add Phase 14d: Prose Phase References
+
+### Added
+- **Phase 14d: Prose Phase References** - Detects stale prose phase references after phase renumbering
+- Implementation: `scripts/src/lib/phases/phase14d-prose-phase-references.ts` (~300 lines)
+- Detailed reference: `references/phase-details.md` - Added Phase 14d section
+- Registry update: Added to `phase-registry.ts` as validation-only phase
+
+### Changed
+- Phase count: 22 phases → 23 phases (22 + 4 sub-phases → 22 + 5 sub-phases)
+- SKILL.md description: "22-phase audit" → "23-phase audit"
+- Quick Reference table: "Full 22-phase audit" → "Full 23-phase audit"
+- Validation-Only category: 14b-c → 14b-d
+- Updated fixing-skills SKILL.md: Phases 14b-c → 14b-d in all references
+
+### Reason
+- **RED failure**: Audit doesn't detect stale prose references like "Phase 4 (implementation)" after phase renumbering
+- **Real example**: orchestrating-feature-development has 5 stale references after Phase 2 (Discovery) insertion
+- Phase 4 (Broken Links) only catches markdown link syntax `[Phase 3](phase-3-file.md)`
+- Prose references like "Return to Phase 4 (implementation)" remain undetected
+
+### Technical Details
+**Detection Logic:**
+1. Extracts canonical phase list from SKILL.md Quick Reference table or `## Phase N:` headings
+2. Scans all skill files (SKILL.md + references/*) for prose patterns: `Phase N (name)` or `Phase N:`
+3. Validates phase number exists and name hint matches canonical phase name
+4. Excludes: `.history/CHANGELOG` (historical), code blocks, cross-skill references
+
+**Output Format:**
+```
+Phase 14d: Prose Phase References
+  WARNING: 5 stale phase reference(s) found
+
+  troubleshooting.md:108 - 'Phase 4 (implementation)' - Phase 4 is now 'Architecture', implementation is Phase 5
+  troubleshooting.md:286 - 'Phase 3 (architecture)' - Phase 3 is now 'Planning', architecture is Phase 4
+```
+
+**Severity:** WARNING (doesn't break functionality)
+**Fix support:** Validation-Only - requires semantic understanding to fix correctly
+
+### Files Changed
+- `scripts/src/lib/phases/phase14d-prose-phase-references.ts` - NEW: Phase implementation
+- `scripts/src/lib/phase-registry.ts` - Added Phase 14d import and registration
+- `SKILL.md` - Updated phase count (22→23), updated Validation-Only phases (14b-c→14b-d)
+- `references/phase-details.md` - Added Phase 14d section with examples
+- `../fixing-skills/SKILL.md` - Updated Validation-Only category (14b-c→14b-d) in 3 locations
+
+### Impact
+**Success criteria:** Running audit on orchestrating-feature-development now detects 5 stale prose references that were previously missed.
+
+## [2025-12-30] - Add Phase Numbering Hygiene Criterion
+
+### Added
+- **Criterion 7: Phase Numbering Hygiene** - New semantic review criterion that detects fractional major phase numbers
+- Detailed reference file: `references/phase-numbering-hygiene.md` (~200 lines)
+- Detection pattern: Scans for `## Phase X.Y` or `## Step X.Y` in headings
+- Distinguishes major phases (flag WARNING) from acceptable sub-steps (e.g., `### Step 7.1`)
+
+### Changed
+- Semantic Review Checklist: 6 criteria → 7 criteria
+- Added "Phase Numbering Hygiene Assessment" subsection in SKILL.md
+- Updated `references/semantic-review-output.md`: "6 criteria" → "7 criteria"
+- Line count: 308 → 322 lines (still well under 500 limit)
+
+### Reason
+- **RED failure**: No audit criterion detects fractional phase numbering (Phase 3.5, Phase 5.4)
+- Historical evidence: `creating-skills` CHANGELOG references Phase 5.3, 5.4, 2.3
+- `managing-skills/references/patterns/changelog-format.md` line 7 references Phase 5.4
+- `updating-skills` was just updated to mandate sequential integer numbering
+- Fractional phases create maintenance debt and numbering confusion
+
+### Technical Details
+**Detection Logic:**
+1. Scans SKILL.md and all files under `references/` directory
+2. Regex pattern: `^##+ (Phase|Step) \d+\.\d+` in headings
+3. Distinguishes fractional MAJOR phases (bad) from sub-steps (acceptable)
+4. Sub-steps like `### Step 7.1` under `## Step 7` represent decomposition, not insertion
+
+**Output Format:**
+```json
+{
+  "severity": "WARNING",
+  "criterion": "Phase Numbering Hygiene",
+  "issue": "Fractional phase numbering detected: Phase 3.5 at line 45",
+  "recommendation": "Renumber phases sequentially and update cross-references"
+}
+```
+
+**Severity:** Always WARNING (not CRITICAL) - impacts maintainability but doesn't block functionality
+
+### Files Changed
+- `SKILL.md` - Added criterion 7 to checklist, added Phase Numbering Hygiene Assessment subsection
+- `references/semantic-review-output.md` - Updated "6 criteria" to "7 criteria"
+- `references/phase-numbering-hygiene.md` - NEW: Detection logic, examples, output format
+
+### Impact
+- Claude will now flag fractional phase numbers during semantic review
+- Complements `updating-skills` Phase Numbering Rule
+- Prevents accumulation of fractional phases in future skill updates
+- Coordinated with pending `fixing-skills` update for automated remediation
+
+### Related Updates
+- Part of 4-skill update sequence:
+  1. ✅ `updating-skills` - Added Phase Numbering Rule
+  2. ✅ `auditing-skills` - Added detection criterion (this update)
+  3. ⏳ `fixing-skills` - Add fix guidance
+  4. ⏳ `managing-skills` - Fix stale Phase 5.4 reference
+
+### Method
+- Manual edit via Edit and Write tools
+- Backup created: `.local/2025-12-30-*-auditing-skills-pre-phase-numbering-hygiene.bak`
+
+---
+
 ## [2025-12-28] - Mandatory Description Quality Assessment
 
 ### Changed
@@ -48,109 +162,3 @@ The deleted `phase1b-description-quality.ts` was "fantasy code" that expected Cl
 When performing semantic review, Claude will now:
 1. Evaluate descriptions against 5 concrete criteria
 2. Report specific issues with recommendations
-3. Cannot bypass or skip this assessment (multiple enforcement points)
-
-## [2024-12-28] - Phase Registry Pattern (Open/Closed Principle)
-
-### Changed
-- **ARCHITECTURE**: Implemented Phase Registry Pattern to fix Open/Closed Principle violation
-  - Before: Adding a phase required manual updates in 6-8 locations
-  - After: Adding a phase requires ONE entry in phase-registry.ts
-  - Impact: Eliminates forgotten wiring when extending the system
-
-### Technical Details
-- Created `phase-registry.ts` as single source of truth for all 23 phases
-  - PHASE_REGISTRY array with metadata (number, name, fixable, requiresSkillsDir, etc.)
-  - PHASE_COUNT derived from registry (no manual constant)
-  - FIXABLE_PHASES filtered list for fix CLI
-  - Helper functions: getPhaseKey(), findPhasesByNumber(), findPhaseByKey()
-- Refactored `audit-engine.ts` to iterate over PHASE_REGISTRY:
-  - runFull(): Replaced 136 lines of explicit calls with 12-line loop
-  - runFullForSingleSkill(): Replaced 91 lines with registry iteration
-  - runSinglePhaseForSkill(): Replaced 28-entry object with findPhasesByNumber() lookup
-- Refactored `fixing-skills/fix.ts`:
-  - Replaced 88 lines of if-block cascade with 12-line loop over FIXABLE_PHASES
-  - Auto-fix routing now works dynamically
-
-### Benefits
-1. **Single Source of Truth**: All phase definitions in `phase-registry.ts`
-2. **Open/Closed Principle**: System now open for extension, closed for modification
-3. **No Manual Coordination**: Consumers automatically iterate over registry
-4. **Reduced Maintenance**: Previously 6-8 touch points, now just 1
-5. **Type Safety**: TypeScript compilation validates all phase references
-
-### Future Phase Addition
-To add Phase 22:
-1. Create `phase22-my-feature.ts` in `phases/` directory
-2. Add ONE entry to PHASE_REGISTRY in `phase-registry.ts`
-3. Done! All commands automatically pick it up
-
-No changes needed to audit-engine.ts, fix.ts, or any consumers.
-
-### Files Modified
-- **Created**: `scripts/src/lib/phase-registry.ts` (133 lines)
-- **Modified**: `scripts/src/lib/audit-engine.ts` (reduced complexity)
-- **Modified**: `fixing-skills/scripts/src/fix.ts` (simplified fix routing)
-
-### Testing
-- ✅ TypeScript compilation successful (both packages)
-- ✅ Full audit on using-skills passed
-- ✅ Single-phase audit (--phase 1) passed
-- ✅ Phase 14 sub-phases work correctly
-- ✅ Fix command (--phase 2) works with registry routing
-- ✅ Compliance audit on auditing-skills passed
-
-### Backward Compatibility
-- 100% backward compatible - all existing commands work identically
-- Fix methods maintained for existing phases
-- CLI help text shows correct phase count (21)
-
-## [2024-12-28] - Performance Optimization
-
-### Changed
-- **PERFORMANCE**: Eliminated O(N×M) complexity in full audit execution
-  - Before: Each of 23 phases independently parsed all N skills (23 × N file operations)
-  - After: Parse all skills once, then run 23 validation phases (N file operations)
-  - Impact: ~23× reduction in file system operations for full audits
-
-### Technical Details
-- Added `parseAllSkills()` private method to `SkillAuditor` class in `audit-engine.ts`
-- Refactored `runFull()` to parse skills once and pass to all phases
-- Added `runOnParsedSkills(skills: SkillFile[])` method to all 23 phase classes:
-  - phase1-description-format.ts through phase21-line-number-references.ts
-  - Special cases: phase10 and phase20 require additional `skillsDir` parameter
-- Maintained 100% backward compatibility - existing `run(skillsDir)` methods still work
-- All phases now support both interfaces:
-  - `run(skillsDir)` - Standalone execution (parses files internally)
-  - `runOnParsedSkills(skills)` - Optimized execution (accepts pre-parsed array)
-
-### Testing
-- ✅ TypeScript compilation successful
-- ✅ Full audit on using-skills passed
-- ✅ Full audit on auditing-skills passed with warnings (pre-existing)
-- ✅ Console output shows "Parsed X skills. Running 23 phases..." message
-
-### Files Modified
-- `scripts/src/lib/audit-engine.ts` - Added parseAllSkills(), updated runFull()
-- `scripts/src/lib/phases/*.ts` - All 23 phase files refactored with new pattern
-- `scripts/src/lib/types.ts` - Added SkillFile to exports
-
-### Backward Compatibility
-- CLI commands unchanged - `npm run audit` and `npm run audit -- <skill-name>` work identically
-- Single-phase execution (`runSinglePhaseForSkill`) unchanged
-- Fix workflows (`fixPhase2`, etc.) unchanged
-- All existing tests pass without modification
-
-## [Previous Entries]
-See git history for earlier changes.
-## 2025-12-29
-
-**Updated phase categorization to match implementation:**
-
-- Deterministic: 2, 5, 6, 7, 12, 14a, 16, 18 (8 phases, down from 10)
-- Hybrid: 4, 10, 19 (3 phases, up from 1)  
-- Claude-Automated: Added Phase 15 (Orphan Detection) - now 8 phases
-
-**Changed:** Lines 20-25 - Phase category counts and lists
-
-**Reason:** Documentation incorrectly listed phases 4, 10 as deterministic and was missing Phase 15 from Claude-Automated category.

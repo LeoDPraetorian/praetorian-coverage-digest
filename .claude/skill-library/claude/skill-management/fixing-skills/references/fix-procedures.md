@@ -202,6 +202,159 @@ See [Agent Recommendation Patterns](../../../../skills/managing-skills/reference
 
 **Reference:** See [code-reference-patterns.md](../../../../skills/managing-skills/references/patterns/code-reference-patterns.md)
 
+### Semantic Criterion 7: Phase Numbering Hygiene
+
+**When:** Fractional major phase numbers (Phase 3.5, Phase 5.4) found during semantic review
+
+**Classification:** Claude-Automated (no user confirmation needed)
+
+**Complete Process:**
+
+**Step 1: Identify All Major Phases**
+
+Scan SKILL.md and references/ for phase headings:
+- Pattern: `## Phase X` or `## Step X`
+- Build list of all current phase numbers
+
+**Step 2: Create Renumbering Map**
+
+Build mapping from old to new phase numbers:
+
+```typescript
+// Example: Phase 2 (Discovery) inserted between Phase 1 and 2
+Current: Phase 1, 2, 3, 4, 5, 6, 7, 8, 9
+After:   Phase 1, 2(new), 3, 4, 5, 6, 7, 8, 9, 10
+Map: {
+  2: 3,
+  3: 4,
+  4: 5,
+  5: 6,
+  6: 7,
+  7: 8,
+  8: 9,
+  9: 10
+}
+```
+
+**Step 3: Update Phase Headings**
+
+Use Edit tool to renumber ALL major phase headings sequentially:
+- Update `## Phase X` → `## Phase Y` in SKILL.md
+- Update `## Phase X` → `## Phase Y` in references/phase-X-*.md files
+- Rename phase reference files: `phase-4-impl.md` → `phase-5-impl.md`
+
+**Step 4: Update Markdown Links**
+
+Find and update all links to phase files:
+- Pattern: `[Phase X](phase-X-file.md)` → `[Phase Y](phase-Y-file.md)`
+- Update in SKILL.md and all reference files
+- Example: `[Phase 4](phase-4-impl.md)` → `[Phase 5](phase-5-impl.md)`
+
+**Step 5: Update Prose References (NEW)**
+
+For ALL files in skill directory (SKILL.md + references/*):
+
+1. **Find prose patterns** - Use regex to find phase references:
+   - `/Phase\s+(\d+)\s*\(/gi` → "Phase 4 (" becomes "Phase 5 ("
+   - `/Phase\s+(\d+)\s*:/gi` → "Phase 4:" becomes "Phase 5:"
+   - `/Phase\s+(\d+)\s+output/gi` → "Phase 4 output" becomes "Phase 5 output"
+   - `/to\s+Phase\s+(\d+)/gi` → "to Phase 4" becomes "to Phase 5"
+   - `/from\s+Phase\s+(\d+)/gi` → "from Phase 4" becomes "from Phase 5"
+   - `/return to Phase\s+(\d+)/gi` → "return to Phase 4" becomes "return to Phase 5" (case-insensitive)
+
+2. **Apply renumbering map** - For each match:
+   - Extract phase number
+   - Look up in renumbering map
+   - Replace with new number
+   - **Preserve descriptive text**: "Phase 4 (implementation)" → "Phase 5 (implementation)"
+
+3. **Target ALL reference files**:
+   - troubleshooting.md
+   - progress-persistence.md
+   - agent-handoffs.md
+   - phase-X-*.md files
+   - Any other .md files in references/
+
+4. **Exclusions**:
+   - `.history/CHANGELOG` - Historical, don't modify
+   - Code blocks - Might be external examples, skip fenced code
+   - External files - Don't modify files outside skill directory
+
+**Example prose updates:**
+
+```markdown
+# Before (troubleshooting.md)
+If test fails, return to Phase 4 (implementation) and verify...
+The Phase 3 output should include...
+Navigate from Phase 2 to Phase 5 when...
+
+# After (troubleshooting.md)
+If test fails, return to Phase 5 (implementation) and verify...
+The Phase 4 output should include...
+Navigate from Phase 3 to Phase 6 when...
+```
+
+**Step 6: Verify Name Hints Match (NEW)**
+
+After renumbering, validate descriptive hints:
+
+1. Extract phase names from SKILL.md phase table or headings
+2. For each prose reference with hint (e.g., "Phase 5 (Implementation)"):
+   - Verify Phase 5 IS the implementation phase
+   - If mismatch detected, flag for manual review
+
+Example validation:
+
+```typescript
+// Phase table shows:
+// Phase 5: Architecture
+// Phase 6: Implementation
+
+// Prose reference says:
+"Return to Phase 5 (Implementation)" ← MISMATCH!
+
+// Flag as: "WARNING: Phase hint mismatch at troubleshooting.md:108
+// Says 'Implementation' but Phase 5 is 'Architecture'"
+```
+
+**Step 7: Report External References (Optional)**
+
+Search for external references to this skill's phases:
+
+```bash
+grep -r "orchestrating-feature.*Phase [0-9]" .claude/skill-library .claude/skills
+```
+
+Report as INFO (do NOT auto-modify):
+- "External reference found in writing-plans/SKILL.md:275 - manual review recommended"
+- "External reference found in managing-skills/references/patterns/changelog-format.md:42 - manual review recommended"
+
+**Why This Matters:**
+
+When phases are inserted or renumbered:
+- Formal headings and links get updated automatically
+- But prose text like "Return to Phase 4 (implementation)" was being missed
+- This caused confusing mismatches where prose pointed to wrong phases
+- Now ALL references in the skill's ecosystem get updated together
+
+**Example Complete Fix:**
+
+```markdown
+# orchestrating-feature-development after Phase 2 (Discovery) inserted
+
+# Files updated by Step 3-4 (existing):
+- SKILL.md: Phase headings and table
+- phase-3-planning.md: Heading and filename
+- All markdown links
+
+# Files updated by Step 5 (NEW):
+- troubleshooting.md:108: "Return to Phase 4 (implementation)" → "Return to Phase 5 (implementation)"
+- troubleshooting.md:286: "Return to Phase 3 (architecture)" → "Return to Phase 4 (architecture)"
+- troubleshooting.md:292: "Return to Phase 2 (planning)" → "Return to Phase 3 (planning)"
+- progress-persistence.md:195: "Phase 3 output" → "Phase 4 output"
+- phase-8-testing.md:218: "Return to Phase 4 (Implementation)" → "Return to Phase 5 (Implementation)"
+```
+
 ---
 
 ## Hybrid Fixes (Step 4c)

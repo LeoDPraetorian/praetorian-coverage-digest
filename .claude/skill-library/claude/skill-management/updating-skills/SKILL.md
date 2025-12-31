@@ -61,6 +61,18 @@ cd "$REPO_ROOT"
 
 **Step 3.5: Research (Optional)** - For significant content updates, consider using researching-skills
 
+**Step 3.6: Phase Numbering Rule (MANDATORY)** - When adding phases to skills:
+
+**PHASE NUMBERING RULE:**
+
+- NEVER use fractional phase numbers (e.g., Phase 3.5, Phase 5.4)
+- ALWAYS renumber subsequent phases to maintain sequential integers
+- Example: To add a phase between Phase 3 and Phase 4:
+  1. Renumber: Phase 4→5, Phase 5→6, Phase 6→7, etc.
+  2. Insert new content as Phase 4
+  3. Update ALL references to renumbered phases throughout SKILL.md and references/
+- Sub-steps WITHIN a phase (Step 7.1, 7.2, 7.3) are acceptable for decomposition
+
 **Step 4: Edit** - Apply minimal fix using Edit or Write tool
 
 **Step 5: Verify GREEN** - Re-test scenario, must pass

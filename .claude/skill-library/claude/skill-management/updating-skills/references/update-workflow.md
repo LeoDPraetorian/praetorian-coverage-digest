@@ -128,7 +128,39 @@ wc -l {skill-path}/SKILL.md
 
 1. **Identify section to change**
 
-2. **Apply minimal edit**:
+2. **Phase Numbering Rule (MANDATORY for phase insertions)**:
+
+   When adding a new MAJOR phase between existing phases:
+
+   **NEVER use fractional phase numbers** (e.g., Phase 3.5, Phase 5.4)
+
+   **ALWAYS renumber subsequent phases** to maintain sequential integers:
+
+   ```
+   Example: To add a phase between Phase 3 and Phase 4:
+
+   Step 1: Renumber ALL subsequent phases
+   - Phase 4 → Phase 5
+   - Phase 5 → Phase 6
+   - Phase 6 → Phase 7
+   (and so on...)
+
+   Step 2: Insert new content as Phase 4
+
+   Step 3: Update ALL references to renumbered phases
+   - Search for "Phase 4", "Phase 5", etc. in SKILL.md
+   - Search in all files under references/ directory
+   - Update cross-references like "see Phase 4" → "see Phase 5"
+   ```
+
+   **Sub-steps WITHIN a phase are acceptable** (Step 7.1, 7.2, 7.3) as they represent decomposition, not insertion.
+
+   **Why this matters**:
+   - Prevents maintenance debt from fractional numbering
+   - Keeps phase sequences clean and predictable
+   - Avoids confusion about phase ordering
+
+3. **Apply minimal edit**:
 
    ```
    Edit {

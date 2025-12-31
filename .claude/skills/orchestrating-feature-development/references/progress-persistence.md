@@ -191,8 +191,10 @@ FEATURE_ID="${FEATURE_SLUG}_${TIMESTAMP}"
 .claude/features/{feature-id}/
 ├── progress.json           # Progress state (this document)
 ├── design.md               # Phase 1 output
-├── plan.md                 # Phase 2 output
-├── architecture.md         # Phase 3 output (or architecture-*.md for full-stack)
+├── frontend-discovery.md   # Phase 2 output
+├── backend-discovery.md    # Phase 2 output
+├── plan.md                 # Phase 3 output
+├── architecture.md         # Phase 4 output (or architecture-*.md for full-stack)
 └── logs/
     ├── architecture.log    # Agent spawn logs
     ├── implementation.log  # Developer agent logs

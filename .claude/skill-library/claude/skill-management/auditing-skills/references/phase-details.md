@@ -103,6 +103,36 @@ See the `non-existent-skill` skill for details.
 2. Phase 2: Another task
 ```
 
+## Phase 14d: Prose Phase References
+
+**Checks:** Prose phase references match canonical phase list
+
+**What it detects:**
+
+- Stale references like "Phase 4 (implementation)" when Phase 4 is now "Architecture"
+- Missing phase numbers referenced in text
+- Name hints that don't match the canonical phase name
+
+**Example failure:**
+
+```markdown
+Return to Phase 4 (implementation) to fix.
+```
+
+When Phase 4 is actually "Architecture" (implementation moved to Phase 5).
+
+**Why:** After phase renumbering (adding/removing phases), prose references become stale while markdown links get caught by Phase 4 (Broken Links).
+
+**Severity:** WARNING (doesn't break functionality)
+
+**Fix:** Validation-Only - requires semantic understanding to fix correctly
+
+**Exclusions:**
+
+- `.history/CHANGELOG` files (historical)
+- Code blocks (examples)
+- Cross-skill references
+
 ## Related
 
 - [Complete Phase List](../../../../../skills/managing-skills/references/audit-phases.md)

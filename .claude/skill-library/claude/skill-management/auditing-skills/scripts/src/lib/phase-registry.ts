@@ -19,6 +19,7 @@ import { Phase13StateExternalization } from './phases/phase13-state-externalizat
 import { Phase14aTableFormatting } from './phases/phase14a-table-formatting.js';
 import { Phase14bCodeBlockQuality } from './phases/phase14b-code-block-quality.js';
 import { Phase14cHeaderHierarchy } from './phases/phase14c-header-hierarchy.js';
+import { Phase14dProsePhaseReferences } from './phases/phase14d-prose-phase-references.js';
 import { Phase15OrphanDetection } from './phases/phase15-orphan-detection.js';
 import { Phase16WindowsPaths } from './phases/phase16-windows-paths.js';
 import { Phase17GatewayStructure } from './phases/phase17-gateway-structure.js';
@@ -78,6 +79,7 @@ export const PHASE_REGISTRY: PhaseDefinition[] = [
   { number: 14, subPhase: 'a', name: 'Table Formatting', phase: Phase14aTableFormatting, fixable: true },
   { number: 14, subPhase: 'b', name: 'Code Block Quality', phase: Phase14bCodeBlockQuality, fixable: false },
   { number: 14, subPhase: 'c', name: 'Header Hierarchy', phase: Phase14cHeaderHierarchy, fixable: false },
+  { number: 14, subPhase: 'd', name: 'Prose Phase References', phase: Phase14dProsePhaseReferences, fixable: false },
   { number: 15, name: 'Orphan Detection', phase: Phase15OrphanDetection, fixable: false },
   { number: 16, name: 'Windows Paths', phase: Phase16WindowsPaths, fixable: true },
 

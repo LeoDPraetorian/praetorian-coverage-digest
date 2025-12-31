@@ -95,7 +95,7 @@ Options:
 
 ```
 TodoWrite: Mark "Phase 1: Brainstorming" as completed
-TodoWrite: Mark "Phase 2: Planning" as in_progress
+TodoWrite: Mark "Phase 2: Discovery" as in_progress
 ```
 
 ## Exit Criteria
@@ -129,5 +129,6 @@ TodoWrite: Mark "Phase 2: Planning" as in_progress
 
 ## Related References
 
-- [Phase 2: Planning](phase-2-planning.md) - Next phase
+- [Phase 2: Discovery](phase-2-discovery.md) - Next phase
+- [Phase 3: Planning](phase-3-planning.md) - Following Discovery
 - [Progress Persistence](progress-persistence.md) - Progress file format

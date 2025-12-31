@@ -1,5 +1,143 @@
 # Changelog
 
+## 2025-12-30 - Enhance Phase Numbering Hygiene to Update Prose References
+
+### Added
+- **Step 5: Update Prose References** - New comprehensive prose reference update procedure
+- Regex patterns for finding all prose references: "Phase X (", "Phase X:", "to Phase X", "return to Phase X"
+- **Step 6: Verify Name Hints Match** - Validates prose hints against actual phase names after renumbering
+- **Step 7: Report External References** - Optional grep search for external skill references
+- Complete example showing troubleshooting.md, progress-persistence.md, agent-handoffs.md updates
+
+### Changed
+- SKILL.md Phase Numbering Hygiene section: 5-step → 7-step procedure
+- fix-procedures.md: Added Semantic Criterion 7 section with complete Step 1-7 process
+- Enhanced example transformation to show prose updates alongside heading/link updates
+- Exclusions list: Added .history/CHANGELOG and code blocks
+- Line count: 310 → 362 lines (SKILL.md), 440 → 596 lines (fix-procedures.md)
+
+### Reason
+- **RED failure**: orchestrating-feature-development had Phase 2 inserted, but prose refs were missed
+- Current fix updates headings and markdown links but MISSES prose like "Return to Phase 4 (implementation)"
+- Evidence from orchestrating-feature-development:
+  - troubleshooting.md:108 - "Return to Phase 4 (implementation)" should be Phase 5
+  - troubleshooting.md:286 - "Return to Phase 3 (architecture)" should be Phase 4
+  - troubleshooting.md:292 - "Return to Phase 2 (planning)" should be Phase 3
+  - progress-persistence.md:195 - "Phase 3 output" should be Phase 4
+  - phase-8-testing.md:218 - "Return to Phase 4 (Implementation)" should be Phase 5
+- Need comprehensive prose reference updates across ALL files in skill directory
+
+### Technical Details
+
+**New Step 5: Prose Reference Updates**
+
+Targets ALL files in skill directory (SKILL.md + references/*):
+- troubleshooting.md
+- progress-persistence.md
+- agent-handoffs.md
+- phase-X-*.md files
+- Any other .md files
+
+Regex patterns:
+- `/Phase\s+(\d+)\s*\(/gi` - "Phase 4 (" → "Phase 5 ("
+- `/Phase\s+(\d+)\s*:/gi` - "Phase 4:" → "Phase 5:"
+- `/Phase\s+(\d+)\s+output/gi` - "Phase 4 output" → "Phase 5 output"
+- `/to\s+Phase\s+(\d+)/gi` - "to Phase 4" → "to Phase 5"
+- `/from\s+Phase\s+(\d+)/gi` - "from Phase 4" → "from Phase 5"
+- `/return to Phase\s+(\d+)/gi` - "return to Phase 4" → "return to Phase 5"
+
+**Preserves descriptive text**: "Phase 4 (implementation)" → "Phase 5 (implementation)" keeps "(implementation)"
+
+**New Step 6: Name Hint Validation**
+
+After renumbering:
+1. Extract phase names from SKILL.md phase table
+2. Validate prose hints: "Phase 5 (Implementation)" - check Phase 5 IS implementation
+3. Flag mismatches for manual review
+
+**New Step 7: External Reference Reporting**
+
+Optional grep search:
+```bash
+grep -r "skill-name.*Phase [0-9]" .claude/
+```
+
+Report as INFO (do NOT auto-modify external files)
+
+### Files Changed
+- `SKILL.md` - Enhanced Phase Numbering Hygiene Fix section (7 steps, prose reference patterns)
+- `references/fix-procedures.md` - Added Semantic Criterion 7 section with complete 7-step process
+
+---
+
+## 2025-12-30 - Add Phase Numbering Hygiene Fix Guidance
+
+### Added
+- **Semantic Criterion 7: Phase Numbering Hygiene** fix guidance as Claude-Automated (Tier 2)
+- 5-step fix procedure for fractional phase renumbering
+- Example transformation showing Phase 1, 2, 3, 3.5, 4 → Phase 1, 2, 3, 4, 5
+- Guidance on updating ALL cross-references (SKILL.md + references/)
+- External reference checks (changelog-format.md and other skills)
+- Clear distinction between fractional major phases (fix) and sub-steps (acceptable)
+
+### Changed
+- Quick Reference table: Added "Semantic Crit 7" to Claude-Automated row
+- Step 4b: Added Phase Numbering Hygiene Fix subsection with complete procedure
+- Line count: 256 → 307 lines (still under 400 limit)
+
+### Reason
+- **RED failure**: No fix guidance exists for Phase Numbering Hygiene violations
+- `auditing-skills` now detects fractional phase numbers (Criterion 7)
+- `updating-skills` mandates sequential integer numbering
+- Historical evidence: `creating-skills` CHANGELOG has Phase 5.3, 5.4, 2.3
+- `managing-skills/references/patterns/changelog-format.md` line 7 references Phase 5.4
+- Need automated fix workflow to remediate existing and prevent future violations
+
+### Technical Details
+
+**Classification: Tier 2 (Claude-Automated)**
+- Requires semantic understanding (identifying major phases vs sub-steps)
+- Requires systematic renumbering (creating map, updating headings)
+- Requires comprehensive reference updates (cross-references throughout files)
+- No human confirmation needed (procedure is mechanical once phases identified)
+
+**Fix Procedure:**
+1. Identify all major phases via heading scan
+2. Create renumbering map (e.g., Phase 3.5→4, Phase 4→5, Phase 5→6)
+3. Update ALL phase headings to sequential integers
+4. Find and update ALL cross-references ("see Phase X", "in Phase Y")
+5. Check external references (managing-skills, other skills)
+
+**Example Included:**
+Shows complete before/after transformation with:
+- Fractional phase heading (## Phase 3.5)
+- Renumbering of subsequent phases
+- Cross-reference update ("See Phase 3.5" → "See Phase 4")
+
+**Distinguishes sub-steps:** Explicitly notes that `### Step 7.1` under `## Step 7` is acceptable decomposition, not a violation.
+
+### Files Changed
+- `SKILL.md` - Updated Quick Reference table, added Phase Numbering Hygiene Fix subsection in Step 4b
+
+### Impact
+- Completes 4-skill update sequence for phase numbering hygiene
+- Enables Claude to automatically fix fractional phase violations
+- Prevents accumulation of fractional phases in skills
+- Provides clear mechanical procedure for renumbering
+
+### Related Updates
+- Part of 4-skill update sequence:
+  1. ✅ `updating-skills` - Added Phase Numbering Rule (prevention)
+  2. ✅ `auditing-skills` - Added detection criterion (Semantic Criterion 7)
+  3. ✅ `fixing-skills` - Add fix guidance (this update - remediation)
+  4. ⏳ `managing-skills` - Fix stale Phase 5.4 reference (cleanup)
+
+### Method
+- Manual edit via Edit tool
+- Backup created: `.local/2025-12-30-*-fixing-skills-pre-phase-numbering-hygiene.bak`
+
+---
+
 ## 2025-12-29 - Compliance Fixes
 
 **Audit Results:**

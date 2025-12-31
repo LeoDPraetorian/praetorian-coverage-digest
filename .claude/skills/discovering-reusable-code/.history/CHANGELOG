@@ -1,0 +1,25 @@
+# Changelog - discovering-reusable-code
+
+## 2025-12-30 - Initial Creation
+
+**RED Phase Documentation:**
+- **Gap**: Implementations add `if newFeature {}` special-casing throughout codebase instead of extending existing patterns because developers don't know what patterns exist to extend
+- **Failure**: PR feedback showed feature implementation added special-case conditionals to 8 functions instead of extending existing handler chain pattern
+- **Root Cause**: No exhaustive discovery methodology before implementation
+
+**Location**: Core (.claude/skills/)
+**Skill Type**: Process/Pattern
+**Purpose**: Define methodology for exhaustive reuse discovery to prevent special-casing anti-patterns
+
+**Key Content**:
+- Exhaustive search methodology with actual bash commands
+- Reusability assessment matrix (100%/80%/60%/40%/0%)
+- 10-file rule before proposing new code
+- Discovery report format with compliance confirmation
+- Validation criteria and anti-pattern detection
+
+**Line Count**: 364 lines (under 500 limit)
+
+**Related**:
+- Agent: code-pattern-analyzer (primary consumer)
+- Skills: enforcing-evidence-based-analysis, adhering-to-dry

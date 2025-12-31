@@ -1,6 +1,6 @@
-# Phase 7: Parallel Testing
+# Phase 8: Testing
 
-Create comprehensive tests by spawning test agents in parallel for all test modes (unit, integration, E2E). Testers follow the test plan created in Phase 6.
+Create comprehensive tests by spawning test agents in parallel for all test modes (unit, integration, E2E). Testers follow the test plan created in Phase 7.
 
 ## Purpose
 
@@ -26,7 +26,7 @@ All test types are independent and can run simultaneously:
 
 ## Test Plan Reference
 
-**CRITICAL:** All testers must follow the test plan created by test-lead in Phase 6.
+**CRITICAL:** All testers must follow the test plan created by test-lead in Phase 7.
 
 **PLAN LOCATION:** `.claude/features/{id}/test-plan.md`
 
@@ -215,8 +215,8 @@ If any tests failing:
 
 1. Read failure details
 2. Determine if implementation bug or test issue
-3. If implementation bug: Return to Phase 4 (Implementation)
-4. If test issue: Document for Phase 8 (Test Validation)
+3. If implementation bug: Return to Phase 5 (Implementation)
+4. If test issue: Document for Phase 9 (Test Validation)
 
 ### Step 5: Verify Complete Test Suite
 
@@ -266,13 +266,13 @@ go test ./...
 ### Step 7: Mark TodoWrite Complete
 
 ```
-TodoWrite: Mark "Phase 7: Testing" as completed
-TodoWrite: Mark "Phase 8: Test Validation" as in_progress
+TodoWrite: Mark "Phase 8: Testing" as completed
+TodoWrite: Mark "Phase 9: Test Validation" as in_progress
 ```
 
 ## Exit Criteria
 
-✅ Proceed to Phase 8 (Test Validation) when:
+✅ Proceed to Phase 9 (Test Validation) when:
 
 - All test agents returned `status: "complete"`
 - All tests passing
@@ -304,11 +304,11 @@ TodoWrite: Mark "Phase 8: Test Validation" as in_progress
 
 ### "Tests are flaky"
 
-**Solution**: Document for Phase 8 (Test Validation). The test-lead will flag flakiness as a quality issue.
+**Solution**: Document for Phase 9 (Test Validation). The test-lead will flag flakiness as a quality issue.
 
 ### "Coverage is below target"
 
-**Solution**: Document current coverage. Test-lead in Phase 8 will determine if additional tests are needed.
+**Solution**: Document current coverage. Test-lead in Phase 9 will determine if additional tests are needed.
 
 ### "E2E tests too slow"
 
@@ -320,7 +320,7 @@ TodoWrite: Mark "Phase 8: Test Validation" as in_progress
 
 ## Related References
 
-- [Phase 6: Test Planning](phase-6-test-planning.md) - Previous phase (test plan creation)
-- [Phase 8: Test Validation](phase-8-test-validation.md) - Next phase (validation against plan)
+- [Phase 7: Test Planning](phase-7-test-planning.md) - Previous phase (test plan creation)
+- [Phase 9: Test Validation](phase-9-test-validation.md) - Next phase (validation against plan)
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Troubleshooting](troubleshooting.md) - Common issues

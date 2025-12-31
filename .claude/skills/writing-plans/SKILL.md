@@ -272,7 +272,7 @@ git commit -m "feat: add specific feature"
 When called from orchestrating-feature-development:
 - **Do NOT** offer execution choices
 - **Simply announce:** "Plan complete and saved to `docs/plans/<filename>.md`. Returning control to orchestration workflow."
-- The orchestration skill will handle Phase 3 (Architecture) next
+- The orchestration skill will handle Phase 4 (Architecture) next
 
 ### If Used Standalone
 

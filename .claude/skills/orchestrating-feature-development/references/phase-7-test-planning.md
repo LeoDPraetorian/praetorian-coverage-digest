@@ -1,4 +1,4 @@
-# Phase 6: Test Planning
+# Phase 7: Test Planning
 
 Create a comprehensive test plan using the test-lead agent before testers write any tests.
 
@@ -181,13 +181,13 @@ Verify the test plan includes all required sections:
 ### Step 5: Mark TodoWrite Complete
 
 ```
-TodoWrite: Mark "Phase 6: Test Planning" as completed
-TodoWrite: Mark "Phase 7: Testing" as in_progress
+TodoWrite: Mark "Phase 7: Test Planning" as completed
+TodoWrite: Mark "Phase 8: Testing" as in_progress
 ```
 
 ## Exit Criteria
 
-✅ Proceed to Phase 7 (Testing) when:
+✅ Proceed to Phase 8 (Testing) when:
 
 - Test-lead returned `status: "complete"`
 - Test plan saved with all required sections
@@ -271,8 +271,8 @@ AskUserQuestion({
 
 ## Related References
 
-- [Phase 5: Code Review](phase-5-code-review.md) - Previous phase
-- [Phase 7: Testing](phase-7-testing.md) - Next phase (testers implement plan)
-- [Phase 8: Test Validation](phase-8-test-validation.md) - test-lead validates against plan
+- [Phase 6: Code Review](phase-6-code-review.md) - Previous phase
+- [Phase 8: Testing](phase-8-testing.md) - Next phase (testers implement plan)
+- [Phase 9: Test Validation](phase-9-test-validation.md) - test-lead validates against plan
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Troubleshooting](troubleshooting.md) - Common issues

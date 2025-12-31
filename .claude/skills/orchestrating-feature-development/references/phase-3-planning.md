@@ -1,4 +1,4 @@
-# Phase 2: Planning
+# Phase 3: Planning
 
 Create a detailed implementation plan with specific tasks, file paths, and verification steps.
 
@@ -135,13 +135,13 @@ If "Let me review": Provide path to plan.md
 ### Step 5: Mark TodoWrite Complete
 
 ```
-TodoWrite: Mark "Phase 2: Planning" as completed
-TodoWrite: Mark "Phase 3: Architecture" as in_progress
+TodoWrite: Mark "Phase 3: Planning" as completed
+TodoWrite: Mark "Phase 4: Architecture" as in_progress
 ```
 
 ## Exit Criteria
 
-✅ Proceed to Phase 3 when:
+✅ Proceed to Phase 4 when:
 
 - Plan saved to `plan.md`
 - User explicitly approves plan
@@ -169,7 +169,7 @@ TodoWrite: Mark "Phase 3: Architecture" as in_progress
 
 ### "Should I include architecture decisions in the plan?"
 
-**Answer**: No. The plan should list "Architecture decisions needed" as questions for the architect agent. Let Phase 3 make those decisions.
+**Answer**: No. The plan should list "Architecture decisions needed" as questions for the architect agent. Let Phase 4 make those decisions.
 
 ### "User wants to change approach mid-planning"
 
@@ -183,5 +183,6 @@ TodoWrite: Mark "Phase 3: Architecture" as in_progress
 ## Related References
 
 - [Phase 1: Brainstorming](phase-1-brainstorming.md) - Previous phase
-- [Phase 3: Architecture](phase-3-architecture.md) - Next phase
+- [Phase 2: Discovery](phase-2-discovery.md) - Discovery phase (parallel to Planning input)
+- [Phase 4: Architecture](phase-4-architecture.md) - Next phase
 - [Progress Persistence](progress-persistence.md) - Progress file format

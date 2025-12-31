@@ -1,4 +1,4 @@
-# Phase 8: Test Validation
+# Phase 9: Test Validation
 
 Validate test implementation against the test plan using the test-lead agent. Includes feedback loop with MAX 1 RETRY before escalating to user.
 
@@ -17,14 +17,14 @@ Validate test suite quality against the test plan before completion by:
 
 Writing tests is not enough. Tests must:
 
-- **Follow the plan** - All required tests from Phase 6 implemented
+- **Follow the plan** - All required tests from Phase 7 implemented
 - **Meet targets** - Coverage meets plan thresholds (Security: 95%, Business: 80%, Integration: 90%)
 - **Avoid anti-patterns** - No patterns flagged in test plan
 - **Test behavior** - Testing what users see, not implementation details
 - **Be maintainable** - No anti-patterns that cause future issues
 - **Be reliable** - No flaky tests that erode confidence
 
-The test-lead validates implementation against the test plan created in Phase 6, ensuring the plan was followed.
+The test-lead validates implementation against the test plan created in Phase 7, ensuring the plan was followed.
 
 ## Workflow
 
@@ -253,13 +253,13 @@ AskUserQuestion({
 ### Step 5: Mark TodoWrite Complete
 
 ```
-TodoWrite: Mark "Phase 8: Test Validation" as completed
-TodoWrite: Mark "Phase 9: Completion" as in_progress
+TodoWrite: Mark "Phase 9: Test Validation" as completed
+TodoWrite: Mark "Phase 10: Completion" as in_progress
 ```
 
 ## Exit Criteria
 
-✅ Proceed to Phase 9 (Completion) when:
+✅ Proceed to Phase 10 (Completion) when:
 
 - Test-lead returned `verdict: "PASS"` (or user approved)
 - All tests from plan implemented
@@ -362,7 +362,7 @@ AskUserQuestion({
 
 ## Validation vs Planning
 
-| Phase 6 (Planning) | Phase 8 (Validation) |
+| Phase 7 (Planning) | Phase 9 (Validation) |
 | ------------------ | -------------------- |
 | test-lead CREATES plan | test-lead VALIDATES against plan |
 | Defines what tests are needed | Verifies tests were implemented |
@@ -372,7 +372,7 @@ AskUserQuestion({
 
 ## Related References
 
-- [Phase 6: Test Planning](phase-6-test-planning.md) - Test plan creation
-- [Phase 7: Testing](phase-7-testing.md) - Previous phase (test implementation)
+- [Phase 7: Test Planning](phase-7-test-planning.md) - Test plan creation
+- [Phase 8: Testing](phase-8-testing.md) - Previous phase (test implementation)
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Troubleshooting](troubleshooting.md) - Common issues

@@ -1,4 +1,4 @@
-# Phase 3: Parallel Architecture Review
+# Phase 4: Architecture
 
 Make design decisions by spawning domain lead + security-lead agents in parallel. Their combined analysis ensures comprehensive architecture validation with security considerations before implementation.
 
@@ -274,13 +274,13 @@ If any agent returns `status: "blocked"`:
 ### Step 8: Mark TodoWrite Complete
 
 ```
-TodoWrite: Mark "Phase 3: Architecture" as completed
-TodoWrite: Mark "Phase 4: Implementation" as in_progress
+TodoWrite: Mark "Phase 4: Architecture" as completed
+TodoWrite: Mark "Phase 5: Implementation" as in_progress
 ```
 
 ## Exit Criteria
 
-✅ Proceed to Phase 4 when:
+✅ Proceed to Phase 5 when:
 
 - Architecture documented in `architecture.md`
 - Security assessment documented in `security-assessment.md`
@@ -327,7 +327,7 @@ Task(subagent_type: "security-lead", description: "Security assessment...", ...)
 
 1. Be documented in security-assessment.md
 2. Inform implementation requirements
-3. Be addressed in Phase 5 (Code Review) by security reviewers
+3. Be addressed in Phase 6 (Code Review) by security reviewers
 
 ### "Should I skip security-lead for simple UI features?"
 
@@ -346,8 +346,9 @@ Previous architecture was too vague. Be specific:
 
 ## Related References
 
-- [Phase 2: Planning](phase-2-planning.md) - Previous phase
-- [Phase 4: Implementation](phase-4-implementation.md) - Next phase
-- [Phase 5: Code Review](phase-5-code-review.md) - Where security review happens
+- [Phase 2: Discovery](phase-2-discovery.md) - Discovery reports (input)
+- [Phase 3: Planning](phase-3-planning.md) - Previous phase
+- [Phase 5: Implementation](phase-5-implementation.md) - Next phase
+- [Phase 6: Code Review](phase-6-code-review.md) - Where security review happens
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Conflict Resolution Examples](conflict-resolution-examples.md) - Handling disagreements

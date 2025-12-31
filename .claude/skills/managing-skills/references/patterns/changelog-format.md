@@ -2,9 +2,12 @@
 
 **Single source of truth for skill changelog structure.**
 
+**Phase Numbering Convention:**
+Skills use sequential integer phase numbers (1, 2, 3, 4, 5...) for major phases. Fractional phase numbers like "Phase 3.5" are not used - when adding phases, renumber sequentially. Sub-steps within phases (e.g., "5.1", "5.2", "5.4") are acceptable for decomposition.
+
 This pattern is referenced by:
 
-- `creating-skills` - Creates initial changelog (Phase 5.4)
+- `creating-skills` - Creates initial changelog (Phase 5, sub-step 5.4)
 - `updating-skills` - Appends update entries (Phase 5)
 - `fixing-skills` - Documents fixes (Step 9)
 
