@@ -158,17 +158,29 @@ Janus framework workflow design, chain composition, state management. **Required
 
 ### FINGERPRINTX DEVELOPMENT (Mandatory: Capability Dev creating fingerprintx modules)
 
-**9. Protocol Research (BLOCKING - MUST BE FIRST)**
+**9. Fingerprintx Development Orchestrator (MANDATORY - Use This as Entry Point) 🔍**
+
+`.claude/skill-library/development/capabilities/orchestrating-fingerprintx-development/SKILL.md`
+
+Complete workflow orchestrator for fingerprintx module creation. Coordinates protocol research, version marker research, and implementation with BLOCKING gates. Enforces proper sequencing, prevents skipped research, ensures artifact persistence. **USE THIS as the single entry point for all new fingerprintx modules. Do NOT use individual skills directly unless orchestrator explicitly invokes them.**
+
+**10. Protocol Research (Invoked by Orchestrator)**
 
 `.claude/skill-library/development/capabilities/researching-protocols/SKILL.md`
 
-Research methodology before implementation - lab setup, active probing, pattern identification, detection strategy documentation. **You cannot write correct detection logic without first researching the protocol. MUST complete before writing any code.**
+Research methodology before implementation - lab setup, active probing, pattern identification, detection strategy documentation. **Invoked by orchestrator in Phase 3. Do not use directly - the orchestrator enforces completion via blocking gate.**
 
-**10. Fingerprintx Module Implementation (AFTER research)**
+**11. Version Marker Research (Invoked by Orchestrator, Conditional)**
+
+`.claude/skill-library/development/capabilities/researching-version-markers/SKILL.md`
+
+Source code analysis across releases to identify version-specific markers (capability flags, defaults, features, errors, banners). Builds Version Fingerprint Matrix for enrichment phase. **Invoked by orchestrator in Phase 4 (conditional on open-source availability). Do not use directly - the orchestrator determines when to invoke and enforces completion via blocking gate.**
+
+**12. Fingerprintx Module Implementation (Invoked by Orchestrator)**
 
 `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md`
 
-Plugin interface (5 methods), type system integration, two-phase detection, CPE generation. **Requires research document as input. Do not start implementation without completing Protocol Research first.**
+Plugin interface (5 methods), type system integration, two-phase detection, CPE generation. **Invoked by orchestrator in Phase 5. Do not use directly - the orchestrator provides research artifacts as inputs.**
 
 ---
 
@@ -177,7 +189,7 @@ Plugin interface (5 methods), type system integration, two-phase detection, CPE 
 1. Identify your role from the Role Filter table above
 2. Read ALL ROLES skill (1 skill)
 3. Based on your role, also read:
-   - Capability Dev: GO ARCHITECTURE (1 skill) + FINGERPRINTX DEVELOPMENT (2 skills, if building fingerprintx modules)
+   - Capability Dev: GO ARCHITECTURE (1 skill) + FINGERPRINTX DEVELOPMENT (1 orchestrator skill, if building fingerprintx modules)
    - VQL Developer: VQL DEVELOPMENT (1 skill)
    - Template Author: TEMPLATE DEVELOPMENT (1 skill)
    - Scanner Integrator: SCANNER INTEGRATION (2 skills)
@@ -213,6 +225,7 @@ This gateway provides access to skills for building offensive security capabilit
 | 🔌 Scanner integration         | `.claude/skill-library/development/capabilities/capabilities-scanner-integration/SKILL.md`     |
 | 🔌 Janus chain orchestration   | `.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md`            |
 | 🔍 Protocol research (FIRST)   | `.claude/skill-library/development/capabilities/researching-protocols/SKILL.md`                |
+| 🔍 Version marker research     | `.claude/skill-library/development/capabilities/researching-version-markers/SKILL.md`          |
 | 🔍 Fingerprintx implementation | `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md`         |
 
 ## When to Use
@@ -510,7 +523,7 @@ Building a new capability?
 ├── Nuclei template → capabilities-nuclei-templates 📋
 ├── Integrate existing scanner → capabilities-scanner-integration 🔌
 ├── Chain multiple tools → capabilities-janus-chains 🔌
-├── Fingerprint services → researching-protocols 🔍 THEN writing-fingerprintx-modules 🔍
+├── Fingerprint services → orchestrating-fingerprintx-development 🔍 (coordinates all phases)
 └── Wrap CLI tool → integrating-standalone-capabilities 🏗️
 
 Porting Python tool to Go?

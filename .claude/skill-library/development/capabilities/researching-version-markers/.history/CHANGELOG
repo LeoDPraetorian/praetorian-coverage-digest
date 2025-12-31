@@ -1,0 +1,47 @@
+# Changelog: researching-version-markers
+
+## 2025-12-30 - Initial Creation
+
+**Author:** Claude AI (via skill-manager create)
+
+**Category:** library-development-capabilities
+
+**Skill Type:** process/pattern
+
+**RED Phase Documentation:**
+
+**Gap identified:** The fingerprintx development workflow had a methodology for protocol detection (`researching-protocols`) but lacked a systematic approach for version-specific marker research. This left developers without guidance for building precise version fingerprint matrices that enable CPE generation like `cpe:2.3:a:oracle:mysql:8.0.23` instead of generic `mysql:*`.
+
+**Failure scenario:** When building fingerprintx modules for open-source services:
+1. Developer uses `researching-protocols` for protocol detection
+2. Wants version-granular detection (8.0.23 vs 8.0.4 vs 5.7.x)
+3. NO SKILL EXISTS for researching version-specific markers systematically
+4. Developer either skips version detection or does ad-hoc research
+5. Result: Imprecise CPEs, missed version boundaries, unreliable enrichment phase
+
+**Test confirmed:** No existing skill for version marker research in fingerprintx workflow.
+
+**Initial implementation:**
+- 8-phase workflow (Repository Setup → Validation)
+- Integration with `researching-github` for source analysis
+- Marker categorization (6 categories: Capability Flags, Default Configs, New Features, Error Formats, Banner Strings, Protocol Extensions)
+- Version Fingerprint Matrix as primary deliverable
+- 4 reference documents created
+- Positioned between `researching-protocols` and `writing-fingerprintx-modules` in workflow
+
+**Gateway placement:** `.claude/skills/gateway-capabilities` - FINGERPRINTX DEVELOPMENT section (optional, for open-source protocols)
+
+**Line count:** 357 lines (SKILL.md) - well under 500-line limit
+
+**References created:**
+1. `release-enumeration-patterns.md` - gh CLI commands for GitHub, GitLab
+2. `marker-categories.md` - Deep dive on 6 marker types with confidence ratings
+3. `version-matrix-template.md` - Copy-paste template for output
+4. `common-protocol-handlers.md` - Where to find protocol code by language
+
+**Related skills:**
+- `researching-protocols` (prerequisite) - Protocol detection research
+- `writing-fingerprintx-modules` (consumer) - Implements enrichment phase using matrix
+- `researching-github` (invoked) - Repository discovery and source analysis
+
+**Key innovation:** Shifts from black-box probing to white-box source analysis for open-source protocols, enabling version-granular detection through systematic cross-version diff analysis.
