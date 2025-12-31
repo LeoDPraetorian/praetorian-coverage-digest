@@ -1,6 +1,6 @@
 ---
 name: writing-plans
-description: Use when design is complete and you need detailed implementation tasks for engineers with zero codebase context - creates comprehensive implementation plans with exact file paths, complete code examples, and verification steps assuming engineer has minimal domain knowledge
+description: Use when design is complete and detailed implementation tasks are needed for engineers with zero codebase context - creates comprehensive implementation plans with exact file paths, complete code examples, and verification steps assuming engineer has minimal domain knowledge
 allowed-tools: "Read, Write, Edit, Bash, Grep"
 ---
 
@@ -11,6 +11,8 @@ allowed-tools: "Read, Write, Edit, Bash, Grep"
 Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
+
+> **MANDATORY:** You MUST use TodoWrite before starting to track all planning steps.
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
@@ -180,7 +182,38 @@ Even then: If you reference ANY existing file, API, or interface → evidence-ba
 
 ---
 
-**Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md`
+**Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md` OR `docs/plans/YYYY-MM-DD-<feature-name>/` (for phased plans)
+
+## Plan Decomposition (Large Features)
+
+**When to decompose:** >30 tasks OR >5 major components OR >2500 lines
+
+For large features, create **phased plans** instead of monolithic files:
+
+```
+docs/plans/YYYY-MM-DD-feature-name/
+├── PLAN.md                      # Manifest: phases, dependencies, progress
+├── phase-0-foundation.md        # Self-contained, 10-20 tasks
+├── phase-1-component-a.md       # Self-contained, 10-20 tasks
+├── phase-2-component-b.md       # Self-contained, 10-20 tasks
+└── phase-3-integration.md       # Self-contained, 10-20 tasks
+```
+
+**Benefits:**
+
+- Executing agents load one phase at a time (no context overflow)
+- Clear progress tracking (phase-level completion)
+- Natural resume points (complete phase before moving on)
+- Parallel execution opportunities (independent phases)
+
+**Each phase includes:**
+
+- Entry criteria (prerequisites from previous phases)
+- Exit criteria (definition of done)
+- Self-contained tasks (no cross-phase references)
+- Handoff to next phase
+
+**For complete decomposition strategy, see:** [references/plan-decomposition.md](references/plan-decomposition.md)
 
 ## Bite-Sized Task Granularity
 
@@ -271,16 +304,22 @@ git commit -m "feat: add specific feature"
 
 When called from orchestrating-feature-development:
 - **Do NOT** offer execution choices
-- **Simply announce:** "Plan complete and saved to `docs/plans/<filename>.md`. Returning control to orchestration workflow."
+- **Simply announce:** "Plan complete and saved to `docs/plans/<path>`. Returning control to orchestration workflow."
 - The orchestration skill will handle Phase 4 (Architecture) next
 
 ### If Used Standalone
 
 After saving the plan, offer execution choice:
 
-**"Plan complete and saved to `docs/plans/<filename>.md`. Two execution options:**
+**For single-file plans:**
+"Plan complete and saved to `docs/plans/<filename>.md`."
 
-**1. Subagent-Driven (this session)** - I dispatch fresh subagent per task, review between tasks, fast iteration
+**For phased plans:**
+"Phased plan complete and saved to `docs/plans/<feature-name>/` with PLAN.md manifest and N phase files."
+
+**Two execution options:**
+
+**1. Subagent-Driven (this session)** - I dispatch fresh subagent per task/phase, review between tasks, fast iteration
 
 **2. Parallel Session (separate)** - Open new session with executing-plans, batch execution with checkpoints
 
@@ -288,12 +327,14 @@ After saving the plan, offer execution choice:
 
 **If Subagent-Driven chosen:**
 - **REQUIRED SUB-SKILL:** Use superpowers:developing-with-subagents
+- For phased plans: Execute one phase at a time, verify exit criteria before next phase
 - Stay in this session
 - Fresh subagent per task + code review
 
 **If Parallel Session chosen:**
 - Guide them to open new session in worktree
 - **REQUIRED SUB-SKILL:** New session uses superpowers:executing-plans
+- For phased plans: executing-plans loads PLAN.md, then executes phases sequentially
 
 ### Detection Logic
 

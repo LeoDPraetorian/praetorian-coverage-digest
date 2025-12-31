@@ -1,0 +1,77 @@
+# Changelog - executing-plans
+
+## 2025-12-30 - Add phased plan execution support
+
+**Type:** Enhancement (Progressive disclosure for plan execution)
+
+**Problem:**
+The executing-plans skill assumes single plan files. writing-plans now produces phased plans (directory with PLAN.md manifest + phase-N-name.md files) for large features (>30 tasks, >5 components). executing-plans had no ability to handle phased plans, causing execution failures.
+
+**Gap:**
+- No plan type detection (single file vs directory)
+- No PLAN.md manifest parsing
+- No phase-level progress tracking
+- No entry/exit criteria verification
+- No phase-by-phase execution workflow
+
+**Solution:**
+Added complete phased plan execution support:
+
+1. **Plan Type Detection** (line 19-37):
+   - Detects single-file vs phased directory
+   - Links to phased workflow section
+
+2. **Phased Plan Workflow** (line 114-303):
+   - Step 1: Load PLAN.md manifest
+   - Step 2: Identify current phase from progress tracking
+   - Step 3: Load current phase file
+   - Step 4: Verify entry criteria (prerequisites)
+   - Step 5: Execute phase tasks in batches (existing batch logic)
+   - Step 6: Verify exit criteria (definition of done)
+   - Step 7: Update PLAN.md progress (mark phase complete)
+   - Step 8: Report phase completion
+   - Step 9: Continue to next phase
+   - Step 10: Complete development (all phases done)
+
+3. **Phased Plan Key Differences** (line 306-316):
+   - Comparison table: single-file vs phased plan workflows
+   - Progress tracking at phase level
+   - Manifest updates after each phase
+
+4. **Phase Dependencies** (line 320-333):
+   - Sequential phases (must complete in order)
+   - Parallel opportunities (independent phases)
+   - Dependency graph checking
+
+5. **Troubleshooting** (line 337-353):
+   - Entry criteria not met
+   - Exit criteria failing
+   - Can't find phase file
+   - Lost track of progress
+
+6. **Reference** (line 357-369):
+   - Links to writing-plans/references/plan-decomposition.md
+   - Complete phase structure details
+
+**Impact:**
+- executing-plans now handles both single-file and phased plans
+- Phase-by-phase execution with entry/exit criteria verification
+- Progress tracking in PLAN.md manifest
+- Natural resume points between phases
+- Prevents context overflow for large plans
+
+**File Changes:**
+- SKILL.md: Added 282 lines (88 → 370 lines, under 500 limit)
+- Created .local/ directory for backups
+- Created .history/ directory for changelog
+- Added TodoWrite mandate (CRITICAL fix)
+- Updated allowed-tools (added Write, Edit, TodoWrite)
+- Updated description to mention phased plan support
+
+**Testing:**
+- ✅ Plan Type Detection section present (line 19)
+- ✅ Phased Plan Workflow section complete (line 114-303)
+- ✅ Links to plan-decomposition.md reference
+- ✅ Line count under 500 (370 total)
+- ✅ TodoWrite mandate added
+- ✅ All 10 phased workflow steps documented

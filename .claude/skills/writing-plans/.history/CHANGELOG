@@ -1,5 +1,64 @@
 # Changelog - writing-plans
 
+## 2025-12-30 - Add plan decomposition for large features
+
+**Type:** Enhancement (Progressive disclosure for plan output)
+
+**Problem:**
+The writing-plans skill outputs monolithic plan files (single .md file). For large refactors (50+ tasks, 5+ components), this produces 5,000-10,000 line plans where executing agents experience context overflow and lose track of progress.
+
+**Gap:**
+- Skill applies bite-sized granularity at TASK level (2-5 min steps)
+- No guidance on PLAN-level decomposition
+- No thresholds for when to split plans
+- No phase structure or manifest format
+
+**Solution:**
+Added progressive disclosure for plan OUTPUT:
+
+1. **New section in SKILL.md** (line 185-212): Plan Decomposition (Large Features)
+   - When to decompose: >30 tasks OR >5 components OR >2500 lines
+   - Phased plan directory structure with PLAN.md manifest
+   - Benefits: no context overflow, phase-level progress, natural resume points
+   - Links to detailed reference
+
+2. **New reference file**: `references/plan-decomposition.md` (~800 lines)
+   - Complete decomposition strategy
+   - PLAN.md manifest format
+   - Phase file structure with entry/exit criteria
+   - Decomposition strategies (by component, dependency, risk)
+   - Phase granularity guidelines (10-20 tasks per phase)
+   - Execution integration with executing-plans and developing-with-subagents
+   - Cross-phase considerations (shared code, breaking changes, rollback)
+   - Migration from monolithic plans
+   - Examples (TanStack migration, auth refactor, DB migration)
+
+3. **Updated Execution Handoff** (line 295-340):
+   - Handles both single-file and phased plans
+   - Phased execution: one phase at a time with exit criteria verification
+   - executing-plans loads PLAN.md then executes phases sequentially
+
+**Impact:**
+- Large plans decompose into digestible phases (800-1200 lines each)
+- Agents load one phase at a time (no context overflow)
+- Clear progress tracking at phase level
+- Natural resume points between phases
+- Parallel execution opportunities for independent phases
+
+**File Changes:**
+- SKILL.md: Added 28 lines (304 → 332 lines, still under 500 limit)
+- Created references/ directory
+- Created references/plan-decomposition.md (~800 lines)
+
+**Testing:**
+- ✅ Plan Decomposition section present (line 185)
+- ✅ Links to plan-decomposition.md reference
+- ✅ Execution Handoff updated for phased plans
+- ✅ Line count under 500 (332 total)
+- ✅ Reference file comprehensive with examples
+
+---
+
 ## 2025-12-28 - Add mandatory Prerequisites section
 
 **Type:** Enhancement (Hard gate for evidence-based analysis)
