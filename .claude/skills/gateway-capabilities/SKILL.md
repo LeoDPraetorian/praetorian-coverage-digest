@@ -67,16 +67,16 @@ Single entry point for offensive security capability development within the Char
 
 ### Role Filter
 
-| Your Role              | Mandatory Sections                                        |
-| ---------------------- | --------------------------------------------------------- |
-| **Capability Dev**     | ALL ROLES + GO ARCHITECTURE                               |
-| **VQL Developer**      | ALL ROLES + VQL DEVELOPMENT                               |
-| **Template Author**    | ALL ROLES + TEMPLATE DEVELOPMENT                          |
-| **Scanner Integrator** | ALL ROLES + SCANNER INTEGRATION                           |
-| **Tool Porter**        | ALL ROLES + GO ARCHITECTURE + GO PORTING                  |
-| **Lead/Architect**     | ALL ROLES + GO ARCHITECTURE + GO PORTING                  |
-| **Reviewer**           | ALL ROLES + GO ARCHITECTURE                               |
-| **Tester**             | ALL ROLES (also invoke `gateway-testing`)                 |
+| Your Role              | Mandatory Sections                                                     |
+| ---------------------- | ---------------------------------------------------------------------- |
+| **Capability Dev**     | ALL ROLES + GO ARCHITECTURE + FINGERPRINTX DEVELOPMENT (if applicable) |
+| **VQL Developer**      | ALL ROLES + VQL DEVELOPMENT                                            |
+| **Template Author**    | ALL ROLES + TEMPLATE DEVELOPMENT                                       |
+| **Scanner Integrator** | ALL ROLES + SCANNER INTEGRATION                                        |
+| **Tool Porter**        | ALL ROLES + GO ARCHITECTURE + GO PORTING                               |
+| **Lead/Architect**     | ALL ROLES + GO ARCHITECTURE + GO PORTING                               |
+| **Reviewer**           | ALL ROLES + GO ARCHITECTURE                                            |
+| **Tester**             | ALL ROLES (also invoke `gateway-testing`)                              |
 
 **Note:** All skills remain available to any role via the routing tables below. The table shows what you MUST load upfront—not what you're limited to.
 
@@ -156,12 +156,28 @@ Janus framework workflow design, chain composition, state management. **Required
 
 ---
 
+### FINGERPRINTX DEVELOPMENT (Mandatory: Capability Dev creating fingerprintx modules)
+
+**9. Protocol Research (BLOCKING - MUST BE FIRST)**
+
+`.claude/skill-library/development/capabilities/researching-protocols/SKILL.md`
+
+Research methodology before implementation - lab setup, active probing, pattern identification, detection strategy documentation. **You cannot write correct detection logic without first researching the protocol. MUST complete before writing any code.**
+
+**10. Fingerprintx Module Implementation (AFTER research)**
+
+`.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md`
+
+Plugin interface (5 methods), type system integration, two-phase detection, CPE generation. **Requires research document as input. Do not start implementation without completing Protocol Research first.**
+
+---
+
 ### Workflow
 
 1. Identify your role from the Role Filter table above
 2. Read ALL ROLES skill (1 skill)
 3. Based on your role, also read:
-   - Capability Dev: GO ARCHITECTURE (1 skill)
+   - Capability Dev: GO ARCHITECTURE (1 skill) + FINGERPRINTX DEVELOPMENT (2 skills, if building fingerprintx modules)
    - VQL Developer: VQL DEVELOPMENT (1 skill)
    - Template Author: TEMPLATE DEVELOPMENT (1 skill)
    - Scanner Integrator: SCANNER INTEGRATION (2 skills)
@@ -184,19 +200,20 @@ This gateway provides access to skills for building offensive security capabilit
 
 ## Quick Reference
 
-**⭐ = Mandatory ALL ROLES | 🏗️ = GO ARCHITECTURE | 🔧 = GO PORTING | 📜 = VQL | 📋 = TEMPLATES | 🔌 = SCANNERS**
+**⭐ = Mandatory ALL ROLES | 🏗️ = GO ARCHITECTURE | 🔧 = GO PORTING | 📜 = VQL | 📋 = TEMPLATES | 🔌 = SCANNERS | 🔍 = FINGERPRINTX**
 
-| Task                           | Skill Path                                                                                            |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| ⭐ Go capability architecture  | `.claude/skill-library/development/capabilities/enforcing-go-capability-architecture/SKILL.md`        |
-| 🏗️ Standalone tool integration | `.claude/skill-library/development/capabilities/integrating-standalone-capabilities/SKILL.md`         |
-| 🔧 Python→Go dependencies      | `.claude/skill-library/development/capabilities/mapping-python-dependencies-to-go/SKILL.md`           |
-| 🔧 Python→Go idioms            | `.claude/skill-library/development/capabilities/translating-python-idioms-to-go/SKILL.md`             |
-| 📜 VQL artifact development    | `.claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md`                |
-| 📋 Nuclei template creation    | `.claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md`               |
-| 🔌 Scanner integration         | `.claude/skill-library/development/capabilities/capabilities-scanner-integration/SKILL.md`            |
-| 🔌 Janus chain orchestration   | `.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md`                   |
-| Fingerprintx plugin dev        | `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md`                |
+| Task                           | Skill Path                                                                                     |
+| ------------------------------ | ---------------------------------------------------------------------------------------------- |
+| ⭐ Go capability architecture  | `.claude/skill-library/development/capabilities/enforcing-go-capability-architecture/SKILL.md` |
+| 🏗️ Standalone tool integration | `.claude/skill-library/development/capabilities/integrating-standalone-capabilities/SKILL.md`  |
+| 🔧 Python→Go dependencies      | `.claude/skill-library/development/capabilities/mapping-python-dependencies-to-go/SKILL.md`    |
+| 🔧 Python→Go idioms            | `.claude/skill-library/development/capabilities/translating-python-idioms-to-go/SKILL.md`      |
+| 📜 VQL artifact development    | `.claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md`         |
+| 📋 Nuclei template creation    | `.claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md`        |
+| 🔌 Scanner integration         | `.claude/skill-library/development/capabilities/capabilities-scanner-integration/SKILL.md`     |
+| 🔌 Janus chain orchestration   | `.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md`            |
+| 🔍 Protocol research (FIRST)   | `.claude/skill-library/development/capabilities/researching-protocols/SKILL.md`                |
+| 🔍 Fingerprintx implementation | `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md`         |
 
 ## When to Use
 
@@ -226,7 +243,7 @@ Match your task to the appropriate capability skill:
 - **Nuclei Templates** → Load `capabilities-nuclei-templates`
 - **Scanner Integration** → Load `capabilities-scanner-integration`
 - **Janus Chains** → Load `capabilities-janus-chains`
-- **Fingerprintx Plugins** → Load `writing-fingerprintx-modules`
+- **Fingerprintx Plugins** → Load `researching-protocols` first, then `writing-fingerprintx-modules`
 - **Standalone Tool Integration** → Load `integrating-standalone-capabilities`
 - **Go Plugin Architecture** → Load `enforcing-go-capability-architecture`
 - **Python→Go Porting** → Load `mapping-python-dependencies-to-go` + `translating-python-idioms-to-go`
@@ -493,7 +510,7 @@ Building a new capability?
 ├── Nuclei template → capabilities-nuclei-templates 📋
 ├── Integrate existing scanner → capabilities-scanner-integration 🔌
 ├── Chain multiple tools → capabilities-janus-chains 🔌
-├── Fingerprint services → writing-fingerprintx-modules
+├── Fingerprint services → researching-protocols 🔍 THEN writing-fingerprintx-modules 🔍
 └── Wrap CLI tool → integrating-standalone-capabilities 🏗️
 
 Porting Python tool to Go?

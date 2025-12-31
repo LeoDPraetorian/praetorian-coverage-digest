@@ -1,0 +1,26 @@
+# Changelog
+
+## 2025-12-30 - Initial Creation
+
+### RED Phase Documentation
+- **Gap:** No protocol research methodology existed for fingerprintx module development
+- **Failure scenario:** Agent attempting to create fingerprintx module without research would:
+  - Jump straight to implementation code
+  - Not know which endpoints to probe
+  - Miss unique service markers
+  - Create incomplete/incorrect detection logic
+- **Evidence:** LLM fingerprintx modules required 1200+ line research document before implementation
+
+### Skill Details
+- **Location:** Library (development/capabilities)
+- **Type:** Process (methodology/workflow)
+- **Line count:** 383 lines (within 500 line limit)
+
+### Content
+- 7-phase research workflow codified from fingerprintx-detecting-llms.md
+- Reference files for probing patterns, response analysis, lab setup
+- Integration with writing-fingerprintx-modules skill
+
+### Integration
+- Feeds into: `writing-fingerprintx-modules` skill
+- Future router parent: `researching-skills` (planned refactor)
