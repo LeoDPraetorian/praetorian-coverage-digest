@@ -30,18 +30,18 @@ export class Phase11CommandAudit {
   /**
    * Check if line has repo-root detection on same or preceding line
    */
-  private static hasRepoRootDetection(lines: string[], lineIndex: number): boolean {
+  private static hasRootDetection(lines: string[], lineIndex: number): boolean {
     const currentLine = lines[lineIndex];
 
     // Check current line
-    if (currentLine.includes('REPO_ROOT=') || currentLine.includes('$REPO_ROOT')) {
+    if (currentLine.includes('ROOT=') || currentLine.includes('$ROOT')) {
       return true;
     }
 
     // Check preceding line
     if (lineIndex > 0) {
       const prevLine = lines[lineIndex - 1];
-      if (prevLine.includes('REPO_ROOT=')) {
+      if (prevLine.includes('ROOT=')) {
         return true;
       }
     }
@@ -98,7 +98,7 @@ export class Phase11CommandAudit {
       }
 
       // Rule 2: WARNING - cd .claude/skills without repo-root detection
-      if (line.match(/\bcd\s+["']?\.claude\/skills\//) && !this.hasRepoRootDetection(lines, i)) {
+      if (line.match(/\bcd\s+["']?\.claude\/skills\//) && !this.hasRootDetection(lines, i)) {
         const cdMatch = line.match(/cd\s+["']?(\.claude\/skills\/[^\s"'&;]+)/);
         if (cdMatch) {
           const cdPath = cdMatch[1];
@@ -110,8 +110,8 @@ export class Phase11CommandAudit {
         }
       }
 
-      // Rule 3: WARNING - npm run --prefix without REPO_ROOT
-      if (line.match(/npm\s+run\s+--prefix\s+\.claude\//) && !this.hasRepoRootDetection(lines, i)) {
+      // Rule 3: WARNING - npm run --prefix without ROOT
+      if (line.match(/npm\s+run\s+--prefix\s+\.claude\//) && !this.hasRootDetection(lines, i)) {
         issues.push({
           severity: 'WARNING',
           message: `Line ${lineNumber}: npm --prefix with relative path - breaks when cwd is not repo root`,

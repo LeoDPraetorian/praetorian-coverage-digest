@@ -151,9 +151,9 @@ Content here...
 
 ```bash
 # Navigate to repo root
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude"
+ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$ROOT/.claude"
 
 # Run specific Phase 14 sub-phase
 npm run -w @chariot/auditing-skills audit -- <skill-name> --phase 14

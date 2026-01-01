@@ -56,9 +56,8 @@ description: >
 ### Automated Check
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skill-library/claude/agent-management/auditing-agents/scripts"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude/skill-library/claude/agent-management/auditing-agents/scripts"
 
 npm run audit-critical -- {agent-name}
 ```

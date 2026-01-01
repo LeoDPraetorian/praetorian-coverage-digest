@@ -49,8 +49,8 @@ async function testLinearMCPConnection() {
       const issueDetails = await getIssue.execute({ id: myIssues.issues[0].identifier });
       console.log(`✅ Retrieved issue: ${issueDetails.identifier}`);
       console.log(`   Title: ${issueDetails.title}`);
-      console.log(`   State: ${issueDetails.state.name}`);
-      console.log(`   Priority: ${issueDetails.priorityLabel}`);
+      console.log(`   State: ${issueDetails.state?.name || 'N/A'}`);
+      console.log(`   Priority: ${issueDetails.priorityLabel || 'N/A'}`);
       if (issueDetails.branchName) {
         console.log(`   Branch: ${issueDetails.branchName}`);
       }

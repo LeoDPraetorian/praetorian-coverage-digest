@@ -1,6 +1,6 @@
 ---
 name: gateway-mcp-tools
-description: Use when calling external APIs (Linear, Praetorian CLI, Context7, Chrome DevTools, Currents, Nebula, Chariot). Routes to 8 MCP wrapper skills with 0 tokens at startup. Two-tier gateway system for progressive loading.
+description: Use when calling external APIs (Linear, Praetorian CLI, Context7, Perplexity, Chrome DevTools, Currents, Nebula, Chariot). Routes to 9 MCP wrapper skills with 0 tokens at startup. Two-tier gateway system for progressive loading.
 allowed-tools: Read, Bash
 ---
 
@@ -56,6 +56,12 @@ Use for: Issues, projects, teams, comments, and Linear workflow automation.
 
 Use for: Looking up library documentation, API references, and package docs.
 
+### Perplexity (AI Search & Research)
+
+**Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-perplexity/SKILL.md`
+
+Use for: Web search, conversational AI, deep research with citations, advanced reasoning.
+
 ### Chrome DevTools (Browser Automation)
 
 **Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-chrome-devtools/SKILL.md`
@@ -108,6 +114,7 @@ npx tsx .claude/tools/discover.ts linear issue
 | Chariot assets/risks/jobs | `.claude/skill-library/claude/mcp-tools/mcp-tools-praetorian-cli/SKILL.md`  |
 | Linear issues/projects    | `.claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md`          |
 | Library documentation     | `.claude/skill-library/claude/mcp-tools/mcp-tools-context7/SKILL.md`        |
+| AI search/research        | `.claude/skill-library/claude/mcp-tools/mcp-tools-perplexity/SKILL.md`      |
 | Browser automation        | `.claude/skill-library/claude/mcp-tools/mcp-tools-chrome-devtools/SKILL.md` |
 | CI test metrics           | `.claude/skill-library/claude/mcp-tools/mcp-tools-currents/SKILL.md`        |
 
@@ -194,6 +201,9 @@ For specific implementations, load the individual service skill.
 
 **Mcp Tools Nebula**: `.claude/skill-library/claude/mcp-tools/mcp-tools-nebula/SKILL.md`
 - Use when accessing nebula services - provides 5 tools for access-key-to-account-id, apollo, public-resources, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
+
+**Mcp Tools Perplexity**: `.claude/skill-library/claude/mcp-tools/mcp-tools-perplexity/SKILL.md`
+- Use when accessing perplexity services - provides 4 tools for search, ask, research, reason. References mcp-tools-registry for Bash + tsx execution patterns.
 
 **Mcp Tools Praetorian Cli**: `.claude/skill-library/claude/mcp-tools/mcp-tools-praetorian-cli/SKILL.md`
 - Use when accessing praetorian-cli services - provides 15 tools for aegis-list, assets-get, assets-list, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.

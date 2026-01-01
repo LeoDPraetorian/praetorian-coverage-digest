@@ -150,7 +150,7 @@ async function applyCommandPortabilityFix(
       // Replace with repo-root detection pattern
       const newLine = line.replace(
         cdPattern,
-        'cd "$REPO_ROOT/$1"'
+        'cd "$ROOT/$1"'
       );
       if (newLine !== line) {
         modified = true;
@@ -173,7 +173,7 @@ async function applyCommandPortabilityFix(
   return {
     success: true,
     fixId: 'phase11-command',
-    message: 'Updated cd commands to use $REPO_ROOT for cross-platform compatibility.',
+    message: 'Updated cd commands to use $ROOT for cross-platform compatibility.',
   };
 }
 

@@ -39,7 +39,7 @@ export const evaluateScript = {
     // Call chrome-devtools MCP server via SHARED client
     const result = await callMCPTool(
       'chrome-devtools',                        // MCP name
-      'mcp__chrome-devtools__evaluate_script', // Actual MCP tool name
+      'evaluate_script', // Actual MCP tool name
       validated                                 // Pass params directly
     );
 

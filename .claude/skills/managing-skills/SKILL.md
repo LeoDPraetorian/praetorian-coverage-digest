@@ -225,7 +225,7 @@ This skill consolidates:
 | **searching-skills**              | `Read(".claude/skill-library/claude/skill-management/searching-skills/SKILL.md")` (LIBRARY)   | Dual-location skill discovery                        |
 | **listing-skills**                | `Read(".claude/skill-library/claude/skill-management/listing-skills/SKILL.md")` (LIBRARY)     | Display all skills with locations                    |
 | **syncing-gateways**              | `Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")` (LIBRARY)   | Validate gateway consistency                         |
-| **researching-skills**            | `Read(".claude/skill-library/claude/skill-management/researching-skills/SKILL.md")` (LIBRARY) | Interactive research orchestrator for skill creation |
+| **researching-skills**            | `skill: "researching-skills"` (CORE)                                                          | Interactive research orchestrator for skill creation |
 | **testing-skills-with-subagents** | `skill: "testing-skills-with-subagents"` (CORE)                                               | Meta-testing skills with pressure scenarios          |
 | **using-skills**                  | `skill: "using-skills"` (CORE)                                                                | Navigator/librarian for skill discovery              |
 | **developing-with-tdd**           | `skill: "developing-with-tdd"` (CORE)                                                         | TDD methodology and best practices                   |

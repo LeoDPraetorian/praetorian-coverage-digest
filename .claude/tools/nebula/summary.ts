@@ -117,8 +117,14 @@ export const summary = {
     // Validate input
     const validated = InputSchema.parse(input);
 
+    // Ensure profile is set (required by Nebula MCP)
+    const profile = validated.profile || process.env.AWS_PROFILE || 'default';
+
     // Call Nebula MCP tool
-    const rawResult = await callMCPTool('nebula', 'summary', validated);
+    const rawResult = await callMCPTool('nebula', 'summary', {
+      ...validated,
+      profile,
+    });
 
     // Parse response (handles JSON, Go maps, plain values)
     const parsed = parseNebulaResponse(rawResult);

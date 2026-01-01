@@ -18,7 +18,7 @@ Use this skill when:
 
 **DO NOT use individual skills directly** - this orchestrator enforces the proper workflow with blocking gates.
 
-**You MUST use TodoWrite before starting** to track all 7 phases. Mental tracking = steps get skipped.
+**You MUST use TodoWrite before starting** to track all 8 phases. Mental tracking = steps get skipped.
 
 ## Quick Reference
 
@@ -29,8 +29,9 @@ Use this skill when:
 | 3. Protocol Research       | **BLOCKING** | protocol-research.md        | NO                    |
 | 4. Version Marker Research | CONDITIONAL  | version-matrix.md           | Only if closed-source |
 | 5. Implementation          | —            | Plugin code                 | NO                    |
-| 6. Validation              | BLOCKING     | validation-report.md        | NO                    |
-| 7. Integration & PR Prep   | —            | pr-description.md           | NO                    |
+| 6. Testing                 | —            | Unit tests                  | NO                    |
+| 7. Validation              | BLOCKING     | validation-report.md        | NO                    |
+| 8. Integration & PR Prep   | —            | pr-description.md           | NO                    |
 
 **For complete gate checklists**, see [references/gate-checklist.md](references/gate-checklist.md)
 
@@ -53,31 +54,28 @@ Use this skill when:
 
 ## Context: Fingerprintx Architecture
 
-Fingerprintx is a service fingerprinting tool in `modules/fingerprintx/`. Creating a plugin requires:
+Fingerprintx is a service fingerprinting tool in `modules/fingerprintx/`. Creating a plugin requires protocol research, version marker research (for open-source), and implementation following the 5-method interface pattern.
 
-1. **Protocol Research** - Understand what makes the protocol unique (detection)
-2. **Version Marker Research** - For open-source protocols, analyze source code across releases to identify version-specific markers (enrichment)
-3. **Implementation** - Create the plugin following the 5-method interface pattern
-
-**See**: [Writing Fingerprintx Modules](../writing-fingerprintx-modules/SKILL.md) for implementation patterns.
+**See**: [Writing Fingerprintx Modules](../writing-fingerprintx-modules/SKILL.md) for implementation details.
 
 ---
 
 ## Coordinated Skills
 
-This orchestrator invokes three specialized skills:
+This orchestrator invokes four specialized skills:
 
-| Skill                            | Path                                                                                   | Purpose                                    | Gate        |
-| -------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------ | ----------- |
-| **researching-protocols**        | `.claude/skill-library/development/capabilities/researching-protocols/SKILL.md`        | Protocol detection methodology (7 phases)  | BLOCKING    |
-| **researching-version-markers**  | `.claude/skill-library/development/capabilities/researching-version-markers/SKILL.md`  | Version marker analysis (8 phases)         | CONDITIONAL |
-| **writing-fingerprintx-modules** | `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md` | Plugin implementation (5-method interface) | —           |
+| Skill                            | Path                                                                                   | Purpose                                        | Gate        |
+| -------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------- | ----------- |
+| **researching-protocols**        | `.claude/skill-library/development/capabilities/researching-protocols/SKILL.md`        | Protocol detection methodology (7 phases)      | BLOCKING    |
+| **researching-version-markers**  | `.claude/skill-library/development/capabilities/researching-version-markers/SKILL.md`  | Version marker analysis (8 phases)             | CONDITIONAL |
+| **writing-fingerprintx-modules** | `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md` | Plugin implementation (5-method interface)     | —           |
+| **writing-fingerprintx-tests**   | `.claude/skill-library/development/capabilities/writing-fingerprintx-tests/SKILL.md`   | Unit test implementation (table-driven, mocks) | —           |
 
 **Critical**: The orchestrator does NOT duplicate sub-skill content - it invokes them and enforces gates.
 
 ---
 
-## Workflow (7 Phases)
+## Workflow (8 Phases)
 
 ### Phase 1: Requirements Gathering
 
@@ -206,7 +204,38 @@ Follow the implementation workflow from writing-fingerprintx-modules skill.
 
 ---
 
-### Phase 6: Validation (BLOCKING GATE)
+### Phase 6: Testing
+
+**Invoke**:
+
+```
+Read('.claude/skill-library/development/capabilities/writing-fingerprintx-tests/SKILL.md')
+```
+
+Follow the testing workflow from writing-fingerprintx-tests skill.
+
+**Inputs Provided**:
+
+- Plugin code (from Phase 5)
+- Protocol structure and patterns
+- Edge cases to test
+
+**Testing Checklist**:
+
+- [ ] Test file created in `pkg/plugins/services/{protocol}/{protocol}_test.go`
+- [ ] Table-driven tests for parsing functions (if applicable)
+- [ ] Response validation tests
+- [ ] Message building tests (if applicable)
+- [ ] Edge cases covered: empty, truncated, wrong type, missing field
+- [ ] Tests pass: `go test ./pkg/plugins/services/{protocol}/... -v`
+
+**Output Artifact**: `{protocol}_test.go` (in plugin directory)
+
+**TodoWrite**: Mark as in_progress during test writing, completed when all tests pass.
+
+---
+
+### Phase 7: Validation (BLOCKING GATE)
 
 **Verification Commands**:
 
@@ -234,7 +263,7 @@ go test ./pkg/plugins/services/{protocol}/... -v
 - [ ] Version detection matches matrix predictions (if applicable)
 - [ ] CPE generated correctly
 
-**If gate fails**: Fix issues and re-validate. Cannot proceed to Phase 7 until passing.
+**If gate fails**: Fix issues and re-validate. Cannot proceed to Phase 8 until passing.
 
 **Output Artifact**: `{protocol}-validation-report.md`
 
@@ -244,7 +273,7 @@ go test ./pkg/plugins/services/{protocol}/... -v
 
 ---
 
-### Phase 7: Integration & PR Preparation
+### Phase 8: Integration & PR Preparation
 
 **Final Checklist**:
 
@@ -298,8 +327,9 @@ Use TodoWrite to track progress. Create these todos at workflow start:
 3. 'Complete protocol research for {protocol}' (Phase 3) - BLOCKING
 4. 'Complete version marker research for {protocol}' (Phase 4) - CONDITIONAL
 5. 'Implement {protocol} fingerprintx plugin' (Phase 5)
-6. 'Validate {protocol} plugin against live services' (Phase 6) - BLOCKING
-7. 'Prepare PR for {protocol} plugin' (Phase 7)
+6. 'Write unit tests for {protocol} plugin' (Phase 6)
+7. 'Validate {protocol} plugin against live services' (Phase 7) - BLOCKING
+8. 'Prepare PR for {protocol} plugin' (Phase 8)
 
 Update todo status as each phase completes. Mark BLOCKED phases clearly.
 
@@ -326,43 +356,15 @@ Phase 3 Gate Check:
 
 ### Rationalization Prevention
 
-Agents WILL try to skip gates. Common rationalizations and responses:
+Agents WILL try to skip gates. **See**: [references/rationalization-table.md](references/rationalization-table.md) for complete list of gate bypass attempts and mandatory responses.
 
-| Rationalization                         | Response                                                  |
-| --------------------------------------- | --------------------------------------------------------- |
-| 'The protocol is simple, I know it'     | DENIED. Research reveals edge cases. Complete Phase 3.    |
-| 'Version detection can be added later'  | DENIED. CPE precision is a requirement. Complete Phase 4. |
-| 'I already have detection code working' | DENIED. Working != Complete. Pass gate checklist.         |
-| 'Time pressure, ship now iterate later' | DENIED. Technical debt has ~10% fix rate. Complete now.   |
-| 'The gate is too strict'                | The gate exists because past modules failed without it.   |
-| 'Just this once'                        | 'Just this once' is how every bad pattern starts.         |
-| 'User said to skip'                     | User doesn't override workflow. Explain why gates matter. |
-
-**See**: [references/rationalization-table.md](references/rationalization-table.md) for complete list.
+**Key principle**: Working code != Complete. Gates validate completeness, not just functionality.
 
 ### Gate Override (EXTREMELY RARE)
 
-The ONLY valid gate override is explicit user acknowledgment.
+The ONLY valid gate override is explicit user acknowledgment via AskUserQuestion.
 
-Use AskUserQuestion:
-
-```
-Phase 3 gate has not passed. Proceeding without complete protocol
-research will likely result in:
-- Poor detection accuracy
-- Missing edge cases
-- Failed plugin
-
-Do you want to proceed anyway?
-
-Options:
-- No, let me complete the research (RECOMMENDED)
-- Yes, I accept the risks and will fix issues later
-```
-
-If user selects override, document it in the PR and changelog.
-
-**See**: [references/gate-override-protocol.md](references/gate-override-protocol.md) for documentation requirements.
+**See**: [references/gate-override-protocol.md](references/gate-override-protocol.md) for override prompt template and documentation requirements.
 
 ---
 
@@ -376,8 +378,13 @@ All artifacts should be saved to a consistent location:
 ├── {protocol}-requirements.md          (Phase 1)
 ├── {protocol}-protocol-research.md     (Phase 3)
 ├── {protocol}-version-matrix.md        (Phase 4, if applicable)
-├── {protocol}-validation-report.md     (Phase 6)
-└── {protocol}-pr-description.md        (Phase 7)
+└── {protocol}-validation-report.md     (Phase 7)
+└── {protocol}-pr-description.md        (Phase 8)
+
+Plugin directory:
+modules/fingerprintx/pkg/plugins/services/{protocol}/
+├── {protocol}.go                       (Phase 5)
+└── {protocol}_test.go                  (Phase 6)
 ```
 
 Follow `persisting-agent-outputs` skill for MANIFEST format.
@@ -418,9 +425,15 @@ Brief walkthrough showing orchestrator in action:
 - Two-phase detection (detect protocol, then enrich with version)
 - Version extraction using matrix decision tree
 
-**Phase 6**: Validate against mysql:8.0.40, mysql:5.7.44, mysql:5.6.51 Docker containers
+**Phase 6**: Invoke writing-fingerprintx-tests, create `mysql_test.go`:
 
-**Phase 7**: Prepare PR with complete documentation
+- Table-driven tests for handshake parsing
+- Response validation tests
+- Edge cases: truncated packets, wrong capability flags
+
+**Phase 7**: Validate against mysql:8.0.40, mysql:5.7.44, mysql:5.6.51 Docker containers
+
+**Phase 8**: Prepare PR with complete documentation
 
 **See**: [examples/mysql-walkthrough.md](examples/mysql-walkthrough.md) for complete example.
 
@@ -428,13 +441,7 @@ Brief walkthrough showing orchestrator in action:
 
 ## Common Rationalizations for Skipping Orchestrator
 
-| Rationalization                              | Why It's Wrong                                        |
-| -------------------------------------------- | ----------------------------------------------------- |
-| 'I'll just use the individual skills'        | You'll skip gates. Orchestrator enforces them.        |
-| 'Orchestrator is overhead'                   | Overhead prevents 10x rework from skipped research.   |
-| 'I know the workflow'                        | Knowing != Following. Orchestrator ensures following. |
-| 'Simple protocol doesn't need full workflow' | Simple protocols have edge cases too.                 |
-| 'I'm experienced, don't need gates'          | Gates catch errors regardless of experience.          |
+Agents WILL try to bypass the orchestrator. **See**: [references/orchestrator-rationalizations.md](references/orchestrator-rationalizations.md) for complete list of bypass attempts and responses.
 
 **The orchestrator exists because skipping steps fails** - even for experienced developers.
 
@@ -459,6 +466,7 @@ Brief walkthrough showing orchestrator in action:
 | **researching-protocols**               | Protocol detection research (invoked Phase 3) |
 | **researching-version-markers**         | Version marker research (invoked Phase 4)     |
 | **writing-fingerprintx-modules**        | Plugin implementation (invoked Phase 5)       |
+| **writing-fingerprintx-tests**          | Unit test implementation (invoked Phase 6)    |
 | **persisting-agent-outputs**            | Output artifact management                    |
 | **gateway-capabilities**                | Router to this orchestrator                   |
 | **orchestrating-multi-agent-workflows** | Multi-phase orchestration patterns            |
@@ -480,7 +488,7 @@ Brief walkthrough showing orchestrator in action:
 
 - [Gate Checklist](references/gate-checklist.md) - Complete pass/fail criteria for all gates
 - [Artifact Templates](references/artifact-templates.md) - Templates for all output documents
-- [Workflow Diagram](references/workflow-diagram.md) - Visual flowchart of 7 phases
+- [Workflow Diagram](references/workflow-diagram.md) - Visual flowchart of 8 phases
 - [Troubleshooting](references/troubleshooting.md) - Common issues and solutions
 - [Rationalization Table](references/rationalization-table.md) - Complete list of bypass attempts
 - [Gate Override Protocol](references/gate-override-protocol.md) - When and how to override gates

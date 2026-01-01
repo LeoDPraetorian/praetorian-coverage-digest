@@ -175,8 +175,8 @@ For developers or debugging, here's the underlying wrapper pattern:
 ### Graph Query (Direct Execution)
 
 ```bash
-npx tsx -e "(async () => {
-  const { query } = await import('./.claude/tools/chariot/query.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { query } = await import('$ROOT/.claude/tools/chariot/query.ts');
   const queryStructure = {
     node: {
       labels: ['Asset'],

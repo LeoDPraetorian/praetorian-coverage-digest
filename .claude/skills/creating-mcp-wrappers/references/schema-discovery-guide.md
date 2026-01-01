@@ -15,39 +15,39 @@ MCP tools have dynamic schemas. You must explore them to:
 
 ### Step 0: Determine MCP Package Name
 
-**Ask user**:
+**CRITICAL: DO NOT ASSUME PACKAGE NAMING CONVENTION**
 
-```
-What MCP service are you creating a wrapper for?
+MCP packages do NOT follow a single naming convention. You MUST search before assuming.
 
-Examples:
-- linear
-- context7
-- praetorian-cli
-- github
-```
+**Discovery methods**:
 
-**Auto-detect package name**:
+1. **Search npm**:
+   ```bash
+   npm search mcp {service}
+   ```
+
+2. **Web search**: `"{service} mcp server npm package"`
+
+3. **Check service documentation** for official MCP package
+
+**Common naming patterns** (varies by vendor):
+
+| Service | Package Name | Notes |
+|---------|-------------|-------|
+| linear | `@modelcontextprotocol/server-linear` | Standard convention |
+| github | `@modelcontextprotocol/server-github` | Standard convention |
+| perplexity | `@perplexity-ai/mcp-server` | **Vendor-specific** |
+| context7 | `@context7/mcp-server` | Vendor-specific |
+| slack | `@modelcontextprotocol/server-slack` | Standard convention |
+
+**Verify package exists**:
 
 ```bash
-# Most MCP servers follow convention:
-SERVICE="linear"
-MCP_PACKAGE="@modelcontextprotocol/server-${SERVICE}"
-
-# Verify package exists:
-npm view ${MCP_PACKAGE} version 2>/dev/null || echo "Package not found"
+# Replace with discovered package name
+npm view {package-name} version 2>/dev/null || echo "Package not found - search again"
 ```
 
-**Common MCP packages**:
-| Service | Package Name |
-|---------|-------------|
-| linear | `@modelcontextprotocol/server-linear` |
-| github | `@modelcontextprotocol/server-github` |
-| gitlab | `@modelcontextprotocol/server-gitlab` |
-| google-drive | `@modelcontextprotocol/server-google-drive` |
-| slack | `@modelcontextprotocol/server-slack` |
-
-**For custom MCPs**: Ask user for full package name or GitHub URL.
+**If package not found**: Search npm/web again with different terms. Don't assume the naming pattern.
 
 ---
 
@@ -220,9 +220,41 @@ try {
 }
 ```
 
-### Step 5: Analyze Responses
+### Step 5: Detect Response Format
 
-For each response, document:
+**CRITICAL: Not all MCPs return JSON. Check response format first.**
+
+```javascript
+const result = await client.callTool({ name: "{tool}", arguments: { /* test input */ } });
+
+// Check response format
+if (typeof result.content === 'string') {
+  // Text/markdown response (common with AI-based MCPs like Perplexity)
+  console.log("Response format: TEXT/MARKDOWN");
+  console.log("Content:", result.content);
+} else if (typeof result.content === 'object') {
+  // JSON response (standard)
+  console.log("Response format: JSON");
+  console.log(JSON.stringify(result.content, null, 2));
+}
+```
+
+**If response is TEXT (not JSON)**:
+
+- Document in discovery: `Response format: text/markdown`
+- Wrapper cannot use JSON.parse - return text directly
+- FilteredResult should be `{ content: string; tokenCount: number }`
+- Tests should expect string responses, not objects
+
+**Example MCPs with text responses**:
+- Perplexity (AI search results as markdown)
+- Some documentation MCPs
+
+### Step 6: Analyze JSON Responses
+
+**Only for MCPs that return JSON.** For text responses, skip to Step 7.
+
+For each JSON response, document:
 
 | Aspect                | What to Capture                   |
 | --------------------- | --------------------------------- |
@@ -232,7 +264,7 @@ For each response, document:
 | **Array types**       | Homogeneous or heterogeneous?     |
 | **Token counts**      | `JSON.stringify(response).length` |
 
-### Step 6: Plan Token Reduction
+### Step 7: Plan Token Reduction
 
 **Original response**: 2,500 tokens
 **Target response**: 500 tokens (80% reduction)
@@ -247,7 +279,7 @@ For each response, document:
 - Calculate: `includedFields.length / totalFields.length`
 - Should be < 20% of fields for 80% token reduction
 
-### Step 7: Cleanup (Stop MCP Server)
+### Step 8: Cleanup (Stop MCP Server)
 
 **After exploration is complete**, stop the MCP server:
 

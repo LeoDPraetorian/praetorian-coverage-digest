@@ -24,7 +24,7 @@ Enable granular agent access control for chariot operations.
 ### query
 
 - **Purpose:** MCP wrapper for query
-- **Import:** `import { query } from './.claude/tools/chariot/query.ts'`
+- **Import:** `import { query } from '$ROOT/.claude/tools/chariot/query.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -51,7 +51,7 @@ interface QueryOutput {
 ### schema
 
 - **Purpose:** MCP wrapper for schema
-- **Import:** `import { schema } from './.claude/tools/chariot/schema.ts'`
+- **Import:** `import { schema } from '$ROOT/.claude/tools/chariot/schema.ts'`
 - **Token cost:** ~unknown tokens
 
 **Returns:**
@@ -70,8 +70,8 @@ interface SchemaOutput {
 ### Query Assets by Status
 
 ```bash
-npx tsx -e "(async () => {
-  const { query } = await import('./.claude/tools/chariot/query.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { query } = await import('$ROOT/.claude/tools/chariot/query.ts');
   const queryStructure = {
     node: {
       labels: ['Asset'],
@@ -119,8 +119,8 @@ npx tsx -e "(async () => {
 ### Query Assets with Vulnerabilities
 
 ```bash
-npx tsx -e "(async () => {
-  const { query } = await import('./.claude/tools/chariot/query.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { query } = await import('$ROOT/.claude/tools/chariot/query.ts');
   const queryStructure = {
     node: {
       labels: ['Asset'],
@@ -151,8 +151,8 @@ npx tsx -e "(async () => {
 ### Get Schema Information
 
 ```bash
-npx tsx -e "(async () => {
-  const { schema } = await import('./.claude/tools/chariot/schema.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { schema } = await import('$ROOT/.claude/tools/chariot/schema.ts');
   const result = await schema.execute({
     stack: process.env.CHARIOT_STACK || 'default',
     username: process.env.PRAETORIAN_CLI_USERNAME || 'user'
@@ -193,8 +193,8 @@ See mcp-tools-registry for complete Bash + tsx execution patterns.
 
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
-npx tsx -e "(async () => {
-  const { query } = await import('./.claude/tools/chariot/query.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { query } = await import('$ROOT/.claude/tools/chariot/query.ts');
   const result = await query.execute({ /* params */ });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null

@@ -92,7 +92,7 @@ Discovery?
 
 ## Troubleshooting
 
-**Agent not found**: Navigate to repo root first (`cd $(git rev-parse --show-toplevel)`)
+**Agent not found**: Navigate to repo root first (`ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"`)
 
 **Audit failing**: Run Phase 0 CLI first, then manual phases. See auditing-agents.
 

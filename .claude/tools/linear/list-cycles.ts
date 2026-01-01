@@ -125,15 +125,23 @@ export const listCycles = {
     // Validate input
     const validated = listCyclesParams.parse(input);
 
+    // Map parameter names: wrapper uses 'team', MCP expects 'teamId'
+    const { team, ...rest } = validated;
+    const mcpParams = {
+      ...rest,
+      ...(team ? { teamId: team } : {})
+    };
+
     // Call MCP tool
     const rawData = await callMCPTool(
       'linear',
       'list_cycles',
-      validated
+      mcpParams
     );
 
-    // Linear MCP returns array directly, not { cycles: [...] }
-    const cycles = Array.isArray(rawData) ? rawData : (rawData?.cycles || []);
+    // callMCPTool already parses JSON from MCP response
+    // Linear returns { content: [{cycle1}, {cycle2}, ...] }
+    const cycles = rawData.content || rawData.cycles || (Array.isArray(rawData) ? rawData : []);
 
     // Filter to essential fields
     const filtered = {

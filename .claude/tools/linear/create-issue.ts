@@ -22,6 +22,7 @@
  * - labels: string[] (optional) - Label names or IDs
  * - dueDate: string (optional) - Due date in ISO format
  * - parentId: string (optional) - Parent issue ID for sub-issues
+ * - cycle: string (optional) - Cycle (sprint) ID or name (set via automatic update after creation)
  *
  * OUTPUT (after filtering):
  * - success: boolean - Always true on successful creation
@@ -38,6 +39,8 @@
  * - Assignee "me" resolves to authenticated user
  * - Labels must be valid label names or UUIDs
  * - Invalid team/assignee/state throws descriptive errors from Linear API
+ * - Cycle parameter triggers automatic orchestration: create issue, then update with cycle
+ * - If cycle assignment fails, issue is still created (warning logged, no error thrown)
  *
  * @example
  * ```typescript
@@ -47,14 +50,15 @@
  *   team: 'Engineering'
  * });
  *
- * // Create with full details
+ * // Create with full details including cycle
  * await createIssue.execute({
  *   title: 'Implement new feature',
  *   description: '## Requirements\n- Feature A\n- Feature B',
  *   team: 'Engineering',
  *   assignee: 'me',
  *   priority: 2,
- *   labels: ['feature', 'backend']
+ *   labels: ['feature', 'backend'],
+ *   cycle: 'Sprint 9'  // Automatically assigned via update after creation
  * });
  * ```
  */
@@ -119,7 +123,13 @@ export const createIssueParams = z.object({
     .refine(validateNoPathTraversal, 'Path traversal not allowed')
     .refine(validateNoCommandInjection, 'Invalid characters detected')
     .optional()
-    .describe('Parent issue ID for sub-issues')
+    .describe('Parent issue ID for sub-issues'),
+  cycle: z.string()
+    .refine(validateNoControlChars, 'Control characters not allowed')
+    .refine(validateNoPathTraversal, 'Path traversal not allowed')
+    .refine(validateNoCommandInjection, 'Invalid characters detected')
+    .optional()
+    .describe('Cycle (sprint) ID or name - will be set via update after creation')
 });
 
 export type CreateIssueInput = z.infer<typeof createIssueParams>;
@@ -174,11 +184,14 @@ export const createIssue = {
     // Validate input
     const validated = createIssueParams.parse(input);
 
-    // Call MCP tool
+    // Extract cycle parameter (not supported by Linear create_issue API)
+    const { cycle, ...createParams } = validated;
+
+    // Call MCP tool to create issue (without cycle)
     const rawData = await callMCPTool(
       'linear',
       'create_issue',
-      validated
+      createParams
     );
 
     // Linear MCP returns the issue directly, not wrapped in {success, issue}
@@ -189,6 +202,22 @@ export const createIssue = {
 
     if (!rawData.id) {
       throw new Error('Failed to create issue: No issue ID returned');
+    }
+
+    // If cycle was provided, update the issue to assign it
+    // (Linear API doesn't support cycle on creation, only on update)
+    if (cycle) {
+      try {
+        const { updateIssue } = await import('./update-issue.js');
+        await updateIssue.execute({
+          id: rawData.identifier,
+          cycle
+        });
+      } catch (error) {
+        // Issue was created successfully, but cycle assignment failed
+        // Log warning but don't fail the entire operation
+        console.warn(`Warning: Issue created but cycle assignment failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
     }
 
     // Filter to essential fields

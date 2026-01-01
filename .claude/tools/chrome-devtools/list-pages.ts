@@ -36,7 +36,7 @@ export const listPages = {
     // Call chrome-devtools MCP server via SHARED client
     const pages = await callMCPTool(
       'chrome-devtools',                  // MCP name
-      'mcp__chrome-devtools__list_pages', // Actual MCP tool name
+      'list_pages', // Actual MCP tool name
       validated                            // Pass params directly
     );
 

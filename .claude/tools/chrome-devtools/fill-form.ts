@@ -44,7 +44,7 @@ export const fillForm = {
     // Call chrome-devtools MCP server via SHARED client
     await callMCPTool(
       'chrome-devtools',                  // MCP name
-      'mcp__chrome-devtools__fill_form', // Actual MCP tool name
+      'fill_form', // Actual MCP tool name
       validated                           // Pass params directly
     );
 

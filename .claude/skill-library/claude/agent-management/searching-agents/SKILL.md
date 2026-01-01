@@ -55,9 +55,7 @@ Search → Find relevant agents → Select best match → Use with Task tool
 **Execute BEFORE any search operation:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **See:** [Repository Root Navigation](../../../../skills/managing-agents/references/patterns/repo-root-detection.md)
@@ -75,9 +73,8 @@ cd "$REPO_ROOT"
 **Setup:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skill-library/claude/agent-management/searching-agents/scripts"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude/skill-library/claude/agent-management/searching-agents/scripts"
 ```
 
 **Execute:**

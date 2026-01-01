@@ -72,16 +72,19 @@ We implemented progressive loading for MCPs through TypeScript wrappers that ach
 
 ### Token Savings
 
-| MCP Server       | Tools   | Before (startup)  | After (startup) | Savings |
-| ---------------- | ------- | ----------------- | --------------- | ------- |
-| `praetorian-cli` | 17      | 25,000 tokens     | 0 tokens        | **25k** |
-| `linear`         | 23      | 15,000 tokens     | 0 tokens        | **15k** |
-| `playwright`     | 25      | 14,000 tokens     | 0 tokens        | **14k** |
-| `currents`       | 8       | 8,000 tokens      | 0 tokens        | **8k**  |
-| `context7`       | 2       | 2,000 tokens      | 0 tokens        | **2k**  |
-| **TOTAL**        | **75+** | **64,000 tokens** | **0 tokens**    | **64k** |
+| MCP Server        | Wrappers | Before (startup)  | After (startup) | Savings |
+| ----------------- | -------- | ----------------- | --------------- | ------- |
+| `praetorian-cli`  | 30+      | 9,000 tokens      | 0 tokens        | **9k**  |
+| `linear`          | 20+      | 46,000 tokens     | 0 tokens        | **46k** |
+| `chrome-devtools` | 25+      | 6,000 tokens      | 0 tokens        | **6k**  |
+| `currents`        | 5        | 3,000 tokens      | 0 tokens        | **3k**  |
+| `context7`        | 2        | 600 tokens        | 0 tokens        | **0.6k**|
+| `perplexity`      | 4        | 2,000 tokens      | 0 tokens        | **2k**  |
+| `nebula`          | 1        | 500 tokens        | 0 tokens        | **0.5k**|
+| `chariot`         | 2        | 1,000 tokens      | 0 tokens        | **1k**  |
+| **TOTAL**         | **90+**  | **68,100 tokens** | **0 tokens**    | **68k** |
 
-Additional savings from eliminated MCP infrastructure: **7,800 tokens**
+Additional savings from eliminated MCP infrastructure: **3,700 tokens**
 
 **Total freed context: 71,800 tokens (7.2% of context window)**
 
@@ -89,13 +92,17 @@ Additional savings from eliminated MCP infrastructure: **7,800 tokens**
 
 ## Skill Architecture (Gateway Pattern)
 
-### Layer 1: MCP Manager (Lifecycle)
+### Layer 1: MCP Wrapper Management (Lifecycle)
 
-**Location**: `.claude/skills/mcp-manager/`
+**Location**: `.claude/skills/managing-mcp-wrappers/` (lifecycle) + `.claude/skills/creating-mcp-wrappers/` (creation)
 
 **Purpose**: Create, test, audit, and maintain MCP wrappers with mandatory TDD enforcement.
 
-> **See [MCP Manager](#mcp-manager) section below for complete documentation** including TDD workflow, 10-phase audit system, directory structure, and CLI reference.
+**Two-Skill Architecture**:
+- `managing-mcp-wrappers` - Lifecycle operations (audit, update, fix, test, generate-skill)
+- `creating-mcp-wrappers` - Instruction-driven wrapper creation with TDD gates
+
+> **See [MCP Wrapper Management](#mcp-wrapper-management) section below for complete documentation** including TDD workflow, 11-phase audit system, directory structure, and CLI reference.
 
 ### Layer 2: Gateway Skill (Discovery & Routing)
 
@@ -209,23 +216,26 @@ skills:
 
 ### Creating a New MCP Wrapper
 
-```
-User: /mcp-manager new linear get-issue
+The `creating-mcp-wrappers` skill provides an instruction-driven workflow with mechanical TDD gates:
 
-1. Command routes to mcp-manager skill
-2. Skill executes TDD workflow:
-   a. npm run create -- linear get-issue
-      → Generates test file ONLY
-   b. npm run verify-red -- linear/get-issue
-      → Confirms tests fail (no implementation)
-   c. npm run generate-wrapper -- linear/get-issue
-      → Creates wrapper from template (blocked until RED passes)
-   d. npm run verify-green -- linear/get-issue
-      → Confirms tests pass with ≥80% coverage
-3. npm run generate-skill -- linear
-   → Creates/updates mcp-tools-linear skill
-4. Agents can now discover and use the new wrapper
 ```
+User: "Create wrapper for linear get-issue"
+
+1. Agent loads `creating-mcp-wrappers` skill
+2. Skill guides 8-phase hybrid workflow:
+   Phase 0: Prerequisites (get $ROOT, verify workspace)
+   Phase 1: Schema Discovery (interactive MCP exploration, ≥3 test cases)
+   Phase 2: Test Design (generate tests using @claude/testing)
+   Phase 3: RED Verification (npm run test:run -- must FAIL)
+   Phase 4: Wrapper Generation (create scaffold)
+   Phase 5: Implementation (code from discovery docs)
+   Phase 6: GREEN Verification (npm run test:coverage -- ≥80%)
+   Phase 7: Structural Audit (verify all artifacts exist)
+   Phase 8: Service Skill Update (npm run generate-skill)
+3. Agents can now discover and use the new wrapper
+```
+
+**Key Insight**: Claude handles discovery and test design (instruction-driven), while vitest enforces TDD gates (mechanical verification). Tests must actually fail in RED and pass in GREEN—no skipping.
 
 ### Using an MCP Wrapper
 
@@ -315,36 +325,39 @@ export const getIssue = {
 
 ---
 
-## MCP Manager
+## MCP Wrapper Management
 
-The MCP Manager is the lifecycle management system for MCP wrappers. It enforces Test-Driven Development (TDD), validates compliance across 10 phases, and provides tooling for creating, updating, auditing, and fixing wrappers.
+The MCP Wrapper Management system is the lifecycle management system for MCP wrappers. It enforces Test-Driven Development (TDD), validates compliance across 11 phases, and provides tooling for creating, updating, auditing, and fixing wrappers.
 
 ### Overview
 
-| Aspect         | Details                                                    |
-| -------------- | ---------------------------------------------------------- |
-| **Location**   | `.claude/skills/mcp-manager/`                              |
-| **Purpose**    | Create, test, audit, and maintain MCP wrappers             |
-| **Philosophy** | TDD-first: tests must exist and fail before implementation |
-| **Coverage**   | Minimum 80% unit test coverage required                    |
-| **Invocation** | Via `/mcp-manager` command or `mcp-manager` skill          |
+| Aspect         | Details                                                                          |
+| -------------- | -------------------------------------------------------------------------------- |
+| **Location**   | `.claude/skills/managing-mcp-wrappers/` + `.claude/skills/creating-mcp-wrappers/`|
+| **Purpose**    | Create, test, audit, and maintain MCP wrappers                                   |
+| **Philosophy** | TDD-first: tests must exist and fail before implementation                       |
+| **Coverage**   | Minimum 80% unit test coverage required                                          |
+| **Invocation** | `skill: "creating-mcp-wrappers"` (create) or `skill: "managing-mcp-wrappers"` (lifecycle) |
 
 ### Directory Structure
 
 ```
-.claude/skills/mcp-manager/
-├── SKILL.md                    # Main skill documentation
+.claude/skills/managing-mcp-wrappers/     # Lifecycle management
+├── SKILL.md                              # Main skill documentation
 ├── scripts/
 │   ├── src/
-│   │   ├── cli.ts              # CLI entry point
-│   │   ├── tdd-enforcer.ts     # RED/GREEN phase enforcement
-│   │   ├── types.ts            # Shared TypeScript types
-│   │   ├── utils.ts            # Shared utilities
-│   │   ├── operations/         # CLI command implementations
-│   │   │   ├── verify-red.ts   # RED phase verification
-│   │   │   ├── verify-green.ts # GREEN phase verification
-│   │   │   └── test.ts         # Test runner
-│   │   ├── phases/             # 10 audit phase implementations
+│   │   ├── cli.ts                        # CLI entry point
+│   │   ├── tdd-enforcer.ts               # RED/GREEN phase enforcement
+│   │   ├── types.ts                      # Shared TypeScript types
+│   │   ├── utils.ts                      # Shared utilities
+│   │   ├── operations/                   # CLI command implementations
+│   │   │   ├── create.ts                 # Create wrapper scaffold
+│   │   │   ├── update.ts                 # Update existing wrapper
+│   │   │   ├── verify-red.ts             # RED phase verification
+│   │   │   ├── verify-green.ts           # GREEN phase verification
+│   │   │   ├── generate-skill.ts         # Generate service skill
+│   │   │   └── test.ts                   # Test runner
+│   │   ├── phases/                       # 11 audit phase implementations
 │   │   │   ├── phase1-schema-discovery.ts
 │   │   │   ├── phase2-optional-fields.ts
 │   │   │   ├── phase3-type-unions.ts
@@ -354,20 +367,29 @@ The MCP Manager is the lifecycle management system for MCP wrappers. It enforces
 │   │   │   ├── phase7-integration-tests.ts
 │   │   │   ├── phase8-test-quality.ts
 │   │   │   ├── phase9-security-validation.ts
-│   │   │   └── phase10-typescript-validation.ts
-│   │   └── fixers/             # Auto-fix implementations
+│   │   │   ├── phase10-typescript-validation.ts
+│   │   │   └── phase11-skill-schema-sync.ts  # NEW: Skill-schema synchronization
+│   │   └── fixers/                       # Auto-fix implementations
 │   │       ├── phase2-fixer.ts
 │   │       ├── phase3-fixer.ts
 │   │       └── phase4-fixer.ts
 │   ├── package.json
 │   └── node_modules/
 ├── templates/
-│   ├── discover-schema.ts      # Schema discovery script template
-│   ├── tool-wrapper.ts.tmpl    # Wrapper implementation template
-│   ├── unit-test.ts.tmpl       # Unit test template
-│   └── tsconfig.json.tmpl      # TypeScript config template (auto-applied by create)
-├── references/                 # Workflow documentation
-└── examples/                   # Example wrappers
+│   ├── discover-schema.ts                # Schema discovery script template
+│   ├── tool-wrapper.ts.tmpl              # Wrapper implementation template
+│   └── tsconfig.json.tmpl                # TypeScript config template
+└── references/                           # Workflow documentation
+
+.claude/skills/creating-mcp-wrappers/     # Creation workflow (instruction-driven)
+├── SKILL.md                              # 8-phase hybrid workflow
+├── references/
+│   ├── schema-discovery-guide.md         # Interactive MCP exploration
+│   ├── test-design-patterns.md           # 6 test categories, 18+ tests
+│   ├── implementation-guide.md           # Zod schemas, filtering, errors
+│   └── batch-mode-guide.md               # Multi-tool workflow
+└── examples/
+    └── linear-get-issue.md               # End-to-end walkthrough
 ```
 
 ### TDD Workflow (Enforced)
@@ -407,34 +429,35 @@ The MCP Manager enforces a strict Red-Green-Refactor cycle. You cannot generate 
 - `generate-wrapper` checks RED phase first, **blocks if not verified**
 - `verify-green` requires ≥80% unit test coverage
 
-### The 10 Audit Phases
+### The 11 Audit Phases
 
-MCP wrappers must pass compliance validation across 10 phases:
+MCP wrappers must pass compliance validation across 11 phases:
 
-| Phase | Name                  | Auto-Fix | Description                                                |
-| ----- | --------------------- | -------- | ---------------------------------------------------------- |
-| 1     | Schema Discovery      | ❌       | Validates discovery docs exist for MCP tool                |
-| 2     | Optional Fields       | ✅       | Tests verify `.optional()` Zod usage                       |
-| 3     | Type Unions           | ❌       | Tests cover `z.union()` edge cases                         |
-| 4     | Nested Access Safety  | ✅       | Tests catch unsafe property access                         |
-| 5     | Reference Validation  | ❌       | Detects deprecated MCP tool references                     |
-| 6     | Unit Test Coverage    | ❌       | **≥80% coverage required**                                 |
-| 7     | Integration Tests     | ❌       | Tests with real MCP server (recommended)                   |
-| 8     | Test Quality          | ❌       | Validates test patterns and structure                      |
-| 9     | Security Validation   | ❌       | Scans for dangerous patterns (eval, hardcoded keys)        |
-| 10    | TypeScript Validation | ❌       | **CRITICAL if tsconfig.json missing**; detects type errors |
+| Phase | Name                       | Auto-Fix | Description                                                |
+| ----- | -------------------------- | -------- | ---------------------------------------------------------- |
+| 1     | Schema Discovery           | ❌       | Validates discovery docs exist for MCP tool                |
+| 2     | Optional Fields            | ✅       | Tests verify `.optional()` Zod usage                       |
+| 3     | Type Unions                | ❌       | Tests cover `z.union()` edge cases                         |
+| 4     | Nested Access Safety       | ✅       | Tests catch unsafe property access                         |
+| 5     | Reference Validation       | ❌       | Detects deprecated MCP tool references                     |
+| 6     | Unit Test Coverage         | ❌       | **≥80% coverage required**                                 |
+| 7     | Integration Tests          | ❌       | Tests with real MCP server (recommended)                   |
+| 8     | Test Quality               | ❌       | Validates test patterns and structure                      |
+| 9     | Security Validation        | ❌       | Scans for dangerous patterns (eval, hardcoded keys)        |
+| 10    | TypeScript Validation      | ❌       | **CRITICAL if tsconfig.json missing**; detects type errors |
+| 11    | Skill-Schema Sync          | ✅       | **Service skill matches wrapper Zod schemas**              |
 
 > **STEPS vs PHASES Clarification:**
 >
-> - **Workflow STEPS** (1-7): Sequential CLI commands you execute
-> - **Audit PHASES** (1-10): Compliance categories checked by `npm run audit`
+> - **Workflow STEPS** (0-8): The 9-phase creation workflow in `creating-mcp-wrappers`
+> - **Audit PHASES** (1-11): Compliance categories checked by `npm run audit`
 
 ### CLI Reference
 
 All commands run from the scripts directory:
 
 ```bash
-cd .claude/skills/mcp-manager/scripts
+cd .claude/skills/managing-mcp-wrappers/scripts
 ```
 
 #### TDD Workflow Commands
@@ -448,39 +471,53 @@ cd .claude/skills/mcp-manager/scripts
 
 #### Maintenance Commands
 
-| Command                                     | Description                            |
-| ------------------------------------------- | -------------------------------------- |
-| `npm run update -- <service> <tool>`        | Update existing wrapper (test-guarded) |
-| `npm run audit -- <service>/<tool>`         | Run 10-phase compliance check          |
-| `npm run audit -- --all`                    | Audit all wrappers                     |
-| `npm run audit -- --service <service>`      | Audit all wrappers in a service        |
-| `npm run fix -- <service>/<tool>`           | Auto-fix issues (phases 2, 4)          |
-| `npm run fix -- <service>/<tool> --dry-run` | Preview fixes without applying         |
-| `npm run test -- <service>/<tool>`          | Run test suite for wrapper             |
-| `npm run generate-skill -- <service>`       | Generate/update service skill          |
+| Command                                     | Description                               |
+| ------------------------------------------- | ----------------------------------------- |
+| `npm run update -- <service> <tool>`        | Update existing wrapper (test-guarded)    |
+| `npm run audit -- <service>/<tool>`         | Run 11-phase compliance check             |
+| `npm run audit -- --all`                    | Audit all wrappers                        |
+| `npm run audit -- --service <service>`      | Audit all wrappers in a service           |
+| `npm run fix -- <service>/<tool>`           | Auto-fix issues (phases 2, 4, 11)         |
+| `npm run fix -- <service>/<tool> --dry-run` | Preview fixes without applying            |
+| `npm run test -- <service>/<tool>`          | Run test suite for wrapper                |
+| `npm run generate-skill -- <service>`       | Generate/update service skill             |
 
 #### Example: Creating a New Wrapper
 
-```bash
-# 1. Setup
-cd .claude/skills/mcp-manager/scripts
-npm install
+**Recommended: Use `creating-mcp-wrappers` skill** (instruction-driven with TDD gates):
 
-# 2. RED Phase - Create tests first
-npm run create -- linear get-issue
-# Edit the generated test file with expected behavior
-npm run verify-red -- linear/get-issue
+```bash
+# Invoke skill - Claude guides you through 8 phases
+skill: "creating-mcp-wrappers"
+
+# Phase 0: Prerequisites
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd $ROOT/.claude && npm install
+
+# Phase 1-2: Schema discovery + test design (Claude-guided)
+# Phase 3: RED verification
+cd $ROOT/.claude && npm run test:run -- tools/linear/get-issue
 # ✅ Tests fail (expected - no implementation yet)
 
-# 3. GREEN Phase - Implement wrapper
-npm run generate-wrapper -- linear/get-issue
-# Implement the wrapper logic
-npm run verify-green -- linear/get-issue
+# Phase 4-5: Wrapper generation + implementation (Claude-guided)
+# Phase 6: GREEN verification
+cd $ROOT/.claude && npm run test:coverage -- tools/linear/get-issue
 # ✅ Tests pass with 85% coverage
 
-# 4. Generate service skill for agent access
-npm run generate-skill -- linear
+# Phase 7-8: Structural audit + service skill
+cd $ROOT/.claude/skills/managing-mcp-wrappers/scripts && npm run generate-skill -- linear
 # ✅ Updated .claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md
+```
+
+**Alternative: Direct CLI** (for experienced developers):
+
+```bash
+cd .claude/skills/managing-mcp-wrappers/scripts && npm install
+npm run create -- linear get-issue      # Generate test scaffold
+npm run verify-red -- linear/get-issue  # Confirm tests fail
+npm run generate-wrapper -- linear/get-issue  # Generate wrapper
+npm run verify-green -- linear/get-issue      # Confirm tests pass ≥80%
+npm run generate-skill -- linear              # Update service skill
 ```
 
 ### Skill Generation
@@ -498,6 +535,99 @@ This creates/updates the service skill at `.claude/skill-library/claude/mcp-tool
 - Execution patterns
 
 Service skills are loaded on-demand by agents via the `gateway-mcp-tools` gateway.
+
+---
+
+## Shared Infrastructure
+
+### @claude/testing Library
+
+**Location**: `.claude/lib/testing/`
+
+**Purpose**: Universal testing infrastructure for all MCP wrappers using Vitest.
+
+The `@claude/testing` package provides shared testing utilities that eliminate boilerplate and ensure consistency:
+
+```typescript
+// Example unit test using @claude/testing
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { createMCPMock, LinearResponses, MCPErrors } from '@claude/testing';
+import { getIssue } from './get-issue';
+import * as mcpClient from '../config/lib/mcp-client';
+
+vi.mock('../config/lib/mcp-client');
+
+describe('getIssue', () => {
+  let mcpMock: ReturnType<typeof createMCPMock>;
+
+  beforeEach(() => {
+    mcpMock = createMCPMock();
+    vi.mocked(mcpClient.callMCPTool).mockImplementation(mcpMock);
+  });
+
+  it('should filter response for token efficiency', async () => {
+    mcpMock.mockResolvedValue(LinearResponses.getIssue({ id: 'ENG-1234' }));
+    const result = await getIssue.execute({ id: 'ENG-1234' });
+    expect(result.id).toBe('ENG-1234');
+  });
+});
+```
+
+**Available Utilities**:
+
+| Category | Exports | Purpose |
+|----------|---------|---------|
+| **Mocking** | `createMCPMock()`, `MCPErrors` | Mock MCP client, simulate errors |
+| **Response Builders** | `LinearResponses`, `Context7Responses`, `CurrentsResponses` | Realistic mock data |
+| **Security Testing** | `getAllSecurityScenarios()`, `testSecurityScenarios()` | 12 attack vector tests |
+| **Schema Assertions** | `assertSchemaAccepts()`, `assertSchemaRejects()` | Zod validation helpers |
+| **Edge Cases** | `EdgeCaseData.boundary`, `EdgeCaseData.special` | Boundary/unicode testing |
+
+**Running Tests** (from workspace root):
+
+```bash
+cd .claude
+npm run test:run              # All tests once
+npm run test:coverage         # With coverage report
+npm run test:run -- tools/linear/get-issue  # Single wrapper
+```
+
+### find-project-root.ts
+
+**Location**: `.claude/lib/find-project-root.ts`
+
+**Purpose**: Robust project root detection that works from any directory (submodules, nested dirs).
+
+This shared utility solves the "where am I?" problem for all Claude Code infrastructure:
+
+```typescript
+import { findProjectRoot, resolveProjectPath } from '../lib/find-project-root.js';
+
+// Works from anywhere in the repo
+const PROJECT_ROOT = findProjectRoot();  // /Users/user/chariot-development-platform
+
+// Build paths safely
+const skillsDir = resolveProjectPath('.claude', 'skills');
+const toolsDir = resolveProjectPath('.claude', 'tools', 'linear');
+```
+
+**Key Functions**:
+
+| Function | Purpose |
+|----------|---------|
+| `findProjectRoot()` | Returns super-repo root from any location |
+| `resolveProjectPath(...segments)` | Builds absolute paths from project root |
+| `isInSubmodule()` | Detects if running from a submodule |
+| `getCurrentSubmoduleName()` | Returns submodule name (e.g., 'chariot') |
+| `findSkillPath(name)` | Locates skill in core or library |
+| `getAllSkillDirectories()` | Lists all directories containing skills |
+
+**Detection Strategy**:
+1. Check `CLAUDE_PROJECT_DIR` env var (fastest)
+2. Git detection with submodule support (`--show-superproject-working-tree`)
+3. Filesystem fallback (search upward for `.claude/` directory)
+
+**Why This Matters**: Scripts, wrappers, and tools can run from any working directory without path resolution errors.
 
 ---
 
@@ -613,19 +743,23 @@ See **Phase 4.1** and **Phase 6** in Current Status & TODO for implementation ro
 ### Migration Path
 
 1. **Identify MCP** to wrap
-2. **Run TDD workflow** via mcp-manager
+2. **Run TDD workflow** via `creating-mcp-wrappers` skill (or `managing-mcp-wrappers` CLI)
 3. **Generate service skill** for agent access
 4. **Remove MCP** from `.mcp.json`
 5. **Update agents** to use wrapper skill
 
 ## Quick Reference
 
-### MCP Manager Commands
+### MCP Wrapper Management Commands
 
-See [MCP Manager](#mcp-manager) section for complete CLI reference.
+See [MCP Wrapper Management](#mcp-wrapper-management) section for complete CLI reference.
 
 ```bash
-cd .claude/skills/mcp-manager/scripts
+# Recommended: Use creating-mcp-wrappers skill for new wrappers
+skill: "creating-mcp-wrappers"
+
+# Alternative: Direct CLI
+cd .claude/skills/managing-mcp-wrappers/scripts
 
 # TDD Workflow
 npm run create -- <service> <tool>           # 1. Test file only
@@ -635,9 +769,9 @@ npm run verify-green -- <service>/<tool>     # 4. Tests pass
 npm run generate-skill -- <service>          # 5. Update service skill
 
 # Maintenance
-npm run audit -- <service>/<tool>            # 10-phase compliance check
+npm run audit -- <service>/<tool>            # 11-phase compliance check
 npm run audit -- --all                       # Audit all wrappers
-npm run fix -- <service>/<tool>              # Auto-fix issues
+npm run fix -- <service>/<tool>              # Auto-fix issues (phases 2, 4, 11)
 ```
 
 ### Execute Wrapper (Agent)
@@ -661,11 +795,13 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
 ### Internal Documentation
 
 - **Gateway Skill**: `.claude/skills/gateway-mcp-tools/SKILL.md` (core skill - entry point)
-- **MCP Manager**: `.claude/skills/mcp-manager/SKILL.md` (lifecycle management)
+- **Creation Workflow**: `.claude/skills/creating-mcp-wrappers/SKILL.md` (8-phase hybrid workflow)
+- **Lifecycle Manager**: `.claude/skills/managing-mcp-wrappers/SKILL.md` (audit, fix, update, test)
+- **Testing Library**: `.claude/lib/testing/README.md` (@claude/testing documentation)
+- **Path Resolution**: `.claude/lib/find-project-root.ts` (shared project root detection)
 - **Registry Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-registry/SKILL.md` (detailed usage)
 - **Service Skills**: `.claude/skill-library/claude/mcp-tools/mcp-tools-{service}/SKILL.md`
 - **Skills Architecture**: `docs/SKILLS-ARCHITECTURE.md` (gateway pattern reference)
-- **Corrections Plan**: `docs/plans/mcp-tool-corrections.md`
 
 ### Industry White Papers
 
@@ -720,7 +856,7 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
   - `sanitize.ts` with validators (48 tests)
   - Security test template with 4 attack vector patterns
   - Phase 9 security validation (static analysis for dangerous patterns)
-  - 10-phase audit system (includes Phase 10: TypeScript validation)
+  - 11-phase audit system (includes Phase 10: TypeScript validation, Phase 11: Skill-Schema Sync)
 
 - [x] **Phase 4: Architecture** (4 items)
   - **Sandboxing Options**: Research complete, implementation deferred (high complexity, low immediate value)
@@ -740,12 +876,34 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
 
 - [x] **Gateway Skill Architecture**
   - Created `gateway-mcp-tools` in `.claude/skills/` (core skill)
-  - Routes to 8 service skills in `.claude/skill-library/claude/mcp-tools/`
+  - Routes to 9 service skills in `.claude/skill-library/claude/mcp-tools/`
   - Single slot in 15K budget, unlimited library skills
 
 - [x] **Phase 10: TypeScript Validation** (Nov 2024)
   - Added `phase10-typescript-validation.ts` to audit pipeline
   - Validates wrapper TypeScript patterns and imports
+
+- [x] **Phase 11: Skill-Schema Sync** (Dec 2024)
+  - Added `phase11-skill-schema-sync.ts` to audit pipeline
+  - Auto-fixable: `npm run generate-skill` regenerates service skill from wrapper schemas
+  - Ensures service skill documentation matches actual Zod schemas in wrappers
+
+- [x] **Hybrid Wrapper Creation Architecture** (Dec 2024)
+  - Split `mcp-manager` into `managing-mcp-wrappers` (lifecycle) + `creating-mcp-wrappers` (creation)
+  - Instruction-driven schema discovery and test design (Claude reasoning)
+  - Mechanical TDD gates (vitest enforcement - cannot bypass)
+  - 8-phase workflow documented in `creating-mcp-wrappers` skill
+
+- [x] **@claude/testing Library** (Dec 2024)
+  - Shared testing infrastructure at `.claude/lib/testing/`
+  - `createMCPMock()`, `MCPErrors`, response builders
+  - 12 security attack vectors automated
+  - Used by all MCP wrapper tests
+
+- [x] **find-project-root.ts Utility** (Dec 2024)
+  - Shared path resolution at `.claude/lib/find-project-root.ts`
+  - Works from submodules, nested directories, any location
+  - Used by all skills, wrappers, and tools
 
 ### Test Coverage Summary
 

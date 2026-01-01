@@ -21,7 +21,7 @@ export class SkillParser {
     const cliPatterns = [
       /npm run (audit|fix|validate|dev)/,
       /scripts\/[a-z-]+\.(?:ts|js)/,
-      /\$REPO_ROOT.*npm run/,
+      /\$ROOT.*npm run/,
       /# Navigate to.*npm run/,
     ];
 

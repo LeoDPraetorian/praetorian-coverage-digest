@@ -69,7 +69,7 @@ Without Context7, you're guessing which patterns are current.
 
 1. **Create structure** (Phase 5)
 2. **STOP before writing** ⚠️
-3. **Load researching-skills** - `Read(".claude/skill-library/claude/skill-management/researching-skills/SKILL.md")`
+3. **Load researching-skills** - `skill: "researching-skills"`
 4. **Follow research workflow**:
    - Codebase search: Find existing patterns
    - Context7 query: Get latest documentation

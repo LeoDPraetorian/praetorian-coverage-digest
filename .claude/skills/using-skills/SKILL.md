@@ -62,7 +62,7 @@ The skill-search CLI searches BOTH core skills and library skills, showing:
 **Search command:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}" && cd "$REPO_ROOT/.claude" && npm run -w @chariot/auditing-skills search -- "QUERY"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run -w @chariot/auditing-skills search -- "QUERY"
 ```
 
 **Examples:**
@@ -118,12 +118,11 @@ skill: "debugging-systematically"
    Read("/Users/you/chariot-development-platform/.claude/skill-library/.../SKILL.md")
    ```
 
-3. **If constructing paths manually**, get REPO_ROOT first:
+3. **If constructing paths manually**, get ROOT first:
 
    ```bash
-   REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-   REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-   echo "$REPO_ROOT/.claude/skill-library/path/to/SKILL.md"
+   ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+   echo "$ROOT/.claude/skill-library/path/to/SKILL.md"
    ```
 
    Then use the echoed path with Read tool.

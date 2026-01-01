@@ -21,8 +21,8 @@ if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
 fi
 
 # Get repository root
-REPO_ROOT=$(git rev-parse --show-toplevel)
-UI_DIR="$REPO_ROOT/modules/chariot/ui"
+ROOT=$(git rev-parse --show-toplevel)
+UI_DIR="$ROOT/modules/chariot/ui"
 
 # Check if UI directory exists
 if [ ! -d "$UI_DIR" ]; then

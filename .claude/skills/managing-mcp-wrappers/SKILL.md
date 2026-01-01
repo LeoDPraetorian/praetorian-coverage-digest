@@ -48,7 +48,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 
 ```bash
 # Navigate to workspace from any location
-cd "$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)/.claude/skills/managing-mcp-wrappers/scripts"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude/skills/managing-mcp-wrappers/scripts"
 npm install
 ```
 
@@ -57,6 +57,23 @@ npm install
 ```bash
 npx -y @modelcontextprotocol/server-{mcp-name} --version
 ```
+
+## Shared Infrastructure
+
+Testing utilities are in `@claude/testing` package (`.claude/lib/testing/`):
+
+- **MCP mocks**: `createMCPMock()`, `MCPErrors`
+- **Security tests**: `testSecurityScenarios()`, `getAllSecurityScenarios()`
+- **Test templates**: `src/templates/unit-test.template.ts`
+- **Response builders**: `src/mocks/response-builders.ts`
+
+**Run tests from workspace root:**
+
+```bash
+cd .claude && npm run test:run
+```
+
+**See:** `.claude/lib/testing/README.md` for complete documentation
 
 ## TDD Workflow (ENFORCED)
 
@@ -106,6 +123,14 @@ npm run verify-green -- <service>/<tool>      # 4. MUST PASS with ≥80% coverag
 > - **Audit PHASES** (1-11): Compliance validation categories checked by `npm run audit`
 >
 > Don't confuse them: Steps are what you DO, Phases are what the audit CHECKS.
+
+**Audit Checklist:**
+
+When auditing wrappers, verify:
+
+- [ ] Tests use `@claude/testing` imports (not custom mocks)
+- [ ] Response builder added to `response-builders.ts`
+- [ ] Tests run from `.claude/` workspace root
 
 ## Operations
 
@@ -389,7 +414,7 @@ Possible causes:
 3. Invalid service/tool name format
 
 Corrective action:
-cd $(git rev-parse --show-toplevel)/.claude/skills/managing-mcp-wrappers/scripts && npm install
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude/skills/managing-mcp-wrappers/scripts" && npm install
 ```
 
 ## Related Skills

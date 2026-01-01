@@ -41,7 +41,7 @@ export const listConsoleMessages = {
     // Call chrome-devtools MCP server via SHARED client
     const messages = await callMCPTool(
       'chrome-devtools',                               // MCP name
-      'mcp__chrome-devtools__list_console_messages',  // Actual MCP tool name
+      'list_console_messages',  // Actual MCP tool name
       validated                                        // Pass params directly
     );
 

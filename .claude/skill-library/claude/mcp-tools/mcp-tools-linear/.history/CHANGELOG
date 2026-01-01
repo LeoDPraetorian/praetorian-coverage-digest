@@ -1,0 +1,20 @@
+
+## [$(date +%Y-%m-%d)] - Documentation Enhancement
+
+### Added
+- List Projects example in Common Operations section (after List Issues, before Update Issue)
+  - Shows how to call listProjects.execute({})
+  - Uses standard ROOT pattern with npx tsx
+  - Includes 2>/dev/null to suppress MCP debug logs
+  - Documents return value: projects array with id, name, description, lead, status fields
+
+### Enhanced
+- Update Issue example now includes project parameter
+  - Added: `project: 'Agentic Development'  // Optional - Project name or ID`
+  - Added to Key parameters list: `- project (optional) - Project name or ID`
+
+### Context
+- Fixed list-projects.ts parsing bug (rawData.content vs rawData.projects)
+- Added CLI project parameter support to .claude/bin/linear.ts
+- Wrappers always supported these features; examples now document them for user discovery
+

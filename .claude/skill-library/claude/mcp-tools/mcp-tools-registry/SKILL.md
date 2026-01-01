@@ -46,7 +46,7 @@ tools:
 **Why Bash is required:** Wrappers are TypeScript files. Agents execute them via:
 
 ```bash
-npx tsx -e "import { tool } from './.claude/tools/...'; ..."
+npx tsx -e "import { tool } from '$ROOT/.claude/tools/...'; ..."
 ```
 
 **Without Bash tool, agents cannot execute wrappers!**
@@ -91,8 +91,8 @@ Found 18 tools:
 ```bash
 # Use Bash tool to execute TypeScript inline
 # Note: 2>/dev/null suppresses MCP debug logs
-npx tsx -e "(async () => {
-  const { assetsList } = await import('./.claude/tools/praetorian-cli/assets-list.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { assetsList } = await import('$ROOT/.claude/tools/praetorian-cli/assets-list.ts');
 
   const result = await assetsList.execute({
     key_prefix: '#asset#example.com',
@@ -170,8 +170,8 @@ npx tsx .claude/tools/scripts/analyze-risks.ts
 **Process in your code:**
 
 ```bash
-npx tsx -e "(async () => {
-  const { assetsList } = await import('./.claude/tools/praetorian-cli/assets-list.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { assetsList } = await import('$ROOT/.claude/tools/praetorian-cli/assets-list.ts');
 
   const result = await assetsList.execute({ pages: 1 });
 
@@ -296,8 +296,8 @@ Wrappers normalize variable MCP response formats automatically. Output is always
 
 ```bash
 # Bash tool command with stderr suppression
-npx tsx -e "(async () => {
-  const { assetsList } = await import('./.claude/tools/praetorian-cli/assets-list.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { assetsList } = await import('$ROOT/.claude/tools/praetorian-cli/assets-list.ts');
 
   const assets = await assetsList.execute({
     key_prefix: '#asset#example.com',
@@ -312,8 +312,8 @@ npx tsx -e "(async () => {
 
 ```bash
 # Bash tool command with stderr suppression
-npx tsx -e "(async () => {
-  const { assetsList, risksGet } = await import('./.claude/tools/praetorian-cli/index.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { assetsList, risksGet } = await import('$ROOT/.claude/tools/praetorian-cli/index.ts');
 
   const assets = await assetsList.execute({ pages: 1 });
   console.log('Assets:', assets.summary.total_count);
@@ -365,8 +365,8 @@ npx tsx .claude/tools/scripts/cross-service.ts
 
 ```bash
 # Bash tool command with stderr suppression
-npx tsx -e "(async () => {
-  const { discoverTools } = await import('./.claude/tools/discover.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { discoverTools } = await import('$ROOT/.claude/tools/discover.ts');
 
   const tools = await discoverTools('praetorian-cli', 'asset');
 
@@ -388,8 +388,8 @@ npx tsx -e "(async () => {
 
 ```bash
 # Use Bash tool with stderr suppression
-npx tsx -e "(async () => {
-  const { assetsList } = await import('./.claude/tools/praetorian-cli/assets-list.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { assetsList } = await import('$ROOT/.claude/tools/praetorian-cli/assets-list.ts');
 
   const result = await assetsList.execute({
     key_prefix: '#asset#example.com',
@@ -450,8 +450,8 @@ npx tsx .claude/tools/scripts/risk-analysis.ts
 
 ```bash
 # Use Bash tool with stderr suppression
-npx tsx -e "(async () => {
-  const { listIssues, createIssue } = await import('./.claude/tools/linear/index.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { listIssues, createIssue } = await import('$ROOT/.claude/tools/linear/index.ts');
 
   const bugs = await listIssues.execute({
     team: 'Engineering',
@@ -523,8 +523,8 @@ npx tsx .claude/tools/discover.ts praetorian-cli
 
 ```bash
 # Bash tool with stderr suppression:
-npx tsx -e "(async () => {
-  const { toolName } = await import('./.claude/tools/category/tool-name.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { toolName } = await import('$ROOT/.claude/tools/category/tool-name.ts');
   const result = await toolName.execute({ params });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null

@@ -38,7 +38,7 @@ export const emulate = {
     // Call chrome-devtools MCP server via SHARED client
     await callMCPTool(
       'chrome-devtools',               // MCP name
-      'mcp__chrome-devtools__emulate', // Actual MCP tool name
+      'emulate', // Actual MCP tool name
       validated                         // Pass params directly
     );
 

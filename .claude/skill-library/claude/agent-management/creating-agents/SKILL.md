@@ -83,9 +83,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Skill, AskUserQue
 ## Phase 0: Navigate to Repo Root (MANDATORY)
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **Cannot proceed without navigating to repo root** ✅

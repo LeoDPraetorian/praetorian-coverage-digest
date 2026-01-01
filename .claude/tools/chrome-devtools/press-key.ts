@@ -37,7 +37,7 @@ export const pressKey = {
     // Call chrome-devtools MCP server via SHARED client
     await callMCPTool(
       'chrome-devtools',                  // MCP name
-      'mcp__chrome-devtools__press_key', // Actual MCP tool name
+      'press_key', // Actual MCP tool name
       validated                           // Pass params directly
     );
 

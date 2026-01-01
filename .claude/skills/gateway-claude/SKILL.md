@@ -94,7 +94,7 @@ Read: .claude/skill-library/claude/agent-management/creating-agents/SKILL.md
 
 ---
 
-## Skill Management (12 operations)
+## Skill Management (11 operations)
 
 **Router Skill:** `.claude/skills/managing-skills/SKILL.md`
 
@@ -113,7 +113,6 @@ The managing-skills skill routes to:
 | List          | `.claude/skill-library/claude/skill-management/listing-skills/SKILL.md`          |
 | Sync Gateways | `.claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md`        |
 | Format Output | `.claude/skill-library/claude/skill-management/formatting-skill-output/SKILL.md` |
-| Research      | `.claude/skill-library/claude/skill-management/researching-skills/SKILL.md`      |
 
 **Usage:**
 
@@ -136,7 +135,6 @@ Read: .claude/skill-library/claude/skill-management/searching-skills/SKILL.md
 Read: .claude/skill-library/claude/skill-management/listing-skills/SKILL.md
 Read: .claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md
 Read: .claude/skill-library/claude/skill-management/formatting-skill-output/SKILL.md
-Read: .claude/skill-library/claude/skill-management/researching-skills/SKILL.md
 ```
 
 ---

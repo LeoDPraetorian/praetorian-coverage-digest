@@ -153,8 +153,9 @@ export const listProjects = {
       validated
     );
 
-    // Linear MCP returns array directly, not { projects: [...] }
-    const projects = Array.isArray(rawData) ? rawData : (rawData.projects || []);
+    // callMCPTool already parses JSON from MCP response
+    // Linear returns { content: [{project1}, {project2}, ...] }
+    const projects = rawData.content || rawData.projects || (Array.isArray(rawData) ? rawData : []);
 
     // Filter to essential fields
     const filtered = {
@@ -167,7 +168,7 @@ export const listProjects = {
           name: project.state.name,
           type: project.state.type
         } : undefined,
-        lead: project.lead ? {
+        lead: (project.lead && project.lead.id) ? {
           id: project.lead.id,
           name: project.lead.name
         } : undefined,

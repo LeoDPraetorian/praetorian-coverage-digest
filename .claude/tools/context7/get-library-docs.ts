@@ -136,8 +136,11 @@ export const getLibraryDocs = {
     // Returns plain text documentation string
     const rawData = await callMCPTool<string>(
       'context7',
-      'get-library-docs',  // Actual Upstash context7 MCP tool name
-      validated
+      'query-docs',  // Actual Upstash context7 MCP tool name
+      {
+        libraryId: validated.context7CompatibleLibraryID,
+        query: validated.topic || 'documentation',
+      }
     );
 
     // Build output compatible with skill-manager Context7Data interface

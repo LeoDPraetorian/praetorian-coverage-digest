@@ -45,9 +45,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, TodoWrite, Skill, AskUserQuestion
 **Step 0: Navigate to repo root**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **Step 1: Document RED** - What's wrong today? Test scenario shows failure.
@@ -131,8 +129,8 @@ AskUserQuestion({
 
 **If user selects "Yes":**
 
-```typescript
-Read(".claude/skill-library/claude/skill-management/researching-skills/SKILL.md");
+```
+skill: "researching-skills"
 ```
 
 The researching-skills skill provides:

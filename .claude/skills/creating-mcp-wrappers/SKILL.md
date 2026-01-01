@@ -1,33 +1,41 @@
 ---
 name: creating-mcp-wrappers
-description: Use when creating MCP wrappers - guides schema discovery, test design, implementation with mechanical TDD verification via CLI
+description: Use when creating MCP wrappers - guides schema discovery, test design, implementation with TDD verification using @claude/testing infrastructure
 allowed-tools: Read, Write, Bash, Grep, Glob, TodoWrite, AskUserQuestion
 ---
 
 # Creating MCP Wrappers
 
-**Hybrid approach: Claude reasoning + CLI enforcement.**
+**Claude-driven TDD workflow using @claude/testing infrastructure.**
 
 **You MUST use TodoWrite before starting to track all phases.**
 
 ## Quick Reference
 
-| Phase                 | Handler | Tool             | Verification         |
-| --------------------- | ------- | ---------------- | -------------------- |
-| 1. Schema Discovery   | Claude  | Bash, Write      | Discovery doc exists |
-| 2. Test Design        | Claude  | Write            | Test file exists     |
-| 3. RED Gate           | CLI     | verify-red       | Tests fail ✅        |
-| 4. Wrapper Generation | CLI     | generate-wrapper | Wrapper exists       |
-| 5. Implementation     | Claude  | Edit             | Code complete        |
-| 6. GREEN Gate         | CLI     | verify-green     | Tests pass ✅, ≥80%  |
-| 7. Audit              | CLI     | audit            | ≥10/11 phases ✅     |
-| 8. Service Skill      | CLI     | generate-skill   | Skill updated        |
+| Phase                   | Handler | Tool             | Verification            |
+| ----------------------- | ------- | ---------------- | ----------------------- |
+| 0. Prerequisites        | Claude  | Bash             | Workspace ready         |
+| 1. Schema Discovery     | Claude  | Bash, Write      | Discovery doc exists    |
+| 2. Test Design          | Claude  | Write            | Test file exists        |
+| 3. RED Verification     | Claude  | Bash (vitest)    | Tests fail ✅           |
+| 4. Wrapper Generation   | Claude  | Write            | Wrapper file exists     |
+| 5. Implementation       | Claude  | Edit             | Code complete           |
+| 6. GREEN Verification   | Claude  | Bash (vitest)    | Tests pass ✅, ≥80%     |
+| 7. Structural Audit     | Claude  | Grep, Read       | All artifacts exist     |
+| 8. Service Skill        | Claude  | Write            | Skill created/updated   |
 
 **Total Time**: ~20-30 minutes
+
+> **Note**: All phases are Claude-driven. No external CLI infrastructure required.
 
 ---
 
 ## Workflow Overview
+
+### Step 0: Prerequisites (Claude)
+
+Verify workspace, credentials, and infrastructure.
+**CRITICAL**: Get `$ROOT` before any file operations.
 
 ### Step 1: Schema Discovery (Claude)
 
@@ -36,209 +44,195 @@ Explore MCP tool interactively, document schema.
 
 ### Step 2: Test Design (Claude)
 
-Generate test file with ≥18 tests across 6 categories.
+Generate test file using `@claude/testing` infrastructure.
 **See**: [references/test-design-patterns.md](references/test-design-patterns.md)
 
-### Step 3: RED Gate (CLI - Mechanical)
+### Step 3: RED Verification (Claude)
 
 ```bash
-npm run verify-red -- {service}/{tool}
-# ✅ Must pass: tests exist, impl doesn't, tests fail
+cd $ROOT/.claude && npm run test:run -- tools/{service}/{tool}
+# ✅ Must pass: tests exist and FAIL (no implementation yet)
 ```
 
-### Step 4: Wrapper Generation (CLI)
+### Step 4: Wrapper Generation (Claude)
 
-```bash
-npm run generate-wrapper -- {service}/{tool}
-# Blocks if RED didn't pass
-```
+Create wrapper scaffold at `$ROOT/.claude/tools/{service}/{tool}.ts`
 
 ### Step 5: Implementation (Claude)
 
 Implement wrapper from discovery docs.
 **See**: [references/implementation-guide.md](references/implementation-guide.md)
 
-### Step 6: GREEN Gate (CLI - Mechanical)
+### Step 6: GREEN Verification (Claude)
 
 ```bash
-npm run verify-green -- {service}/{tool}
-# ✅ Must pass: tests pass, coverage ≥80%
+cd $ROOT/.claude && npm run test:run -- tools/{service}/{tool}
+# ✅ Must pass: tests PASS, coverage ≥80%
 ```
 
-### Step 7: Audit (CLI)
+### Step 7: Structural Audit (Claude)
 
-```bash
-npm run audit -- {service}/{tool}
-# ✅ Target: ≥10/11 phases
-```
+Verify all artifacts exist:
+- [ ] Discovery doc at `tools/{service}/docs/{tool}-discovery.md`
+- [ ] Test file at `tools/{service}/{tool}.unit.test.ts`
+- [ ] Wrapper at `tools/{service}/{tool}.ts`
+- [ ] Coverage ≥80%
 
-### Step 8: Service Skill Update (CLI)
+### Step 8: Service Skill Update (Claude)
 
-```bash
-npm run generate-skill -- {service}
-# Updates mcp-tools-{service} skill
-```
+Create/update `mcp-tools-{service}` skill in skill-library.
 
 ---
 
 ## Phase Descriptions
 
-### Phase 1: Schema Discovery (Automated Setup)
+### Phase 0: Prerequisites & Infrastructure Setup
+
+**Goal**: Verify workspace and infrastructure before starting.
+
+**CRITICAL - Path Safety**:
+```bash
+# ALWAYS get project root FIRST before ANY file operation
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+echo "Working in: $ROOT"
+```
+
+**Tasks**:
+
+1. **Get project root** (MANDATORY first step):
+   ```bash
+   ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+   ```
+
+2. **Install workspace dependencies**:
+   ```bash
+   cd $ROOT/.claude && npm install
+   ```
+
+3. **Verify @claude/testing is available**:
+   ```bash
+   ls $ROOT/.claude/lib/testing/src/
+   ```
+
+4. **Check credentials exist** (if MCP requires auth):
+   ```bash
+   cat $ROOT/.claude/tools/config/credentials.json | grep -q "{service}" || echo "Credentials needed"
+   ```
+
+5. **Add MCP client configuration** (if new service):
+   - Edit `$ROOT/.claude/tools/config/lib/mcp-client.ts`
+   - Add service to the MCP client map
+
+**Verification**:
+- [ ] `$ROOT` variable set
+- [ ] npm workspace installed
+- [ ] @claude/testing package accessible
+- [ ] Credentials configured (if required)
+- [ ] MCP client configured for service
+
+---
+
+### Phase 1: Schema Discovery
 
 **Goal**: Understand MCP tool behavior through exploration.
 
-**Mode Selection**:
-
-Ask user which tools to wrap:
-
-```
-Which tools from {service} MCP should I wrap?
-
-Options:
-1. All tools (batch mode) - Wrap every tool available
-2. Specific tool - Choose one tool to wrap
-3. Multiple specific tools - Choose several tools
-```
-
-**Tasks for Single Tool**:
-
-1. Ask user for service/tool names (AskUserQuestion)
-2. **Auto-install MCP**: `npx -y @modelcontextprotocol/server-{service}` (automatic)
-3. **Auto-start server**: Start in background, capture PID for cleanup
-4. **Verify connection**: Test connectivity, detect credential requirements
-5. Create docs directory: `mkdir -p .claude/tools/{service}/docs`
-6. Explore MCP tool with ≥3 test cases
-7. Document findings in `.claude/tools/{service}/docs/{tool}-discovery.md`
-8. **Cleanup**: Stop MCP server (kill PID)
-
-**Tasks for Batch Mode (All Tools)**:
-
-1. Ask user for service name only
-2. **Auto-install MCP**: Same as single tool
-3. **Auto-start server**: Same as single tool
-4. **Enumerate ALL tools**: Call `tools/list` to get complete tool list
-5. **For each tool discovered**:
-   - Create docs directory
-   - Explore with ≥3 test cases
-   - Document findings
-   - Generate tests (Phase 2)
-   - Run through RED → GREEN → Audit cycle
-6. **Cleanup**: Stop MCP server after all tools processed
-
-**Automated setup**:
-
-- npx auto-downloads MCP on first run (no manual install)
-- Bash starts server in background
-- Connection test detects if credentials needed
-- Server stopped automatically after exploration
-
-**Key outputs** (per tool):
-
-- Input schema (required + optional fields)
-- Output schema (always present + conditional fields)
-- Token counts (original response size)
-- Token reduction strategy (target 80% reduction)
-- Security considerations
-
-**Batch mode benefits**:
-
-- Single MCP server session for all tools (efficient)
-- Consistent exploration across all tools
-- Complete service coverage in one workflow
-
 **Detailed guide**: [references/schema-discovery-guide.md](references/schema-discovery-guide.md)
 
-**Verification (Single)**:
+**Critical tasks**:
 
-- [ ] MCP server auto-started
-- [ ] Connection successful (or credential guidance provided)
-- [ ] Discovery doc exists
-- [ ] ≥3 test cases documented
+1. **Discover MCP package name** (DO NOT ASSUME naming convention):
+   - Search npm: `npm search mcp {service}` or web search
+   - Example: Perplexity is `@perplexity-ai/mcp-server`, NOT `@modelcontextprotocol/server-perplexity`
+2. Install and start MCP server
+3. **Detect response format**: JSON vs text/markdown
+4. Explore with ≥3 test cases
+5. Document in `$ROOT/.claude/tools/{service}/docs/{tool}-discovery.md`
+
+**Key outputs**:
+
+- Input schema (required + optional fields)
+- Output schema + response format (JSON or text)
+- Token reduction strategy (target 80% reduction)
+
+**Verification**:
+
+- [ ] Discovery doc exists with ≥3 test cases
+- [ ] Response format documented
 - [ ] Token reduction strategy defined
-- [ ] MCP server stopped after exploration
-
-**Verification (Batch)**:
-
-- [ ] MCP server auto-started once
-- [ ] All tools enumerated from `tools/list`
-- [ ] Discovery doc exists for EACH tool
-- [ ] Tests generated for EACH tool
-- [ ] All wrappers pass GREEN gate
-- [ ] MCP server stopped after all tools processed
 
 ---
 
 ### Phase 2: Test Design
 
-**Goal**: Generate test file with cases based on discovered schema.
+**Goal**: Generate test file using `@claude/testing` infrastructure.
+
+**CRITICAL**: Use shared testing utilities, NOT custom mocks.
+
+**Detailed guide**: [references/test-design-patterns.md](references/test-design-patterns.md)
 
 **Tasks**:
 
-1. Read discovery docs
-2. Design tests across 6 categories (≥18 total)
-3. Write test file at `.claude/tools/{service}/{tool}.unit.test.ts`
+1. Copy test template from `$ROOT/.claude/lib/testing/src/templates/unit-test.template.ts`
+2. Import from `@claude/testing`: `createMCPMock`, `MCPErrors`, `testSecurityScenarios`
+3. Add response builder to `$ROOT/.claude/lib/testing/src/mocks/response-builders.ts`
+4. Write ≥18 tests across 6 categories
 
-**Test categories** (minimum tests):
+**Test categories**: Input Validation (≥3), MCP Integration (≥2), Response Filtering (≥2), Security (≥4), Edge Cases (≥4), Error Handling (≥3)
 
-- Input Validation (≥3)
-- MCP Integration (≥2)
-- Response Filtering (≥2)
-- Security (≥4)
-- Edge Cases (≥4)
-- Error Handling (≥3)
+**Running Tests**: `cd $ROOT/.claude && npm run test:run -- tools/{service}`
 
-**Detailed guide**: [references/test-design-patterns.md](references/test-design-patterns.md)
+**Verification**:
+
+- [ ] Test file at `$ROOT/.claude/tools/{service}/{tool}.unit.test.ts`
+- [ ] Imports from @claude/testing (not custom mocks)
+- [ ] Response builder added to response-builders.ts
+
+---
+
+### Phase 3: RED Verification (Claude-Driven)
+
+**Goal**: Verify TDD is being followed - tests exist and FAIL.
+
+**Command**:
+
+```bash
+cd $ROOT/.claude && npm run test:run -- tools/{service}/{tool}
+```
+
+**Verification checks** (Claude performs manually):
+
+1. ✅ Test file exists at `$ROOT/.claude/tools/{service}/{tool}.unit.test.ts`
+2. ✅ Implementation does NOT exist yet at `$ROOT/.claude/tools/{service}/{tool}.ts`
+3. ✅ Tests FAIL when run (expected - no implementation)
+
+**Example expected output**:
+```
+FAIL  tools/{service}/{tool}.unit.test.ts
+✘ 18 tests failed
+```
+
+**Cannot proceed until tests fail properly.**
 
 **Verification**:
 
 - [ ] Test file exists
-- [ ] ≥18 tests across 6 categories
-- [ ] Tests reference discovery findings
+- [ ] Wrapper file does NOT exist yet
+- [ ] Tests run and FAIL (this is correct behavior)
 
 ---
 
-### Phase 3: RED Gate (CLI)
+### Phase 4: Wrapper Generation (Claude-Driven)
 
-**Goal**: Mechanical verification that TDD is being followed.
+**Goal**: Create wrapper scaffold at `$ROOT/.claude/tools/{service}/{tool}.ts`
 
-**CLI Command**:
+**Detailed guide**: [references/implementation-guide.md](references/implementation-guide.md)
 
-```bash
-cd .claude/skills/managing-mcp-wrappers/scripts
-npm run verify-red -- {service}/{tool}
-```
-
-**Mechanical checks**:
-
-1. Test file exists ✓
-2. Implementation does NOT exist ✓
-3. Tests FAIL when run ✓
-
-**Cannot proceed without this passing.**
+**Required exports**: `InputSchema` (Zod), `FilteredResult` (interface), `{toolName}` (with execute stub)
 
 **Verification**:
 
-- [ ] Command exits with code 0
-- [ ] Output shows "✅ RED PHASE VALIDATED"
-
----
-
-### Phase 4: Wrapper Generation (CLI)
-
-**Goal**: Generate wrapper scaffold from template.
-
-**CLI Command**:
-
-```bash
-npm run generate-wrapper -- {service}/{tool}
-```
-
-**Blocks if RED gate didn't pass.**
-
-**Verification**:
-
-- [ ] Wrapper file created
-- [ ] Contains template scaffold
+- [ ] Wrapper file created at correct path
+- [ ] Contains InputSchema, FilteredResult, execute stub
 
 ---
 
@@ -263,139 +257,129 @@ npm run generate-wrapper -- {service}/{tool}
 
 ---
 
-### Phase 6: GREEN Gate (CLI)
+### Phase 6: GREEN Verification (Claude-Driven)
 
-**Goal**: Mechanical verification that tests pass with coverage.
+**Goal**: Verify tests pass with ≥80% coverage.
 
-**CLI Command**:
+**Command**:
 
 ```bash
-npm run verify-green -- {service}/{tool}
+cd $ROOT/.claude && npm run test:coverage -- tools/{service}/{tool}
 ```
 
-**Mechanical checks**:
+**Verification checks** (Claude performs manually):
 
-1. Tests PASS ✓
-2. Coverage ≥80% ✓
+1. ✅ Tests PASS
+2. ✅ Coverage ≥80%
 
-**Cannot proceed without this passing.**
+**Example expected output**:
+```
+✓ tools/{service}/{tool}.unit.test.ts (18 tests)
+Coverage: 85%
+```
+
+**Cannot proceed without tests passing and coverage ≥80%.**
 
 **Verification**:
 
-- [ ] Command exits with code 0
+- [ ] All tests pass
 - [ ] Coverage ≥80% reported
+- [ ] No skipped tests
 
 ---
 
-### Phase 7: Audit (CLI)
+### Phase 7: Structural Audit (Claude-Driven)
 
-**Goal**: Validate 11 structural compliance phases.
+**Goal**: Verify all required artifacts exist and are correct.
 
-**CLI Command**:
+**Checklist** (Claude checks manually):
 
+| Artifact | Path | Status |
+|----------|------|--------|
+| Discovery doc | `tools/{service}/docs/{tool}-discovery.md` | ✅/❌ |
+| Test file | `tools/{service}/{tool}.unit.test.ts` | ✅/❌ |
+| Wrapper | `tools/{service}/{tool}.ts` | ✅/❌ |
+| Response builder | `lib/testing/src/mocks/response-builders.ts` | ✅/❌ |
+| MCP client config | `tools/config/lib/mcp-client.ts` | ✅/❌ |
+
+**Commands to verify**:
 ```bash
-npm run audit -- {service}/{tool}
+ls $ROOT/.claude/tools/{service}/docs/{tool}-discovery.md
+ls $ROOT/.claude/tools/{service}/{tool}.unit.test.ts
+ls $ROOT/.claude/tools/{service}/{tool}.ts
+grep -l "{Service}Responses" $ROOT/.claude/lib/testing/src/mocks/response-builders.ts
 ```
-
-**Target**: ≥10/11 phases pass (Phase 7 integration tests optional)
 
 **Verification**:
 
-- [ ] ≥10/11 phases pass
+- [ ] All 5 artifacts exist
+- [ ] Coverage still ≥80%
 
 ---
 
 ### Phase 8: Service Skill Update (CLI)
 
-**Goal**: Update service skill with new wrapper documentation.
+**Goal**: Generate service skill and update gateway automatically.
 
-**CLI Command**:
+**Command**:
 
 ```bash
+cd $ROOT/.claude/skills/managing-mcp-wrappers/scripts
 npm run generate-skill -- {service}
 ```
 
-**Automatically extracts schemas and updates skill.**
+**What this command does**:
+
+1. Scans `$ROOT/.claude/tools/{service}/` for wrapper files
+2. Extracts Zod schemas, export names, token estimates from code
+3. Generates `mcp-tools-{service}` skill at `.claude/skill-library/claude/mcp-tools/`
+4. **Automatically syncs gateway-mcp-tools** (adds new service to gateway)
 
 **Verification**:
 
-- [ ] Service skill updated
-- [ ] New wrapper documented
+- [ ] Skill generated at `skill-library/claude/mcp-tools/mcp-tools-{service}/SKILL.md`
+- [ ] Gateway synced (check gateway-mcp-tools includes new service)
 
 ---
 
 ## Batch Mode (All Tools)
 
-**When to use**: User wants to wrap ALL tools from a service
+**When to use**: User wants to wrap ALL tools from a service.
 
-**Workflow**:
+**See**: [references/batch-mode-guide.md](references/batch-mode-guide.md)
 
-1. Start MCP server ONCE
-2. Call `tools/list` to enumerate all tools
-3. **For EACH tool** in the list:
-   - Phase 1: Explore and document (3+ test cases)
-   - Phase 2: Generate tests (18+ tests)
-   - Phase 3: verify-red (mechanical gate)
-   - Phase 4: generate-wrapper
-   - Phase 5: Implement wrapper
-   - Phase 6: verify-green (mechanical gate)
-   - Phase 7: audit (11 phases)
-4. Phase 8: generate-skill ONCE (includes all tools)
-5. Stop MCP server ONCE
-
-**Efficiency**:
-
-- One MCP start/stop for N tools
-- Parallel-ready (could process tools concurrently)
-- Single service skill generation at end
-
-**Example**:
-
-```
-User: /mcp-manager create zen
-Skill: Which tools to wrap?
-User: All tools
-
-Skill discovers 8 tools from zen MCP:
-1. get-document ✅ (2 min)
-2. search-docs ✅ (2 min)
-3. create-doc ✅ (2 min)
-4. update-doc ✅ (2 min)
-5. delete-doc ✅ (2 min)
-6. list-docs ✅ (2 min)
-7. get-metadata ✅ (2 min)
-8. search-metadata ✅ (2 min)
-
-Total: 16 minutes for 8 wrappers
-Service skill: mcp-tools-zen with 8 tools documented
-```
+**Summary**: Start MCP once → enumerate tools → run full TDD cycle for each tool → create service skill → stop MCP.
 
 ---
 
 ## Critical Rules
 
-### CLI Gates Are Non-Negotiable
+### TDD Gates Are Non-Negotiable
 
-You MUST run CLI commands and show output:
+You MUST run vitest and verify output:
 
 ```bash
-npm run verify-red -- {service}/{tool}
-# Output must show: "✅ RED PHASE VALIDATED"
+# RED phase - tests must FAIL
+cd $ROOT/.claude && npm run test:run -- tools/{service}/{tool}
+# Expected: FAIL (no implementation yet)
 
-npm run verify-green -- {service}/{tool}
-# Output must show: Coverage percentage ≥80%
+# GREEN phase - tests must PASS with coverage
+cd $ROOT/.claude && npm run test:coverage -- tools/{service}/{tool}
+# Expected: PASS, coverage ≥80%
 ```
 
 **In batch mode**: Run gates for EACH tool (cannot skip any)
 
 **Not acceptable**:
 
-- ❌ Claiming gate passed without running command
+- ❌ Claiming gate passed without running vitest
 - ❌ Skipping gates due to time pressure
-- ❌ Generating wrapper before RED passes
+- ❌ Generating wrapper before RED fails properly
 - ❌ Skipping a tool because "it looks similar to another"
+- ❌ Using relative paths (always use `$ROOT`)
+- ❌ Creating custom mocks instead of using @claude/testing
 
-**The gates are mechanical - they literally run tests.**
+**The gates run actual tests - you must show output.**
 
 ### Discovery Before Tests
 
@@ -421,16 +405,17 @@ The TDD cycle is enforced by CLI:
 
 ### TodoWrite Tracking
 
-Create todos for all 8 phases at start:
+Create todos for all 9 phases at start:
 
 ```
-- Phase 1: Schema Discovery (IN_PROGRESS)
+- Phase 0: Prerequisites (IN_PROGRESS)
+- Phase 1: Schema Discovery (PENDING)
 - Phase 2: Test Design (PENDING)
-- Phase 3: RED Gate (PENDING)
+- Phase 3: RED Verification (PENDING)
 - Phase 4: Wrapper Generation (PENDING)
 - Phase 5: Implementation (PENDING)
-- Phase 6: GREEN Gate (PENDING)
-- Phase 7: Audit (PENDING)
+- Phase 6: GREEN Verification (PENDING)
+- Phase 7: Structural Audit (PENDING)
 - Phase 8: Service Skill Update (PENDING)
 ```
 
@@ -440,101 +425,54 @@ Mark each complete after verification passes.
 
 ## Detailed Guides
 
-### Schema Discovery
-
-**See**: [references/schema-discovery-guide.md](references/schema-discovery-guide.md)
-
-- MCP connection patterns
-- Test case design (happy path, edge, error)
-- Response analysis techniques
-- Token reduction calculation
-- Documentation templates
-
-### Test Design
-
-**See**: [references/test-design-patterns.md](references/test-design-patterns.md)
-
-- 6 test categories with examples
-- 18+ minimum test requirements
-- Coverage targets per category
-- Mocking strategies
-- Anti-patterns to avoid
-
-### Implementation
-
-**See**: [references/implementation-guide.md](references/implementation-guide.md)
-
-- Complete implementation example
-- InputSchema patterns
-- Response filtering techniques
-- Error handling
-- Common patterns and anti-patterns
-
-### Complete Example
-
-**See**: [examples/linear-get-issue.md](examples/linear-get-issue.md)
-
-- End-to-end walkthrough
-- All 8 phases with actual commands
-- Expected outputs
-- 20-minute timeline
+| Guide | Path | Contents |
+|-------|------|----------|
+| Schema Discovery | [references/schema-discovery-guide.md](references/schema-discovery-guide.md) | MCP connection, test cases, token reduction |
+| Test Design | [references/test-design-patterns.md](references/test-design-patterns.md) | 6 categories, mocking, coverage |
+| Implementation | [references/implementation-guide.md](references/implementation-guide.md) | Schemas, filtering, error handling |
+| Batch Mode | [references/batch-mode-guide.md](references/batch-mode-guide.md) | Multi-tool workflow |
+| Complete Example | [examples/linear-get-issue.md](examples/linear-get-issue.md) | End-to-end walkthrough |
 
 ---
 
 ## Prerequisites
 
-**MCP server available**:
+**Workspace setup** (one-time):
 
 ```bash
-npx -y @modelcontextprotocol/server-{service} --version
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd $ROOT/.claude && npm install
 ```
 
-**MCP manager CLI setup** (one-time):
+**@claude/testing available**:
 
 ```bash
-cd .claude/skills/managing-mcp-wrappers/scripts
-npm install
+ls $ROOT/.claude/lib/testing/src/
+```
+
+**MCP package discoverable** (search before assuming):
+
+```bash
+npm search mcp {service}
+# OR web search for "{service} mcp server npm"
 ```
 
 ---
 
 ## Troubleshooting
 
-### verify-red fails
-
-**"Tests are passing"**:
-
-- Tests too generic or implementation exists
-- Delete wrapper file, make tests more specific
-
-**"Test file not found"**:
-
-- Test file not created yet
-- Run Phase 2 (Test Design)
-
-### verify-green fails
-
-**"Tests failing"**:
-
-- Implementation incomplete or incorrect
-- Review test errors, fix implementation
-
-**"Coverage <80%"**:
-
-- Not enough tests or branches
-- Add tests for uncovered code paths
-
-### Audit fails
-
-**"Schema discovery docs missing"**:
-
-- Phase 1 incomplete
-- Create discovery doc
-
-**"Coverage below 80%"**:
-
-- Phase 6 (GREEN gate) should have caught this
-- Add more tests
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| Files in wrong location | Relative paths | Use `$ROOT` (set in Phase 0) for all paths |
+| Cannot find test file | Wrong directory | Run tests from workspace: `cd $ROOT/.claude` |
+| Package not found | Wrong naming | Search npm/web - names vary (e.g., `@perplexity-ai/mcp-server`) |
+| MCP returns text not JSON | AI-based MCPs | Document format in discovery, handle text parsing |
+| Cannot find @claude/testing | Missing install | Run `cd $ROOT/.claude && npm install` |
+| Import errors | Wrong paths | Use `@claude/testing`, no `.js` extensions |
+| Tests pass in RED phase | Implementation exists | Delete wrapper file before Phase 3 |
+| Coverage <80% | Missing tests | Run `npm run test:coverage` to find gaps |
+| Missing artifacts | Skipped steps | Run Phase 7 checklist, create missing files |
+| Response builder not found | Not added | Add to `lib/testing/src/mocks/response-builders.ts` |
 
 ---
 

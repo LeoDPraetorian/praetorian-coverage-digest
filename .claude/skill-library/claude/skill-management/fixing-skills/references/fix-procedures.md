@@ -62,16 +62,14 @@ description: Use when creating skills - TDD workflow (RED-GREEN-REFACTOR) with v
 
 ### Phase 11: cd Commands
 
-**When:** cd commands use absolute paths or relative paths without REPO_ROOT
+**When:** cd commands use absolute paths or relative paths without ROOT
 
 **Process:**
 
 1. Find all cd commands in code blocks
 2. For repo-relative paths, replace with:
    ```bash
-   REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-   test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-   cd "$REPO_ROOT/{relative-path}"
+   ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/{relative-path}"
    ```
 3. Skip cd commands to temp directories or external paths
 

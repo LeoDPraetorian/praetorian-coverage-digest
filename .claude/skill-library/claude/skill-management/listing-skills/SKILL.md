@@ -60,9 +60,7 @@ find .claude/skill-library -name "SKILL.md" -type f | \
 **Execute BEFORE any list operation:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.

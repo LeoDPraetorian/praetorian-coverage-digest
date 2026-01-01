@@ -1,0 +1,39 @@
+## 2025-12-30 - Initial Creation
+
+**Type**: New skill creation
+
+**RED Phase Documentation**:
+- **Gap Identified**: The researching-skills router is being refactored into specialized research skills (researching-protocols, researching-context7, researching-codebase, researching-arxiv). No fallback skill exists for general web research when these specialized skills don't apply.
+- **Failure Scenario**: Without this skill, agents would either try to use Context7 for non-indexed APIs (fails), use researching-codebase for external resources (wrong tool), or do ad-hoc web searches without methodology (inconsistent quality).
+- **Need**: Research skill for API documentation not in Context7, blog posts, tutorials, GitHub resources, Stack Overflow, official documentation, general technical research, and comparing multiple approaches/libraries.
+
+**Category**: Library skill - `claude/skill-management/`
+
+**Skill Type**: Process/Pattern (research methodology)
+
+**Integration**:
+- Future router parent: researching-skills (planned refactor to router pattern)
+- Sibling skills: researching-protocols, researching-context7, researching-codebase, researching-arxiv
+- Fallback role: Use when other specialized research skills don't apply
+
+**Structure Created**:
+- SKILL.md (185 lines - well under 500 line limit)
+- references/query-templates.md - Complete search query patterns by intent type
+- references/source-validation.md - Quality indicators and validation checklist
+- references/output-format.md - Structured research output format with citations
+- references/scenario-handling.md - Common research scenarios and handling strategies
+
+**Key Features**:
+- 6-phase workflow: Query Formulation → Source Prioritization → Search Execution → Content Fetching → Source Validation → Synthesis
+- Source priority matrix (Official docs → GitHub → Blogs → Stack Overflow → Community → General)
+- Query templates for official docs, tutorials, troubleshooting, comparisons, GitHub, versions, APIs
+- Validation checklist with quality indicators (date, author, engagement, version, domain, updates)
+- Scenario handling (outdated info, conflicts, no results, paywalls, version mismatch, multiple valid approaches)
+- Output format with citations, findings, conflict resolution, caveats, recommendations
+
+**Tools**: WebSearch, WebFetch, Read, Write, TodoWrite, AskUserQuestion
+
+**Next Steps**:
+- GREEN phase: Verify skill works with test scenario
+- REFACTOR phase: Pressure test with subagents
+- Update researching-skills gateway routing (when router refactor happens)

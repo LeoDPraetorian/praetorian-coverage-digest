@@ -236,8 +236,8 @@ Library skills: 5 levels to skill-library/lib (re-exports from main lib)
 **For specialized CLI tool (phase 8):**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skill-library/claude/skills/claude-skill-audit-script-paths/scripts"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude/skill-library/claude/skills/claude-skill-audit-script-paths/scripts"
 
 # Scan for issues
 npm run dev -- audit --dir /path/to/skills

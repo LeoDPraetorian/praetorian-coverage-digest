@@ -93,13 +93,13 @@ When you invoke this command, I will:
 First, detect the super-repo root:
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
 ```
 
 Then read the skill file:
 
 ```bash
-Read: $REPO_ROOT/.claude/skill-library/claude/mcp-tools/mcp-tools-currents/SKILL.md
+Read: $ROOT/.claude/skill-library/claude/mcp-tools/mcp-tools-currents/SKILL.md
 ```
 
 This gives me context about available tools and execution patterns.
@@ -117,8 +117,7 @@ I'll analyze your input for:
 **All commands use dynamic repository root detection** to work from any directory:
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "..." 2>/dev/null
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "..." 2>/dev/null
 ```
 
 Based on your request, I'll execute one of:
@@ -126,9 +125,8 @@ Based on your request, I'll execute one of:
 **get-projects** - List all Currents projects
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getProjects } = await import('./.claude/tools/currents/get-projects.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getProjects } = await import('$ROOT/.claude/tools/currents/get-projects.ts');
   const result = await getProjects.execute({});
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
@@ -137,9 +135,8 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 **get-runs** - Get recent test runs
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getRuns } = await import('./.claude/tools/currents/get-runs.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getRuns } = await import('$ROOT/.claude/tools/currents/get-runs.ts');
   const result = await getRuns.execute({
     projectId: '1mwNCW',  // Chariot E2E project
     limit: 10
@@ -151,9 +148,8 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 **get-run-details** - Get specific run statistics
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getRunDetails } = await import('./.claude/tools/currents/get-run-details.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getRunDetails } = await import('$ROOT/.claude/tools/currents/get-run-details.ts');
   const result = await getRunDetails.execute({
     runId: 'abc123'
   });
@@ -164,9 +160,8 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 **get-test-results** - Get test execution results
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getTestResults } = await import('./.claude/tools/currents/get-test-results.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getTestResults } = await import('$ROOT/.claude/tools/currents/get-test-results.ts');
   const result = await getTestResults.execute({
     signature: 'spec-file.ts:test-name',
     status: 'failed',
@@ -179,9 +174,8 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 **get-tests-performance** - Get performance metrics
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getTestsPerformance } = await import('./.claude/tools/currents/get-tests-performance.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getTestsPerformance } = await import('$ROOT/.claude/tools/currents/get-tests-performance.ts');
   const result = await getTestsPerformance.execute({
     projectId: '1mwNCW',
     limit: 10
@@ -193,9 +187,8 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 **get-spec-files-performance** - Get file-level performance
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getSpecFilesPerformance } = await import('./.claude/tools/currents/get-spec-files-performance.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getSpecFilesPerformance } = await import('$ROOT/.claude/tools/currents/get-spec-files-performance.ts');
   const result = await getSpecFilesPerformance.execute({
     projectId: '1mwNCW'
   });
@@ -206,9 +199,8 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 **get-spec-instance** - Get spec debugging data
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getSpecInstance } = await import('./.claude/tools/currents/get-spec-instance.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getSpecInstance } = await import('$ROOT/.claude/tools/currents/get-spec-instance.ts');
   const result = await getSpecInstance.execute({
     instanceId: 'instance123'
   });
@@ -219,9 +211,8 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 **get-tests-signatures** - Get test signatures for filtering
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getTestsSignatures } = await import('./.claude/tools/currents/get-tests-signatures.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getTestsSignatures } = await import('$ROOT/.claude/tools/currents/get-tests-signatures.ts');
   const result = await getTestsSignatures.execute({
     projectId: '1mwNCW'
   });
@@ -246,7 +237,7 @@ If you don't specify a project, I'll use this default.
 
 ## Authentication
 
-Currents tools use API key authentication configured in `$REPO_ROOT/.claude/tools/config/credentials.json`:
+Currents tools use API key authentication configured in `$ROOT/.claude/tools/config/credentials.json`:
 
 ```json
 {
@@ -298,7 +289,7 @@ For developers or debugging, here are the underlying wrapper patterns:
 
 ### Authentication Setup
 
-API key is read from `$REPO_ROOT/.claude/tools/config/credentials.json`:
+API key is read from `$ROOT/.claude/tools/config/credentials.json`:
 
 ```json
 {

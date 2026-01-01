@@ -321,22 +321,21 @@ mv {skill-path}/scripts/search.sh {skill-path}/scripts/.archived/
 
 **Issue:** Uses absolute paths or non-portable cd
 
-**REPO_ROOT pattern:**
+**ROOT pattern:**
 
 ```bash
 # ❌ Before: Absolute path
 cd /Users/username/project/.claude/skills && npm run command
 
-# ✅ After: REPO_ROOT pattern
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skills" && npm run command
+# ✅ After: ROOT pattern
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude/skills" && npm run command
 ```
 
 **Why this works:**
 
-- `git rev-parse --show-superproject-working-tree`: Gets root of super-repo if in submodule
-- `git rev-parse --show-toplevel`: Falls back to current repo root
+- Single git command with both `--show-superproject-working-tree` and `--show-toplevel` flags
+- Pipe to `head -1` automatically selects first non-empty result (super-repo root when in submodule)
+- Works identically from any directory depth in the repository
 - Works from any directory in the repository
 - Portable across machines and users
 

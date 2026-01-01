@@ -69,24 +69,11 @@ export function findProjectRoot() {
     }
     // 2. FALLBACK: Git-based detection (works in submodules!)
     try {
-        // Try superproject first (for submodule detection)
-        let gitRoot = '';
-        try {
-            gitRoot = execSync('git rev-parse --show-superproject-working-tree', {
-                encoding: 'utf-8',
-                stdio: ['pipe', 'pipe', 'ignore']
-            }).trim();
-        }
-        catch {
-            // Not in submodule or git command failed
-        }
-        // If no superproject, get regular toplevel
-        if (!gitRoot || gitRoot.length === 0) {
-            gitRoot = execSync('git rev-parse --show-toplevel', {
-                encoding: 'utf-8',
-                stdio: ['pipe', 'pipe', 'ignore']
-            }).trim();
-        }
+        // Single git call with both flags - picks super-repo root if in submodule, else repo root
+        const gitRoot = execSync('git rev-parse --show-superproject-working-tree --show-toplevel', {
+            encoding: 'utf-8',
+            stdio: ['pipe', 'pipe', 'ignore']
+        }).trim().split('\n')[0]; // Equivalent to | head -1 in bash
         if (gitRoot && gitRoot.length > 0) {
             cachedProjectRoot = gitRoot;
             return gitRoot;

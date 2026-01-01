@@ -275,14 +275,6 @@ Each skill is organized by domain for easy discovery.
 
 - Load testing, stress testing, and performance benchmarking
 
-## Git Hooks & CI Integration
-
-**Vitest Pre-Push Testing**: `.claude/skill-library/testing/vitest-prepush-testing/SKILL.md`
-
-- Integrating Vitest with git pre-push hooks to test commits being pushed
-- Fixes the common pitfall where `vitest --changed` without a git reference finds zero files after commit
-- Documents stdin parsing, base ref detection, and proper `--changed` flag usage
-
 ## Quick Reference
 
 **⭐ = Mandatory for ALL ROLES | 📋 = Mandatory for TEST LEAD (Planning)**

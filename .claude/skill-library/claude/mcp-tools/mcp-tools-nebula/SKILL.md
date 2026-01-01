@@ -24,7 +24,7 @@ Enable granular agent access control for nebula operations.
 ### access-key-to-account-id
 
 - **Purpose:** MCP wrapper for access-key-to-account-id
-- **Import:** `import { accessKeyToAccountId } from './.claude/tools/nebula/access-key-to-account-id.ts'`
+- **Import:** `import { accessKeyToAccountId } from '$ROOT/.claude/tools/nebula/access-key-to-account-id.ts'`
 - **Token cost:** ~unknown tokens
 
 **Returns:**
@@ -43,7 +43,7 @@ interface AccessKeyToAccountIdOutput {
 ### apollo
 
 - **Purpose:** MCP wrapper for apollo
-- **Import:** `import { apollo } from './.claude/tools/nebula/apollo.ts'`
+- **Import:** `import { apollo } from '$ROOT/.claude/tools/nebula/apollo.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -67,7 +67,7 @@ interface ApolloOutput {
 ### public-resources
 
 - **Purpose:** MCP wrapper for public-resources
-- **Import:** `import { publicResources } from './.claude/tools/nebula/public-resources.ts'`
+- **Import:** `import { publicResources } from '$ROOT/.claude/tools/nebula/public-resources.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -93,7 +93,7 @@ interface PublicResourcesOutput {
 ### summary
 
 - **Purpose:** MCP wrapper for summary
-- **Import:** `import { summary } from './.claude/tools/nebula/summary.ts'`
+- **Import:** `import { summary } from '$ROOT/.claude/tools/nebula/summary.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -118,7 +118,7 @@ interface SummaryOutput {
 ### whoami
 
 - **Purpose:** MCP wrapper for whoami
-- **Import:** `import { whoami } from './.claude/tools/nebula/whoami.ts'`
+- **Import:** `import { whoami } from '$ROOT/.claude/tools/nebula/whoami.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -147,8 +147,8 @@ See mcp-tools-registry for complete Bash + tsx execution patterns.
 
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
-npx tsx -e "(async () => {
-  const { accessKeyToAccountId } = await import('./.claude/tools/nebula/access-key-to-account-id.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { accessKeyToAccountId } = await import('$ROOT/.claude/tools/nebula/access-key-to-account-id.ts');
   const result = await accessKeyToAccountId.execute({ /* params */ });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null

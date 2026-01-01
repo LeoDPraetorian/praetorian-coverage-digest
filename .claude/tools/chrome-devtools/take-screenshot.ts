@@ -42,7 +42,7 @@ export const takeScreenshot = {
     // Call chrome-devtools MCP server via SHARED client
     const result = await callMCPTool(
       'chrome-devtools',                        // MCP name
-      'mcp__chrome-devtools__take_screenshot', // Actual MCP tool name
+      'take_screenshot', // Actual MCP tool name
       validated                                 // Pass params directly
     );
 

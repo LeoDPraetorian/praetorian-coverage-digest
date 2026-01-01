@@ -37,7 +37,7 @@ export const closePage = {
     // Call chrome-devtools MCP server via SHARED client
     await callMCPTool(
       'chrome-devtools',                  // MCP name
-      'mcp__chrome-devtools__close_page', // Actual MCP tool name
+      'close_page', // Actual MCP tool name
       validated                            // Pass params directly
     );
 

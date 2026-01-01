@@ -38,7 +38,7 @@ export const newPage = {
     // Call chrome-devtools MCP server via SHARED client
     await callMCPTool(
       'chrome-devtools',                 // MCP name
-      'mcp__chrome-devtools__new_page', // Actual MCP tool name
+      'new_page', // Actual MCP tool name
       validated                          // Pass params directly
     );
 

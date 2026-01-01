@@ -113,7 +113,8 @@ interface SemanticFinding {
     | "Gateway Membership"
     | "Tool Appropriateness"
     | "Content Density"
-    | "External Documentation";
+    | "External Documentation"
+    | "Phase Numbering Hygiene";
   issue: string; // max 100 chars
   recommendation: string; // max 100 chars
 }

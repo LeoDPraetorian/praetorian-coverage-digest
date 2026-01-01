@@ -412,7 +412,7 @@ async function generatePhase11Suggestion(
   skillName: string
 ): Promise<SemanticSuggestion | null> {
   // Check for cd commands without repo-root detection
-  const cdPattern = /cd\s+["']?(?!.*\$REPO_ROOT)(?!.*\$\()\.claude\/|cd\s+["']?\.claude\//gm;
+  const cdPattern = /cd\s+["']?(?!.*\$ROOT)(?!.*\$\()\.claude\/|cd\s+["']?\.claude\//gm;
   const matches = skill.content.match(cdPattern);
 
   if (matches && matches.length > 0) {
@@ -432,7 +432,7 @@ async function generatePhase11Suggestion(
       title: pattern.title,
       explanation: pattern.explanationTemplate(lineNumber, matches[0]),
       currentValue: matches[0],
-      suggestedValue: 'Use repo-root detection: cd "$REPO_ROOT/.claude/..."',
+      suggestedValue: 'Use repo-root detection: cd "$ROOT/.claude/..."',
       options: SUGGESTION_PATTERNS['phase11-cd-command'].options,
       applyCommand: buildApplyCommand(skillName, 'phase11-command', true),
     };

@@ -2,6 +2,85 @@
 
 All notable changes to the auditing-skills skill.
 
+## [2025-12-31] - Fix Semantic Review JSON Confusion
+
+### Changed
+- **Semantic Review Checklist**: Removed "(CSO)" suffix from "Description Quality (CSO)" criterion name
+  - Before: "Description Quality (CSO)" in checklist
+  - After: "Description Quality" (matches schema validation)
+  - Reason: The "(CSO)" caused Claude to use wrong criterion name in JSON, failing schema validation
+
+### Added
+- **Inline JSON Example**: Added explicit example showing correct semantic findings structure
+  - Shows exact field names: `severity`, `criterion`, `issue`, `recommendation`
+  - Includes warning: "Required fields: ... (NOT 'phase'!)"
+  - Prevents confusion between structural phase output and semantic criterion field
+
+### Why This Matters
+- Claude was copying "Description Quality (CSO)" from checklist into JSON
+- Schema validation rejected it (only accepts "Description Quality")
+- Adding inline example prevents need to navigate to reference file
+- Explicit "NOT 'phase'!" warning prevents wrong field name
+
+### Files Changed
+- `SKILL.md` line 174: Removed "(CSO)" from criterion name
+- `SKILL.md` lines 208-225: Added inline JSON example with explicit field requirements
+
+---
+
+## [2025-12-31] - Simplify Repository Root Navigation Pattern
+
+### Changed
+- **Repository Root Detection**: Replaced complex 3-line pattern with simplified industry-standard approach
+  - Before: Three separate commands with stderr redirect and conditional test
+  - After: Single combined git command with pipe to `head -1`
+  - Variable rename: `REPO_ROOT` → `ROOT` for consistency with command files and MCP tools
+
+### Technical Details
+**Old Pattern (Lines 66-68, 89-91):**
+```bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+```
+
+**New Pattern:**
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
+```
+
+**Why This Is Better:**
+- Single git command with both flags (--show-superproject-working-tree and --show-toplevel)
+- The `| head -1` picks first non-empty result automatically (super-repo root when in submodule, repo root otherwise)
+- No stderr redirect (`2>/dev/null`) needed
+- No conditional `test -z` check needed
+- Simpler: 2 commands instead of 3
+- Avoids bash parsing errors when combined with other operators (`;`, `&&`, `|`)
+- Proven to work from both super-repo and submodules
+
+### Files Changed
+- `SKILL.md` lines 66-68: Updated "Step 0: Navigate to Repository Root"
+- `SKILL.md` lines 89-91: Updated "Audit Single Skill" setup section
+- `SKILL.md` line 94: Updated compatibility note to explain new pattern behavior
+- `SKILL.md` line 311: Changed "Missing REPO_ROOT pattern" to "Missing repository root pattern"
+- `references/common-failure-patterns.md` lines 107-120: Updated "Missing cd REPO_ROOT pattern" section with new approach
+
+### Reason
+- **Problem**: Complex 3-line pattern caused bash parsing errors and was difficult to maintain
+- **Solution**: Industry-standard git pattern used across command files and MCP tools
+- **Impact**: More reliable, easier to understand, consistent with project conventions
+
+### Testing
+- ✅ Pattern tested from submodule directory (modules/chariot/ui/src/)
+- ✅ Pattern tested from super-repo root
+- ✅ No bash parsing errors
+
+### Method
+- Updated via Edit tool following TDD workflow (RED-GREEN-REFACTOR)
+- Backup created: `.local/SKILL.md.backup-20251231-*`
+
+---
+
 ## [2025-12-30] - Add Phase 14d: Prose Phase References
 
 ### Added

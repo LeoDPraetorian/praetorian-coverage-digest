@@ -39,7 +39,7 @@ export const performanceAnalyzeInsight = {
     // Call chrome-devtools MCP server via SHARED client
     const insight = await callMCPTool(
       'chrome-devtools',                                   // MCP name
-      'mcp__chrome-devtools__performance_analyze_insight', // Actual MCP tool name
+      'performance_analyze_insight', // Actual MCP tool name
       validated                                            // Pass params directly
     );
 

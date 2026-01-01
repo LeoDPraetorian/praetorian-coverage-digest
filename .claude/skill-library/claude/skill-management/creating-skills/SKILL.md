@@ -39,9 +39,7 @@ Use this skill when:
 **Execute BEFORE any skill operation:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **See:** [Repository Root Navigation](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
@@ -317,7 +315,7 @@ touch {skill-path}/references/{appropriate-file}.md
 **🚨 YOU MUST invoke researching-skills before writing content. Do not skip.**
 
 ```
-Read(".claude/skill-library/claude/skill-management/researching-skills/SKILL.md")
+skill: "researching-skills"
 ```
 
 The researching-skills skill will guide you through:
@@ -391,10 +389,7 @@ Options:
 Verify compliance (from anywhere in the repo):
 
 ```bash
-# Uses backticks for Claude Code compatibility
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && npm run audit -- {skill-name}
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run audit -- {skill-name}
 ```
 
 **For gateways**: Also run gateway-specific audit (phases 17-20). See [references/gateway-creation.md](references/gateway-creation.md#phase-8-green-verification).
@@ -439,10 +434,7 @@ Follow the `testing-skills-with-subagents` methodology to test:
 Run audit and confirm all phases pass (from anywhere in the repo):
 
 ```bash
-# Uses backticks for Claude Code compatibility
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && npm run audit -- {skill-name}
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run audit -- {skill-name}
 ```
 
 **Skill is complete when:**

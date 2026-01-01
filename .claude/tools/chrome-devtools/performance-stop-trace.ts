@@ -36,7 +36,7 @@ export const performanceStopTrace = {
     // Call chrome-devtools MCP server via SHARED client
     const insights = await callMCPTool(
       'chrome-devtools',                                // MCP name
-      'mcp__chrome-devtools__performance_stop_trace',  // Actual MCP tool name
+      'performance_stop_trace',  // Actual MCP tool name
       validated                                         // Pass params directly
     );
 

@@ -256,8 +256,8 @@ For developers or debugging, here are the underlying wrapper patterns:
 ### List Network Requests (Direct Execution)
 
 ```bash
-npx tsx -e "(async () => {
-  const { listNetworkRequests } = await import('./.claude/tools/chrome-devtools/list-network-requests.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { listNetworkRequests } = await import('$ROOT/.claude/tools/chrome-devtools/list-network-requests.ts');
   const result = await listNetworkRequests.execute({
     resourceTypes: ['fetch', 'xhr'],
     pageSize: 30
@@ -269,8 +269,8 @@ npx tsx -e "(async () => {
 ### Take Screenshot (Direct Execution)
 
 ```bash
-npx tsx -e "(async () => {
-  const { takeScreenshot } = await import('./.claude/tools/chrome-devtools/take-screenshot.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { takeScreenshot } = await import('$ROOT/.claude/tools/chrome-devtools/take-screenshot.ts');
   const result = await takeScreenshot.execute({
     filePath: '/tmp/screenshot.png',
     fullPage: true
@@ -282,8 +282,8 @@ npx tsx -e "(async () => {
 ### New Page (Direct Execution)
 
 ```bash
-npx tsx -e "(async () => {
-  const { newPage } = await import('./.claude/tools/chrome-devtools/new-page.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { newPage } = await import('$ROOT/.claude/tools/chrome-devtools/new-page.ts');
   const result = await newPage.execute({
     url: 'https://example.com'
   });

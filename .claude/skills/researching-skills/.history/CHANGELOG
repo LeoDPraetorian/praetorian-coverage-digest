@@ -1,0 +1,38 @@
+# Changelog
+
+## 2025-12-31 - Initial Creation
+
+### RED Phase (Gap Documentation)
+- **Problem**: Existing `researching-skills` library skill is a hybrid - not a pure router
+- **Failures identified**:
+  - Implements Context7 and Web research inline instead of delegating
+  - Inconsistent delegation pattern (some skills delegated, others inline)
+  - No user prompt for source selection (user has no control)
+  - No persistent output (research disappears after session)
+  - Web treated as fallback instead of primary source
+
+### Creation Details
+- **Location**: Core skill (`.claude/skills/`)
+- **Type**: Process/Router (pure delegation pattern)
+- **Purpose**: Orchestrate research across 5 specialized methods with user control
+
+### Features
+- Pure router pattern - delegates to 5 specialized library skills
+- User-controlled source selection via AskUserQuestion (multiSelect)
+- Smart recommendations based on context clue detection
+- Sequential execution of selected research workflows
+- Mandatory synthesis of findings (SYNTHESIS.md)
+- Persistent output to `.claude/research/{timestamp}-{topic}/`
+- TodoWrite tracking for all phases
+
+### Specialized Skills (Library)
+1. `researching-codebase` - Local pattern discovery
+2. `researching-context7` - npm/library official docs
+3. `researching-github` - Open-source repos, code, issues
+4. `researching-arxiv` - Academic papers
+5. `researching-web` - Blogs, tutorials, Stack Overflow
+
+### Reference Files
+- `references/synthesis-template.md` - SYNTHESIS.md template
+- `references/recommendation-logic.md` - Keyword detection patterns
+- `references/output-structure.md` - File organization details

@@ -67,9 +67,10 @@ function getMCPServerConfig(mcpName: string): MCPServerConfig {
   // In real implementation, would read from .mcp.json
   // For now, hardcoded configs based on .mcp.json
   const configs: Record<string, MCPServerConfig> = {
+    // Note: Uses sh wrapper to suppress debug output (stderr)
     'currents': {
-      command: 'npx',
-      args: ['-y', '@currents/mcp'],
+      command: 'sh',
+      args: ['-c', 'npx -y @currents/mcp 2>/dev/null'],
       envVars: { 'CURRENTS_API_KEY': 'apiKey' }
     },
     'chrome-devtools': {
@@ -92,14 +93,15 @@ function getMCPServerConfig(mcpName: string): MCPServerConfig {
     // - Auto-refresh: 7-day tokens with refresh_token rotation
     // - Granular scopes: only permissions explicitly granted
     // - User consent: explicit browser authorization required
+    // Note: Uses sh wrapper to suppress mcp-remote debug output (stderr)
     'linear-mcp': {
-      command: 'npx',
-      args: ['-y', 'mcp-remote', 'https://mcp.linear.app/sse'],
+      command: 'sh',
+      args: ['-c', 'npx -y mcp-remote https://mcp.linear.app/sse 2>/dev/null'],
       envVars: { 'LINEAR_SCOPES': 'read,write,issues:create,admin' }
     },
     'linear': {
-      command: 'npx',
-      args: ['-y', 'mcp-remote', 'https://mcp.linear.app/sse'],
+      command: 'sh',
+      args: ['-c', 'npx -y mcp-remote https://mcp.linear.app/sse 2>/dev/null'],
       envVars: { 'LINEAR_SCOPES': 'read,write,issues:create,admin' }
     },
     'github': {
@@ -116,6 +118,11 @@ function getMCPServerConfig(mcpName: string): MCPServerConfig {
       command: 'go',
       args: ['run', resolveProjectPath('modules', 'nebula'), 'mcp-server'],
       envVars: {} // Uses local AWS credentials
+    },
+    'perplexity': {
+      command: 'npx',
+      args: ['-y', '@perplexity-ai/mcp-server'],
+      envVars: { 'PERPLEXITY_API_KEY': 'apiKey' } // Uses apiKey from credentials.json
     }
   };
 
@@ -142,6 +149,14 @@ export const DEFAULT_RETRYABLE_ERRORS = ['ETIMEDOUT', 'ECONNREFUSED', 'ECONNRESE
  * Default response size limit (1MB)
  */
 export const DEFAULT_MAX_RESPONSE_BYTES = 1_000_000;
+
+/**
+ * Per-service response size limits
+ * Services not listed use DEFAULT_MAX_RESPONSE_BYTES
+ */
+export const SERVICE_SIZE_LIMITS: Record<string, number> = {
+  'praetorian-cli': 10_000_000,  // 10MB - reasonable for paginated lists
+};
 
 /**
  * Error thrown when response exceeds size limit
@@ -282,7 +297,7 @@ export async function callMCPTool<T = any>(
   const maxRetries = options.maxRetries ?? DEFAULT_MAX_RETRIES;
   const retryDelayMs = options.retryDelayMs ?? DEFAULT_RETRY_DELAY_MS;
   const retryableErrors = options.retryableErrors ?? DEFAULT_RETRYABLE_ERRORS;
-  const maxResponseBytes = options.maxResponseBytes ?? DEFAULT_MAX_RESPONSE_BYTES;
+  const maxResponseBytes = options.maxResponseBytes ?? SERVICE_SIZE_LIMITS[mcpName] ?? DEFAULT_MAX_RESPONSE_BYTES;
 
   // MCPs that use external credentials (AWS CLI, system keychain, OAuth, etc.)
   // These don't need entries in credentials.json
@@ -328,6 +343,12 @@ export async function callMCPTool<T = any>(
   const env: Record<string, string> = Object.fromEntries(
     Object.entries(process.env).filter((entry): entry is [string, string] => entry[1] !== undefined)
   );
+
+  // Suppress debug output from MCP processes (especially mcp-remote)
+  // These environment variables disable common debug loggers
+  env.DEBUG = '';           // Disable debug module
+  env.NODE_DEBUG = '';      // Disable Node.js internal debug
+  env.MCP_DEBUG = '0';      // Disable MCP debug if supported
 
   // Add credentials from credentials.json OR use literal values
   if (serverConfig.envVars) {

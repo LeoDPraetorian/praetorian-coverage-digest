@@ -73,9 +73,7 @@ Lists all agents in the repository:
 **Execute BEFORE any list operation:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **See:** [Repository Root Navigation](../../../../skills/managing-agents/references/patterns/repo-root-detection.md)

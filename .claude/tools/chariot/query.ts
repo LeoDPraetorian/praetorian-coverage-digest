@@ -78,6 +78,7 @@ const QuerySchema = z.object({
 
 /**
  * Input parameters for query execution
+ * stack and username default to environment variables if not provided
  */
 const InputSchema = z.object({
   query: z.string().min(1), // JSON string of query structure
@@ -86,13 +87,15 @@ const InputSchema = z.object({
     .min(1)
     .refine(validateNoPathTraversal, 'Invalid path traversal')
     .refine(validateNoCommandInjection, 'Invalid command injection')
-    .refine(validateNoControlChars, 'Invalid control characters'),
+    .refine(validateNoControlChars, 'Invalid control characters')
+    .optional(),
   username: z
     .string()
     .min(1)
     .refine(validateNoPathTraversal, 'Invalid path traversal')
     .refine(validateNoCommandInjection, 'Invalid command injection')
-    .refine(validateNoControlChars, 'Invalid control characters'),
+    .refine(validateNoControlChars, 'Invalid control characters')
+    .optional(),
   tree: z.boolean().optional().default(false),
 });
 
@@ -137,22 +140,30 @@ export const query = {
       throw new Error(`Invalid query structure: ${error instanceof Error ? error.message : String(error)}`);
     }
 
-    // 3. Call Chariot MCP server via SHARED client
+    // 3. Resolve stack and username from input or environment
+    const stack = validated.stack || process.env.CHARIOT_STACK || 'production';
+    const username = validated.username || process.env.PRAETORIAN_CLI_USERNAME;
+
+    if (!username) {
+      throw new Error('Username required: provide username parameter or set PRAETORIAN_CLI_USERNAME environment variable');
+    }
+
+    // 4. Call Chariot MCP server via SHARED client
     const rawResults = await callMCPTool<any>(
       'chariot',
       'query',
       {
         query: validated.query,
-        stack: validated.stack,
-        username: validated.username,
+        stack,
+        username,
         tree: validated.tree,
       }
     );
 
-    // 4. Apply intelligent filtering
+    // 5. Apply intelligent filtering
     const filtered = filterResults(rawResults, queryObj);
 
-    // 5. Validate and return
+    // 6. Validate and return
     return OutputSchema.parse(filtered);
   },
 };

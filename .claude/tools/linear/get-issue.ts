@@ -170,7 +170,7 @@ export const getIssue = {
         value: rawData.estimate.value
       } : undefined,
 
-      state: rawData.state ? {
+      state: (rawData.state && rawData.state.id) ? {
         id: rawData.state.id,
         name: rawData.state.name,
         type: rawData.state.type

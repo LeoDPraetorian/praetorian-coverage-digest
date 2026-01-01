@@ -18,7 +18,7 @@ export class ConsoleReporter {
     result: AuditResult,
     projectRoot: string
   ): string {
-    const displayLocation = location.replace(projectRoot, '$REPO_ROOT');
+    const displayLocation = location.replace(projectRoot, '$ROOT');
 
     // Header
     console.log(chalk.blue.bold(`\n📊 Audit Results: ${skillName}\n`));

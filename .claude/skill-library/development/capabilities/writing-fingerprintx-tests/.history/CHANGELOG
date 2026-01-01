@@ -1,0 +1,44 @@
+## 2025-12-31 - Initial Creation
+
+**Phase**: 🔴 RED
+
+**Gap Documented**:
+Fingerprintx service detection plugins frequently lack comprehensive unit tests. Without systematic testing guidance, developers:
+- Write integration tests requiring live services instead of unit tests
+- Skip edge cases (truncated data, malformed input, wrong types)
+- Don't test protocol parsing functions (BSON, binary protocols)
+- Miss response validation and message building tests
+- Create inconsistent test patterns across plugins
+
+**Failure Behavior (Without Skill)**:
+When asked "Write unit tests for a fingerprintx plugin", Claude:
+- Creates integration tests requiring real services
+- Misses critical edge cases (empty documents, wrong types, truncated data)
+- Doesn't follow established table-driven test patterns from mysql_test.go, postgresql_test.go
+- Skips protocol-specific parsing function tests
+- Doesn't provide guidance on mock response construction
+
+**Evidence**: User stated "Many existing plugins lack tests" - proves need for skill to ensure comprehensive test coverage following established patterns.
+
+**Category**: development/capabilities/
+**Location**: Library (fingerprintx-specific domain knowledge)
+**Skill Type**: Process/Pattern
+
+**Created Files**:
+- SKILL.md (272 lines - well under 500 limit)
+- references/parsing-tests.md - BSON and binary protocol parsing patterns
+- references/response-validation-tests.md - Protocol response verification (OP_REPLY, OP_MSG)
+- references/message-building-tests.md - Wire protocol message construction
+- references/mock-construction.md - Building realistic test responses without live services
+
+**Integration**: Phase 4 of fingerprintx development workflow:
+1. researching-protocols - Research protocol specification
+2. researching-version-markers - Identify version detection markers
+3. writing-fingerprintx-modules - Implement the plugin
+4. writing-fingerprintx-tests - Write comprehensive tests (THIS SKILL)
+
+**Next Steps**:
+- Phase 6: Research (examine reference test files in fingerprintx codebase)
+- Phase 7: Update gateway-capabilities routing table
+- Phase 8: GREEN verification
+- Phase 9: REFACTOR with pressure testing

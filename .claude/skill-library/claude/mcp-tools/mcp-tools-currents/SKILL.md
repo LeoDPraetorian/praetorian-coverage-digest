@@ -26,33 +26,33 @@ Enable granular agent access control for currents operations.
 ### get-projects
 
 - **Purpose:** MCP wrapper for get-projects
-- **Import:** `import { getProjects } from './.claude/tools/currents/get-projects.ts'`
+- **Import:** `import { getProjects } from '$ROOT/.claude/tools/currents/get-projects.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-run-details
 
 - **Purpose:** Get detailed information about a specific test run (status, test counts, duration)
 - **Required parameter:** `runId` (string) - The run identifier
-- **Import:** `import { getRunDetails } from './.claude/tools/currents/get-run-details.ts'`
+- **Import:** `import { getRunDetails } from '$ROOT/.claude/tools/currents/get-run-details.ts'`
 - **Token cost:** ~unknown tokens
 - **Use when:** You have a run ID and want to see its overall statistics
 
 ### get-runs
 
 - **Purpose:** MCP wrapper for get-runs
-- **Import:** `import { getRuns } from './.claude/tools/currents/get-runs.ts'`
+- **Import:** `import { getRuns } from '$ROOT/.claude/tools/currents/get-runs.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-spec-files-performance
 
 - **Purpose:** MCP wrapper for get-spec-files-performance
-- **Import:** `import { getSpecFilesPerformance } from './.claude/tools/currents/get-spec-files-performance.ts'`
+- **Import:** `import { getSpecFilesPerformance } from '$ROOT/.claude/tools/currents/get-spec-files-performance.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-spec-instance
 
 - **Purpose:** MCP wrapper for get-spec-instance
-- **Import:** `import { getSpecInstance } from './.claude/tools/currents/get-spec-instance.ts'`
+- **Import:** `import { getSpecInstance } from '$ROOT/.claude/tools/currents/get-spec-instance.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-test-results
@@ -60,20 +60,20 @@ Enable granular agent access control for currents operations.
 - **Purpose:** Get test execution results for a specific test signature (for debugging failed tests)
 - **Required parameter:** `signature` (string) - Test identifier from get-tests-signatures
 - **Optional parameters:** `status`, `authors`, `branches`, `tags`, `cursor`, `limit`
-- **Import:** `import { getTestResults } from './.claude/tools/currents/get-test-results.ts'`
+- **Import:** `import { getTestResults } from '$ROOT/.claude/tools/currents/get-test-results.ts'`
 - **Token cost:** ~unknown tokens
 - **Use when:** You have a test signature and want to see its execution history
 
 ### get-tests-performance
 
 - **Purpose:** MCP wrapper for get-tests-performance
-- **Import:** `import { getTestsPerformance } from './.claude/tools/currents/get-tests-performance.ts'`
+- **Import:** `import { getTestsPerformance } from '$ROOT/.claude/tools/currents/get-tests-performance.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-tests-signatures
 
 - **Purpose:** MCP wrapper for get-tests-signatures
-- **Import:** `import { getTestsSignatures } from './.claude/tools/currents/get-tests-signatures.ts'`
+- **Import:** `import { getTestsSignatures } from '$ROOT/.claude/tools/currents/get-tests-signatures.ts'`
 - **Token cost:** ~unknown tokens
 
 ## Tool Mapping Guide
@@ -106,23 +106,19 @@ See mcp-tools-registry for complete Bash + tsx execution patterns.
 All tool executions MUST use dynamic root detection to work from any subdirectory:
 
 ```bash
-# ✅ CORRECT: Works from any subdirectory (e.g., modules/chariot/)
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getProjects } = await import('./.claude/tools/currents/get-projects.ts');
+# ✅ CORRECT: Works from any subdirectory including submodules
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getProjects } = await import('$ROOT/.claude/tools/currents/get-projects.ts');
   const result = await getProjects.execute({});
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
 ```
 
-```bash
-# ❌ WRONG: Fails when executed from modules/chariot/
-npx tsx -e "(async () => {
-  const { getProjects } = await import('./.claude/tools/currents/get-projects.ts');
-  const result = await getProjects.execute({});
-  console.log(JSON.stringify(result, null, 2));
-})();" 2>/dev/null
-```
+**Why this works:**
+- `--show-superproject-working-tree --show-toplevel` returns super-repo root from submodules
+- `| head -1` picks first non-empty result
+- `$ROOT` expands in double-quoted string before tsx sees it
+- No `cd` needed = no "Shell cwd was reset" messages
 
 ## Comprehensive Code Examples
 
@@ -130,9 +126,8 @@ npx tsx -e "(async () => {
 
 ```bash
 # Get details for a specific run
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getRunDetails } = await import('./.claude/tools/currents/get-run-details.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getRunDetails } = await import('$ROOT/.claude/tools/currents/get-run-details.ts');
   const result = await getRunDetails.execute({ runId: 'run-abc123' });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
@@ -142,9 +137,8 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 
 ```bash
 # Get execution history for a specific test
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getTestResults } = await import('./.claude/tools/currents/get-test-results.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getTestResults } = await import('$ROOT/.claude/tools/currents/get-test-results.ts');
   const result = await getTestResults.execute({
     signature: 'spec-file.ts:test-name',
     status: 'failed',
@@ -158,23 +152,22 @@ cd "$REPO_ROOT" && npx tsx -e "(async () => {
 
 ```bash
 # 1. Get projects
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getProjects } = await import('./.claude/tools/currents/get-projects.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getProjects } = await import('$ROOT/.claude/tools/currents/get-projects.ts');
   const projects = await getProjects.execute({});
   console.log('Projects:', projects.projects.map(p => p.id));
 })();" 2>/dev/null
 
 # 2. Get latest runs for project
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getRuns } = await import('./.claude/tools/currents/get-runs.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getRuns } = await import('$ROOT/.claude/tools/currents/get-runs.ts');
   const runs = await getRuns.execute({ projectId: 'proj-456' });
   console.log('Latest runs:', runs.runs.map(r => r.id));
 })();" 2>/dev/null
 
 # 3. Get run details
-cd "$REPO_ROOT" && npx tsx -e "(async () => {
-  const { getRunDetails } = await import('./.claude/tools/currents/get-run-details.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getRunDetails } = await import('$ROOT/.claude/tools/currents/get-run-details.ts');
   const details = await getRunDetails.execute({ runId: 'run-abc123' });
   console.log('Run stats:', details.run);
 })();" 2>/dev/null

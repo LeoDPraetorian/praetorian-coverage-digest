@@ -264,9 +264,9 @@ npm run audit -- gateway-{domain}
 **Run gateway audit** (includes gateway-specific phases 17-20):
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude" && npm run audit -- gateway-{domain}
+ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$ROOT/.claude" && npm run audit -- gateway-{domain}
 ```
 
 **Gateway validation phases**:

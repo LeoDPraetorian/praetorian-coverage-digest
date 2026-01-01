@@ -24,9 +24,9 @@ Uses template at `templates/gateway-template.md` with proper two-tier structure.
 **Via CLI:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude" && npm run audit -- gateway-frontend
+ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$ROOT/.claude" && npm run audit -- gateway-frontend
 ```
 
 Runs all 22 phases (phases 17-20 are gateway-specific):
@@ -41,9 +41,9 @@ Runs all 22 phases (phases 17-20 are gateway-specific):
 **Via CLI:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude" && npm run -w @chariot/fixing-skills fix -- gateway-frontend --phase 18
+ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$ROOT/.claude" && npm run -w @chariot/fixing-skills fix -- gateway-frontend --phase 18
 ```
 
 Gateway-specific fixes for structure and routing table issues.

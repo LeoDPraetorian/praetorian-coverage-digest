@@ -175,8 +175,8 @@ For developers or debugging, here are the underlying wrapper patterns:
 ### List Assets (Direct Execution)
 
 ```bash
-npx tsx -e "(async () => {
-  const { assetsList } = await import('./.claude/tools/praetorian-cli/assets-list.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { assetsList } = await import('$ROOT/.claude/tools/praetorian-cli/assets-list.ts');
   const result = await assetsList.execute({
     key_prefix: 'example.com',  // Optional: filter by prefix
     asset_type: 'domain',        // Optional: filter by type
@@ -189,8 +189,8 @@ npx tsx -e "(async () => {
 ### Get Asset (Direct Execution)
 
 ```bash
-npx tsx -e "(async () => {
-  const { assetsGet } = await import('./.claude/tools/praetorian-cli/assets-get.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { assetsGet } = await import('$ROOT/.claude/tools/praetorian-cli/assets-get.ts');
   const result = await assetsGet.execute({
     key: 'example.com'  // Asset key
   });
@@ -201,8 +201,8 @@ npx tsx -e "(async () => {
 ### List Risks (Direct Execution)
 
 ```bash
-npx tsx -e "(async () => {
-  const { risksList } = await import('./.claude/tools/praetorian-cli/risks-list.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { risksList } = await import('$ROOT/.claude/tools/praetorian-cli/risks-list.ts');
   const result = await risksList.execute({
     pages: 1  // Optional: pagination
   });
@@ -213,8 +213,8 @@ npx tsx -e "(async () => {
 ### Search (Direct Execution)
 
 ```bash
-npx tsx -e "(async () => {
-  const { searchByQuery } = await import('./.claude/tools/praetorian-cli/search-by-query.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { searchByQuery } = await import('$ROOT/.claude/tools/praetorian-cli/search-by-query.ts');
   const result = await searchByQuery.execute({
     query: 'status:active',  // Search query
     limit: 20                 // Optional: result limit

@@ -80,6 +80,7 @@ export function validateSemanticFindings(json: unknown): SemanticFindingsJson {
     "Tool Appropriateness",
     "Content Density",
     "External Documentation",
+    "Phase Numbering Hygiene",
   ];
 
   for (const finding of obj.findings) {
@@ -93,8 +94,8 @@ export function validateSemanticFindings(json: unknown): SemanticFindingsJson {
       throw new Error(`Invalid severity: ${f.severity}`);
     }
 
-    if (typeof f.criterion !== "string" || f.criterion.length === 0) {
-      throw new Error("Invalid criterion: expected non-empty string");
+    if (!validCriteria.includes(f.criterion as string)) {
+      throw new Error(`Invalid criterion: ${f.criterion}`);
     }
 
     if (typeof f.issue !== "string" || f.issue.length === 0) {

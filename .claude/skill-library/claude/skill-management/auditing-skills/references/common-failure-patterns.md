@@ -104,9 +104,9 @@ npm run build  # See errors
 
 ---
 
-## "Missing cd REPO_ROOT pattern"
+## "Missing repository root pattern"
 
-**Symptom:** Phase 11 warning, cd commands don't use REPO_ROOT
+**Symptom:** Phase 11 warning, cd commands don't use proper repository root detection
 
 **Fix:** Update to portable pattern
 
@@ -115,9 +115,7 @@ npm run build  # See errors
 cd /absolute/path && command
 
 # CORRECT (see repo-root-detection.md for pattern)
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/relative/path" && command
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/relative/path" && command
 ```
 
 ---

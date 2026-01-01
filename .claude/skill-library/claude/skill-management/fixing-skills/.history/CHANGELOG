@@ -1,5 +1,47 @@
 # Changelog
 
+## 2025-12-31 - Simplify Repository Root Navigation Pattern
+
+### Changed
+- **Step 0: Navigate to Repository Root** in SKILL.md - Replaced complex 3-line pattern with industry-standard single-line approach
+- **Step 1: Run Audit** in SKILL.md - Updated audit navigation to use simplified pattern
+- Old pattern (2 locations): `REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel); cd "$REPO_ROOT"`
+- New pattern (Location 1): `ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"`
+- New pattern (Location 2): `ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run audit -- {skill-name}`
+- Variable name: `REPO_ROOT` → `ROOT` for consistency with commands and MCP tools
+- Updated `references/fix-procedures.md` Phase 11 with new ROOT pattern
+- Updated `references/phase-fixes.md` Phase 11 with new ROOT pattern and explanation
+- Updated `scripts/src/fix.ts` line 163 help text to reference $ROOT instead of $REPO_ROOT
+
+### Reason
+- **RED failure**: Old pattern uses unnecessary complexity (stderr redirect, conditional test, 3 separate commands per location)
+- Can cause parsing errors in Claude Code's Bash tool when combined with other operators
+- Inconsistent with updated patterns across codebase (commands, MCP skills, CLAUDE.md)
+- More verbose and harder to maintain than necessary
+- fixing-skills is used as a reference for fixing other skills, so patterns must be exemplary
+
+### Technical Details
+- Single git command with both `--show-superproject-working-tree` and `--show-toplevel` flags
+- Pipe to `head -1` automatically selects first non-empty result (super-repo root when in submodule)
+- Simpler: 2-3 commands instead of 4-5, one line instead of three per location
+- No stderr redirect needed, no conditional test needed
+- Proper quoting prevents bash parsing errors
+- Works identically from any directory depth (tested from super-repo and deep submodule)
+
+### Files Changed
+- `SKILL.md` lines 64-66 - Replaced Step 0 navigation pattern (3 lines → 1 line)
+- `SKILL.md` lines 78-80 - Replaced Step 1 audit navigation pattern (3 lines → 1 line)
+- `references/fix-procedures.md` lines 65-74 - Updated Phase 11 cd Commands with new ROOT pattern
+- `references/phase-fixes.md` lines 324-339 - Updated Phase 11 example with new ROOT pattern and explanation
+- `scripts/src/fix.ts` line 163 - Updated help text from $REPO_ROOT to $ROOT
+- Line count: 325 → 319 lines (6 lines removed due to consolidation)
+
+### Verification
+- ✅ Tested from submodule directory (`modules/chariot/ui/src/`) → Returns super-repo root
+- ✅ Tested from super-repo root with .claude navigation → Successfully navigates to .claude directory
+- ✅ All REPO_ROOT references replaced with ROOT in markdown files
+- ✅ Help text updated in TypeScript CLI tool
+
 ## 2025-12-30 - Enhance Phase Numbering Hygiene to Update Prose References
 
 ### Added

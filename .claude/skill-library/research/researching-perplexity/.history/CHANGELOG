@@ -1,0 +1,37 @@
+## 2025-12-31 - Initial Creation
+
+**Type**: New skill creation
+
+**RED Phase Documentation**:
+- **Gap Identified**: researching-skills router only supports 5 sources (Codebase, Context7, GitHub, arxiv, Web). No skill exists to orchestrate Perplexity MCP for AI-powered research as a 6th option.
+- **Failure Scenario**: User wants to select "Perplexity" from researching-skills menu → option doesn't exist. User tries to use Perplexity manually → output format incompatible with synthesis requirements.
+- **Need**: Skill to orchestrate Perplexity research (API validation, query formulation, tool selection, execution, output formatting) with output compatible with researching-skills synthesis (perplexity.md file format).
+
+**Category**: Library skill - `research/`
+
+**Skill Type**: Tool Wrapper (wraps Perplexity MCP CLI and underlying wrappers)
+
+**Integration**:
+- Sibling to researching-web in `.claude/skill-library/research/`
+- Called by researching-skills router when Perplexity source selected
+- Output saved to `perplexity.md` in research directory
+
+**Structure Created**:
+- SKILL.md (273 lines - well under 500 line limit)
+- references/tool-selection.md - Decision matrix for search vs ask vs research vs reason
+- references/output-format.md - Output template matching researching-web format
+- references/query-templates.md - Search query patterns by intent type
+
+**Key Features**:
+- 5-phase workflow: API Validation → Query Formulation → Tool Selection → Execution → Output Formatting
+- API key detection with setup instructions if missing
+- 4 Perplexity commands (search, ask, research, reason) with selection logic
+- Citation tracking and AI synthesis notes
+- Compatible with researching-skills synthesis format
+
+**Tools**: Bash, Read, Write, TodoWrite
+
+**Next Steps**:
+- GREEN phase: Test with researching-skills router
+- REFACTOR phase: Pressure test with subagents
+- Update researching-skills router to add Perplexity as 6th source

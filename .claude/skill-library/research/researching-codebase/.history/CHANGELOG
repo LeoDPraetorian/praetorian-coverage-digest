@@ -1,0 +1,110 @@
+# Changelog: researching-codebase
+
+## 2025-12-30 - Initial Creation
+
+**Type:** NEW SKILL
+
+**Category:** Library skill - claude/skill-management/
+
+**Skill Type:** Process/Pattern (research methodology)
+
+**RED Phase Documentation:**
+
+**Gap Identified:** When creating or updating skills, there was no systematic way to research codebases to discover patterns, conventions, and existing implementations. Existing tools serve different purposes:
+
+- `code-pattern-analyzer` agent - Focuses on finding code to REUSE for implementation
+- `codebase-mapper` agent - Focuses on security/threat modeling
+- `researching-context7` skill - Focuses on library documentation
+- `researching-protocols` skill - Focuses on protocol specifications (mentioned but not yet created)
+
+**Test Scenario:** A developer needs to create a skill about Go handler patterns in the Chariot codebase. Without `researching-codebase`, they would:
+
+1. Manually grep for patterns without a structured approach
+2. Miss technology stack detection
+3. Not systematically analyze naming conventions
+4. Fail to document directory structures
+5. Not capture representative code examples with paths
+6. Skip anti-pattern identification
+
+**Expected Failure:** Without this skill, skill creators either skip codebase research entirely (leading to inaccurate examples) or perform ad-hoc searches that miss important patterns.
+
+**Structure Created:**
+
+```
+.claude/skill-library/claude/skill-management/researching-codebase/
+├── SKILL.md (334 lines - well under 500 limit)
+├── references/
+│   ├── technology-detection.md
+│   ├── search-templates.md
+│   ├── convention-analysis.md
+│   ├── example-extraction.md
+│   └── output-format.md
+├── examples/ (empty, ready for future examples)
+└── .history/
+    └── CHANGELOG (this file)
+```
+
+**Key Features:**
+
+1. **Path-agnostic design** - Uses `{TARGET_PATH}` placeholder, works with ANY codebase
+2. **Stack-agnostic** - Detects technology stack dynamically before searching
+3. **Evidence-based** - All findings cite specific file paths and function signatures (NOT line numbers)
+4. **Skill-focused** - Output designed for creating/updating skills, not implementation
+5. **Durable references** - Mandates function signatures over line numbers (Phase 21 audit compliance)
+6. **Progressive disclosure** - Main file 334 lines, detailed content in references/
+
+**Integration:**
+
+- Sibling to `researching-skills`, `researching-context7`, `researching-arxiv`
+- Will be integrated into `researching-skills` router pattern (future)
+- Complements `code-pattern-analyzer` (implementation focus) and `codebase-mapper` (security focus)
+
+**Tools Required:** Bash, Grep, Glob, Read, Write, TodoWrite, AskUserQuestion
+
+**Workflow Completed:**
+
+- Phase 7: Research (SKIPPED - this IS a research skill, self-referential)
+- Phase 8: Update gateway - ✅ Added to gateway-claude routing table
+- Phase 9: GREEN verification - ✅ Audit passed with 0 critical issues (3 warnings only)
+- Phase 10: REFACTOR pressure testing - ✅ Completed with findings
+
+**REFACTOR Phase Results (2025-12-30):**
+
+Ran 3 pressure tests with subagents:
+
+1. **Integration Test (realistic task without skill mention)**: ❌ FAIL
+   - Agent did NOT invoke researching-codebase skill
+   - Performed ad-hoc grep/read without systematic workflow
+   - **Root cause**: Discovery problem - agent didn't know to use skill for this task
+
+2. **Pressure Test (time + sunk cost + authority)**: ✅ PASS
+   - Agent chose Option A (full workflow) despite 15-min deadline
+   - Rejected rationalizations: "good enough for now", "sunk cost trap"
+   - Reasoning: "Code examples are foundational to a skill"
+
+3. **Extreme Pressure Test (production + manager + deploy window)**: ✅ PASS
+   - Agent chose Option A despite extreme pressure (10-min window, prod down)
+   - Reasoning: "Bad examples deployed fast = more production incidents"
+   - "Option A. Every time. Regardless of pressure."
+
+**Critical Finding:** Skill PASSES pressure tests (agents follow it when they have it) but FAILS integration test (agents don't discover/invoke it).
+
+**Fixes Applied:**
+
+1. **Enhanced description** (225 chars → 380 chars):
+   - Added explicit trigger phrases: "need code examples", "looking for existing patterns", "researching before writing docs"
+   - Added value propositions: "6-phase workflow", "durable code references"
+   - Better searchability for discovery
+
+2. **Added "When NOT to Skip This Skill" section**:
+   - Explicit negations of common rationalizations
+   - ❌ "I can just grep quickly" → ✅ "Misses patterns/conventions"
+   - ❌ "Time pressure" → ✅ "Bad examples fast = MORE work"
+   - ❌ "Sunk cost" → ✅ "Not reason to skip rigor"
+   - Direct counter to pressure scenarios tested
+
+**Line count:** 354 (well under 500 limit after additions)
+
+**Compliance Target:** [Skill Compliance Contract](../../../../skills/managing-skills/references/skill-compliance-contract.md)
+
+**Status:** ✅ COMPLETE - Skill is bulletproof under pressure, discovery enhanced for better invocation

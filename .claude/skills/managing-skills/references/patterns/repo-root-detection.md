@@ -11,9 +11,7 @@ Referenced by: All skill-management skills (`updating-skills`, `creating-skills`
 **Before ANY skill operation, execute this command:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **Why this is mandatory:**
@@ -32,6 +30,29 @@ ls .claude/skill-library/  # Should list library categories
 ```
 
 **Cannot proceed with skill operations without this step** ✅
+
+---
+
+## How the Pattern Works
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+```
+
+**Breakdown:**
+
+1. `--show-superproject-working-tree` - Returns super-repo root if in submodule (empty if not)
+2. `--show-toplevel` - Returns current repo root
+3. Both flags together - Git outputs both values (super-repo first, then toplevel)
+4. `| head -1` - Takes the first non-empty line (super-repo root when in submodule, repo root otherwise)
+
+**Why this pattern is best:**
+
+- Single git command with both flags
+- No stderr redirect (`2>/dev/null`) needed
+- No conditional `test -z` check needed
+- Works reliably in Claude Code's Bash tool
+- Avoids parsing issues with complex bash operators
 
 ---
 
@@ -82,58 +103,43 @@ git rev-parse --show-toplevel  # Returns submodule root, not super-repo root
 **Standard Pattern** (use this exact snippet):
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
 ```
 
-**CRITICAL for Claude Code Bash Tool:**
+This works from:
+- Super-repo root → returns super-repo root
+- Any submodule → returns super-repo root
+- Any subdirectory → returns appropriate root
 
-Claude Code's Bash tool has issues with `$()` command substitution in certain contexts. When you need to use REPO_ROOT:
-
-```bash
-# ✅ BEST: Use absolute paths directly (no REPO_ROOT needed)
-cd /Users/nathansportsman/chariot-development-platform/.claude
-
-# ✅ ALTERNATIVE: Get REPO_ROOT once, then use in subsequent commands
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude"
-
-# ❌ AVOID: Nested $() in same line with Bash tool
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-```
-
-**For skill documentation** (where developers use terminal):
-
-```bash
-# Developers can use the concise version
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-```
-
-## Why This Pattern
-
-1. **`--show-superproject-working-tree`** - Returns super-repo root if in submodule
-2. **`2>/dev/null`** - Suppresses error when not in submodule
-3. **`${VAR:-default}`** - Falls back to regular toplevel if not in super-repo
+---
 
 ## Usage in Skills
 
-### For Bash Code Blocks
+### Navigate to Repo Root
 
 ```bash
-# At the start of any multi-line bash block
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-
-cd "$REPO_ROOT/.claude" && npm run audit -- skill-name
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
-### For Single Commands (Inline)
+### Navigate to .claude Directory
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}" && cd "$REPO_ROOT/.claude" && npm run audit -- skill-name
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude"
 ```
+
+### Run Workspace Commands
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run audit -- skill-name
+```
+
+### Run Skill Search
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run -w @chariot/auditing-skills search -- "query"
+```
+
+---
 
 ## Absolute Paths with Read Tool
 
@@ -152,53 +158,46 @@ Use Read tool with the **absolute path** shown in search output.
 Example: `/Users/username/chariot-development-platform/.claude/skill-library/path/to/SKILL.md`
 ```
 
-## Common Mistakes
+---
 
-### Mistake 1: Using `test -z`
+## Old Patterns (DEPRECATED)
+
+These patterns are deprecated. Update to the new simplified pattern above.
+
+### ❌ DEPRECATED: 3-Line Pattern
 
 ```bash
-# OLD (verbose)
+# OLD - verbose and can cause parsing issues
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
 test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+```
 
-# NEW (concise with same behavior)
+### ❌ DEPRECATED: || Fallback Pattern
+
+```bash
+# OLD - doesn't work reliably in Claude Code bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
+```
+
+### ❌ DEPRECATED: Parameter Expansion Fallback
+
+```bash
+# OLD - complex and error-prone
 REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
 REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
 ```
 
-### Mistake 2: Missing Error Suppression
+### ✅ NEW: Simplified Pattern
 
 ```bash
-# WRONG - prints error to stderr
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree)
-
-# CORRECT - silent fallback
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+# NEW - simple, reliable, works everywhere
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
-### Mistake 3: cd Without Path Validation
-
-```bash
-# WRONG - may fail silently
-cd "$REPO_ROOT/.claude"
-
-# CORRECT - fail fast if path doesn't exist
-cd "$REPO_ROOT/.claude" || { echo "Error: .claude directory not found"; exit 1; }
-```
-
-## Integration with npm Workspaces
-
-The `.claude` directory uses npm workspaces. Always run commands from `.claude`:
-
-```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-
-# Run workspace command
-cd "$REPO_ROOT/.claude" && npm run -w @chariot/auditing-skills search -- "query"
-```
+---
 
 ## Related Patterns
 
-- [Backup Strategy](./backup-strategy.md) - Uses REPO_ROOT for backup paths
-- [CLI Usage](../cli-usage.md) - Full CLI reference with REPO_ROOT usage
+- [Backup Strategy](./backup-strategy.md) - Uses ROOT for backup paths
+- [CLI Usage](../cli-usage.md) - Full CLI reference with ROOT usage

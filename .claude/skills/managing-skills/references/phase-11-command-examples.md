@@ -2,8 +2,8 @@
 
 ## What It Checks
 
-- Bash command examples use REPO_ROOT detection pattern
-- No hardcoded `cd .claude/skills/` without $REPO_ROOT
+- Bash command examples use ROOT detection pattern
+- No hardcoded `cd .claude/skills/` without $ROOT
 - npm --prefix commands include /scripts suffix
 - Commands work from any directory (root, submodules, nested)
 
@@ -35,7 +35,7 @@ cd /Users/name/project/.claude/skills/...
 
 ### WARNING Issues
 
-**1. cd Without REPO_ROOT**
+**1. cd Without ROOT**
 
 ```bash
 cd .claude/skills/my-skill && npm run dev
@@ -57,7 +57,7 @@ cd .claude/skills/my-skill && npm run dev
 
 **What it fixes:**
 
-- ✅ Adds REPO_ROOT detection to cd commands
+- ✅ Adds ROOT detection to cd commands
 - ✅ Fixes npm --prefix to use cd pattern instead
 - ✅ Wraps commands with repo-root detection
 - ❌ Cannot fix all context-dependent patterns
@@ -67,15 +67,15 @@ cd .claude/skills/my-skill && npm run dev
 **Standard pattern for all bash examples:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skills/skill-name/scripts" && npm run command
+ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$ROOT/.claude/skills/skill-name/scripts" && npm run command
 ```
 
 **Why this works:**
 
 - `--show-superproject-working-tree`: Returns super-repo root when in submodule
 - Returns empty string (not error) when not in submodule
-- `${REPO_ROOT:-$(fallback)}`: Uses fallback if empty
+- `${ROOT:-$(fallback)}`: Uses fallback if empty
 - `--show-toplevel`: Gets repo root for non-submodule case
 - Works from ANY directory
 
@@ -92,8 +92,8 @@ cd .claude/skills/my-skill/scripts && npm run audit
 **After:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skills/my-skill/scripts" && npm run audit
+ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$ROOT/.claude/skills/my-skill/scripts" && npm run audit
 ```
 
 ### Example 2: Fix npm --prefix
@@ -108,8 +108,8 @@ npm run --prefix .claude/skills/my-skill search
 **After:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skills/my-skill/scripts" && npm run search
+ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$ROOT/.claude/skills/my-skill/scripts" && npm run search
 ```
 
 ### Example 3: Claude Code Execution
@@ -123,7 +123,7 @@ cd "$REPO_ROOT/.claude/skills/my-skill/scripts" && npm run search
 **After:**
 
 ```bash
-!REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}" && cd "$REPO_ROOT/.claude/skills/my-skill/scripts" && npm run command
+!ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); ROOT="${ROOT:-$(git rev-parse --show-toplevel)}" && cd "$ROOT/.claude/skills/my-skill/scripts" && npm run command
 ```
 
 ## Edge Cases
@@ -140,8 +140,8 @@ npm run dev
 **After:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude/skills/my-skill"
+ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$ROOT/.claude/skills/my-skill"
 npm install
 npm run dev
 ```
@@ -179,8 +179,8 @@ npm run fix -- my-skill --phase 11
 
 **Manual pattern application:**
 
-1. Prefix all cd commands with REPO_ROOT detection
-2. Use `"$REPO_ROOT/..."` for all .claude/ paths
+1. Prefix all cd commands with ROOT detection
+2. Use `"$ROOT/..."` for all .claude/ paths
 3. Test from different directories:
    - Repo root
    - Submodule (if applicable)
@@ -195,6 +195,6 @@ npm run fix -- my-skill --phase 11
 
 | Pattern        | Fix                      | Specialized CLI |
 | -------------- | ------------------------ | --------------- |
-| cd .claude/... | ✅ Add REPO_ROOT         | audit-commands  |
+| cd .claude/... | ✅ Add ROOT         | audit-commands  |
 | npm --prefix   | ✅ Convert to cd pattern | audit-commands  |
 | Relative paths | ✅ Make absolute         | audit-commands  |

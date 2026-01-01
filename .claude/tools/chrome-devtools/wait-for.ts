@@ -38,7 +38,7 @@ export const waitFor = {
     // Call chrome-devtools MCP server via SHARED client
     await callMCPTool(
       'chrome-devtools',                  // MCP name
-      'mcp__chrome-devtools__wait_for',  // Actual MCP tool name
+      'wait_for',  // Actual MCP tool name
       validated                           // Pass params directly
     );
 

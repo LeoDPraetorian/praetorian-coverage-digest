@@ -10,8 +10,8 @@ import { EXIT_SUCCESS, EXIT_ERROR, EXIT_ISSUES } from '../types.js';
 import { findWrapperFile, getToolsDir, findRepoRoot } from '../utils.js';
 import { auditPhase11 } from '../phases/phase11-skill-schema-sync.js';
 
-const REPO_ROOT = findRepoRoot();
-const CLAUDE_DIR = path.join(REPO_ROOT, '.claude');
+const ROOT = findRepoRoot();
+const CLAUDE_DIR = path.join(ROOT, '.claude');
 
 export async function updateWrapper(options: CLIOptions): Promise<number> {
   if (!options.service || !options.tool) {

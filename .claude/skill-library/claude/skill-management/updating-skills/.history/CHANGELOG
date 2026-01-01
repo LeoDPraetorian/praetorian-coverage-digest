@@ -1,3 +1,34 @@
+## [2025-12-31] - Simplify Repository Root Navigation Pattern
+
+### Changed
+- **Step 0: Navigate to repo root** in SKILL.md - Replaced complex 3-line pattern with industry-standard single-line approach
+- Old pattern: `REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel); cd "$REPO_ROOT"`
+- New pattern: `ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"`
+- Variable name: `REPO_ROOT` → `ROOT` for consistency with commands and MCP tools
+
+### Reason
+- **RED failure**: Old pattern uses unnecessary complexity (stderr redirect, conditional test, 3 separate commands)
+- Can cause parsing errors in Claude Code's Bash tool when combined with other operators
+- Inconsistent with updated patterns across codebase (commands, MCP skills, CLAUDE.md)
+- More verbose and harder to maintain than necessary
+
+### Technical Details
+- Single git command with both `--show-superproject-working-tree` and `--show-toplevel` flags
+- Pipe to `head -1` automatically selects first non-empty result (super-repo root when in submodule)
+- Simpler: 2 commands instead of 3, one line instead of three
+- No stderr redirect needed, no conditional test needed
+- Proper quoting prevents bash parsing errors
+- Works identically from any directory depth (tested from super-repo and submodule)
+
+### Files Changed
+- `SKILL.md` lines 47-50 - Replaced navigation pattern with simplified approach
+- Line count: 188 → 185 lines (3 lines removed due to consolidation)
+
+### Verification
+- ✅ Tested from submodule directory (`modules/chariot/ui/src/`) → Returns super-repo root
+- ✅ Tested from super-repo root → Returns super-repo root
+- ✅ No old pattern examples remain in `references/` subdirectory
+
 ## [2025-12-30] - Add Phase Numbering Rule
 
 ### Added

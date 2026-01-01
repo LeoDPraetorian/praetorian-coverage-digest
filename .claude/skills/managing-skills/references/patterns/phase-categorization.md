@@ -151,7 +151,7 @@ These phases require semantic understanding but Claude can handle without human 
 | ----- | ---------------------- | ------------------------------------------------------------------------- |
 | 1     | Description format     | Rewrite to "Use when..." pattern, <120 chars                              |
 | 3     | Line count >500        | Identify extraction candidates, create references/                        |
-| 11    | cd commands            | Update to REPO_ROOT pattern                                               |
+| 11    | cd commands            | Update to ROOT pattern                                               |
 | 13    | TodoWrite missing      | Detect multi-step workflows, add mandate                                  |
 | 15    | Orphan detection       | Identify orphaned library skills, suggest agent integrations              |
 | 17    | Gateway structure      | Populate from template with gateway-specific details                      |
@@ -198,7 +198,7 @@ description: Use when creating skills - TDD workflow (RED-GREEN-REFACTOR) with v
 
 1. Find all cd commands: `cd /absolute/path` or `cd relative/path`
 2. Determine if cd is to repo-relative location
-3. Replace with REPO_ROOT pattern (see [repo-root-detection.md](repo-root-detection.md))
+3. Replace with ROOT pattern (see [repo-root-detection.md](repo-root-detection.md))
 4. Skip cd commands to temp directories or external paths
 
 ### Phase 13: TodoWrite Missing (Claude-Automated)

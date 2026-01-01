@@ -41,7 +41,7 @@ export const listNetworkRequests = {
     // Call chrome-devtools MCP server via SHARED client
     const requests = await callMCPTool(
       'chrome-devtools',                               // MCP name
-      'mcp__chrome-devtools__list_network_requests',  // Actual MCP tool name
+      'list_network_requests',  // Actual MCP tool name
       validated                                        // Pass params directly
     );
 

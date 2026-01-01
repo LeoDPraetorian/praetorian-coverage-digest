@@ -11,9 +11,7 @@ Referenced by: All agent-management skills (`updating-agents`, `creating-agents`
 **Before ANY agent operation, execute this command:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **Why this is mandatory:**
@@ -31,6 +29,29 @@ ls .claude/agents/     # Should list agent categories
 ```
 
 **Cannot proceed with agent operations without this step** ✅
+
+---
+
+## How the Pattern Works
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+```
+
+**Breakdown:**
+
+1. `--show-superproject-working-tree` - Returns super-repo root if in submodule (empty if not)
+2. `--show-toplevel` - Returns current repo root
+3. Both flags together - Git outputs both values (super-repo first, then toplevel)
+4. `| head -1` - Takes the first non-empty line (super-repo root when in submodule, repo root otherwise)
+
+**Why this pattern is best:**
+
+- Single git command with both flags
+- No stderr redirect (`2>/dev/null`) needed
+- No conditional `test -z` check needed
+- Works reliably in Claude Code's Bash tool
+- Avoids parsing issues with complex bash operators
 
 ---
 
@@ -75,8 +96,7 @@ Agent tried to update `frontend-architect` agent, couldn't find file, concluded 
 When you need to detect repo root but NOT navigate (e.g., in CLI scripts):
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
 ```
 
 ---
@@ -92,10 +112,12 @@ This repository is a **super-repo with submodules**. Standard `git rev-parse --s
 
 ### Solution
 
-1. **First try**: `--show-superproject-working-tree` - Returns super-repo root if in submodule
-2. **Fallback**: `--show-toplevel` - Returns repo root if not in submodule
-3. **Combine**: Use bash parameter expansion `${VAR:-default}` for fallback
-4. **Navigate**: `cd "$REPO_ROOT"` to actually move to the location
+The combined flags pattern solves this:
+
+1. **`--show-superproject-working-tree`** - Returns super-repo root if in submodule
+2. **`--show-toplevel`** - Returns repo root
+3. **`| head -1`** - Takes first non-empty result (super-repo wins when in submodule)
+4. **`&& cd "$ROOT"`** - Navigate to the detected location
 
 ---
 
@@ -107,15 +129,11 @@ This repository is a **super-repo with submodules**. Standard `git rev-parse --s
 ## Step 0: Navigate to Repository Root (MANDATORY)
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 ````
 
 **See:** [Repository Root Navigation](../../../../skills/managing-agents/references/patterns/repo-root-detection.md)
-
-````
 
 ---
 
@@ -126,7 +144,7 @@ cd "$REPO_ROOT"
 ```bash
 # WRONG - breaks on different machines
 cd /Users/dev/chariot-development-platform/.claude
-````
+```
 
 ### Wrong: Only git rev-parse --show-toplevel
 
@@ -155,18 +173,18 @@ find .claude/agents -name "foo.md"
 
 ## Quick Reference
 
-| Component                      | Command                                                                                                                                                        |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Navigate to root (Step 0)**  | `REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel); cd "$REPO_ROOT"` |
-| Get repo root (detection only) | `REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"`                          |
-| Agents directory               | `$REPO_ROOT/.claude/agents`                                                                                                                                    |
-| Skill library                  | `$REPO_ROOT/.claude/skill-library`                                                                                                                             |
-| Core skills                    | `$REPO_ROOT/.claude/skills`                                                                                                                                    |
+| Component                      | Command                                                                                          |
+| ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| **Navigate to root (Step 0)**  | `ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel \| head -1)" && cd "$ROOT"` |
+| Get repo root (detection only) | `ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel \| head -1)"`              |
+| Agents directory               | `$ROOT/.claude/agents`                                                                           |
+| Skill library                  | `$ROOT/.claude/skill-library`                                                                    |
+| Core skills                    | `$ROOT/.claude/skills`                                                                           |
 
 ---
 
 ## Related
 
-- Skill management uses identical pattern
+- Skill management uses identical pattern: [managing-skills repo-root-detection](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
 - [Agent Compliance Contract](../agent-compliance-contract.md)
 - Referenced by all agent-management library skills

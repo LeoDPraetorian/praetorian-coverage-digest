@@ -63,9 +63,7 @@ This skill validates against the [Skill Compliance Contract](../../../../skills/
 **Execute BEFORE any audit operation:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **See:** [Repository Root Navigation](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
@@ -86,12 +84,10 @@ See [Repo Root Detection](../../../../skills/managing-skills/references/patterns
 
 ```bash
 # Get repo root (works from super-repo or any submodule)
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude"
 ```
 
-**Note:** Using `test -z` for compatibility with Claude Code's Bash tool.
+**Note:** This pattern combines both git flags in a single command. The `| head -1` automatically picks the first non-empty result (super-repo root when in submodule, repo root otherwise). No stderr redirect or conditional test needed.
 
 **Execute:**
 
@@ -175,7 +171,7 @@ This applies even if the script passed with zero warnings. Semantic review catch
 
 Evaluate the skill against these 7 criteria (full details in [Post-Audit Semantic Review](#post-audit-semantic-review) section below):
 
-1. **Description Quality (CSO)** - MANDATORY detailed assessment (see section below)
+1. **Description Quality** - MANDATORY detailed assessment (see section below)
 2. **Skill Categorization** - Is this frontend/backend/testing/security/tooling/claude?
 3. **Gateway Membership** - Should this skill be listed in a gateway? Is it in the correct gateway(s)?
 4. **Tool Appropriateness** - Are allowed-tools appropriate for the skill's purpose?
@@ -209,10 +205,29 @@ Evaluate the skill against these 7 criteria (full details in [Post-Audit Semanti
 
 **⛔ CRITICAL: Output semantic findings as JSON ONLY. Do NOT output tables or prose.**
 
-Write findings to JSON file, then invoke CLI to merge:
+Write findings to JSON file with this EXACT structure:
 
 ```bash
-npm run -w @chariot/auditing-skills audit -- ${SKILL_NAME} --merge-semantic $TMPFILE
+cat > /tmp/semantic-findings.json << 'EOF'
+{
+  "findings": [
+    {
+      "severity": "WARNING",
+      "criterion": "Description Quality",
+      "issue": "Missing specific trigger terms",
+      "recommendation": "Add keywords to improve discoverability"
+    }
+  ]
+}
+EOF
+```
+
+**Required fields:** `severity`, `criterion`, `issue`, `recommendation` (NOT "phase"!)
+
+Then invoke CLI to merge:
+
+```bash
+npm run -w @chariot/auditing-skills audit -- ${SKILL_NAME} --merge-semantic /tmp/semantic-findings.json
 ```
 
 **See:** [Semantic Review Output](references/semantic-review-output.md) for JSON format, severity levels, and output contract.
@@ -312,7 +327,7 @@ See [Common Failure Patterns](references/common-failure-patterns.md) for detaile
 - Broken references (Phase 4)
 - Phantom skill references (Phase 10)
 - TypeScript compilation errors (Phase 8)
-- Missing REPO_ROOT pattern (Phase 11)
+- Missing repository root pattern (Phase 11)
 
 ---
 

@@ -15,7 +15,8 @@ import { callMCPTool } from '../config/lib/mcp-client.js';
 const InputSchema = z.object({
   prefix_filter: z.string().default(''),
   offset: z.string().optional(),
-  pages: z.number().int().min(1).max(100000).default(100000)
+  pages: z.number().int().min(1).max(100).default(1),  // Default to 1 page (~100 jobs)
+  limit: z.number().int().min(1).max(1000).default(100)  // Max results to return
 });
 
 // ============================================================================
@@ -53,12 +54,13 @@ export const jobsList = {
 
   async execute(input: z.infer<typeof InputSchema>): Promise<z.infer<typeof FilteredOutputSchema>> {
     const validated = InputSchema.parse(input);
-    // Remove null values before sending to MCP (MCP expects string or omitted, not null)
+    // Remove limit (wrapper-only param) and null values before sending to MCP
+    const { limit, ...mcpParams } = validated;
     const cleanedInput = Object.fromEntries(
-      Object.entries(validated).filter(([_, v]) => v !== null)
+      Object.entries(mcpParams).filter(([_, v]) => v !== null)
     );
     const rawResult = await callMCPTool('praetorian-cli', 'jobs_list', cleanedInput);
-    const filtered = filterJobsResult(rawResult);
+    const filtered = filterJobsResult(rawResult, limit);
     return FilteredOutputSchema.parse(filtered);
   }
 };
@@ -67,7 +69,7 @@ export const jobsList = {
 // Filtering Logic
 // ============================================================================
 
-function filterJobsResult(rawResult: any): any {
+function filterJobsResult(rawResult: any, limit: number = 100): any {
   // MCP may return array directly OR as [array, offset] tuple
   const jobs = Array.isArray(rawResult[0]) ? rawResult[0] : rawResult;
   const nextOffset = Array.isArray(rawResult[0]) ? rawResult[1] : null;
@@ -84,7 +86,7 @@ function filterJobsResult(rawResult: any): any {
     });
   });
 
-  const filteredJobs = jobs.slice(0, 20).map((job: any) => ({
+  const filteredJobs = jobs.slice(0, limit).map((job: any) => ({
     key: job.key,
     status: job.status,
     dns: job.dns,
@@ -97,7 +99,7 @@ function filterJobsResult(rawResult: any): any {
     summary: {
       total_count: jobs.length,
       returned_count: filteredJobs.length,
-      has_more: jobs.length > 20,
+      has_more: jobs.length > limit,
       status_counts: statusCounts,
       capability_counts: capabilityCounts
     },

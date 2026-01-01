@@ -46,115 +46,115 @@ rm -rf ~/.mcp-auth/mcp-remote-*/*linear*
 ### create-bug
 
 - **Purpose:** MCP wrapper for create-bug
-- **Import:** `import { createBug } from './.claude/tools/linear/create-bug.ts'`
+- **Import:** `import { createBug } from '$ROOT/.claude/tools/linear/create-bug.ts'`
 - **Token cost:** ~unknown tokens
 
 ### create-comment
 
 - **Purpose:** MCP wrapper for create-comment
-- **Import:** `import { createComment } from './.claude/tools/linear/create-comment.ts'`
+- **Import:** `import { createComment } from '$ROOT/.claude/tools/linear/create-comment.ts'`
 - **Token cost:** ~unknown tokens
 
 ### create-issue
 
 - **Purpose:** MCP wrapper for create-issue
-- **Import:** `import { createIssue } from './.claude/tools/linear/create-issue.ts'`
+- **Import:** `import { createIssue } from '$ROOT/.claude/tools/linear/create-issue.ts'`
 - **Token cost:** ~unknown tokens
 
 ### create-jira-bug
 
 - **Purpose:** MCP wrapper for create-jira-bug
-- **Import:** `import { createJiraBug } from './.claude/tools/linear/create-jira-bug.ts'`
+- **Import:** `import { createJiraBug } from '$ROOT/.claude/tools/linear/create-jira-bug.ts'`
 - **Token cost:** ~unknown tokens
 
 ### create-project
 
 - **Purpose:** MCP wrapper for create-project
-- **Import:** `import { createProject } from './.claude/tools/linear/create-project.ts'`
+- **Import:** `import { createProject } from '$ROOT/.claude/tools/linear/create-project.ts'`
 - **Token cost:** ~unknown tokens
 
 ### find-issue
 
 - **Purpose:** MCP wrapper for find-issue
-- **Import:** `import { findIssue } from './.claude/tools/linear/find-issue.ts'`
+- **Import:** `import { findIssue } from '$ROOT/.claude/tools/linear/find-issue.ts'`
 - **Token cost:** ~unknown tokens
 
 ### find-user
 
 - **Purpose:** MCP wrapper for find-user
-- **Import:** `import { findUser } from './.claude/tools/linear/find-user.ts'`
+- **Import:** `import { findUser } from '$ROOT/.claude/tools/linear/find-user.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-issue
 
 - **Purpose:** MCP wrapper for get-issue
-- **Import:** `import { getIssue } from './.claude/tools/linear/get-issue.ts'`
+- **Import:** `import { getIssue } from '$ROOT/.claude/tools/linear/get-issue.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-project
 
 - **Purpose:** MCP wrapper for get-project
-- **Import:** `import { getProject } from './.claude/tools/linear/get-project.ts'`
+- **Import:** `import { getProject } from '$ROOT/.claude/tools/linear/get-project.ts'`
 - **Token cost:** ~unknown tokens
 
 ### get-team
 
 - **Purpose:** MCP wrapper for get-team
-- **Import:** `import { getTeam } from './.claude/tools/linear/get-team.ts'`
+- **Import:** `import { getTeam } from '$ROOT/.claude/tools/linear/get-team.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-comments
 
 - **Purpose:** MCP wrapper for list-comments
-- **Import:** `import { listComments } from './.claude/tools/linear/list-comments.ts'`
+- **Import:** `import { listComments } from '$ROOT/.claude/tools/linear/list-comments.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-cycles
 
 - **Purpose:** MCP wrapper for list-cycles
-- **Import:** `import { listCycles } from './.claude/tools/linear/list-cycles.ts'`
+- **Import:** `import { listCycles } from '$ROOT/.claude/tools/linear/list-cycles.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-issues
 
 - **Purpose:** MCP wrapper for list-issues
-- **Import:** `import { listIssues } from './.claude/tools/linear/list-issues.ts'`
+- **Import:** `import { listIssues } from '$ROOT/.claude/tools/linear/list-issues.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-projects
 
 - **Purpose:** MCP wrapper for list-projects
-- **Import:** `import { listProjects } from './.claude/tools/linear/list-projects.ts'`
+- **Import:** `import { listProjects } from '$ROOT/.claude/tools/linear/list-projects.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-teams
 
 - **Purpose:** MCP wrapper for list-teams
-- **Import:** `import { listTeams } from './.claude/tools/linear/list-teams.ts'`
+- **Import:** `import { listTeams } from '$ROOT/.claude/tools/linear/list-teams.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-users
 
 - **Purpose:** MCP wrapper for list-users
-- **Import:** `import { listUsers } from './.claude/tools/linear/list-users.ts'`
+- **Import:** `import { listUsers } from '$ROOT/.claude/tools/linear/list-users.ts'`
 - **Token cost:** ~unknown tokens
 
 ### update-cycle
 
 - **Purpose:** MCP wrapper for update-cycle
-- **Import:** `import { updateCycle } from './.claude/tools/linear/update-cycle.ts'`
+- **Import:** `import { updateCycle } from '$ROOT/.claude/tools/linear/update-cycle.ts'`
 - **Token cost:** ~unknown tokens
 
 ### update-issue
 
 - **Purpose:** MCP wrapper for update-issue
-- **Import:** `import { updateIssue } from './.claude/tools/linear/update-issue.ts'`
+- **Import:** `import { updateIssue } from '$ROOT/.claude/tools/linear/update-issue.ts'`
 - **Token cost:** ~unknown tokens
 
 ### update-project
 
 - **Purpose:** MCP wrapper for update-project
-- **Import:** `import { updateProject } from './.claude/tools/linear/update-project.ts'`
+- **Import:** `import { updateProject } from '$ROOT/.claude/tools/linear/update-project.ts'`
 - **Token cost:** ~unknown tokens
 
 ## Common Operations with Parameters
@@ -162,8 +162,8 @@ rm -rf ~/.mcp-auth/mcp-remote-*/*linear*
 ### Create Issue
 
 ```bash
-npx tsx -e "(async () => {
-  const { createIssue } = await import('./.claude/tools/linear/create-issue.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { createIssue } = await import('$ROOT/.claude/tools/linear/create-issue.ts');
   const result = await createIssue.execute({
     title: 'Issue title here',
     description: 'Optional description in Markdown',
@@ -186,8 +186,8 @@ npx tsx -e "(async () => {
 ### Get Issue
 
 ```bash
-npx tsx -e "(async () => {
-  const { getIssue } = await import('./.claude/tools/linear/get-issue.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getIssue } = await import('$ROOT/.claude/tools/linear/get-issue.ts');
   const result = await getIssue.execute({
     id: 'CHARIOT-1234'  // Issue identifier
   });
@@ -198,8 +198,8 @@ npx tsx -e "(async () => {
 ### List Issues
 
 ```bash
-npx tsx -e "(async () => {
-  const { listIssues } = await import('./.claude/tools/linear/list-issues.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { listIssues } = await import('$ROOT/.claude/tools/linear/list-issues.ts');
   const result = await listIssues.execute({
     limit: 20  // Optional, defaults to 20
   });
@@ -207,20 +207,42 @@ npx tsx -e "(async () => {
 })();" 2>/dev/null
 ```
 
+### List Projects
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { listProjects } = await import('$ROOT/.claude/tools/linear/list-projects.ts');
+  const result = await listProjects.execute({});
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+**Returns:** Projects array with id, name, description, lead, status fields.
+
 ### Update Issue
 
 ```bash
-npx tsx -e "(async () => {
-  const { updateIssue } = await import('./.claude/tools/linear/update-issue.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { updateIssue } = await import('$ROOT/.claude/tools/linear/update-issue.ts');
   const result = await updateIssue.execute({
     id: 'CHARIOT-1234',
     title: 'Updated title',  // Optional
     state: 'In Progress',    // Optional
-    priority: 1              // Optional
+    priority: 1,             // Optional
+    project: 'Agentic Development'  // Optional - Project name or ID
   });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
 ```
+
+**Key parameters:**
+
+- `id` (required) - Issue identifier (e.g., CHARIOT-1234)
+- `title` (optional) - Updated title
+- `state` (optional) - State name or ID
+- `priority` (optional) - 0=No priority, 1=Urgent, 2=High, 3=Normal, 4=Low
+- `assignee` (optional) - User ID, name, email, or "me"
+- `project` (optional) - Project name or ID
 
 ## Quick Reference
 
@@ -230,8 +252,9 @@ See mcp-tools-registry for complete Bash + tsx execution patterns.
 
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
-npx tsx -e "(async () => {
-  const { toolName } = await import('./.claude/tools/linear/tool-name.ts');
+# ROOT pattern works from any directory including submodules
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { toolName } = await import('$ROOT/.claude/tools/linear/tool-name.ts');
   const result = await toolName.execute({ /* params */ });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null

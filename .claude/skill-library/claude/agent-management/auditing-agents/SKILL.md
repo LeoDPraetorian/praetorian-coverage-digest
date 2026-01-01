@@ -43,9 +43,7 @@ allowed-tools: Bash, Read, TodoWrite, AskUserQuestion
 **Step 0: Navigate to repo root** (mandatory)
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **Step 1: Run Phase 0 CLI**

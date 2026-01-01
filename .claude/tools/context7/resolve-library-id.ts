@@ -52,7 +52,16 @@ const InputSchema = z.object({
     .refine(validateNoControlChars, {
       message: 'Control characters not allowed'
     })
-    .describe('Library name to search for (alphanumeric, @, -, _, . only)')
+    .describe('Name of the library to search for (e.g., "react", "lodash")'),
+  query: z.string()
+    .min(1, 'Query is required')
+    .max(500, 'Query too long (max 500 characters)')
+    .refine(validateNoControlChars, {
+      message: 'Control characters not allowed'
+    })
+    .optional()
+    .default('documentation')
+    .describe('User question/task for ranking results by relevance')
 });
 
 // ============================================================================

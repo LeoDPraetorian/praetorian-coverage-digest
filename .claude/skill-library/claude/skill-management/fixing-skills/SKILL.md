@@ -61,9 +61,7 @@ Fixes restore compliance with the [Skill Compliance Contract](../../../../skills
 **Execute BEFORE any fix operation:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **See:** [Repository Root Navigation](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
@@ -77,9 +75,7 @@ cd "$REPO_ROOT"
 ## Step 1: Run Audit
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && npm run audit -- {skill-name}
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run audit -- {skill-name}
 ```
 
 **Capture output for issue categorization.**

@@ -1,0 +1,41 @@
+# Changelog - researching-context7
+
+## 2025-12-30 - Initial Creation
+
+**Type**: Library skill (process/research methodology)
+**Category**: claude/skill-management
+**Location**: .claude/skill-library/claude/skill-management/researching-context7
+
+**RED Phase Documentation**:
+
+**Gap**: When creating skills for npm libraries/frameworks (TanStack Query, Zustand, Zod, etc.), Claude agents either:
+1. Hallucinate outdated API patterns from stale training data (12-18 months old)
+2. Use web search which returns scattered, inconsistent documentation
+3. Skip research entirely ("I already know this") and create skills with deprecated patterns
+
+**Failure Scenario**: Agent asked to create a skill for TanStack Query v5 without Context7:
+- Uses v4 API patterns from training data (queryCache.setQueryData instead of queryClient.setQueryData)
+- Misses breaking changes in v5 (removed QueryCache export, changed hook signatures)
+- Creates skill with outdated patterns that fail when users try them
+- No version awareness or migration guidance
+
+**Need**: Structured workflow for fetching official, indexed, versioned documentation from Context7 MCP service with quality indicators (✅ Recommended, ⚠️ Caution, ❌ Deprecated) to ensure authoritative, current API patterns.
+
+**Features**:
+- 6-phase workflow: Library Identification → Search → Confirmation → Fetch → Analysis → Synthesis
+- Quality indicator system for package selection (main vs -core/-internal variants)
+- Conditional user confirmation for multiple/ambiguous packages
+- Structured synthesis output format for skill creation
+- Fallback strategy when Context7 unavailable
+- Integration with MCP wrappers (.claude/tools/context7/)
+
+**Structure**:
+- SKILL.md: 369 lines (✅ under 500-line limit)
+- Progressive disclosure with 4 reference files planned
+- Related to: researching-skills (orchestrator), researching-protocols, researching-arxiv (siblings)
+
+**Next Steps**:
+- Create reference files (context7-tools.md, quality-indicators.md, troubleshooting.md, documentation-analysis.md)
+- Research population using researching-skills workflow
+- GREEN phase: Test with TanStack Query v5 skill creation scenario
+- REFACTOR phase: Pressure test with subagents

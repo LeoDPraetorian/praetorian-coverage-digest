@@ -39,7 +39,7 @@ export const takeSnapshot = {
     // Call chrome-devtools MCP server via SHARED client
     const snapshot = await callMCPTool(
       'chrome-devtools',                      // MCP name
-      'mcp__chrome-devtools__take_snapshot', // Actual MCP tool name
+      'take_snapshot', // Actual MCP tool name
       validated                               // Pass params directly
     );
 

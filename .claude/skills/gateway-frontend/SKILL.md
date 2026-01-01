@@ -183,13 +183,6 @@ Form testing patterns - validation testing, user interaction simulation, error s
 
 TanStack Query testing and debugging - cache state investigation, invalidation patterns, optimistic update testing. **Required for integration testers working with server state.**
 
-**13. Creating Mocks (via gateway-testing)**
-
-For MSW handlers and API mocking patterns, invoke `gateway-testing` and read:
-`.claude/skill-library/testing/creating-mocks/SKILL.md`
-
-Mock service worker setup, request handlers, response factories. **Required for integration testers mocking API boundaries.**
-
 ---
 
 ### Workflow

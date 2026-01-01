@@ -256,8 +256,8 @@ dist/
 
 ```bash
 # MANDATORY pattern for ALL commands
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude/skills/skill-name/scripts" && npm run dev
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude/skills/skill-name/scripts" && npm run dev
 ```
 
 **Why this works:**
@@ -275,8 +275,8 @@ cd "$REPO_ROOT/.claude/skills/skill-name/scripts" && npm run dev
 
 ```bash
 # From ANY directory - single install for everything
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && npm install
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude" && npm install
 
 # This installs ALL dependencies for:
 # - MCP tool wrappers (tools/*)
@@ -288,31 +288,31 @@ cd "$REPO_ROOT/.claude" && npm install
 
 ```bash
 # Run from ANY directory - uses repo-root detection
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude/skills/claude-skill-search/scripts" && npm run dev -- search "query"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude/skills/claude-skill-search/scripts" && npm run dev -- search "query"
 
 # Or use workspace command (also from any directory)
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && npm run dev --workspace @chariot/auditing-skills -- search "query"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude" && npm run dev --workspace @chariot/auditing-skills -- search "query"
 ```
 
 ### Running Tests
 
 ```bash
 # From ANY directory - runs ALL tests (tools + skills)
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && npm test
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude" && npm test
 
 # Run specific test file
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && npm test -- skills/*/scripts/**/*.test.ts
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude" && npm test -- skills/*/scripts/**/*.test.ts
 ```
 
 ### Building All TypeScript Skills
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && npm run build:skills  # Builds all skill workspace packages
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude" && npm run build:skills  # Builds all skill workspace packages
 ```
 
 ## Dependency Management
@@ -320,8 +320,8 @@ cd "$REPO_ROOT/.claude" && npm run build:skills  # Builds all skill workspace pa
 ### Adding Dependencies to Specific Skill
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && npm install commander --workspace @chariot/skill-name
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude" && npm install commander --workspace @chariot/skill-name
 ```
 
 Dependency gets hoisted to root if version matches other skills.
@@ -422,8 +422,8 @@ skill-name/
 **Commands:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude/skills/skill-name"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude/skills/skill-name"
 mkdir -p scripts
 mv package.json package-lock.json tsconfig.json src scripts/
 rm -rf node_modules dist
@@ -435,7 +435,7 @@ dist/
 EOF
 
 # Update workspace
-cd "$REPO_ROOT/.claude" && npm install
+cd "$ROOT/.claude" && npm install
 ```
 
 ## File Organization Rules
@@ -495,7 +495,7 @@ skill-name/
 
 ```bash
 # The ! prefix tells Claude Code to execute this command
-!REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel) && cd "$REPO_ROOT/.claude/skills/skill-name/scripts" && npm run command -- "args"
+!ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude/skills/skill-name/scripts" && npm run command -- "args"
 ```
 
 ### Pattern 2: Mixed Bash + TypeScript
@@ -534,8 +534,8 @@ No package.json needed - just executable scripts.
 **Solution:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && rm -rf node_modules skills/*/scripts/node_modules && npm install
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude" && rm -rf node_modules skills/*/scripts/node_modules && npm install
 ```
 
 ### Issue: "npm ERR! workspace not found"
@@ -555,8 +555,8 @@ cd "$REPO_ROOT/.claude" && rm -rf node_modules skills/*/scripts/node_modules && 
 npm workspaces handle this - install specific version in that skill:
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude" && npm install typescript@5.0.0 --workspace @chariot/skill-name
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude" && npm install typescript@5.0.0 --workspace @chariot/skill-name
 ```
 
 ## Best Practices
@@ -597,7 +597,7 @@ function findRepoRoot(): string {
   try {
     // MANDATORY: Handle submodules with --show-superproject-working-tree
     const gitRoot = execSync(
-      "git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel",
+      "git rev-parse --show-superproject-working-tree --show-toplevel | head -1",
       { encoding: "utf-8", stdio: ["pipe", "pipe", "ignore"] }
     ).trim();
     if (gitRoot) return gitRoot;
@@ -680,7 +680,7 @@ function findProjectRoot(): string {
   try {
     // For submodules: get super-repo root, else get repo root
     const gitRoot = execSync(
-      "git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel",
+      "git rev-parse --show-superproject-working-tree --show-toplevel | head -1",
       { encoding: "utf-8", stdio: ["pipe", "pipe", "ignore"] }
     ).trim();
     if (gitRoot) return gitRoot;
@@ -726,19 +726,19 @@ const AGENTS_DIR = join(PROJECT_ROOT, ".claude/agents");
 
 ```bash
 # MANDATORY: Always use repo-root detection
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
 
 # Setup workspace (first time)
-cd "$REPO_ROOT/.claude" && npm install
+cd "$ROOT/.claude" && npm install
 
 # Run any TypeScript skill
-cd "$REPO_ROOT/.claude/skills/skill-name/scripts" && npm run dev -- "args"
+cd "$ROOT/.claude/skills/skill-name/scripts" && npm run dev -- "args"
 
 # Run all tests (tools + skills)
-cd "$REPO_ROOT/.claude" && npm test
+cd "$ROOT/.claude" && npm test
 
 # Build all TypeScript skills
-cd "$REPO_ROOT/.claude" && npm run build:skills
+cd "$ROOT/.claude" && npm run build:skills
 ```
 
 Follow this pattern for all TypeScript-based skills.

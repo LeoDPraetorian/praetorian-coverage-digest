@@ -38,7 +38,7 @@ export const resizePage = {
     // Call chrome-devtools MCP server via SHARED client
     await callMCPTool(
       'chrome-devtools',                    // MCP name
-      'mcp__chrome-devtools__resize_page', // Actual MCP tool name
+      'resize_page', // Actual MCP tool name
       validated                             // Pass params directly
     );
 

@@ -38,7 +38,7 @@ export const performanceStartTrace = {
     // Call chrome-devtools MCP server via SHARED client
     await callMCPTool(
       'chrome-devtools',                                 // MCP name
-      'mcp__chrome-devtools__performance_start_trace',  // Actual MCP tool name
+      'performance_start_trace',  // Actual MCP tool name
       validated                                          // Pass params directly
     );
 

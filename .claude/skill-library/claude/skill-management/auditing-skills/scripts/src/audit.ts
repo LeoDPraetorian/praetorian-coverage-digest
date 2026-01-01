@@ -221,7 +221,7 @@ program
         let totalSkills = 0;
 
         for (const dir of skillDirs) {
-          console.log(chalk.blue(`\n📁 Auditing directory: ${dir.replace(PROJECT_ROOT, '$REPO_ROOT')}\n`));
+          console.log(chalk.blue(`\n📁 Auditing directory: ${dir.replace(PROJECT_ROOT, '$ROOT')}\n`));
           const auditor = new SkillAuditor(dir);
           const result = await auditor.runFull();
 

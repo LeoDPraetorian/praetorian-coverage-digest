@@ -65,9 +65,9 @@ The creating-skills skill guides you through an **interactive workflow** using A
 ### Step 4: Audit and Compliance
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-REPO_ROOT="${REPO_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$REPO_ROOT/.claude" && npm run audit -- {skill-name}
+ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
+cd "$ROOT/.claude" && npm run audit -- {skill-name}
 ```
 
 Ensure the skill passes all 21 structural phases.

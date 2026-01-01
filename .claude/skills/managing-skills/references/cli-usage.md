@@ -11,10 +11,10 @@ This document provides detailed instructions for executing skill management CLI 
 **Recommended:** Use workspace shortcuts from `.claude/` root (from anywhere in the repo):
 
 ```bash
-# Setup REPO_ROOT (uses backticks for Claude Code compatibility)
-REPO_ROOT=`git rev-parse --show-superproject-working-tree 2>/dev/null`
-test -z "$REPO_ROOT" && REPO_ROOT=`git rev-parse --show-toplevel`
-cd "$REPO_ROOT/.claude"
+# Setup ROOT (uses backticks for Claude Code compatibility)
+ROOT=`git rev-parse --show-superproject-working-tree 2>/dev/null`
+test -z "$ROOT" && ROOT=`git rev-parse --show-toplevel`
+cd "$ROOT/.claude"
 ```
 
 > **Prerequisites:** Run `npm install` in `.claude/` first to link workspace packages.
@@ -127,7 +127,7 @@ Scripts live in the library skill that owns the functionality:
 **Solution:** Run `npm install` in `.claude/` directory first:
 
 ```bash
-cd "$REPO_ROOT/.claude"
+cd "$ROOT/.claude"
 npm install
 ```
 
@@ -149,10 +149,10 @@ npm run audit -- managing-skills.md
 
 **Problem:** Not in `.claude/` directory
 
-**Solution:** Always navigate to `.claude/` first using the REPO_ROOT pattern:
+**Solution:** Always navigate to `.claude/` first using the ROOT pattern:
 
 ```bash
-REPO_ROOT=`git rev-parse --show-superproject-working-tree 2>/dev/null`
-test -z "$REPO_ROOT" && REPO_ROOT=`git rev-parse --show-toplevel`
-cd "$REPO_ROOT/.claude"
+ROOT=`git rev-parse --show-superproject-working-tree 2>/dev/null`
+test -z "$ROOT" && ROOT=`git rev-parse --show-toplevel`
+cd "$ROOT/.claude"
 ```

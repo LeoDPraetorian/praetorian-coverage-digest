@@ -988,7 +988,7 @@ ${data.criticalCount === 0 ? chalk.green('✅ No critical issues!') : chalk.red(
       8: "Fix TypeScript compilation errors",
       9: "Migrate bash code to TypeScript",
       10: "Fix phantom skill references",
-      11: "Replace cd commands with REPO_ROOT pattern",
+      11: "Replace cd commands with ROOT pattern",
       12: "Improve CLI error handling",
       13: "Add TodoWrite mandate for multi-step workflows",
       14: "Fix table/code block/header formatting",

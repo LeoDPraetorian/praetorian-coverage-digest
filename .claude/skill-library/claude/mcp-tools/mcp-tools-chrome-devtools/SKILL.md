@@ -69,7 +69,7 @@ Error: Failed to fetch browser webSocket URL from http://localhost:9222/json/ver
 ### click
 
 - **Purpose:** Wrapper for chrome-devtools click tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { click } from './.claude/tools/chrome-devtools/click.ts'`
+- **Import:** `import { click } from '$ROOT/.claude/tools/chrome-devtools/click.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -83,13 +83,13 @@ interface ClickInput {
 ### close-page
 
 - **Purpose:** Wrapper for chrome-devtools close_page tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { closePage } from './.claude/tools/chrome-devtools/close-page.ts'`
+- **Import:** `import { closePage } from '$ROOT/.claude/tools/chrome-devtools/close-page.ts'`
 - **Token cost:** ~unknown tokens
 
 ### drag
 
 - **Purpose:** Wrapper for chrome-devtools drag tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { drag } from './.claude/tools/chrome-devtools/drag.ts'`
+- **Import:** `import { drag } from '$ROOT/.claude/tools/chrome-devtools/drag.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -103,7 +103,7 @@ interface DragInput {
 ### emulate
 
 - **Purpose:** Wrapper for chrome-devtools emulate tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { emulate } from './.claude/tools/chrome-devtools/emulate.ts'`
+- **Import:** `import { emulate } from '$ROOT/.claude/tools/chrome-devtools/emulate.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -117,7 +117,7 @@ interface EmulateInput {
 ### evaluate-script
 
 - **Purpose:** Wrapper for chrome-devtools evaluate_script tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { evaluateScript } from './.claude/tools/chrome-devtools/evaluate-script.ts'`
+- **Import:** `import { evaluateScript } from '$ROOT/.claude/tools/chrome-devtools/evaluate-script.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -139,7 +139,7 @@ interface EvaluateScriptOutput {
 ### fill-form
 
 - **Purpose:** Wrapper for chrome-devtools fill_form tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { fillForm } from './.claude/tools/chrome-devtools/fill-form.ts'`
+- **Import:** `import { fillForm } from '$ROOT/.claude/tools/chrome-devtools/fill-form.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -155,7 +155,7 @@ interface FillFormInput {
 ### fill
 
 - **Purpose:** Wrapper for chrome-devtools fill tool
-- **Import:** `import { fill } from './.claude/tools/chrome-devtools/fill.ts'`
+- **Import:** `import { fill } from '$ROOT/.claude/tools/chrome-devtools/fill.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -169,7 +169,7 @@ interface FillInput {
 ### get-console-message
 
 - **Purpose:** Wrapper for chrome-devtools get_console_message tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { getConsoleMessage } from './.claude/tools/chrome-devtools/get-console-message.ts'`
+- **Import:** `import { getConsoleMessage } from '$ROOT/.claude/tools/chrome-devtools/get-console-message.ts'`
 - **Token cost:** ~unknown tokens
 
 **Returns:**
@@ -183,7 +183,7 @@ interface GetConsoleMessageOutput {
 ### get-network-request
 
 - **Purpose:** Wrapper for chrome-devtools get_network_request tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { getNetworkRequest } from './.claude/tools/chrome-devtools/get-network-request.ts'`
+- **Import:** `import { getNetworkRequest } from '$ROOT/.claude/tools/chrome-devtools/get-network-request.ts'`
 - **Token cost:** ~unknown tokens
 
 **Returns:**
@@ -197,7 +197,7 @@ interface GetNetworkRequestOutput {
 ### handle-dialog
 
 - **Purpose:** Wrapper for chrome-devtools handle_dialog tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { handleDialog } from './.claude/tools/chrome-devtools/handle-dialog.ts'`
+- **Import:** `import { handleDialog } from '$ROOT/.claude/tools/chrome-devtools/handle-dialog.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -211,13 +211,13 @@ interface HandleDialogInput {
 ### hover
 
 - **Purpose:** Wrapper for chrome-devtools hover tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { hover } from './.claude/tools/chrome-devtools/hover.ts'`
+- **Import:** `import { hover } from '$ROOT/.claude/tools/chrome-devtools/hover.ts'`
 - **Token cost:** ~unknown tokens
 
 ### list-console-messages
 
 - **Purpose:** Wrapper for chrome-devtools list_console_messages tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { listConsoleMessages } from './.claude/tools/chrome-devtools/list-console-messages.ts'`
+- **Import:** `import { listConsoleMessages } from '$ROOT/.claude/tools/chrome-devtools/list-console-messages.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -241,7 +241,7 @@ interface ListConsoleMessagesOutput {
 ### list-network-requests
 
 - **Purpose:** Wrapper for chrome-devtools list_network_requests tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { listNetworkRequests } from './.claude/tools/chrome-devtools/list-network-requests.ts'`
+- **Import:** `import { listNetworkRequests } from '$ROOT/.claude/tools/chrome-devtools/list-network-requests.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -265,7 +265,7 @@ interface ListNetworkRequestsOutput {
 ### list-pages
 
 - **Purpose:** Wrapper for chrome-devtools list_pages tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { listPages } from './.claude/tools/chrome-devtools/list-pages.ts'`
+- **Import:** `import { listPages } from '$ROOT/.claude/tools/chrome-devtools/list-pages.ts'`
 - **Token cost:** ~unknown tokens
 
 **Returns:**
@@ -279,7 +279,7 @@ interface ListPagesOutput {
 ### navigate-page
 
 - **Purpose:** Wrapper for chrome-devtools navigate_page tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { navigatePage } from './.claude/tools/chrome-devtools/navigate-page.ts'`
+- **Import:** `import { navigatePage } from '$ROOT/.claude/tools/chrome-devtools/navigate-page.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -295,7 +295,7 @@ interface NavigatePageInput {
 ### new-page
 
 - **Purpose:** Wrapper for chrome-devtools new_page tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { newPage } from './.claude/tools/chrome-devtools/new-page.ts'`
+- **Import:** `import { newPage } from '$ROOT/.claude/tools/chrome-devtools/new-page.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -309,7 +309,7 @@ interface NewPageInput {
 ### performance-analyze-insight
 
 - **Purpose:** Wrapper for chrome-devtools performance_analyze_insight tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { performanceAnalyzeInsight } from './.claude/tools/chrome-devtools/performance-analyze-insight.ts'`
+- **Import:** `import { performanceAnalyzeInsight } from '$ROOT/.claude/tools/chrome-devtools/performance-analyze-insight.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -332,7 +332,7 @@ interface PerformanceAnalyzeInsightOutput {
 ### performance-start-trace
 
 - **Purpose:** Wrapper for chrome-devtools performance_start_trace tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { performanceStartTrace } from './.claude/tools/chrome-devtools/performance-start-trace.ts'`
+- **Import:** `import { performanceStartTrace } from '$ROOT/.claude/tools/chrome-devtools/performance-start-trace.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -346,7 +346,7 @@ interface PerformanceStartTraceInput {
 ### performance-stop-trace
 
 - **Purpose:** Wrapper for chrome-devtools performance_stop_trace tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { performanceStopTrace } from './.claude/tools/chrome-devtools/performance-stop-trace.ts'`
+- **Import:** `import { performanceStopTrace } from '$ROOT/.claude/tools/chrome-devtools/performance-stop-trace.ts'`
 - **Token cost:** ~unknown tokens
 
 **Returns:**
@@ -360,7 +360,7 @@ interface PerformanceStopTraceOutput {
 ### press-key
 
 - **Purpose:** Wrapper for chrome-devtools press_key tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { pressKey } from './.claude/tools/chrome-devtools/press-key.ts'`
+- **Import:** `import { pressKey } from '$ROOT/.claude/tools/chrome-devtools/press-key.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -374,7 +374,7 @@ interface PressKeyInput {
 ### resize-page
 
 - **Purpose:** Wrapper for chrome-devtools resize_page tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { resizePage } from './.claude/tools/chrome-devtools/resize-page.ts'`
+- **Import:** `import { resizePage } from '$ROOT/.claude/tools/chrome-devtools/resize-page.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -388,13 +388,13 @@ interface ResizePageInput {
 ### select-page
 
 - **Purpose:** Wrapper for chrome-devtools select_page tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { selectPage } from './.claude/tools/chrome-devtools/select-page.ts'`
+- **Import:** `import { selectPage } from '$ROOT/.claude/tools/chrome-devtools/select-page.ts'`
 - **Token cost:** ~unknown tokens
 
 ### take-screenshot
 
 - **Purpose:** Wrapper for chrome-devtools take_screenshot tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { takeScreenshot } from './.claude/tools/chrome-devtools/take-screenshot.ts'`
+- **Import:** `import { takeScreenshot } from '$ROOT/.claude/tools/chrome-devtools/take-screenshot.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -419,7 +419,7 @@ interface TakeScreenshotOutput {
 ### take-snapshot
 
 - **Purpose:** Wrapper for chrome-devtools take_snapshot tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { takeSnapshot } from './.claude/tools/chrome-devtools/take-snapshot.ts'`
+- **Import:** `import { takeSnapshot } from '$ROOT/.claude/tools/chrome-devtools/take-snapshot.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -441,7 +441,7 @@ interface TakeSnapshotOutput {
 ### upload-file
 
 - **Purpose:** Wrapper for chrome-devtools upload_file tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { uploadFile } from './.claude/tools/chrome-devtools/upload-file.ts'`
+- **Import:** `import { uploadFile } from '$ROOT/.claude/tools/chrome-devtools/upload-file.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -455,7 +455,7 @@ interface UploadFileInput {
 ### wait-for
 
 - **Purpose:** Wrapper for chrome-devtools wait_for tool Uses SHARED MCP client from .claude/tools/config/lib/mcp-client.ts
-- **Import:** `import { waitFor } from './.claude/tools/chrome-devtools/wait-for.ts'`
+- **Import:** `import { waitFor } from '$ROOT/.claude/tools/chrome-devtools/wait-for.ts'`
 - **Token cost:** ~unknown tokens
 
 **Parameters:**
@@ -471,8 +471,8 @@ interface WaitForInput {
 ### List Network Requests
 
 ```bash
-npx tsx -e "(async () => {
-  const { listNetworkRequests } = await import('./.claude/tools/chrome-devtools/list-network-requests.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { listNetworkRequests } = await import('$ROOT/.claude/tools/chrome-devtools/list-network-requests.ts');
   const result = await listNetworkRequests.execute({
     resourceTypes: ['fetch', 'xhr'],  // Optional: filter by type
     pageSize: 30,                      // Optional: default 20
@@ -492,8 +492,8 @@ npx tsx -e "(async () => {
 ### New Page
 
 ```bash
-npx tsx -e "(async () => {
-  const { newPage } = await import('./.claude/tools/chrome-devtools/new-page.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { newPage } = await import('$ROOT/.claude/tools/chrome-devtools/new-page.ts');
   const result = await newPage.execute({
     url: 'https://example.com',  // URL to load in new page
     timeout: 30000               // Optional: wait timeout in ms
@@ -505,8 +505,8 @@ npx tsx -e "(async () => {
 ### Take Screenshot
 
 ```bash
-npx tsx -e "(async () => {
-  const { takeScreenshot } = await import('./.claude/tools/chrome-devtools/take-screenshot.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { takeScreenshot } = await import('$ROOT/.claude/tools/chrome-devtools/take-screenshot.ts');
   const result = await takeScreenshot.execute({
     filePath: '/tmp/screenshot.png',  // Optional: where to save
     format: 'png',                    // Optional: png, jpeg, webp
@@ -520,8 +520,8 @@ npx tsx -e "(async () => {
 ### List Console Messages
 
 ```bash
-npx tsx -e "(async () => {
-  const { listConsoleMessages } = await import('./.claude/tools/chrome-devtools/list-console-messages.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { listConsoleMessages } = await import('$ROOT/.claude/tools/chrome-devtools/list-console-messages.ts');
   const result = await listConsoleMessages.execute({
     pageSize: 50,                     // Optional: default 20
     includePreservedMessages: false   // Optional: include preserved
@@ -533,8 +533,8 @@ npx tsx -e "(async () => {
 ### Navigate Page
 
 ```bash
-npx tsx -e "(async () => {
-  const { navigatePage } = await import('./.claude/tools/chrome-devtools/navigate-page.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { navigatePage } = await import('$ROOT/.claude/tools/chrome-devtools/navigate-page.ts');
   const result = await navigatePage.execute({
     url: 'https://example.com',  // URL to navigate to
     type: 'load',                // Optional: 'load' or 'reload'
@@ -547,8 +547,8 @@ npx tsx -e "(async () => {
 ### Execute JavaScript
 
 ```bash
-npx tsx -e "(async () => {
-  const { evaluateScript } = await import('./.claude/tools/chrome-devtools/evaluate-script.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { evaluateScript } = await import('$ROOT/.claude/tools/chrome-devtools/evaluate-script.ts');
   const result = await evaluateScript.execute({
     function: 'document.querySelector(\"h1\").textContent'
   });
@@ -564,8 +564,8 @@ See mcp-tools-registry for complete Bash + tsx execution patterns.
 
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
-npx tsx -e "(async () => {
-  const { toolName } = await import('./.claude/tools/chrome-devtools/tool-name.ts');
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { toolName } = await import('$ROOT/.claude/tools/chrome-devtools/tool-name.ts');
   const result = await toolName.execute({ /* params */ });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null

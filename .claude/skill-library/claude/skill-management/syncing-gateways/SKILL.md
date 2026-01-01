@@ -1,6 +1,6 @@
 ---
 name: syncing-gateways
-description: Use when library skills are added, renamed, or deleted - synchronizes gateway routing tables with library skills using automated CLI tools
+description: Use when library skills are added, renamed, or deleted - synchronizes gateway routing tables with library skills, detects orphaned skills and broken paths using automated CLI tools
 allowed-tools: Glob, Read, Edit, Bash, TodoWrite
 ---
 
@@ -66,9 +66,7 @@ Each gateway contains:
 **Execute BEFORE any sync operation:**
 
 ```bash
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
 **See:** [Repository Root Navigation](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
@@ -105,9 +103,7 @@ cd "$REPO_ROOT"
 
 ```bash
 # Navigate to repository root
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude"
 
 # Preview changes without applying
 npm run -w @chariot/auditing-skills gateway -- sync --dry-run
@@ -144,9 +140,7 @@ Gateway: gateway-backend
 
 ```bash
 # Navigate to repository root
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude"
 
 # Apply changes
 npm run -w @chariot/auditing-skills gateway -- sync
@@ -180,9 +174,7 @@ npm run -w @chariot/auditing-skills gateway -- sync
 
 ```bash
 # Navigate to repository root
-REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT/.claude"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude"
 
 # Validate specific gateway
 npm run -w @chariot/auditing-skills gateway -- validate --gateway gateway-frontend

@@ -1,0 +1,99 @@
+# Changelog: researching-arxiv
+
+## [Initial Creation] - 2025-12-30
+
+**TDD Phase: RED**
+
+### Gap Documented
+
+When creating skills that need academic backing (e.g., LLM fingerprinting, security research, AI agents), there was no documented workflow for searching arxiv.org academic papers. This created:
+
+1. Skills lacking academic grounding and peer-reviewed foundations
+2. Agents using ad-hoc approaches instead of proven techniques
+3. No consistent methodology for formulating academic search queries
+4. No standard output format for research synthesis
+
+**Failure scenario captured:**
+- User: "Create a skill for LLM fingerprinting"
+- Agent: Uses WebSearch for "LLM fingerprinting" → gets blog posts, not peer-reviewed papers
+- Result: Skill built on ad-hoc techniques instead of validated research
+
+### Skill Details
+
+- **Category:** Library skill - claude/skill-management/
+- **Type:** Process/Pattern (research methodology)
+- **Integration:** Sibling to researching-protocols, used by creating-skills Phase 6
+- **Line count:** 448 lines (within 500 line limit)
+
+### Features Created
+
+1. 5-phase workflow: Query Formulation → Search Execution → Paper Analysis → Synthesis → Recommendation
+2. arxiv.org Search API documentation with URL patterns
+3. Academic vs colloquial terminology guide
+4. Structured output format with arxiv ID citations
+5. Common search patterns by topic (LLM Security, AI Agents, RAG, etc.)
+6. Quality indicators for paper selection
+7. Integration with researching-skills workflow
+
+---
+
+## [GREEN Phase Verified] - 2025-12-30
+
+**TDD Phase: GREEN**
+
+### Audit Results
+
+- ✅ Passed audit with 2 warnings (line count: 463, orphan detection: expected)
+- ✅ 3 INFO-level issues (minor formatting)
+- ✅ All structural phases compliant
+- ✅ Progressive disclosure implemented (SKILL.md + 3 reference files)
+
+### Verification
+
+- Created comprehensive references:
+  - query-formulation.md - Academic terminology patterns
+  - paper-analysis.md - Rapid and deep analysis techniques
+  - citation-standards.md - arxiv ID formatting standards
+- Line count: 463 (within 500 limit, room for growth)
+- All required sections present and complete
+
+---
+
+## [REFACTOR Phase Decision] - 2025-12-30
+
+**TDD Phase: REFACTOR - NOT REQUIRED**
+
+### Pressure Testing Assessment
+
+Per `testing-skills-with-subagents` guidance, this skill is categorized as:
+
+**Reference skill (research methodology) - NOT a discipline skill**
+
+**Why pressure testing is not applicable:**
+
+1. **No compliance costs** - Research improves outcomes, agents don't resist
+2. **No shortcuts to rationalize** - Unlike "skip tests to save time"
+3. **No rules to violate** - Provides helpful workflow, not enforcement
+
+**From testing-skills-with-subagents:**
+
+> Don't test:
+> - Pure reference skills (API docs, syntax guides)
+> - Skills without rules to violate
+> - Skills agents have no incentive to bypass
+
+**Skill Type Classification:**
+
+- ❌ Discipline-enforcing (requires pressure testing)
+- ✅ Methodology/Reference (verification via audit sufficient)
+
+**Verification Strategy Used:**
+
+- ✅ Structural audit (22 phases)
+- ✅ Progressive disclosure compliance
+- ✅ Documentation completeness
+- ✅ Integration clarity (with researching-skills)
+
+### Conclusion
+
+Skill is COMPLETE and VERIFIED without pressure testing. This is the appropriate verification strategy for reference/methodology skills.

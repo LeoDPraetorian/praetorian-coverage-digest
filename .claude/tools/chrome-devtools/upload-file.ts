@@ -38,7 +38,7 @@ export const uploadFile = {
     // Call chrome-devtools MCP server via SHARED client
     await callMCPTool(
       'chrome-devtools',                     // MCP name
-      'mcp__chrome-devtools__upload_file',  // Actual MCP tool name
+      'upload_file',  // Actual MCP tool name
       validated                              // Pass params directly
     );
 

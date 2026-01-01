@@ -9,6 +9,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { execSync } from 'child_process';
 import { findRepoRoot, getToolsDir } from '../utils.js';
 import { EXIT_SUCCESS, EXIT_ERROR, EXIT_ISSUES, type CLIOptions } from '../types.js';
 import { extractSchemasFromWrapper, formatSchemaAsInterface } from '../lib/schema-parser.js';
@@ -268,10 +269,34 @@ export async function generateSkill(options: CLIOptions): Promise<number> {
 
   console.log(`\n✅ ${exists ? 'Updated' : 'Generated'}: ${skillPath}`);
   console.log(`   Tools: ${tools.length}`);
+
+  // Sync gateway to add new service skill to gateway-mcp-tools
+  console.log(`\n🔄 Syncing gateway-mcp-tools...`);
+  let gatewaySynced = false;
+  try {
+    const claudeDir = path.join(repoRoot, '.claude');
+    execSync('npm run -w @chariot/auditing-skills gateway -- sync', {
+      cwd: claudeDir,
+      stdio: 'pipe', // Capture output to keep console clean
+    });
+    console.log(`   ✅ Gateway synced - mcp-tools-${service} added to gateway-mcp-tools`);
+    gatewaySynced = true;
+  } catch (error) {
+    console.log(`   ⚠️  Gateway sync failed (run manually if needed):`);
+    console.log(`      cd ${path.join(repoRoot, '.claude')} && npm run -w @chariot/auditing-skills gateway -- sync`);
+  }
+
   console.log(`\n📋 NEXT STEPS:`);
-  console.log(`   1. Review generated skill: ${skillPath}`);
-  console.log(`   2. Commit changes`);
-  console.log(`   3. Agents with this skill can now discover ${service} tools\n`);
+  if (!gatewaySynced) {
+    console.log(`   1. Review generated skill: ${skillPath}`);
+    console.log(`   2. Run gateway sync: cd .claude && npm run -w @chariot/auditing-skills gateway -- sync`);
+    console.log(`   3. Commit changes`);
+    console.log(`   4. Agents with this skill can now discover ${service} tools\n`);
+  } else {
+    console.log(`   1. Review generated skill: ${skillPath}`);
+    console.log(`   2. Commit changes`);
+    console.log(`   3. Agents with this skill can now discover ${service} tools\n`);
+  }
 
   return EXIT_SUCCESS;
 }

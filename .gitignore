@@ -49,3 +49,8 @@ __pycache__/
 
 # Working plans (not for version control)
 docs/plans/
+.claude/tools/config/credentials.json
+
+# Research outputs (keep directory, ignore contents)
+.claude/research/*
+!.claude/research/.gitkeep

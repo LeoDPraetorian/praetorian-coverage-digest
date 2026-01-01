@@ -1,0 +1,64 @@
+# Changelog: researching-github
+
+## 2024-12-30 - Add Prioritization Algorithm
+
+**Update Type:** Feature addition (scoring formula)
+
+**Changes:**
+- Added weighted prioritization algorithm to Phase 3 with research-backed weights:
+  - Popularity (stars): 40%
+  - Maintenance (days since commit): 35%
+  - Forks: 15%
+  - Issue Health (fewer open issues): 10%
+- Created references/prioritization-algorithm.md with:
+  - Full normalization formulas for each component
+  - Worked example (uber-go/ratelimit: score 0.60)
+  - Edge case handling (new repos, archived repos, 0 issues)
+  - Customization guidance for different use cases
+  - Research basis citing npms.io, GitHub trending, Snyk Advisor
+- Updated Phase 6 output format to include scores in repository listings
+- Maintains line count under 500 (currently ~500 after additions)
+
+**Rationale:**
+Research into npms.io (35% maintenance, 35% popularity), GitHub trending (velocity-based), and Snyk Advisor (maintenance = popularity) shows professional ranking systems weight maintenance equal to or higher than popularity. Our weights prioritize stars slightly higher (40%) since GitHub repos lack download metrics.
+
+**Line Count Impact:** +29 lines in SKILL.md (471 → 500), detailed content in references/
+
+---
+
+## 2024-12-30 - Initial Creation
+
+**RED Phase Documentation:**
+
+Gap identified: No systematic GitHub research workflow in the researching-skills router. When asked to find GitHub repositories, code patterns, or issues, Claude would:
+- Use generic WebSearch without detecting gh CLI availability
+- Miss quality assessment framework (stars, license, activity, docs)
+- Skip dual-tool strategy (gh CLI primary, web fallback)
+- Not follow structured 6-phase workflow
+
+**Skill Details:**
+- **Category:** skill-library/claude/skill-management
+- **Type:** Process/Pattern
+- **Location:** Library (sibling to researching-arxiv, researching-codebase, researching-context7, researching-web)
+
+**Key Features:**
+- 6-phase workflow (Environment & Query → Search → Filter → Inspect → Extract → Synthesize)
+- Dual-tool strategy (gh CLI primary with web fallback)
+- Quality indicators (✅ High Quality, ⚠️ Medium, 🔍 Evaluate, ❌ Skip)
+- Durable code references (function signatures, not line numbers)
+- Structured synthesis with citations
+
+**References Created:**
+- references/gh-cli-commands.md - Complete gh CLI reference
+- references/search-filters.md - GitHub search filter syntax
+- references/quality-indicators.md - Repository quality assessment criteria
+- references/output-format.md - Synthesis template
+- references/query-formulation.md - Query patterns
+- references/deep-inspection.md - Phase 4 inspection methodology
+
+**Line Count:** 448 lines (under 500-line limit)
+
+**Next Steps:**
+- Phase 7: Update researching-skills router to include researching-github
+- Phase 8: GREEN verification (test skill works)
+- Phase 9: REFACTOR with pressure testing

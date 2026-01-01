@@ -19,8 +19,8 @@ import type { CLIOptions } from '../types.js';
 import { EXIT_SUCCESS, EXIT_ERROR } from '../types.js';
 import { findRepoRoot, getToolsDir } from '../utils.js';
 
-const REPO_ROOT = findRepoRoot();
-const CLAUDE_DIR = path.join(REPO_ROOT, '.claude');
+const ROOT = findRepoRoot();
+const CLAUDE_DIR = path.join(ROOT, '.claude');
 
 export async function createWrapper(options: CLIOptions): Promise<number> {
   if (!options.service || !options.tool) {

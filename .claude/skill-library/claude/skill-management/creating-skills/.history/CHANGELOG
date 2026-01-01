@@ -1,3 +1,56 @@
+## [Date: 2025-12-31] - Simplify Repository Root Navigation Pattern
+
+### Changed
+- Updated repository root detection pattern from 3-line verbose approach to industry-standard single-line pattern
+- Changed variable name from `REPO_ROOT` to `ROOT` for consistency across all skills
+- Applied to 3 locations: Step 0 (line 42), Phase 8 audit (line 392), Phase 11 audit (line 437)
+
+### Old Pattern (3-4 commands)
+```bash
+REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+```
+
+### New Pattern (2 commands)
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
+```
+
+### Improvements
+- Simpler: 2-3 commands instead of 4-5
+- No stderr redirect needed (`2>/dev/null` removed)
+- No conditional test needed (`test -z` removed)
+- Single git command with both flags, pipe to `head -1` picks first non-empty result
+- Proper quoting prevents bash parsing errors
+- Consistent variable naming (`ROOT` not `REPO_ROOT`)
+- Works reliably from super-repo root and deep submodules
+
+### Removed
+- Comments claiming "backticks for Claude Code compatibility" (lines 394, 442)
+- These comments were based on old `||` fallback that didn't work
+
+### Reason
+- **Issue**: Complex pattern propagates to all newly created skills
+- **Impact**: Parsing errors with Claude Code Bash tool, inconsistent naming
+- **Solution**: Industry-standard git pattern (documented in git-scm.com/docs/git-rev-parse)
+
+### Technical Details
+- Pattern tested from both super-repo root and `modules/chariot/ui/src/`
+- Consistent with: all 6 commands, all 9 MCP tool skills, CLAUDE.md examples
+- Line count unchanged (467 lines, well under 500 limit)
+
+### Files Changed
+- `SKILL.md` - Lines 42-44 (Step 0 navigation)
+- `SKILL.md` - Lines 392-397 (Phase 8 audit, comment removed)
+- `SKILL.md` - Lines 437-445 (Phase 11 audit, comment removed)
+
+### Method
+- Used `updating-skills` TDD workflow via `managing-skills` router
+- Backup: `.local/SKILL.md.backup-20251231-145812`
+
+---
+
 ## [Date: 2025-12-27] - Remove Phase 10 (Agent Discovery)
 
 ### Removed

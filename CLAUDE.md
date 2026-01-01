@@ -380,7 +380,7 @@ grep -w "fieldname" modules/chariot/backend/pkg/query/allowed_columns.go
 pwd && git remote get-url origin    # Verify current location and repository
 
 # Navigate to super-repo root from anywhere
-cd $(git rev-parse --show-superproject-working-tree || git rev-parse --show-toplevel)
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 
 # Navigate to specific module
 cd modules/[module-name]            # Must be in super-repo first
