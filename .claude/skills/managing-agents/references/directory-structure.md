@@ -12,7 +12,7 @@ Agents are organized by purpose in `.claude/agents/`. Each category has a specif
 ├── quality/          # 5 agents - code review, auditing
 ├── analysis/         # 6 agents - security, complexity (permissionMode: plan)
 ├── research/         # 3 agents - web search, docs (permissionMode: plan)
-├── orchestrator/     # 8 agents - coordination, workflows
+├── orchestrator/     # Reserved - orchestration done via skills, not agents
 ├── mcp-tools/        # 2 agents - specialized MCP access
 └── .archived/        # Deprecated agents with reason
 ```
@@ -53,13 +53,13 @@ Agents are organized by purpose in `.claude/agents/`. Each category has a specif
 
 - **Purpose:** Web research, documentation lookup, codebase exploration
 - **Permission Mode:** `plan` (research should be reviewed before implementation)
-- **Examples:** `code-pattern-analyzer`
+- **Note:** For codebase discovery, prefer the native `Explore` agent (via Task tool) over custom research agents
 
 ### orchestrator/
 
-- **Purpose:** Multi-phase workflows, agent coordination
-- **Permission Mode:** `default`
-- **Examples:** `frontend-orchestrator`, `backend-orchestrator`
+- **Purpose:** Reserved directory (orchestration is done via skills, not agents)
+- **Note:** Subagents cannot spawn other subagents, so orchestrator agents don't work. Use orchestration skills instead (`orchestrating-feature-development`, `orchestrating-research`, `developing-with-subagents`)
+- **Examples:** None - use skills for orchestration
 
 ### mcp-tools/
 
@@ -83,7 +83,7 @@ When creating a new agent, choose the category based on its **primary purpose**:
 - **Reviews code?** → `quality/`
 - **Analyzes security?** → `analysis/`
 - **Researches information?** → `research/`
-- **Coordinates other agents?** → `orchestrator/`
+- **Coordinates other agents?** → Use orchestration **skills** instead (agents can't spawn agents)
 - **Wraps MCP tools?** → `mcp-tools/`
 
 If an agent spans multiple categories, choose the category that represents the **majority of its work**.

@@ -7,6 +7,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const InputSchema = z.object({
   offset: z.string().optional(),
@@ -27,7 +28,7 @@ const FilteredOutputSchema = z.object({
     status: z.string()
   })),
   next_offset: z.number().nullable(),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 });
 
 export const keysList = {
@@ -68,15 +69,19 @@ function filterKeysResult(rawResult: any): any {
     status: key.status
   }));
 
-  return {
+  const result = {
     summary: {
       total_count: keys.length,
       active_count: activeCount,
       deleted_count: deletedCount
     },
     keys: filteredKeys,
-    next_offset: nextOffset,
-    estimated_tokens: 500
+    next_offset: nextOffset
+  };
+
+  return {
+    ...result,
+    estimatedTokens: estimateTokens(result)
   };
 }
 

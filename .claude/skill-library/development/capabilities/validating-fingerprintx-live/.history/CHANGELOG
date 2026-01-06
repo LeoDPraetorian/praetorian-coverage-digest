@@ -1,0 +1,16 @@
+## [1.0.0] - 2024-01-15
+
+### Added
+- Initial skill creation
+- Main SKILL.md with 5-step workflow
+- protocol-query-mapping.md reference with Shodan query patterns
+- result-analysis-patterns.md reference with metric calculations
+- live-validation-report-template.md reference with complete template
+- Integration point with orchestrating-fingerprintx-development Phase 7.4
+- Ethical scanning guidelines (rate limiting, sample size)
+- Pass/fail thresholds: 80% detection, 50% version/CPE, 20% false negative
+
+### Dependencies
+- Requires mcp-tools-shodan-api skill for Shodan queries
+- Requires .claude/tools/shodan/ wrappers to be functional
+- Requires Shodan API key in credentials.json

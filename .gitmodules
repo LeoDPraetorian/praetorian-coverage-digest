@@ -70,3 +70,6 @@
 [submodule "modules/fingerprintx"]
 	path = modules/fingerprintx
 	url = https://github.com/praetorian-inc/fingerprintx
+[submodule "modules/venator"]
+	path = modules/venator
+	url = https://github.com/praetorian-inc/venator.git

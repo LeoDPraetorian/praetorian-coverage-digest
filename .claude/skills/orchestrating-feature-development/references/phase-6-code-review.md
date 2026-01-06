@@ -55,7 +55,7 @@ Task(
   description: "Review {feature-name} implementation",
   prompt: "Review implementation against architecture plan:
 
-Architecture: {content from .claude/features/{id}/architecture.md}
+Architecture: {content from .claude/.output/features/{id}/architecture.md}
 Files modified: {from implementation-log.md}
 
 CHECK:
@@ -66,7 +66,7 @@ CHECK:
 - Import organization
 
 DELIVERABLE:
-Save review to: .claude/features/{id}/review.md
+Save review to: .claude/.output/features/{id}/review.md
 
 Return JSON:
 {
@@ -86,7 +86,7 @@ Task(
   description: "Security review {feature-name}",
   prompt: "Security review implementation:
 
-Security requirements: {from .claude/features/{id}/security-assessment.md}
+Security requirements: {from .claude/.output/features/{id}/security-assessment.md}
 Files modified: {from implementation-log.md}
 
 CHECK:
@@ -97,7 +97,7 @@ CHECK:
 - CSRF protection
 
 DELIVERABLE:
-Save review to: .claude/features/{id}/security-review.md
+Save review to: .claude/.output/features/{id}/security-review.md
 
 Return JSON:
 {
@@ -227,8 +227,8 @@ AskUserQuestion({
       "retry_count": 1,
       "agents_used": ["frontend-reviewer", "frontend-security"],
       "outputs": {
-        "review": ".claude/features/{id}/review.md",
-        "security_review": ".claude/features/{id}/security-review.md"
+        "review": ".claude/.output/features/{id}/review.md",
+        "security_review": ".claude/.output/features/{id}/security-review.md"
       },
       "verdicts": {
         "code": "APPROVED",
@@ -281,10 +281,10 @@ Task(subagent_type: "backend-security", ...)
 
 **Outputs:**
 
-- `.claude/features/{id}/review.md` (frontend code review)
-- `.claude/features/{id}/security-review.md` (frontend security)
-- `.claude/features/{id}/backend-review.md` (backend code review)
-- `.claude/features/{id}/backend-security-review.md` (backend security)
+- `.claude/.output/features/{id}/review.md` (frontend code review)
+- `.claude/.output/features/{id}/security-review.md` (frontend security)
+- `.claude/.output/features/{id}/backend-review.md` (backend code review)
+- `.claude/.output/features/{id}/backend-security-review.md` (backend security)
 
 **Feedback loop for full-stack**: If issues exist in BOTH domains:
 

@@ -31,7 +31,7 @@ Use this skill when you need to:
 | ------------------ | ------------------------------------------ | ------------------------ | ------------------ |
 | 0: Setup           | -                                          | Create feature directory | -                  |
 | 1: Brainstorming   | brainstorming skill                        | Sequential               | 🛑 Human           |
-| 2: Discovery       | code-pattern-analyzer (frontend + backend) | **PARALLEL**             | -                  |
+| 2: Discovery       | Explore (frontend + backend)               | **PARALLEL**             | -                  |
 | 3: Planning        | writing-plans skill                        | Sequential               | 🛑 Human           |
 | 4: Architecture    | frontend-lead + security-lead              | **PARALLEL**             | 🛑 Human           |
 | 5: Implementation  | frontend-developer                         | Sequential               | -                  |
@@ -69,68 +69,126 @@ Cross-cutting concerns and troubleshooting guides:
 
 **CRITICAL: Use TodoWrite to track all phases.** Do NOT track mentally.
 
+**REQUIRED SUB-SKILLS for this workflow:**
+
+| Phase | Required Sub-Skills                                     | Conditional Sub-Skills                              |
+| ----- | ------------------------------------------------------- | --------------------------------------------------- |
+| All   | `persisting-agent-outputs` (output format)              | -                                                   |
+| All   | `orchestrating-multi-agent-workflows` (blocked routing) | -                                                   |
+| 1     | `brainstorming`                                         | -                                                   |
+| 2     | -                                                       | `dispatching-parallel-agents` (if 3+ failures)      |
+| 3     | `writing-plans`                                         | -                                                   |
+| 4-9   | -                                                       | `developing-with-subagents` (if >3 tasks)           |
+| 4-9   | -                                                       | `persisting-progress-across-sessions` (if >5 tasks) |
+| 10    | `finishing-a-development-branch`                        | -                                                   |
+
 ```text
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 0: Setup                                                         │
-│  Create: .claude/features/YYYY-MM-DD-{semantic-name}/                   │
+│  Create: .claude/.output/features/YYYY-MM-DD-HHMMSS-{semantic-name}/    │
+│                                                                         │
+│  **REQUIRED SUB-SKILL:** persisting-agent-outputs (discover output dir) │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 1: Brainstorming                                                 │
-│  Tool: Skill("brainstorming")                                           │
+│  **REQUIRED SUB-SKILL:** brainstorming                                  │
 │  Output: design.md                                                      │
-│  Human Checkpoint                                                       │
+│  X Human Checkpoint                                                     │
+│                                                                         │
+│  Gate Checklist:                                                        │
+│  - [ ] design.md exists with complete content                           │
+│  - [ ] User requirements captured (not assumed)                         │
+│  - [ ] Edge cases identified                                            │
+│  - [ ] Human approved via AskUserQuestion                               │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 2: Discovery (PARALLEL)                                          │
-│  Agents: code-pattern-analyzer (frontend) + (backend)                   │
-│  Tool: Skill("discovering-reusable-code")                               │
+│  Agents: Explore (frontend) + Explore (backend) - very thorough mode    │
+│  **PROMPT TEMPLATE:** references/prompts/explore-prompt.md              │
 │  Output: frontend-discovery.md, backend-discovery.md                    │
-│  No Human Checkpoint (feeds into Architecture)                          │
+│  No Human Checkpoint (feeds into Planning)                              │
+│                                                                         │
+│  **CONDITIONAL SUB-SKILL:** dispatching-parallel-agents                 │
+│    (when investigating 3+ independent failures)                         │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 3: Planning                                                      │
-│  Tool: Skill("writing-plans")                                           │
+│  **REQUIRED SUB-SKILL:** writing-plans                                  │
 │  Output: plan.md                                                        │
-│  Human Checkpoint                                                       │
+│  X Human Checkpoint                                                     │
+│                                                                         │
+│  Gate Checklist:                                                        │
+│  - [ ] plan.md exists with implementation steps                         │
+│  - [ ] Each step has file paths and code examples                       │
+│  - [ ] Dependencies between steps identified                            │
+│  - [ ] Human approved via AskUserQuestion                               │
+│                                                                         │
+│  **CONDITIONAL SUB-SKILL:** developing-with-subagents                   │
+│    (when plan has >3 independent tasks - offer execution choice)        │
+│  **CONDITIONAL SUB-SKILL:** persisting-progress-across-sessions         │
+│    (when plan has >5 tasks - enable session resume)                     │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 4: Architecture (PARALLEL)                                       │
-│  Agents: frontend-lead + security-lead (single Task message)            │
-│  Input: frontend-discovery.md + backend-discovery.md                    │
+│  Agents: frontend-lead + security-lead                                  │
+│  **PROMPT TEMPLATE:** references/prompts/architect-prompt.md            │
+│  Input: frontend-discovery.md + backend-discovery.md + plan.md          │
 │  Output: architecture.md, security-assessment.md, tech-debt.md          │
 │  Tech Debt Registry: Update .claude/tech-debt-registry.md               │
-│  Human Checkpoint (enhanced with tech debt decisions)                   │
+│  X Human Checkpoint (enhanced with tech debt decisions)                 │
+│                                                                         │
+│  Gate Checklist:                                                        │
+│  - [ ] architecture.md created by frontend-lead (or backend-lead)       │
+│  - [ ] security-assessment.md created by security-lead                  │
+│  - [ ] tech-debt.md created with findings                               │
+│  - [ ] Tech debt registry updated                                       │
+│  - [ ] Human approved via AskUserQuestion                               │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 5: Implementation                                                │
 │  Agent: frontend-developer (+ backend-developer if full-stack)          │
+│  **PROMPT TEMPLATE:** references/prompts/developer-prompt.md            │
 │  Input: architecture.md + security-assessment.md + tech-debt.md         │
 │  Output: Code files + implementation-log.md                             │
+│                                                                         │
+│  **REQUIRED (in prompt):** developing-with-tdd                          │
+│  **REQUIRED (in prompt):** verifying-before-completion                  │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 6: Code Review (PARALLEL, MAX 1 RETRY)                           │
+│  Stage 1: Spec Compliance Review (does code match plan?)                │
+│  Stage 2: Code Quality Review (is code well-built?)                     │
+│  **PROMPT TEMPLATE:** references/prompts/reviewer-prompt.md             │
 │  Agents: frontend-reviewer + frontend-security                          │
 │  Output: review.md, security-review.md                                  │
 │  Loop: If CHANGES_REQUESTED → developer fixes → re-review ONCE          │
 │  Escalate: If still failing → AskUserQuestion                           │
+│                                                                         │
+│  Gate Checklist:                                                        │
+│  - [ ] Spec compliance confirmed (code matches plan.md)                 │
+│  - [ ] Code quality approved (clean, maintainable)                      │
+│  - [ ] All reviewers returned APPROVED                                  │
+│  - [ ] OR max 1 retry completed                                         │
+│  - [ ] If still failing after retry, escalated via AskUserQuestion      │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 7: Test Planning                                                 │
 │  Agent: test-lead (creates test plan)                                   │
+│  **PROMPT TEMPLATE:** references/prompts/test-lead-prompt.md            │
 │  Output: test-plan.md                                                   │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
@@ -138,8 +196,11 @@ Cross-cutting concerns and troubleshooting guides:
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 8: Testing (PARALLEL - all 3 modes)                              │
 │  Agents: frontend-tester × 3 (unit, integration, e2e)                   │
+│  **PROMPT TEMPLATE:** references/prompts/tester-prompt.md               │
 │  Input: test-plan.md (follow plan requirements)                         │
 │  Output: test files + test-summary-*.md                                 │
+│                                                                         │
+│  **REQUIRED (in prompt):** developing-with-tdd                          │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
@@ -149,13 +210,21 @@ Cross-cutting concerns and troubleshooting guides:
 │  Output: test-validation.md                                             │
 │  Loop: If plan not met → tester fixes → re-validate ONCE                │
 │  Escalate: If still failing → AskUserQuestion                           │
+│                                                                         │
+│  Gate Checklist:                                                        │
+│  - [ ] test-lead validation confirms plan adherence                     │
+│  - [ ] quality_score >= 70                                              │
+│  - [ ] OR max 1 retry completed                                         │
+│  - [ ] If still failing after retry, escalated via AskUserQuestion      │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 10: Completion                                                   │
+│  **REQUIRED SUB-SKILL:** finishing-a-development-branch                 │
 │  Final verification: npm run build, npx tsc --noEmit, npm test          │
 │  Update metadata.json status: "complete"                                │
+│  Present options: merge, PR, keep branch, discard                       │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -164,10 +233,9 @@ Cross-cutting concerns and troubleshooting guides:
 Create feature workspace with semantic naming:
 
 ```bash
-FEATURE_DATE=$(date +%Y-%m-%d)
 FEATURE_NAME="<semantic-abbreviation>"  # e.g., "asset-filtering"
-FEATURE_ID="${FEATURE_DATE}-${FEATURE_NAME}"
-FEATURE_DIR=".claude/features/${FEATURE_ID}"
+FEATURE_ID="$(date +%Y-%m-%d-%H%M%S)-${FEATURE_NAME}"
+FEATURE_DIR=".claude/.output/features/${FEATURE_ID}"
 
 mkdir -p "${FEATURE_DIR}"
 ```
@@ -181,7 +249,7 @@ mkdir -p "${FEATURE_DIR}"
 
 ```json
 {
-  "feature_id": "2025-12-28-asset-filtering",
+  "feature_id": "2025-12-28-100000-asset-filtering",
   "description": "Original feature description",
   "created": "2025-12-28T10:00:00Z",
   "status": "in_progress",
@@ -245,35 +313,50 @@ After ONE retry cycle, escalate to user via AskUserQuestion. Do NOT loop indefin
 
 ### Agent Handoffs Must Be Structured
 
-All Task agents must return JSON with:
+All Task agents must follow `persisting-agent-outputs` skill for output format.
 
-```json
-{
-  "status": "complete|blocked|needs_review",
-  "summary": "What was accomplished",
-  "files_modified": ["paths"],
-  "verdict": "APPROVED|CHANGES_REQUESTED|BLOCKED",
-  "handoff": {
-    "recommended_agent": "next-agent",
-    "context": "Key info for next phase"
-  }
-}
-```
+Key handoff fields:
+
+- `status`: complete, blocked, or needs_review
+- `blocked_reason`: Required when blocked (for routing table lookup)
+- `attempted`: Required when blocked (what agent tried)
+- `handoff.next_agent`: null when blocked (orchestrator decides), suggested agent when complete
+- `handoff.context`: Key info for next phase
+
+When agents return `status: blocked`, use `orchestrating-multi-agent-workflows` skill's agent routing table to determine next agent based on `blocked_reason`.
+
+See [Agent Handoffs](references/agent-handoffs.md) for examples.
+
+## Rationalization Prevention
+
+Agents rationalize skipping steps. Watch for warning phrases and use evidence-based gates.
+
+**Reference**: See [shared rationalization prevention](../using-skills/references/rationalization-prevention.md) for:
+
+- Statistical evidence (technical debt ~10% fix rate, 'later' ~5% completion)
+- Phrase detection patterns ('close enough', 'just this once', 'I'll fix it later')
+- Override protocol (requires AskUserQuestion with explicit risk disclosure)
+
+### Feature Development Rationalizations
+
+See [references/rationalization-table.md](references/rationalization-table.md) for domain-specific rationalizations.
+
+**Key principle**: If you detect rationalization phrases in your thinking, STOP. Return to the phase checklist. Complete all items before proceeding.
 
 ## Agent Matrix by Feature Type
 
-| Type       | Discovery (Phase 2)      | Leads (Phase 4)               | Developers (Phase 5) | Reviewers (Phase 6)                   | Planner (Phase 7) | Testers (Phase 8)  | Validator (Phase 9) |
-| ---------- | ------------------------ | ----------------------------- | -------------------- | ------------------------------------- | ----------------- | ------------------ | ------------------- |
-| Frontend   | code-pattern-analyzer ×2 | frontend-lead + security-lead | frontend-developer   | frontend-reviewer + frontend-security | test-lead         | frontend-tester ×3 | test-lead           |
-| Backend    | code-pattern-analyzer ×2 | backend-lead + security-lead  | backend-developer    | backend-reviewer + backend-security   | test-lead         | backend-tester ×3  | test-lead           |
-| Full-stack | code-pattern-analyzer ×2 | All 4 leads                   | Both developers      | All 4 reviewers                       | test-lead         | All 6 testers      | test-lead           |
+| Type       | Discovery (Phase 2)        | Leads (Phase 4)               | Developers (Phase 5) | Reviewers (Phase 6)                   | Planner (Phase 7) | Testers (Phase 8)  | Validator (Phase 9) |
+| ---------- | -------------------------- | ----------------------------- | -------------------- | ------------------------------------- | ----------------- | ------------------ | ------------------- |
+| Frontend   | Explore ×2 (very thorough) | frontend-lead + security-lead | frontend-developer   | frontend-reviewer + frontend-security | test-lead         | frontend-tester ×3 | test-lead           |
+| Backend    | Explore ×2 (very thorough) | backend-lead + security-lead  | backend-developer    | backend-reviewer + backend-security   | test-lead         | backend-tester ×3  | test-lead           |
+| Full-stack | Explore ×2 (very thorough) | All 4 leads                   | Both developers      | All 4 reviewers                       | test-lead         | All 6 testers      | test-lead           |
 
-**Rule**: Match agents to feature domain. Discovery always runs frontend + backend analyzers in parallel. Full-stack features spawn ALL agents in parallel for phases 4-9.
+**Rule**: Match agents to feature domain. Discovery always runs frontend + backend Explore agents in parallel (very thorough mode). Full-stack features spawn ALL agents in parallel for phases 4-9.
 
 ## Feature Directory Structure
 
 ```text
-.claude/features/YYYY-MM-DD-{semantic-name}/
+.claude/.output/features/YYYY-MM-DD-HHMMSS-{semantic-name}/
 ├── metadata.json              # Status, timestamps, phase tracking
 ├── design.md                  # Phase 1: brainstorming output
 ├── frontend-discovery.md      # Phase 2: frontend pattern analysis
@@ -297,7 +380,7 @@ All Task agents must return JSON with:
 
 ### "I lost context mid-workflow"
 
-**Solution**: Read `.claude/features/{feature-id}/metadata.json` and continue from `current_phase`.
+**Solution**: Read `.claude/.output/features/{feature-id}/metadata.json` and continue from `current_phase`.
 
 ### "Reviewer returned CHANGES_REQUESTED twice"
 
@@ -323,7 +406,7 @@ AskUserQuestion({
 
 **Solution**: Spawn ALL domain agents in parallel:
 
-- Phase 2: code-pattern-analyzer (frontend) + code-pattern-analyzer (backend) - always runs
+- Phase 2: Explore (frontend) + Explore (backend) - always runs, very thorough mode
 - Phase 4: frontend-lead + backend-lead + security-lead (3 agents)
 - Phase 5: frontend-developer + backend-developer (2 agents)
 - Phase 6: All 4 reviewers in parallel
@@ -331,15 +414,79 @@ AskUserQuestion({
 
 See [Troubleshooting](references/troubleshooting.md) for more scenarios.
 
-## Related Skills
+## Integration
 
-- `brainstorming` - Phase 1 refinement workflow
-- `discovering-reusable-code` - Phase 2 pattern discovery methodology
-- `writing-plans` - Phase 3 plan creation
-- `executing-plans` - Alternative pattern for batch execution
-- `persisting-progress-across-sessions` - Cross-session state management
-- `orchestrating-multi-agent-workflows` - Multi-agent coordination patterns
-- `dispatching-parallel-agents` - For 3+ independent failures during debugging
+### Called By
+
+- `/feature` command - Primary entry point for users
+- `/capability` command - Via orchestrating-capability-development (similar pattern)
+
+### Requires (invoke before or at start)
+
+| Skill                                 | When               | Purpose                                             |
+| ------------------------------------- | ------------------ | --------------------------------------------------- |
+| `persisting-agent-outputs`            | Phase 0            | Discover output directory, set up feature workspace |
+| `orchestrating-multi-agent-workflows` | When agent blocked | Routing table for blocked_reason handling           |
+
+### Calls (skill-invocation via Skill tool)
+
+| Skill                            | Phase    | Purpose                                |
+| -------------------------------- | -------- | -------------------------------------- |
+| `brainstorming`                  | Phase 1  | Design refinement with human-in-loop   |
+| `writing-plans`                  | Phase 3  | Create detailed implementation plan    |
+| `finishing-a-development-branch` | Phase 10 | Verify tests, present options, cleanup |
+
+### Spawns (agent-dispatch via Task tool)
+
+| Agent                                     | Phase      | Key Mandatory Skills                             |
+| ----------------------------------------- | ---------- | ------------------------------------------------ |
+| `Explore` ×2                              | Phase 2    | discovering-reusable-code                        |
+| `frontend-lead` + `security-lead`         | Phase 4    | adhering-to-dry, adhering-to-yagni               |
+| `frontend-developer`                      | Phase 5    | developing-with-tdd, verifying-before-completion |
+| `frontend-reviewer` + `frontend-security` | Phase 6    | adhering-to-dry                                  |
+| `test-lead`                               | Phase 7, 9 | -                                                |
+| `frontend-tester` ×3                      | Phase 8    | developing-with-tdd                              |
+
+**Note**: All spawned agents receive `persisting-agent-outputs` in prompt. See prompt templates for complete skill list.
+
+### Conditional (based on complexity)
+
+| Skill                                 | Trigger                       | Purpose                                    |
+| ------------------------------------- | ----------------------------- | ------------------------------------------ |
+| `developing-with-subagents`           | Plan has >3 independent tasks | Fresh subagent per task + two-stage review |
+| `persisting-progress-across-sessions` | Plan has >5 tasks             | Enable session resume for long workflows   |
+| `dispatching-parallel-agents`         | 3+ independent failures       | Parallel investigation of unrelated issues |
+
+### Agent Skills (embedded in prompts)
+
+These skills are included in prompt templates for subagents:
+
+| Skill                         | Agents                    | Purpose                                     |
+| ----------------------------- | ------------------------- | ------------------------------------------- |
+| `developing-with-tdd`         | Developers, Testers       | Write test first, verify failure, implement |
+| `verifying-before-completion` | All implementation agents | Verify before claiming done                 |
+| `adhering-to-dry`             | Developers                | Prevent duplication                         |
+| `adhering-to-yagni`           | Developers                | Prevent over-engineering                    |
+
+### Prompt Templates
+
+Located in `references/prompts/`:
+
+| Template              | Used In    | Agents                                     |
+| --------------------- | ---------- | ------------------------------------------ |
+| `explore-prompt.md`   | Phase 2    | Explore (frontend + backend)               |
+| `architect-prompt.md` | Phase 4    | frontend-lead, backend-lead, security-lead |
+| `developer-prompt.md` | Phase 5    | frontend-developer, backend-developer      |
+| `reviewer-prompt.md`  | Phase 6    | _-reviewer, _-security                     |
+| `test-lead-prompt.md` | Phase 7, 9 | test-lead                                  |
+| `tester-prompt.md`    | Phase 8    | frontend-tester, backend-tester            |
+
+### Alternative Workflows
+
+| Skill                       | When to Use Instead                                              |
+| --------------------------- | ---------------------------------------------------------------- |
+| `executing-plans`           | Batch execution in separate session (not same-session subagents) |
+| `developing-with-subagents` | When you have a plan and want same-session execution with review |
 
 ## Exit Criteria
 
@@ -349,8 +496,7 @@ Feature development is complete when:
 - ✅ Discovery reports generated for frontend and backend
 - ✅ Tech debt registry updated with findings from architecture phase
 - ✅ All reviewers returned verdict: APPROVED
-- ✅ Test plan created with coverage targets
-- ✅ All tests from plan implemented
-- ✅ Test validation confirms plan adherence and quality_score >= 70
+- ✅ Test plan created and all tests implemented (quality_score >= 70)
 - ✅ Final verification passed (build, lint, tests)
 - ✅ User approves final result
+- ✅ No rationalization phrases; all gate checklists passed; overrides documented

@@ -6,4 +6,4 @@
 >
 > All skill management operations now reference the shared file.
 
-For REFACTOR rules, see: [Shared REFACTOR Rules](../../../../skills/managing-skills/references/patterns/refactor-rules.md)
+For REFACTOR rules, see: [Shared REFACTOR Rules](.claude/skills/managing-skills/references/patterns/refactor-rules.md)

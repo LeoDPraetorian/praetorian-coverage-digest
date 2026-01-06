@@ -1,6 +1,6 @@
 ---
 name: researching-web
-description: Use when researching general web resources (API docs not in Context7, blog posts, tutorials, GitHub, Stack Overflow, official docs) - fallback skill in researching-skills router for non-specialized research needs
+description: Use when researching general web resources (API docs not in Context7, blog posts, tutorials, GitHub, Stack Overflow, official docs) - fallback skill in research orchestration for non-specialized research needs
 allowed-tools: WebSearch, WebFetch, Read, Write, TodoWrite, AskUserQuestion
 ---
 
@@ -124,6 +124,27 @@ Synthesize findings with:
 
 **Output Format:** See [references/output-format.md](references/output-format.md)
 
+**Output location depends on invocation mode:**
+
+**Mode 1: Standalone (invoked directly)**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+TIMESTAMP=$(date +"%Y-%m-%d-%H%M%S")
+TOPIC="{semantic-topic-name}"
+mkdir -p "$ROOT/.claude/.output/research/${TIMESTAMP}-${TOPIC}-web"
+# Write synthesis to: $ROOT/.claude/.output/research/${TIMESTAMP}-${TOPIC}-web/SYNTHESIS.md
+```
+
+**Mode 2: Orchestrated (invoked by orchestrating-research)**
+
+When parent skill provides `OUTPUT_DIR`:
+
+- Write synthesis to: `${OUTPUT_DIR}/web.md`
+- Do NOT create directory (parent already created it)
+
+**Detection logic:** If parent skill passed an output directory path, use Mode 2. Otherwise use Mode 1.
+
 ---
 
 ## Key Principles
@@ -178,10 +199,10 @@ Synthesize findings with:
 
 ## Related Skills
 
-| Skill                     | Access Method                                                                                    | Purpose                                    |
-| ------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| **researching-skills**    | `skill: "researching-skills"` (CORE)                                                             | Interactive research orchestrator (router) |
-| **researching-context7**  | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)  | npm/library documentation via Context7     |
-| **researching-arxiv**     | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)     | Academic paper research                    |
-| **researching-codebase**  | `Read(".claude/skill-library/research/researching-codebase/SKILL.md")` (LIBRARY)  | Codebase pattern discovery                 |
-| **researching-protocols** | `Read(".claude/skill-library/claude/skill-management/researching-protocols/SKILL.md")` (LIBRARY) | Protocol fingerprinting for fingerprintx   |
+| Skill                      | Access Method                                                                                    | Purpose                                  |
+| -------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------- |
+| **orchestrating-research** | `skill: "orchestrating-research"` (CORE)                                                         | Research orchestrator (router)           |
+| **researching-context7**   | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)                 | npm/library documentation via Context7   |
+| **researching-arxiv**      | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)                    | Academic paper research                  |
+| **researching-codebase**   | `Read(".claude/skill-library/research/researching-codebase/SKILL.md")` (LIBRARY)                 | Codebase pattern discovery               |
+| **researching-protocols**  | `Read(".claude/skill-library/claude/skill-management/researching-protocols/SKILL.md")` (LIBRARY) | Protocol fingerprinting for fingerprintx |

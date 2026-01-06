@@ -105,20 +105,20 @@ func readCString(data []byte, offset int) (string, int) {
 
 ### BSON Type Codes
 
-| Type | Code | Value Format |
-|------|------|--------------|
-| Double | 0x01 | 8 bytes (IEEE 754) |
-| String | 0x02 | int32 length + string + null |
-| Document | 0x03 | Nested BSON document |
-| Array | 0x04 | BSON document with "0", "1", ... keys |
-| Binary | 0x05 | int32 length + subtype + bytes |
-| ObjectId | 0x07 | 12 bytes |
-| Boolean | 0x08 | 1 byte (0x00 or 0x01) |
-| DateTime | 0x09 | int64 (milliseconds since epoch) |
-| Null | 0x0A | No value |
-| Int32 | 0x10 | 4 bytes |
-| Timestamp | 0x11 | 8 bytes |
-| Int64 | 0x12 | 8 bytes |
+| Type      | Code | Value Format                          |
+| --------- | ---- | ------------------------------------- |
+| Double    | 0x01 | 8 bytes (IEEE 754)                    |
+| String    | 0x02 | int32 length + string + null          |
+| Document  | 0x03 | Nested BSON document                  |
+| Array     | 0x04 | BSON document with "0", "1", ... keys |
+| Binary    | 0x05 | int32 length + subtype + bytes        |
+| ObjectId  | 0x07 | 12 bytes                              |
+| Boolean   | 0x08 | 1 byte (0x00 or 0x01)                 |
+| DateTime  | 0x09 | int64 (milliseconds since epoch)      |
+| Null      | 0x0A | No value                              |
+| Int32     | 0x10 | 4 bytes                               |
+| Timestamp | 0x11 | 8 bytes                               |
+| Int64     | 0x12 | 8 bytes                               |
 
 ### Minimal BSON String Parser
 

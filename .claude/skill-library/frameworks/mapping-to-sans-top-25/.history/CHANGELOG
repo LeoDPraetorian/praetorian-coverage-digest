@@ -1,0 +1,43 @@
+# Changelog
+
+## 2026-01-06 - Research Integration
+
+**Updated with current 2025 CWE Top 25 data:**
+- Complete 2025 rankings (1-25) with scores
+- Year-over-year comparison (2024 → 2025)
+- KEV correlation data (18 KEV for CWE-78, 14 for CWE-502, etc.)
+- New entries: CWE-120, 121, 122, 284, 639, 770
+- Removed entries: CWE-269, 798, 287, 119, 190, 400
+- Biggest movers: CWE-476 (+8), CWE-862 (+5), CWE-77 (-10)
+
+**Reference files created:**
+- historical-trends.md: 2024-2025 comparison table
+- kev-correlation.md: KEV catalog mapping (1,484 entries, +245 in 2025)
+- priority-matrix.md: Capability prioritization decision tree
+
+**Line count:** 180 lines
+
+---
+
+## 2026-01-06 - Initial Creation
+
+**Category:** frameworks (library skill)
+**Type:** Library/Framework
+
+### RED Phase Documentation
+- **Gap:** Developers can tag CWEs but don't know which are most critical for prioritization
+- **Test Scenario:** "Should we prioritize CWE-352 or CWE-77?" → No data-driven answer without skill
+- **Failure Without Skill:** Guess based on intuition, miss that 352 moved #9→#4 in 2024
+
+### Initial Structure
+- SKILL.md: 169 lines
+- Top 25 list with 2024 rankings
+- Trend data (rising/falling threats)
+- KEV correlation section
+- Prioritization guidance (High/Medium priority)
+- Use case examples
+
+### Pending
+- Research phase to populate references/ with historical data
+- Gateway update for routing
+- GREEN/REFACTOR phases

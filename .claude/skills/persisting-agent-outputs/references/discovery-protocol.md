@@ -19,6 +19,7 @@ if (taskPrompt.includes("feature_directory:")) {
 ```
 
 **When this happens:**
+
 - Orchestrated workflows (`/feature` command)
 - Main Claude spawning subsequent agents in a workflow
 
@@ -28,22 +29,22 @@ if (taskPrompt.includes("feature_directory:")) {
 
 ```bash
 # Find MANIFEST.yaml files modified in last 60 minutes
-find .claude/features -name "MANIFEST.yaml" -mmin -60 -type f
+find .claude/.output/agents -name "MANIFEST.yaml" -mmin -60 -type f
 ```
 
 **Scenarios:**
 
-| Found | Action |
-|-------|--------|
-| **0 files** | Proceed to Tier 3 (create new) |
-| **1 file** | Use this directory (no ambiguity) |
+| Found        | Action                                                           |
+| ------------ | ---------------------------------------------------------------- |
+| **0 files**  | Proceed to Tier 3 (create new)                                   |
+| **1 file**   | Use this directory (no ambiguity)                                |
 | **2+ files** | Read each MANIFEST.yaml, semantic match against task description |
 
 **Semantic matching algorithm:**
 
 ```typescript
 function findBestMatch(manifestFiles: string[], taskDescription: string): string {
-  const scores = manifestFiles.map(file => {
+  const scores = manifestFiles.map((file) => {
     const manifest = readYAML(file);
     const nameScore = similarity(manifest.feature_name, taskDescription);
     const descScore = similarity(manifest.description, taskDescription);
@@ -51,7 +52,7 @@ function findBestMatch(manifestFiles: string[], taskDescription: string): string
 
     return {
       file,
-      score: (nameScore * 0.4) + (descScore * 0.4) + (slugScore * 0.2)
+      score: nameScore * 0.4 + descScore * 0.4 + slugScore * 0.2,
     };
   });
 
@@ -66,10 +67,11 @@ function findBestMatch(manifestFiles: string[], taskDescription: string): string
 TIMESTAMP=$(date +"%Y-%m-%d-%H%M%S")
 SLUG=$(generateSlug(taskDescription))
 
-mkdir -p .claude/features/${TIMESTAMP}-${SLUG}
+mkdir -p .claude/.output/agents/${TIMESTAMP}-${SLUG}
 ```
 
 **When this happens:**
+
 - No feature_directory parameter
 - No recent MANIFEST.yaml found
 - You are the first agent
@@ -108,7 +110,7 @@ Which feature is this task related to?
 
 ```typescript
 // Orchestrator spawns agents
-const featureDir = `.claude/features/${timestamp}-${slug}`;
+const featureDir = `.claude/.output/agents/${timestamp}-${slug}`;
 
 spawnAgent("frontend-lead", {
   prompt: `Review plan. feature_directory: ${featureDir}`,
@@ -129,7 +131,7 @@ spawnAgent("frontend-developer", {
 frontend-lead:
   1. Check for feature_directory parameter → NOT FOUND
   2. Search for recent MANIFEST.yaml → NONE FOUND
-  3. Create new directory: .claude/features/2025-12-30-143022-tanstack-migration/
+  3. Create new directory: .claude/.output/agents/2025-12-30-143022-tanstack-migration/
   4. Write MANIFEST.yaml
   5. Return feature_directory in output
 ```
@@ -142,7 +144,7 @@ frontend-lead:
 Main Claude sees previous output included feature_directory
 
 Main Claude spawns:
-  feature_directory: ".claude/features/2025-12-30-143022-tanstack-migration"
+  feature_directory: ".claude/.output/agents/2025-12-30-143022-tanstack-migration"
 
 frontend-developer:
   1. Check for feature_directory parameter → FOUND
@@ -151,11 +153,11 @@ frontend-developer:
 
 ## Troubleshooting
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Agent creates duplicate directory | Missing feature_directory param | Main Claude should extract from previous agent output |
-| Agent can't find directory | >60 min since last MANIFEST update | Pass feature_directory explicitly or accept new directory creation |
-| Wrong directory selected | Poor semantic match | Improve slug generation, add keywords to MANIFEST description |
+| Issue                             | Cause                              | Solution                                                           |
+| --------------------------------- | ---------------------------------- | ------------------------------------------------------------------ |
+| Agent creates duplicate directory | Missing feature_directory param    | Main Claude should extract from previous agent output              |
+| Agent can't find directory        | >60 min since last MANIFEST update | Pass feature_directory explicitly or accept new directory creation |
+| Wrong directory selected          | Poor semantic match                | Improve slug generation, add keywords to MANIFEST description      |
 
 ## Related
 

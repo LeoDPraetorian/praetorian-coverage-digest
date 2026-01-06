@@ -38,7 +38,7 @@ import (
 **Rules**:
 
 1. **Group 1: Standard library** - All packages from Go's stdlib
-2. **Group 2: External** - Third-party dependencies (github.com/*, etc.)
+2. **Group 2: External** - Third-party dependencies (github.com/\*, etc.)
 3. **Group 3: Internal** - Your project's own packages
 
 **Blank line between each group** - Makes groups visually distinct
@@ -67,12 +67,12 @@ import (
 
 **These are guidelines with flexibility for complex implementations:**
 
-| File Type      | Soft Limit | Consider Split At | Action Required      |
-| -------------- | ---------- | ----------------- | -------------------- |
-| Capability     | 500 lines  | 400 lines         | Extract helpers      |
-| Interface file | 200 lines  | 150 lines         | Split by concern     |
-| Test file      | 800 lines  | 600 lines         | Split by test type   |
-| Registry       | 300 lines  | 250 lines         | Extract loader       |
+| File Type      | Soft Limit | Consider Split At | Action Required    |
+| -------------- | ---------- | ----------------- | ------------------ |
+| Capability     | 500 lines  | 400 lines         | Extract helpers    |
+| Interface file | 200 lines  | 150 lines         | Split by concern   |
+| Test file      | 800 lines  | 600 lines         | Split by test type |
+| Registry       | 300 lines  | 250 lines         | Extract loader     |
 
 **Functions: 50 Line Soft Limit**
 

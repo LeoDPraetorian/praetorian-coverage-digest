@@ -7,6 +7,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 // ============================================================================
 // Input Schema
@@ -40,7 +41,7 @@ const FilteredOutputSchema = z.object({
     updated: z.string().optional()
   })),
   next_offset: z.string().nullable(),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 });
 
 // ============================================================================
@@ -95,7 +96,7 @@ function filterJobsResult(rawResult: any, limit: number = 100): any {
     updated: job.updated
   }));
 
-  return {
+  const result = {
     summary: {
       total_count: jobs.length,
       returned_count: filteredJobs.length,
@@ -104,8 +105,12 @@ function filterJobsResult(rawResult: any, limit: number = 100): any {
       capability_counts: capabilityCounts
     },
     jobs: filteredJobs,
-    next_offset: nextOffset,
-    estimated_tokens: 1500
+    next_offset: nextOffset
+  };
+
+  return {
+    ...result,
+    estimatedTokens: estimateTokens(result)
   };
 }
 

@@ -1,0 +1,73 @@
+# Changelog - implementing-go-pipelines
+
+## 2026-01-01 - Initial Creation
+
+**Type:** Process/Pattern (methodology)
+**Category:** Library (development/backend)
+**Created by:** Claude (via /skill-manager create)
+
+**RED Phase - Gap Identified:**
+
+Without this skill, Claude lacks guidance on:
+- Official Go blog canonical pipeline pattern (2014, still authoritative)
+- Critical principle: "Goroutines are NOT garbage collected" - must exit explicitly
+- Explicit cancellation with done channel broadcast pattern
+- Buffered channel sizing guidelines (10-100, 100-1000, 1000+)
+- TruffleHog multi-stage pipeline architecture (40K+ items/hour)
+
+**Problem:** Go developers implementing concurrent pipelines struggle with:
+- Goroutine leaks from blocked sends (no explicit exit)
+- Pipeline deadlocks from unclosed channels
+- Memory exhaustion from unbuffered channels in high-throughput scenarios
+- Choosing appropriate cancellation patterns (done channel vs context)
+
+**Content Source:**
+
+Core pattern from official Go blog:
+- Go Blog - Pipelines and Cancellation (2014, canonical): https://go.dev/blog/pipelines
+- Go Blog - Advanced Concurrency Patterns
+- Research document: `.claude/research/2026-01-01-go-scanner-architecture-patterns/github.md` (TruffleHog Engine)
+
+Production validation:
+- TruffleHog: Multi-stage pipeline with stage-specific buffering and worker tuning
+  - Stage 1 (I/O): 1 worker, buffer 100
+  - Stage 2 (CPU): 3× workers, buffer 1000
+  - Stage 3 (Network): 2× workers, buffer 100
+  - Stage 4 (I/O): 1× workers, buffer 100
+  - Achieves 40K+ items/hour throughput
+
+**Progressive Disclosure:**
+
+SKILL.md (500 lines - exactly at limit):
+- Official pattern definition (Go blog)
+- Critical principle (goroutines not GC'd)
+- Basic 3-stage pipeline example
+- Explicit cancellation patterns (done channel, context)
+- Buffered channel sizing guidelines
+- TruffleHog production example
+- Fan-out/fan-in patterns
+- Common pitfalls (3 with solutions)
+- Testing strategies
+- Quick reference table
+- Performance characteristics
+
+References/ (to be populated):
+- cancellation-patterns.md - Done channel vs context patterns
+- trufflehog-architecture.md - Complete multi-stage pipeline analysis
+- fan-out-fan-in-patterns.md - Advanced parallel processing
+- common-pitfalls.md - Expanded pitfall catalog with debugging
+- testing-patterns.md - Pipeline testing strategies
+- buffer-tuning.md - Channel buffer sizing strategies
+
+**Complements Existing Skills:**
+
+This skill complements:
+- `go-errgroup-concurrency`: Error aggregation across pipeline stages
+- `implementing-go-semaphore-pools`: Bounded concurrency per stage
+
+**Next Steps:**
+
+- GREEN Phase: Populate references/ with detailed content
+- Gateway: Update gateway-backend routing table
+- Audit: Run compliance validation
+2026-01-02 - Backfilled 5 stub reference files with production Go pipeline patterns from Trivy, TruffleHog, Nuclei, Prometheus, etcd research (2500+ lines total)

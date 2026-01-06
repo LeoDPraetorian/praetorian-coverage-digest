@@ -1,0 +1,821 @@
+/**
+ * Unit tests for Serena Connection Pool
+ *
+ * Tests pool module structure, state machine, concurrency, and module switching.
+ * Mocks MCP SDK to avoid spawning actual processes.
+ */
+
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { SerenaPoolImpl } from './serena-pool';
+import type { PoolConfig } from './serena-pool';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+
+// Mock MCP SDK
+vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
+  Client: vi.fn().mockImplementation(() => ({
+    connect: vi.fn().mockResolvedValue(undefined),
+    callTool: vi.fn().mockResolvedValue({
+      content: [{ type: 'text', text: '[]' }]
+    }),
+    close: vi.fn().mockResolvedValue(undefined),
+  })),
+}));
+
+vi.mock('@modelcontextprotocol/sdk/client/stdio.js', () => ({
+  StdioClientTransport: vi.fn().mockImplementation(() => ({
+    on: vi.fn(),
+    close: vi.fn().mockResolvedValue(undefined),
+  })),
+}));
+
+/**
+ * Testable subclass that exposes checkIdleTimeout for direct testing
+ * Avoids fake timer + async-mutex interaction issues
+ */
+class TestableSerenaPool extends SerenaPoolImpl {
+  public triggerIdleTimeout(): void {
+    this.checkIdleTimeout();
+  }
+}
+
+describe('SerenaPoolImpl', () => {
+  const defaultConfig: PoolConfig = {
+    idleTimeoutMs: 5000,
+    maxCallsPerConnection: 1000,
+    debug: false,
+  };
+
+  let pool: SerenaPoolImpl;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(async () => {
+    // CRITICAL: Restore real timers FIRST (before any async cleanup)
+    // This prevents hangs when tests using fake timers fail before cleanup
+    vi.useRealTimers();
+
+    if (pool) {
+      await pool.dispose();
+    }
+
+    // Clear all mocks for test isolation
+    vi.clearAllMocks();
+  });
+
+  describe('Task 1: Pool Module Structure', () => {
+    it('should exist and be constructable', () => {
+      pool = new SerenaPoolImpl(defaultConfig);
+      expect(pool).toBeDefined();
+    });
+
+    it('should have required methods', () => {
+      pool = new SerenaPoolImpl(defaultConfig);
+      expect(pool.acquire).toBeDefined();
+      expect(pool.release).toBeDefined();
+      expect(pool.dispose).toBeDefined();
+      expect(pool.stats).toBeDefined();
+    });
+  });
+
+  describe('Task 2: State Machine', () => {
+    beforeEach(() => {
+      pool = new SerenaPoolImpl(defaultConfig);
+    });
+
+    it('should start in disconnected state', () => {
+      const stats = pool.stats();
+      expect(stats.state).toBe('disconnected');
+      expect(stats.currentModule).toBeNull();
+      expect(stats.callCount).toBe(0);
+    });
+
+    it('should transition to in_use after acquire', async () => {
+      await pool.acquire('chariot', {});
+      const stats = pool.stats();
+      expect(stats.state).toBe('in_use');
+      expect(stats.currentModule).toBe('chariot');
+      expect(stats.callCount).toBe(1);
+    });
+
+    it('should transition to idle after release', async () => {
+      await pool.acquire('chariot', {});
+      pool.release();
+      const stats = pool.stats();
+      expect(stats.state).toBe('idle');
+      expect(stats.currentModule).toBe('chariot');
+    });
+
+    it('should reuse connection for same module', async () => {
+      const client1 = await pool.acquire('chariot', {});
+      pool.release();
+      const client2 = await pool.acquire('chariot', {});
+      expect(client1).toBe(client2);
+      expect(pool.stats().callCount).toBe(2);
+    });
+  });
+
+  describe('Task 3: Mutex Locking', () => {
+    beforeEach(() => {
+      pool = new SerenaPoolImpl(defaultConfig);
+    });
+
+    it('should serialize concurrent acquire calls', async () => {
+      // Spawn 3 concurrent acquire calls
+      const results = await Promise.all([
+        pool.acquire('chariot', {}),
+        pool.acquire('chariot', {}),
+        pool.acquire('chariot', {}),
+      ]);
+
+      // All should get the same client instance (serialized)
+      expect(results[0]).toBe(results[1]);
+      expect(results[1]).toBe(results[2]);
+
+      // Should have incremented call count to 3
+      expect(pool.stats().callCount).toBe(3);
+    });
+
+    it('should prevent race conditions during module switch', async () => {
+      // First acquire for chariot
+      await pool.acquire('chariot', {});
+      pool.release();
+
+      // Concurrent acquires for different modules
+      const [chariotClient, nebulaClient] = await Promise.all([
+        pool.acquire('chariot', {}),
+        pool.acquire('nebula', {}),
+      ]);
+
+      // One of them should have won, stats should be consistent
+      const stats = pool.stats();
+      expect(stats.state).toBe('in_use');
+      expect(['chariot', 'nebula']).toContain(stats.currentModule);
+    });
+  });
+
+  describe('Task 4: Module Switching', () => {
+    beforeEach(() => {
+      pool = new SerenaPoolImpl(defaultConfig);
+    });
+
+    it('should detect module switch and create new connection', async () => {
+      // First acquire for chariot
+      const client1 = await pool.acquire('chariot', {});
+      expect(pool.stats().currentModule).toBe('chariot');
+      pool.release();
+
+      // Acquire for different module (nebula)
+      const client2 = await pool.acquire('nebula', {});
+
+      // Should have killed chariot connection and created nebula connection
+      expect(client1).not.toBe(client2);
+      expect(pool.stats().currentModule).toBe('nebula');
+      expect(pool.stats().callCount).toBe(1); // Reset to 1 for new connection
+    });
+
+    it('should maintain connection across multiple calls to same module', async () => {
+      // Multiple calls to chariot
+      const client1 = await pool.acquire('chariot', {});
+      pool.release();
+      const client2 = await pool.acquire('chariot', {});
+      pool.release();
+      const client3 = await pool.acquire('chariot', {});
+
+      // All should be the same client
+      expect(client1).toBe(client2);
+      expect(client2).toBe(client3);
+      expect(pool.stats().callCount).toBe(3);
+    });
+
+    it('should handle alternating module switches', async () => {
+      // Chariot
+      await pool.acquire('chariot', {});
+      pool.release();
+      expect(pool.stats().currentModule).toBe('chariot');
+
+      // Switch to nebula
+      await pool.acquire('nebula', {});
+      pool.release();
+      expect(pool.stats().currentModule).toBe('nebula');
+      expect(pool.stats().callCount).toBe(1);
+
+      // Switch back to chariot
+      await pool.acquire('chariot', {});
+      expect(pool.stats().currentModule).toBe('chariot');
+      expect(pool.stats().callCount).toBe(1);
+    });
+  });
+
+  describe('Task 5: TTL-Based Cleanup (Refactored - No Fake Timers)', () => {
+    let testablePool: TestableSerenaPool;
+
+    beforeEach(() => {
+      testablePool = new TestableSerenaPool({
+        idleTimeoutMs: 1000, // Not actually used with direct trigger
+        maxCallsPerConnection: 1000,
+        debug: false,
+      });
+    });
+
+    afterEach(async () => {
+      if (testablePool) {
+        await testablePool.dispose();
+      }
+    });
+
+    it('should dispose connection when triggerIdleTimeout fires in idle state', async () => {
+      // Acquire and release connection
+      await testablePool.acquire('chariot', {});
+      testablePool.release();
+
+      // Should be idle now
+      expect(testablePool.stats().state).toBe('idle');
+      expect(testablePool.stats().currentModule).toBe('chariot');
+
+      // Directly trigger idle timeout logic (no fake timers needed)
+      testablePool.triggerIdleTimeout();
+
+      // Wait for async dispose to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Should be disconnected now
+      expect(testablePool.stats().state).toBe('disconnected');
+      expect(testablePool.stats().currentModule).toBeNull();
+    });
+
+    it('should not dispose when triggerIdleTimeout fires in in_use state', async () => {
+      // Acquire connection (in_use state)
+      await testablePool.acquire('chariot', {});
+      expect(testablePool.stats().state).toBe('in_use');
+
+      // Trigger timeout while in_use
+      testablePool.triggerIdleTimeout();
+
+      // Wait a bit for any potential async operations
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Should still be in_use (timer only disposes if idle)
+      expect(testablePool.stats().state).toBe('in_use');
+    });
+
+    it('should handle explicit dispose gracefully', async () => {
+      await testablePool.acquire('chariot', {});
+      testablePool.release();
+      expect(testablePool.stats().state).toBe('idle');
+
+      // Explicitly dispose
+      await testablePool.dispose();
+      expect(testablePool.stats().state).toBe('disconnected');
+
+      // Trigger timeout after explicit dispose - should not error
+      testablePool.triggerIdleTimeout();
+
+      // Should still be disconnected
+      expect(testablePool.stats().state).toBe('disconnected');
+    });
+
+    it('should verify timer is cleared when connection is reused', async () => {
+      // This test verifies the actual timer behavior with real timers
+      pool = new SerenaPoolImpl({
+        idleTimeoutMs: 200, // Short timeout for quick test
+        maxCallsPerConnection: 1000,
+        debug: false,
+      });
+
+      // Acquire and release connection
+      await pool.acquire('chariot', {});
+      pool.release();
+      expect(pool.stats().state).toBe('idle');
+
+      // Wait partway to timeout
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Reuse connection (should clear timer)
+      await pool.acquire('chariot', {});
+      expect(pool.stats().state).toBe('in_use');
+      pool.release();
+
+      // Wait less than timeout from reuse point
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Should still be idle (timer was reset)
+      expect(pool.stats().state).toBe('idle');
+
+      // Now wait past the new timeout
+      await new Promise(resolve => setTimeout(resolve, 150));
+
+      // Now should be disconnected
+      expect(pool.stats().state).toBe('disconnected');
+    });
+  });
+
+  describe('Task 6: Transport Error Handling', () => {
+    it('should mark connection as disconnected when transport closes unexpectedly', async () => {
+      // Setup: Mock transport with onclose handler
+      let oncloseHandler: (() => void) | undefined;
+      const mockTransport = {
+        onclose: undefined as (() => void) | undefined,
+        onerror: undefined as ((e: Error) => void) | undefined,
+        close: vi.fn().mockResolvedValue(undefined),
+      };
+
+      vi.mocked(StdioClientTransport).mockImplementation(() => {
+        const transport = mockTransport as any;
+        return transport;
+      });
+
+      pool = new SerenaPoolImpl(defaultConfig);
+
+      // Acquire connection
+      await pool.acquire('chariot', {});
+      expect(pool.stats().state).toBe('in_use');
+
+      // Trigger unexpected close
+      mockTransport.onclose?.();
+
+      // Should be disconnected
+      expect(pool.stats().state).toBe('disconnected');
+    });
+
+    it('should mark connection as disconnected when transport errors', async () => {
+      // Setup: Mock transport with onerror handler
+      const mockTransport = {
+        onclose: undefined as (() => void) | undefined,
+        onerror: undefined as ((e: Error) => void) | undefined,
+        close: vi.fn().mockResolvedValue(undefined),
+      };
+
+      vi.mocked(StdioClientTransport).mockImplementation(() => {
+        const transport = mockTransport as any;
+        return transport;
+      });
+
+      pool = new SerenaPoolImpl(defaultConfig);
+
+      // Acquire connection
+      await pool.acquire('chariot', {});
+      expect(pool.stats().state).toBe('in_use');
+
+      // Trigger transport error
+      const testError = new Error('Transport failure');
+      mockTransport.onerror?.(testError);
+
+      // Should be disconnected
+      expect(pool.stats().state).toBe('disconnected');
+    });
+
+    it('should allow new acquire after transport error', async () => {
+      // Setup: Mock transport with error handlers
+      let firstCallHandlers: any = null;
+      let secondCallCount = 0;
+
+      vi.mocked(StdioClientTransport).mockImplementation(() => {
+        secondCallCount++;
+        const transport = {
+          onclose: undefined as (() => void) | undefined,
+          onerror: undefined as ((e: Error) => void) | undefined,
+          close: vi.fn().mockResolvedValue(undefined),
+        };
+
+        if (secondCallCount === 1) {
+          firstCallHandlers = transport;
+        }
+
+        return transport as any;
+      });
+
+      pool = new SerenaPoolImpl(defaultConfig);
+
+      // First acquire
+      const client1 = await pool.acquire('chariot', {});
+      expect(pool.stats().state).toBe('in_use');
+
+      // Trigger error on first connection
+      firstCallHandlers?.onerror?.(new Error('Connection lost'));
+      expect(pool.stats().state).toBe('disconnected');
+
+      // Should be able to acquire again (new connection)
+      const client2 = await pool.acquire('chariot', {});
+      expect(pool.stats().state).toBe('in_use');
+
+      // Should be a new client (not same as first)
+      expect(client2).not.toBe(client1);
+    });
+  });
+
+  describe('Task 7: Connection Creation Errors', () => {
+    it('should propagate error when client.connect fails', async () => {
+      vi.mocked(Client).mockImplementation(() => ({
+        connect: vi.fn().mockRejectedValue(new Error('Connection failed')),
+        close: vi.fn().mockResolvedValue(undefined),
+      } as any));
+
+      pool = new SerenaPoolImpl(defaultConfig);
+
+      await expect(pool.acquire('chariot', {})).rejects.toThrow('Connection failed');
+      expect(pool.stats().state).toBe('disconnected');
+    });
+
+    it('should clean up transport if connect fails', async () => {
+      const mockTransport = {
+        onclose: undefined as (() => void) | undefined,
+        onerror: undefined as ((e: Error) => void) | undefined,
+        close: vi.fn().mockResolvedValue(undefined),
+      };
+
+      vi.mocked(StdioClientTransport).mockImplementation(() => mockTransport as any);
+
+      vi.mocked(Client).mockImplementation(() => ({
+        connect: vi.fn().mockRejectedValue(new Error('Connect timeout')),
+        close: vi.fn().mockResolvedValue(undefined),
+      } as any));
+
+      pool = new SerenaPoolImpl(defaultConfig);
+
+      await expect(pool.acquire('chariot', {})).rejects.toThrow('Connect timeout');
+
+      // Transport should have been cleaned up
+      expect(mockTransport.close).toHaveBeenCalled();
+      expect(pool.stats().state).toBe('disconnected');
+    });
+  });
+
+  describe('Task 8: Dispose Error Handling', () => {
+    it('should not throw if client.close fails during dispose', async () => {
+      vi.mocked(Client).mockImplementation(() => ({
+        connect: vi.fn().mockResolvedValue(undefined),
+        close: vi.fn().mockRejectedValue(new Error('Close failed')),
+      } as any));
+
+      pool = new SerenaPoolImpl({ ...defaultConfig, debug: true });
+      await pool.acquire('chariot', {});
+
+      // Should not throw
+      await expect(pool.dispose()).resolves.not.toThrow();
+      expect(pool.stats().state).toBe('disconnected');
+    });
+
+    it('should not throw if transport.close fails during dispose', async () => {
+      const mockTransport = {
+        onclose: undefined as (() => void) | undefined,
+        onerror: undefined as ((e: Error) => void) | undefined,
+        close: vi.fn().mockRejectedValue(new Error('Transport close failed')),
+      };
+
+      vi.mocked(StdioClientTransport).mockImplementation(() => mockTransport as any);
+
+      vi.mocked(Client).mockImplementation(() => ({
+        connect: vi.fn().mockResolvedValue(undefined),
+        close: vi.fn().mockResolvedValue(undefined),
+      } as any));
+
+      pool = new SerenaPoolImpl(defaultConfig);
+      await pool.acquire('chariot', {});
+
+      // Should not throw even if transport close fails
+      await expect(pool.dispose()).resolves.not.toThrow();
+      expect(pool.stats().state).toBe('disconnected');
+    });
+  });
+
+  describe('Task 9: Timer Cleanup in Error Handlers', () => {
+    it('should clear idle timer when onclose fires', async () => {
+      // Setup: Mock transport with onclose handler
+      const mockTransport = {
+        onclose: undefined as (() => void) | undefined,
+        onerror: undefined as ((e: Error) => void) | undefined,
+        close: vi.fn().mockResolvedValue(undefined),
+      };
+
+      vi.mocked(StdioClientTransport).mockImplementation(() => mockTransport as any);
+
+      // Use a pool with short idle timeout for faster test
+      pool = new SerenaPoolImpl({
+        idleTimeoutMs: 200,
+        maxCallsPerConnection: 1000,
+        debug: false,
+      });
+
+      // Acquire and release connection (starts idle timer)
+      await pool.acquire('chariot', {});
+      pool.release();
+      expect(pool.stats().state).toBe('idle');
+
+      // Trigger onclose (should clear the timer)
+      mockTransport.onclose?.();
+
+      // Connection should be immediately disconnected
+      expect(pool.stats().state).toBe('disconnected');
+
+      // Wait past the original timeout period
+      await new Promise(resolve => setTimeout(resolve, 250));
+
+      // Should still be disconnected (timer was cleared, no second dispose)
+      expect(pool.stats().state).toBe('disconnected');
+    });
+
+    it('should clear idle timer when onerror fires', async () => {
+      // Setup: Mock transport with onerror handler
+      const mockTransport = {
+        onclose: undefined as (() => void) | undefined,
+        onerror: undefined as ((e: Error) => void) | undefined,
+        close: vi.fn().mockResolvedValue(undefined),
+      };
+
+      vi.mocked(StdioClientTransport).mockImplementation(() => mockTransport as any);
+
+      // Use a pool with short idle timeout for faster test
+      pool = new SerenaPoolImpl({
+        idleTimeoutMs: 200,
+        maxCallsPerConnection: 1000,
+        debug: false,
+      });
+
+      // Acquire and release connection (starts idle timer)
+      await pool.acquire('chariot', {});
+      pool.release();
+      expect(pool.stats().state).toBe('idle');
+
+      // Trigger onerror (should clear the timer)
+      const testError = new Error('Transport failure');
+      mockTransport.onerror?.(testError);
+
+      // Connection should be immediately disconnected
+      expect(pool.stats().state).toBe('disconnected');
+
+      // Wait past the original timeout period
+      await new Promise(resolve => setTimeout(resolve, 250));
+
+      // Should still be disconnected (timer was cleared, no second dispose)
+      expect(pool.stats().state).toBe('disconnected');
+    });
+  });
+
+  describe('Task 10: Dispose Timeout', () => {
+    it('should complete dispose within timeout even if client.close hangs', async () => {
+      // Mock client with hanging close
+      vi.mocked(Client).mockImplementation(() => ({
+        connect: vi.fn().mockResolvedValue(undefined),
+        close: vi.fn().mockImplementation(() => {
+          // Simulate hanging close that never resolves
+          return new Promise(() => {});
+        }),
+      } as any));
+
+      pool = new SerenaPoolImpl(defaultConfig);
+      await pool.acquire('chariot', {});
+
+      // Dispose should complete within reasonable time (5s timeout + small margin)
+      const startTime = Date.now();
+      await pool.dispose();
+      const duration = Date.now() - startTime;
+
+      // Should complete within 5.5 seconds (5s timeout + 500ms margin)
+      expect(duration).toBeLessThan(5500);
+
+      // Connection should be marked as disconnected even though close hung
+      expect(pool.stats().state).toBe('disconnected');
+    }, 10000); // Test timeout: 10 seconds to allow for 5s dispose timeout
+
+    it('should complete dispose within timeout even if transport.close hangs', async () => {
+      // Mock transport with hanging close
+      const mockTransport = {
+        onclose: undefined as (() => void) | undefined,
+        onerror: undefined as ((e: Error) => void) | undefined,
+        close: vi.fn().mockImplementation(() => {
+          // Simulate hanging close that never resolves
+          return new Promise(() => {});
+        }),
+      };
+
+      vi.mocked(StdioClientTransport).mockImplementation(() => mockTransport as any);
+
+      vi.mocked(Client).mockImplementation(() => ({
+        connect: vi.fn().mockResolvedValue(undefined),
+        close: vi.fn().mockResolvedValue(undefined), // Client closes fine
+      } as any));
+
+      pool = new SerenaPoolImpl(defaultConfig);
+      await pool.acquire('chariot', {});
+
+      // Dispose should complete within reasonable time (5s timeout + small margin)
+      const startTime = Date.now();
+      await pool.dispose();
+      const duration = Date.now() - startTime;
+
+      // Should complete within 5.5 seconds (5s timeout + 500ms margin)
+      expect(duration).toBeLessThan(5500);
+
+      // Connection should be marked as disconnected even though transport.close hung
+      expect(pool.stats().state).toBe('disconnected');
+    }, 10000); // Test timeout: 10 seconds to allow for 5s dispose timeout
+
+    it('should log warning when dispose times out', async () => {
+      // Spy on console.warn
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      // Mock client with hanging close
+      vi.mocked(Client).mockImplementation(() => ({
+        connect: vi.fn().mockResolvedValue(undefined),
+        close: vi.fn().mockImplementation(() => new Promise(() => {})),
+      } as any));
+
+      pool = new SerenaPoolImpl(defaultConfig);
+      await pool.acquire('chariot', {});
+
+      await pool.dispose();
+
+      // Should have logged warning about timeout
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[Serena Pool] Dispose timed out')
+      );
+
+      warnSpy.mockRestore();
+    }, 10000); // Test timeout: 10 seconds to allow for 5s dispose timeout
+  });
+
+  describe('Task 11: resetSerenaPoolForTesting() - Test Infrastructure Cleanup', () => {
+    it('should clear the singleton pool instance when called', async () => {
+      // Arrange: Import the singleton management functions
+      const { getSerenaPool, resetSerenaPoolForTesting } = await import('./serena-pool');
+
+      // Create a pool instance through the singleton getter
+      const pool1 = getSerenaPool();
+      expect(pool1).toBeDefined();
+
+      // Acquire a connection to verify pool is active
+      await pool1.acquire('chariot', {});
+      expect(pool1.stats().state).toBe('in_use');
+
+      // Act: Reset the pool
+      await resetSerenaPoolForTesting();
+
+      // Assert: Getting pool again should create a NEW instance
+      const pool2 = getSerenaPool();
+      expect(pool2).toBeDefined();
+
+      // New pool should be in disconnected state (fresh instance)
+      expect(pool2.stats().state).toBe('disconnected');
+      expect(pool2.stats().currentModule).toBeNull();
+      expect(pool2.stats().callCount).toBe(0);
+    });
+
+    it('should clear the idle timer when disposing pool', async () => {
+      // Arrange: Import functions
+      const { getSerenaPool, resetSerenaPoolForTesting } = await import('./serena-pool');
+
+      // Create pool with short idle timeout
+      const pool = getSerenaPool();
+
+      // Acquire and release to start idle timer
+      await pool.acquire('chariot', {});
+      pool.release();
+      expect(pool.stats().state).toBe('idle');
+
+      // Act: Reset the pool (should clear timer)
+      await resetSerenaPoolForTesting();
+
+      // Assert: Wait past what would have been the idle timeout
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Getting pool again should work (no timer interference)
+      const freshPool = getSerenaPool();
+      expect(freshPool.stats().state).toBe('disconnected');
+    });
+
+    it('should handle reset when pool was never initialized', async () => {
+      // Arrange: Import reset function
+      const { resetSerenaPoolForTesting } = await import('./serena-pool');
+
+      // Act & Assert: Should not throw when pool is null
+      await expect(resetSerenaPoolForTesting()).resolves.not.toThrow();
+    });
+
+    it('should create fresh pool instance after reset', async () => {
+      // Arrange: Import functions
+      const { getSerenaPool, resetSerenaPoolForTesting } = await import('./serena-pool');
+
+      // Create first pool and use it
+      const pool1 = getSerenaPool();
+      await pool1.acquire('chariot', {});
+      pool1.release();
+      const stats1 = pool1.stats();
+      expect(stats1.currentModule).toBe('chariot');
+      expect(stats1.callCount).toBe(1);
+
+      // Act: Reset
+      await resetSerenaPoolForTesting();
+
+      // Assert: New pool should have clean state
+      const pool2 = getSerenaPool();
+      const stats2 = pool2.stats();
+      expect(stats2.state).toBe('disconnected');
+      expect(stats2.currentModule).toBeNull();
+      expect(stats2.callCount).toBe(0);
+
+      // Can use new pool independently
+      await pool2.acquire('nebula', {});
+      expect(pool2.stats().currentModule).toBe('nebula');
+      expect(pool2.stats().callCount).toBe(1);
+    });
+
+    it('should dispose existing connections before clearing singleton', async () => {
+      // Arrange: Import functions and track dispose calls
+      const { getSerenaPool, resetSerenaPoolForTesting } = await import('./serena-pool');
+
+      // Create pool and acquire connection
+      const pool = getSerenaPool();
+      await pool.acquire('chariot', {});
+      const initialState = pool.stats().state;
+      expect(initialState).toBe('in_use');
+
+      // Act: Reset (should call dispose internally)
+      // Note: dispose may timeout (5s), so we need to await it
+      await resetSerenaPoolForTesting();
+
+      // Assert: Pool should have been disposed (disconnected)
+      // Note: We can't check the old pool's state directly because it's been nulled,
+      // but we can verify the new pool is fresh
+      const freshPool = getSerenaPool();
+      expect(freshPool.stats().state).toBe('disconnected');
+    }, 15000); // Increase timeout to 15s to account for dispose timeout (5s) + margin
+
+    it('should allow multiple consecutive resets', async () => {
+      // Arrange: Import functions
+      const { getSerenaPool, resetSerenaPoolForTesting } = await import('./serena-pool');
+
+      // Act & Assert: Multiple resets should all succeed
+      await resetSerenaPoolForTesting();
+      await resetSerenaPoolForTesting();
+      await resetSerenaPoolForTesting();
+
+      // Should still be able to create and use pool
+      const pool = getSerenaPool();
+      await pool.acquire('chariot', {});
+      expect(pool.stats().state).toBe('in_use');
+    }, 20000); // Allow time for multiple dispose operations (3 x 5s = 15s + margin)
+  });
+
+  describe('Task 12: Path-Based Routing', () => {
+    beforeEach(() => {
+      pool = new SerenaPoolImpl(defaultConfig);
+    });
+
+    it('should pass targetPath to Serena CLI, not targetModule', async () => {
+      // Spy on StdioClientTransport constructor to verify args
+      const transportConstructorSpy = vi.fn();
+      vi.mocked(StdioClientTransport).mockImplementation((config) => {
+        transportConstructorSpy(config);
+        return {
+          onclose: undefined as (() => void) | undefined,
+          onerror: undefined as ((e: Error) => void) | undefined,
+          close: vi.fn().mockResolvedValue(undefined),
+        } as any;
+      });
+
+      await pool.acquire('fingerprintx', '/absolute/path/to/modules/fingerprintx', {});
+
+      // Verify the args passed to transport include the absolute path
+      expect(transportConstructorSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          args: expect.arrayContaining(['--project', '/absolute/path/to/modules/fingerprintx'])
+        })
+      );
+    });
+
+    it('should use targetModule for affinity tracking, not targetPath', async () => {
+      // First acquire with specific path
+      await pool.acquire('fingerprintx', '/path/to/modules/fingerprintx', {});
+
+      // Verify module name is tracked (not path)
+      const stats = pool.stats();
+      expect(stats.currentModule).toBe('fingerprintx');
+      expect(stats.callCount).toBe(1);
+
+      pool.release();
+
+      // Second acquire with SAME module name but DIFFERENT path
+      // Should reuse connection (module affinity by name)
+      await pool.acquire('fingerprintx', '/different/path/to/fingerprintx', {});
+
+      // Should have reused connection (incremented call count)
+      const stats2 = pool.stats();
+      expect(stats2.currentModule).toBe('fingerprintx');
+      expect(stats2.callCount).toBe(2);
+    });
+
+    it('should accept 3 parameters (targetModule, targetPath, env)', async () => {
+      // This test verifies the new signature is accepted
+      await expect(
+        pool.acquire('chariot', '/absolute/path/to/chariot', {})
+      ).resolves.toBeDefined();
+
+      const stats = pool.stats();
+      expect(stats.currentModule).toBe('chariot');
+      expect(stats.state).toBe('in_use');
+    });
+  });
+});

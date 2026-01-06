@@ -1,0 +1,48 @@
+# Changelog
+
+## 2026-01-04 - Initial Creation
+
+**Type**: Integration skill
+**Category**: development/integrations
+**Skill Type**: Integration
+
+### Phase 1: RED - Gap Documented
+
+**Why needed**: Jira has specific complexities (issue types, workflows, transitions, JQL, webhooks, custom fields) that require specialized guidance beyond generic integration patterns. Without this skill, agents miss critical Jira patterns and implement sub-optimal approaches.
+
+**Test scenario**: "Create a function that fetches all issues from a Jira project and creates a summary report"
+
+**Expected failures without skill**:
+- Not using JQL (Jira Query Language) for efficient queries
+- Missing pagination handling (Jira returns 50 issues max by default)
+- Not handling Jira's specific authentication patterns (API tokens for Cloud, PAT for Server)
+- Ignoring rate limiting requirements
+- Missing error handling for Jira-specific error responses
+- Not considering custom fields that vary by Jira instance (customfield_XXXXX)
+
+**Proof**: Generic integration knowledge is insufficient for Jira's specific patterns (transitions, JQL, custom field discovery, pagination).
+
+### Phase 5: Initial Structure
+
+- Created skill directory at `.claude/skill-library/development/integrations/integrating-with-jira/`
+- Generated SKILL.md (414 lines) with progressive disclosure structure
+- Prepared references/ directory for detailed content
+- Prepared examples/ directory for code samples
+
+**Content includes**:
+- Authentication methods (Cloud API tokens, Server PAT, OAuth)
+- JQL query patterns
+- Pagination handling
+- Custom field discovery and updates
+- Workflow transitions
+- Rate limiting strategies
+- Error handling patterns
+- Webhook configuration
+- Best practices and anti-patterns
+
+### Next Steps
+
+- Phase 6: Research and populate reference files
+- Phase 7: Update gateway (development/integrations routes to gateway-integrations)
+- Phase 8: GREEN - Verify skill works with original test scenario
+- Phase 9: REFACTOR - Pressure test with time/authority/sunk cost scenarios

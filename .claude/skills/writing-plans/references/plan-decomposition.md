@@ -5,6 +5,7 @@
 ## Problem
 
 Monolithic plan files create execution problems:
+
 - 5,000-10,000 line plans overwhelm executing agents
 - Context windows can't hold entire plan
 - Agents lose track of progress
@@ -21,12 +22,12 @@ Monolithic plan files create execution problems:
 
 Apply decomposition when plans meet ANY threshold:
 
-| Threshold | Indicates |
-|-----------|-----------|
-| **>30 tasks** | Too many steps for single execution flow |
-| **>5 major components** | Multiple independent concerns |
-| **>2500 lines** | Context overflow risk |
-| **>3 days estimated** | Multi-session work |
+| Threshold               | Indicates                                |
+| ----------------------- | ---------------------------------------- |
+| **>30 tasks**           | Too many steps for single execution flow |
+| **>5 major components** | Multiple independent concerns            |
+| **>2500 lines**         | Context overflow risk                    |
+| **>3 days estimated**   | Multi-session work                       |
 
 **When in doubt:** Decompose. Better to have 3 small phases than 1 overwhelming document.
 
@@ -54,6 +55,7 @@ docs/plans/YYYY-MM-DD-feature-name/
 - **descriptive-name:** Lowercase, hyphenated, describes phase focus
 
 **Examples:**
+
 - `phase-0-foundation.md` - Setup, infrastructure, shared utilities
 - `phase-1-router-migration.md` - TanStack Router migration
 - `phase-2-table-migration.md` - TanStack Table adoption
@@ -116,6 +118,7 @@ This phase is complete when:
 ### Task 1: [Component Name]
 
 **Files:**
+
 - Create: `exact/path/to/file.tsx`
 - Modify: `exact/path/to/existing.tsx:123-145`
 - Test: `tests/exact/path/to/test.tsx`
@@ -123,11 +126,11 @@ This phase is complete when:
 **Step 1: Write the failing test**
 
 ```typescript
-describe('ComponentName', () => {
-  it('should handle specific behavior', () => {
+describe("ComponentName", () => {
+  it("should handle specific behavior", () => {
     // Test implementation
-  })
-})
+  });
+});
 ```
 
 **Step 2: Run test to verify it fails**
@@ -140,7 +143,7 @@ Expected: FAIL with "component not defined"
 ```typescript
 export const ComponentName = () => {
   // Minimal implementation
-}
+};
 ```
 
 **Step 4: Run test to verify it passes**
@@ -222,9 +225,11 @@ The manifest provides the index and coordination for all phases.
 [2-3 sentences about the technical approach]
 
 **Tech Stack:**
+
 - [Key technologies/libraries]
 
 **Key Principles:**
+
 - DRY, YAGNI, TDD
 - Frequent commits
 - Test-first development
@@ -234,6 +239,7 @@ The manifest provides the index and coordination for all phases.
 ## Phase Index
 
 ### Phase 0: Foundation
+
 **File:** `phase-0-foundation.md`
 **Focus:** Setup, infrastructure, shared utilities
 **Tasks:** ~10
@@ -241,6 +247,7 @@ The manifest provides the index and coordination for all phases.
 **Status:** ⬜ Not Started
 
 ### Phase 1: Component A Migration
+
 **File:** `phase-1-component-a.md`
 **Focus:** [Description]
 **Tasks:** ~15
@@ -248,6 +255,7 @@ The manifest provides the index and coordination for all phases.
 **Status:** ⬜ Not Started
 
 ### Phase 2: Component B Migration
+
 **File:** `phase-2-component-b.md`
 **Focus:** [Description]
 **Tasks:** ~15
@@ -255,6 +263,7 @@ The manifest provides the index and coordination for all phases.
 **Status:** ⬜ Not Started
 
 ### Phase 3: Integration
+
 **File:** `phase-3-integration.md`
 **Focus:** Bring components together
 **Tasks:** ~12
@@ -262,6 +271,7 @@ The manifest provides the index and coordination for all phases.
 **Status:** ⬜ Not Started
 
 ### Phase 4: Cleanup
+
 **File:** `phase-4-cleanup.md`
 **Focus:** Remove deprecated code, update docs
 **Tasks:** ~8
@@ -275,6 +285,7 @@ The manifest provides the index and coordination for all phases.
 ### Suggested Order
 
 **Sequential phases:**
+
 1. Phase 0 (Foundation) → MUST complete first
 2. Phase 1 (Component A) → Can start after Phase 0
 3. Phase 2 (Component B) → Can start after Phase 0
@@ -282,6 +293,7 @@ The manifest provides the index and coordination for all phases.
 5. Phase 4 (Cleanup) → MUST complete Phase 3 first
 
 **Parallel opportunities:**
+
 - Phase 1 and Phase 2 can be executed in parallel (independent)
 
 ### Cross-Phase Dependencies
@@ -356,12 +368,14 @@ Phase 0 (Foundation)
 **Best for:** Features with clear component boundaries
 
 **Structure:**
+
 - Phase 0: Foundation (shared code, utilities, types)
 - Phase 1-N: One phase per major component
 - Phase N+1: Integration (bring components together)
 - Phase N+2: Cleanup (remove old code, docs)
 
 **Example:** TanStack Migration
+
 ```
 Phase 0: Foundation (shared types, utilities)
 Phase 1: Router migration
@@ -376,12 +390,14 @@ Phase 5: Cleanup deprecated code
 **Best for:** Refactors with strict ordering requirements
 
 **Structure:**
+
 - Phase 0: Low-level primitives
 - Phase 1: Mid-level components depending on Phase 0
 - Phase 2: High-level features depending on Phase 1
 - Phase 3: Integration and cleanup
 
 **Example:** Authentication Refactor
+
 ```
 Phase 0: Auth primitives (token storage, validation)
 Phase 1: Auth context (React context using primitives)
@@ -395,12 +411,14 @@ Phase 4: Remove old auth system
 **Best for:** High-risk refactors requiring careful rollout
 
 **Structure:**
+
 - Phase 0: Low-risk, isolated changes
 - Phase 1: Medium-risk, limited blast radius
 - Phase 2: High-risk, critical path changes
 - Phase 3: Verification and rollback preparation
 
 **Example:** Database Migration
+
 ```
 Phase 0: Add new schema alongside old
 Phase 1: Dual-write to both schemas
@@ -415,12 +433,12 @@ Phase 4: Remove old schema
 
 ### Ideal Phase Size
 
-| Metric | Target |
-|--------|--------|
-| **Tasks** | 10-20 per phase |
-| **Lines** | 800-1200 per phase file |
-| **Execution Time** | 2-4 hours per phase |
-| **Commits** | 10-20 per phase |
+| Metric             | Target                  |
+| ------------------ | ----------------------- |
+| **Tasks**          | 10-20 per phase         |
+| **Lines**          | 800-1200 per phase file |
+| **Execution Time** | 2-4 hours per phase     |
+| **Commits**        | 10-20 per phase         |
 
 ### Too Small (Anti-Pattern)
 
@@ -508,17 +526,19 @@ Phase 2: Import and use formatDate
 
 **Solution:** Document breaking changes in phase file
 
-````markdown
+```markdown
 ## Breaking Changes in This Phase
 
 **Function signature changed:**
+
 - Old: `createUser(name: string)`
 - New: `createUser(data: UserInput)`
 
 **Impact:**
+
 - Phase 1 code needs update if re-executed
 - Documented in phase-1-component-a.md under "Post-Phase-2 Notes"
-````
+```
 
 ### Rollback Strategy
 
@@ -526,7 +546,7 @@ Phase 2: Import and use formatDate
 
 **Solution:** Document rollback in phase file
 
-````markdown
+```markdown
 ## Rollback Procedure
 
 If this phase fails:
@@ -536,7 +556,7 @@ If this phase fails:
 3. Apply fix to Phase 1
 4. Re-execute Phase 2
 5. Re-attempt Phase 3
-````
+```
 
 ---
 
@@ -545,8 +565,9 @@ If this phase fails:
 ### Detect Monolithic Plan
 
 Signs you have a monolithic plan:
+
 - Single file >2500 lines
-- >30 tasks in sequence
+- > 30 tasks in sequence
 - Multiple major components mixed together
 - Hard to find specific tasks
 
@@ -555,6 +576,7 @@ Signs you have a monolithic plan:
 **Step 1: Identify natural boundaries**
 
 Read through plan, mark component transitions:
+
 ```
 Tasks 1-12: Router migration  ← Phase 1
 Tasks 13-25: Table migration  ← Phase 2
@@ -565,6 +587,7 @@ Tasks 36-40: Documentation    ← Phase 4
 **Step 2: Extract phases**
 
 Create phase files, copy relevant tasks:
+
 ```
 phase-1-router.md: Tasks 1-12
 phase-2-table.md: Tasks 13-25
@@ -575,6 +598,7 @@ phase-4-docs.md: Tasks 36-40
 **Step 3: Add phase structure**
 
 For each phase file:
+
 - Add entry criteria
 - Add exit criteria
 - Add phase goal
@@ -583,6 +607,7 @@ For each phase file:
 **Step 4: Create PLAN.md**
 
 Build manifest:
+
 - Phase index
 - Dependencies
 - Execution order
@@ -622,6 +647,7 @@ Build manifest:
 **Complexity:** 65 tasks, 4 major components, ~8000 lines
 
 **Decomposition:**
+
 ```
 PLAN.md (manifest)
 phase-0-foundation.md (15 tasks - types, utilities)
@@ -638,6 +664,7 @@ phase-4-cleanup.md (4 tasks - remove old code)
 **Complexity:** 42 tasks, 3 layers, ~5200 lines
 
 **Decomposition:**
+
 ```
 PLAN.md (manifest)
 phase-0-primitives.md (10 tasks - token, validation)
@@ -653,6 +680,7 @@ phase-3-migration.md (5 tasks - update pages)
 **Complexity:** 38 tasks, 5 risk stages, ~4500 lines
 
 **Decomposition:**
+
 ```
 PLAN.md (manifest)
 phase-0-new-schema.md (8 tasks - add new tables)

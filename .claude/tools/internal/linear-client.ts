@@ -45,7 +45,7 @@ export async function executeLinearQuery<T = any>(
 
   if (!apiKey || typeof apiKey !== 'string') {
     throw new Error(
-      'LINEAR_API_KEY not configured. Set LINEAR_API_KEY environment variable or add to credentials.json'
+      'Linear authentication not configured. Please configure OAuth 2.0 in credentials.json'
     );
   }
 

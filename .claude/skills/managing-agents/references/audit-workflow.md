@@ -145,4 +145,4 @@ None - the auditing-agents skill handles all setup internally.
 
 ## Historical Note: test.ts CLI (DEPRECATED)
 
-The `test.ts` CLI script was deprecated - it performed structural checks that now belong in audit, not test. The `test` operation now ONLY routes to `testing-agent-skills` for behavioral validation.
+The `test.ts` CLI script was deprecated - it performed structural checks that now belong in audit, not test. The `test` operation now ONLY routes to `verifying-agent-skill-invocation` for behavioral validation.

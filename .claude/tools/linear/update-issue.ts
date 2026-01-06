@@ -1,12 +1,12 @@
 /**
- * update_issue - Linear MCP Wrapper
+ * update_issue - Linear GraphQL Wrapper
  *
- * Update an existing issue in Linear via MCP server
+ * Update an existing issue in Linear via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~500 tokens (update response)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -25,20 +25,19 @@
  * - cycle: string (optional) - Cycle (sprint) ID to assign issue to
  *
  * OUTPUT (after filtering):
- * - success: boolean - Always true on successful update
- * - issue: object
- *   - id: string - Linear internal UUID
- *   - identifier: string - Human-readable ID (e.g., CHARIOT-1234)
- *   - title: string - Issue title (updated or original)
- *   - url: string - Direct link to the issue
+ * - id: string - Linear internal UUID
+ * - identifier: string - Human-readable ID (e.g., CHARIOT-1234)
+ * - title: string - Issue title (updated or original)
+ * - url: string - Direct link to the issue
+ * - estimatedTokens: number - Token usage estimate
  *
  * Edge cases discovered:
- * - MCP returns the issue directly, not wrapped in {success, issue}
- * - On error, MCP returns a string error message, not an object
+ * - GraphQL returns {success, issue} structure via issueUpdate mutation
  * - Issue ID can be identifier (CHARIOT-1234) or UUID
- * - Assignee "me" resolves to authenticated user
+ * - Assignee "me" resolves to authenticated user (mapped to assigneeId)
  * - Only provided fields are updated; omitted fields remain unchanged
  * - Invalid issue ID returns descriptive error from Linear API
+ * - Field names must be mapped (assignee → assigneeId, state → stateId, etc.)
  *
  * @example
  * ```typescript
@@ -58,13 +57,33 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoControlCharsAllowWhitespace,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL mutation for updating an issue
+ */
+const UPDATE_ISSUE_MUTATION = `
+  mutation IssueUpdate($id: String!, $input: IssueUpdateInput!) {
+    issueUpdate(id: $id, input: $input) {
+      success
+      issue {
+        id
+        identifier
+        title
+        url
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -133,21 +152,35 @@ export type UpdateIssueInput = z.infer<typeof updateIssueParams>;
 
 /**
  * Output schema - minimal essential fields
+ * Returns flattened structure (no nested issue wrapper)
  */
 export const updateIssueOutput = z.object({
-  success: z.boolean(),
-  issue: z.object({
-    id: z.string(),
-    identifier: z.string(),
-    title: z.string(),
-    url: z.string()
-  })
+  id: z.string(),
+  identifier: z.string(),
+  title: z.string(),
+  url: z.string(),
+  estimatedTokens: z.number()
 });
 
 export type UpdateIssueOutput = z.infer<typeof updateIssueOutput>;
 
 /**
- * Update an existing issue in Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface IssueUpdateResponse {
+  issueUpdate: {
+    success: boolean;
+    issue?: {
+      id: string;
+      identifier: string;
+      title: string;
+      url: string;
+    };
+  };
+}
+
+/**
+ * Update an existing issue in Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -172,36 +205,87 @@ export const updateIssue = {
   description: 'Update an existing issue in Linear',
   parameters: updateIssueParams,
 
-  async execute(input: UpdateIssueInput): Promise<UpdateIssueOutput> {
+  async execute(
+    input: UpdateIssueInput,
+    testToken?: string
+  ): Promise<UpdateIssueOutput> {
     // Validate input
     const validated = updateIssueParams.parse(input);
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'update_issue',
-      validated
+    // Extract id from input
+    const { id, ...updateFields } = validated;
+
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Build GraphQL input - map field names to Linear API format
+    const mutationInput: {
+      title?: string;
+      description?: string;
+      assigneeId?: string;
+      stateId?: string;
+      priority?: number;
+      projectId?: string;
+      labelIds?: string[];
+      dueDate?: string;
+      parentId?: string;
+      cycleId?: string;
+    } = {};
+
+    // Add optional fields if present
+    if (updateFields.title) {
+      mutationInput.title = updateFields.title;
+    }
+    if (updateFields.description) {
+      mutationInput.description = updateFields.description;
+    }
+    if (updateFields.assignee) {
+      mutationInput.assigneeId = updateFields.assignee; // assignee → assigneeId
+    }
+    if (updateFields.state) {
+      mutationInput.stateId = updateFields.state; // state → stateId
+    }
+    if (updateFields.priority !== undefined) {
+      mutationInput.priority = updateFields.priority;
+    }
+    if (updateFields.project) {
+      mutationInput.projectId = updateFields.project; // project → projectId
+    }
+    if (updateFields.labels) {
+      mutationInput.labelIds = updateFields.labels; // labels → labelIds
+    }
+    if (updateFields.dueDate) {
+      mutationInput.dueDate = updateFields.dueDate;
+    }
+    if (updateFields.parentId) {
+      mutationInput.parentId = updateFields.parentId;
+    }
+    if (updateFields.cycle) {
+      mutationInput.cycleId = updateFields.cycle; // cycle → cycleId
+    }
+
+    // Execute GraphQL mutation
+    const response = await executeGraphQL<IssueUpdateResponse>(
+      client,
+      UPDATE_ISSUE_MUTATION,
+      { id, input: mutationInput }
     );
 
-    // Linear MCP returns the issue directly, not wrapped in {success, issue}
-    // Check if we got an error message instead of an issue
-    if (typeof rawData === 'string') {
-      throw new Error(`Failed to update issue: ${rawData}`);
+    if (!response.issueUpdate?.success || !response.issueUpdate?.issue) {
+      throw new Error('Failed to update issue');
     }
 
-    if (!rawData.id) {
-      throw new Error('Failed to update issue: No issue ID returned');
-    }
+    // Filter to essential fields (flattened structure)
+    const baseData = {
+      id: response.issueUpdate.issue.id,
+      identifier: response.issueUpdate.issue.identifier,
+      title: response.issueUpdate.issue.title,
+      url: response.issueUpdate.issue.url
+    };
 
-    // Filter to essential fields
     const filtered = {
-      success: true,
-      issue: {
-        id: rawData.id,
-        identifier: rawData.identifier,
-        title: rawData.title,
-        url: rawData.url
-      }
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

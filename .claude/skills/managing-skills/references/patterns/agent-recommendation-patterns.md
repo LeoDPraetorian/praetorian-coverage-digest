@@ -437,7 +437,7 @@ When integrating a skill with an agent:
 
 - [ ] **Verification**
   - Agent can discover skill through normal workflow
-  - Skill appears in `npm run search -- "{keyword}"`
+  - Skill appears in searching-skills results for "{keyword}"
 ```
 
 ## Related Files

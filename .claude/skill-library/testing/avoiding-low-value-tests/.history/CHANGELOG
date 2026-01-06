@@ -1,0 +1,18 @@
+# Changelog
+
+## 2026-01-02 - Initial Creation
+
+### RED Phase Evidence
+- **Gap**: During go-cicd Phase 2 implementation, agents wrote tests that achieved 94.8% coverage but ~40% were low-value (constant identity tests, trivial getters, length-only assertions)
+- **Failure**: Agent instructed to "add tests for 90% coverage" produced coverage-padding tests like `TestNodeType_Values` that only verify constants equal themselves
+- **Impact**: Coverage numbers looked good but tests wouldn't catch real bugs; concurrency tests missing despite mutex usage
+
+### Implementation
+- **Location**: skill-library/testing/
+- **Type**: Process/Pattern (methodology)
+- **Content**:
+  - 5 low-value patterns to avoid with examples
+  - 5 high-value patterns required with examples
+  - Mandatory checklist (7 categories)
+  - Anti-pattern detection table
+  - Counter-arguments for common rationalizations

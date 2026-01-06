@@ -1,12 +1,12 @@
 /**
- * find_user - Linear MCP Wrapper
+ * find_user - Linear GraphQL Wrapper
  *
- * Find a specific user in Linear workspace via MCP server
+ * Find a specific user in Linear workspace via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~300 tokens (single user)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: 46,000 tokens at start
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -25,7 +25,7 @@
  * - createdAt: string (optional) - ISO timestamp
  *
  * Edge cases discovered:
- * - MCP list_users with query returns array, we take first match
+ * - GraphQL users query returns array, we take first match
  * - Empty query returns all users, not an error
  * - Query matches against name and email
  *
@@ -40,16 +40,39 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL query for finding a user
+ */
+const FIND_USER_QUERY = `
+  query Users($filter: UserFilter) {
+    users(filter: $filter, first: 1) {
+      nodes {
+        id
+        name
+        email
+        displayName
+        avatarUrl
+        active
+        admin
+        createdAt
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
- * Maps to list_users params with query
+ * Maps to users query params with filter
  */
 export const findUserParams = z.object({
   // Search query - full validation
@@ -75,12 +98,31 @@ export const findUserOutput = z.object({
   active: z.boolean().optional(),
   admin: z.boolean().optional(),
   createdAt: z.string().optional(),
+  estimatedTokens: z.number()
 });
 
 export type FindUserOutput = z.infer<typeof findUserOutput>;
 
 /**
- * Find a user in Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface UsersResponse {
+  users: {
+    nodes: Array<{
+      id: string;
+      name: string;
+      email: string;
+      displayName?: string | null;
+      avatarUrl?: string | null;
+      active?: boolean | null;
+      admin?: boolean | null;
+      createdAt?: string | null;
+    }>;
+  } | null;
+}
+
+/**
+ * Find a user in Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -95,19 +137,34 @@ export const findUser = {
   description: 'Find a specific user in Linear workspace',
   parameters: findUserParams,
 
-  async execute(input: FindUserInput): Promise<FindUserOutput> {
+  async execute(
+    input: FindUserInput,
+    testToken?: string
+  ): Promise<FindUserOutput> {
     // Validate input
     const validated = findUserParams.parse(input);
 
-    // Call MCP tool (uses list_users with query to find)
-    const rawData = await callMCPTool(
-      'linear',
-      'list_users',
-      { query: validated.query, limit: 1 }
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Execute GraphQL query with filter
+    // Note: Linear's API will match the query string against name and email
+    const response = await executeGraphQL<UsersResponse>(
+      client,
+      FIND_USER_QUERY,
+      {
+        filter: {
+          or: [
+            { email: { containsIgnoreCase: validated.query } },
+            { name: { containsIgnoreCase: validated.query } },
+            { displayName: { containsIgnoreCase: validated.query } }
+          ]
+        }
+      }
     );
 
-    // Linear MCP returns array from list_users
-    const users = Array.isArray(rawData) ? rawData : (rawData?.users || []);
+    // Linear GraphQL returns array from users query
+    const users = response.users?.nodes || [];
 
     if (users.length === 0) {
       throw new Error(`User not found: ${validated.query}`);
@@ -116,15 +173,20 @@ export const findUser = {
     const user = users[0];
 
     // Filter to essential fields
-    const filtered = {
+    const baseData = {
       id: user.id,
       name: user.name,
       email: user.email,
-      displayName: user.displayName,
-      avatarUrl: user.avatarUrl,
-      active: user.active,
-      admin: user.admin,
-      createdAt: user.createdAt,
+      displayName: user.displayName || undefined,
+      avatarUrl: user.avatarUrl || undefined,
+      active: user.active ?? undefined,
+      admin: user.admin ?? undefined,
+      createdAt: user.createdAt || undefined,
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

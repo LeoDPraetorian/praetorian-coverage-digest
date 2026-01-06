@@ -29,7 +29,7 @@ Modifying existing agent?
 Validating agent?
 ├─ Quick check → skill: "auditing-agents" (Phase 0 CLI)
 ├─ Full audit → Read auditing-agents (Phases 1-18)
-└─ Test behavior → Read testing-agent-skills
+└─ Test behavior → Read verifying-agent-skill-invocation
 
 Discovery?
 ├─ Find agent → Read searching-agents
@@ -77,16 +77,16 @@ Discovery?
 
 ## Router Table
 
-| Operation | Library Skill                                                                 |
-| --------- | ----------------------------------------------------------------------------- |
-| create    | `.claude/skill-library/claude/agent-management/creating-agents/SKILL.md`      |
-| update    | `.claude/skill-library/claude/agent-management/updating-agents/SKILL.md`      |
-| audit     | `.claude/skill-library/claude/agent-management/auditing-agents/SKILL.md`      |
-| fix       | `.claude/skill-library/claude/agent-management/fixing-agents/SKILL.md`        |
-| rename    | `.claude/skill-library/claude/agent-management/renaming-agents/SKILL.md`      |
-| test      | `.claude/skill-library/claude/agent-management/testing-agent-skills/SKILL.md` |
-| search    | `.claude/skill-library/claude/agent-management/searching-agents/SKILL.md`     |
-| list      | `.claude/skill-library/claude/agent-management/listing-agents/SKILL.md`       |
+| Operation | Library Skill                                                                             |
+| --------- | ----------------------------------------------------------------------------------------- |
+| create    | `.claude/skill-library/claude/agent-management/creating-agents/SKILL.md`                  |
+| update    | `.claude/skill-library/claude/agent-management/updating-agents/SKILL.md`                  |
+| audit     | `.claude/skill-library/claude/agent-management/auditing-agents/SKILL.md`                  |
+| fix       | `.claude/skill-library/claude/agent-management/fixing-agents/SKILL.md`                    |
+| rename    | `.claude/skill-library/claude/agent-management/renaming-agents/SKILL.md`                  |
+| test      | `.claude/skill-library/claude/agent-management/verifying-agent-skill-invocation/SKILL.md` |
+| search    | `.claude/skill-library/claude/agent-management/searching-agents/SKILL.md`                 |
+| list      | `.claude/skill-library/claude/agent-management/listing-agents/SKILL.md`                   |
 
 ---
 

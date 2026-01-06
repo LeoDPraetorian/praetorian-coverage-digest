@@ -31,7 +31,7 @@
   },
   "test-skills-with-subagents": {
     "type": "renamed",
-    "replacedBy": "testing-skills-with-subagents",
+    "replacedBy": "pressure-testing-skill-content",
     "deprecatedOn": "2025-11-30"
   },
   "time-calibration": {

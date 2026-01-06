@@ -36,6 +36,7 @@ class HarnessResult:
 Create three runner modules:
 
 **generator_runner.py**:
+
 ```python
 def run_generator(name: str, prompt: str, generations: int) -> dict:
     # Import and instantiate Python generator
@@ -47,6 +48,7 @@ def run_generator(name: str, prompt: str, generations: int) -> dict:
 ```
 
 **detector_runner.py**:
+
 ```python
 def run_detector(name: str, attempt_json: str) -> dict:
     # Parse attempt
@@ -60,6 +62,7 @@ def run_detector(name: str, attempt_json: str) -> dict:
 ```
 
 **probe_runner.py**:
+
 ```python
 def run_probe(name: str, generator_name: Optional[str] = None) -> dict:
     # Import and instantiate Python probe
@@ -232,11 +235,13 @@ See examples in SKILL.md main content.
 ### Example Fix
 
 **Test output**:
+
 ```
 Difference in primary_detector: Go=always.Pass, Python=any.AnyOutput
 ```
 
 **Fix in Go**:
+
 ```go
 // Before
 func (b *Blank) GetPrimaryDetector() string {
@@ -250,6 +255,7 @@ func (b *Blank) GetPrimaryDetector() string {
 ```
 
 **Update unit test**:
+
 ```go
 // Before
 assert.Equal(t, "always.Pass", probe.GetPrimaryDetector())

@@ -21,13 +21,13 @@ Use this skill when:
 
 ## Quick Reference
 
-| Step | Action | Files Modified |
-|------|--------|----------------|
-| 1 | Create plugin directory | `pkg/plugins/services/{protocol}/` |
-| 2 | Implement Plugin interface | `{protocol}.go` |
-| 3 | Add type constants | `pkg/plugins/types.go` |
-| 4 | Register plugin import | `pkg/scan/plugin_list.go` |
-| 5 | Test against real service | Manual verification |
+| Step | Action                     | Files Modified                     |
+| ---- | -------------------------- | ---------------------------------- |
+| 1    | Create plugin directory    | `pkg/plugins/services/{protocol}/` |
+| 2    | Implement Plugin interface | `{protocol}.go`                    |
+| 3    | Add type constants         | `pkg/plugins/types.go`             |
+| 4    | Register plugin import     | `pkg/scan/plugin_list.go`          |
+| 5    | Test against real service  | Manual verification                |
 
 ## Plugin Interface (5 Methods)
 
@@ -259,29 +259,29 @@ func buildCPE(version string) string {
 
 ## Priority Guidelines
 
-| Priority | Use When |
-|----------|----------|
-| -1 | Protocol may coexist with HTTP on same port (MongoDB, some DBs) |
-| 0-50 | High-priority protocols (SSH, common services) |
-| 100 | Default for most protocols |
-| 200+ | Low-priority, try after others |
+| Priority | Use When                                                        |
+| -------- | --------------------------------------------------------------- |
+| -1       | Protocol may coexist with HTTP on same port (MongoDB, some DBs) |
+| 0-50     | High-priority protocols (SSH, common services)                  |
+| 100      | Default for most protocols                                      |
+| 200+     | Low-priority, try after others                                  |
 
 ## Protocol Type Reference
 
-| Type | Description | Example Protocols |
-|------|-------------|-------------------|
-| `plugins.TCP` | Plain TCP connection | Redis, MongoDB, MySQL |
-| `plugins.TCPTLS` | TLS-wrapped TCP | HTTPS, LDAPS, IMAPS |
-| `plugins.UDP` | UDP datagram | DNS, SNMP, NTP |
+| Type             | Description          | Example Protocols     |
+| ---------------- | -------------------- | --------------------- |
+| `plugins.TCP`    | Plain TCP connection | Redis, MongoDB, MySQL |
+| `plugins.TCPTLS` | TLS-wrapped TCP      | HTTPS, LDAPS, IMAPS   |
+| `plugins.UDP`    | UDP datagram         | DNS, SNMP, NTP        |
 
 ## Example Plugins to Study
 
-| Complexity | Plugin | Path | Pattern |
-|------------|--------|------|---------|
-| Simple | Redis | `pkg/plugins/services/redis/` | Text protocol, single probe |
-| Complex | MongoDB | `pkg/plugins/services/mongodb/` | Binary protocol, two-phase, fallbacks |
-| TLS | HTTPS | `pkg/plugins/services/https/` | TLS handling, Wappalyzer |
-| UDP | DNS | `pkg/plugins/services/dns/` | UDP protocol handling |
+| Complexity | Plugin  | Path                            | Pattern                               |
+| ---------- | ------- | ------------------------------- | ------------------------------------- |
+| Simple     | Redis   | `pkg/plugins/services/redis/`   | Text protocol, single probe           |
+| Complex    | MongoDB | `pkg/plugins/services/mongodb/` | Binary protocol, two-phase, fallbacks |
+| TLS        | HTTPS   | `pkg/plugins/services/https/`   | TLS handling, Wappalyzer              |
+| UDP        | DNS     | `pkg/plugins/services/dns/`     | UDP protocol handling                 |
 
 ## Testing Checklist (REQUIRED)
 
@@ -312,24 +312,24 @@ Each plugin should include:
 
 ## Common Pitfalls
 
-| Pitfall | Solution |
-|---------|----------|
-| Forgetting to register in `plugin_list.go` | Plugin won't be discovered |
-| Wrong priority (HTTP blocks detection) | Use -1 for DB protocols on HTTP ports |
-| Not handling auth-required | Detection should succeed, enrichment can fail |
-| Hardcoded timeouts | Always use the `timeout` parameter |
-| Missing error types | Use `utils.InvalidResponseErrorInfo` |
+| Pitfall                                    | Solution                                      |
+| ------------------------------------------ | --------------------------------------------- |
+| Forgetting to register in `plugin_list.go` | Plugin won't be discovered                    |
+| Wrong priority (HTTP blocks detection)     | Use -1 for DB protocols on HTTP ports         |
+| Not handling auth-required                 | Detection should succeed, enrichment can fail |
+| Hardcoded timeouts                         | Always use the `timeout` parameter            |
+| Missing error types                        | Use `utils.InvalidResponseErrorInfo`          |
 
 ## Common Rationalizations (DO NOT USE)
 
-| Rationalization | Why It's Wrong |
-|-----------------|----------------|
-| "Older plugins don't have CPEs" | Legacy debt. New plugins must have CPE. |
-| "CPE is marked `omitempty`" | That's for JSON output, not a license to skip. |
-| "Ship it, iterate later" | TODOs have ~10% completion rate. Do it now. |
+| Rationalization                           | Why It's Wrong                                            |
+| ----------------------------------------- | --------------------------------------------------------- |
+| "Older plugins don't have CPEs"           | Legacy debt. New plugins must have CPE.                   |
+| "CPE is marked `omitempty`"               | That's for JSON output, not a license to skip.            |
+| "Ship it, iterate later"                  | TODOs have ~10% completion rate. Do it now.               |
 | "Two-phase is only for complex protocols" | It's the standard pattern. Detection + Enrichment always. |
-| "It works manually, so it's done" | Working != Complete. Follow the checklist. |
-| "Time pressure - merge now, fix later" | Technical debt compounds. Take the time. |
+| "It works manually, so it's done"         | Working != Complete. Follow the checklist.                |
+| "Time pressure - merge now, fix later"    | Technical debt compounds. Take the time.                  |
 
 **If you catch yourself making these excuses, STOP.** Go back to the skill and complete all requirements.
 
@@ -341,8 +341,8 @@ Each plugin should include:
 
 ## Related Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `gateway-backend` | Go development patterns |
-| `gateway-capabilities` | Other security tool development |
-| `developing-with-tdd` | Test-driven development workflow |
+| Skill                  | Purpose                          |
+| ---------------------- | -------------------------------- |
+| `gateway-backend`      | Go development patterns          |
+| `gateway-capabilities` | Other security tool development  |
+| `developing-with-tdd`  | Test-driven development workflow |

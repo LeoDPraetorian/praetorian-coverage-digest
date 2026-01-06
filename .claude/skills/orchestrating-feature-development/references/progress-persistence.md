@@ -13,7 +13,7 @@ Enable long-running feature development by:
 
 ## Progress File Schema
 
-**Location**: `.claude/features/{feature-id}/progress.json`
+**Location**: `.claude/.output/features/{feature-id}/progress.json`
 
 ```json
 {
@@ -28,7 +28,7 @@ Enable long-running feature development by:
     "brainstorming": {
       "status": "complete",
       "approved": true,
-      "design_file": ".claude/features/user-dashboard_20241213_103000/design.md",
+      "design_file": ".claude/.output/features/user-dashboard_20241213_103000/design.md",
       "started_at": "2024-12-13T10:30:00Z",
       "completed_at": "2024-12-13T10:45:00Z",
       "duration_minutes": 15
@@ -37,7 +37,7 @@ Enable long-running feature development by:
     "planning": {
       "status": "complete",
       "approved": true,
-      "plan_file": ".claude/features/user-dashboard_20241213_103000/plan.md",
+      "plan_file": ".claude/.output/features/user-dashboard_20241213_103000/plan.md",
       "task_count": 8,
       "started_at": "2024-12-13T10:45:00Z",
       "completed_at": "2024-12-13T11:00:00Z",
@@ -46,7 +46,7 @@ Enable long-running feature development by:
 
     "architecture": {
       "status": "complete",
-      "architecture_file": ".claude/features/user-dashboard_20241213_103000/architecture.md",
+      "architecture_file": ".claude/.output/features/user-dashboard_20241213_103000/architecture.md",
       "agent_used": "frontend-architect",
       "decisions": [
         "Compound component pattern for dashboard widgets",
@@ -84,10 +84,10 @@ Enable long-running feature development by:
   },
 
   "artifacts": {
-    "design": ".claude/features/user-dashboard_20241213_103000/design.md",
-    "plan": ".claude/features/user-dashboard_20241213_103000/plan.md",
-    "architecture": ".claude/features/user-dashboard_20241213_103000/architecture.md",
-    "progress": ".claude/features/user-dashboard_20241213_103000/progress.json"
+    "design": ".claude/.output/features/user-dashboard_20241213_103000/design.md",
+    "plan": ".claude/.output/features/user-dashboard_20241213_103000/plan.md",
+    "architecture": ".claude/.output/features/user-dashboard_20241213_103000/architecture.md",
+    "progress": ".claude/.output/features/user-dashboard_20241213_103000/progress.json"
   },
 
   "metadata": {
@@ -107,8 +107,8 @@ Enable long-running feature development by:
 jq '.phases.brainstorming.status = "complete" |
     .phases.brainstorming.completed_at = "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'" |
     .current_phase = "planning"' \
-    .claude/features/{feature-id}/progress.json > /tmp/progress.json && \
-    mv /tmp/progress.json .claude/features/{feature-id}/progress.json
+    .claude/.output/features/{feature-id}/progress.json > /tmp/progress.json && \
+    mv /tmp/progress.json .claude/.output/features/{feature-id}/progress.json
 ```
 
 Or use Node.js/TypeScript:
@@ -116,7 +116,7 @@ Or use Node.js/TypeScript:
 ```typescript
 import fs from "fs";
 
-const progressPath = `.claude/features/${featureId}/progress.json`;
+const progressPath = `.claude/.output/features/${featureId}/progress.json`;
 const progress = JSON.parse(fs.readFileSync(progressPath, "utf-8"));
 
 progress.phases.brainstorming.status = "complete";
@@ -133,7 +133,7 @@ fs.writeFileSync(progressPath, JSON.stringify(progress, null, 2));
 ```typescript
 // Check if feature ID provided
 const featureId = args[0];
-const progressPath = `.claude/features/${featureId}/progress.json`;
+const progressPath = `.claude/.output/features/${featureId}/progress.json`;
 
 if (fs.existsSync(progressPath)) {
   const progress = JSON.parse(fs.readFileSync(progressPath, "utf-8"));
@@ -188,7 +188,7 @@ FEATURE_ID="${FEATURE_SLUG}_${TIMESTAMP}"
 ## Workspace Directory Structure
 
 ```
-.claude/features/{feature-id}/
+.claude/.output/features/{feature-id}/
 ├── progress.json           # Progress state (this document)
 ├── design.md               # Phase 1 output
 ├── frontend-discovery.md   # Phase 2 output
@@ -214,7 +214,7 @@ FEATURE_ID="${FEATURE_SLUG}_${TIMESTAMP}"
 ## Resume Workflow
 
 1. **Detect resume mode**: User provides feature ID instead of description
-2. **Load progress file**: Read `.claude/features/{id}/progress.json`
+2. **Load progress file**: Read `.claude/.output/features/{id}/progress.json`
 3. **Display status**: Show current phase and last completed
 4. **Load artifacts**: Read design, plan, architecture files
 5. **Create TodoWrite**: Reconstruct todos based on phase status

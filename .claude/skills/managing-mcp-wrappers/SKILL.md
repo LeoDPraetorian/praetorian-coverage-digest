@@ -14,13 +14,13 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 
 ### Create Workflow (Instruction-Driven)
 
-| Operation  | Method                               | Time      |
-| ---------- | ------------------------------------ | --------- |
-| **Create** | Use `creating-mcp-wrappers` skill    | 20-30 min |
-| Update     | `npm run update -- <service> <tool>` | 10-20 min |
-| Audit      | `npm run audit -- <service>/<tool>`  | 2-5 min   |
+| Operation  | Method                                          | Time      |
+| ---------- | ----------------------------------------------- | --------- |
+| **Create** | Routes to `orchestrating-mcp-development` skill | 30-60 min |
+| Update     | `npm run update -- <service> <tool>`            | 10-20 min |
+| Audit      | `npm run audit -- <service>/<tool>`             | 2-5 min   |
 
-### TDD Workflow (CLI Gates - Used by creating-mcp-wrappers)
+### TDD Workflow (CLI Gates - Used by orchestrating-mcp-development)
 
 | Step            | Command                                        | What It Does                            |
 | --------------- | ---------------------------------------------- | --------------------------------------- |
@@ -134,44 +134,45 @@ When auditing wrappers, verify:
 
 ## Operations
 
-### Create (Delegated to creating-mcp-wrappers)
+### Create (Routes to orchestrating-mcp-development)
 
-**Wrapper creation is now instruction-driven via the `creating-mcp-wrappers` skill.**
+**Wrapper creation uses multi-agent orchestration for 100% tool coverage.**
 
-Use the skill:
+Load the orchestration skill:
 
 ```
-skill: "creating-mcp-wrappers"
+Read(".claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md")
 ```
 
-The `creating-mcp-wrappers` skill guides you through:
+The `orchestrating-mcp-development` skill provides:
 
-1. **Schema Discovery** - Interactive MCP exploration with ≥3 test cases
-2. **Test Design** - Claude reasons about test cases (≥18 tests across 6 categories)
-3. **RED Gate** - CLI mechanical verification (`npm run verify-red`)
-4. **Wrapper Generation** - CLI template generation (`npm run generate-wrapper`)
-5. **Implementation** - Claude implements from schema discovery docs
-6. **GREEN Gate** - CLI mechanical verification (`npm run verify-green`, coverage ≥80%)
-7. **Audit** - CLI validates 11 phases (`npm run audit`)
-8. **Service Skill** - CLI updates service skill (`npm run generate-skill`)
+1. **Phase 0-1**: Setup workspace and configure MCP server
+2. **Phase 2**: Tool discovery - find ALL tools in the MCP service
+3. **Phase 3**: Shared architecture design (mcp-tool-lead + security-lead in PARALLEL)
+4. **Phase 4**: Per-tool architecture + test planning (BATCHED, 3-5 tools)
+5. **Phase 5**: RED Gate - all tests must fail
+6. **Phase 6**: Implementation (mcp-tool-developer, BATCHED)
+7. **Phase 7**: Code review (mcp-tool-reviewer, max 1 retry per tool)
+8. **Phase 8**: GREEN Gate - all tests pass with ≥80% coverage
+9. **Phase 9**: Audit - all wrappers pass ≥10/11 phases
+10. **Phase 10**: Completion - generate service skill
 
-**Why instruction-driven?**
+**Why multi-agent orchestration?**
 
-- Claude can explore MCP tools interactively (vs manual schema script)
-- Test cases are tailored to discovered schema (vs generic template)
-- Implementation is guided by schema analysis (vs "customize wrapper" instruction)
-- **CLI gates still enforce mechanical TDD** (verify-red, verify-green are unchanged)
-
-**The CLI becomes the "guard rails" that the skill delegates to for enforcement.**
+- **100% tool coverage** - wraps ALL tools in an MCP service
+- **Shared patterns** - consistent architecture across all wrappers
+- **Batched parallel execution** - efficient processing of multiple tools
+- **Quality gates** - human checkpoint, code review, coverage enforcement
+- **CLI gates still enforce mechanical TDD** (verify-red, verify-green unchanged)
 
 **After creation, verify compliance:**
 
 ```bash
-npm run audit -- {service}/{tool}
-# Target: ≥10/11 phases pass
+npm run audit -- {service}
+# Target: ≥10/11 phases pass for ALL wrappers
 ```
 
-**See**: `creating-mcp-wrappers` skill for complete workflow documentation
+**See**: `orchestrating-mcp-development` skill for complete 11-phase workflow
 
 ### Update (Test-Guarded Changes)
 

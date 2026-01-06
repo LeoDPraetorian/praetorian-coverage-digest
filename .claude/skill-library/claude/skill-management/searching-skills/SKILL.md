@@ -183,7 +183,7 @@ Found {count} matches
 **Search: "test"**
 
 ```text
-[CORE] testing-skills-with-subagents (Score: 100)
+[CORE] pressure-testing-skill-content (Score: 100)
 [LIB] frontend-unit-test-engineer (Score: 50)
 [LIB] backend-tester (Score: 50)
 ```

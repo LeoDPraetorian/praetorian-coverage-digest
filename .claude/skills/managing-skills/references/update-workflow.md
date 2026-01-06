@@ -41,16 +41,12 @@ Gap: Skill doesn't explicitly forbid implementation-first
 
 ### Step 3: Update Skill Minimally
 
-**Command:**
+**Process:**
 
-```bash
-# From .claude/ root (using workspace shortcut)
-cd .claude
-npm run update -- skill-name "Brief description of change"
+Use the updating-skills library skill which guides through the TDD update workflow:
 
-# Or from the updating-skills scripts directory
-cd .claude/skill-library/claude/skill-management/updating-skills/scripts
-npm run update -- skill-name "Brief description of change"
+```
+Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")
 ```
 
 **Make minimal change:**
@@ -104,18 +100,16 @@ npm run update -- skill-name "Brief description of change"
 
 ### Step 6: Compliance Re-Audit
 
-**Automatic re-validation:**
+**Re-validate by invoking auditing-skills:**
 
-```bash
-npm run audit -- skill-name
-```
+Audit the skill to verify compliance with all phase requirements.
 
 **Verify:**
 
 - Word count still appropriate
 - No broken links introduced
 - File organization maintained
-- All 22 phases still pass
+- All compliance requirements still pass
 
 **If audit shows word count warning (>500 lines), proceed to Step 7.**
 
@@ -288,9 +282,7 @@ wc -l references/*.md # Can be any length
 
 **Step 7.7: Re-Run Audit**
 
-```bash
-npm run audit -- skill-name
-```
+Audit the skill to verify compliance with all phase requirements.
 
 **Should now pass Phase 3 (Word Count) without warnings.**
 

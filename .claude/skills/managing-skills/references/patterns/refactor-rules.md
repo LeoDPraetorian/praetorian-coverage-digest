@@ -114,7 +114,7 @@ When updating existing skills via `updating-skills`, REFACTOR is **optional only
 ### 1. Load Pressure Testing Skill
 
 ```
-skill: "testing-skills-with-subagents"
+Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")
 ```
 
 This skill provides:
@@ -215,6 +215,6 @@ Is this a new skill or an update?
 
 ## Related
 
-- `testing-skills-with-subagents` skill - Pressure testing methodology
+- `pressure-testing-skill-content` skill - Pressure testing methodology
 - `creating-skills` - New skill creation workflow (Phase 9: REFACTOR)
 - `updating-skills` - Existing skill update workflow (Phase 8: REFACTOR)

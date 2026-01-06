@@ -1,6 +1,6 @@
 ---
 name: integrating-standalone-capabilities
-description: Use when integrating standalone security tools with Chariot - generates capability wrappers, adapters, and parsers for both existing CLI tools and new Go tools implementing the simple interface pattern
+description: Use when integrating standalone security tools with Chariot - guides distribution architecture decisions (open-source purity, wrapper location) and generates capability wrappers, adapters, and parsers
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion
 ---
 
@@ -16,8 +16,91 @@ Use this skill when:
 - Integrating new Go tools that implement the simple interface pattern
 - Converting standalone scanners into Chariot capabilities
 - Automating capability integration without manual boilerplate
+- **Making distribution architecture decisions** (where integration code lives)
 
 **You MUST use TodoWrite** to track the generation workflow.
+
+---
+
+## 🚨 Distribution Architecture (READ FIRST)
+
+**CRITICAL: This section prevents a common architectural mistake.**
+
+### The Correct Pattern (fingerprintx)
+
+```
+OPEN-SOURCE TOOL REPO (e.g., github.com/praetorian-inc/go-cicd)
+==============================================================
+tool/
+├── go.mod                        # NO Chariot/Tabularium imports
+├── cmd/tool/                     # Standalone CLI
+└── pkg/                          # Pure library (no private deps)
+
+
+PRIVATE CHARIOT REPO (github.com/praetorian-inc/chariot)
+========================================================
+chariot/backend/build/pkg/tasks/capabilities/
+└── tool_name/
+    ├── capability.go             # Implements model.Capability
+    ├── adapter.go                # Finding → Risk translation
+    └── init.go                   # Registration
+```
+
+**Key Principle**: Integration code lives in **Chariot**, NOT in the tool. The tool stays pure open-source.
+
+### The Anti-Pattern (DO NOT DO THIS)
+
+```
+❌ WRONG: Chariot code inside tool repo
+==========================================
+tool/
+├── go.mod                        # Has Chariot/Tabularium imports ← BREAKS OSS
+├── cmd/tool/
+├── pkg/
+└── chariot/                      # ← WRONG LOCATION
+    ├── capability.go             # Imports private repos
+    └── adapter.go
+```
+
+**Why this is wrong:**
+
+| Problem                             | Impact                                     |
+| ----------------------------------- | ------------------------------------------ |
+| Private dependencies in public repo | Open-source users can't `go build`         |
+| Version coupling                    | Tool releases blocked by Chariot stability |
+| Wrong dependency direction          | OSS depends on private = anti-pattern      |
+| Violates all existing patterns      | 87+ capabilities follow correct pattern    |
+
+**Evidence**: This exact mistake was made in go-cicd's Phase 4 plan and caught during architecture review. See `.claude/.output/capabilities/20260104-180219-go-cicd-phase3-plugins/distribution-architecture-analysis.md`.
+
+### CLI Mode vs Library Mode
+
+When creating the Chariot wrapper, choose an invocation mode:
+
+| Mode             | How                             | When to Use                                                                       |
+| ---------------- | ------------------------------- | --------------------------------------------------------------------------------- |
+| **CLI Mode**     | `exec.Command("tool", args...)` | Default for all tools. Matches fingerprintx, nuclei, gato-x pattern.              |
+| **Library Mode** | `import "tool/pkg"`             | Only when type safety is critical AND you accept Chariot rebuild on tool updates. |
+
+**Recommendation: CLI Mode** for most tools because:
+
+- Matches 100% of existing standalone tool patterns
+- Complete process isolation
+- Tool updates don't require Chariot rebuild
+- JSON output parsing is straightforward
+
+### Decision Checklist
+
+Before writing any integration code:
+
+- [ ] Tool's go.mod has NO Chariot/Tabularium imports
+- [ ] Integration code will live in `chariot/backend/build/pkg/tasks/capabilities/`
+- [ ] Tool can be built/run independently (`go build ./cmd/tool`)
+- [ ] Invocation mode chosen (CLI recommended)
+
+**Cannot proceed to generation workflow until checklist passes.** ✅
+
+---
 
 ## Quick Reference
 

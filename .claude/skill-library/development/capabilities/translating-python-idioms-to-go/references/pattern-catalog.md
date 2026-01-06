@@ -5,6 +5,7 @@
 ## 1. Generators (yield) → iter.Seq
 
 ### Python Pattern
+
 ```python
 def buff(self, attempts):
     """Generator that transforms attempts."""
@@ -18,6 +19,7 @@ for attempt in buff(attempts):
 ```
 
 ### Go 1.25 Pattern
+
 ```go
 import "iter"
 
@@ -41,6 +43,7 @@ for attempt := range buff.Buff(attempts) {
 ### iter.Seq Variants
 
 **Single value** (`iter.Seq[V]`):
+
 ```go
 func Generate() iter.Seq[string] {
     return func(yield func(string) bool) {
@@ -54,6 +57,7 @@ func Generate() iter.Seq[string] {
 ```
 
 **Key-value pairs** (`iter.Seq2[K,V]`):
+
 ```go
 func Enumerate[V any](slice []V) iter.Seq2[int, V] {
     return func(yield func(int, V) bool) {
@@ -72,6 +76,7 @@ for i, item := range Enumerate(items) {
 ```
 
 **Pull iterators** (advanced):
+
 ```go
 import "iter"
 
@@ -92,6 +97,7 @@ func consumeIterator() {
 ## 2. Class Inheritance → Interface + Struct Embedding
 
 ### Python Pattern (ABC)
+
 ```python
 from abc import ABC, abstractmethod
 
@@ -159,12 +165,14 @@ func (p *DanProbe) Probe(ctx context.Context, gen Generator) ([]Attempt, error) 
 ### Multiple Interface Implementation
 
 **Python (multiple inheritance)**:
+
 ```python
 class ConcreteProbe(BaseProbe, Serializable, Configurable):
     pass
 ```
 
 **Go (interface composition)**:
+
 ```go
 type ConcreteProbe interface {
     Prober
@@ -184,6 +192,7 @@ type DanProbe struct {
 ### Middleware Pattern (Function Wrapping)
 
 **Python**:
+
 ```python
 @retry(max_attempts=3)
 @timeout(seconds=30)
@@ -193,6 +202,7 @@ def call_api(endpoint, data):
 ```
 
 **Go**:
+
 ```go
 type Handler func(string, interface{}) (interface{}, error)
 
@@ -225,7 +235,8 @@ handler := withRetry(3, withTimeout(30*time.Second, callAPI))
 
 ### Functional Options Pattern (Constructor Configuration)
 
-**Python (**kwargs)**:
+**Python (**kwargs)\*\*:
+
 ```python
 class Generator:
     def __init__(self, model, **kwargs):
@@ -238,6 +249,7 @@ gen = Generator("gpt-4", temperature=0.9, timeout=60)
 ```
 
 **Go**:
+
 ```go
 type Generator struct {
     model       string
@@ -280,6 +292,7 @@ gen := NewGenerator("gpt-4", WithTemperature(0.9), WithTimeout(60*time.Second))
 ## 4. Exception Handling → Error Returns
 
 ### Basic Pattern
+
 ```python
 try:
     result = operation()
@@ -295,6 +308,7 @@ if err != nil {
 ```
 
 ### Specific Exception Types
+
 ```python
 try:
     result = api.call()
@@ -327,6 +341,7 @@ if err != nil {
 ```
 
 ### Error Wrapping
+
 ```python
 try:
     data = load_file()
@@ -344,6 +359,7 @@ if err != nil {
 ## 5. Async/Await → Goroutines
 
 ### Simple Async
+
 ```python
 async def fetch(url):
     response = await http.get(url)
@@ -369,6 +385,7 @@ result, err := fetch(ctx, "https://api.example.com")
 ```
 
 ### Concurrent Operations (asyncio.gather)
+
 ```python
 async def fetch_all(urls):
     tasks = [fetch(url) for url in urls]
@@ -403,6 +420,7 @@ func fetchAll(ctx context.Context, urls []string) ([]string, error) {
 ```
 
 ### Async Context Managers
+
 ```python
 async with session.get(url) as response:
     data = await response.json()
@@ -421,6 +439,7 @@ data, err := resp.JSON()
 ## Additional Patterns
 
 See [pattern-catalog-extended.md](pattern-catalog-extended.md) for:
+
 - Property decorators → Getters/Setters
 - Multiple return values
 - Named returns

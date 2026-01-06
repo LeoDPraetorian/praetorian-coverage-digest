@@ -13,40 +13,61 @@ Enable clean coordination between phases by:
 
 ## Standard Handoff Format
 
-All Task agents **MUST** return this JSON structure:
+All Task agents **MUST** follow the `persisting-agent-outputs` skill for output format.
+
+The metadata JSON block at the end of each agent output file serves as the handoff:
 
 ```json
 {
+  "agent": "frontend-developer",
+  "output_type": "implementation",
+  "timestamp": "2025-12-30T15:45:00Z",
+  "feature_directory": ".claude/.output/features/...",
+  "skills_invoked": [...],
+  "library_skills_read": [...],
+  "source_files_verified": [...],
   "status": "complete|blocked|needs_review",
-  "phase": "architecture|implementation|testing",
-  "summary": "1-2 sentence description of what was accomplished",
-  "files_modified": ["path/to/file1.ts", "path/to/file2.tsx"],
-  "artifacts": ["path/to/architecture.md", "path/to/diagram.png"],
-  "verification": {
-    "tests_passed": true|false,
-    "build_success": true|false,
-    "lint_passed": true|false,
-    "coverage_percent": 85,
-    "command_output": "Relevant command output snippet"
-  },
+  "blocked_reason": "security_concern|architecture_decision|missing_requirements|test_failures|out_of_scope|unknown",
+  "attempted": ["What agent tried before blocking"],
   "handoff": {
-    "next_phase": "implementation|testing|complete",
-    "recommended_agent": "frontend-developer",
-    "context": "Key information the next agent needs to know",
-    "blockers": []
+    "next_agent": null,
+    "context": "Key information for next phase"
   }
 }
 ```
 
+**Key rules:**
+
+- When `status` is `blocked`: include `blocked_reason` and `attempted`
+- When `status` is `blocked`: set `handoff.next_agent` to `null` (orchestrator decides routing via `orchestrating-multi-agent-workflows` skill)
+- When `status` is `complete`: `handoff.next_agent` can suggest next phase agent
+
+See `persisting-agent-outputs` skill for complete field definitions.
+
 ## Field Descriptions
+
+See `persisting-agent-outputs/references/metadata-format.md` for complete field definitions.
 
 ### status
 
 | Value          | When to Use                                                |
 | -------------- | ---------------------------------------------------------- |
 | `complete`     | All work finished successfully, ready for next phase       |
-| `blocked`      | Cannot proceed without user input or external dependency   |
+| `blocked`      | Cannot proceed - include `blocked_reason` and `attempted`  |
 | `needs_review` | Work complete but requires user approval before next phase |
+
+### blocked_reason (required when status=blocked)
+
+| Value                   | When to Use                                |
+| ----------------------- | ------------------------------------------ |
+| `security_concern`      | Security issue needs security agent review |
+| `architecture_decision` | Design decision needs lead agent input     |
+| `missing_requirements`  | Cannot proceed without more information    |
+| `test_failures`         | Tests failing, needs debugging             |
+| `out_of_scope`          | Task exceeds agent's domain                |
+| `unknown`               | Blocker doesn't fit other categories       |
+
+The orchestrator uses `orchestrating-multi-agent-workflows` skill's agent routing table to determine next steps based on `blocked_reason`.
 
 ### phase
 
@@ -90,8 +111,8 @@ Optional: Non-code files created (documentation, diagrams, etc.):
 
 ```json
 "artifacts": [
-  ".claude/features/user-dashboard_20241213_103000/architecture.md",
-  ".claude/features/user-dashboard_20241213_103000/component-diagram.png"
+  ".claude/.output/features/user-dashboard_20241213_103000/architecture.md",
+  ".claude/.output/features/user-dashboard_20241213_103000/component-diagram.png"
 ]
 ```
 
@@ -127,20 +148,19 @@ Next phase in the sequence:
 - `testing` - After implementation
 - `complete` - After testing (feature done)
 
-### handoff.recommended_agent
+### handoff.next_agent
 
-Which agent should continue:
+Suggested next agent (orchestrator decides final routing):
 
 ```json
-// After architecture
-"recommended_agent": "frontend-developer"
+// When complete - can suggest next phase agent
+"next_agent": "frontend-developer"
 
-// After implementation
-"recommended_agent": "frontend-unit-test-engineer"
-
-// After unit tests, recommend E2E
-"recommended_agent": "frontend-e2e-test-engineer"
+// When blocked - orchestrator decides using routing table
+"next_agent": null
 ```
+
+**Key principle**: When `status` is `blocked`, set to `null` and include `blocked_reason`. The orchestrator uses `orchestrating-multi-agent-workflows` skill's routing table to determine the appropriate next agent based on the blocker type.
 
 ### handoff.context
 
@@ -188,7 +208,7 @@ Only populated when `status: "blocked"`:
   "phase": "architecture",
   "summary": "Designed dashboard using compound component pattern with Zustand for state and TanStack Query for API calls",
   "files_modified": [],
-  "artifacts": [".claude/features/user-dashboard_20241213_103000/architecture.md"],
+  "artifacts": [".claude/.output/features/user-dashboard_20241213_103000/architecture.md"],
   "verification": {
     "patterns_referenced": true,
     "existing_code_analyzed": true,
@@ -196,7 +216,7 @@ Only populated when `status: "blocked"`:
   },
   "handoff": {
     "next_phase": "implementation",
-    "recommended_agent": "frontend-developer",
+    "next_agent": "frontend-developer",
     "context": "Dashboard structure: <Dashboard> parent with <Dashboard.Widget> children. Create 3 widgets: ActiveScansWidget, VulnerabilitiesWidget, AssetsWidget. State management: Zustand store at stores/dashboardStore.ts for UI state (layout, filters). Data fetching: TanStack Query hooks in hooks/useDashboardMetrics.ts, hooks/useVulnerabilityMetrics.ts, hooks/useAssetMetrics.ts. Follow existing patterns in sections/insights/metrics/.",
     "blockers": []
   }
@@ -224,7 +244,7 @@ Only populated when `status: "blocked"`:
   },
   "handoff": {
     "next_phase": "testing",
-    "recommended_agent": "backend-tester",
+    "next_agent": "backend-tester",
     "context": "Handler at pkg/handler/handlers/dashboard/get_metrics.go. Accepts query params: timeRange (7d|30d|90d), metricTypes (scans|vulns|assets). Returns aggregated metrics from DynamoDB. Added unit tests but need more edge case coverage: invalid timeRange, missing auth, empty results. Target 80% coverage.",
     "blockers": []
   }
@@ -252,7 +272,7 @@ Only populated when `status: "blocked"`:
   },
   "handoff": {
     "next_phase": "complete",
-    "recommended_agent": null,
+    "next_agent": null,
     "context": "Feature fully tested. Unit tests cover all widgets, loading states, error handling, and data transformations. E2E tests cover dashboard navigation, widget rendering, and user interactions. No known issues.",
     "blockers": []
   }
@@ -263,29 +283,28 @@ Only populated when `status: "blocked"`:
 
 ```json
 {
+  "agent": "frontend-developer",
+  "output_type": "implementation-blocked",
+  "timestamp": "2025-12-30T15:45:00Z",
+  "feature_directory": ".claude/.output/features/2025-12-30-dashboard",
+  "skills_invoked": ["gateway-frontend", "developing-with-tdd"],
+  "library_skills_read": [],
+  "source_files_verified": ["src/api/dashboard.ts:45-120"],
   "status": "blocked",
-  "phase": "implementation",
-  "summary": "Partially implemented dashboard, blocked on missing API specification",
-  "files_modified": ["modules/chariot/ui/src/sections/dashboard/index.tsx"],
-  "artifacts": [],
-  "verification": {
-    "build_success": false,
-    "command_output": "TypeScript errors: Cannot find type 'MetricsResponse'"
-  },
+  "blocked_reason": "missing_requirements",
+  "attempted": [
+    "Searched for API specification in docs/",
+    "Checked existing endpoint patterns in src/api/",
+    "Reviewed Swagger/OpenAPI definitions"
+  ],
   "handoff": {
-    "next_phase": "implementation",
-    "recommended_agent": "frontend-developer",
-    "context": "Created dashboard shell but cannot complete without API types. Need backend team to provide: 1) Response type for /api/dashboard/metrics 2) Error response format 3) Sample response data for mocking",
-    "blockers": [
-      {
-        "type": "missing_dependency",
-        "description": "API type definitions not available",
-        "resolution": "Backend team must provide TypeScript types or OpenAPI spec"
-      }
-    ]
+    "next_agent": null,
+    "context": "Dashboard metrics API endpoint not documented. Need specification for: response shape, pagination, filtering parameters."
   }
 }
 ```
+
+Note: `handoff.next_agent` is `null` because the orchestrator determines routing using the agent routing table in `orchestrating-multi-agent-workflows`.
 
 ## Handling Handoffs
 

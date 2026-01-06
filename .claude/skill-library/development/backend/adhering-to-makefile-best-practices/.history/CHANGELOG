@@ -1,0 +1,53 @@
+# Changelog
+
+## [Initial Creation] - 2026-01-06
+
+### RED Phase Documentation
+
+**Gap Identified:**
+The Chariot Development Platform extensively uses Makefiles (root-level Makefile with `make chariot`, `make setup`, module-specific Makefiles in backend/capabilities/etc.), but there was no skill to guide Makefile creation or maintenance following best practices.
+
+**Failure Scenario:**
+Task: "Update the root Makefile to add a new target for running integration tests. Make sure it follows best practices."
+
+Without this skill, Claude would:
+1. Add a bare target without `.PHONY` declaration
+2. Hardcode paths instead of using variables
+3. Not consider cross-platform compatibility (`?=` operator)
+4. Miss dependency declarations (targets wouldn't rebuild when sources change)
+5. Use wildcards incorrectly (bare `*` instead of `$(wildcard)` or `$(shell find)`)
+6. Create overly complex compound commands (violating CLAUDE.md guidance)
+7. Forget `.DELETE_ON_ERROR` (leaving partial artifacts on failure)
+8. Not add help target with `### comment` patterns
+
+**Research Sources:**
+- [Makefile Tutorial by Example](https://makefiletutorial.com/)
+- [Modern Make](https://makefile.site/)
+- [Cloud Posse Best Practices](https://docs.cloudposse.com/best-practices/developer/makefile/)
+- [Makefiles Best Practices](https://danyspin97.org/blog/makefiles-best-practices/)
+- [Common Pitfalls - MoldStud](https://moldstud.com/articles/p-makefile-madness-common-pitfalls-and-how-to-avoid-them)
+- [Top 5 Mistakes - ConfigZen](https://configzen.com/blog/top-5-makefile-mistakes-dev-process)
+
+### Skill Metadata
+
+- **Category:** `development/backend/`
+- **Location:** Skill Library (on-demand loading)
+- **Type:** Process/Pattern
+- **Line Count:** 394 lines (under 500 limit)
+- **References:** 8 planned reference files for progressive disclosure
+
+### Changes
+
+- Initial SKILL.md with progressive disclosure architecture
+- Core principles: variables, targets, dependencies, patterns, auto-discovery, safety
+- Chariot-specific integration (command simplicity requirement)
+- Quick reference table for common patterns
+- Validation checklist (10 items)
+- Anti-pattern catalog (10 common mistakes)
+
+### Next Steps
+
+- Phase 6: Research and populate reference files
+- Phase 7: Add to gateway-backend routing table
+- Phase 8: GREEN verification (test skill resolves original scenario)
+- Phase 9: REFACTOR pressure testing

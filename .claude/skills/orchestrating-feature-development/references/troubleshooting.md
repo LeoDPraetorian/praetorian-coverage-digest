@@ -10,7 +10,7 @@ Common issues and solutions when orchestrating feature development.
 
 1. Read progress file:
    ```bash
-   cat .claude/features/{feature-id}/progress.json
+   cat .claude/.output/features/{feature-id}/progress.json
    ```
 2. Check `current_phase` field
 3. Load artifacts (design.md, plan.md, architecture.md)

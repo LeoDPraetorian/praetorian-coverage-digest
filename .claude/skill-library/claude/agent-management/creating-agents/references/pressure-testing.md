@@ -4,7 +4,7 @@
 
 **When to read**: Phase 10 (REFACTOR) of agent creation workflow
 
-**Integration**: Uses `testing-skills-with-subagents` skill methodology applied to agent testing
+**Integration**: Uses `pressure-testing-skill-content` skill methodology applied to agent testing
 
 ---
 
@@ -48,11 +48,11 @@ Here's a minimal test suite (10 min) covering critical paths..."
 
 ---
 
-## Integration with testing-skills-with-subagents
+## Integration with pressure-testing-skill-content
 
 ### How the Skills Work Together
 
-**testing-skills-with-subagents**:
+**pressure-testing-skill-content**:
 
 - General methodology for testing any skill
 - RED-GREEN-REFACTOR cycle for process documentation
@@ -71,7 +71,7 @@ Here's a minimal test suite (10 min) covering critical paths..."
 **In Phase 10 of agent creation** (after Phase 8 Skill Verification):
 
 ```
-skill: "testing-skills-with-subagents"
+Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")
 ```
 
 **Then read this document**:
@@ -82,7 +82,7 @@ Read `.claude/skills/creating-agents/references/pressure-testing.md`
 
 **Workflow**:
 
-1. testing-skills-with-subagents provides general TDD methodology
+1. pressure-testing-skill-content provides general TDD methodology
 2. pressure-testing.md provides agent-specific application
 3. You combine both to test the agent
 
@@ -1106,7 +1106,7 @@ making the outage worse. Here's a 5-minute test suite covering the fix..."
 
 **REFACTOR phase complete when**:
 
-- [ ] `testing-skills-with-subagents` skill invoked
+- [ ] `pressure-testing-skill-content` skill invoked
 - [ ] This document (`pressure-testing.md`) read
 - [ ] 3 pressure scenarios designed (time, authority, sunk cost)
 - [ ] Each scenario combines 2-3 pressure elements
@@ -1127,6 +1127,6 @@ making the outage worse. Here's a 5-minute test suite covering the fix..."
 
 - **`tdd-workflow.md`** - Full TDD methodology (RED-GREEN-REFACTOR)
 - **`../SKILL.md`** - Phase 10 quick reference
-- **`testing-skills-with-subagents`** skill - General pressure testing methodology
+- **`pressure-testing-skill-content`** skill - General pressure testing methodology
 
-**This document adapts testing-skills-with-subagents specifically for agent testing.**
+**This document adapts pressure-testing-skill-content specifically for agent testing.**

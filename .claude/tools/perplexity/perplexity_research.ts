@@ -119,7 +119,7 @@ export const perplexityResearch = {
       'perplexity',
       'perplexity_research',
       validated,
-      { timeoutMs: 60000 } // 60s timeout for deep research
+      { timeoutMs: 120000 } // 2 min timeout for deep research
     );
 
     if (!rawData) {

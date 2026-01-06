@@ -1,12 +1,12 @@
 /**
- * list_teams - Linear MCP Wrapper
+ * list_teams - Linear GraphQL Wrapper
  *
- * List teams from Linear workspace via MCP server
+ * List teams from Linear workspace via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~600 tokens (team list)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -28,27 +28,50 @@
  * - totalTeams: number - Count of returned teams
  *
  * Edge cases discovered:
- * - MCP returns array directly, not wrapped in { teams: [...] }
  * - Empty search returns empty array, not error
  * - Description truncated to 200 chars for token efficiency
  *
  * @example
  * ```typescript
  * // List all teams
- * await listTeams.execute({});
+ * const result = await listTeams.execute({});
  *
  * // Search teams
- * await listTeams.execute({ query: 'Engineering' });
+ * const result = await listTeams.execute({ query: 'Engineering' });
+ *
+ * // With test token
+ * const result = await listTeams.execute({}, 'test-token');
  * ```
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL query for listing teams
+ */
+const LIST_TEAMS_QUERY = `
+  query ListTeams($filter: TeamFilter, $first: Int, $orderBy: PaginationOrderBy) {
+    teams(filter: $filter, first: $first, orderBy: $orderBy) {
+      nodes {
+        id
+        key
+        name
+        description
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -81,13 +104,30 @@ export const listTeamsOutput = z.object({
     createdAt: z.string().optional(),
     updatedAt: z.string().optional()
   })),
-  totalTeams: z.number()
+  totalTeams: z.number(),
+  estimatedTokens: z.number()
 });
 
 export type ListTeamsOutput = z.infer<typeof listTeamsOutput>;
 
 /**
- * List teams from Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface TeamsResponse {
+  teams: {
+    nodes: Array<{
+      id: string;
+      key?: string | null;
+      name: string;
+      description?: string | null;
+      createdAt?: string;
+      updatedAt?: string;
+    }>;
+  } | null;
+}
+
+/**
+ * List teams from Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -98,6 +138,9 @@ export type ListTeamsOutput = z.infer<typeof listTeamsOutput>;
  *
  * // Search teams
  * const searchResults = await listTeams.execute({ query: 'Engineering' });
+ *
+ * // With test token
+ * const teams2 = await listTeams.execute({}, 'test-token');
  * ```
  */
 export const listTeams = {
@@ -105,30 +148,60 @@ export const listTeams = {
   description: 'List teams from Linear workspace',
   parameters: listTeamsParams,
 
-  async execute(input: ListTeamsInput): Promise<ListTeamsOutput> {
+  async execute(
+    input: ListTeamsInput,
+    testToken?: string
+  ): Promise<ListTeamsOutput> {
     // Validate input
     const validated = listTeamsParams.parse(input);
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'list_teams',
-      validated
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Build GraphQL variables
+    const variables: Record<string, unknown> = {
+      first: validated.limit || 50,
+      orderBy: validated.orderBy || 'updatedAt',
+    };
+
+    // Add filter if query or includeArchived provided
+    if (validated.query || validated.includeArchived !== undefined) {
+      const filter: Record<string, unknown> = {};
+      if (validated.query) {
+        filter.name = { contains: validated.query };
+      }
+      if (validated.includeArchived !== undefined) {
+        filter.includeArchived = validated.includeArchived;
+      }
+      variables.filter = filter;
+    }
+
+    // Execute GraphQL query
+    const response = await executeGraphQL<TeamsResponse>(
+      client,
+      LIST_TEAMS_QUERY,
+      variables
     );
 
+    // Extract teams array (handle null/undefined)
+    const teams = response.teams?.nodes || [];
+
     // Filter to essential fields
-    // Linear MCP returns array directly, not { teams: [...] }
-    const teams = Array.isArray(rawData) ? rawData : (rawData.teams || []);
-    const filtered = {
-      teams: teams.map((team: any) => ({
+    const baseData = {
+      teams: teams.map((team) => ({
         id: team.id,
-        key: team.key,
+        key: team.key || undefined,
         name: team.name,
-        description: team.description?.substring(0, 200), // Truncate for token efficiency
+        description: team.description?.substring(0, 200) || undefined, // Truncate for token efficiency
         createdAt: team.createdAt,
-        updatedAt: team.updatedAt
+        updatedAt: team.updatedAt,
       })),
-      totalTeams: teams.length
+      totalTeams: teams.length,
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData),
     };
 
     // Validate output

@@ -107,6 +107,7 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 ```
 
 This works from:
+
 - Super-repo root → returns super-repo root
 - Any submodule → returns super-repo root
 - Any subdirectory → returns appropriate root
@@ -127,17 +128,13 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude"
 ```
 
-### Run Workspace Commands
+### Example: Audit Skill
 
-```bash
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run audit -- skill-name
-```
+Audit the skill by invoking auditing-skills to verify compliance with all phase requirements.
 
-### Run Skill Search
+### Example: Search Skills
 
-```bash
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run -w @chariot/auditing-skills search -- "query"
-```
+Search for skills by invoking searching-skills with your keyword query.
 
 ---
 
@@ -200,4 +197,3 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 ## Related Patterns
 
 - [Backup Strategy](./backup-strategy.md) - Uses ROOT for backup paths
-- [CLI Usage](../cli-usage.md) - Full CLI reference with ROOT usage

@@ -4,6 +4,7 @@
 import { z } from 'zod';
 import { resolveLibraryId } from '../resolve-library-id';
 import { getLibraryDocs } from '../get-library-docs';
+import { estimateTokens } from '../../config/lib/response-utils.js';
 
 interface ValidationResult {
   name: string;
@@ -218,7 +219,7 @@ async function testTokenReduction() {
     });
 
     // Estimate tokens: ~1 token per 4 characters
-    const estimatedActualTokens = Math.ceil(JSON.stringify(result).length / 4);
+    const estimatedActualTokens = estimateTokens(result);
 
     const isReduced = result.estimatedTokens <= 300; // Should be ~200
     const matches = Math.abs(result.estimatedTokens - estimatedActualTokens) < 50;

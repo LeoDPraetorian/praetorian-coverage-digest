@@ -1,8 +1,236 @@
+## [Date: 2026-01-06] - Add Integration Section to SKILL Template
+
+### Changed
+- **templates/SKILL-template.md** - Added Integration section between Examples and References
+  - `## Integration` heading with four required subsections
+  - `### Called By` - Documents what invokes the skill
+  - `### Requires (invoke before starting)` - Documents prerequisites with table
+  - `### Calls (during execution)` - Documents invoked skills with table
+  - `### Pairs With (conditional)` - Documents conditional relationships with table
+  - Guidance for standalone/terminal skills ("None - standalone skill")
+
+### Reason
+- New Phase 28 audit (Integration Section) requires all skills to have structured Integration sections
+- Template must include section so new skills are compliant by default
+- Based on [obra/superpowers](https://github.com/obra/superpowers) pattern analysis
+
+### Related Changes
+- `auditing-skills` - Added Phase 28: Integration Section
+- `creating-skills` - Added Integration section guidance to Phase 5.2
+- `fixing-skills` - Added Phase 28 fix procedure
+
+---
+
+## [Date: 2026-01-03] - Remove CLI Terminology from Phase Categorization
+
+### Changed
+- **Opening paragraph** (line 8): "Routes fixes to appropriate handler (TypeScript CLI vs Claude reasoning)" → "Routes fixes to appropriate handler based on user interaction needs"
+- **Overview table** (lines 18-21): Handler column values:
+  - "TypeScript CLI" → "Claude (auto-apply)"
+  - "CLI + Claude" → "Claude (user confirms)"
+- **Section headers**:
+  - Line 28: "Deterministic Phases (TypeScript CLI Only)" → "Deterministic Phases (Auto-Apply)"
+  - Line 61: "Hybrid Phases (CLI + Claude Reasoning)" → "Hybrid Phases (User Confirmation)"
+- **Table column headers**:
+  - Line 32: "CLI Action" → "Claude Action"
+  - Line 65: "CLI Part (Deterministic)" → "Claude Part (Deterministic)"
+- **Throughout file**: Replaced terminology:
+  - "CLI handles" → "Claude handles"
+  - "CLI auto-fix" → "Claude auto-applies"
+  - "CLI applies" → "Claude applies"
+  - "CLI converts" → "Claude converts"
+- **Fix Responsibility Matrix** (lines 472-475): Updated table to show "Claude" instead of "CLI" in Deterministic and Hybrid columns
+- **Quick Reference** (lines 484-488): Updated terminology to match new headers
+
+### Reason
+The TypeScript CLI scripts were removed in the instruction-based migration. The three-tier model (Deterministic/Hybrid/Human-Required) remains valid, but the distinction is now about USER INTERACTION level (auto-apply vs user confirmation), not CLI vs Claude. Claude applies all fixes; tiers determine whether user confirmation is needed.
+
+### Location
+`.claude/skills/managing-skills/references/patterns/phase-categorization.md`
+
+---
+
+## [Date: 2026-01-03] - Fix Stale CLI References in Delegation Map
+
+### Changed
+- **Delegation Map** (line 74): "audit X skill" - Changed from "CLI in `auditing-skills/scripts`" to "Instruction-based"
+- **Delegation Map** (line 76): "fix X skill" - Changed from "CLI in `fixing-skills/scripts`" to "Instruction-based"
+
+### Reason
+The scripts/ directories were deleted in the TypeScript-to-instructions migration, but the Delegation Map still referenced them. This update corrects the Implementation column to reflect the current instruction-based architecture.
+
+---
+
+## [Date: 2026-01-03] - Remove All TypeScript CLI References
+
+### Changed
+- **Quick Reference table** (lines 11-27): Replaced "CLI Location" column with "Implementation" column, changed all entries to "Instruction-based"
+- **Delegation Map** (lines 56-83): Kept instruction-based workflow descriptions unchanged
+- **Operations summary** (lines 154-159): Updated step counts:
+  - Line 156: "7-phase protocol" → "8-phase protocol" (deleting-skills)
+  - Line 159: "7-step protocol" → "10-step protocol" (renaming-skills)
+- **Migration from Old Skills** (lines 203-205):
+  - `claude-skill-write` → use `creating-skills` or `updating-skills` skill (removed `npm run update` reference)
+  - `claude-skill-compliance` → use `auditing-skills` or `fixing-skills` skill (removed `npm run audit` and `npm run fix` references)
+  - `claude-skill-search` → use `searching-skills` skill (removed `npm run search` reference)
+- **Tool Usage** (line 96): "Execute CLI commands" → "Execute system commands for file operations"
+
+### Deleted
+- **CLI Ownership section** (lines 91-103): Removed entire section documenting TypeScript CLI packages
+  - Removed `@chariot/auditing-skills` and `@chariot/fixing-skills` package table
+  - Removed shared library location documentation
+- **CLI usage reference** (line 29): Removed "For CLI usage instructions, see: cli-usage.md" link
+
+### Removed from Reference Files
+- **operations.md**:
+  - Removed all `npm run audit` commands, replaced with instruction-based skill invocation
+  - Removed all `npm run fix` commands, replaced with fixing-skills library skill invocation
+  - Removed all `npm run update` commands, replaced with updating-skills library skill invocation
+- **rename-protocol.md** (line 100-101): Replaced `npm run audit -- new-skill-name` with instruction-based audit invocation
+
+### Files to Update (Remaining Work)
+The following reference files still contain CLI references and need updating:
+- `references/cli-usage.md` - 158 lines, entirely about CLI usage (should be deleted)
+- `references/fix-workflow.md` - Multiple npm run fix references
+- `references/update-workflow.md` - npm run audit and npm run update references
+- `references/list-workflow.md` - npm run audit reference
+- `references/create-workflow.md` - npm run audit reference
+- `references/gateway-management.md` - npm run audit reference
+- `references/migrate-workflow.md` - npm run audit reference
+- `references/skill-compliance-contract.md` - npm run audit reference
+- `references/patterns/repo-root-detection.md` - npm run audit reference
+
+### Reason
+- **Architectural Shift**: Moving from TypeScript CLI automation to pure instruction-based workflows
+- **CLI Deletion**: All TypeScript CLIs (`npm run audit`, `npm run fix`, `npm run update`) are being deleted
+- **Skill-Based Invocation**: All operations now delegated to library skills via Read tool or Skill tool invocation
+- **Step Count Corrections**: deleting-skills grew from 7 to 8 phases, renaming-skills from 7 to 10 steps
+
+### Pattern Replacements Applied
+**npm run audit**:
+- Before: `npm run audit -- {skill-name}`
+- After: `Audit {skill-name} to verify compliance with all phase requirements.` or "Invoke auditing-skills"
+
+**npm run fix**:
+- Before: `npm run fix -- {skill-name}`
+- After: `Fix compliance issues in {skill-name} following procedures in phase-categorization.md.` or "Invoke fixing-skills"
+
+**npm run update**:
+- Before: `npm run update -- {skill-name} "changes"`
+- After: `Update {skill-name} with changelog entry following update-workflow.md process.` or "Invoke updating-skills"
+
+### Impact
+- managing-skills no longer documents or references TypeScript CLI commands
+- All skill operations now instruction-based via library skill invocation
+- Clearer delegation model (router skill → library skills)
+- Step counts now accurate for deleting-skills and renaming-skills
+
+### Next Steps (Library Skills Update)
+After completing managing-skills, update 10 library skills per user's requirements:
+1. creating-skills - SKILL.md lines 412, 457; references/gateway-creation.md lines 257, 269
+2. updating-skills - references/update-workflow.md line 241; references/gateway-updates.md lines 85, 86, 131, 185, 186, 241 (also remove stale Phase 18, 19 references)
+3. fixing-skills - SKILL.md lines 78, 269
+4. deleting-skills - SKILL.md lines 470, 471
+5. syncing-gateways - examples/gateway-sync-output.md line 105; examples/full-sync-output.md lines 174-177; references/error-recovery.md line 114
+6. renaming-skills - references/common-scenarios.md lines 521-522
+7. migrating-skills - (check for references)
+8. listing-skills - (check for references)
+9. searching-skills - (check for references)
+10. auditing-skills - SKILL.md lines 50-52, 95, 103, 111; references/phase-details.md lines 139, 304, 311, 324, 330, 1064, 1067; references/phase-15-semantic-review.md line 110
+
+### Method
+- Manual edits via Edit tool following updating-skills TDD workflow
+- Backup created: `.local/SKILL.md.backup-20260103-*`
+- Partial completion: SKILL.md complete, reference files partially complete
+
+## [Date: 2026-01-03] - Replace researching-skills with orchestrating-research
+
+### Changed
+- **Quick Reference table** (line 22): Updated Research operation to delegate to `orchestrating-research` instead of `researching-skills`
+- **Delegation Map** (line 82): Changed "research X" routing from `researching-skills` to `orchestrating-research` with updated description "Parallel research with intent expansion"
+- **Tool Usage section** (line 121): Updated Task tool reference from "used by researching-skills" to "used by orchestrating-research"
+- **Key Principles** (line 218): Updated principle 8 from "Use researching-skills" to "Use orchestrating-research"
+- **Related Skills table** (line 234): Replaced `researching-skills` entry with `orchestrating-research` with updated purpose "Parallel research orchestration with intent expansion"
+
+### Added
+- **Note on Research** (lines 87-91): Added explanatory note after Delegation Map explaining that orchestrating-research replaces researching-skills and documenting its capabilities:
+  - Intent expansion via translating-intent (handles vague queries)
+  - Parallel agent execution across 6 sources
+  - Cross-interpretation synthesis with conflict detection
+  - Comprehensive OUTPUT_DIR with SYNTHESIS.md
+
+### Reason
+- **Skill Consolidation**: orchestrating-research is more capable than researching-skills
+  - Parallel vs sequential execution
+  - Intent expansion for vague queries (e.g., "research auth patterns")
+  - Cross-source synthesis with conflict detection
+- **Reduced Redundancy**: Consolidating on one research skill reduces maintenance burden
+- orchestrating-research provides comprehensive research capabilities that supersede researching-skills
+
+### Files Changed
+- `SKILL.md` - Updated all references from researching-skills to orchestrating-research (5 locations)
+
+### Impact
+- Users invoking research operations will now be routed to orchestrating-research
+- Improved research capabilities with parallel execution and intent expansion
+- Clearer documentation of research capabilities in one location
+
+### Method
+- Manual edit via Edit tool following updating-skills TDD workflow
+- Backup created: `.local/SKILL.md.backup-20260103-*`
+
+## [Date: 2026-01-02] - Convert to Repo-Root Paths and Clean Up Phase References
+
+### Changed
+- **Path Format**: Converted all cross-skill references from relative paths (`../../../`) to repo-root format (`.claude/...`)
+- **Phase References**: Updated all Phase 14a/b/c references to Phase 14/15/16 (sub-phases eliminated)
+- **Fix Categories**: Replaced explicit phase number lists with category references in operations.md
+- **Phase Files**: Evaluated individual phase files - kept all (contain managing-skills-specific guidance)
+
+### Files Modified
+- `references/operations.md` - Updated auditing-skills references, replaced phase number lists with category references
+- `references/patterns/phase-categorization.md` - Updated path format and phase references
+- `references/skill-compliance-contract.md` - Updated auditing-skills reference
+- `references/table-formatting.md` - Updated Phase 14a → Phase 14 throughout
+- `references/patterns/visual-style-guidelines.md` - Updated Phase 14a-c → Phases 14-16, updated phase headers
+- `references/fix-workflow.md` - Updated auditing-skills reference
+- `references/list-workflow.md` - Updated auditing-skills reference
+- `references/gateway-management.md` - Updated auditing-skills reference
+
+### Deleted
+- `references/.backup-audit-phases-20251228-222855.md` - Removed stale backup file
+
+### Reason
+- **RED failure**: Inconsistent path formats across reference files using relative paths
+- Phase 14 sub-phases (14a/b/c) were renumbered to sequential integers (14/15/16) in auditing-skills
+- Explicit phase number lists in operations.md will drift as phases are added/removed
+- Backup file was outdated and should not be version controlled
+
+### Path Convention
+Cross-skill references now use repo-root format:
+- Core skills: `.claude/skills/{name}/...`
+- Library skills: `.claude/skill-library/{domain}/{category}/{name}/...`
+
+Benefits:
+- Unambiguous about file location
+- Works directly with agent Read tool
+- No counting `../` levels required
+
+### Verification
+- ✅ No relative paths remain (grep verified)
+- ✅ No Phase 14a/b/c references remain (grep verified)
+- ✅ Backup file deleted
+- ✅ Audit passes with expected warnings
+- ✅ Phase files retained (contain managing-skills-specific guidance)
+
+### Method
+- Manual edit via Edit tool following updating-skills TDD workflow
+
 ## [Date: 2025-12-30] - Add Phase Numbering Convention Note
 
 ### Changed
 - `references/patterns/changelog-format.md` - Clarified Phase 5.4 reference and added phase numbering convention note
-- Updated line 10: Changed "Phase 5.4" to "Phase 5, sub-step 5.4" to clarify it's a sub-step, not fractional major phase
+- Updated line 10: Changed "Phase 5" to "Phase 5, sub-step 5.4" to clarify it's a sub-step, not fractional major phase
 - Added Phase Numbering Convention section at top of document
 
 ### Added
@@ -82,3 +310,46 @@
 
 ### REFACTOR Assessment
 - **Change Classification**: Documentation update (adds reference, no behavioral change)
+
+## [Date: 2026-01-03] - Delete Orphaned Phase Documentation Files
+
+### Deleted
+- `references/phase-01-description.md` - 7,046 bytes
+- `references/phase-02-allowed-tools.md` - 3,483 bytes
+- `references/phase-03-word-count.md` - 8,498 bytes
+- `references/phase-04-broken-links.md` - 3,446 bytes
+- `references/phase-05-file-organization.md` - 3,665 bytes
+- `references/phase-06-script-organization.md` - 3,161 bytes
+- `references/phase-07-output-directories.md` - 6,809 bytes
+- `references/phase-08-typescript-structure.md` - 6,657 bytes
+- `references/phase-09-bash-migration.md` - 5,985 bytes
+- `references/phase-10-reference-audit.md` - 4,192 bytes
+- `references/phase-11-command-examples.md` - 4,637 bytes
+- `references/phase-12-cli-errors.md` - 5,602 bytes
+- `references/phase-13-state-externalization.md` - 17,976 bytes
+- `references/phase-16-windows-paths.md` - 3,648 bytes
+
+### Reason
+- **Ownership Model**: auditing-skills owns phase documentation (phase-details.md + specialized files)
+- **managing-skills Role**: Owns compliance contract and routing only
+- **Content Migration**: All content from these files has been migrated to auditing-skills/references/phase-details.md
+- **No References**: Verified no files in managing-skills reference these orphaned files (all references were internal to deleted files)
+
+### Pre-Deletion Verification
+```bash
+grep -r 'phase-[0-9]' .claude/skills/managing-skills --include='*.md' | grep -v '.history'
+```
+- All references were internal cross-references between phase files being deleted
+- No references from SKILL.md or non-phase reference files
+- No references from patterns/ subdirectory (phase-categorization.md, visual-style-guidelines.md, agent-recommendation-patterns.md)
+
+### Impact
+- Removed 14 orphaned files totaling ~80KB
+- Cleaner managing-skills references/ directory
+- Single source of truth for phase documentation now in auditing-skills
+- No broken references created (verified with grep)
+
+### Method
+- Manual deletion via Bash rm command
+- Followed updating-skills TDD workflow
+- Verification: `ls .claude/skills/managing-skills/references/phase-*.md` returns "no matches found"

@@ -14,6 +14,7 @@ import {
   validateNoCommandInjection,
   validateNoControlChars,
 } from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const GetRunDetailsInputSchema = z.object({
   runId: z
@@ -111,7 +112,7 @@ export const getRunDetails = {
 
     const filtered = {
       run,
-      estimatedTokens: Math.ceil(JSON.stringify(run).length / 4),
+      estimatedTokens: estimateTokens(run),
     };
 
     return GetRunDetailsOutputSchema.parse(filtered);

@@ -12,7 +12,7 @@ frontend-lead:
   2. Check for recent MANIFEST.yaml
   3. None found → create new directory
   4. Generate slug: "tanstack-migration"
-  5. Create: .claude/features/2025-12-30-143022-tanstack-migration/
+  5. Create: .claude/.output/agents/2025-12-30-143022-tanstack-migration/
   6. Write MANIFEST.yaml
   7. Write frontend-lead-architecture-review.md
   8. Return feature_directory in output JSON
@@ -58,9 +58,8 @@ frontend-lead working on "tanstack-migration"
 backend-developer working on "auth-refactor"
 
 Both create separate directories:
-- .claude/features/2025-12-30-143022-tanstack-migration/
-- .claude/features/2025-12-30-150000-auth-refactor/
+- .claude/.output/agents/2025-12-30-143022-tanstack-migration/
+- .claude/.output/agents/2025-12-30-150000-auth-refactor/
 
 No collision because discovery protocol uses semantic matching.
 ```
-

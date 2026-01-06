@@ -1,0 +1,48 @@
+# Changelog - optimizing-llm-api-responses
+
+## 2026-01-01 - Initial Creation
+
+**Created by**: Claude Code (managing-skills → creating-skills workflow)
+**Category**: development/typescript
+**Type**: Process/Pattern
+**Location**: Library skill
+
+### RED Phase Documentation
+
+**Why this skill is needed**:
+When designing APIs or wrappers consumed by LLMs, developers often return complete responses without considering token efficiency, leading to context window exhaustion, degraded model performance, slow responses, and higher costs.
+
+**Failure behavior without skill**:
+Developers creating MCP wrappers or API integrations typically:
+- Return entire API responses with audit logs, timestamps, metadata
+- Include 100+ item arrays without pagination
+- Use verbose natural language instead of structured JSON
+- Nest objects 5+ levels deep
+- Miss opportunities for progressive disclosure
+
+**Specific scenario**:
+When asked to "create an MCP wrapper for the Linear API that returns issues," without this skill a developer would return the entire API response (15,000 tokens) including audit timestamps, full user objects, nested project/team/label objects, all custom fields, and 50+ issues without pagination. This exhausts the context window rapidly and degrades agent performance.
+
+### Initial Content
+
+**Token reduction strategies**:
+1. Response Filtering (80-90% reduction) - Remove audit fields, internal IDs, metadata
+2. Field Selection (50-70% reduction) - Let callers specify needed fields
+3. Truncation with Indicators (60-80% reduction) - Limit large text fields
+4. Structured Over Verbose (30-50% reduction) - JSON instead of natural language
+5. Progressive Disclosure (90-95% reduction) - Summary first, details on demand
+
+**Core principles**:
+- Always filter responses for LLM consumption
+- Include token estimates in `_meta` field
+- Default pagination to ≤20 items
+- Structure data hierarchically for progressive disclosure
+- Avoid nested objects beyond 2-3 levels
+
+### Research Sources
+
+- Chroma Context Rot study (model attention degradation)
+- Anthropic Context Engineering Guide
+- Token Efficiency Techniques (medium.com/@anicomanesh)
+- Context Window Management (getmaxim.ai)
+- Internal Chariot MCP wrapper implementations

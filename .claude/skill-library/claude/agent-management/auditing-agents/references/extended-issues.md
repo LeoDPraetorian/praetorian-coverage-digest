@@ -1575,6 +1575,7 @@ When implementing features, follow TDD:
 1. **Identify duplicated sections** using Phase 17 analysis
 2. **Delete the embedded content** from agent body
 3. **Add skill to Tier 3** (if not already present):
+
    ```markdown
    ### Tier 3: Triggered by Task Type
 
@@ -1582,6 +1583,7 @@ When implementing features, follow TDD:
    | --------------------------------- | ------------------------------------ |
    | [task that triggers this content] | `.claude/skill-library/.../SKILL.md` |
    ```
+
 4. **Verify skill is accessible** via appropriate gateway
 5. **Re-audit** to confirm no remaining duplications
 

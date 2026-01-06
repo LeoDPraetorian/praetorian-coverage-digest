@@ -1,0 +1,37 @@
+# Changelog: reviewing-frontend-implementations
+
+## [2026-01-04] Initial Creation
+
+**RED Phase Documentation:**
+- **Gap**: frontend-reviewer agent was 235 lines, exceeding target of <150 lines
+- **Problem**: Embedded Review Process (lines 116-216) contained ~100 lines of detailed methodology
+- **Test Scenario**: Agent contained duplicate content preventing reuse and violating lean agent pattern
+- **Failure**: frontend-reviewer.md was 235 lines with embedded process documentation
+
+**GREEN Phase:**
+- Extracted Review Process into library skill (142 lines)
+- Follows pattern established by reviewing-backend-implementations
+- 5-step review process: Locate Plan → Review Against Plan → Code Quality → Verification → Document
+
+**Category**: frontend (library skill)
+**Type**: Process/Pattern
+**Location**: .claude/skill-library/frontend/reviewing-frontend-implementations/SKILL.md
+
+**Agent Update** (Completed 2026-01-04):
+- Removed embedded Review Process section (lines 116-216) from frontend-reviewer.md
+- Reduced agent from 235 lines to 148 lines (87 line reduction)
+- Added skill reference in semantic matching guidance
+- Added "Review Workflow" section referencing the skill via gateway-frontend
+
+**Gateway Update** (Completed 2026-01-04):
+- Added routing to gateway-frontend Intent Detection table
+- Created "Code Review" section in Skill Registry
+- Triggers: "review", "code review", "PR review"
+
+**REFACTOR Phase** (Completed 2026-01-04):
+- Note: This is a reference/methodology skill, not a discipline-enforcement skill
+- Pressure testing applies at agent level (frontend-reviewer), not skill level
+- Skill verified for completeness and consistency with backend equivalent
+- Tables formatted with prettier
+- Frontmatter follows "Use when" pattern
+- Line count: 142 lines (under 500 limit)

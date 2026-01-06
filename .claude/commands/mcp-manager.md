@@ -1,17 +1,14 @@
 ---
 description: MCP wrapper management - create, update, audit, fix, test MCP tool wrappers with TDD enforcement
-argument-hint: <create|verify-red|generate-wrapper|verify-green|update|audit|fix|test|generate-skill> [service] [tool]
+argument-hint: <create|update|audit|fix|test> [service] [tool]
 model: sonnet
 allowed-tools: Skill, AskUserQuestion
-skills: managing-mcp-wrappers, creating-mcp-wrappers
+skills: managing-mcp-wrappers
 ---
 
 # MCP Wrapper Management
 
-**ACTION:**
-
-**For `create` subcommand**: Invoke the `creating-mcp-wrappers` skill.
-**For all other subcommands**: Invoke the `managing-mcp-wrappers` skill.
+**ACTION:** Invoke the `managing-mcp-wrappers` skill for ALL operations.
 
 **Arguments:**
 
@@ -22,23 +19,19 @@ skills: managing-mcp-wrappers, creating-mcp-wrappers
 **Routing Logic:**
 
 ```
-If $1 == "create":
-  → Invoke creating-mcp-wrappers skill with service name from $2
-  → Skill will ask for tool name via AskUserQuestion
-  → Automated: install, start MCP, explore, document, cleanup
-
-Else (verify-red, verify-green, audit, fix, etc.):
-  → Invoke managing-mcp-wrappers skill with all arguments
-  → CLI scripts handle mechanical operations
+ALL subcommands → Invoke managing-mcp-wrappers skill with all arguments
+                → Skill routes internally:
+                    - create → orchestrating-mcp-development (multi-agent workflow)
+                    - audit, fix, test, etc. → CLI scripts
 ```
 
 **Critical Rules:**
 
-1. **CREATE DELEGATES TO SKILL:** `create` operations use instruction-driven `creating-mcp-wrappers` skill
-2. **CLI OPS USE MANAGING-MCP-WRAPPERS:** verify-red, verify-green, audit, etc. use CLI via `managing-mcp-wrappers` skill
+1. **SINGLE ENTRY POINT:** ALL operations route to `managing-mcp-wrappers` skill
+2. **SKILL HANDLES ROUTING:** `managing-mcp-wrappers` decides internal routing (orchestration vs CLI)
 3. **DELEGATE COMPLETELY:** Invoke the skill and display output verbatim
 4. **DO NOT BYPASS:** Do not attempt to execute operations yourself
 
-**Note:** The `managing-mcp-wrappers` skill handles all CLI-based MCP wrapper lifecycle operations with mandatory TDD enforcement.
+**Note:** The `managing-mcp-wrappers` skill handles all MCP wrapper lifecycle operations - routing `create` to multi-agent orchestration and other operations to CLI scripts.
 
 ---

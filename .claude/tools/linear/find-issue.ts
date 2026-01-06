@@ -59,13 +59,16 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
-import { getIssueOutput, type GetIssueOutput } from './get-issue';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
+import { getIssue, getIssueOutput, type GetIssueOutput } from './get-issue.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
 
 /**
  * Input validation schema
@@ -131,6 +134,60 @@ export interface NotFoundResult {
 export type FindIssueOutput = FoundResult | DisambiguationResult | NotFoundResult;
 
 /**
+ * GraphQL query for searching issues
+ */
+const SEARCH_ISSUES_QUERY = `
+  query Issues($first: Int!, $filter: IssueFilter, $orderBy: PaginationOrderBy) {
+    issues(first: $first, filter: $filter, orderBy: $orderBy) {
+      nodes {
+        id
+        identifier
+        title
+        state {
+          id
+          name
+          type
+        }
+        assignee {
+          name
+        }
+        url
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+/**
+ * GraphQL response type for issue search
+ */
+interface SearchIssuesResponse {
+  issues: {
+    nodes: Array<{
+      id: string;
+      identifier: string;
+      title: string;
+      state?: {
+        id: string;
+        name: string;
+        type: string;
+      } | null;
+      assignee?: {
+        name: string;
+      } | null;
+      url?: string;
+    }>;
+    pageInfo: {
+      hasNextPage: boolean;
+      endCursor?: string | null;
+    };
+  };
+}
+
+/**
  * Check if input looks like an issue identifier
  * Patterns: CHARIOT-1234, 1234, ABC-123, UUID
  */
@@ -170,47 +227,18 @@ function isCriticalError(error: unknown): boolean {
 
 /**
  * Try to get issue by exact ID or identifier
+ * @param id - Issue ID or identifier
+ * @param testToken - Optional test token for authentication
  * @param propagateErrors - if true, propagate critical errors instead of returning null
  */
-async function tryExactMatch(id: string, propagateErrors: boolean = false): Promise<GetIssueOutput | null> {
+async function tryExactMatch(
+  id: string,
+  testToken?: string,
+  propagateErrors: boolean = false
+): Promise<GetIssueOutput | null> {
   try {
-    const rawData = await callMCPTool('linear', 'get_issue', { id });
-    if (!rawData) return null;
-
-    // Filter to essential fields
-    const filtered = {
-      id: rawData.id,
-      identifier: rawData.identifier,
-      title: rawData.title,
-      description: rawData.description?.substring(0, 500),
-      priority: rawData.priority ? {
-        name: rawData.priority.name,
-        value: rawData.priority.value
-      } : undefined,
-      priorityLabel: rawData.priorityLabel,
-      estimate: rawData.estimate ? {
-        name: rawData.estimate.name,
-        value: rawData.estimate.value
-      } : undefined,
-      state: rawData.state ? {
-        id: rawData.state.id,
-        name: rawData.state.name,
-        type: rawData.state.type
-      } : undefined,
-      assignee: rawData.assignee || undefined,
-      assigneeId: rawData.assigneeId || undefined,
-      url: rawData.url,
-      branchName: rawData.gitBranchName || rawData.branchName,
-      createdAt: rawData.createdAt,
-      updatedAt: rawData.updatedAt,
-      attachments: rawData.attachments?.map((a: any) => ({
-        id: a.id,
-        title: a.title,
-        url: a.url
-      }))
-    };
-
-    return getIssueOutput.parse(filtered);
+    const issue = await getIssue.execute({ id }, testToken);
+    return issue;
   } catch (error) {
     // Propagate critical errors (rate limit, server error, timeout)
     if (propagateErrors && isCriticalError(error)) {
@@ -221,36 +249,39 @@ async function tryExactMatch(id: string, propagateErrors: boolean = false): Prom
 }
 
 /**
- * Search for issues matching the query
+ * Search for issues matching the query using GraphQL
  */
 async function searchIssues(
   query: string,
+  client: HTTPPort,
   team?: string,
   limit: number = 5
 ): Promise<IssueCandidate[]> {
   try {
-    const params: any = {
-      query,
-      limit,
-      includeArchived: false,
-      orderBy: 'updatedAt'
+    const filter: any = {
+      title: { contains: query },
     };
 
     if (team) {
-      params.team = team;
+      filter.team = { name: { eq: team } };
     }
 
-    const rawData = await callMCPTool('linear', 'list_issues', params);
-    if (!rawData) return [];
+    const response = await executeGraphQL<SearchIssuesResponse>(
+      client,
+      SEARCH_ISSUES_QUERY,
+      {
+        first: limit,
+        filter,
+        orderBy: 'updatedAt',
+      }
+    );
 
-    const issues = Array.isArray(rawData) ? rawData : (rawData.issues || []);
-
-    return issues.map((issue: any) => ({
+    return response.issues.nodes.map((issue) => ({
       identifier: issue.identifier,
       title: issue.title,
       state: issue.state?.name,
-      assignee: issue.assignee,
-      url: issue.url
+      assignee: issue.assignee?.name,
+      url: issue.url,
     }));
   } catch {
     return [];
@@ -258,46 +289,48 @@ async function searchIssues(
 }
 
 /**
- * Search for issues by identifier number
+ * Search for issues by identifier number using GraphQL
  */
 async function searchByNumber(
   number: string,
+  client: HTTPPort,
   team?: string,
   limit: number = 5
 ): Promise<IssueCandidate[]> {
   try {
     // Search for issues containing the number in their identifier
     // Linear doesn't have a direct "identifier contains" filter,
-    // so we search and then filter results
-    const params: any = {
-      limit: 50, // Get more to filter
-      includeArchived: false,
-      orderBy: 'updatedAt'
-    };
+    // so we fetch more and then filter results
+    const filter: any = {};
 
     if (team) {
-      params.team = team;
+      filter.team = { name: { eq: team } };
     }
 
-    const rawData = await callMCPTool('linear', 'list_issues', params);
-    if (!rawData) return [];
-
-    const issues = Array.isArray(rawData) ? rawData : (rawData.issues || []);
+    const response = await executeGraphQL<SearchIssuesResponse>(
+      client,
+      SEARCH_ISSUES_QUERY,
+      {
+        first: 50, // Get more to filter
+        filter,
+        orderBy: 'updatedAt',
+      }
+    );
 
     // Filter to issues where identifier contains the number
-    const matching = issues
-      .filter((issue: any) => {
+    const matching = response.issues.nodes
+      .filter((issue) => {
         const identifierNumber = issue.identifier?.split('-')[1];
         return identifierNumber?.includes(number);
       })
       .slice(0, limit);
 
-    return matching.map((issue: any) => ({
+    return matching.map((issue) => ({
       identifier: issue.identifier,
       title: issue.title,
       state: issue.state?.name,
-      assignee: issue.assignee,
-      url: issue.url
+      assignee: issue.assignee?.name,
+      url: issue.url,
     }));
   } catch {
     return [];
@@ -312,9 +345,15 @@ export const findIssue = {
   description: 'Smart issue finder - handles partial IDs and searches with disambiguation',
   parameters: findIssueParams,
 
-  async execute(input: FindIssueInput): Promise<FindIssueOutput> {
+  async execute(
+    input: FindIssueInput,
+    testToken?: string
+  ): Promise<FindIssueOutput> {
     const validated = findIssueParams.parse(input);
     const { query, team, maxResults } = validated;
+
+    // Create client once (with optional test token)
+    const client = await createLinearClient(testToken);
 
     // Step 1: Handle identifier-like inputs
     if (looksLikeIdentifier(query)) {
@@ -325,7 +364,7 @@ export const findIssue = {
         for (const prefix of commonPrefixes) {
           const fullId = `${prefix}-${query}`;
           // First attempt propagates errors (rate limit, server error, timeout)
-          const match = await tryExactMatch(fullId, prefix === 'CHARIOT');
+          const match = await tryExactMatch(fullId, testToken, prefix === 'CHARIOT');
           if (match) {
             return {
               status: 'found',
@@ -335,10 +374,10 @@ export const findIssue = {
         }
 
         // Search by number if no prefix match
-        const numberMatches = await searchByNumber(query, team, maxResults);
+        const numberMatches = await searchByNumber(query, client, team, maxResults);
         if (numberMatches.length === 1) {
           // Single match - fetch full details
-          const fullIssue = await tryExactMatch(numberMatches[0].identifier);
+          const fullIssue = await tryExactMatch(numberMatches[0].identifier, testToken);
           if (fullIssue) {
             return {
               status: 'found',
@@ -357,7 +396,7 @@ export const findIssue = {
       } else {
         // Full identifier or UUID - try exact match first
         // Propagate critical errors on first attempt
-        const exactMatch = await tryExactMatch(query, true);
+        const exactMatch = await tryExactMatch(query, testToken, true);
         if (exactMatch) {
           return {
             status: 'found',
@@ -368,7 +407,7 @@ export const findIssue = {
     }
 
     // Step 2: Fall back to text search
-    const searchResults = await searchIssues(query, team, maxResults);
+    const searchResults = await searchIssues(query, client, team, maxResults);
 
     if (searchResults.length === 0) {
       return {
@@ -385,7 +424,7 @@ export const findIssue = {
 
     if (searchResults.length === 1) {
       // Single match - fetch full details
-      const fullIssue = await tryExactMatch(searchResults[0].identifier);
+      const fullIssue = await tryExactMatch(searchResults[0].identifier, testToken);
       if (fullIssue) {
         return {
           status: 'found',

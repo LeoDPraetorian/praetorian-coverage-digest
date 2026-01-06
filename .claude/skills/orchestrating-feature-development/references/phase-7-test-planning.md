@@ -38,11 +38,11 @@ Task(
 FEATURE: {feature-name}
 
 INPUTS (Read and synthesize):
-1. Design: .claude/features/{id}/design.md
-2. Plan: .claude/features/{id}/plan.md
-3. Architecture: .claude/features/{id}/architecture.md
-4. Security Assessment: .claude/features/{id}/security-assessment.md
-5. Implementation: .claude/features/{id}/implementation-log.md
+1. Design: .claude/.output/features/{id}/design.md
+2. Plan: .claude/.output/features/{id}/plan.md
+3. Architecture: .claude/.output/features/{id}/architecture.md
+4. Security Assessment: .claude/.output/features/{id}/security-assessment.md
+5. Implementation: .claude/.output/features/{id}/implementation-log.md
 
 TASK:
 Analyze the implementation and create a test plan that specifies:
@@ -71,7 +71,7 @@ Analyze the implementation and create a test plan that specifies:
    - Anti-pattern checks
 
 DELIVERABLE:
-Save test plan to: .claude/features/{id}/test-plan.md
+Save test plan to: .claude/.output/features/{id}/test-plan.md
 
 Follow test-lead's Test Plan Template format.
 
@@ -91,7 +91,7 @@ Return JSON:
   },
   'handoff': {
     'recommended_agents': ['frontend-tester', 'frontend-tester', 'frontend-tester'],
-    'plan_location': '.claude/features/{id}/test-plan.md',
+    'plan_location': '.claude/.output/features/{id}/test-plan.md',
     'context': 'Implement tests according to plan in Phase 7'
   }
 }
@@ -104,7 +104,7 @@ Return JSON:
 Check that test-lead returned:
 
 - ✅ `status: "complete"`
-- ✅ Test plan saved to `.claude/features/{id}/test-plan.md`
+- ✅ Test plan saved to `.claude/.output/features/{id}/test-plan.md`
 - ✅ Coverage targets defined for all categories
 - ✅ Specific test cases listed with rationale
 - ✅ Anti-patterns documented
@@ -125,23 +125,28 @@ Verify the test plan includes all required sections:
 ## Test Plan: {Feature Name}
 
 ### Coverage Analysis (Current State)
+
 {Current vs target coverage with gaps}
 
 ### Required Tests (Priority Order)
+
 1. Security Functions (CRITICAL)
 2. Business Logic (HIGH)
 3. Integration Paths (HIGH)
 
 ### Testing Approach
+
 - Behavior testing principles
 - Anti-patterns to AVOID
 - Async handling guidelines
 - Available infrastructure
 
 ### Acceptance Criteria
+
 {Coverage thresholds and quality gates}
 
 ### Review Checklist
+
 {Validation criteria for Phase 8}
 ```
 
@@ -155,7 +160,7 @@ Verify the test plan includes all required sections:
       "status": "complete",
       "agent_used": "test-lead",
       "outputs": {
-        "test_plan": ".claude/features/{id}/test-plan.md"
+        "test_plan": ".claude/.output/features/{id}/test-plan.md"
       },
       "coverage_targets": {
         "security_functions": "95%",
@@ -209,12 +214,12 @@ TodoWrite: Mark "Phase 8: Testing" as in_progress
 
 ## Test Plan Quality Checklist
 
-| Aspect | Good | Bad |
-| ------ | ---- | --- |
-| Coverage targets | "Security: 95%, Business: 80%, Integration: 90%" | "High coverage needed" |
-| Test cases | "Auth token validation in auth.service.test.ts - currently untested attack vector" | "Test auth" |
-| Anti-patterns | "No mock-only tests, no implementation testing" | "Write good tests" |
-| Acceptance | "≥95% security coverage, zero mock-only tests" | "Good coverage" |
+| Aspect           | Good                                                                               | Bad                    |
+| ---------------- | ---------------------------------------------------------------------------------- | ---------------------- |
+| Coverage targets | "Security: 95%, Business: 80%, Integration: 90%"                                   | "High coverage needed" |
+| Test cases       | "Auth token validation in auth.service.test.ts - currently untested attack vector" | "Test auth"            |
+| Anti-patterns    | "No mock-only tests, no implementation testing"                                    | "Write good tests"     |
+| Acceptance       | "≥95% security coverage, zero mock-only tests"                                     | "Good coverage"        |
 
 ## Common Issues
 
@@ -248,26 +253,28 @@ go test -coverprofile=coverage.out && go tool cover -func=coverage.out
 
 ```typescript
 AskUserQuestion({
-  questions: [{
-    question: "Test plan suggests 28 tests. Proceed with full plan or reduce scope?",
-    header: "Test Planning",
-    options: [
-      { label: "Full plan", description: "Implement all 28 tests" },
-      { label: "Critical only", description: "Only security + critical business logic" },
-    ]
-  }]
-})
+  questions: [
+    {
+      question: "Test plan suggests 28 tests. Proceed with full plan or reduce scope?",
+      header: "Test Planning",
+      options: [
+        { label: "Full plan", description: "Implement all 28 tests" },
+        { label: "Critical only", description: "Only security + critical business logic" },
+      ],
+    },
+  ],
+});
 ```
 
 ## Test Plan Benefits
 
-| Without Plan | With Plan |
-| ------------ | --------- |
-| Testers guess what to test | Testers follow explicit requirements |
-| Inconsistent coverage | Unified coverage targets |
-| Anti-patterns discovered late | Anti-patterns prevented upfront |
-| Tests fail validation | Tests meet acceptance criteria |
-| Rework required | Right the first time |
+| Without Plan                  | With Plan                            |
+| ----------------------------- | ------------------------------------ |
+| Testers guess what to test    | Testers follow explicit requirements |
+| Inconsistent coverage         | Unified coverage targets             |
+| Anti-patterns discovered late | Anti-patterns prevented upfront      |
+| Tests fail validation         | Tests meet acceptance criteria       |
+| Rework required               | Right the first time                 |
 
 ## Related References
 

@@ -1,0 +1,37 @@
+# Changelog: porting-python-capabilities-to-go
+
+## 2026-01-06 - Initial Creation
+
+**RED Phase Documentation:**
+
+**Gap Identified:** Current capability porting lacks structured orchestration. When porting Python security capabilities to Go, three library skills exist (mapping-python-dependencies, translating-python-idioms-to-go, verifying-port-equivalent) but aren't coordinated.
+
+**Test Scenario:** User asks to "port Python S3 scanner capability to Go"
+
+**Current Failure (without skill):**
+- User manually invokes three skills (might skip or reorder phases)
+- No blocking gates (continues despite incomplete outputs)
+- Outputs scattered or forgotten
+- No MANIFEST.yaml tracking workflow state
+- Inline translation attempts miss dependency/idiom analysis
+- No verification of behavioral equivalence
+
+**Result:** Incomplete ports that compile but fail functionally.
+
+**Skill Type:** Process/Pattern - Orchestration workflow
+
+**Location:** Core (.claude/skills/) - orchestration skills belong in core, called by orchestrating-capability-development
+
+**Structure:**
+- 476 lines (within 500 limit)
+- 3 phases with blocking gates
+- Progressive disclosure with references/ directory prepared
+- REQUIRED SUB-SKILLS table included
+- Integration section complete
+- Workflow diagram with gate checklists inline
+
+**Next Steps:**
+- Phase 6: Research (optional, skipping - skill is coordination wrapper)
+- Phase 7: Gateway update (N/A - core skill)
+- Phase 8: GREEN verification
+- Phase 9: REFACTOR pressure testing

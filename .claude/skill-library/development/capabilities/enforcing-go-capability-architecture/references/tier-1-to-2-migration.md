@@ -13,6 +13,7 @@
 ## Example
 
 Before:
+
 ```text
 pkg/probes/
 ├── probe.go
@@ -24,6 +25,7 @@ pkg/probes/
 ```
 
 After:
+
 ```text
 pkg/probes/
 ├── probe.go

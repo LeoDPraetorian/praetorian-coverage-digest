@@ -1,7 +1,7 @@
 /**
- * list_cycles - Linear MCP Wrapper
+ * list_cycles - Linear GraphQL Wrapper
  *
- * List cycles from Linear workspace via MCP server
+ * List cycles from Linear workspace via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
@@ -30,9 +30,9 @@
  * - totalCycles: number - Count of returned cycles
  *
  * Edge cases discovered:
- * - MCP returns array directly, not wrapped in { cycles: [...] }
  * - Empty search returns empty array, not error
  * - Cycles are team-specific; filter by team for relevant results
+ * - All optional fields may be null/undefined
  *
  * @example
  * ```typescript
@@ -48,12 +48,38 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL query for listing cycles
+ */
+const LIST_CYCLES_QUERY = `
+  query Cycles($filter: CycleFilter) {
+    cycles(filter: $filter) {
+      nodes {
+        id
+        name
+        number
+        team {
+          id
+          name
+        }
+        startsAt
+        endsAt
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -97,13 +123,35 @@ export const listCyclesOutput = z.object({
     createdAt: z.string().optional(),
     updatedAt: z.string().optional()
   })),
-  totalCycles: z.number()
+  totalCycles: z.number(),
+  estimatedTokens: z.number()
 });
 
 export type ListCyclesOutput = z.infer<typeof listCyclesOutput>;
 
 /**
- * List cycles from Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface CyclesResponse {
+  cycles: {
+    nodes: Array<{
+      id: string;
+      name: string;
+      number?: number | null;
+      team?: {
+        id: string;
+        name: string;
+      } | null;
+      startsAt?: string | null;
+      endsAt?: string | null;
+      createdAt?: string | null;
+      updatedAt?: string | null;
+    }>;
+  } | null;
+}
+
+/**
+ * List cycles from Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -114,6 +162,9 @@ export type ListCyclesOutput = z.infer<typeof listCyclesOutput>;
  *
  * // Filter by team
  * const teamCycles = await listCycles.execute({ team: 'Engineering' });
+ *
+ * // With test token
+ * const cycles2 = await listCycles.execute({ team: 'Product' }, 'test-token');
  * ```
  */
 export const listCycles = {
@@ -121,44 +172,59 @@ export const listCycles = {
   description: 'List cycles from Linear workspace',
   parameters: listCyclesParams,
 
-  async execute(input: ListCyclesInput): Promise<ListCyclesOutput> {
+  async execute(
+    input: ListCyclesInput,
+    testToken?: string
+  ): Promise<ListCyclesOutput> {
     // Validate input
     const validated = listCyclesParams.parse(input);
 
-    // Map parameter names: wrapper uses 'team', MCP expects 'teamId'
-    const { team, ...rest } = validated;
-    const mcpParams = {
-      ...rest,
-      ...(team ? { teamId: team } : {})
-    };
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'list_cycles',
-      mcpParams
+    // Build filter object for GraphQL (Linear API expects specific filter format)
+    const filter: any = {};
+    if (validated.team) {
+      filter.team = { name: { eq: validated.team } };
+    }
+    if (validated.query) {
+      filter.name = { contains: validated.query };
+    }
+    if (validated.includeArchived !== undefined) {
+      filter.includeArchived = validated.includeArchived;
+    }
+
+    // Execute GraphQL query
+    const response = await executeGraphQL<CyclesResponse>(
+      client,
+      LIST_CYCLES_QUERY,
+      Object.keys(filter).length > 0 ? { filter } : {}
     );
 
-    // callMCPTool already parses JSON from MCP response
-    // Linear returns { content: [{cycle1}, {cycle2}, ...] }
-    const cycles = rawData.content || rawData.cycles || (Array.isArray(rawData) ? rawData : []);
+    // Extract cycles array (handle null/undefined)
+    const cycles = response.cycles?.nodes || [];
 
     // Filter to essential fields
-    const filtered = {
-      cycles: cycles.map((cycle: any) => ({
+    const baseData = {
+      cycles: cycles.map((cycle) => ({
         id: cycle.id,
         name: cycle.name,
-        number: cycle.number,
+        number: cycle.number ?? undefined,
         team: cycle.team ? {
           id: cycle.team.id,
           name: cycle.team.name
         } : undefined,
-        startsAt: cycle.startsAt,
-        endsAt: cycle.endsAt,
-        createdAt: cycle.createdAt,
-        updatedAt: cycle.updatedAt
+        startsAt: cycle.startsAt ?? undefined,
+        endsAt: cycle.endsAt ?? undefined,
+        createdAt: cycle.createdAt ?? undefined,
+        updatedAt: cycle.updatedAt ?? undefined
       })),
       totalCycles: cycles.length
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

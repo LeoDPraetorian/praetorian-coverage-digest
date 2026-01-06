@@ -83,9 +83,9 @@ Without business context, technical threat models produce "security theater" ins
 
 ### State Must Be Persisted
 
-All artifacts go to: `.claude/.threat-model/{session}/`
+All artifacts go to: `.claude/.output/threat-modeling/{timestamp}-{slug}/`
 
-**Never** rely on context alone. Write structured JSON artifacts that downstream phases can read.
+**Never** rely on context alone. Write structured artifacts (Markdown, JSON) that downstream phases can read.
 
 ### Scope Selection Is Required
 
@@ -101,15 +101,50 @@ All artifacts go to: `.claude/.threat-model/{session}/`
 
 ### Step 0: Session Setup
 
-1. **Generate session ID**: `YYYYMMDD-HHMMSS` format
-2. **Create session directory**:
+**YOU MUST run the actual `date` command — DO NOT approximate or invent timestamps.**
+
+1. **Get EXACT timestamp**:
+
    ```bash
-   mkdir -p .claude/.threat-model/{session-id}/phase-{0,1,2,3,4}
-   mkdir -p .claude/.threat-model/{session-id}/checkpoints
-   mkdir -p .claude/.threat-model/{session-id}/handoffs
-   mkdir -p .claude/.threat-model/{session-id}/final-report
+   # Step 1: Get repository root
+   ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+
+   # Step 2: Get EXACT timestamp by running this command
+   date +"%Y-%m-%d-%H%M%S"
+   # Example output: 2026-01-04-152847
+
+   # Step 3: Generate slug from target (lowercase, hyphenated, 2-4 words)
+   # Examples: chariot-backend, nebula-scanner, janus-framework
+   SLUG="your-target-slug"
+
+   # Step 4: Create directory with EXACT timestamp from Step 2
+   TIMESTAMP="2026-01-04-152847"  # Use actual output from date command
+   OUTPUT_DIR="$ROOT/.claude/.output/threat-modeling/${TIMESTAMP}-${SLUG}"
+   mkdir -p "${OUTPUT_DIR}"
    ```
-3. **Write config.json** with scope and options
+
+   **WRONG**: Guessing 150000 (rounded to 15:00:00)
+   **RIGHT**: Using actual output like 152847 (15:28:47)
+
+2. **Store OUTPUT_DIR** - Pass it to every agent spawned.
+
+3. **Initialize metadata.json**:
+   ```json
+   {
+     "session_id": "2026-01-04-152847-chariot-backend",
+     "target": "chariot-backend",
+     "created": "2026-01-04T15:28:47Z",
+     "status": "in_progress",
+     "current_phase": "scope_selection",
+     "phases": {
+       "business_context": { "status": "pending" },
+       "codebase_mapping": { "status": "pending" },
+       "security_controls": { "status": "pending" },
+       "threat_modeling": { "status": "pending" },
+       "test_planning": { "status": "pending" }
+     }
+   }
+   ```
 
 ### Step 1: Scope Selection
 
@@ -144,15 +179,15 @@ skill: "business-context-discovery"
 5. Compliance Mapping - SOC2, PCI-DSS, HIPAA, GDPR (15-20 min)
 6. Security Objectives - Protection priorities (10-15 min)
 
-**Artifacts produced** (in `phase-0/`):
+**Artifacts produced** (flat files in OUTPUT_DIR):
 
-- `business-objectives.json` - App purpose, users, value
-- `data-classification.json` - Crown jewels, PII/PHI/PCI
-- `threat-actors.json` - Who attacks, motivations, capabilities
-- `business-impact.json` - Financial, operational, regulatory consequences
-- `compliance-requirements.json` - Applicable regulations
-- `security-objectives.json` - Protection priorities, CIA, RTO/RPO
-- `summary.md` - <2000 token handoff
+- `business-context.md` - Consolidated business context including:
+  - App purpose, users, value proposition
+  - Crown jewels and data classification (PII/PHI/PCI)
+  - Threat actor profiles with motivations and capabilities
+  - Business impact assessment (financial, operational, regulatory)
+  - Compliance requirements (SOC2, PCI-DSS, HIPAA, GDPR)
+  - Security objectives and protection priorities
 
 **Checkpoint**: Present business context findings, ask for approval before Phase 1.
 
@@ -169,18 +204,35 @@ skill: "business-context-discovery"
 
 **Execution**: Spawn `codebase-mapper` agents in parallel for large codebases.
 
+**Each agent prompt MUST include OUTPUT_DIRECTORY:**
+
 ```
-Task("codebase-mapper", "Analyze {component-path} for threat modeling", "codebase-mapper")
+Task("codebase-mapper", "
+Analyze {component-path} for threat modeling.
+
+OUTPUT_DIRECTORY: {OUTPUT_DIR}
+Mode: orchestrated
+Output file: ${OUTPUT_DIR}/codebase-mapping-{component-slug}.md
+
+[Analysis requirements...]
+
+MANDATORY SKILLS (invoke ALL before completing):
+- persisting-agent-outputs: For file persistence to OUTPUT_DIRECTORY
+
+COMPLIANCE: Document invoked skills in output metadata. I will verify.
+", "codebase-mapper")
 ```
 
-**Artifacts produced** (in `phase-1/`):
+**CRITICAL**: Agents detect orchestrated mode when OUTPUT_DIRECTORY is provided. They will:
 
-- `manifest.json` - File inventory
-- `components/*.json` - Per-component analysis
-- `entry-points.json` - Attack surface
-- `data-flows.json` - Data movement
-- `trust-boundaries.json` - Security boundaries
-- `summary.md` - <2000 token handoff
+- Save to `${OUTPUT_DIR}/{filename}.md`
+- NOT create their own timestamped directory
+- Use the orchestrator's directory structure
+
+**Artifacts produced** (flat files in OUTPUT_DIR):
+
+- `codebase-mapping.md` - Consolidated analysis
+- `codebase-mapping-{component}.md` - Per-component analysis (if parallel)
 
 **Checkpoint**: Present findings, ask for approval.
 
@@ -192,14 +244,29 @@ See [references/phase-1-workflow.md](references/phase-1-workflow.md) for detaile
 
 **Execution**: Spawn `security-controls-mapper` agents in parallel.
 
-**Artifacts produced** (in `phase-2/`):
+**Each agent prompt MUST include OUTPUT_DIRECTORY:**
 
-- `authentication.json` - Auth mechanisms
-- `authorization.json` - RBAC, ABAC, permissions
-- `input-validation.json` - Validation patterns
-- `cryptography.json` - Encryption, hashing
-- `control-gaps.json` - Missing controls
-- `summary.md` - <2000 token handoff
+```
+Task("security-controls-mapper", "
+Map security controls in {component-path}.
+
+OUTPUT_DIRECTORY: {OUTPUT_DIR}
+Mode: orchestrated
+Output file: ${OUTPUT_DIR}/security-controls-{component-slug}.md
+
+[Analysis requirements...]
+
+MANDATORY SKILLS (invoke ALL before completing):
+- persisting-agent-outputs: For file persistence to OUTPUT_DIRECTORY
+
+COMPLIANCE: Document invoked skills in output metadata. I will verify.
+", "security-controls-mapper")
+```
+
+**Artifacts produced** (flat files in OUTPUT_DIR):
+
+- `security-controls.md` - Consolidated controls mapping
+- `security-controls-{component}.md` - Per-component analysis (if parallel)
 
 **Checkpoint**: Present controls found and gaps, ask for approval.
 
@@ -211,15 +278,11 @@ See [references/phase-2-workflow.md](references/phase-2-workflow.md) for detaile
 
 **Execution**: Sequential (needs holistic view). Read and apply `threat-modeling` skill.
 
-**Inputs**: Load Phase 1 + Phase 2 summaries and key artifacts.
+**Inputs**: Load Phase 0 (business context), Phase 1 (codebase mapping), and Phase 2 (security controls) from OUTPUT_DIR.
 
-**Artifacts produced** (in `phase-3/`):
+**Artifacts produced** (flat files in OUTPUT_DIR):
 
-- `threat-model.json` - Structured threat entries
-- `abuse-cases/*.json` - Per-category abuse scenarios
-- `attack-trees/*.md` - Attack path diagrams
-- `risk-matrix.json` - Impact × Likelihood scoring
-- `summary.md` - <2000 token handoff
+- `threat-model.md` - Comprehensive threat analysis with STRIDE categorization
 
 **Checkpoint**: Present top threats and abuse cases, ask for approval.
 
@@ -231,15 +294,11 @@ See [references/phase-3-workflow.md](references/phase-3-workflow.md) for detaile
 
 **Execution**: Sequential. Read and apply `security-test-planning` skill.
 
-**Inputs**: Load Phase 3 threat model and Phase 1 entry points.
+**Inputs**: Load Phase 0 (business context), Phase 1 (entry points), and Phase 3 (threat model) from OUTPUT_DIR.
 
-**Artifacts produced** (in `phase-4/`):
+**Artifacts produced** (flat files in OUTPUT_DIR):
 
-- `code-review-plan.json` - Prioritized files
-- `sast-recommendations.json` - Static analysis focus
-- `dast-recommendations.json` - Dynamic testing targets
-- `manual-test-cases.json` - Threat-driven tests
-- `summary.md` - Execution roadmap
+- `test-plan.md` - Comprehensive test plan with prioritized targets
 
 **Checkpoint**: Present test plan, ask for final approval.
 
@@ -247,13 +306,21 @@ See [references/phase-4-workflow.md](references/phase-4-workflow.md) for detaile
 
 ### Step 6: Final Report Generation
 
-**Consolidate all phases** into final deliverables:
+**Consolidate all phases** into final deliverable:
 
-| Format   | File                     | Purpose               |
-| -------- | ------------------------ | --------------------- |
-| Markdown | `threat-model-report.md` | Human-readable report |
-| JSON     | `threat-model-data.json` | Machine-readable data |
-| SARIF    | `threat-model.sarif`     | IDE integration       |
+| Format   | File           | Purpose                                               |
+| -------- | -------------- | ----------------------------------------------------- |
+| Markdown | `SYNTHESIS.md` | Comprehensive report consolidating all phase findings |
+
+The SYNTHESIS.md file should include:
+
+- Executive summary with key findings
+- Business context (crown jewels, compliance, threat actors)
+- Architecture overview from codebase mapping
+- Security controls assessment
+- Threat model with STRIDE analysis
+- Prioritized test plan
+- Recommendations
 
 See [references/report-templates.md](references/report-templates.md) for output schemas.
 
@@ -261,14 +328,14 @@ See [references/report-templates.md](references/report-templates.md) for output 
 
 ## Handoff Protocol
 
-Between each phase, write a handoff file:
+Between each phase, write a handoff file (flat files in OUTPUT_DIR):
 
 ```json
 {
-  "sessionId": "{session-id}",
-  "fromPhase": 1,
-  "toPhase": 2,
-  "timestamp": "2024-12-17T10:30:00Z",
+  "sessionId": "{timestamp}-{slug}",
+  "fromPhase": 0,
+  "toPhase": 1,
+  "timestamp": "2026-01-04T15:28:47Z",
   "summary": {
     "keyFindings": ["..."],
     "criticalRisks": ["..."],
@@ -277,12 +344,14 @@ Between each phase, write a handoff file:
     "userFeedback": ["..."]
   },
   "artifacts": [
-    { "name": "phase-0-summary", "path": "phase-0/summary.md", "loadWhen": "always" },
-    { "name": "entry-points.json", "path": "phase-1/entry-points.json", "loadWhen": "always" }
+    { "name": "business-context", "path": "business-context.md", "loadWhen": "always" },
+    { "name": "codebase-mapping", "path": "codebase-mapping.md", "loadWhen": "phase1+" }
   ],
   "nextPhaseGuidance": "Focus on authentication controls first"
 }
 ```
+
+**File naming**: `handoff-phase-{N}-to-{M}.json` (flat, not in subdirectory)
 
 **Why handoffs matter**: Phases run in separate contexts. Handoffs compress findings for downstream use.
 
@@ -359,42 +428,61 @@ See [references/checkpoint-prompts.md](references/checkpoint-prompts.md) for all
 ## Session Directory Structure
 
 ```
-.claude/.threat-model/{session-id}/
-├── config.json              # Session configuration
-├── scope.json               # User-selected scope
-├── checkpoints/             # Human approval records
-│   ├── phase-0-checkpoint.json
-│   ├── phase-1-checkpoint.json
-│   ├── phase-2-checkpoint.json
-│   ├── phase-3-checkpoint.json
-│   └── phase-4-checkpoint.json
-├── phase-0/                 # Business context outputs (MANDATORY FIRST)
-├── phase-1/                 # Codebase mapping outputs
-├── phase-2/                 # Security controls outputs
-├── phase-3/                 # Threat model outputs
-├── phase-4/                 # Test plan outputs
-├── handoffs/                # Phase transition records
-│   ├── phase-0-to-1.json
-│   ├── phase-1-to-2.json
-│   ├── phase-2-to-3.json
-│   └── phase-3-to-4.json
-└── final-report/            # Consolidated outputs (includes business context)
-    ├── threat-model-report.md
-    ├── threat-model-data.json
-    └── threat-model.sarif
+.claude/.output/threat-modeling/{timestamp}-{slug}/
+├── metadata.json                  # Status, timestamps, phase tracking
+├── scope.json                     # User-selected scope
+├── business-context.md            # Phase 0 output
+├── codebase-mapping.md            # Phase 1 consolidated output
+├── codebase-mapping-frontend.md   # Phase 1: codebase-mapper agent (if parallel)
+├── codebase-mapping-backend.md    # Phase 1: codebase-mapper agent (if parallel)
+├── security-controls.md           # Phase 2 output
+├── threat-model.md                # Phase 3 output
+├── test-plan.md                   # Phase 4 output
+├── checkpoint-phase-0.json        # Human approval records (flat, not in subdirectory)
+├── checkpoint-phase-1.json
+├── checkpoint-phase-2.json
+├── checkpoint-phase-3.json
+├── checkpoint-phase-4.json
+├── handoff-phase-0-to-1.json      # Phase transitions (flat, not in subdirectory)
+├── handoff-phase-1-to-2.json
+├── handoff-phase-2-to-3.json
+├── handoff-phase-3-to-4.json
+└── SYNTHESIS.md                   # Final consolidated report
 ```
 
 ---
 
 ## Parallel Execution Strategy
 
-For large codebases, spawn multiple agents:
+For large codebases, spawn multiple agents with OUTPUT_DIRECTORY:
 
 ```
 # Phase 1: Parallel codebase mapping
-Task("codebase-mapper", "Analyze frontend: ./modules/ui")
-Task("codebase-mapper", "Analyze backend: ./modules/backend")
-Task("codebase-mapper", "Analyze infra: ./modules/devops")
+Task("codebase-mapper", "
+Analyze frontend: ./modules/ui
+
+OUTPUT_DIRECTORY: {OUTPUT_DIR}
+Mode: orchestrated
+Output file: ${OUTPUT_DIR}/codebase-mapping-frontend.md
+
+MANDATORY SKILLS (invoke ALL before completing):
+- persisting-agent-outputs: For file persistence to OUTPUT_DIRECTORY
+
+COMPLIANCE: Document invoked skills in output metadata. I will verify.
+", "codebase-mapper")
+
+Task("codebase-mapper", "
+Analyze backend: ./modules/backend
+
+OUTPUT_DIRECTORY: {OUTPUT_DIR}
+Mode: orchestrated
+Output file: ${OUTPUT_DIR}/codebase-mapping-backend.md
+
+MANDATORY SKILLS (invoke ALL before completing):
+- persisting-agent-outputs: For file persistence to OUTPUT_DIRECTORY
+
+COMPLIANCE: Document invoked skills in output metadata. I will verify.
+", "codebase-mapper")
 
 # Wait for all to complete, then consolidate
 ```
@@ -405,7 +493,7 @@ Task("codebase-mapper", "Analyze infra: ./modules/devops")
 - > 10,000 files total
 - Multiple technology stacks
 
-**Always consolidate** parallel results before checkpoint.
+**Always consolidate** parallel results into `codebase-mapping.md` before checkpoint.
 
 ---
 

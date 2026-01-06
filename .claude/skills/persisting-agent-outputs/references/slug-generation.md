@@ -31,9 +31,8 @@ function generateSlug(taskDescription: string): string {
   const keywords = extractKeywords(taskDescription);
 
   // Take top 2-3 most meaningful words
-  const slug = keywords.slice(0, 3).join('-');
+  const slug = keywords.slice(0, 3).join("-");
 
   return slug.toLowerCase();
 }
 ```
-

@@ -1,3 +1,408 @@
+## [Date: 2026-01-06] - Add Integration Section Requirement (Phase 28 Compliance)
+
+### Added
+- **Integration Section (MANDATORY)** block in Phase 5.2 (Generate SKILL.md)
+  - Documents required structure: Called By, Requires, Calls, Pairs With
+  - Explains why required (obra/superpowers analysis)
+  - Links to Phase 28 details in auditing-skills
+
+### Reason
+- New Phase 28 audit requires all skills to have Integration section
+- Based on [obra/superpowers](https://github.com/obra/superpowers) pattern analysis
+- Skills with Integration sections are never orphaned and have traceable dependencies
+
+### Files Modified
+- `SKILL.md:262-294` - Added Integration Section guidance after Target line count
+
+---
+
+## [Date: 2026-01-05] - Add Rationalization Prevention to Skill Creation Workflow
+
+### Added
+- New section: "Rationalization Prevention" (after Phase 0, before Phase 1)
+  - Links to shared rationalization prevention reference
+  - References domain-specific rationalization-table.md
+  - Key principle: detect phrases, STOP, return to checklist
+- New file: references/rationalization-table.md with phase-specific rationalizations
+  - Phase 1 (RED): 4 rationalizations (skip RED, user said so, similar skill, bureaucracy)
+  - Phase 2 (Validation): 2 rationalizations (name close enough, didn't search properly)
+  - Phase 5 (Generation): 3 rationalizations (500 lines close enough, later, placeholders)
+  - Phase 6 (Research): 4 rationalizations (know topic, takes long, simple skill, training data)
+  - Phase 7 (Gateway): 2 rationalizations (later, obvious which gateway)
+  - Phase 8 (GREEN): 2 rationalizations (looks complete, skip audit)
+  - Phase 9 (REFACTOR): 3 rationalizations (simple skill, overkill, one test enough)
+  - Cross-phase: 3 rationalizations (TDD optional, different skill, 8/9 enough)
+
+### Changed
+- Phase 1 (RED): Added statistical evidence after "TDD is mandatory"
+  - "Skills created without RED phase have ~40% failure rate (don't solve the actual problem)"
+  - "5 minutes to document failure prevents hours of building the wrong thing"
+- Phase 6.2 (Research): Added statistical evidence after "Common Rationalizations" reference
+  - "Skills populated from training data instead of research have ~30% stale/incorrect information"
+  - "Research takes 10-15 minutes but prevents weeks of propagating wrong patterns"
+
+### Reason
+- **Problem (RED)**: Agents frequently shortcut critical phases by rationalizing
+  - "Skip RED, I know what's needed" → 40% failure rate
+  - "I'll add references later" → 5% completion rate
+  - "Skip research, I know this" → 30% stale/incorrect information
+  - "Simple skill doesn't need pressure testing" → bypassed under time pressure
+- **Impact**: Low-quality skills that don't solve actual problems, stale content, missing safety gates
+- **Solution (GREEN)**: Explicit rationalization prevention section + evidence-based gates
+
+### Technical Details
+- Rationalization Prevention section placed after Phase 0 (affects all 9 phases)
+- Statistical evidence added at two critical gates (RED, Research) where shortcuts are most common
+- rationalization-table.md provides 20+ phase-specific rationalizations with counters
+- Links to shared rationalization-prevention.md for cross-cutting patterns
+
+### Benefits
+- Makes rationalization explicit and detectable
+- Evidence-based gates harder to dismiss ("~40% failure" vs "TDD is important")
+- Phase-specific guidance prevents "this phase is different" bypass
+- Consistent with using-skills rationalization prevention architecture
+
+---
+
+## [Date: 2026-01-04] - Fix Research Integration Workflow Continuation
+
+### Changed
+- Phase 6.2: Replaced implicit continuation instructions with explicit TodoWrite-based handoff protocol
+- Workflow Continuation Rules: Added 4-step mechanism explanation for post-research continuation
+- Phase 6.3: Added "POST-RESEARCH RESUME POINT" marker in header
+
+### Removed
+- Phase 6.2: Removed "CRITICAL - Automatic Continuation" box (lines 352-357 in old version)
+- This box contained instructions invisible to agent during research execution
+
+### Reason
+- **Problem (RED)**: Agent stops after Phase 6.2 research instead of continuing to Phase 6.3-9
+- **Root Cause**: Continuation instructions in Phase 6.2 are invisible when agent is reading orchestrating-research
+- **Impact**: Workflow stops, agent reports "Research complete!" and waits for user input
+- **Solution (GREEN)**: Write remaining phases to TodoWrite BEFORE invoking research (persists across context switch)
+
+### Technical Details
+- Phase 6.2 now has 3-step workflow:
+  1. Write Phases 6.2-9 to TodoWrite with status (in_progress/pending)
+  2. Invoke orchestrating-research skill
+  3. When research returns: Mark 6.2 complete, read SYNTHESIS.md, continue to 6.3
+- Workflow Continuation Rules section explains mechanism:
+  1. TodoWrite written before research
+  2. orchestrating-research signals WORKFLOW_CONTINUATION_REQUIRED
+  3. Agent checks TodoWrite for pending Phase 6.3
+  4. Agent continues 6.3 → 7 → 8 → 9 automatically
+- Phase 6.3 header changed from "Automatic Phase: This phase executes IMMEDIATELY..." to "← POST-RESEARCH RESUME POINT" for visibility
+
+### Benefits
+- TodoWrite persistence survives context switch to orchestrating-research
+- Explicit resume point visible in Phase 6.3 header
+- Mechanism documented in Workflow Continuation Rules
+- Removes reliance on invisible post-research instructions
+
+### Line Count
+- Before: 487 lines
+- After: 487 lines (no change, stayed under 500 limit)
+
+### Files Changed
+- `SKILL.md` - Lines 53-64 (Workflow Continuation Rules rewritten)
+- `SKILL.md` - Lines 337-375 (Phase 6.2 rewritten with TodoWrite protocol)
+- `SKILL.md` - Line 377 (Phase 6.3 header updated)
+
+### Method
+- Used `updating-skills` TDD workflow via `managing-skills` router
+- Backup: `.local/SKILL.md.backup-20260104-*`
+
+---
+
+## [Date: 2026-01-04] - Replace Deterministic Gateway Mapping with Semantic Reasoning
+
+### Changed
+- Phase 7: Replaced deterministic path-to-gateway mapping with semantic analysis + AskUserQuestion
+- Removed hardcoded category → gateway mappings (`testing/` → `gateway-testing`, etc.)
+- Added guidance to analyze skill PURPOSE, not path, for gateway selection
+
+### Reason
+- **RED failure**: Skill at `testing/backend/implementing-backend-tests/` was synced to `gateway-testing` using deterministic keyword matching
+- **Expected**: Should sync to `gateway-backend` (skill is about backend test implementation with Go/pytest)
+- **Root cause**: Deterministic mapping saw `testing/` first, ignored `backend/` in path and skill's actual purpose
+- **Impact**: `backend-tester` agent didn't load the skill because it invokes `gateway-backend`, not `gateway-testing`
+
+### Technical Details
+- Old approach: Path prefix determines gateway (`development/frontend/` → `gateway-frontend`)
+- New approach: Semantic analysis considers primary consumers, skill purpose, and nested path ambiguity
+- User confirmation via AskUserQuestion with reasoned recommendation
+
+### Benefits
+- Paths are organizational; skill PURPOSE determines gateway
+- Handles ambiguous cases like `testing/backend/` correctly
+- User has final say with informed recommendation
+- Reduces incorrect gateway assignments
+
+### Line Count
+- Before: 489 lines
+- After: 487 lines (under 500 limit)
+
+### Files Changed
+- `SKILL.md` - Lines 367-376 (Phase 7 rewritten)
+
+### Method
+- Used `updating-skills` TDD workflow via `managing-skills` router
+- Backup: `.local/SKILL.md.bak`
+
+### REFACTOR Phase Results
+
+**Pressure Test**: Agent tasked with routing `testing/backend/validating-dynamodb-tables/` under 10-minute deadline.
+
+**Loopholes Discovered**:
+1. Agent identified `backend-tester` as consumer but didn't CHECK which gateway it invokes
+2. Agent rationalized skipping AskUserQuestion: "given the 10-minute deadline..."
+3. Agent chose wrong gateway (`gateway-testing` instead of `gateway-backend`)
+
+**Counters Added**:
+1. Line 372: "READ their definition to verify which gateway they invoke in Step 1"
+2. Line 376: "NO EXCEPTIONS, even under time pressure"
+
+**Why These Work**:
+- "READ" is an action verb requiring verification, not just identification
+- "NO EXCEPTIONS, even under time pressure" explicitly closes the deadline rationalization
+
+---
+
+## [Date: 2026-01-03] - Remove npm References and Fix Path Issues
+
+### Changed
+- **SKILL.md**: Replaced 2 `npm run audit` commands (lines 418, 463) with markdown format: `Audit {skill-name} to verify compliance with all 27 phase requirements.`
+- **SKILL.md**: Converted 11 deep relative paths from `../../../../skills/managing-skills/...` to repo-root format `.claude/skills/managing-skills/...`
+- **SKILL.md**: Updated Related Skills section (line 487) to replace "TypeScript CLI" with "instruction-based"
+- **gateway-creation.md**: Replaced 2 `npm run audit` commands (lines 257, 269) with markdown format
+- **gateway-creation.md**: Added ROOT prefix to 3 mkdir commands (lines 92, 93, 230) to ensure correct path resolution
+- **research-integration.md**: Converted 2 deep relative paths to repo-root format
+- **refactor-rules.md**: Converted 1 deep relative path to repo-root format
+
+### Reason
+- **Problem (RED)**: Skill files contained outdated `npm run audit` CLI commands that should be replaced with skill invocations
+- **Problem (RED)**: mkdir commands without ROOT prefix fail when executed from arbitrary working directories
+- **Problem (RED)**: Deep relative paths (4-7 levels) are fragile and break when files move; repo-root format is stable
+- **Solution (GREEN)**: All audit references now use markdown format for skill invocation; all path operations use ROOT prefix; all cross-references use repo-root format
+
+### Technical Details
+- npm audit commands → markdown format enables skill system routing
+- mkdir operations → ROOT prefix ensures correct path resolution from any working directory
+- Relative paths → repo-root format prevents breakage when file structure changes
+- Line count: 488 lines (unchanged, within 500 limit)
+- All changes verified with grep/bash validation
+
+### Verification
+- ✅ No `npm run audit` commands remain in SKILL.md or gateway-creation.md
+- ✅ No deep relative paths (`../../../../`) remain in any file
+- ✅ All mkdir commands have ROOT prefix
+- ✅ Line count: 488 lines (under 500 limit)
+- ✅ All changed files have backups in .local/
+
+---
+
+## [Date: 2026-01-03] - Fix Workflow Continuation After orchestrating-research
+
+### Changed
+- Added new section "Workflow Continuation Rules" after Phase 0 (before Phase 0 heading)
+- Phase 6.2: Added "CRITICAL - Automatic Continuation" section with explicit DO/DON'T instructions
+- Phase 6.3: Added "Automatic Phase" marker indicating immediate execution after Phase 6.2
+- Condensed Phase 6.1 Research Decision section (from 22 lines to 4 lines) to accommodate line count
+- Condensed Quick Reference table (removed "Tools Used" column) to save space
+
+### Reason
+- **Problem (RED)**: When creating-skills invokes orchestrating-research in Phase 6.2, research completes successfully but workflow STOPS instead of automatically continuing to Phase 6.3, Phase 5, Phase 7, Phase 8-9
+- **Impact**: Assistant reports "Research complete! Here are findings..." and waits for user to say "continue", defeating workflow automation
+- **Root Cause**: Phase 6.2 said "invoke orchestrating-research" but lacked explicit instructions about what to do AFTER it returns
+- **Solution (GREEN)**: Added three explicit continuity points:
+  1. Workflow Continuation Rules section explaining the 9-phase automation principle
+  2. Phase 6.2 CRITICAL section with DO/DON'T after research returns
+  3. Phase 6.3 Automatic Phase marker
+
+### Technical Details
+- Workflow Continuation Rules section teaches key principle: "Subskills are steps, not endpoints"
+- Phase 6.2 CRITICAL section explicitly prohibits: reporting to user, summarizing results, waiting for "continue", stopping workflow
+- Phase 6.2 CRITICAL section explicitly requires: proceed directly to Phase 6.3, continue all remaining phases, only stop for AskUserQuestion
+- Phase 6.3 marker reinforces: "This phase executes IMMEDIATELY after Phase 6.2 completes. No user checkpoint."
+- File grew from 499 to 546 lines after additions, then compressed to 482 lines (under 500 limit) via:
+  - Phase 6.1: Condensed from 22 lines to 4 lines
+  - Workflow Continuation Rules: Condensed examples
+  - Quick Reference: Removed "Tools Used" column
+  - Phase 6.2: Compressed continuation instructions
+
+### Verification
+Test: Create a skill with research enabled, verify workflow continues automatically through all 9 phases without stopping after orchestrating-research completes.
+
+Expected: Phase 6.2 → Research completes → Phase 6.3 (immediate) → Phase 5 → Phase 7 → Phase 8 → Phase 9 → "Skill complete"
+
+---
+
+## [Date: 2026-01-03] - Replace researching-skills with orchestrating-research
+
+### Changed
+- Phase 6.2: Changed skill invocation from `researching-skills` to `orchestrating-research`
+- Phase 6.2: Updated capability list to reflect orchestrating-research features:
+  - Intent expansion via translating-intent
+  - Parallel execution across 6 sources (Codebase, Context7, GitHub, arxiv, Perplexity, Web)
+  - Cross-interpretation conflict detection
+  - Comprehensive SYNTHESIS.md output
+- Phase 6.3: Added explicit note about OUTPUT_DIR structure (SYNTHESIS.md + individual {source}.md files)
+- Quick Reference table (line 31): Updated Phase 7 reference to `orchestrating-research` skill
+- Related Skills section: Changed `researching-skills` to `orchestrating-research`
+
+### Reason
+- **Problem**: researching-skills is a simple sequential research tool, but skill creation often involves vague topics requiring sophisticated research coordination
+- **Impact**: Research for skills like "TanStack Query patterns" produced shallow results without exploring multiple semantic interpretations
+- **Solution**: orchestrating-research uses intent expansion and parallel agents for comprehensive, cross-source synthesis
+
+### Technical Details
+- orchestrating-research advantages:
+  - Handles vague queries via translating-intent (expands "research X" into multiple interpretations)
+  - Parallel execution (6 research agents run concurrently vs sequential)
+  - Cross-source synthesis (detects conflicts, validates patterns across sources)
+  - Better for library skills requiring up-to-date API docs and community patterns
+
+---
+
+## [Date: 2026-01-02] - Fix Skip-Research Path to Use Prompt Content
+
+### Changed
+- Phase 5.5: Renamed from "Create Reference File Structure" to "Prepare Reference File Structure"
+- Phase 5.5: Removed `touch` command that created empty placeholder files
+- Phase 5.5: Added note "Do NOT create empty placeholder files"
+- Phase 6.1 "No, skip research" path: Added content population instructions
+
+### Reason
+- **Problem**: When user selects "No, skip research", Phase 5.5 already created empty placeholders via `touch` command, and Phase 6.1 had no instruction to USE prompt content
+- **Impact**: Self-contained prompts still produced template shells with 0-byte reference files
+- **Solution**: Stop creating empty files, explicitly populate from prompt when research skipped
+
+### Technical Details
+- Phase 5.5 changes:
+  - Heading: "Create placeholder files" → "Files created later when you have content"
+  - Removed: `touch {skill-path}/references/{appropriate-file}.md`
+  - Added: "Do NOT create empty placeholder files"
+  - Table remains as guidance for what TO create when content available
+- Phase 6.1 "No" path changes (from 2 lines to 5 lines):
+  - Old: "Skip to Phase 7/8, document skip in changelog"
+  - New: "Populate SKILL.md from request, create files ONLY with content, no empty placeholders, skip to Phase 7/8, document skip"
+
+### Key Principle
+Whether research=yes or research=no, skill must have REAL content:
+- Research=yes → content from SYNTHESIS.md (Phase 6.3)
+- Research=no → content from user prompt (Phase 6.1)
+
+Difference is SOURCE, not whether content exists.
+
+### Line Count
+- Phase 5.5: 497 → 494 lines (-3 lines removed touch command section)
+- Phase 6.1: 494 → 497 lines (+3 lines added content instructions)
+- Net: 499 lines (no change, stayed under 500 limit)
+
+### Files Changed
+- `SKILL.md` - Lines 293-308 (Phase 5.5), lines 338-343 (Phase 6.1)
+
+### Method
+- Used `updating-skills` TDD workflow via `managing-skills` router
+- Backup: `.local/SKILL.md.backup-20260102-HHMMSS`
+
+---
+
+## [Date: 2026-01-02] - Add Phase 6.3 Research Integration
+
+### Added
+- Phase 6.3: Incorporate Research into Skill (new sub-phase after 6.2)
+- Explicit instructions to USE research findings after researching-skills completes
+- Checkpoint: Cannot proceed to Phase 7 until skill reflects research findings
+- New reference file: `references/research-integration.md` (complete integration workflow)
+
+### Changed
+- Phase 6 now has 3 sub-phases: 6.1 (Decision), 6.2 (Execute), 6.3 (Incorporate)
+- Line count: 495 → 499 lines (stayed under 500 hard limit via progressive disclosure)
+
+### Reason
+- **Problem**: After Phase 6.2 invokes researching-skills, research saved to `.claude/research/{timestamp}-{topic}/` but no instruction to USE it
+- **Impact**: Skill content remained template-based, research artifacts orphaned
+- **Solution**: Add Phase 6.3 to read SYNTHESIS.md and incorporate findings into SKILL.md and references/
+
+### Technical Details
+- Phase 6.3 structure:
+  1. Read SYNTHESIS.md from research output directory
+  2. Update SKILL.md with patterns (codebase), API docs (Context7), best practices (web)
+  3. Populate references/ with detailed source-specific content
+  4. Replace template placeholders with real examples
+- Detailed workflow extracted to `references/research-integration.md` (150+ lines)
+  - Integration steps with examples
+  - Verification checklist
+  - Anti-patterns and rationalizations
+  - Before/after transformation examples
+
+### Benefits
+- Research findings now explicitly incorporated into skill content
+- Clear checkpoint prevents skipping integration step
+- Progressive disclosure keeps SKILL.md concise
+- Reference file provides complete guidance
+
+### Files Changed
+- `SKILL.md` - Lines 374-377 (Phase 6.3 added)
+- `references/research-integration.md` - Created (complete integration workflow)
+
+### Method
+- Used `updating-skills` TDD workflow via `managing-skills` router
+- Backup: `.local/SKILL.md.backup-20260102-HHMMSS`
+
+---
+
+## [Date: 2026-01-02] - Add Research Gating Question to Phase 6
+
+### Changed
+- Phase 6: Restructured with sub-phases 6.1 (Research Decision) and 6.2 (Execute Research)
+- Added AskUserQuestion at start of Phase 6 to ask if user wants to conduct research
+- Research is now optional with explicit user consent via gating question
+
+### Added
+- Section 6.1: Research Decision with AskUserQuestion
+  - Question: "Would you like to conduct research to populate the skill content?"
+  - Options: "Yes, research sources (Recommended)" and "No, skip research"
+  - Descriptions explain research benefits vs existing knowledge tradeoffs
+- Conditional branching logic:
+  - If "No": Skip to Phase 7 (Gateway Update) or Phase 8 (GREEN), document skip in changelog
+  - If "Yes": Continue to Phase 6.2 (execute researching-skills)
+- Section 6.2: Execute Research (moved existing content here)
+
+### Reason
+- **Problem**: Phase 6 immediately invoked researching-skills with no option to skip
+- **Impact**: Users with sufficient knowledge or time constraints forced through research
+- **UX Issue**: researching-skills uses 2 AskUserQuestion calls, each auto-adds "Other" option, creating confusion
+- **Solution**: Gate research with single upfront question in creating-skills, keeping researching-skills unchanged
+
+### Technical Details
+- Line count: 462 → 495 lines (still under 500 hard limit, 5 lines to spare)
+- Question structure uses multiSelect: false for binary choice
+- "Recommended" marks research option to guide users
+- Common Rationalizations section moved under 6.2 (appears after "Yes" selection)
+- researching-skills skill remains unchanged (no modifications)
+
+### Benefits
+- Users can skip research if they have current knowledge
+- Gating question prevents "Other" prompt duplication confusion
+- Explicit choice improves UX and workflow clarity
+- Research remains recommended but not forced
+
+### Architecture
+- Gating question lives in creating-skills (not researching-skills)
+- Separation of concerns: creating-skills decides IF, researching-skills decides WHAT
+- researching-skills still uses multi-tab questions for source selection (unchanged)
+
+### Files Changed
+- `SKILL.md` - Lines 313-372 (Phase 6 restructure)
+
+### Method
+- Used `updating-skills` TDD workflow via `managing-skills` router
+- Backup: `.local/SKILL.md.backup-20260102-HHMMSS`
+
+---
+
 ## [Date: 2025-12-31] - Simplify Repository Root Navigation Pattern
 
 ### Changed

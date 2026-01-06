@@ -271,7 +271,7 @@
 
 When called from `researching-skills` router, output is saved to `perplexity.md`:
 
-**File location**: `.claude/research/{timestamp}-{topic}/perplexity.md`
+**File location**: `.claude/.output/research/{timestamp}-{topic}/perplexity.md`
 
 **Router expects**:
 

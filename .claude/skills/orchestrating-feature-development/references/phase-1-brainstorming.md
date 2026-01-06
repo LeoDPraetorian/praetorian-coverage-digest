@@ -32,7 +32,7 @@ Save refined design to feature workspace:
 
 ```bash
 # Save brainstorming output
-cat > .claude/features/{feature-id}/design.md << 'EOF'
+cat > .claude/.output/features/{feature-id}/design.md << 'EOF'
 # {Feature Name} - Design
 
 ## Overview
@@ -80,7 +80,7 @@ Options:
     "brainstorming": {
       "status": "complete",
       "approved": true,
-      "design_file": ".claude/features/{id}/design.md",
+      "design_file": ".claude/.output/features/{id}/design.md",
       "completed_at": "2024-12-13T10:30:00Z"
     },
     "planning": {

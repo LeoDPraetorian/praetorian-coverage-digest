@@ -165,9 +165,9 @@ func CompareProbePrompts(goResult, pyResult *ProbeResult) ComparisonResult {
 
 ## Why Type-Specific Comparison
 
-| Type | Comparison | Reason |
-|------|------------|--------|
-| Float | Epsilon (1e-9) | Floating point imprecision |
-| String | Exact match | Must be character-perfect |
-| Array | Element + order | Python list semantics |
-| Struct | Field-by-field | Semantic equivalence |
+| Type   | Comparison      | Reason                     |
+| ------ | --------------- | -------------------------- |
+| Float  | Epsilon (1e-9)  | Floating point imprecision |
+| String | Exact match     | Must be character-perfect  |
+| Array  | Element + order | Python list semantics      |
+| Struct | Field-by-field  | Semantic equivalence       |

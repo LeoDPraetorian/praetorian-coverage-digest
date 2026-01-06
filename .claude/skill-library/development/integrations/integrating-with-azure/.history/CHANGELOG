@@ -1,0 +1,123 @@
+# Changelog: integrating-with-azure
+
+## 2026-01-04 - Initial Creation
+
+**Type**: New skill creation
+**Location**: `.claude/skill-library/development/integrations/integrating-with-azure/`
+**Category**: development/integrations
+**Skill Type**: Integration
+
+### RED Phase Documentation
+
+**Gap Identified**: Developers lack comprehensive, up-to-date guidance for integrating applications with Microsoft Azure, leading to:
+
+1. **Outdated authentication patterns**: Using connection strings/shared keys instead of DefaultAzureCredential and managed identities
+2. **Missing credential chain knowledge**: Not understanding the proper authentication fallback pattern
+3. **Security gaps**:
+   - Not using managed identities in Azure environments
+   - Missing least privilege IAM configuration
+   - No credential rotation strategy
+   - Credentials embedded in code/config
+4. **SDK version confusion**: Mixing old (track 1) and new (track 2) Azure SDK patterns
+5. **Incomplete setup**: Missing environment variables, local dev vs production differences
+6. **Service-specific patterns**: Each Azure service (Key Vault, Storage, CosmosDB) has authentication nuances
+
+**Test Scenario**: Configure Azure SDK authentication (managed identity, service principal, or credential chain) for a Go backend application.
+
+**Expected Failure**: Without this skill, Claude may suggest outdated patterns, miss security best practices, reference wrong SDK versions, or provide incomplete configuration.
+
+### Skill Coverage
+
+This skill provides comprehensive guidance on:
+
+- Azure SDK authentication patterns (DefaultAzureCredential, managed identity, service principal)
+- Infrastructure as Code (Terraform, Bicep, ARM templates)
+- Azure DevOps pipeline configuration
+- Azure security patterns (Key Vault, IAM/RBAC, network security)
+- Service-specific SDK usage (Storage, Key Vault, Cosmos DB)
+- Error handling and retry policies
+- Environment-specific configuration
+- Monitoring and observability
+- Cost optimization strategies
+
+### Initial Structure
+
+- **SKILL.md**: 424 lines (within target 300-450)
+- **references/**: Prepared for detailed content population during research phase
+- **examples/**: Prepared for code examples
+
+### Research Completed
+
+**Date**: 2026-01-04
+**Research Output**: `.claude/.output/research/2026-01-04-211427-azure-integration/`
+**Agents Spawned**: 8 (sequential execution across 4 sources)
+**Total Research Time**: ~11 minutes
+
+**Key Research Findings Incorporated**:
+
+1. **Critical Production Warnings Section Added**:
+   - Application Insights migration deadline (March 31, 2025)
+   - DefaultAzureCredential production guidance (use ManagedIdentityCredential instead)
+   - az ad sp create-for-rbac vulnerability (GitHub #32299)
+   - MSAL version regressions (4.67.1, 4.70.0)
+   - Key Vault RBAC migration requirement
+
+2. **Authentication Patterns Updated**:
+   - Separated development (DefaultAzureCredential) vs production (ManagedIdentityCredential) patterns
+   - Added complete 10-step credential chain documentation
+   - Emphasized performance overhead and unpredictability issues
+   - Added service principal security hierarchy
+
+3. **Service Principal Section Enhanced**:
+   - Added vulnerability warning with safer alternatives
+   - Documented security hierarchy (managed identity > federated > certificates > secrets)
+   - Added credential rotation requirements (90 days standard, 60 days for compliance)
+
+**Content Changes**:
+- Added: 70 lines (Critical Warnings section + enhanced auth guidance)
+- Modified: 30 lines (authentication patterns, service principal setup)
+- Final line count: 494 (under 500-line hard limit)
+
+### Phase 7: Gateway Update (Complete)
+
+Added to `gateway-integrations` routing table with comprehensive triggers:
+- Azure, Microsoft Azure, Key Vault
+- Managed identity, DefaultAzureCredential, RBAC, service principal
+- Terraform Azure, Bicep, ARM templates
+
+### Phase 8: GREEN Verification (Complete)
+
+**Original Gap** (RED phase):
+- Developers lack guidance on Azure SDK authentication patterns
+- Missing knowledge of DefaultAzureCredential chain, managed identities
+- Security gaps (no least privilege, no credential rotation)
+
+**Skill Addresses**:
+- ✅ Critical production warnings (2026 deadlines, vulnerabilities)
+- ✅ Clear dev vs production authentication separation
+- ✅ Complete 10-step DefaultAzureCredential chain documentation
+- ✅ Managed identity setup with explicit client IDs
+- ✅ Service principal security hierarchy
+- ✅ Comprehensive research (8 agents, 60+ citations)
+
+**User Verification**: Confirmed skill addresses original authentication gaps
+
+### Phase 9: REFACTOR Pressure Testing (Not Applicable)
+
+**Rationale**: The integrating-with-azure skill is a reference/documentation skill providing Azure integration patterns. According to pressure-testing methodology: "Don't test: Pure reference skills (API docs, syntax guides), Skills without rules to violate."
+
+This skill provides information and warnings but does not enforce process discipline that agents might rationalize bypassing. Pressure testing is designed for methodology skills (TDD, testing requirements) where agents face compliance costs.
+
+**Final Status**: Skill creation complete and ready for use.
+
+### Skill Summary
+
+**Name**: integrating-with-azure
+**Location**: `.claude/skill-library/development/integrations/integrating-with-azure/`
+**Type**: Integration (reference/documentation)
+**Line Count**: 494 lines (under 500-line limit)
+**Gateway**: gateway-integrations
+**Research**: 8 sources (Context7, GitHub, Perplexity, Web) across 2 interpretations
+**Critical Features**: Production warnings, dev/prod authentication separation, security hierarchy
+
+**Usage**: Invoke via `gateway-integrations` when working with Azure SDK, authentication, Key Vault, managed identities, or Azure infrastructure.

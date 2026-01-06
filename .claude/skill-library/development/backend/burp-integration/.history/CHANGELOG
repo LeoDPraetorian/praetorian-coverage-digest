@@ -1,0 +1,32 @@
+# Changelog
+
+## 2026-01-01 - Cross-Reference to Generic GraphQL Patterns
+
+**What changed:**
+- Added cross-reference to `building-graphql-batch-clients` skill in Related Skills section
+- Added note to GraphQL Query Structure (Critical Rule #3) pointing to generic patterns
+- Created `references/generic-graphql-extraction.md` documenting Burp-specific vs reusable patterns
+- Organized Related Skills into "GraphQL Patterns" and "Concurrency & Testing" subsections
+
+**Line count:** 340 → 351 (11 lines added, all cross-references)
+
+**Why:** Developers implementing GraphQL clients for GitHub/GitLab/Azure APIs can now discover generic patterns (variable binding, rate limiting, error handling, pagination, batch queries, testing) that were originally demonstrated in burp-integration but are now extracted to a dedicated skill.
+
+**Burp-specific patterns remain unchanged:**
+- Site provisioning workflow
+- Scan lifecycle management
+- Chariot header injection
+- Result processing and conversion
+
+**Generic patterns now in building-graphql-batch-clients:**
+- Variable binding (security)
+- Rate limiting approaches
+- Error response structure
+- Testing with httptest.NewServer
+- Batch query construction
+- Cursor-based pagination
+
+**Verification:**
+- All existing Burp-specific content unchanged
+- Changes are additive (cross-references only)
+- Skill remains focused on Burp integration

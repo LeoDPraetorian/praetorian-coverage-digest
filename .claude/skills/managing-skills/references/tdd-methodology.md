@@ -38,7 +38,7 @@ Same Iron Law: **NO SKILL WITHOUT A FAILING TEST FIRST**
 
 **This is "watch the test fail"** - you MUST see what agents naturally do before writing the skill.
 
-**Required skill:** Use [testing-skills-with-subagents](../testing-skills-with-subagents/SKILL.md) for complete testing methodology.
+**Required skill:** Use [pressure-testing-skill-content](../pressure-testing-skill-content/SKILL.md) for complete testing methodology.
 
 ### GREEN: Write Minimal Skill
 

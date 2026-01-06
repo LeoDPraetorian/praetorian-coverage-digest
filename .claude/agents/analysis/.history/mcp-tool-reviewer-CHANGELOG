@@ -1,0 +1,76 @@
+## [2026-01-02] - Lean Agent Refactor
+
+### Changed
+- Reduced from 259 lines to 106 lines (59% reduction)
+- Removed hardcoded TypeScript skill paths table
+- Added `gateway-typescript` to skills frontmatter
+- Agents now load TypeScript patterns via gateway, not hardcoded paths
+- Simplified review process and checklist (gateway provides criteria)
+- Removed verbose output format template
+
+### Reason
+- Follow lean agent pattern per AGENT-ARCHITECTURE.md
+- Analysis agents target: <150 lines (was 259, now 106)
+- Delegate detailed patterns to gateways and skills
+
+---
+
+## [2026-01-02] - Initial Creation
+
+### Created
+- New mcp-tool-reviewer agent for reviewing MCP wrapper implementations
+- Modeled after frontend-reviewer agent structure
+- Integrated with orchestrating-mcp-development workflow (Phase 7)
+
+### Architecture
+- Type: analysis
+- Permission Mode: plan
+- Model: sonnet
+- Color: cyan
+
+### Skills Integrated
+**Step 1 (Always Invoke):**
+- `calibrating-time-estimates` - Grounds effort estimates
+- `enforcing-evidence-based-analysis` - Prevents hallucinations
+- `semantic-code-operations` - Semantic code search
+- `gateway-mcp-tools` - Routes to MCP wrapper patterns
+- `persisting-agent-outputs` - File output protocol
+- `verifying-before-completion` - Final verification
+
+**Step 2 (TypeScript Library Skills):**
+- `avoiding-barrel-files` - Import patterns
+- `documenting-with-tsdoc` - Documentation
+- `validating-with-zod-schemas` - Input validation
+- `implementing-result-either-pattern` - Error handling
+- `sanitizing-inputs-securely` - Security
+
+**Step 3 (Context-Based):**
+- `adhering-to-dry` - Duplication review
+- `adhering-to-yagni` - Scope creep detection
+- `debugging-systematically` - Root cause analysis
+- `using-todowrite` - Task tracking
+
+### Review Focus Areas
+1. Architecture adherence (token optimization 80-99%, filtering rules, error handling)
+2. TypeScript best practices (no barrel files, TSDoc, Zod schemas)
+3. Security (input sanitization)
+4. Verification (tsc, tests, coverage ≥80%)
+
+### Verdict Options
+- APPROVED: All architecture requirements met, no CRITICAL issues
+- CHANGES_REQUESTED: Minor deviations, HIGH issues
+- BLOCKED: CRITICAL issues, missing architecture, fundamental problems
+
+### Integration Points
+- Input: Wrapper implementation from Phase 6
+- Output: review.md with verdict
+- Next: Returns to orchestrator, MAX 1 retry if CHANGES_REQUESTED
+
+### Reason
+- orchestrating-mcp-development skill requires dedicated reviewer agent
+- Provides quality gate between implementation and GREEN gate
+- Ensures consistent review standards across MCP wrappers
+
+### Verification
+- GREEN: Agent created and structured
+- Compliance: Follows frontend-reviewer pattern

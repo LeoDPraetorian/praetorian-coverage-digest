@@ -177,13 +177,13 @@ func CreateServiceFrom(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `target` | `Target` | Original scan target |
-| `metadata` | `Metadata` | Protocol-specific metadata struct |
-| `tls` | `bool` | Whether TLS is used |
-| `version` | `string` | Extracted version (empty if unknown) |
-| `transport` | `Protocol` | TCP, TCPTLS, or UDP |
+| Parameter   | Type       | Description                          |
+| ----------- | ---------- | ------------------------------------ |
+| `target`    | `Target`   | Original scan target                 |
+| `metadata`  | `Metadata` | Protocol-specific metadata struct    |
+| `tls`       | `bool`     | Whether TLS is used                  |
+| `version`   | `string`   | Extracted version (empty if unknown) |
+| `transport` | `Protocol` | TCP, TCPTLS, or UDP                  |
 
 **Usage:**
 

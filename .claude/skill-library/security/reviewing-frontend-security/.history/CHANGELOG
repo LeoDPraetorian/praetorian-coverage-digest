@@ -1,0 +1,84 @@
+# Changelog - reviewing-frontend-security
+
+## [2026-01-04] - Initial Creation
+
+### Context
+
+**RED Phase Documentation:**
+
+**Gap**: The frontend-security agent is 244 lines, violating the lean agent pattern (<150 lines, ideally <130). The agent contains ~106 lines of embedded Security Review Process content (lines 120-226) that should be extracted into a reusable library skill.
+
+**Test Scenario**: Before this skill existed, the frontend-security agent was bloated with detailed process steps that:
+- Made the agent harder to maintain
+- Violated the lean agent pattern
+- Duplicated content that could be reused across multiple agents
+- Made updates to the review process require agent changes
+
+**Failure**: Agent line count of 244 lines with embedded process content, exceeding the 150-line threshold.
+
+### Changes
+
+**Created**: `.claude/skill-library/security/reviewing-frontend-security/SKILL.md`
+
+**Category**: security (library skill)
+
+**Skill Type**: Process/Pattern - security review methodology for React/TypeScript frontend code
+
+**Content Extracted**:
+1. Step 1: Locate Security Architecture Plan (bash examples, plan discovery)
+2. Step 2: Read All Code Before Reviewing (find commands, Read examples)
+3. Step 3: Review Against Security Framework (Authentication & Authorization, Input Validation & XSS Prevention, Severity Classification table)
+4. Step 4: Write Security Findings to File (complete markdown template)
+5. Step 5: Verify Findings Before Completion (static analysis, evidence requirements)
+6. Authentication & Authorization Review Checklist
+7. Input Validation & XSS Prevention Checklist
+
+**Related**: Mirrors `reviewing-backend-security` structure for consistency across security review skills.
+
+### Expected Impact
+
+**After extraction**:
+- frontend-security agent reduces from 244 lines to ~140 lines
+- Security review process becomes reusable across multiple frontend security agents
+- Updates to the review methodology only need to happen in one place
+- Agent references the skill via gateway-security routing
+
+### Compliance
+
+- Line count: 169 lines (within <500 target)
+- Progressive disclosure: Main process in SKILL.md, no references/ needed yet
+- Code references: Uses durable patterns (method names, file paths)
+- Frontmatter: Complete with name, description, allowed-tools
+
+### GREEN Phase (2026-01-04)
+
+**Test Scenario**: Frontend-security agent performing full security audit
+**Before**: Agent had 244 lines with embedded process, violated lean agent pattern
+**After**: Agent has 139 lines, loads skill via gateway-security
+
+**Verification**:
+- ✅ Skill file exists at `.claude/skill-library/security/reviewing-frontend-security/SKILL.md`
+- ✅ Gateway routes "frontend security" / "React security" / "XSS" to skill
+- ✅ Agent references skill in line 49 semantic matching
+- ✅ Agent line count reduced from 244 to 139 lines (105-line reduction)
+
+### REFACTOR Phase (2026-01-04)
+
+**Rationalization Vectors Analyzed**:
+1. "Simple review, don't need process" → Agent line 47 requires gateway routing even for quick checks
+2. "I know React security" → Agent lines 82-90 counter with "training data stale", "read current skills"
+3. "Time pressure" → Agent lines 79-80 counter with "100x faster", calibrating-time-estimates
+4. "Obvious vulnerability" → Agent line 83 counters with "Gateway skills have Chariot-specific context"
+
+**Protections Verified**:
+- Agent Step 1 forces skill invocation (non-negotiable)
+- Gateway routing ensures skill discovery via keywords
+- Semantic matching explicitly lists skill for "Full security audit"
+- All counter-rationalizations inherited from original agent
+
+**Compliance Audit**: PASSED
+- Description format: ✅ "Use when...", third-person, <120 chars
+- Allowed tools: ✅ Bash, Grep, Glob, Read, Write, TodoWrite
+- Line count: ✅ 169 lines (<500)
+- Gateway routing: ✅ Added to gateway-security
+- Table formatting: ✅ Prettier applied

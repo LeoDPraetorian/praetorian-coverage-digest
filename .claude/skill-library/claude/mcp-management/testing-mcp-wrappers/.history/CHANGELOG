@@ -1,0 +1,70 @@
+# Changelog - testing-mcp-wrappers
+
+## 2026-01-02 - Initial Creation
+
+### Context
+**Category**: Library skill (testing/)
+**Skill Type**: Process/Pattern
+**Location**: `.claude/skill-library/testing/testing-mcp-wrappers/`
+
+### RED Phase: Gap Documentation
+**Why this skill is needed:**
+- MCP wrapper testing requires specialized patterns not covered by general testing skills
+- gateway-testing needs a focused skill to route MCP Tester agents to
+- Current testing skills don't address MCP-specific concerns: response filtering, token optimization, schema validation
+
+**Test scenario without skill:**
+MCP Tester agents would receive generic testing guidance from gateway-testing, missing critical MCP wrapper patterns:
+- No guidance on when to use unit vs schema vs integration tests for wrappers
+- No code examples for response filtering verification
+- No token optimization testing patterns
+- No Zod schema testing examples specific to MCP wrappers
+
+**Expected behavior with skill:**
+- Clear test mode selection (unit/schema/integration)
+- Practical code examples for MCP-specific test scenarios
+- Test implementation process aligned with test-lead workflows
+- MCP wrapper test checklist for completion verification
+
+### Content Summary
+**Main sections:**
+1. Test Mode Selection - When to use unit, schema, integration tests
+2. MCP-Specific Test Patterns - Code examples for:
+   - Response filtering verification
+   - Token optimization measurement (80%+ reduction target)
+   - Zod schema validation (valid/invalid/edge cases)
+3. Test Implementation Process - Locate plan, implement, verify
+4. MCP Wrapper Test Checklist - Completion criteria
+5. Common Pitfalls - Anti-patterns with ❌/✅ examples
+6. Test Infrastructure - Token counting, mocks, fixtures
+
+**Line count:** 338 lines (well under 500 limit)
+
+**References created:** None (all content in main SKILL.md)
+
+### Research Phase
+**Research decision:** Skipped - user provided comprehensive content in initial request
+
+All content populated from user requirements:
+- Test mode selection (unit/schema/integration)
+- MCP-specific test patterns with code examples
+- Test implementation process
+- MCP wrapper test checklist
+- Common pitfalls and anti-patterns
+- Test infrastructure examples
+
+### GREEN Phase Status
+**Status:** ✅ PASSED
+
+Audit results:
+- No critical issues
+- INFO-level issues: 2 (code block language tags, header hierarchy - acceptable)
+- Compliance verified with `npm run audit -- testing-mcp-wrappers`
+- Gateway updated: `gateway-testing` now routes MCP Tester agents to this skill
+
+### REFACTOR Phase Status
+**Status:** SKIPPED (user decision)
+
+Can be conducted later with updating-skills workflow if pressure testing needed.
+
+---

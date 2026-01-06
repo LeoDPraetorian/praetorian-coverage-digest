@@ -1,17 +1,18 @@
 # Gateway-Specific Fixes (Phases 17-20)
 
-**Gateway skills** (names starting with `gateway-`) have additional validation phases for routing table integrity and two-tier system documentation.
+**Gateway skills** (names starting with `gateway-`) have additional validation phases for routing table integrity and progressive disclosure documentation.
 
 ## Phase 17: Gateway Structure (Manual)
 
 **What it validates:**
 
-- Presence of "Understanding This Gateway" section
-- `<IMPORTANT>` warning block about Skill tool vs Read tool
-- Correct invocation example: `skill: "gateway-X"`
-- Explanation of Read tool usage for library skills
-- Two-tier system explanation
-- Anti-pattern examples (❌ WRONG / ✅ RIGHT)
+- Presence of `<EXTREMELY-IMPORTANT>` block with 1% Rule and Skill Announcement
+- Presence of "Progressive Disclosure" section with 3-tier explanation
+- Presence of "Intent Detection" table (Task Intent | Route To)
+- Presence of "Routing Algorithm" (numbered steps)
+- Presence of "Skill Registry" tables with Skill | Path | Triggers columns
+- Presence of "Cross-Gateway Routing" table
+- Presence of "Loading Skills" section
 
 **How to fix:**
 
@@ -22,11 +23,15 @@
    ```
 
 2. Copy missing sections to your gateway SKILL.md:
-   - Understanding This Gateway
-   - IMPORTANT block about library skill invocation
-   - Anti-pattern examples
+   - EXTREMELY-IMPORTANT block (1% Rule, Skill Announcement)
+   - Progressive Disclosure (3-tier loading)
+   - Intent Detection table
+   - Routing Algorithm
+   - Skill Registry tables
+   - Cross-Gateway Routing table
+   - Loading Skills section
 
-3. Ensure two-tier explanation is clear
+3. Ensure intent-based routing is used (not role-based)
 
 **Template location:** `.claude/skills/managing-skills/templates/gateway-template.md`
 
@@ -34,8 +39,10 @@
 
 **What it validates:**
 
-- Routing tables show full paths, not just skill names
+- Skill Registry tables show full paths, not just skill names
 - Format: `.claude/skill-library/{category}/{skill-name}/SKILL.md`
+- Presence of Triggers column with keywords
+- Table format: `| Skill | Path | Triggers |`
 
 **How to fix (automatic):**
 
@@ -43,14 +50,16 @@
 # Auto-fix will:
 # 1. Search filesystem for each skill name
 # 2. Convert "frontend-tanstack" → ".claude/skill-library/frontend/frontend-tanstack/SKILL.md"
-# 3. Update routing table with full paths
+# 3. Add Triggers column if missing
+# 4. Update Skill Registry with full paths and triggers
 ```
 
 **Manual alternative:**
 
-1. For each skill name in routing table
+1. For each skill name in Skill Registry
 2. Find full path: `find .claude/skill-library -name "{skill-name}" -type d`
 3. Update table entry to show full path
+4. Add Triggers column with keywords matching Intent Detection
 
 ## Phase 19: Broken Paths (Auto)
 
@@ -110,4 +119,4 @@ skill-manager sync-gateways --full-sync
 - Main skill: [fixing-skills](../SKILL.md)
 - Gateway template: `.claude/skills/managing-skills/templates/gateway-template.md`
 - Gateway documentation: `.claude/skills/managing-skills/references/gateway-management.md`
-- Audit implementations: `.claude/skill-library/claude/skill-management/auditing-skills/scripts/src/lib/phases/phase17-20*.ts`
+- Audit implementations: See Phases 20-23 in [phase-details.md](.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md)

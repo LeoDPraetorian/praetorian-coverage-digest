@@ -14,13 +14,13 @@ Testing validates agent BEHAVIOR - does the agent correctly invoke and follow sk
 
 ## How to Test an Agent
 
-**Route to the testing-agent-skills skill:**
+**Route to the verifying-agent-skill-invocation skill:**
 
 ```
-Read: .claude/skill-library/claude/agent-management/testing-agent-skills/SKILL.md
+Read: .claude/skill-library/claude/agent-management/verifying-agent-skill-invocation/SKILL.md
 ```
 
-The `testing-agent-skills` skill provides the complete workflow.
+The `verifying-agent-skill-invocation` skill provides the complete workflow.
 
 ---
 
@@ -47,7 +47,7 @@ The `testing-agent-skills` skill provides the complete workflow.
 User: "Test if frontend-developer uses developing-with-tdd correctly"
 
 Agent workflow:
-1. Read testing-agent-skills skill
+1. Read verifying-agent-skill-invocation skill
 2. Provide agent=frontend-developer, skill=developing-with-tdd
 3. Spawn frontend-developer with RED phase trigger scenario
 4. Evaluate: Did agent invoke developing-with-tdd?
@@ -91,14 +91,14 @@ Testing requires complex capabilities:
 
 ## Prerequisites
 
-None - the testing-agent-skills skill handles all setup internally.
+None - the verifying-agent-skill-invocation skill handles all setup internally.
 
 ---
 
 ## Documentation
 
 **Full workflow details:**
-`.claude/skill-library/claude/agent-management/testing-agent-skills/SKILL.md`
+`.claude/skill-library/claude/agent-management/verifying-agent-skill-invocation/SKILL.md`
 
 **Related references:**
 
@@ -110,4 +110,4 @@ None - the testing-agent-skills skill handles all setup internally.
 
 ## Historical Note: test.ts CLI (DEPRECATED)
 
-The `test.ts` CLI script was deprecated - it performed structural checks that now belong in audit. The `test` operation now ONLY provides behavioral validation via the testing-agent-skills skill.
+The `test.ts` CLI script was deprecated - it performed structural checks that now belong in audit. The `test` operation now ONLY provides behavioral validation via the verifying-agent-skill-invocation skill.

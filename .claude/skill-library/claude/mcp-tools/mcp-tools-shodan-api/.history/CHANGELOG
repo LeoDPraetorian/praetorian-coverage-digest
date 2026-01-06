@@ -1,0 +1,19 @@
+## 2026-01-04 - Initial Creation
+
+**RED Phase:**
+- Gap: Shodan REST API wrappers exist but aren't discoverable
+- Test scenario: User asks "how do I search Shodan for nginx servers?" → Claude doesn't know wrappers exist
+- Failure: No skill documenting the three wrappers (hostSearch, hostInfo, dnsDomain)
+
+**Location:** .claude/skill-library/security/shodan-api/
+**Category:** security
+**Type:** Tool Wrapper (documentation for REST API wrappers)
+
+**Context:**
+- Three wrappers at .claude/tools/shodan/: hostSearch, hostInfo, dnsDomain
+- 51 passing unit tests
+- All tested with live Shodan API
+- Token optimization: 80-95% reduction via field filtering, array limits, truncation
+
+**Rationale:**
+Documents the Shodan wrappers for discoverability. Users can find usage examples, input/output schemas, and token optimization features. Parallel to mcp-tools-* skills but for REST API instead of MCP.

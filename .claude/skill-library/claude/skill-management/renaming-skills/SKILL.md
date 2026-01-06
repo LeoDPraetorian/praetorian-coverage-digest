@@ -1,6 +1,6 @@
 ---
 name: renaming-skills
-description: Use when renaming existing skills - safe renaming with reference updates across gateways and commands
+description: Use when renaming existing skills - safe 10-step protocol with reference updates across gateways, commands, and other skills, plus integrity verification
 allowed-tools: Read, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion
 ---
 
@@ -45,18 +45,18 @@ Safely renames skills by:
 
 ## Quick Reference - 10-Step Safe Rename
 
-| Step | Action                        | Tool              | Verification                  |
-| ---- | ----------------------------- | ----------------- | ----------------------------- |
-| 1    | Validate source exists        | Bash, Read        | Directory exists, valid skill |
-| 2    | Validate target available     | Bash              | No conflicts                  |
-| 3    | Confirm with user             | AskUserQuestion   | User approves                 |
-| 4    | Update frontmatter            | Edit              | Name field updated            |
-| 5    | Move directory                | Bash              | New dir exists, old gone      |
-| 6    | Find references               | Grep              | List all matches              |
-| 7    | Update non-gateway references | Edit              | Commands, skills updated      |
-| 8    | Sync gateways                 | syncing-gateways  | Tables formatted, sorted      |
-| 9    | Verify integrity              | Grep              | Zero matches for old name     |
-| 10   | Report success                | Output            | Summary displayed             |
+| Step | Action                        | Tool             | Verification                  |
+| ---- | ----------------------------- | ---------------- | ----------------------------- |
+| 1    | Validate source exists        | Bash, Read       | Directory exists, valid skill |
+| 2    | Validate target available     | Bash             | No conflicts                  |
+| 3    | Confirm with user             | AskUserQuestion  | User approves                 |
+| 4    | Update frontmatter            | Edit             | Name field updated            |
+| 5    | Move directory                | Bash             | New dir exists, old gone      |
+| 6    | Find references               | Grep             | List all matches              |
+| 7    | Update non-gateway references | Edit             | Commands, skills updated      |
+| 8    | Sync gateways                 | syncing-gateways | Tables formatted, sorted      |
+| 9    | Verify integrity              | Grep             | Zero matches for old name     |
+| 10   | Report success                | Output           | Summary displayed             |
 
 ---
 
@@ -387,6 +387,7 @@ Note: Gateway references will be updated in Step 8.
 **Use `syncing-gateways` skill for proper structural validation.**
 
 After updating non-gateway references, gateway routing tables need to be synced to:
+
 1. Update skill name references with proper formatting
 2. Maintain alphabetical sorting
 3. Ensure Prettier-compliant table structure
@@ -394,12 +395,13 @@ After updating non-gateway references, gateway routing tables need to be synced 
 **Read the syncing-gateways skill:**
 
 ```typescript
-Read('.claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md')
+Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md");
 ```
 
 **Execute the gateway sync workflow:**
 
 The `syncing-gateways` skill will:
+
 - Detect old skill name in gateway routing tables
 - Update to new skill name
 - Re-sort tables alphabetically
@@ -409,6 +411,7 @@ The `syncing-gateways` skill will:
 **Why this matters:**
 
 Using regex/Edit directly on gateway tables can:
+
 - Break table alignment
 - Lose alphabetical sorting
 - Create formatting inconsistencies

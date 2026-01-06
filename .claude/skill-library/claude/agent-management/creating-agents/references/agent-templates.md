@@ -113,6 +113,7 @@ color: [color]
 | `verifying-before-completion`       | Ensures outputs are verified before claiming done                  |
 
 **MANDATORY universal skills (ALL agents must have these 3):**
+
 - `calibrating-time-estimates`
 - `enforcing-evidence-based-analysis`
 - `verifying-before-completion`
@@ -121,14 +122,14 @@ color: [color]
 
 Your `skills` frontmatter makes these core skills available. **Invoke based on semantic relevance to your task**:
 
-| Trigger                       | Skill                               | When to Invoke                                |
-| ----------------------------- | ----------------------------------- | --------------------------------------------- |
-| [Task pattern 1]              | `[skill-name]`                      | [When to use this skill]                      |
-| [Task pattern 2]              | `[skill-name]`                      | [When to use this skill]                      |
-| [Task pattern 3]              | `[skill-name]`                      | [When to use this skill]                      |
-| Bug, error, unexpected behavior | `debugging-systematically`         | Investigating issues before fixing            |
-| Multi-step task (≥2 steps)    | `using-todowrite`                   | [Domain-specific tracking needs]              |
-| Before claiming task complete | `verifying-before-completion`       | Always before final output                    |
+| Trigger                         | Skill                         | When to Invoke                     |
+| ------------------------------- | ----------------------------- | ---------------------------------- |
+| [Task pattern 1]                | `[skill-name]`                | [When to use this skill]           |
+| [Task pattern 2]                | `[skill-name]`                | [When to use this skill]           |
+| [Task pattern 3]                | `[skill-name]`                | [When to use this skill]           |
+| Bug, error, unexpected behavior | `debugging-systematically`    | Investigating issues before fixing |
+| Multi-step task (≥2 steps)      | `using-todowrite`             | [Domain-specific tracking needs]   |
+| Before claiming task complete   | `verifying-before-completion` | Always before final output         |
 
 **Semantic matching guidance:**
 
@@ -147,10 +148,11 @@ The gateway provides:
 **You MUST follow the gateway's instructions.** It tells you which library skills to load.
 
 After invoking the gateway, use its routing tables to find and Read relevant library skills:
+```
 
-```
 Read(".claude/skill-library/path/from/gateway/SKILL.md")
-```
+
+````
 
 ## Anti-Bypass
 
@@ -218,7 +220,7 @@ Report: "Blocked: [issue]. Attempted: [what]. Recommend: [agent] for [capability
     "context": "What the next agent should do"
   }
 }
-```
+````
 
 ---
 
@@ -309,3 +311,4 @@ When creating agents, customize based on type:
 
 - **`gold-standards.md`** - Analysis of gold standard agents as exemplars
 - **`../SKILL.md`** - Full agent creation workflow
+```

@@ -14,6 +14,7 @@ import {
   validateNoCommandInjection,
   validateNoControlChars,
 } from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const GetSpecFilesPerformanceInputSchema = z.object({
   projectId: z
@@ -208,7 +209,7 @@ export const getSpecFilesPerformance = {
       totalSpecs: safeSpecFiles.length,
       page: validated.page,
       hasMore: safeSpecFiles.length > validated.limit,
-      estimatedTokens: Math.ceil(JSON.stringify(specFiles).length / 4),
+      estimatedTokens: estimateTokens(specFiles),
     };
 
     return GetSpecFilesPerformanceOutputSchema.parse(filtered);

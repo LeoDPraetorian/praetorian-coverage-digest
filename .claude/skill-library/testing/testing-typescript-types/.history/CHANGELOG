@@ -1,0 +1,70 @@
+# Changelog: testing-typescript-types
+
+## 2026-01-01 - Initial Creation
+
+**Type:** Process/Pattern skill
+**Category:** testing
+**Location:** .claude/skill-library/testing/testing-typescript-types
+
+### RED Phase Documentation
+
+**Gap identified:**
+Complex TypeScript types (branded types, mapped types, conditional types, recursive transformations) need tests just like runtime code. Without type-level testing:
+
+1. Type regressions occur during refactoring without runtime errors
+2. Complex type transformations (DeepPartial, DeepReadonly) can't be validated systematically
+3. Branded type helpers (Asset vs Risk IDs) need verification they prevent mixing
+4. Manual inspection doesn't scale for complex type logic
+
+Modern type testing libraries (tsd, expect-type, vitest expectTypeOf) solve this but are not well-known or strongly represented in LLM training data.
+
+**Current Claude behavior without skill:**
+- Would not suggest type testing for complex types
+- Might not know modern libraries (tsd, expect-type, vitest expectTypeOf)
+- Would recommend runtime tests (which don't catch type issues)
+- No Chariot-specific examples (Tabularium types, branded IDs)
+
+**Test scenario:**
+Developer asks: "I have complex branded type helpers for Asset IDs and Risk IDs. How do I ensure they can't be mixed up?"
+
+Without skill: Recommends runtime tests that don't validate type behavior.
+With skill: Shows expectTypeOf patterns for compile-time validation.
+
+### Structure Created
+
+**SKILL.md:** 455 lines (under 500-line limit)
+
+**Sections:**
+1. When to Use (decision criteria for type testing)
+2. Quick Reference (library comparison table)
+3. The Problem (untested types lead to regressions)
+4. Type Testing Libraries (tsd, expect-type, vitest expectTypeOf)
+5. Basic Type Assertions (equality, assignability, never)
+6. Testing Type Transformations (mapped, conditional, recursive)
+7. Testing Branded Types (non-assignability, brand correctness)
+8. Chariot Patterns (Tabularium types, entity IDs, API transformations)
+9. Integration with Test Suites (Vitest, standalone files, CI/CD)
+10. Advanced Patterns (generics, negative testing)
+11. Legacy Pattern (extracted from deleted typescript-advanced skill lines 667-681)
+12. Best Practices (when to test, file organization, testing strategy)
+
+**Content Extracted:**
+- Lines 667-681 from deleted typescript-advanced skill (commit 0eb53fce6)
+- AssertEqual helper type
+- ExpectError helper type
+- Modernized to use expect-type/vitest instead of manual helpers
+
+### Research Sources
+
+1. expect-type library documentation
+2. tsd library documentation
+3. Vitest type testing documentation
+4. Git history (recovered deleted skill content)
+5. Chariot codebase patterns (Tabularium types, branded IDs)
+
+### Next Steps
+
+- Phase 7: Research phase (user may skip if content is adequate)
+- Phase 8: Update gateway-testing (type testing skill → testing gateway)
+- Phase 9: GREEN verification and audit
+- Phase 10: REFACTOR pressure testing

@@ -1,302 +1,138 @@
 ---
 name: gateway-claude
-description: Use when managing Claude Code infrastructure (agents, skills, commands, MCP tools) - create, update, audit, fix, search, list. Routes to specialized management operations.
-allowed-tools: Read, Skill
+description: Routes Claude Code management tasks to library skills. Intent detection + progressive loading.
+allowed-tools: Read
 ---
+
+<EXTREMELY-IMPORTANT>
+# STOP. READ THIS FIRST. DO NOT SKIP.
+
+## The 1% Rule (NON-NEGOTIABLE)
+
+If there is even a **1% chance** a skill might apply to your task:
+
+- You MUST invoke that skill
+- This is not optional
+- This is not negotiable
+- You cannot rationalize your way out of this
+
+Uncertainty = Invocation. Period.
+
+## Skill Announcement (MANDATORY)
+
+Before using any skill, you MUST announce it in your response:
+
+"I am invoking `{skill-name}` because {reason}."
+
+This announcement must appear BEFORE you begin work.
+No announcement = no invocation = PROTOCOL VIOLATION = FAILURE!
+</EXTREMELY-IMPORTANT>
 
 # Gateway: Claude Code Management
 
-**Routes to specialized skills for managing Claude Code infrastructure (agents, skills, commands, MCP tools).**
+Routes Claude Code management tasks to appropriate skills. Does NOT contain methodology—skills do.
 
----
+## Progressive Disclosure
 
-## Understanding This Gateway
+This gateway implements 3-tier loading:
 
-**How you got here**: You invoked this gateway via Skill tool:
+- **Level 1 (now):** Routing tables (~300 tokens)
+- **Level 2 (on-demand):** Skill SKILL.md loaded when routed
+- **Level 3 (as-needed):** Skill resources loaded during execution
 
-```
-skill: "gateway-claude"
-```
+## Intent Detection
 
-**What this gateway provides**: A routing table of **library skills** with their paths.
+**Match your task to a routing pattern:**
 
-**How to load library skills**: Use the Read tool with the full path:
+| Task Intent                                | Route To                              |
+| ------------------------------------------ | ------------------------------------- |
+| "create agent" / "update agent" / "agents" | → `managing-agents` (core skill)      |
+| "create skill" / "update skill" / "skills" | → `managing-skills` (core skill)      |
+| "command" / "slash command"                | → `managing-commands` (core skill)    |
+| "MCP wrapper" / "tool wrapper"             | → `managing-mcp-wrappers` (core)      |
+| "hook" / "pre-commit" / "post-tool"        | → `claude-hook-write` (library)       |
+| "plugin" / "extension"                     | → `claude-plugin-structure` (library) |
+| "marketplace" / "publish"                  | → `claude-marketplace-management`     |
+| "research" / "investigate"                 | → `researching-skills` (core)         |
+| "brainstorm" / "design"                    | → `brainstorming` (core)              |
 
-```
-Read(".claude/skill-library/claude/agent-management/creating-agents/SKILL.md")
-```
-
-### Critical: Two-Tier Skill System
-
-**Core/Gateway tier** (in `skills` directory):
-
-- Location: `.claude/skills/{skill-name}/`
-- Invoke with: `skill: "gateway-claude"`
-
-**Library tier** (in `skill-library` directory):
-
-- Location: `.claude/skill-library/{domain}/{category}/`
-- Invoke with: `Read("{full-path}")`
-
-<IMPORTANT>
-Library skills listed below are NOT available via Skill tool.
-You MUST use Read tool to load them.
-
-❌ WRONG: skill: "creating-agents" ← Will fail, not a core skill
-✅ RIGHT: Read(".claude/skill-library/claude/agent-management/creating-agents/SKILL.md")
-
-❌ WRONG: skill: "auditing-skills" ← Will fail, not a core skill
-✅ RIGHT: Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")
-</IMPORTANT>
-
----
-
-## When to Use
-
-- Managing agents (create, update, test, audit, fix, rename, search, list)
-- Managing skills (create, update, audit, fix, rename, migrate, search, list)
-- Managing commands (create, audit, fix, list)
-- Managing MCP wrappers (create, test, audit, fix)
-
-**This gateway routes you to the appropriate management skill based on what you're managing.**
-
----
-
-## Agent Management (8 operations)
-
-**Router Skill:** `.claude/skills/managing-agents/SKILL.md`
-
-The managing-agents skill routes to:
-
-| Operation | Skill                                                                         |
-| --------- | ----------------------------------------------------------------------------- |
-| Create    | `.claude/skill-library/claude/agent-management/creating-agents/SKILL.md`      |
-| Update    | `.claude/skill-library/claude/agent-management/updating-agents/SKILL.md`      |
-| Test      | `.claude/skill-library/claude/agent-management/testing-agent-skills/SKILL.md` |
-| Audit     | `.claude/skill-library/claude/agent-management/auditing-agents/SKILL.md`      |
-| Fix       | `.claude/skill-library/claude/agent-management/fixing-agents/SKILL.md`        |
-| Rename    | `.claude/skill-library/claude/agent-management/renaming-agents/SKILL.md`      |
-| Search    | `.claude/skill-library/claude/agent-management/searching-agents/SKILL.md`     |
-| List      | `.claude/skill-library/claude/agent-management/listing-agents/SKILL.md`       |
-
-**Usage:**
+## Routing Algorithm
 
 ```
-# Via command (recommended)
-/agent-manager <operation> <args>
+1. Parse task for trigger keywords from Intent Detection
+2. If core skill → use Skill tool: skill: "skill-name"
+3. If library skill → use Read tool: Read("path")
+4. Check Cross-Gateway Routing for domain-specific gateways
+5. Follow skill instructions
+```
 
-# Via managing-agents skill
+## Core Skills (Use Skill Tool)
+
+| Skill                   | Command            | Triggers                   |
+| ----------------------- | ------------------ | -------------------------- |
+| `managing-agents`       | `/agent-manager`   | agents, create, update     |
+| `managing-skills`       | `/skill-manager`   | skills, audit, fix         |
+| `managing-commands`     | `/command-manager` | commands, slash            |
+| `managing-mcp-wrappers` | `/mcp-manager`     | MCP wrappers, tool wrapper |
+| `researching-skills`    | —                  | research, investigate      |
+| `brainstorming`         | —                  | brainstorm, design         |
+
+```
 skill: "managing-agents"
-
-# Direct skill access
-Read: .claude/skill-library/claude/agent-management/creating-agents/SKILL.md
-```
-
----
-
-## Skill Management (11 operations)
-
-**Router Skill:** `.claude/skills/managing-skills/SKILL.md`
-
-The managing-skills skill routes to:
-
-| Operation     | Skill                                                                            |
-| ------------- | -------------------------------------------------------------------------------- |
-| Create        | `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md`         |
-| Update        | `.claude/skill-library/claude/skill-management/updating-skills/SKILL.md`         |
-| Delete        | `.claude/skill-library/claude/skill-management/deleting-skills/SKILL.md`         |
-| Audit         | `.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md`         |
-| Fix           | `.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md`           |
-| Rename        | `.claude/skill-library/claude/skill-management/renaming-skills/SKILL.md`         |
-| Migrate       | `.claude/skill-library/claude/skill-management/migrating-skills/SKILL.md`        |
-| Search        | `.claude/skill-library/claude/skill-management/searching-skills/SKILL.md`        |
-| List          | `.claude/skill-library/claude/skill-management/listing-skills/SKILL.md`          |
-| Sync Gateways | `.claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md`        |
-| Format Output | `.claude/skill-library/claude/skill-management/formatting-skill-output/SKILL.md` |
-
-**Usage:**
-
-```
-# Via command (recommended)
-/skill-manager <operation> <args>
-
-# Via managing-skills skill
 skill: "managing-skills"
-
-# Direct skill access (instruction-based operations)
-Read: .claude/skill-library/claude/skill-management/creating-skills/SKILL.md
-Read: .claude/skill-library/claude/skill-management/updating-skills/SKILL.md
-Read: .claude/skill-library/claude/skill-management/deleting-skills/SKILL.md
-Read: .claude/skill-library/claude/skill-management/auditing-skills/SKILL.md
-Read: .claude/skill-library/claude/skill-management/fixing-skills/SKILL.md
-Read: .claude/skill-library/claude/skill-management/renaming-skills/SKILL.md
-Read: .claude/skill-library/claude/skill-management/migrating-skills/SKILL.md
-Read: .claude/skill-library/claude/skill-management/searching-skills/SKILL.md
-Read: .claude/skill-library/claude/skill-management/listing-skills/SKILL.md
-Read: .claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md
-Read: .claude/skill-library/claude/skill-management/formatting-skill-output/SKILL.md
+skill: "managing-commands"
 ```
 
----
+## Skill Registry (Library Skills - Use Read Tool)
 
-## Command Management
+### Agent Management
 
-**Router Skill:** `.claude/skills/managing-commands/SKILL.md`
+| Skill           | Path                                                                                      | Triggers     |
+| --------------- | ----------------------------------------------------------------------------------------- | ------------ |
+| Creating Agents | `.claude/skill-library/claude/agent-management/creating-agents/SKILL.md`                  | create agent |
+| Updating Agents | `.claude/skill-library/claude/agent-management/updating-agents/SKILL.md`                  | update agent |
+| Testing Agents  | `.claude/skill-library/claude/agent-management/verifying-agent-skill-invocation/SKILL.md` | test agent   |
+| Auditing Agents | `.claude/skill-library/claude/agent-management/auditing-agents/SKILL.md`                  | audit agent  |
+| Fixing Agents   | `.claude/skill-library/claude/agent-management/fixing-agents/SKILL.md`                    | fix agent    |
+| Renaming Agents | `.claude/skill-library/claude/agent-management/renaming-agents/SKILL.md`                  | rename agent |
 
-**Operations:** create, audit, fix, list
+### Skill Management
 
-**Usage:**
+| Skill                          | Path                                                                                    | Triggers                  |
+| ------------------------------ | --------------------------------------------------------------------------------------- | ------------------------- |
+| Auditing Skills                | `.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md`                | audit skill               |
+| Closing Skill Loopholes        | `.claude/skill-library/claude/skill-management/closing-skill-loopholes/SKILL.md`        | loophole, rationalization |
+| Creating Skills                | `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md`                | create skill              |
+| Deleting Skills                | `.claude/skill-library/claude/skill-management/deleting-skills/SKILL.md`                | delete skill              |
+| Fixing Skills                  | `.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md`                  | fix skill                 |
+| Migrating Skills               | `.claude/skill-library/claude/skill-management/migrating-skills/SKILL.md`               | migrate skill             |
+| Pressure Testing Skill Content | `.claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md` | pressure test, verify     |
+| Renaming Skills                | `.claude/skill-library/claude/skill-management/renaming-skills/SKILL.md`                | rename skill              |
+| Syncing Gateways               | `.claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md`               | sync gateway              |
+| Updating Skills                | `.claude/skill-library/claude/skill-management/updating-skills/SKILL.md`                | update skill              |
 
-```
-/command-manager <operation> <args>
-```
+### Hooks & Plugins
 
----
+| Skill                  | Path                                                                               | Triggers          |
+| ---------------------- | ---------------------------------------------------------------------------------- | ----------------- |
+| Hook Writing           | `.claude/skill-library/claude/hooks/claude-hook-write/SKILL.md`                    | hook, pre-commit  |
+| Plugin Structure       | `.claude/skill-library/claude/plugins/claude-plugin-structure/SKILL.md`            | plugin, extension |
+| Plugin Settings        | `.claude/skill-library/claude/plugins/claude-plugin-settings/SKILL.md`             | plugin settings   |
+| Plugin Security Audit  | `.claude/skill-library/claude/plugins/claude-plugin-security-auditor/SKILL.md`     | plugin security   |
+| Marketplace Management | `.claude/skill-library/claude/marketplaces/claude-marketplace-management/SKILL.md` | marketplace       |
 
-## MCP Management
+## Cross-Gateway Routing
 
-**Router Skill:** `.claude/skills/managing-mcp-wrappers/SKILL.md`
+| If Task Involves    | Also Invoke          |
+| ------------------- | -------------------- |
+| MCP services, tools | `gateway-mcp-tools`  |
+| TypeScript, types   | `gateway-typescript` |
+| Testing patterns    | `gateway-testing`    |
 
-**Operations:** create, verify-red, generate-wrapper, verify-green, update, audit, fix, test
+## Loading Skills
 
-**Usage:**
+**Core skills:** `skill: "skill-name"`
 
-```
-/mcp-manager <operation> <args>
-```
+**Library skills:** `Read(".claude/skill-library/claude/{category}/{skill-name}/SKILL.md")`
 
----
-
-## Hooks Management
-
-**Claude Hook Write**: `.claude/skill-library/claude/hooks/claude-hook-write/SKILL.md`
-
-- Git hook creation, hook lifecycle, event handling patterns
-
----
-
-## Marketplace Management
-
-**Claude Marketplace Management**: `.claude/skill-library/claude/marketplaces/claude-marketplace-management/SKILL.md`
-
-- Plugin marketplace, distribution, team configuration
-
----
-
-## Plugin Management
-
-**Claude Plugin Security Auditor**: `.claude/skill-library/claude/plugins/claude-plugin-security-auditor/SKILL.md`
-
-- Security auditing for Claude Code plugins
-
-**Claude Plugin Settings**: `.claude/skill-library/claude/plugins/claude-plugin-settings/SKILL.md`
-
-- Plugin settings management and configuration
-
-**Claude Plugin Structure**: `.claude/skill-library/claude/plugins/claude-plugin-structure/SKILL.md`
-
-- Plugin architecture, component patterns, manifest reference
-
----
-
-## Core Workflow Skills
-
-**These skills enforce critical practices during planning and development workflows.**
-
-| Skill                              | Purpose                                          | When to Use                                 |
-| ---------------------------------- | ------------------------------------------------ | ------------------------------------------- |
-| `enforcing-evidence-based-analysis` | Prevents hallucination during planning/analysis | Creating plans, analyzing code, using APIs  |
-| `verifying-before-completion`      | Verifies outputs before claiming completion      | Before commit, before "task complete" claim |
-| `developing-with-tdd`              | Test-first development methodology               | Implementing any feature or bugfix          |
-| `debugging-systematically`         | Four-phase root cause investigation              | Encountering bugs or unexpected behavior    |
-
-**Usage:**
-
-```
-skill: "enforcing-evidence-based-analysis"
-skill: "verifying-before-completion"
-skill: "developing-with-tdd"
-skill: "debugging-systematically"
-```
-
----
-
-## How to Use This Gateway
-
-**Step 1: Find the skill** you need in the sections above
-
-**Step 2: Choose your access method:**
-
-- **Router skill (core)**: `skill: "managing-agents"` - Use Skill tool
-- **Operation skill (library)**: `Read("{full-path-from-routing-table}")` - Use Read tool
-- **Slash command shortcut**: `/agent-manager create` - Direct command
-
-**Examples:**
-
-```
-# Via router skill (Skill tool)
-skill: "managing-agents"
-
-# Via slash command
-/agent-manager create
-
-# Direct library access (Read tool)
-Read(".claude/skill-library/claude/agent-management/creating-agents/SKILL.md")
-```
-
-**Pattern: Exploring management operations**
-
-```
-User: "How do I manage agents in Claude Code?"
-1. Read this gateway (you're here)
-2. Find Agent Management section
-3. Use skill: "managing-agents" OR Read the operation skill directly
-```
-
----
-
-## Quick Reference: Core Router Skills
-
-> **Note:** This gateway routes to **core** router skills (in `skills` directory), which then route to library skills. This is a meta-gateway pattern.
-
-- **Agents**: `skill: "managing-agents"` → Routes to agent-management library skills
-- **Skills**: `skill: "managing-skills"` → Routes to skill-management library skills
-- **Commands**: `skill: "managing-commands"` → Routes to command management operations
-- **MCP Wrappers**: `skill: "managing-mcp-wrappers"` → Routes to MCP wrapper operations
-
-**Router skills are in Core** → Use `skill: "name"` (Skill tool)
-**Operation skills are in Library** → Use `Read("{full-path}")` (Read tool)
-
----
-
-## Why This Architecture
-
-**From SKILLS-ARCHITECTURE.md:**
-
-> "Gateway skills are intentionally lightweight. A gateway like gateway-frontend contains just:
->
-> - A description for discovery (~100 tokens)
-> - A routing table of paths (~200 tokens)
->
-> This is far more efficient than loading 15 full skill descriptions into the Skill tool."
-
-**Token budget impact:**
-
-- 1 gateway-claude in Core = ~100 chars
-- 8 agent-management skills moved to Library = 0 chars at discovery
-- Net savings: ~800 chars from Core budget
-
-**Context engineering:**
-
-- Discovery: Gateway visible, low token cost
-- Execution: Skills load just-in-time when actually needed
-- Result: More room for universal skills in Core
-
----
-
-## See Also
-
-- `managing-agents` - Agent lifecycle operations (routes to library)
-- `managing-skills` - Skill lifecycle operations
-- `managing-commands` - Command lifecycle operations
-- `managing-mcp-wrappers` - MCP wrapper lifecycle operations
+Do NOT use `skill: "skill-name"` for library skills—they require Read tool.

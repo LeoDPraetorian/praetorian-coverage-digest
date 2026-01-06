@@ -1,0 +1,24 @@
+# Changelog
+
+## 2026-01-01 - Initial Creation
+
+### RED Phase Documentation
+
+- **Gap identified**: No skill exists for Vitest mocking patterns
+- **Failure behavior**: Agents don't know vi.mock() vs vi.spyOn(), forget mock cleanup, miss type-safe patterns
+
+### Skill Details
+
+- **Category**: testing
+- **Type**: Library/Framework
+- **Purpose**: Effective mocking strategies for Vitest unit and integration tests
+
+### Content
+
+- Mock vs spy decision matrix
+- Module mocking patterns: full, partial, factory functions, async
+- Type-safe mocking with MockedFunction and vitest-mock-extended
+- Mock lifecycle management: clearAllMocks, resetAllMocks, restoreAllMocks
+- Common scenarios: fetch, Date, timers, localStorage
+- MSW integration for API mocking
+- Mock assertions and pitfalls

@@ -142,21 +142,25 @@ When implementing features:
 **Examples by Agent Type:**
 
 **Development agent:**
+
 - Plan Execution (follow architect's plans)
 - Bug Fixes & Performance (debug, optimize)
 - Code Quality (standards, patterns, conventions)
 
 **Architecture agent:**
+
 - Design Review (evaluate existing architecture)
 - Architecture Design (create implementation plans)
 - Pattern Validation (ensure best practices)
 
 **Testing agent:**
+
 - Test Creation (unit, integration, E2E)
 - Test Maintenance (fix flaky tests, refactor)
 - Coverage Validation (ensure thresholds met)
 
 **Quality agent:**
+
 - Code Review (validate implementations against plans)
 - Quality Standards (check conventions, patterns)
 - Feedback Delivery (constructive improvement suggestions)
@@ -204,9 +208,9 @@ When implementing features:
 
 Your `skills` frontmatter makes these core skills available. **Invoke based on semantic relevance to your task**:
 
-| Trigger                         | Skill                               | When to Invoke                                       |
-| ------------------------------- | ----------------------------------- | ---------------------------------------------------- |
-| [Add task-specific triggers]    | [skill-name]                        | [Description of when to use]                         |
+| Trigger                      | Skill        | When to Invoke               |
+| ---------------------------- | ------------ | ---------------------------- |
+| [Add task-specific triggers] | [skill-name] | [Description of when to use] |
 
 ### Step 3: Load Library Skills from Gateway
 

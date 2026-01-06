@@ -10,10 +10,19 @@
  * Security: All MCP calls have a 30-second timeout to prevent hanging.
  */
 
+import * as path from 'path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { getToolConfig } from '../config-loader';
-import { resolveProjectPath } from '../../../lib/find-project-root.js';
+import { resolveProjectPath, findProjectRoot } from '../../../lib/find-project-root.js';
+import { routeToSerena } from '../../serena/semantic-router.js';
+import { createSerenaHTTPClient } from './serena-http-client.js';
+import { serenaLog, mcpLog, isDebugEnabled } from './debug.js';
+
+// Global type declarations for Serena semantic routing state
+declare global {
+  var __serenaCurrentModule: string | null;
+}
 
 /**
  * Default timeout for MCP calls (30 seconds)
@@ -58,12 +67,96 @@ interface MCPServerConfig {
 }
 
 /**
+ * Serena routing result with metadata for observability
+ */
+interface SerenaRoutingResult {
+  args: string[];
+  routedTo: string;
+  semanticContext?: string;
+  wasRouted: boolean;
+}
+
+/**
+ * Track last Serena routing for observability
+ * Accessible via getLastSerenaRouting() for debugging
+ */
+let lastSerenaRouting: SerenaRoutingResult | null = null;
+
+/**
+ * Get the last Serena routing decision for debugging
+ */
+export function getLastSerenaRouting(): SerenaRoutingResult | null {
+  return lastSerenaRouting;
+}
+
+/**
+ * Get Serena args with semantic routing
+ *
+ * If semanticContext is provided, routes to the most relevant module.
+ * Otherwise, falls back to --project-from-cwd (full super-repo scan).
+ *
+ * @param semanticContext - Optional query for semantic routing
+ * @returns Array of CLI args for Serena
+ */
+function getSerenaArgs(semanticContext?: string): string[] {
+  const baseArgs = [
+    '--from', 'git+https://github.com/oraios/serena',
+    'serena', 'start-mcp-server',
+    '--context', 'claude-code',
+  ];
+
+  if (!semanticContext) {
+    // No context provided - fall back to project-from-cwd
+    // This will be slow for super-repos but works as fallback
+    lastSerenaRouting = {
+      args: [...baseArgs, '--project-from-cwd'],
+      routedTo: 'super-repo (no semanticContext provided)',
+      wasRouted: false,
+    };
+
+    // Log warning - this is the slow path
+    serenaLog.warn('⚠️  No semanticContext - using --project-from-cwd (SLOW)');
+
+    return lastSerenaRouting.args;
+  }
+
+  try {
+    const projectRoot = findProjectRoot();
+    const { args: routedArgs, scopeDescription } = routeToSerena(semanticContext, projectRoot);
+
+    lastSerenaRouting = {
+      args: [...baseArgs, ...routedArgs],
+      routedTo: scopeDescription,
+      semanticContext,
+      wasRouted: true,
+    };
+
+    // Log routing decision (only in debug mode)
+    serenaLog.info(`✓ Routed: ${scopeDescription}`);
+
+    return lastSerenaRouting.args;
+  } catch (error) {
+    // If routing fails, fall back to project-from-cwd
+    lastSerenaRouting = {
+      args: [...baseArgs, '--project-from-cwd'],
+      routedTo: 'super-repo (routing failed)',
+      semanticContext,
+      wasRouted: false,
+    };
+
+    serenaLog.warn('⚠️  Routing failed, using --project-from-cwd:', error);
+    return lastSerenaRouting.args;
+  }
+}
+
+/**
  * Get MCP server configuration from .mcp.json
  *
  * @param mcpName - Name of MCP server (e.g., 'currents', 'linear', 'github')
+ * @param semanticContext - Optional context for semantic routing (Serena only)
  * @returns Server configuration with command, args, and env vars
  */
-function getMCPServerConfig(mcpName: string): MCPServerConfig {
+function getMCPServerConfig(mcpName: string, semanticContext?: string): MCPServerConfig {
   // In real implementation, would read from .mcp.json
   // For now, hardcoded configs based on .mcp.json
   const configs: Record<string, MCPServerConfig> = {
@@ -123,6 +216,12 @@ function getMCPServerConfig(mcpName: string): MCPServerConfig {
       command: 'npx',
       args: ['-y', '@perplexity-ai/mcp-server'],
       envVars: { 'PERPLEXITY_API_KEY': 'apiKey' } // Uses apiKey from credentials.json
+    },
+    'serena': {
+      command: 'uvx',
+      // Args generated dynamically via getSerenaArgs() with semantic routing
+      args: getSerenaArgs(semanticContext),
+      envVars: {} // No authentication required (local tool)
     }
   };
 
@@ -156,6 +255,19 @@ export const DEFAULT_MAX_RESPONSE_BYTES = 1_000_000;
  */
 export const SERVICE_SIZE_LIMITS: Record<string, number> = {
   'praetorian-cli': 10_000_000,  // 10MB - reasonable for paginated lists
+  'serena': 5_000_000,           // 5MB - symbol bodies can be large with include_body=true
+};
+
+/**
+ * Per-service timeout overrides
+ * Services not listed use DEFAULT_MCP_TIMEOUT_MS (30s)
+ *
+ * Serena needs longer timeout for Go modules with large go.work workspaces.
+ * gopls loads entire workspace (1000+ packages) on cold start (~30-40s).
+ * 5 minutes allows for cold start + LSP initialization + actual query.
+ */
+export const SERVICE_TIMEOUTS: Record<string, number> = {
+  'serena': 600_000,  // 10 min - Go workspace cold start with gopls can take 3-4 min on large go.work
 };
 
 /**
@@ -178,10 +290,51 @@ export class ResponseTooLargeError extends Error {
 }
 
 /**
+ * MCP Port Interface (Hexagonal Architecture)
+ *
+ * Explicit contract for MCP communication. All MCP wrappers depend on this
+ * abstraction, not the concrete implementation. This enables:
+ *
+ * - **Testability**: Mock the port without vi.mock() module mocking
+ * - **Swappability**: Add CachingMCPPort, BatchingMCPPort, etc.
+ * - **Documentation**: Contract is visible and explicit
+ *
+ * @example Testing with port injection
+ * ```typescript
+ * const mockPort: MCPPort = {
+ *   callTool: vi.fn().mockResolvedValue({ issues: [] })
+ * };
+ * const adapter = new ListIssuesAdapter(mockPort);
+ * ```
+ *
+ * @example Multiple implementations
+ * ```typescript
+ * class CachingMCPPort implements MCPPort {
+ *   constructor(private delegate: MCPPort, private cache: Map<string, any>) {}
+ *   async callTool<T>(...args): Promise<T> {
+ *     const key = JSON.stringify(args);
+ *     if (this.cache.has(key)) return this.cache.get(key);
+ *     const result = await this.delegate.callTool(...args);
+ *     this.cache.set(key, result);
+ *     return result;
+ *   }
+ * }
+ * ```
+ */
+export interface MCPPort {
+  callTool<T = unknown>(
+    mcpName: string,
+    toolName: string,
+    params?: unknown,
+    options?: MCPCallOptions
+  ): Promise<T>;
+}
+
+/**
  * Options for MCP tool calls
  */
 export interface MCPCallOptions {
-  /** Timeout in milliseconds (default: 30000) */
+  /** Timeout in milliseconds (default: 30000, or per-service override) */
   timeoutMs?: number;
   /** Maximum retry attempts for transient errors (default: 3) */
   maxRetries?: number;
@@ -191,6 +344,21 @@ export interface MCPCallOptions {
   retryableErrors?: string[];
   /** Maximum response size in bytes (default: 1000000 = 1MB) */
   maxResponseBytes?: number;
+  /**
+   * Semantic context for intelligent routing (Serena only)
+   *
+   * When provided for Serena calls, the semantic router analyzes this
+   * query to determine which module to scope Serena to, avoiding
+   * full super-repo scanning.
+   *
+   * @example
+   * ```typescript
+   * await callMCPTool('serena', 'find-symbol', { name_path_pattern: 'Asset' }, {
+   *   semanticContext: 'Find the Asset class in the React frontend'
+   * });
+   * ```
+   */
+  semanticContext?: string;
 }
 
 /**
@@ -257,7 +425,7 @@ function logAuditEvent(entry: AuditLogEntry): void {
     parts.push(`error="${entry.error}"`);
   }
 
-  console.log(parts.join(' '));
+  mcpLog.debug(parts.join(' '));
 }
 
 /**
@@ -293,7 +461,8 @@ export async function callMCPTool<T = any>(
   params: any = {},
   options: MCPCallOptions = {}
 ): Promise<T> {
-  const timeoutMs = options.timeoutMs ?? DEFAULT_MCP_TIMEOUT_MS;
+  // Use per-service timeout if not explicitly overridden
+  const timeoutMs = options.timeoutMs ?? SERVICE_TIMEOUTS[mcpName] ?? DEFAULT_MCP_TIMEOUT_MS;
   const maxRetries = options.maxRetries ?? DEFAULT_MAX_RETRIES;
   const retryDelayMs = options.retryDelayMs ?? DEFAULT_RETRY_DELAY_MS;
   const retryableErrors = options.retryableErrors ?? DEFAULT_RETRYABLE_ERRORS;
@@ -307,6 +476,7 @@ export async function callMCPTool<T = any>(
     'linear-mcp',       // Uses OAuth via ~/.mcp-auth/
     'chrome-devtools',  // No auth needed (local browser)
     'chariot',          // Internal tool, no auth
+    'serena',           // No auth needed (local tool)
   ];
 
   // Get credentials from shared config (only once, not per retry)
@@ -322,7 +492,7 @@ export async function callMCPTool<T = any>(
       });
     } catch (error) {
       // Some MCPs don't require credentials (e.g., local servers)
-      console.warn(`No credentials found for ${mcpName}, continuing without auth`);
+      mcpLog.info(`No credentials found for ${mcpName}, continuing without auth`);
     }
   }
 
@@ -336,7 +506,8 @@ export async function callMCPTool<T = any>(
   });
 
   // Get MCP server configuration (only once, not per retry)
-  const serverConfig = getMCPServerConfig(mcpName);
+  // Pass semanticContext for Serena semantic routing
+  const serverConfig = getMCPServerConfig(mcpName, options.semanticContext);
 
   // Build environment variables for MCP server
   // Filter out undefined values from process.env
@@ -349,6 +520,13 @@ export async function callMCPTool<T = any>(
   env.DEBUG = '';           // Disable debug module
   env.NODE_DEBUG = '';      // Disable Node.js internal debug
   env.MCP_DEBUG = '0';      // Disable MCP debug if supported
+
+  // For Serena: Disable go.work workspace detection
+  // Without this, gopls loads ALL 1276 packages from go.work (takes 30-40s)
+  // With GOWORK=off, gopls only indexes the target module (~1s)
+  if (mcpName === 'serena') {
+    env.GOWORK = 'off';
+  }
 
   // Add credentials from credentials.json OR use literal values
   if (serverConfig.envVars) {
@@ -363,6 +541,144 @@ export async function callMCPTool<T = any>(
     }
   }
 
+  // Special handling for Serena - use HTTP client (SSE transport mode)
+  if (mcpName === 'serena') {
+    // Create HTTP client (connects to Serena running in SSE mode on localhost:9121)
+    const httpClient = createSerenaHTTPClient();
+
+    // Get routing info for semantic module switching
+    const projectRoot = findProjectRoot();
+    const routing = routeToSerena(options.semanticContext || '', projectRoot);
+    const targetModule = routing.primaryModule;
+
+    // Compute absolute path for activate_project call
+    const targetPath = routing.allMatches.length > 0
+      ? path.join(projectRoot, routing.allMatches[0].path)
+      : projectRoot;  // Fallback to project root if no matches
+
+    // Track current active module for semantic routing
+    // NOTE: In persistent SSE mode, we need to call activate_project when module changes
+    // This is stored at module level to persist across calls
+    if (!global.__serenaCurrentModule) {
+      global.__serenaCurrentModule = null;
+    }
+
+    // Call activate_project if module changed (semantic routing)
+    if (global.__serenaCurrentModule !== targetPath) {
+      serenaLog.info(`[Serena] Module switch: ${global.__serenaCurrentModule || 'none'} → ${targetModule}`);
+      try {
+        await httpClient.activateProject(targetPath, { timeoutMs: 30_000 });
+        global.__serenaCurrentModule = targetPath;
+        serenaLog.info(`[Serena] ✓ Activated module: ${targetModule}`);
+      } catch (error) {
+        serenaLog.warn(`[Serena] Failed to activate project: ${error instanceof Error ? error.message : String(error)}`);
+        // Continue anyway - the call might still work
+      }
+    }
+
+    // Retry configuration for Serena (matches DEFAULT_MAX_RETRIES for consistency)
+    const maxRetries = 3;
+    let lastError: Error | null = null;
+
+    // Retry loop
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        // Health check before call (fast TCP check)
+        if (attempt === 0) {
+          const health = await httpClient.healthCheck({ timeoutMs: 5000 });
+          if (!health.healthy) {
+            throw new Error(`[Serena] Server not reachable: ${health.error}`);
+          }
+        }
+
+        if (attempt > 0) {
+          serenaLog.info(`[Serena] Retry attempt ${attempt}/${maxRetries} for ${toolName}`);
+        }
+
+        // Call tool via HTTP
+        const result = await httpClient.callTool(
+          {
+            name: toolName,
+            arguments: params,
+          },
+          { timeoutMs }
+        );
+
+        // Result is already parsed by HTTP client (JSON or plain text)
+        // Check if it's a string (needs further parsing) or already an object
+        let parsedResult: T;
+        if (typeof result === 'string') {
+          // Try to parse as JSON, fall back to string
+          try {
+            parsedResult = JSON.parse(result) as T;
+          } catch {
+            parsedResult = result as T;
+          }
+        } else {
+          parsedResult = result as T;
+        }
+
+        // Check response size (serialize to estimate)
+        const responseBytes = JSON.stringify(parsedResult).length;
+        if (responseBytes > maxResponseBytes) {
+          throw new ResponseTooLargeError(responseBytes, maxResponseBytes, mcpName, toolName);
+        }
+
+        // Warn at 80% threshold
+        if (responseBytes > maxResponseBytes * 0.8) {
+          mcpLog.warn(
+            `Response size ${responseBytes.toLocaleString()} bytes approaching limit of ${maxResponseBytes.toLocaleString()} bytes ` +
+            `(${Math.round((responseBytes / maxResponseBytes) * 100)}%)`
+          );
+        }
+
+        // Log success
+        const durationMs = Date.now() - callStartTime;
+        logAuditEvent({
+          timestamp: new Date().toISOString(),
+          event: 'mcp_call_success',
+          mcpName,
+          toolName,
+          success: true,
+          durationMs,
+        });
+
+        serenaLog.info(`[Serena] ✓ ${toolName} completed in ${durationMs}ms (HTTP, module: ${targetModule})`);
+
+        return parsedResult;
+      } catch (error) {
+        lastError = error as Error;
+
+        // Don't retry on last attempt
+        if (attempt === maxRetries) {
+          break;
+        }
+
+        // Don't retry certain error types
+        const errorMessage = lastError.message.toLowerCase();
+        if (
+          errorMessage.includes('not found') ||
+          errorMessage.includes('permission denied') ||
+          errorMessage.includes('not reachable')
+        ) {
+          serenaLog.info(`[Serena] Terminal error, not retrying: ${errorMessage}`);
+          break;
+        }
+
+        // Small delay before retry
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+    }
+
+    // All retries exhausted
+    throw new Error(
+      `[Serena] All ${maxRetries + 1} attempts failed for ${toolName}. Last error: ${lastError?.message}`
+    );
+  }
+
+  // Non-Serena MCPs use existing fresh-connection logic
   let lastError: Error | null = null;
 
   // Retry loop with exponential backoff
@@ -416,8 +732,8 @@ export async function callMCPTool<T = any>(
 
       // Warn at 80% threshold
       if (responseBytes > maxResponseBytes * 0.8) {
-        console.warn(
-          `[MCP] Response size ${responseBytes.toLocaleString()} bytes approaching limit of ${maxResponseBytes.toLocaleString()} bytes ` +
+        mcpLog.warn(
+          `Response size ${responseBytes.toLocaleString()} bytes approaching limit of ${maxResponseBytes.toLocaleString()} bytes ` +
           `(${Math.round((responseBytes / maxResponseBytes) * 100)}%)`
         );
       }
@@ -430,14 +746,24 @@ export async function callMCPTool<T = any>(
       }
 
       // Log success
+      const durationMs = Date.now() - callStartTime;
       logAuditEvent({
         timestamp: new Date().toISOString(),
         event: 'mcp_call_success',
         mcpName,
         toolName,
         success: true,
-        durationMs: Date.now() - callStartTime,
+        durationMs,
       });
+
+      // Log Serena-specific timing for observability
+      if (mcpName === 'serena') {
+        const routing = lastSerenaRouting;
+        serenaLog.info(
+          `✓ ${toolName} completed in ${durationMs}ms` +
+          (routing?.wasRouted ? ` (routed to ${routing.routedTo.split(' ')[0]})` : ' (no routing)')
+        );
+      }
 
       // Parse JSON response (or return text if not JSON)
       try {
@@ -462,7 +788,7 @@ export async function callMCPTool<T = any>(
 
       if (shouldRetry) {
         const delay = retryDelayMs * Math.pow(2, attempt); // Exponential backoff: 1s, 2s, 4s
-        console.warn(`[MCP] Retry ${attempt + 1}/${maxRetries} for ${mcpName}.${toolName} after ${delay}ms`);
+        mcpLog.info(`Retry ${attempt + 1}/${maxRetries} for ${mcpName}.${toolName} after ${delay}ms`);
         await sleep(delay);
         continue;
       }
@@ -515,7 +841,85 @@ export async function isMCPAvailable(mcpName: string, testTool: string): Promise
     await callMCPTool(mcpName, testTool, {});
     return true;
   } catch (error) {
-    console.error(`MCP ${mcpName} not available:`, error);
+    mcpLog.error(`MCP ${mcpName} not available:`, error);
     return false;
   }
+}
+
+// =============================================================================
+// Default MCP Client (Hexagonal Port Implementation)
+// =============================================================================
+
+/**
+ * Default MCP client implementation
+ *
+ * Implements the MCPPort interface by delegating to callMCPTool.
+ * Use this for dependency injection in new code.
+ *
+ * @example New adapter pattern (recommended for new code)
+ * ```typescript
+ * import { defaultMCPClient, type MCPPort } from '../config/lib/mcp-client';
+ *
+ * export class ListIssuesAdapter {
+ *   constructor(private mcp: MCPPort = defaultMCPClient) {}
+ *
+ *   async execute(input: ListIssuesInput): Promise<ListIssuesOutput> {
+ *     const data = await this.mcp.callTool('linear', 'list_issues', input);
+ *     return this.transform(data);
+ *   }
+ * }
+ *
+ * // In tests - no vi.mock() needed!
+ * const mockMCP: MCPPort = { callTool: vi.fn().mockResolvedValue([]) };
+ * const adapter = new ListIssuesAdapter(mockMCP);
+ * ```
+ *
+ * @example Existing pattern still works (backward compatible)
+ * ```typescript
+ * import { callMCPTool } from '../config/lib/mcp-client';
+ * const data = await callMCPTool('linear', 'list_issues', {});
+ * ```
+ */
+export const defaultMCPClient: MCPPort = {
+  callTool: callMCPTool,
+};
+
+/**
+ * Create a mock MCP client for testing
+ *
+ * Helper factory that creates a properly typed mock MCPPort.
+ * Cleaner than vi.mock() for unit tests.
+ *
+ * @example
+ * ```typescript
+ * import { createMockMCPClient } from '../config/lib/mcp-client';
+ *
+ * const mockMCP = createMockMCPClient({
+ *   'linear': {
+ *     'list_issues': [{ id: '1', title: 'Test' }],
+ *     'get_issue': { id: '1', title: 'Test', description: 'Details' }
+ *   }
+ * });
+ *
+ * const adapter = new ListIssuesAdapter(mockMCP);
+ * const result = await adapter.execute({});
+ * expect(result.issues).toHaveLength(1);
+ * ```
+ */
+export function createMockMCPClient(
+  responses: Record<string, Record<string, unknown>>
+): MCPPort {
+  return {
+    callTool: async <T>(mcpName: string, toolName: string): Promise<T> => {
+      const mcpResponses = responses[mcpName];
+      if (!mcpResponses) {
+        throw new Error(`No mock configured for MCP: ${mcpName}`);
+      }
+      const response = mcpResponses[toolName];
+      if (response === undefined) {
+        throw new Error(`No mock configured for tool: ${mcpName}.${toolName}`);
+      }
+      return response as T;
+    },
+  };
 }

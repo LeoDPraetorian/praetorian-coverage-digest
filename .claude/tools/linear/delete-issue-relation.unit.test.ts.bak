@@ -1,0 +1,124 @@
+import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
+import { setupServer } from 'msw/node';
+import { HttpResponse, graphql } from 'msw';
+import { deleteIssueRelation, type DeleteIssueRelationInput } from './delete-issue-relation';
+
+// Setup MSW server with Linear GraphQL endpoint
+const linearApi = graphql.link('https://api.linear.app/graphql');
+
+const server = setupServer(
+  // Delete Issue Relation mutation handler
+  linearApi.mutation('IssueRelationDelete', () => {
+    return HttpResponse.json({
+      data: {
+        issueRelationDelete: {
+          success: true,
+        },
+      },
+    });
+  })
+);
+
+describe('deleteIssueRelation', () => {
+  beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+  afterAll(() => server.close());
+  afterEach(() => server.resetHandlers());
+
+  describe('input validation', () => {
+    it('validates required relationId field', async () => {
+      await expect(
+        deleteIssueRelation.execute({} as DeleteIssueRelationInput, { apiKey: 'test-api-key' })
+      ).rejects.toThrow();
+    });
+
+    it('validates relationId against control characters', async () => {
+      await expect(
+        deleteIssueRelation.execute({
+          relationId: 'rel\x00123'
+        }, { apiKey: 'test-api-key' })
+      ).rejects.toThrow('Control characters not allowed');
+    });
+
+    it('validates relationId against path traversal', async () => {
+      await expect(
+        deleteIssueRelation.execute({
+          relationId: '../../../etc/passwd'
+        }, { apiKey: 'test-api-key' })
+      ).rejects.toThrow('Path traversal not allowed');
+    });
+
+    it('validates relationId against command injection', async () => {
+      await expect(
+        deleteIssueRelation.execute({
+          relationId: 'rel-123; rm -rf /'
+        }, { apiKey: 'test-api-key' })
+      ).rejects.toThrow('Invalid characters detected');
+    });
+  });
+
+  describe('successful deletion', () => {
+    it('deletes a relation by ID', async () => {
+      const result = await deleteIssueRelation.execute({
+        relationId: 'rel-123'
+      }, { apiKey: 'test-api-key' });
+
+      expect(result.success).toBe(true);
+    });
+
+    it('handles UUID format relation IDs', async () => {
+      const result = await deleteIssueRelation.execute({
+        relationId: '550e8400-e29b-41d4-a716-446655440000'
+      }, { apiKey: 'test-api-key' });
+
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe('error handling', () => {
+    it('throws error when GraphQL returns failure', async () => {
+      server.use(
+        linearApi.mutation('IssueRelationDelete', () => {
+          return HttpResponse.json({
+            data: {
+              issueRelationDelete: {
+                success: false,
+              },
+            },
+          });
+        })
+      );
+
+      await expect(
+        deleteIssueRelation.execute({
+          relationId: 'rel-123'
+        }, { apiKey: 'test-api-key' })
+      ).rejects.toThrow('Failed to delete issue relation');
+    });
+
+    it('throws error when relation ID is invalid', async () => {
+      server.use(
+        linearApi.mutation('IssueRelationDelete', () => {
+          return HttpResponse.json({
+            errors: [{ message: 'Relation not found' }],
+          });
+        })
+      );
+
+      await expect(
+        deleteIssueRelation.execute({
+          relationId: 'invalid-id'
+        }, { apiKey: 'test-api-key' })
+      ).rejects.toThrow('Relation not found');
+    });
+  });
+
+  describe('token estimation', () => {
+    it('includes token estimation in output', async () => {
+      const result = await deleteIssueRelation.execute({
+        relationId: 'rel-123'
+      }, { apiKey: 'test-api-key' });
+
+      expect(result.estimatedTokens).toBeGreaterThan(0);
+    });
+  });
+});

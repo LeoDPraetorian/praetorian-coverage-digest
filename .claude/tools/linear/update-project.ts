@@ -1,12 +1,12 @@
 /**
- * update_project - Linear MCP Wrapper
+ * update_project - Linear GraphQL Wrapper
  *
- * Update an existing project in Linear via MCP server
+ * Update an existing project in Linear via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~500 tokens (update response)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -31,7 +31,7 @@
  *   - url: string - Linear URL for the project
  *
  * Edge cases discovered:
- * - MCP returns { success: true, project: {...} } on success
+ * - GraphQL returns { success: true, project: {...} } on success
  * - Only provided fields are updated; omitted fields remain unchanged
  * - Project must exist or error is thrown
  *
@@ -50,12 +50,30 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+
+/**
+ * GraphQL mutation for updating a project
+ */
+const UPDATE_PROJECT_MUTATION = `
+  mutation ProjectUpdate($id: String!, $input: ProjectUpdateInput!) {
+    projectUpdate(id: $id, input: $input) {
+      success
+      project {
+        id
+        name
+        url
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -128,13 +146,28 @@ export const updateProjectOutput = z.object({
     id: z.string(),
     name: z.string(),
     url: z.string()
-  })
+  }),
+  estimatedTokens: z.number()
 });
 
 export type UpdateProjectOutput = z.infer<typeof updateProjectOutput>;
 
 /**
- * Update an existing project in Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface ProjectUpdateResponse {
+  projectUpdate: {
+    success: boolean;
+    project: {
+      id: string;
+      name: string;
+      url: string;
+    };
+  };
+}
+
+/**
+ * Update an existing project in Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -159,29 +192,44 @@ export const updateProject = {
   description: 'Update an existing project in Linear',
   parameters: updateProjectParams,
 
-  async execute(input: UpdateProjectInput): Promise<UpdateProjectOutput> {
+  async execute(
+    input: UpdateProjectInput,
+    testToken?: string
+  ): Promise<UpdateProjectOutput> {
     // Validate input
     const validated = updateProjectParams.parse(input);
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'update_project',
-      validated
+    // Extract id and build update input
+    const { id, ...updateInput } = validated;
+
+    // Create client (with optional test credentials)
+    const client = createLinearClient(testToken);
+
+    // Execute GraphQL mutation
+    const response = await executeGraphQL<ProjectUpdateResponse>(
+      client,
+      UPDATE_PROJECT_MUTATION,
+      { id, input: updateInput }
     );
 
-    if (!rawData?.success) {
+    // Check for success
+    if (!response.projectUpdate.success) {
       throw new Error('Failed to update project');
     }
 
     // Filter to essential fields
-    const filtered = {
-      success: rawData.success,
+    const baseData = {
+      success: true,
       project: {
-        id: rawData.project?.id,
-        name: rawData.project?.name,
-        url: rawData.project?.url
+        id: response.projectUpdate.project.id,
+        name: response.projectUpdate.project.name,
+        url: response.projectUpdate.project.url
       }
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

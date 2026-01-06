@@ -1,6 +1,6 @@
 # Gateway Management
 
-Gateway skills route agents from core to library in the two-tier system. Gateway-specific capabilities include:
+Gateway skills route agents from core to library using intent-based routing and progressive disclosure. Gateway-specific capabilities include:
 
 ## Create Gateway
 
@@ -17,34 +17,28 @@ Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md");
 // Follow workflow with gateway template
 ```
 
-Uses template at `templates/gateway-template.md` with proper two-tier structure.
+Uses template at `templates/gateway-template.md` with canonical gateway structure.
 
 ## Audit Gateway
 
-**Via CLI:**
+**Via skill invocation:**
 
-```bash
-ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$ROOT/.claude" && npm run audit -- gateway-frontend
-```
+Audit the gateway skill by invoking auditing-skills to verify compliance with all phase requirements.
 
-Runs all 22 phases (phases 17-20 are gateway-specific):
+Validates all compliance requirements including gateway-specific checks:
 
-- **Phase 17**: Gateway structure (two-tier explanation, IMPORTANT block)
-- **Phase 18**: Routing table format (full paths, not skill names)
-- **Phase 19**: Path resolution (all paths exist)
-- **Phase 20**: Coverage check (all library skills in one gateway)
+- **Gateway structure**: EXTREMELY-IMPORTANT block, Progressive Disclosure, Intent Detection
+- **Skill Registry format**: Full paths with Triggers column
+- **Path resolution**: All paths exist
+- **Coverage check**: All library skills in one gateway
+
+For complete validation details, see [auditing-skills](.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md).
 
 ## Fix Gateway
 
-**Via CLI:**
+**Via skill invocation:**
 
-```bash
-ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$ROOT/.claude" && npm run -w @chariot/fixing-skills fix -- gateway-frontend --phase 18
-```
+Fix gateway compliance issues by invoking fixing-skills following procedures in phase-categorization.md.
 
 Gateway-specific fixes for structure and routing table issues.
 

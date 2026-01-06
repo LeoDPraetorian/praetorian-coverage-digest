@@ -406,13 +406,17 @@ When analyzing Context7 documentation:
 - [ ] Identified anti-patterns and warnings
 - [ ] Extracted best practices and recommendations
 - [ ] Organized findings in structured tables
-- [ ] Saved synthesis to .local/ for skill creation reference
+- [ ] Saved synthesis to research output directory
 
 ---
 
 ## Output Format for Skill Creation
 
-**Save to**: `.local/context7-research-{library-name}.md`
+**Output location depends on invocation mode:**
+
+**Mode 1: Standalone** - Save to `$ROOT/.claude/.output/research/${TIMESTAMP}-${LIBRARY}-context7/SYNTHESIS.md`
+
+**Mode 2: Orchestrated** - Save to `${OUTPUT_DIR}/context7.md` (parent provides OUTPUT_DIR)
 
 ```markdown
 ## Context7 Research: {library-name}

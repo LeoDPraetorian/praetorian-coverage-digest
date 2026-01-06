@@ -5,6 +5,17 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+
+    // Global safety guard - catches unmocked process spawns
+    setupFiles: ['./vitest.setup.ts'],
+
+    // Global teardown - drains Serena pool
+    globalTeardown: './vitest.global-teardown.ts',
+
+    // Timeout configuration - fail fast instead of hanging
+    testTimeout: 10000,      // 10s max per test
+    hookTimeout: 10000,      // 10s max for setup/teardown hooks
+
     include: [
       // MCP tool wrapper tests (use @claude/testing)
       'tools/**/*.unit.test.ts',

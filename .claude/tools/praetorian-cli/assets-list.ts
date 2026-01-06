@@ -7,6 +7,12 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import {
+  extractPaginatedResponse,
+  buildListResponse,
+  PaginationLimits,
+  estimateTokens,
+} from '../config/lib/response-utils.js';
 
 // ============================================================================
 // Input Schema
@@ -39,7 +45,7 @@ const FilteredOutputSchema = z.object({
     created: z.string().optional()
   })),
   next_offset: z.number().nullable(),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 });
 
 // ============================================================================
@@ -67,91 +73,55 @@ export const assetsList = {
 };
 
 // ============================================================================
-// Filtering Logic
+// Filtering Logic (using shared utilities)
 // ============================================================================
 
 /**
  * Filter assets result to reduce token usage
- * Strategy:
- * - Return summary statistics (counts by type/status)
- * - Return full details for first 20 assets only
- * - For remaining assets, return only keys
- * - Remove verbose fields (timestamps, metadata)
+ *
+ * Uses shared utilities from response-utils.ts:
+ * - extractPaginatedResponse: Handles tuple/object response formats
+ * - buildListResponse: Generates summary with counts
  */
 function filterAssetsResult(rawResult: any): any {
-  // Parse response defensively
-  const [assets, nextOffset] = parseAssetsListResponse(rawResult);
+  // Parse response using shared utility (handles tuple, object, array formats)
+  const { items: assets, nextOffset } = extractPaginatedResponse<any>(rawResult);
 
-  // Calculate summary statistics
-  const assetTypes: Record<string, number> = {};
-  const statuses: Record<string, number> = {};
+  // Build response with summary using shared utility
+  const { items: filteredAssets, summary } = buildListResponse(
+    assets,
+    PaginationLimits.DEFAULT, // 20 items
+    (asset: any) => ({
+      key: asset.key,
+      dns: asset.dns,
+      name: asset.name,
+      status: asset.status,
+      class: asset.class,
+      created: asset.created
+    }),
+    {
+      // Generate counts by type and status
+      asset_types: (a: any) => a.class || 'unknown',
+      statuses: (a: any) => a.status || 'unknown',
+    }
+  );
 
-  assets.forEach((asset: any) => {
-    const type = asset.class || 'unknown';
-    const status = asset.status || 'unknown';
-    assetTypes[type] = (assetTypes[type] || 0) + 1;
-    statuses[status] = (statuses[status] || 0) + 1;
-  });
-
-  // Return detailed info for first 20, keys only for rest
-  const filteredAssets = assets.slice(0, 20).map((asset: any) => ({
-    key: asset.key,
-    dns: asset.dns,
-    name: asset.name,
-    status: asset.status,
-    class: asset.class,
-    created: asset.created
-  }));
-
-  return {
+  const result = {
     summary: {
-      total_count: assets.length,
-      returned_count: filteredAssets.length,
-      has_more: assets.length > 20,
-      asset_types: assetTypes,
-      statuses: statuses
+      total_count: summary.total,
+      returned_count: summary.returned,
+      has_more: summary.hasMore,
+      asset_types: summary.counts?.asset_types || {},
+      statuses: summary.counts?.statuses || {}
     },
     assets: filteredAssets,
-    next_offset: nextOffset,
-    estimated_tokens: 1000 // vs 10,000+ for full result
+    next_offset: nextOffset
   };
-}
 
-/**
- * Defensive response parsing for MCP tool
- *
- * MCP server can return different formats:
- * - Direct tuple: [assets, nextOffset]
- * - Object with data field: { data: [assets, nextOffset] }
- * - Direct array: [assets]
- *
- * This function normalizes to expected format
- */
-function parseAssetsListResponse(rawResult: any): [any[], any] {
-  // Handle direct tuple format (expected)
-  if (Array.isArray(rawResult) && rawResult.length >= 1) {
-    const assets = rawResult[0] || [];
-    const nextOffset = rawResult[1] || null;
-    return [assets, nextOffset];
-  }
-
-  // Handle object with data field
-  if (rawResult && typeof rawResult === 'object' && rawResult.data) {
-    if (Array.isArray(rawResult.data)) {
-      const assets = rawResult.data[0] || [];
-      const nextOffset = rawResult.data[1] || null;
-      return [assets, nextOffset];
-    }
-  }
-
-  // Fallback: assume it's just the assets array
-  if (Array.isArray(rawResult)) {
-    return [rawResult, null];
-  }
-
-  // Last resort: empty response
-  console.warn('Unexpected MCP response format:', rawResult);
-  return [[], null];
+  return {
+    ...result,
+    estimatedTokens: estimateTokens(result)
+  };
 }
 
 // ============================================================================

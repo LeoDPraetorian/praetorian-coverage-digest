@@ -238,6 +238,141 @@ export const GenericResponses = {
 };
 
 /**
+ * Serena-specific response builders
+ *
+ * Serena MCP returns JSON strings for most operations.
+ */
+export const SerenaResponses = {
+  /**
+   * find_symbol response - returns array of symbol objects
+   */
+  findSymbol: (symbols: Array<{
+    name_path: string;
+    kind?: number;
+    relative_path?: string;
+    body_location?: { start_line: number; end_line: number };
+    body?: string;
+  }>) => symbols.map(s => ({
+    name_path: s.name_path,
+    kind: s.kind ?? 12, // Function by default
+    relative_path: s.relative_path ?? 'src/example.ts',
+    body_location: s.body_location ?? { start_line: 1, end_line: 10 },
+    ...(s.body ? { body: s.body } : {}),
+  })),
+
+  /**
+   * Single symbol match
+   */
+  singleSymbol: (name_path: string, kind: number = 12) => [{
+    name_path,
+    kind,
+    relative_path: 'src/example.ts',
+    body_location: { start_line: 1, end_line: 10 },
+  }],
+
+  /**
+   * Empty symbol search
+   */
+  emptySymbolSearch: () => [],
+
+  /**
+   * Symbol with body included
+   */
+  symbolWithBody: (name_path: string, body: string) => [{
+    name_path,
+    kind: 12,
+    relative_path: 'src/example.ts',
+    body_location: { start_line: 1, end_line: body.split('\n').length },
+    body,
+  }],
+
+  /**
+   * get_symbols_overview response
+   */
+  symbolsOverview: (symbols: Array<{
+    name: string;
+    kind: number;
+    children?: Array<{ name: string; kind: number }>;
+  }>) => symbols,
+
+  /**
+   * find_referencing_symbols response
+   */
+  referencingSymbols: (refs: Array<{
+    name_path: string;
+    kind: number;
+    relative_path: string;
+    content_around_reference?: string;
+  }>) => refs.map(r => ({
+    name_path: r.name_path,
+    kind: r.kind,
+    relative_path: r.relative_path,
+    content_around_reference: r.content_around_reference ?? '  // reference here',
+  })),
+
+  /**
+   * Memory operations - success message
+   */
+  memorySuccess: (operation: string, name: string) =>
+    `Memory '${name}' ${operation} successfully.`,
+
+  /**
+   * list_memories response
+   */
+  listMemories: (names: string[]) => names,
+
+  /**
+   * read_memory response
+   */
+  readMemory: (content: string) => content,
+
+  /**
+   * list_dir response
+   */
+  listDir: (dirs: string[], files: string[]) => ({ dirs, files }),
+
+  /**
+   * find_file response
+   */
+  findFile: (files: string[]) => ({ files }),
+
+  /**
+   * search_for_pattern response
+   */
+  searchPattern: (matches: Array<{
+    file: string;
+    line: number;
+    content: string;
+  }>) => matches,
+
+  /**
+   * Thinking tool responses (prompts)
+   */
+  thinkingPrompt: (type: 'collected_info' | 'task_adherence' | 'done') => {
+    const prompts: Record<string, string> = {
+      collected_info: 'Reflect on the information you have gathered...',
+      task_adherence: 'Consider whether you are still on track with the task...',
+      done: 'Evaluate whether the task is truly complete...',
+    };
+    return prompts[type] || 'Reflect on your progress...';
+  },
+
+  /**
+   * Generic success response
+   */
+  success: () => 'Success',
+
+  /**
+   * get_current_config response
+   */
+  currentConfig: () => ({
+    active_project: 'test-project',
+    tools: ['find_symbol', 'replace_symbol_body'],
+    modes: ['interactive', 'editing'],
+  }),
+};
+
+/**
  * Test data generators
  */
 export const TestData = {

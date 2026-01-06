@@ -1,0 +1,168 @@
+# Changelog: integrating-with-hackerone
+
+## 2026-01-03 - Major Documentation Expansion
+
+**Status:** Complete
+
+### Summary
+Comprehensive update to HackerOne integration skill based on extensive API research. Expanded from ~15% API coverage to 90%+ with complete reference documentation for all 50+ endpoints.
+
+### Changes
+
+#### New Reference Files (8 files created, ~130KB total)
+1. **api-reference.md** (17KB)
+   - Complete catalog of 50+ endpoints across all resource types
+   - Customer Resources: Activities, Analytics, Credentials, Email, HAI
+   - Hacker Resources: Reports, Programs, Hacktivity, Financial, Report Intents
+   - Pagination patterns, rate limit details, error responses
+
+2. **webhook-handling.md** (17KB)
+   - Complete event type catalog (Report, Activity, Program, Bounty events)
+   - HMAC-SHA256 signature verification implementation (Go + Python)
+   - Idempotency and replay protection patterns
+   - Async processing architecture (Webhook → SQS → Lambda)
+   - Professional tier requirement (Jan 2025)
+
+3. **data-mapping.md** (17KB)
+   - Chariot Risk ↔ HackerOne Report bidirectional mapping
+   - State machine mappings with transition rules
+   - CVSS 4.0 support (added Jan 2025)
+   - Asset type mappings and enrichment pipeline
+   - Conflict resolution with last-write-wins
+
+4. **error-handling.md** (18KB)
+   - Complete HTTP status code decision tree
+   - Retry strategies with exponential backoff and full jitter
+   - Circuit breaker pattern implementation
+   - Graceful degradation and fallback strategies
+   - Error recovery procedures
+
+5. **client-implementation.md** (15KB)
+   - Production-ready Go client architecture
+   - Interface-based authentication (BasicAuth, SecretsManagerAuth)
+   - Rate limiting with golang.org/x/time/rate
+   - Caching strategy with TTL and in-memory implementation
+   - Pagination helpers and typed resource methods
+
+6. **sync-patterns.md** (16KB)
+   - Incremental activities sync (10-100x more efficient than polling)
+   - Webhook-driven sync for Professional tier
+   - Hybrid sync pattern (webhooks + incremental fallback)
+   - Bidirectional sync with conflict resolution
+   - Full reconciliation patterns
+
+7. **testing-patterns.md** (16KB)
+   - Unit testing with mocks and table-driven tests
+   - Integration testing with sandbox environment
+   - E2E testing for full sync workflows
+   - Contract testing and performance testing
+   - CI/CD integration patterns
+
+8. **security-practices.md** (16KB)
+   - Comprehensive security checklist (40+ items)
+   - Credential management with AWS Secrets Manager
+   - Token rotation procedures and automation scripts
+   - PII handling, audit logging patterns
+   - SOC 2, GDPR compliance considerations
+
+#### Updated Files
+1. **SKILL.md**
+   - ✅ Fixed: Corrected OAuth 2.0 error → HTTP Basic Auth (critical fix)
+   - ✅ Added: 2024-2025 API additions section
+     - Report Intents (AI-assisted submission, Sept 2024)
+     - CVSS 4.0 support (Jan 2025)
+     - Email & messaging endpoints (2025)
+     - HAI (AI) endpoints for vulnerability analysis (Preview)
+     - Asset management & tagging (2024-2025)
+   - ✅ Added: 4 new reference file links in Quick Reference table
+   - ✅ Updated: Core API Operations section documenting 50+ endpoints
+   - ✅ Updated: Description to reflect comprehensive endpoint coverage
+
+2. **authentication.md** (existing, verified)
+   - Already accurate (HTTP Basic Auth, no changes needed)
+   - Token lifecycle and rotation procedures correct
+
+3. **rate-limiting.md** (existing, verified)
+   - Rate limit quotas accurate (600/min reads, 300/min report pages, 25/20s writes)
+   - Exponential backoff algorithms correct
+
+### API Coverage Improvements
+
+| Metric | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| API Coverage | ~15% | ~90% | +75% |
+| Endpoints Documented | ~3 mentioned | 50+ detailed | +47 endpoints |
+| Reference Files | 2/10 exist | 10/10 exist | +8 files |
+| Code Examples | ~5 | ~100+ | +95 examples |
+| Documentation Size | ~15KB | ~145KB | +130KB |
+
+### Missing Endpoints Now Documented
+- **Credentials Management** (12 endpoints) - Create, assign, revoke test credentials
+- **Credential Inquiries** (6 endpoints) - Hacker credential requests
+- **Incremental Activities** (2 endpoints) - **Critical for efficient sync**
+- **Report Intents AI** (9 endpoints) - AI-assisted vulnerability drafting
+- **Analytics** (1 endpoint) - Time-series metrics
+- **Email** (1 endpoint) - Markdown emails to org members
+- **HAI AI** (2+ endpoints) - AI chat with report context
+- **Hacker Financial** (3 endpoints) - Balance, earnings, payouts
+- **Hacktivity** (1 endpoint) - Public vulnerability feed
+- **Asset Management** (3+ endpoints) - Tagging, scope updates
+- **Messaging** (2 endpoints) - Message hackers, external platforms
+
+### 2024-2025 API Timeline Documented
+- **March 2024:** Hacktivity API for hackers
+- **May 2024:** Asset Tagging with API support
+- **August 2024:** Delete sensitive attachments via API
+- **September 2024:** Report Intents API (AI-assisted drafting)
+- **December 2024-2025:** Asset tag creation, get all categories
+- **January 2025:** CVSS 4.0 support, Email endpoint
+- **July 2025:** Message hackers endpoint
+- **October 2025:** Notify external platforms, update asset scope
+
+### Key Research Findings
+- ✅ No API v2 exists - HackerOne evolves v1 with backward compatibility
+- ✅ No GraphQL API - REST only
+- ✅ Webhooks require Professional tier (as of January 2025)
+- ✅ Incremental activities endpoint is critical for production (10-100x more efficient)
+- ✅ Rate limits updated October 2023 (report pages: 600→300 req/min)
+- ✅ CVSS 4.0 support added January 2025 (backward compatible with 3.1)
+
+### Files Modified
+- `.history/CHANGELOG` (created/updated)
+- `SKILL.md` (5 edits - corrected OAuth error, added 2024-2025 features)
+- `references/api-reference.md` (created, 17KB)
+- `references/webhook-handling.md` (created, 17KB)
+- `references/data-mapping.md` (created, 17KB)
+- `references/error-handling.md` (created, 18KB)
+- `references/client-implementation.md` (created, 15KB)
+- `references/sync-patterns.md` (created, 16KB)
+- `references/testing-patterns.md` (created, 16KB)
+- `references/security-practices.md` (created, 16KB)
+
+### Verification Steps Completed
+✅ All 10 reference files exist and are accessible
+✅ All file references in SKILL.md are valid
+✅ Authentication documentation verified accurate
+✅ Rate limiting documentation verified accurate
+✅ 2024-2025 API additions researched and documented
+✅ Comprehensive research synthesis saved to `.claude/research/2026-01-03-164914-hackerone-api-completeness/`
+
+### Total Documentation Added
+- ~130KB of new reference documentation
+- ~1,500 lines of production-ready code examples
+- 40+ security checklist items
+- 50+ endpoint specifications with request/response schemas
+- 100+ code snippets (Go, Python, Bash, YAML)
+
+### Next Recommendations
+- Consider adding `examples/` directory with complete integration code
+- Add sequence diagrams for sync workflows
+- Create troubleshooting guide for common error scenarios
+- Add Postman/curl collection for endpoint testing
+
+---
+
+## Version History
+
+- **2026-01-03:** Major documentation expansion - 8 new files, OAuth fix, 2024-2025 features
+- **2023-xx-xx:** Initial skill creation with partial documentation

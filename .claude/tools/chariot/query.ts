@@ -30,6 +30,7 @@
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client';
 import { validateNoPathTraversal, validateNoCommandInjection, validateNoControlChars } from '../config/lib/sanitize';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 /**
  * Filter operation schema
@@ -257,15 +258,12 @@ function filterResults(rawResults: any, query: QueryStructure): ChariotQueryOutp
     ...(item.updated && { updated: item.updated }),
   }));
 
-  // Calculate estimated tokens (rough approximation)
-  const estimatedTokens = JSON.stringify(filtered).length / 4;
-
   return {
     results: filtered,
     totalCount: results.length,
     page: query.page,
     hasMore: results.length > limit,
-    estimatedTokens: Math.ceil(estimatedTokens),
+    estimatedTokens: estimateTokens(filtered),
   };
 }
 

@@ -1,0 +1,35 @@
+# Changelog - implementing-go-cli-applications
+
+## [1.0.0] - 2026-01-05 - Initial Creation
+
+### RED Phase Documentation
+**Gap Identified**: No consolidated guidance for Go CLI development in Chariot platform
+- Multiple CLI tools (nebula, praetorian-cli, trajan) lack consistency
+- Framework selection criteria undocumented
+- Configuration precedence patterns scattered
+- UX best practices (error messages, progress, TTY detection) missing
+- Binary size optimization for containers not addressed
+
+**Test Scenario**: "Build a Go CLI for cloud infrastructure scanning with JSON/YAML output, error handling, and configuration management"
+
+**Failure Without Skill**: Claude suggests frameworks without trade-offs, misses 12-Factor precedence, ignores POSIX conventions, provides generic errors, skips progress feedback, doesn't optimize for containers.
+
+### Skill Details
+- **Category**: development/backend
+- **Type**: Process/Pattern
+- **Location**: Library (reusable across all Go projects)
+- **Line Count**: 471 lines (within 500 line limit)
+- **Research**: Comprehensive 9-agent research completed (GitHub, Perplexity, Web × 3 interpretations)
+
+### Content Structure
+- Framework selection matrix (Cobra/Kong/urfave/stdlib)
+- Configuration management (Koanf/Viper with 12-Factor precedence)
+- UX best practices (POSIX, three-part errors, progress, TTY)
+- Anti-patterns catalog
+- Real-world references (kubectl, docker, gh, hugo, terraform)
+- Chariot-specific recommendations
+
+### Created By
+- Skill management workflow v2.0
+- TDD methodology enforced
+- Progressive disclosure pattern applied

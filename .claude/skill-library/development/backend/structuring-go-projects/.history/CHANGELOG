@@ -1,0 +1,47 @@
+# Changelog - structuring-go-projects
+
+## 2026-01-06 - Initial Creation
+
+**Phase**: RED-GREEN-REFACTOR (TDD)
+
+**RED Phase Documentation:**
+- **Gap identified**: Without this skill, Claude cannot systematically evaluate Go project structure compliance
+- **Test scenario**: User asked "do modules nero, augustus, diocletian, and trajan follow golang standards?"
+- **Failure observed**: Claude made ad-hoc observations without:
+  - Systematic evaluation framework
+  - Clear distinction between official vs community standards (golang-standards/project-layout)
+  - Decision trees for when `/internal`, `/pkg`, `/cmd` are appropriate
+  - Understanding of project complexity impact on structure decisions
+  - Actionable recommendations for fixing non-compliance
+
+**Skill Details:**
+- **Location**: Skill Library
+- **Category**: development/backend
+- **Type**: Process/Pattern
+- **Line count**: 270 (target <500)
+
+**Content Sources:**
+- Official Go documentation (go.dev/doc/modules/layout)
+- golang-standards/project-layout (community pattern)
+- 2025 best practices from web research
+- Community debate on `/pkg` directory usage
+
+**Phase 6 Completed**: Research incorporated from go.dev, golang-standards, and 2025 community best practices
+- Created 5 reference files: official-guidance.md, community-patterns.md, decision-matrices.md, migration-examples.md, anti-patterns.md
+
+**Phase 7 Completed**: Added to gateway-backend routing table with triggers: "Go structure", "project layout", "cmd pkg internal", "golang standards"
+
+**Phase 8 GREEN Completed**: Verified skill closes the gap
+- Re-tested original scenario (evaluate nero, augustus, diocletian, trajan)
+- WITH skill: Provided systematic evaluation, identified specific issues, actionable fixes
+- WITHOUT skill (Phase 1 RED): Made ad-hoc observations, no framework
+
+**Phase 9 REFACTOR Completed**:
+- Note: Pressure testing not applicable for reference/framework skills (per pressure-testing-skill-content methodology)
+- Final audit PASSED:
+  - Line count: 293 lines (well under 500 limit) ✅
+  - Description format: Compliant with "Use when" pattern ✅
+  - All reference files exist ✅
+  - Gateway integration: Verified ✅
+
+**Status**: PRODUCTION READY ✅

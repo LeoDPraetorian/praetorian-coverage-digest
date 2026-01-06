@@ -1,0 +1,23 @@
+# Changelog
+
+## 2026-01-01 - Initial Creation
+
+### RED Phase Documentation
+
+- **Gap identified**: No skill exists for OWASP input sanitization patterns
+- **Failure behavior**: Agents use denylist approaches (vulnerable), forget context-aware escaping, miss defense-in-depth layers
+
+### Skill Details
+
+- **Category**: security/defensive
+- **Type**: Process/Pattern
+- **Purpose**: Defense against injection attacks through OWASP-compliant input validation
+
+### Content
+
+- OWASP principles: allowlist over denylist, validate early/escape late, defense in depth
+- Security validators: path traversal, command injection, SQL injection, control characters
+- Context-aware escaping: HTML, URL, JavaScript contexts
+- Validation patterns: email, password, file uploads
+- Common pitfalls: client-side only, double encoding, inconsistent validation
+- References: injection-prevention.md (SQL, command, LDAP, XPath, NoSQL, SSTI, XXE), owasp-cheatsheets.md, library-usage.md (validator.js, DOMPurify, sanitize-html)

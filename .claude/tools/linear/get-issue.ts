@@ -1,12 +1,12 @@
 /**
- * get_issue - Linear MCP Wrapper
+ * get_issue - Linear GraphQL Wrapper
  *
- * Get detailed information about a specific issue via MCP server
+ * Get detailed information about a specific issue via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~600 tokens (single issue)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT-1516):
@@ -38,12 +38,53 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL query for getting an issue
+ */
+const GET_ISSUE_QUERY = `
+  query Issue($id: String!) {
+    issue(id: $id) {
+      id
+      identifier
+      title
+      description
+      priority
+      priorityLabel
+      estimate
+      state {
+        id
+        name
+        type
+      }
+      assignee {
+        id
+        name
+        email
+      }
+      url
+      branchName
+      createdAt
+      updatedAt
+      attachments {
+        nodes {
+          id
+          title
+          url
+        }
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -75,19 +116,13 @@ export const getIssueOutput = z.object({
   // Optional fields with correct types
   description: z.string().optional(),
 
-  // Priority is an OBJECT, not a number
-  priority: z.object({
-    name: z.string(),
-    value: z.number()
-  }).optional(),
+  // Priority is a Float (number), not an object
+  priority: z.number().nullable().optional(),
 
   priorityLabel: z.string().optional(),
 
-  // Estimate follows same pattern as priority
-  estimate: z.object({
-    name: z.string(),
-    value: z.number()
-  }).optional(),
+  // Estimate is a Float (number), not an object
+  estimate: z.number().nullable().optional(),
 
   state: z.object({
     id: z.string(),
@@ -95,9 +130,12 @@ export const getIssueOutput = z.object({
     type: z.string()
   }).optional(),
 
-  // Assignee is a STRING (name), not an object
-  assignee: z.string().optional(),
-  assigneeId: z.string().optional(),
+  // Assignee is returned as object with id, name, email
+  assignee: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+  }).nullable().optional(),
 
   url: z.string().optional(),
   branchName: z.string().optional(),
@@ -108,13 +146,56 @@ export const getIssueOutput = z.object({
     id: z.string(),
     title: z.string(),
     url: z.string()
-  })).optional()
+  })).optional(),
+
+  estimatedTokens: z.number()
 });
 
 export type GetIssueOutput = z.infer<typeof getIssueOutput>;
 
 /**
- * Get a Linear issue by ID or identifier using MCP wrapper
+ * GraphQL response type
+ */
+interface IssueResponse {
+  issue: {
+    id: string;
+    identifier: string;
+    title: string;
+    description?: string | null;
+    priority?: {
+      name: string;
+      value: number;
+    } | null;
+    priorityLabel?: string | null;
+    estimate?: {
+      name: string;
+      value: number;
+    } | null;
+    state?: {
+      id: string;
+      name: string;
+      type: string;
+    } | null;
+    assignee?: {
+      name: string;
+    } | null;
+    assigneeId?: string | null;
+    url?: string;
+    branchName?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    attachments?: {
+      nodes: Array<{
+        id: string;
+        title: string;
+        url: string;
+      }>;
+    };
+  } | null;
+}
+
+/**
+ * Get a Linear issue by ID or identifier using GraphQL API
  *
  * @example
  * ```typescript
@@ -134,62 +215,66 @@ export const getIssue = {
   description: 'Get detailed information about a specific Linear issue',
   parameters: getIssueParams,
 
-  async execute(input: GetIssueInput): Promise<GetIssueOutput> {
+  async execute(
+    input: GetIssueInput,
+    testToken?: string
+  ): Promise<GetIssueOutput> {
     // Validate input
     const validated = getIssueParams.parse(input);
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'get_issue',
-      validated
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Execute GraphQL query
+    const response = await executeGraphQL<IssueResponse>(
+      client,
+      GET_ISSUE_QUERY,
+      { id: validated.id }
     );
 
-    if (!rawData) {
+    if (!response.issue) {
       throw new Error(`Issue not found: ${validated.id}`);
     }
 
     // Filter to essential fields with correct types
-    const filtered = {
-      id: rawData.id,
-      identifier: rawData.identifier,
-      title: rawData.title,
-      description: rawData.description?.substring(0, 500), // Truncate for token efficiency
+    const baseData = {
+      id: response.issue.id,
+      identifier: response.issue.identifier,
+      title: response.issue.title,
+      description: response.issue.description?.substring(0, 500), // Truncate for token efficiency
 
-      // Priority is an object with name and value
-      priority: rawData.priority ? {
-        name: rawData.priority.name,
-        value: rawData.priority.value
+      // Priority is a number (not object)
+      priority: response.issue.priority ?? undefined,
+
+      priorityLabel: response.issue.priorityLabel || undefined,
+
+      // Estimate is a number (not object)
+      estimate: response.issue.estimate ?? undefined,
+
+      state: (response.issue.state && response.issue.state.id) ? {
+        id: response.issue.state.id,
+        name: response.issue.state.name,
+        type: response.issue.state.type
       } : undefined,
 
-      priorityLabel: rawData.priorityLabel,
+      // Assignee is an object with id, name, email
+      assignee: response.issue.assignee || undefined,
 
-      // Estimate follows same pattern as priority
-      estimate: rawData.estimate ? {
-        name: rawData.estimate.name,
-        value: rawData.estimate.value
-      } : undefined,
+      url: response.issue.url,
+      branchName: response.issue.branchName,
+      createdAt: response.issue.createdAt,
+      updatedAt: response.issue.updatedAt,
 
-      state: (rawData.state && rawData.state.id) ? {
-        id: rawData.state.id,
-        name: rawData.state.name,
-        type: rawData.state.type
-      } : undefined,
-
-      // Assignee is a string (name), not an object
-      assignee: rawData.assignee || undefined,
-      assigneeId: rawData.assigneeId || undefined,
-
-      url: rawData.url,
-      branchName: rawData.gitBranchName || rawData.branchName, // API uses gitBranchName
-      createdAt: rawData.createdAt,
-      updatedAt: rawData.updatedAt,
-
-      attachments: rawData.attachments?.map((a: any) => ({
+      attachments: response.issue.attachments?.nodes?.map((a) => ({
         id: a.id,
         title: a.title,
         url: a.url
       }))
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

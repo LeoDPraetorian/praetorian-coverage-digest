@@ -195,7 +195,7 @@ Your output MUST include:
 
 ## Date: [ISO timestamp]
 
-## Analyst: [Your name or "code-pattern-analyzer"]
+## Analyst: [Your name or "Explore agent"]
 
 ---
 
@@ -360,7 +360,7 @@ Flag these in your report:
 This skill is orchestration-agnostic. It can be:
 
 1. **Invoked standalone** - User asks "what can we reuse for X?"
-2. **Used by code-pattern-analyzer agent** - Primary consumer of methodology
+2. **Used by Explore agent** - Primary consumer of methodology (via Task tool, very thorough mode)
 3. **Part of orchestration** - Discovery phase before architecture
 4. **Ad-hoc analysis** - Any time reuse question arises
 
@@ -374,7 +374,7 @@ The output format (Discovery Report) is consumable by any caller.
 
 ## Related Agents
 
-- **code-pattern-analyzer** - Primary consumer of this methodology
+- **Explore agent** - Native Claude Code agent for codebase discovery (use via Task tool with "very thorough" mode)
 
 ## Remember
 

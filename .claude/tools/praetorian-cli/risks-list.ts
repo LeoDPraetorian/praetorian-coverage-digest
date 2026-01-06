@@ -7,6 +7,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 // ============================================================================
 // Input Schema
@@ -44,7 +45,7 @@ const FilteredOutputSchema = z.object({
   })),
   other_risks_count: z.number(),
   next_offset: z.number().nullable(),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 });
 
 // ============================================================================
@@ -103,7 +104,7 @@ function filterRisksResult(rawResult: any): any {
   });
 
   // Return detailed info for critical (all), high (top 10), and counts for rest
-  return {
+  const result = {
     summary: {
       total_count: risks.length,
       by_status: byStatus,
@@ -124,8 +125,12 @@ function filterRisksResult(rawResult: any): any {
       status: r.status
     })),
     other_risks_count: otherRisks.length,
-    next_offset: nextOffset,
-    estimated_tokens: 5000 // vs 100,000+ for full result
+    next_offset: nextOffset
+  };
+
+  return {
+    ...result,
+    estimatedTokens: estimateTokens(result)
   };
 }
 

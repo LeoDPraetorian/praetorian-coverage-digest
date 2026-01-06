@@ -282,13 +282,31 @@ next.ServeHTTP(w, r)
 
 ## Output Location
 
-Save synthesis to:
+**Output location depends on invocation mode:**
 
-```
-.local/github-research-{topic-slug}.md
+### Mode 1: Standalone (invoked directly)
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+TIMESTAMP=$(date +"%Y-%m-%d-%H%M%S")
+TOPIC="{topic-slug}"
+mkdir -p "$ROOT/.claude/.output/research/${TIMESTAMP}-${TOPIC}-github"
+# Save to: $ROOT/.claude/.output/research/${TIMESTAMP}-${TOPIC}-github/SYNTHESIS.md
 ```
 
-Example: `.local/github-research-rate-limiting-go.md`
+Example: `$ROOT/.claude/.output/research/2026-01-03-143052-rate-limiting-go-github/SYNTHESIS.md`
+
+### Mode 2: Orchestrated (invoked by parent skill)
+
+When parent skill (researching-skills, orchestrating-research) provides `OUTPUT_DIR`:
+
+```bash
+# Save to: ${OUTPUT_DIR}/github.md
+```
+
+Example: `$ROOT/.claude/.output/research/2026-01-03-143052-rate-limiting-go/github.md`
+
+**Detection:** If output directory was passed by parent, use Mode 2. Otherwise, use Mode 1.
 
 ## When to Skip Sections
 

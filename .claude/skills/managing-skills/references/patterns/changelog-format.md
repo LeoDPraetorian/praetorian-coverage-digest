@@ -102,7 +102,7 @@ All entries follow this format:
 
 ### Method
 
-- Auto-fix via `npm run -w @chariot/fixing-skills fix`
+- Auto-fix via fixing-skills
 - Manual fix for: {list if any}
 
 ### Backup
@@ -144,7 +144,7 @@ All entries follow this format:
 
 ### Method
 
-- Auto-fix via `npm run -w @chariot/fixing-skills fix`
+- Auto-fix via fixing-skills
 
 ### Backup
 

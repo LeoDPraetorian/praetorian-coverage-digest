@@ -1,0 +1,18 @@
+# Changelog
+
+## 2026-01-01 - Initial Creation
+
+### RED Phase Documentation
+- **Gap identified**: Existing skills cover React Hook Form + Zod integration, but no skill for standalone Zod validation patterns
+- **Failure behavior**: Agents use `parse()` at API boundaries instead of `safeParse()`, miss schema composition patterns, don't know discriminated unions
+
+### Skill Details
+- **Category**: development/typescript
+- **Type**: Library/Framework
+- **Purpose**: Type-safe runtime validation for TypeScript applications beyond form handling
+
+### Content
+- Core patterns: safeParse vs parse, schema composition, discriminated unions
+- Common patterns: API validation, environment variables, optional defaults
+- Error handling: flattening, custom error maps
+- References: advanced-patterns.md (recursive, branded, preprocessing), error-handling.md (localization, API errors)

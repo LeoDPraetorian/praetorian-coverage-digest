@@ -3,6 +3,13 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client';
+import {
+  ensureArray,
+  truncate,
+  paginate,
+  PaginationLimits,
+  estimateTokens,
+} from '../config/lib/response-utils';
 
 // ============================================================================
 // Input Schema (matches ACTUAL chrome-devtools MCP tool signature)
@@ -21,7 +28,20 @@ const InputSchema = z.object({
 
 const OutputSchema = z.object({
   success: z.boolean(),
-  requests: z.array(z.any()).optional()
+  requests: z.array(z.object({
+    url: z.string(),
+    method: z.string().optional(),
+    status: z.number().optional(),
+    type: z.string().optional(),
+    size: z.number().optional(),
+    time: z.number().optional(),
+  })),
+  summary: z.object({
+    total: z.number(),
+    returned: z.number(),
+    hasMore: z.boolean(),
+  }),
+  estimatedTokens: z.number()
 });
 
 // ============================================================================
@@ -35,18 +55,36 @@ export const listNetworkRequests = {
   outputSchema: OutputSchema,
 
   async execute(input: z.infer<typeof InputSchema>): Promise<z.infer<typeof OutputSchema>> {
-    // Validate input
     const validated = InputSchema.parse(input);
 
-    // Call chrome-devtools MCP server via SHARED client
-    const requests = await callMCPTool(
-      'chrome-devtools',                               // MCP name
-      'list_network_requests',  // Actual MCP tool name
-      validated                                        // Pass params directly
+    const rawRequests = await callMCPTool(
+      'chrome-devtools',
+      'list_network_requests',
+      validated
     );
 
-    // Return filtered result (token efficient)
-    return { success: true, requests };
+    // Normalize and filter using shared utilities
+    const allRequests = ensureArray(rawRequests);
+    const limit = validated.pageSize ?? PaginationLimits.MEDIUM;
+    const filtered = paginate(allRequests, limit);
+
+    const result = {
+      success: true,
+      requests: filtered.map((req: any) => ({
+        url: truncate(req.url, 'MEDIUM') || req.url, // Truncate long URLs
+        method: req.method,
+        status: req.status,
+        type: req.resourceType || req.type,
+        size: req.encodedDataLength || req.size,
+        time: req.time,
+      })),
+      summary: {
+        total: allRequests.length,
+        returned: filtered.length,
+        hasMore: allRequests.length > limit,
+      },
+    };
+    return { ...result, estimatedTokens: estimateTokens(result) };
   }
 };
 

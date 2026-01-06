@@ -18,6 +18,7 @@ import (
 ```
 
 **Observations**:
+
 - **Package**: Same as implementation (`package mongodb`)
 - **Imports**: Minimal - only `encoding/binary` and `testing`
 - **No external test frameworks**: Uses standard `testing` package
@@ -58,21 +59,22 @@ func TestParseBSONInt32(t *testing.T) {
 ```
 
 **Pattern**: Classic table-driven test with struct containing:
+
 - `name` - descriptive test case name
 - Input parameters (`bsonDoc`, `key`)
 - Expected outputs (`expected`, `found`)
 
 ### Test Cases (7 total)
 
-| Case                       | Purpose                                          | Line |
-| -------------------------- | ------------------------------------------------ | ---- |
-| "valid int32 value"        | Happy path - extract maxWireVersion=17           | 32   |
-| "zero value"               | Edge case - valid zero value                     | 59   |
-| "key not found"            | Field doesn't exist in document                  | 79   |
-| "empty document"           | Minimal valid BSON document (5 bytes)            | 99   |
-| "document too short"       | Truncated data (2 bytes)                         | 106  |
-| "wrong type"               | Field exists but is string, not int32            | 113  |
-| "multiple fields"          | Document with 3 fields, extract middle one       | 136  |
+| Case                 | Purpose                                    | Line |
+| -------------------- | ------------------------------------------ | ---- |
+| "valid int32 value"  | Happy path - extract maxWireVersion=17     | 32   |
+| "zero value"         | Edge case - valid zero value               | 59   |
+| "key not found"      | Field doesn't exist in document            | 79   |
+| "empty document"     | Minimal valid BSON document (5 bytes)      | 99   |
+| "document too short" | Truncated data (2 bytes)                   | 106  |
+| "wrong type"         | Field exists but is string, not int32      | 113  |
+| "multiple fields"    | Document with 3 fields, extract middle one | 136  |
 
 ### BSON Document Construction Pattern
 
@@ -96,6 +98,7 @@ bsonDoc: func() []byte {
 ```
 
 **Benefits**:
+
 - Self-contained - no external builder functions needed
 - Explicit - shows exact byte structure
 - Flexible - easy to create variations with flaws
@@ -108,14 +111,15 @@ bsonDoc: func() []byte {
 
 ### Test Cases (4 total)
 
-| Case                 | Purpose                             | Line |
-| -------------------- | ----------------------------------- | ---- |
-| "valid string value" | Extract msg="isdbgrid"              | 200  |
-| "version string"     | Extract version="8.0.4"             | 221  |
-| "key not found"      | Field doesn't exist                 | 242  |
-| "empty document"     | Empty input (edge case)             | 248  |
+| Case                 | Purpose                 | Line |
+| -------------------- | ----------------------- | ---- |
+| "valid string value" | Extract msg="isdbgrid"  | 200  |
+| "version string"     | Extract version="8.0.4" | 221  |
+| "key not found"      | Field doesn't exist     | 242  |
+| "empty document"     | Empty input (edge case) | 248  |
 
 **Differences from TestParseBSONInt32**:
+
 - Uses simpler struct (no `found` boolean, just empty string for not found)
 - Fewer test cases (4 vs 7) but still covers edge cases
 - No "wrong type" test case (could be added)
@@ -128,12 +132,12 @@ bsonDoc: func() []byte {
 
 ### Test Cases (4 total)
 
-| Case                    | Purpose                                    | Line | wantValid | wantErr |
-| ----------------------- | ------------------------------------------ | ---- | --------- | ------- |
+| Case                    | Purpose                                      | Line | wantValid | wantErr |
+| ----------------------- | -------------------------------------------- | ---- | --------- | ------- |
 | "valid OP_REPLY"        | Well-formed response with correct request ID | 275  | true      | false   |
-| "response too short"    | Truncated data (3 bytes)                   | 313  | false     | true    |
-| "wrong opcode"          | OP_MSG instead of OP_REPLY                 | 320  | false     | true    |
-| "mismatched request ID" | responseTo doesn't match expectedRequestID | 347  | false     | true    |
+| "response too short"    | Truncated data (3 bytes)                     | 313  | false     | true    |
+| "wrong opcode"          | OP_MSG instead of OP_REPLY                   | 320  | false     | true    |
+| "mismatched request ID" | responseTo doesn't match expectedRequestID   | 347  | false     | true    |
 
 ### Mock Response Construction
 
@@ -185,13 +189,14 @@ response: func() []byte {
 
 ### Test Cases (3 total)
 
-| Case                 | Purpose                      | Line | wantValid | wantErr |
-| -------------------- | ---------------------------- | ---- | --------- | ------- |
-| "valid OP_MSG"       | Well-formed OP_MSG response  | 397  | true      | false   |
-| "response too short" | Truncated data (2 bytes)     | 430  | false     | true    |
-| "wrong section kind" | Section kind 1 instead of 0  | 437  | false     | true    |
+| Case                 | Purpose                     | Line | wantValid | wantErr |
+| -------------------- | --------------------------- | ---- | --------- | ------- |
+| "valid OP_MSG"       | Well-formed OP_MSG response | 397  | true      | false   |
+| "response too short" | Truncated data (2 bytes)    | 430  | false     | true    |
+| "wrong section kind" | Section kind 1 instead of 0 | 437  | false     | true    |
 
 **Notable**: OP_MSG has different structure than OP_REPLY:
+
 - Opcode: 2013 (vs 1 for OP_REPLY)
 - Has `flagBits` field (4 bytes)
 - Has section kind (1 byte) - must be 0 for body
@@ -272,6 +277,7 @@ Same commands as Test 5, but building OP_MSG format:
 | "buildInfo" | 101        | 554  |
 
 **Additional verification** (vs OP_QUERY):
+
 - OpCode must be OP_MSG (2013)
 - Section kind must be 0 (byte at offset 20)
 
@@ -303,6 +309,7 @@ func TestFunctionName(t *testing.T) {
 ```
 
 **Benefits**:
+
 - Easy to add new test cases
 - Clear test case names
 - Parallel execution possible with `t.Parallel()`
@@ -320,6 +327,7 @@ bsonDoc: func() []byte {
 ```
 
 **Why**:
+
 - Self-contained test cases
 - No external builder functions needed
 - Easy to create variations with specific flaws
@@ -327,6 +335,7 @@ bsonDoc: func() []byte {
 ### 3. Edge Case Coverage
 
 **Every parsing/validation function tests**:
+
 - ✅ Valid input (happy path)
 - ✅ Empty/minimal input
 - ✅ Truncated input (too short)
@@ -337,6 +346,7 @@ bsonDoc: func() []byte {
 ### 4. Byte-Level Verification
 
 **Message building tests verify**:
+
 - Total message length
 - Length field matches actual length
 - Request ID placement

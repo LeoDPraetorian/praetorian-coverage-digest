@@ -1,0 +1,54 @@
+# Changelog
+
+## [2026-01-04] - Effort Scaling Guidance
+
+### Added
+- **Effort Scaling** section with 4-tier complexity table (Simple/Moderate/Complex/Major) mapping agent counts to tool call estimates
+- **Scaling Tiers table** with concrete examples: 1 agent (3-10 calls) for bug fixes, up to 10+ agents for major refactors
+- **Decision Checklist** with 4 questions to assess if multi-agent is justified (15x token cost consideration)
+- **Interdependent Task Warning** with signs to watch for (serial dependencies, shared state, tight coupling, iterative cycles)
+- **Alternatives for interdependent work** (single agent with TodoWrite, sequential spawning, manual orchestration)
+
+### Changed
+- **"When to Orchestrate vs Delegate Directly"** section now references Effort Scaling tiers and adds "Task complexity is 'Simple' tier (3-10 tool calls expected)" criterion
+- **Anti-Patterns** section expanded with two new items:
+  - Item 7: "Ignoring token cost: Multi-agent uses 15x more tokens—don't orchestrate simple tasks"
+  - Item 8: "Parallelizing interdependent work: Serial tasks should stay serial, don't force parallel"
+
+### Context
+Research from Anthropic's multi-agent systems documentation specifies clear effort scaling rules. Without this guidance, orchestrators either:
+1. Over-orchestrate simple tasks (wasteful - multi-agent uses 15x more tokens)
+2. Under-orchestrate complex tasks (miss parallel execution benefits)
+3. Make inconsistent decisions about agent counts
+
+This update provides objective criteria for matching agent count to task complexity and recognizing when NOT to use multi-agent orchestration.
+
+### Line Count
+- Before: 308 lines
+- After: 347 lines
+- Under 500-line limit: ✅
+
+## [2026-01-04] - Centralized Agent Routing
+
+### Added
+- **Agent Routing Table** in "Handling Agent Results" section - provides decision matrix for spawning next agent based on blocked reason
+- **Structured Blocked Response Format** - JSON schema that agents should return when blocked, enabling orchestrators to route appropriately
+- **"Spawn next agent" guidance** in Escalation Protocol - clarifies when to auto-route vs escalate to user
+
+### Changed
+- Enhanced "If blocked" instruction to reference routing table instead of generic "escalate to user"
+- Added note to Escalation Protocol establishing this skill as single source of truth for routing logic
+- Added `blocked_reason: "unknown"` as explicit user escalation trigger
+
+### Context
+Research on multi-agent architecture (Anthropic's official docs) confirms:
+1. Only orchestrators should spawn agents, not subordinate agents
+2. Escalation/routing logic belongs in orchestrator skills, not in agent definitions
+3. Agents should return structured status and let orchestrators decide next steps
+
+This update enables removing "## Escalation Protocol" sections from 29 individual agent definitions, centralizing routing logic here.
+
+### Line Count
+- Before: 266 lines
+- After: 308 lines
+- Under 500-line limit: ✅

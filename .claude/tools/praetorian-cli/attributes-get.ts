@@ -4,6 +4,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 // ============================================================================
 // Input Schema
@@ -22,7 +23,7 @@ const FilteredOutputSchema = z.object({
   name: z.string(),
   value: z.string(),
   source: z.string().optional(),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 }).nullable();
 
 // ============================================================================
@@ -50,12 +51,14 @@ export const attributesGet = {
       key: rawResult.key,
       name: rawResult.name,
       value: rawResult.value,
-      source: rawResult.source,
-      estimated_tokens: 100
+      source: rawResult.source
     };
 
     // Validate output
-    return FilteredOutputSchema.parse(filtered);
+    return FilteredOutputSchema.parse({
+      ...filtered,
+      estimatedTokens: estimateTokens(filtered)
+    });
   }
 };
 

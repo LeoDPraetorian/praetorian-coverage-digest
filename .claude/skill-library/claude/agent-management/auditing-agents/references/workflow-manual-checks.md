@@ -1434,6 +1434,7 @@ DUPLICATION CONFIRMED:
 
 1. **Delete duplicated section** from agent body
 2. **Add skill to Tier 3** (if not already present):
+
    ```markdown
    ### Tier 3: Triggered by Task Type
 
@@ -1441,6 +1442,7 @@ DUPLICATION CONFIRMED:
    | ------------------------------ | ------------------------------------ |
    | [task that needs this content] | `.claude/skill-library/.../SKILL.md` |
    ```
+
 3. **Verify skill is accessible** via gateway (if library skill)
 
 **Example Fix:**

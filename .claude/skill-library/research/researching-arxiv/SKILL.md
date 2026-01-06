@@ -267,7 +267,30 @@ Priority order for full paper reading:
    - **Why:** {alternative approach for comparison}
 ```
 
-### 4.2 Citation Format
+### 4.2 Output Location
+
+**Output location depends on invocation mode:**
+
+**Mode 1: Standalone (invoked directly)**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+TIMESTAMP=$(date +"%Y-%m-%d-%H%M%S")
+TOPIC="{semantic-topic-name}"
+mkdir -p "$ROOT/.claude/.output/research/${TIMESTAMP}-${TOPIC}-arxiv"
+# Write synthesis to: $ROOT/.claude/.output/research/${TIMESTAMP}-${TOPIC}-arxiv/SYNTHESIS.md
+```
+
+**Mode 2: Orchestrated (invoked by orchestrating-research)**
+
+When parent skill provides `OUTPUT_DIR`:
+
+- Write synthesis to: `${OUTPUT_DIR}/arxiv.md`
+- Do NOT create directory (parent already created it)
+
+**Detection logic:** If parent skill passed an output directory path, use Mode 2. Otherwise use Mode 1.
+
+### 4.3 Citation Format
 
 **Always use arxiv ID format:**
 
@@ -400,19 +423,19 @@ When selecting papers, look for:
 
 ---
 
-## Integration with researching-skills Workflow
+## Integration with Research Orchestration
 
-This skill is invoked during **Phase 6: Research & Populate Content** of `creating-skills` via the `researching-skills` CORE skill:
+This skill is invoked during research orchestration via `orchestrating-research`:
 
 ```
-skill: "researching-skills"
+skill: "orchestrating-research"
 ```
 
-The researching-skills skill will delegate to:
+Research orchestration typically delegates to:
 
 1. **Codebase research** - Find similar skills/patterns
 2. **Context7 research** - Library documentation
-3. **arxiv research** - Academic papers (THIS SKILL)
+3. **arXiv research** - Academic papers (THIS SKILL)
 4. **Web research** - Supplemental sources
 
 **Output:** Comprehensive research document combining all sources.
@@ -454,9 +477,9 @@ Before completing research:
 
 ## Related Skills
 
-| Skill                   | Purpose                                     |
-| ----------------------- | ------------------------------------------- |
-| `researching-skills`    | Parent router delegating to this skill (CORE) |
-| `researching-protocols` | Sibling skill for network protocol research |
-| `creating-skills`       | Uses this skill in Phase 6                  |
-| `updating-skills`       | Uses this skill when adding research        |
+| Skill                    | Purpose                                         |
+| ------------------------ | ----------------------------------------------- |
+| `orchestrating-research` | Orchestrator delegating to this skill (CORE)    |
+| `researching-protocols`  | Sibling skill for network protocol research     |
+| `creating-skills`        | Uses research orchestration in Phase 6          |
+| `updating-skills`        | Uses research orchestration when adding content |

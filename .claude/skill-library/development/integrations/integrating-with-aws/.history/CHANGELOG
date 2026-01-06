@@ -1,0 +1,46 @@
+# Changelog
+
+## 2026-01-04 - Initial Creation
+
+**RED Failure Documentation:**
+- **Problem**: No centralized skill for AWS integration patterns across Chariot modules
+- **Gap**: Developers must search multiple modules for AWS SDK usage, auth patterns, error handling, and CloudFormation templates
+- **Impact**: Inconsistent implementations, repeated searches, potential security issues
+- **Failure Behavior**: Without skill, developers lack guidance on:
+  - AWS service client creation patterns
+  - Proper error handling and retry strategies
+  - IAM role and credential management
+  - CloudFormation/SAM template structure
+  - Multi-service orchestration
+  - Security best practices for serverless
+  - Cost and performance optimization
+
+**Skill Details:**
+- **Category**: development/integrations/
+- **Type**: Integration
+- **Location**: Library (on-demand loading via gateway)
+- **Line Count**: 391 (safe zone)
+
+## 2026-01-04 - Research Incorporated (Phase 6.3)
+
+**Research Completed:**
+- Codebase research: Chariot AWS patterns (`modules/chariot/backend`)
+- GitHub research: AWS SDK Go v2 community examples
+- Web research: AWS official documentation
+
+**Key Findings Incorporated:**
+1. **Client Initialization**: Added Chariot's singleton with mutex pattern + alternative init() approach
+2. **Error Handling**: Enhanced with smithy.APIError unwrapping and production patterns
+3. **Retry Strategies**: Documented SDK defaults (3 attempts, 20s backoff) as production-ready baseline
+4. **Multi-Tenant Security**: Added unique Chariot patterns for DynamoDB partition keys and S3 hierarchical paths
+5. **Lambda Performance**: Emphasized client reuse and connection management
+
+**Updates Made:**
+- Step 1 (Client Creation): Added two production patterns with thread-safety guidance
+- Step 2 (Error Handling): Added basic and advanced patterns with retry strategy documentation
+- Chariot-Specific Patterns: Expanded with multi-tenant isolation patterns (DynamoDB, S3, account assumption)
+
+**Next Steps:**
+- Phase 7: Add to gateway-integrations routing table
+- Phase 8: GREEN verification - test skill with real AWS integration scenario
+- Phase 9: REFACTOR - pressure test with time/authority/sunk-cost scenarios

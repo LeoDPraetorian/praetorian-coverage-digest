@@ -9,6 +9,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const GetTestsSignaturesInputSchema = z.object({
   projectId: z.string().min(1),
@@ -40,7 +41,7 @@ export const getTestsSignatures = {
       projectId: validated.projectId,
       spec: validated.spec,
       title: validated.title,
-      estimatedTokens: Math.ceil(JSON.stringify(rawData).length / 4),
+      estimatedTokens: estimateTokens(rawData),
     };
 
     return GetTestsSignaturesOutputSchema.parse(filtered);

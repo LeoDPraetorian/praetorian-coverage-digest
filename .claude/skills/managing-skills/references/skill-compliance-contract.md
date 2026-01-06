@@ -189,24 +189,35 @@ See [Changelog Format](patterns/changelog-format.md) for complete details.
 
 ---
 
-## 7. Audit Phases
+## 7. Compliance Validation
 
-See [Audit Phases](audit-phases.md) for complete phase definitions.
+Skill compliance is validated against requirement categories. For validation details, see [auditing-skills](.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md).
 
-### Phase Summary
+### Requirement Categories
 
-**Structural Phases (1-9):** Validate file format and organization
+**Frontmatter Requirements:**
 
-**Semantic Phases (10-13):** Validate content quality and patterns
+- Description: Must start with "Use when...", <120 chars, third-person
+- Allowed-tools: Must declare appropriate tools for skill type
 
-**Gateway Phases (17-20):** Validate gateway-specific requirements
+**Structural Requirements:**
 
-### Auto-Fix vs Manual
+- Line count: SKILL.md must be <500 lines
+- File organization: Must have references/ for progressive disclosure
+- Script organization: Scripts must be in scripts/ subdirectory
 
-| Type         | Phases                        | Description                   |
-| ------------ | ----------------------------- | ----------------------------- |
-| Auto-fixable | 2, 4, 5, 6, 7, 10, 12, 18, 19 | Deterministic transformations |
-| Manual       | 1, 3, 8, 9, 11, 13, 17, 20    | Require semantic decisions    |
+**Quality Requirements:**
+
+- Links: All markdown links must resolve
+- References: No phantom skill/agent references
+- Formatting: Tables Prettier-formatted, code blocks have language tags
+
+**Gateway Requirements (gateway-\* skills only):**
+
+- Structure: Must explain two-tier system
+- Routing: Must use full paths, paths must exist
+
+For fix categories and patterns, see [phase-categorization.md](patterns/phase-categorization.md).
 
 ---
 
@@ -245,20 +256,13 @@ Use this checklist to validate skill compliance:
 
 ## 9. Quick Commands
 
-**Path Resolution:** See [Repo Root Detection](patterns/repo-root-detection.md) for the standard pattern used in all commands below.
-
 ### Validate Single Skill
 
-```bash
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude"
-npm run audit -- {skill-name}
-```
+Audit the skill by invoking auditing-skills to verify compliance with all phase requirements.
 
 ### Fix Issues
 
-```bash
-npm run -w @chariot/fixing-skills fix -- {skill-name}
-```
+Fix compliance issues by invoking fixing-skills following procedures in phase-categorization.md.
 
 ### Check Line Count
 
@@ -276,4 +280,5 @@ wc -l {skill-path}/SKILL.md
 - [REFACTOR Rules](patterns/refactor-rules.md) - Pressure testing requirements
 - [Repo Root Detection](patterns/repo-root-detection.md) - Path resolution for super-repo/submodule contexts
 - [Progressive Disclosure](progressive-disclosure.md) - Content organization
-- [Audit Phases](audit-phases.md) - Complete phase definitions
+- [Phase Categorization](patterns/phase-categorization.md) - Fix categories and validation patterns
+- [auditing-skills](.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md) - Compliance validation details

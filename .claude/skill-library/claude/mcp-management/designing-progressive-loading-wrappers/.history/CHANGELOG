@@ -1,0 +1,125 @@
+# Changelog
+
+All notable changes to designing-progressive-loading-wrappers will be documented in this file.
+
+## [Initial Creation] - 2026-01-01
+
+### Added
+
+- **RED Phase Documentation:**
+  - Gap: MCP wrappers and API SDKs consume 71,800+ tokens at startup without progressive loading patterns
+  - Failure: Developers create wrappers that load all tool definitions upfront, return unfiltered responses, lack token optimization
+  - Impact: "Token usage alone explains 80% of performance variance" - sessions start slow, context windows fill quickly, agent performance degrades
+
+- **Skill Metadata:**
+  - Location: Library (`.claude/skill-library/claude/mcp-tools/`)
+  - Category: `claude/mcp-tools` (complements `creating-mcp-wrappers` core skill)
+  - Type: Process/Pattern (architectural methodology for token optimization)
+
+- **Core Patterns:**
+  - Progressive Loading Architecture (99% token reduction at startup)
+  - Response Filtering Strategies (75-95% reduction for collections)
+  - Token Estimation Pattern (visibility into optimization impact)
+  - Architecture Decision Tree (guidance for when to apply patterns)
+
+- **Quick Reference Table:**
+  - 7 patterns with token impact and applicability
+  - Summary + Limited Items (90% reduction)
+  - Field Truncation (50-80% reduction)
+  - Nested Resource Suppression (60-90% reduction)
+
+- **Anti-Patterns Section:**
+  - Loading all tool definitions at startup
+  - Returning unfiltered API responses
+  - Not truncating large text fields
+  - Loading nested resources by default
+  - No token visibility
+
+- **Real-World Example:**
+  - Linear MCP Wrapper optimization
+  - Before: 146,000 tokens (46K startup + 100K per call)
+  - After: 1,000 tokens (0 startup + 1K per call)
+  - 99.3% reduction
+
+- **Progressive Disclosure Structure:**
+  - SKILL.md: 444 lines (within 450-500 warning threshold)
+  - References planned for detailed implementation
+  - Examples directory for case studies
+
+### References Created (Placeholders)
+
+- `progressive-loading-examples.md` - Complete code examples
+- `response-filtering-patterns.md` - Advanced filtering techniques
+- `token-estimation.md` - Accurate token counting
+- `architecture-decision-tree.md` - Detailed decision criteria
+- `anti-patterns.md` - Common mistakes and fixes
+- `validation-checklist.md` - Complete validation criteria
+- `performance-benchmarks.md` - Production performance data
+
+### Examples Created (Placeholders)
+
+- `linear-wrapper-optimization.md` - Real-world case study
+
+### Related Skills
+
+- `creating-mcp-wrappers` (CORE) - TDD implementation workflow
+- `managing-mcp-wrappers` (LIBRARY) - Wrapper lifecycle management
+- `gateway-mcp-tools` (CORE) - MCP tool discovery router
+- `developing-with-tdd` (CORE) - TDD methodology
+
+## [Completed] - 2026-01-01
+
+### Phase 6: Reference Content Populated
+
+All reference files created with comprehensive content:
+- `progressive-loading-examples.md` - Complete code examples with directory-based and manifest-based discovery
+- `response-filtering-patterns.md` - Summary + Limited Items, Field Selection, Field Truncation, Nested Suppression
+- `token-estimation.md` - Character-based and tiktoken estimation, budget enforcement
+- `architecture-decision-tree.md` - Visual decision tree with pattern selection matrix
+- `anti-patterns.md` - 6 anti-patterns with bad/good examples
+- `validation-checklist.md` - Pre-deployment verification with test scenarios
+- `performance-benchmarks.md` - Real-world metrics (Linear, GitHub, Salesforce wrappers)
+- `linear-wrapper-optimization.md` - Complete before/after case study
+
+### Phase 7: Gateway Updated
+
+- Added skill to `gateway-mcp-tools` in "Designing MCP Wrapper Architecture" section
+- Added to Related section as prerequisite to `creating-mcp-wrappers`
+
+### Phase 8: GREEN Verification
+
+- Audit passed with no critical issues
+- TodoWrite mandate added
+- Line count: 474 lines (warning zone, within limits)
+
+### Phase 9: REFACTOR - Pressure Testing
+
+**3 pressure tests conducted via subagents:**
+
+1. **Time Pressure Test**: 45-minute deadline to ship wrapper
+   - Agent chose: Load all at startup (anti-pattern)
+   - Rationalizations: "Ship first, optimize later", "YAGNI", "v1.1 follow-up"
+
+2. **Authority Pressure Test**: Tech lead says skip progressive loading
+   - Agent chose: Push back, but would defer if told no
+   - Partial resistance, referenced existing gateway patterns
+
+3. **Sunk Cost Test**: 3 days invested in non-progressive wrapper
+   - Agent chose: Keep current, plan v1.1 refactor
+   - Rationalizations: "Need usage data", "shipping beats delayed perfection"
+
+**Loopholes Closed:**
+
+Added "Common Rationalizations (And Why They're Wrong)" section with:
+- 6 rationalization patterns and counter-arguments
+- Clear guidance on when rationalizations ARE valid (< 5 tools, prototype)
+- Clear guidance on when they're NOT valid (20+ tools, production)
+
+### Final Status
+
+- ✅ RED phase documented (gap proven)
+- ✅ GREEN phase passed (skill works, audit passes)
+- ✅ REFACTOR phase complete (pressure tested, loopholes closed)
+- ✅ Gateway updated
+- ✅ All reference files populated
+- ✅ Line count: 474 lines (within limits)

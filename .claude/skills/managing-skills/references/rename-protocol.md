@@ -10,11 +10,9 @@ Renaming a skill requires updating multiple locations to maintain consistency. T
 
 ### Step 1: Validate Old Name Exists
 
-```bash
-npm run rename -- old-skill-name new-skill-name
-```
+Verify the old skill exists in core (`.claude/skills/`) or library (`.claude/skill-library/`).
 
-Verifies old skill exists in core or library.
+Use Glob or Grep to locate the skill directory.
 
 ### Step 2: Validate New Name Available
 
@@ -97,11 +95,13 @@ If skill is referenced in:
 
 ### 3. Re-audit Skill
 
-```bash
-npm run audit -- new-skill-name
+Audit the renamed skill to verify all phases still pass:
+
+```markdown
+Audit {new-skill-name} to verify compliance with all phase requirements.
 ```
 
-Verify all phases still pass.
+Or invoke auditing-skills library skill directly.
 
 ## Common Rename Scenarios
 

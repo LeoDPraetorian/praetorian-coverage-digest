@@ -1,13 +1,13 @@
 /**
- * create_jira_bug - Linear MCP Wrapper
+ * create_jira_bug - Linear GraphQL Wrapper
  *
- * Create a Jira integration bug issue in Linear via MCP server
+ * Create a Jira integration bug issue in Linear via GraphQL API
  * Convenience wrapper for reporting Jira sync/push failures
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~500 tokens (creation response)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: 46,000 tokens at start
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -31,7 +31,7 @@
  *   - url: string - Linear URL for the issue
  *
  * Edge cases discovered:
- * - Uses create_issue MCP with labels ['bug', 'jira', 'integration']
+ * - Uses issueCreate mutation with labels ['bug', 'jira', 'integration']
  * - Default priority is 1 (Urgent) for Jira integration bugs
  * - Auto-generates description template if not provided
  *
@@ -55,12 +55,32 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL mutation for creating an issue
+ */
+const CREATE_ISSUE_MUTATION = `
+  mutation IssueCreate($input: IssueCreateInput!) {
+    issueCreate(input: $input) {
+      success
+      issue {
+        id
+        identifier
+        title
+        url
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -120,7 +140,8 @@ export const createJiraBugOutput = z.object({
     identifier: z.string(),
     title: z.string(),
     url: z.string()
-  })
+  }),
+  estimatedTokens: z.number()
 });
 
 export type CreateJiraBugOutput = z.infer<typeof createJiraBugOutput>;
@@ -149,7 +170,22 @@ function generateJiraDescription(input: CreateJiraBugInput): string {
 }
 
 /**
- * Create a Jira integration bug issue in Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface IssueCreateResponse {
+  issueCreate: {
+    success: boolean;
+    issue?: {
+      id: string;
+      identifier: string;
+      title: string;
+      url: string;
+    } | null;
+  };
+}
+
+/**
+ * Create a Jira integration bug issue in Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -176,7 +212,10 @@ export const createJiraBug = {
   description: 'Create a Jira integration bug issue in Linear',
   parameters: createJiraBugParams,
 
-  async execute(input: CreateJiraBugInput): Promise<CreateJiraBugOutput> {
+  async execute(
+    input: CreateJiraBugInput,
+    testToken?: string
+  ): Promise<CreateJiraBugOutput> {
     // Validate input
     const validated = createJiraBugParams.parse(input);
 
@@ -184,36 +223,53 @@ export const createJiraBug = {
     const description = validated.description || generateJiraDescription(validated);
 
     // Jira-specific labels
-    const labels = ['bug', 'jira', 'integration'];
+    const labelNames = ['bug', 'jira', 'integration'];
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'create_issue',
-      {
-        title: validated.title,
-        description,
-        team: validated.team,
-        assignee: validated.assignee,
-        priority: validated.priority ?? 1,
-        cycle: validated.cycle,
-        labels,
-      }
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Build GraphQL input
+    const issueInput: Record<string, unknown> = {
+      title: validated.title,
+      description,
+      teamId: validated.team,
+      priority: validated.priority ?? 1,
+      labelNames,
+    };
+
+    // Add optional fields
+    if (validated.assignee) {
+      issueInput.assigneeId = validated.assignee;
+    }
+    if (validated.cycle) {
+      issueInput.cycleId = validated.cycle;
+    }
+
+    // Execute GraphQL mutation
+    const response = await executeGraphQL<IssueCreateResponse>(
+      client,
+      CREATE_ISSUE_MUTATION,
+      { input: issueInput }
     );
 
-    if (!rawData?.success) {
+    if (!response.issueCreate.success || !response.issueCreate.issue) {
       throw new Error('Failed to create Jira bug');
     }
 
     // Filter to essential fields
-    const filtered = {
-      success: rawData.success,
+    const baseData = {
+      success: response.issueCreate.success,
       issue: {
-        id: rawData.issue?.id,
-        identifier: rawData.issue?.identifier,
-        title: rawData.issue?.title,
-        url: rawData.issue?.url
+        id: response.issueCreate.issue.id,
+        identifier: response.issueCreate.issue.identifier,
+        title: response.issueCreate.issue.title,
+        url: response.issueCreate.issue.url
       }
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

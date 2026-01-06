@@ -349,11 +349,16 @@ endif
 		echo "export GOPRIVATE=github.com/praetorian-inc" >> $(PROFILE_FILE); \
 		echo "Added GOPRIVATE to $(PROFILE_FILE)"; \
 	fi
+	@if ! grep -q 'go/bin' $(PROFILE_FILE) 2>/dev/null; then \
+		echo 'export PATH="$$HOME/go/bin:$$PATH"' >> $(PROFILE_FILE); \
+		echo "Added Go bin path to $(PROFILE_FILE)"; \
+	fi
 	@make check-git-version
 	@make submodule-init-robust
 	@make submodule-pull
 	@make install-git-hooks
 	@make setup-ui
+	@make setup-go-tools
 	@make mcp-tools-setup
 	@make claude-skills-setup
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
@@ -484,6 +489,14 @@ configure-cli:
 	echo "" && \
 	echo "Use this command prefix for Praetorian CLI:" && \
 	echo "  praetorian --profile $$UUID"
+
+.PHONY: setup-go-tools
+setup-go-tools: ## Install Go development tools (gopls language server for Serena)
+	@echo "📦 Installing Go development tools..."
+	@echo "  → gopls (Go language server)..."
+	@go install golang.org/x/tools/gopls@latest
+	@echo "✅ Go tools installed to $(shell go env GOPATH)/bin"
+	@echo "ℹ️  Ensure $(shell go env GOPATH)/bin is in your PATH"
 
 .PHONY: mcp-tools-setup
 mcp-tools-setup: ## Install dependencies for all MCP custom tools (chrome-devtools, currents, context7, linear)

@@ -1,0 +1,26 @@
+# Changelog
+
+## 2026-01-01 - Initial Creation
+
+### RED Phase Documentation
+
+- **Gap identified**: No skill exists for retry/backoff patterns
+- **Failure behavior**: Naive retries without exponential backoff, missing jitter (thundering herd), retrying non-idempotent operations without keys
+
+### Skill Details
+
+- **Category**: development/typescript
+- **Type**: Pattern/Implementation
+- **Purpose**: Resilient network operations through exponential backoff and jitter
+
+### Content
+
+- Core retry algorithm with exponential backoff
+- Jitter importance (thundering herd prevention)
+- Retryable vs non-retryable error detection
+- Timeout handling (per-request and total operation)
+- Idempotency considerations and key usage
+- Rate limiting (429) and Retry-After headers
+- Circuit breaker pattern
+- Library examples: p-retry, axios-retry, exponential-backoff
+- Testing patterns and common pitfalls

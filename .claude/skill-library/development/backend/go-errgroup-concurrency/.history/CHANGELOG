@@ -1,0 +1,53 @@
+# Changelog
+
+## 2026-01-04 - Compliance Fixes: Description, Tools, Table Formatting
+
+**What changed:**
+- Phase 1: Condensed description from 371 chars to 249 chars for better readability
+- Phase 2: Removed unused `Bash` tool from allowed-tools (skill uses only Go code examples)
+- Phase 14: Verified table formatting with Prettier (already compliant)
+
+**Method:**
+- Claude-Automated (Phase 1 description condensation)
+- Deterministic (Phase 2 tool removal)
+- Deterministic (Phase 14 table formatting verification)
+
+**Why:** Audit identified minor compliance issues. Description was comprehensive but overly long. Bash tool was unnecessary since skill contains only Go code examples, not bash commands.
+
+**Line count:** 475 (no change, already under 500-line limit)
+
+**Verification:**
+- Description maintains all key terms (errgroup, patterns, TruffleHog, Nuclei, benchmarks, anti-patterns)
+- Semantic meaning preserved while improving conciseness
+- Gateway membership confirmed in gateway-backend routing table
+- All structural validation phases pass
+
+---
+
+## 2026-01-01 - Production Examples, Semaphore Cross-Reference, Performance Benchmarks
+
+**What changed:**
+- Added Pattern 7: Stage-Specific Worker Counts (TruffleHog pattern)
+- Added Production Examples section with TruffleHog and Nuclei real-world usage
+- Added Performance Benchmarks table comparing sequential, errgroup, and worker pool patterns
+- Added errgroup vs Semaphore cross-reference in Decision Guide
+- Extracted Anti-Patterns to references/anti-patterns.md (7 patterns)
+- Extracted Advanced Patterns to references/advanced-patterns.md (3 patterns)
+- Condensed API Reference from detailed sections to compact table
+- Condensed Quality Checklist to 3-line format
+- Updated References section with TruffleHog, Nuclei, and research documents
+
+**Line count:** 615 → 473 (142 lines saved, now well under 500-line limit)
+
+**Why:** Enrich skill with production scanner patterns from 24K+ star projects (TruffleHog, Nuclei), add cross-references to new semaphore skill, provide performance benchmarks for choosing patterns. Progressive disclosure via references/ keeps SKILL.md lean.
+
+**Sources:**
+- TruffleHog GitHub: https://github.com/trufflesecurity/trufflehog
+- Nuclei GitHub: https://github.com/projectdiscovery/nuclei
+- Research: .claude/research/2026-01-01-go-scanner-architecture-patterns/github.md
+
+**Verification:**
+- All existing content preserved (moved to references/, not deleted)
+- New content enhances without replacing existing guidance
+- Chariot concurrency limits maintained
+- All 6 original patterns intact

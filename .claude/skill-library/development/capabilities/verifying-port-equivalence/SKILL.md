@@ -19,12 +19,12 @@ Use this skill when:
 
 ## Quick Reference
 
-| Component | Purpose | Location |
-|-----------|---------|----------|
-| Python Harness | Subprocess wrapper calling Python | `tools/python_harness/` |
-| Go Runner | Direct Go execution via registry | `tests/equivalence/go_runner.go` |
-| Comparison Logic | Semantic diff with type handling | `tests/equivalence/compare.go` |
-| Test Suites | Table-driven equivalence tests | `tests/equivalence/*_equiv_test.go` |
+| Component        | Purpose                           | Location                            |
+| ---------------- | --------------------------------- | ----------------------------------- |
+| Python Harness   | Subprocess wrapper calling Python | `tools/python_harness/`             |
+| Go Runner        | Direct Go execution via registry  | `tests/equivalence/go_runner.go`    |
+| Comparison Logic | Semantic diff with type handling  | `tests/equivalence/compare.go`      |
+| Test Suites      | Table-driven equivalence tests    | `tests/equivalence/*_equiv_test.go` |
 
 **Complete workflow:** See [references/workflow.md](references/workflow.md)
 
@@ -65,6 +65,7 @@ Use this skill when:
 **Purpose**: Subprocess wrapper that calls original Python implementation
 
 **Interface**:
+
 ```python
 # CLI: python harness.py <type> <name> [args]
 # Returns: {"success": bool, "capability_type": str, "capability_name": str,
@@ -72,6 +73,7 @@ Use this skill when:
 ```
 
 **Runners**:
+
 - `generator_runner.py` - Runs Python generators
 - `detector_runner.py` - Runs Python detectors
 - `probe_runner.py` - Runs Python probes
@@ -83,6 +85,7 @@ Use this skill when:
 **Purpose**: Direct execution of Go implementations via registry
 
 **Interface**:
+
 ```go
 func RunGoGenerator(ctx context.Context, name, prompt string, generations int) (*GeneratorResult, error)
 func RunGoDetector(ctx context.Context, name string, attemptInput AttemptInput) (*DetectorResult, error)
@@ -98,6 +101,7 @@ func RunGoProbe(ctx context.Context, name string, generatorName string) (*ProbeR
 **Purpose**: Semantic diff with proper type handling
 
 **Key Functions**:
+
 ```go
 func CompareGeneratorOutputs(goResult, pyResult *GeneratorResult) ComparisonResult
 func CompareDetectorScores(goResult, pyResult *DetectorResult) ComparisonResult
@@ -105,6 +109,7 @@ func CompareProbePrompts(goResult, pyResult *ProbeResult) ComparisonResult
 ```
 
 **Type Handling**:
+
 - **Floats**: Epsilon comparison (1e-9 tolerance) for detector scores
 - **Strings**: Exact match for generator outputs
 - **Arrays**: Element-by-element comparison with order preservation
@@ -117,6 +122,7 @@ func CompareProbePrompts(goResult, pyResult *ProbeResult) ComparisonResult
 ### 4. macOS arm64 Fix
 
 **Problem**: Go may run under Rosetta (x86_64) while Python packages are arm64, causing:
+
 ```
 dlopen(.../_regex.cpython-312-darwin.so, 0x0002):
 mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')
@@ -149,6 +155,7 @@ if useArch {
 4. **Add tests** - pytest test suite (30-40 tests)
 
 **Output**:
+
 ```
 tools/python_harness/
 ├── harness.py          # CLI entry point
@@ -176,6 +183,7 @@ tools/python_harness/
 3. **Assert equivalence** - Use `require.True(t, result.Equivalent)`
 
 **Example**:
+
 ```go
 func TestGeneratorEquivalence(t *testing.T) {
     harness, _ := NewPythonHarness()
@@ -219,12 +227,14 @@ func TestGeneratorEquivalence(t *testing.T) {
 ### ❌ Don't Assume Go is Correct
 
 **Wrong**:
+
 ```go
 // Test fails showing Python returns "any.AnyOutput"
 // Developer thinks: "Python must be wrong, Go is simpler"
 ```
 
 **Right**:
+
 ```go
 // Test fails showing Python returns "any.AnyOutput"
 // Update Go to match: GetPrimaryDetector() { return "any.AnyOutput" }
@@ -235,6 +245,7 @@ func TestGeneratorEquivalence(t *testing.T) {
 ### ❌ Don't Skip Float Epsilon
 
 **Wrong**:
+
 ```go
 if goScore != pyScore {  // Exact comparison
     t.Errorf("Scores differ")
@@ -242,6 +253,7 @@ if goScore != pyScore {  // Exact comparison
 ```
 
 **Right**:
+
 ```go
 if math.Abs(goScore - pyScore) > 1e-9 {  // Epsilon tolerance
     t.Errorf("Scores differ beyond epsilon")
@@ -253,11 +265,13 @@ if math.Abs(goScore - pyScore) > 1e-9 {  // Epsilon tolerance
 ### ❌ Don't Hardcode Paths
 
 **Wrong**:
+
 ```go
 harnessPath := "/Users/you/project/tools/python_harness/harness.py"
 ```
 
 **Right**:
+
 ```go
 // Find harness.py relative to test file
 func FindHarnessPath() (string, error) {
@@ -272,12 +286,14 @@ func FindHarnessPath() (string, error) {
 ### ❌ Don't Ignore Architecture Issues on macOS
 
 **Wrong**:
+
 ```go
 // Just call python3 directly
 cmd := exec.Command("python3", "harness.py", args...)
 ```
 
 **Right**:
+
 ```go
 // Detect arm64 and wrap if needed
 if isArm64Hardware() {
@@ -292,6 +308,7 @@ if isArm64Hardware() {
 ### Issue: "mach-o file, but is an incompatible architecture"
 
 **Symptom**:
+
 ```
 dlopen(.../_regex.cpython-312-darwin.so, 0x0002):
 have 'arm64', need 'x86_64'
@@ -316,6 +333,7 @@ have 'arm64', need 'x86_64'
 **Cause**: Python subprocess overhead
 
 **Fix**:
+
 - Run tests in parallel: `go test -parallel 8`
 - Use test caching: `go test -count=1` only when needed
 - Group similar tests to reduce subprocess spawns
@@ -331,6 +349,7 @@ have 'arm64', need 'x86_64'
 ## Reference Implementation
 
 **Venator Project** (garak → Go port):
+
 - Python harness: `venator/tools/python_harness/`
 - Go runner: `venator/tests/equivalence/go_runner.go`
 - Comparison: `venator/tests/equivalence/compare.go`

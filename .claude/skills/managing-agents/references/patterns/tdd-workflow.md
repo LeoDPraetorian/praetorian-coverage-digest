@@ -2,7 +2,7 @@
 
 **Single source of truth for Test-Driven Development in agent creation/updates.**
 
-Referenced by: `creating-agents`, `updating-agents`, `testing-agent-skills`
+Referenced by: `creating-agents`, `updating-agents`, `verifying-agent-skill-invocation`
 
 ---
 

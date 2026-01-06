@@ -64,10 +64,10 @@ Task(
 FEATURE: {feature-name}
 
 DESIGN:
-{content from .claude/features/{id}/design.md}
+{content from .claude/.output/features/{id}/design.md}
 
 PLAN:
-{content from .claude/features/{id}/plan.md}
+{content from .claude/.output/features/{id}/plan.md}
 
 INSTRUCTIONS:
 1. Invoke `brainstorming` skill to explore alternatives
@@ -83,7 +83,7 @@ Document your architectural decisions focusing on:
 5. Reusable components identified
 6. Implementation tasks breakdown
 
-Save to: .claude/features/{id}/architecture.md
+Save to: .claude/.output/features/{id}/architecture.md
 
 Return JSON:
 {
@@ -103,10 +103,10 @@ Task(
 FEATURE: {feature-name}
 
 DESIGN:
-{content from .claude/features/{id}/design.md}
+{content from .claude/.output/features/{id}/design.md}
 
 PLAN:
-{content from .claude/features/{id}/plan.md}
+{content from .claude/.output/features/{id}/plan.md}
 
 FOCUS AREAS:
 1. Authentication/authorization requirements
@@ -125,7 +125,7 @@ Document your security assessment focusing on:
 5. Data handling requirements
 6. Security test requirements
 
-Save to: .claude/features/{id}/security-assessment.md
+Save to: .claude/.output/features/{id}/security-assessment.md
 
 Return JSON:
 {
@@ -211,8 +211,8 @@ Combine outputs from all agents:
 {from security-lead}
 ```
 
-Save merged architecture to: `.claude/features/{id}/architecture.md`
-Save security assessment to: `.claude/features/{id}/security-assessment.md`
+Save merged architecture to: `.claude/.output/features/{id}/architecture.md`
+Save security assessment to: `.claude/.output/features/{id}/security-assessment.md`
 
 ### Step 5: Human Checkpoint (MANDATORY)
 
@@ -257,8 +257,8 @@ If any agent returns `status: "blocked"`:
       "status": "complete",
       "agents_used": ["frontend-lead", "security-lead"],
       "outputs": {
-        "architecture": ".claude/features/{id}/architecture.md",
-        "security": ".claude/features/{id}/security-assessment.md"
+        "architecture": ".claude/.output/features/{id}/architecture.md",
+        "security": ".claude/.output/features/{id}/security-assessment.md"
       },
       "human_approved": true,
       "completed_at": "2025-12-28T11:30:00Z"
@@ -309,9 +309,9 @@ Task(subagent_type: "security-lead", description: "Security assessment...", ...)
 
 **Outputs:**
 
-- `.claude/features/{id}/architecture.md` (frontend decisions)
-- `.claude/features/{id}/backend-architecture.md` (backend decisions)
-- `.claude/features/{id}/security-assessment.md` (security requirements)
+- `.claude/.output/features/{id}/architecture.md` (frontend decisions)
+- `.claude/.output/features/{id}/backend-architecture.md` (backend decisions)
+- `.claude/.output/features/{id}/security-assessment.md` (security requirements)
 
 **Total agents for full-stack**: 3 (frontend-lead + backend-lead + security-lead)
 

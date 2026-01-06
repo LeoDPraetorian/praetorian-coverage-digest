@@ -1,0 +1,88 @@
+# Changelog
+
+All notable changes to avoiding-barrel-files will be documented in this file.
+
+## [Initial Creation] - 2026-01-01
+
+### Added
+
+- **RED Phase Documentation:**
+  - Gap: Barrel files (index.ts with export *) break tree-shaking and inflate bundle sizes by 400KB+
+  - Failure: Developers create barrel files for "clean imports" without knowing they prevent tree-shaking
+  - Impact: Production bundles include unused code, slower page loads, increased hosting costs
+
+- **Skill Metadata:**
+  - Location: Library (`.claude/skill-library/development/frontend/`)
+  - Category: `development/frontend` (frontend patterns and optimization)
+  - Type: Process/Pattern (import organization methodology)
+
+- **Core Patterns:**
+  - Direct Imports (0% overhead, always recommended)
+  - Granular package.json exports (for npm packages)
+  - sideEffects flag (enables aggressive tree-shaking)
+  - Type-only barrel imports (acceptable for types)
+
+- **Quick Reference Table:**
+  - 4 patterns with bundle impact and applicability
+  - Direct imports: Always use for application code
+  - Package exports: Libraries with multiple entry points
+  - sideEffects: false: npm packages
+
+- **Anti-Pattern Documentation:**
+  - What barrel files are (index.ts re-exports)
+  - Why they break tree-shaking (bundlers load everything)
+  - Real example: 5KB button → 400KB with barrel
+
+- **Solutions:**
+  - Direct imports from source files
+  - Granular package.json exports configuration
+  - sideEffects flag usage
+
+- **When Barrels Are Acceptable:**
+  - Application code (you own the graph)
+  - Type-only exports
+  - Internal packages
+
+- **Detection Commands:**
+  - find . -name 'index.ts' -exec grep -l 'export \*' {} \;
+  - grep -r "export \*" src/components/
+
+- **Bundle Size Impact:**
+  - Component library: 82% reduction (485KB → 85KB)
+  - Utility package: 90% reduction (120KB → 12KB)
+  - React application: 17% reduction (2.4MB → 2.0MB)
+
+- **Progressive Disclosure Structure:**
+  - SKILL.md: 278 lines (safe zone)
+  - References planned for detailed configuration
+  - Examples directory for case studies
+
+### References Created (Placeholders)
+
+- `package-exports.md` - package.json configuration
+- `side-effects.md` - sideEffects flag usage
+- `refactoring-barrels.md` - Step-by-step refactoring guide
+- `vite-rollup-config.md` - Bundler configuration
+- `component-library-refactor.md` - Real case study
+
+### Related Skills
+
+- `optimizing-react-performance` (LIBRARY) - General bundle optimization
+- `using-eslint` (LIBRARY) - Lint rules for imports
+- `frontend-architecture` (LIBRARY) - Module organization
+
+### External References
+
+- Burn the Barrel (uglow.medium.com)
+- A Practical Guide Against Barrel Files (dev.to/thepassle)
+- Next.js Bundle Size Improvements (catchmetrics.io)
+
+### Final Status
+
+- ✅ RED phase documented (gap proven)
+- ✅ Skill structure created
+- ✅ Line count: 278 lines (safe zone)
+- ✅ Formatted with prettier
+- ⏳ Reference files (to be populated)
+- ⏳ Gateway update (pending)
+- ⏳ Audit (pending)

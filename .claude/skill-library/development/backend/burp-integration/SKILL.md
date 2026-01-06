@@ -1,10 +1,12 @@
 ---
 name: burp-integration
-description: Integrates Chariot with Burp Suite DAST via GraphQL API. Use when implementing Burp scan workflows, processing scan results, or managing site provisioning.
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+description: Use when integrating Chariot with Burp Suite DAST via GraphQL API - implementing scan workflows, processing results, managing site provisioning, or debugging Burp API integration issues.
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 ---
 
 # Burp DAST Integration
+
+> **MANDATORY**: You MUST use TodoWrite before starting to track all steps when implementing Burp integration workflows (site provisioning, scan execution, result processing).
 
 ## When to Use This Skill
 
@@ -243,6 +245,10 @@ result, err := graphql.Graphql[ResponseType](
 
 **Never** build queries with string interpolation - always use GraphQL variables.
 
+**For generic GraphQL patterns** (batch queries, pagination, rate limiting) applicable to other APIs (GitHub, GitLab, Azure DevOps), see **building-graphql-batch-clients** skill.
+
+`burp-integration` is Burp-specific. The new skill extracts generic patterns useful for SCM/CI-CD API clients.
+
 ### 4. API Definition Handling
 
 For web services (API endpoints), use API definitions instead of start URLs:
@@ -309,6 +315,14 @@ result, err := client.ParseAPIDefinitionFromURL(ctx, url)
 ```
 
 ## Related Skills
+
+### GraphQL Patterns
+
+- **[building-graphql-batch-clients](./../building-graphql-batch-clients/SKILL.md)** - Generic GraphQL client patterns (batch queries, pagination, rate limiting)
+
+**Note:** `burp-integration` uses GraphQL extensively. For generic GraphQL patterns applicable to GitHub/GitLab/Azure APIs, see the `building-graphql-batch-clients` skill.
+
+### Concurrency & Testing
 
 - **[go-errgroup-concurrency](./../go-errgroup-concurrency/SKILL.md)** - Parallel scan processing
 - **[aws-cognito](./../aws-cognito/SKILL.md)** - Credential management patterns

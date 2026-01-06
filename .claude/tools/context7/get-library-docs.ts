@@ -4,6 +4,7 @@
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client';
 import { validateNoPathTraversal, validateNoCommandInjection, validateNoXSS, validateNoControlChars } from '../config/lib/sanitize';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 /**
  * Schema Discovery Results (2 test cases: react code mode, react info mode):
@@ -155,7 +156,7 @@ export const getLibraryDocs = {
       mode: validated.mode || 'code',
       topic: validated.topic,
       page: validated.page || 1,
-      estimatedTokens: Math.ceil(rawData.length / 4),
+      estimatedTokens: estimateTokens(rawData),
     };
 
     return OutputSchema.parse(filtered);

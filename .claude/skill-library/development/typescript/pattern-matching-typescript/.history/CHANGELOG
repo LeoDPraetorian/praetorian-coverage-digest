@@ -1,0 +1,69 @@
+# Changelog: pattern-matching-typescript
+
+## 2026-01-01 - Initial Creation
+
+**Type:** Library/Framework skill
+**Category:** development/typescript
+**Location:** .claude/skill-library/development/typescript/pattern-matching-typescript
+
+### RED Phase Documentation
+
+**Gap identified:**
+Modern TypeScript development uses discriminated unions for complex state management (API responses, job states, integration results). Traditional approach (discriminated unions + switch statements) has critical weaknesses:
+
+1. No compile-time exhaustiveness checking - missing cases become runtime bugs
+2. Verbose syntax with repetitive property access and type narrowing
+3. Poor ergonomics for deeply nested conditionals
+
+The ts-pattern library (8.8k GitHub stars) solves this with:
+- Compile-time exhaustiveness via `.exhaustive()`
+- Better ergonomics with pattern matching
+- Type-safe destructuring and guards
+
+**Current Claude behavior without skill:**
+- Recommends traditional switch statements for discriminated unions
+- Doesn't know about ts-pattern library (training data staleness)
+- Misses opportunities for exhaustiveness checking
+- Shows generic examples instead of Chariot patterns
+
+**Test scenario:**
+Developer asks: "How should I handle TanStack Query states (loading/error/success/idle) in my React component with type safety?"
+
+Without skill: Claude recommends discriminated union + switch, missing ts-pattern entirely, no exhaustiveness checking.
+
+With skill: Claude teaches ts-pattern with `.exhaustive()`, shows Chariot-specific TanStack Query patterns, demonstrates compile-time safety.
+
+### Structure Created
+
+**SKILL.md:** 477 lines (under 500-line limit)
+
+**Sections:**
+1. When to Use (decision criteria)
+2. Quick Reference table
+3. Installation & Setup
+4. The Problem (verbose switch)
+5. Basic Pattern Matching (with/exhaustive/destructuring)
+6. Advanced Patterns (nested/guards/select - delegated to references/)
+7. Chariot Patterns (TanStack Query, jobs, integrations, assets - delegated to references/)
+8. vs Discriminated Unions (comparison table)
+9. Integration Patterns (React/API/error handling)
+10. Performance Considerations
+11. Anti-patterns
+
+**References:**
+- `references/advanced-patterns.md` - Guards, select, nested patterns, optional, wildcard, arrays
+- `references/chariot-patterns.md` - Real Chariot examples: TanStack Query, job execution, integrations, asset rendering
+
+### Research Sources
+
+1. ts-pattern GitHub repository and documentation
+2. TypeScript 2025 best practices articles
+3. Chariot codebase patterns (TanStack Query usage, job states, integration responses)
+4. ts-pattern vs discriminated union comparisons
+
+### Next Steps
+
+- Phase 6: Research and populate content via researching-skills
+- Phase 7: Update gateway-frontend (TypeScript skill → frontend gateway)
+- Phase 8: GREEN verification and audit
+- Phase 9: REFACTOR pressure testing

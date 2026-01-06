@@ -105,6 +105,16 @@ Methods needed?
 └─ 6+  → Split ❌
 ```
 
+**For comprehensive interface design guidance**, see:
+
+- **designing-go-interfaces** - Dave Cheney principles, interface{} vs generics, small interfaces
+
+**Key principle from that skill:** "Accept interfaces, return structs" - Capability libraries should:
+
+- ✅ Accept minimal interfaces as parameters (allows any implementation)
+- ✅ Return concrete struct types (allows future expansion)
+- ❌ Avoid requiring callers to implement large interfaces
+
 **Details**: [Interface Design](references/interface-design.md)
 
 ## Registry Pattern
@@ -146,6 +156,8 @@ func init() {
 ## HTTP Client Standards
 
 **Core Principle**: Use stdlib `net/http` with thin wrapper + functional options. NO external HTTP libraries.
+
+**For generic interface design principles**, see **designing-go-interfaces** skill (covers "accept interfaces, return structs" in depth).
 
 ### The Pattern
 
@@ -264,6 +276,50 @@ func (c *APICapability) Execute(ctx context.Context, target string) (*Result, er
 1. **Fat interfaces** - Split into composed small interfaces
 2. **Interface in implementation package** - Define consumer-side
 3. **Directories for organization** - Use files if not a real package
+
+### Mistake 4: Fat Interfaces
+
+**Problem:** Requiring capabilities to implement 10+ method interfaces
+
+**From designing-go-interfaces skill:**
+
+- Prefer 1-3 methods (ideal)
+- 5 methods maximum
+- Split large interfaces into composable small ones
+
+**Example - WRONG:**
+
+```go
+type Capability interface {
+    Name() string
+    Execute() error
+    Validate() error
+    Setup() error
+    Cleanup() error
+    Timeout() int
+    Accepts() bool
+    // ... 20 more methods
+}
+```
+
+**Example - CORRECT:**
+
+```go
+type Capability interface {
+    Name() string
+    Execute() error
+}
+
+type Validator interface {
+    Validate() error
+}
+
+type SetupCleaner interface {
+    Setup() error
+    Cleanup() error
+}
+// Compose as needed
+```
 
 **Details**: [Common Mistakes](references/common-mistakes.md)
 

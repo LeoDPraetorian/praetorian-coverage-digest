@@ -1,0 +1,159 @@
+# Changelog - implementing-go-semaphore-pools
+
+## 2026-01-01 - Initial Creation
+
+**Type:** Process/Pattern (methodology)
+**Category:** Library (development/backend)
+**Created by:** Claude (via /skill-manager create)
+
+**RED Phase - Gap Identified:**
+
+Without this skill, Claude lacks guidance on:
+- When to use semaphore.NewWeighted vs errgroup.SetLimit vs worker pools
+- Optimal pattern combining errgroup + semaphore for bounded concurrency
+- Performance characteristics (2.4x speedup, 20-40% less memory)
+- Tuning guidelines for CPU-bound (NumCPU) vs I/O-bound (10-100) workloads
+- Production patterns from TruffleHog, Nuclei, Trivy
+
+**Problem:** Go developers implementing concurrent systems struggle with:
+- Unbounded goroutine creation causing OOM
+- Rate limit violations when calling external APIs
+- Choosing between built-in errgroup.SetLimit and semaphore patterns
+- Weighted semaphores for variable-cost tasks
+
+**Content Source:**
+
+Core patterns from research document:
+- `.claude/research/2026-01-01-go-scanner-architecture-patterns/github.md`
+- golang.org/x/sync/semaphore API documentation
+- Encore.dev Advanced Concurrency patterns
+- Performance benchmarks (sequential vs errgroup vs worker pools)
+
+Production validation:
+- TruffleHog (24K stars): Multi-stage worker pools with multipliers
+- Nuclei (26K stars): Rate limiting at 150 req/sec
+- Trivy (30K stars): pkg/parallel/parallel.go bounded concurrency
+
+**Progressive Disclosure:**
+
+SKILL.md (435 lines - within 500 limit):
+- Quick decision matrix (6 scenarios)
+- Core semaphore API patterns
+- 3 implementation patterns (errgroup+semaphore, SetLimit, worker pool)
+- Tuning guidelines (CPU/I/O/network)
+- Performance benchmark summary
+- Production examples (TruffleHog, Nuclei, Trivy)
+- Common pitfalls (defer release, acquire placement)
+- Testing strategies
+- Quick reference table
+
+References/ (to be populated):
+- weighted-semaphore-patterns.md - Variable-cost task scheduling
+- worker-pool-patterns.md - High-throughput worker implementations
+- rate-limiting-patterns.md - Combining rate limiter + semaphore
+- benchmark-analysis.md - Detailed performance data
+- production-case-studies.md - Deep dives into TruffleHog/Nuclei/Trivy
+- common-pitfalls.md - Expanded pitfall catalog
+- testing-patterns.md - Concurrent behavior testing
+
+**Complements Existing Skill:**
+
+This skill complements `go-errgroup-concurrency` by adding:
+- Bounded concurrency control (semaphore patterns)
+- Rate limiting for external APIs
+- Worker pool implementations
+- Performance tuning guidelines
+
+**Next Steps:**
+
+- GREEN Phase: Populate references/ with detailed content
+- Gateway: Update gateway-backend routing table
+- Audit: Run compliance validation
+
+---
+
+## 2026-01-02 - Reference Files Backfill (GREEN Phase Complete)
+
+**Type:** Content Update
+**Category:** Library (development/backend)
+**Updated by:** Claude (via /skill-manager update)
+
+**GREEN Phase - Implementation Complete:**
+
+Populated all 7 reference files with production-validated content extracted from research:
+
+**Files Updated:**
+
+1. **worker-pool-patterns.md** (321 lines)
+   - Trivy generic Pipeline[T,U] implementation from pkg/parallel/pipeline.go
+   - TruffleHog multi-stage worker pools with stage-specific multipliers (4x/1x/10x)
+   - Work stealing pool pattern for load balancing
+   - Default worker count analysis (5-25 workers across production tools)
+   - Comparison: Worker pool vs errgroup.SetLimit (Go 1.20+)
+
+2. **weighted-semaphore-patterns.md** (362 lines)
+   - Trivy semaphore wrapper with default sizing (5 workers)
+   - Basic semaphore patterns with acquire/release
+   - Combining errgroup + semaphore for bounded parallelism
+   - Weighted semaphore for variable-cost tasks (memory/CPU/network)
+   - Nuclei dual-layer control (rate limiter + semaphore)
+   - Common mistakes (missing defer, wrong release weight)
+
+3. **rate-limiting-patterns.md** (377 lines)
+   - Nuclei rate limiting at 150 req/sec default (-rl flag)
+   - Token bucket implementation with golang.org/x/time/rate
+   - Multi-token rate limiting for GitHub API (6 PATs example)
+   - Adaptive rate adjustment algorithms (TCP-like congestion control)
+   - Performance overhead measurements (<1 microsecond)
+
+4. **benchmark-analysis.md** (128 lines)
+   - Performance comparison: Sequential vs errgroup vs worker pool
+   - 2.4x speedup with worker pools (46,867 ns/op vs 111,483 ns/op)
+   - Memory reduction: 20-40% with bounded concurrency
+   - Production throughput data:
+     - TruffleHog: 40K+ items/hour
+     - Nuclei: 540K requests/hour
+     - Trivy: 100-300 containers/minute
+
+5. **production-case-studies.md** (177 lines)
+   - TruffleHog (24K ⭐): Multi-stage pipeline architecture
+   - Nuclei (26K ⭐): Rate limiter + semaphore dual control
+   - Trivy (30K ⭐): Reusable parallel utility abstraction
+   - Performance summary table with worker counts and throughput
+
+6. **common-pitfalls.md** (255 lines)
+   - 10 anti-patterns with real code examples
+   - Unbounded goroutines (Uber Go Style Guide validation)
+   - Missing semaphore release with defer patterns
+   - Goroutine leaks from blocked sends
+   - Context cancellation ignorance
+   - etcd FAQ principle: "More isn't always better" (bounded concurrency)
+
+7. **testing-patterns.md** (260 lines)
+   - Race detection with -race flag examples
+   - Timeout patterns for concurrent tests
+   - Goroutine leak detection (goleak library patterns)
+   - Table-driven concurrent tests
+   - Stress testing for 1000+ iterations
+   - Context cancellation testing
+
+**Content Source:**
+
+All content extracted from existing research documents:
+- `.claude/research/2026-01-01-202322-production-go-streaming-scanners/SYNTHESIS.md`
+- `.claude/research/2026-01-01-go-scanner-architecture-patterns/SYNTHESIS.md`
+- `.claude/research/2026-01-01-go-scanner-architecture-patterns/github.md`
+- `.claude/research/2026-01-01-go-scanner-architecture-patterns/web.md`
+
+**Quality Validation:**
+
+✅ All quality gates met:
+- No TODO comments remaining (all removed)
+- Real code examples from production tools (not hypothetical)
+- Citations to research sources (inline and explicit)
+- 128-377 lines per file (exceeds 50-line minimum)
+- 252K combined GitHub stars referenced (Trivy, Nuclei, TruffleHog, Prometheus, Jaeger, etcd, MinIO)
+
+**Total Content:** 1,880 lines of production-validated patterns across 7 reference files
+
+**Status:** GREEN phase complete. Skill ready for use with comprehensive reference documentation.

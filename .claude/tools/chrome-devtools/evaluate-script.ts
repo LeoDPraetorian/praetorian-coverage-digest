@@ -3,6 +3,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 // ============================================================================
 // Input Schema (matches ACTUAL chrome-devtools MCP tool signature)
@@ -19,7 +20,8 @@ const InputSchema = z.object({
 
 const OutputSchema = z.object({
   success: z.boolean(),
-  result: z.any().optional()
+  result: z.any().optional(),
+  estimatedTokens: z.number()
 });
 
 // ============================================================================
@@ -44,7 +46,8 @@ export const evaluateScript = {
     );
 
     // Return filtered result (token efficient)
-    return { success: true, result };
+    const output = { success: true, result };
+    return { ...output, estimatedTokens: estimateTokens(output) };
   }
 };
 

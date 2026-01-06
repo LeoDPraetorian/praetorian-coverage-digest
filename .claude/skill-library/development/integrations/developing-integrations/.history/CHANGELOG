@@ -1,0 +1,84 @@
+# Changelog
+
+## [2026-01-04-2] - Augmentation with Validated Code Examples
+
+### Added
+
+- **CheckAffiliation Patterns** (references/checkaffiliation-patterns.md) - Wiz real implementation from wiz/wiz.go:717-783 (THE ONLY working example), stub pattern analysis
+- **Pagination Patterns** (references/pagination-patterns.md) - 4 validated patterns with complete code:
+  - Token-Based: Okta (okta/okta.go:154-201)
+  - Page-Based: GitHub (github/github.go:132-174)
+  - Cursor-Based: Xpanse (xpanse/xpanse.go:459-488)
+  - SDK-Based: DigitalOcean (digitalocean/digitalocean.go:202-226)
+- **errgroup Patterns** (references/errgroup-patterns.md) - 4 concurrency patterns with file:line references:
+  - Standard: Xpanse (xpanse/xpanse.go:388-433)
+  - Shared State: CrowdStrike (crowdstrike/crowdstrike.go:162-232)
+  - Loop Variable Capture: Microsoft Defender (microsoft-defender.go:229-274)
+  - Continue-on-Error: Cloudflare WAF (cloudflare-waf.go:130-160)
+- **Tabularium Mapping** (references/tabularium-mapping.md) - Model decision tree with examples:
+  - NewAsset: Nessus, Cloudflare
+  - NewAWSResource: Amazon (amazon/amazon.go:261-267)
+  - NewAzureResource: Azure (azure/azure.go:204-213)
+  - NewGCPResource: GCP (gcp/gcp.go:149-157)
+  - NewRisk: Invicti (invicti/invicti.go:158-210)
+- **ValidateCredentials Patterns** (references/validatecredentials-patterns.md) - 6 authentication patterns:
+  - API Call + Status Code: GitHub (github/github.go:73-107)
+  - Multiple Permission Tests: Cloudflare (cloudflare/cloudflare.go:62-94)
+  - OAuth2 Flow: Wiz (wiz/wiz.go:140-205)
+  - User + Namespace: GitLab (gitlab.go:106-142)
+  - JWT Client Assertion: Okta (okta/okta.go:97-137)
+  - HMAC Signature: Xpanse (xpanse/xpanse.go:108-166)
+- **Test Patterns** (references/test-patterns.md) - Production test strategies:
+  - Table-Driven Tests: seed-import_test.go (488 lines)
+  - Mock HTTP Server: pingone_test.go (463 lines)
+  - Mock Collector: xpanse_mock_test.go (324 lines)
+  - Race Detection patterns
+
+### Changed
+
+- Updated main SKILL.md to reference new validated patterns
+- Reorganized References section into categories: Requirements & Compliance, Implementation Patterns, Frontend & Testing
+- Step 5 now highlights validated code examples with file:line references
+
+### Metadata Update
+
+- **Line Count**: 301 lines (well under 500 line limit)
+- **New Reference Files**: 6 files (~60KB of validated production code examples)
+- **Source Integrations**: 12+ production integrations analyzed for patterns
+- **Code References**: All examples include file:line citations for verification
+
+## [2026-01-04] - Initial Creation
+
+### Added
+
+- Initial skill creation via `creating-skills` workflow
+- Complete development workflow for Chariot backend integrations
+- Mandatory requirements documentation (P0 blocking: VMFilter, CheckAffiliation, ValidateCredentials, errgroup safety, error handling, pagination safety)
+- Pre-PR checklist with 12 verification items
+- Anti-pattern warnings (6 common mistakes)
+- Frontend integration requirements (UI card, enum, logos)
+- Violation examples from existing integrations (42 integrations audited)
+- Progressive disclosure structure with references/ directory
+
+### RED Phase Documentation
+
+**Gap**: Developers creating Chariot integrations lack systematic guidance on mandatory requirements, leading to widespread compliance violations:
+
+- VMFilter: 4 integrations missing (DigitalOcean, GitHub, GitLab, Cloudflare)
+- CheckAffiliation: 41 of 42 integrations have stub implementations (only Wiz correct)
+- ValidateCredentials: DigitalOcean skips validation entirely
+- errgroup race conditions: Found in wiz.go:314, github.go:154, tenable-vm.go, insightvm_import.go:92, nessus_import.go:92
+- Ignored errors: 11 instances in wiz, okta, xpanse, tenable_vm
+- Infinite pagination risk: MS Defender, EntraID, CrowdStrike Spotlight, Xpanse, InsightVM, GitLab
+
+**Test Scenario**: Developer asks "Help me create a new Chariot integration for Shodan API"
+
+**Expected Failure (without skill)**: Claude creates integration without VMFilter, stub CheckAffiliation, skips ValidateCredentials, uses errgroup without SetLimit, misses pagination safety, forgets frontend UI.
+
+### Metadata
+
+- **Category**: development/integrations (library)
+- **Skill Type**: Process/Pattern
+- **Line Count**: 281 lines (target: <500)
+- **Location**: .claude/skill-library/development/integrations/developing-integrations/
+- **Routes To**: integration-chariot-patterns (detailed implementation examples)

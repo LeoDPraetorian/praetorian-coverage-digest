@@ -1,0 +1,297 @@
+# Changelog - orchestrating-capability-development
+
+## [2026-01-04] Initial Creation
+
+### RED Phase Documentation
+
+**Gap Identified**: No unified orchestration skill for security capability development. The `/capability` command needs a backing orchestration skill that coordinates the full workflow from architecture through testing.
+
+**Test Scenario**: User says "create a new VQL capability to detect exposed S3 buckets"
+
+**Expected Failure Without Skill**:
+1. No standardized workflow for VQL, Nuclei, Janus, Fingerprintx, Scanner integrations
+2. Manual coordination of 4-6 specialized agents required
+3. Missing human checkpoints at critical phases
+4. No capability-type-specific routing or quality checks
+5. No structured output directory for capability artifacts
+
+**Evidence of Need**:
+- `/capability` command exists but has no backing orchestration skill
+- `orchestrating-fingerprintx-development` exists but only handles one capability type
+- Multiple capability types (VQL, Nuclei, Janus, Fingerprintx, Scanner) need unified workflow
+- Specialized agents exist (capability-lead, capability-developer, capability-reviewer, capability-tester) but lack coordination
+
+### Skill Metadata
+
+- **Location**: Core Skills (.claude/skills/)
+- **Category**: N/A (core skill)
+- **Skill Type**: Process/Pattern (orchestration workflow)
+- **Line Count**: 303 lines (target: <500)
+
+### Rationale for Core Location
+
+1. High-frequency usage via `/capability` command
+2. Cross-domain orchestration (coordinates multiple agent types)
+3. Follows pattern of other orchestration skills in core (orchestrating-feature-development, orchestrating-multi-agent-workflows, orchestrating-research)
+
+### Phase Tracking
+
+- [x] Phase 0: Navigate to repository root
+- [x] Phase 1: RED - Document gap and prove need
+- [x] Phase 2: Validate skill name and check existence
+- [x] Phase 3: Determine location (core)
+- [x] Phase 4: Determine skill type (process/pattern)
+- [x] Phase 5: Generate skill structure and SKILL.md
+- [x] Phase 6: Research and populate content
+  - Created comprehensive reference files for all 6 phases
+  - Capability types comparison matrix
+  - Quality standards by type
+  - Agent handoffs format
+  - Troubleshooting guide
+- [x] Phase 7: Update gateway (N/A - core skill)
+- [x] Phase 8: GREEN - Skill structure and description verified
+- [ ] Phase 9: REFACTOR - Pressure test (requires user validation)
+
+### Reference Files Created
+
+- phase-1-brainstorming.md (5,037 bytes)
+- phase-2-discovery.md (7,448 bytes)
+- phase-3-architecture.md (7,202 bytes)
+- phase-4-implementation.md (7,808 bytes)
+- phase-5-review.md (8,530 bytes)
+- phase-6-testing.md (8,369 bytes)
+- capability-types.md (9,886 bytes)
+- quality-standards.md (8,228 bytes)
+- agent-handoffs.md (10,212 bytes)
+- troubleshooting.md (9,343 bytes)
+
+**Total Reference Content**: ~82KB of comprehensive documentation
+
+### GREEN Phase Verification
+
+✅ SKILL.md: 303 lines (under 500-line limit)
+✅ Description format: Third-person, starts with "Use when", <120 chars
+✅ Progressive disclosure: Core workflow in SKILL.md, details in references/
+✅ Reference files: 10 comprehensive reference files created
+✅ Tables formatted: All markdown tables formatted with prettier
+✅ Capability-specific: Tailored for 5 capability types (VQL, Nuclei, Janus, Fingerprintx, Scanner)
+
+### Skill Complete
+
+The skill is now ready for Phase 9 (REFACTOR - pressure testing) which requires user-driven validation scenarios.
+
+**Status**: Complete and ready for use
+**Next Step**: User should invoke skill to test real capability development workflow
+
+## [2026-01-05] Rationalization Prevention Update
+
+### RED Phase Documentation
+
+**Gap Identified**: The orchestrating-capability-development skill lacks explicit rationalization prevention mechanisms to prevent agents from skipping critical quality steps during capability development workflows.
+
+**Test Scenario**: Agent executing capability development workflow rationalizes "Detection works in my test" and skips comprehensive testing, or rationalizes "Architecture is straightforward" and skips architecture review.
+
+**Expected Failure Without Update**:
+1. No warning phrases documented for capability development rationalizations
+2. Missing gate checklists at human checkpoints (Phases 1, 3)
+3. Missing gate checklists at review/testing phases (Phases 5, 6)
+4. No exit criteria defining completion requirements
+5. No domain-specific rationalization table
+
+### Changes Applied
+
+1. **Added Rationalization Prevention Section** (after Key Principles)
+   - References shared rationalization prevention patterns
+   - Links to domain-specific rationalization table
+   - Provides key principle: Stop if rationalization detected
+
+2. **Created references/rationalization-table.md**
+   - Phase-specific rationalizations (Phases 1-6)
+   - Capability-type specific rationalizations (VQL, Nuclei, Janus, Fingerprintx, Scanner)
+   - Cross-phase rationalizations
+   - Total: 28 rationalization patterns documented
+
+3. **Added Gate Checklists to Workflow Diagram**
+   - Phase 1 (Brainstorming): 4-item checklist
+   - Phase 3 (Architecture): 5-item checklist
+   - Phase 5 (Review): 4-item checklist
+   - Phase 6 (Testing): 6-item checklist
+
+4. **Added Exit Criteria Section**
+   - All 6 phases complete in metadata.json
+   - All gate checklists passed
+   - Quality metrics populated
+   - No rationalization phrases in execution
+   - Override protocol compliance
+   - Human approval
+
+### GREEN Phase Verification
+
+✅ Line count: 351 lines (added 47 lines, under 500-line limit)
+✅ Rationalization Prevention section: Added at line 302
+✅ Exit Criteria section: Added at line 317
+✅ Gate checklists: Added to Phases 1, 3, 5, 6 in workflow diagram
+✅ Reference file: rationalization-table.md created (5,934 bytes)
+✅ All links verified: rationalization-prevention.md exists in using-skills/references/
+✅ Compliance audit: Passed (minor description length warning acceptable for orchestration scope)
+
+### Skill Metadata Update
+
+- **Line Count**: 351 lines (was 304, added 47)
+- **Reference Files**: 11 files (added rationalization-table.md)
+- **Backup Created**: .local/SKILL.md.backup-20260105-HHMMSS
+
+**Status**: Update complete and verified
+**Impact**: Agents now have explicit rationalization detection and prevention for capability development workflows
+
+## [2026-01-06] Skill Composition Patterns Update
+
+### RED Phase Documentation
+
+**Gap Identified**: The orchestrating-capability-development skill lacks explicit skill composition patterns from obra/superpowers methodology. Without inline directives, prompt templates, and structured integration documentation, orchestrators cannot reliably ensure sub-skills are invoked and agent prompts are consistent.
+
+**Test Scenario**: Orchestrator executing capability development workflow needs to understand which skills are required vs conditional when reading the workflow → Currently unclear which skills MUST be invoked vs which are optional.
+
+**Expected Failure Without Update**:
+1. No REQUIRED SUB-SKILL directives in workflow diagram
+2. No PROMPT TEMPLATE directives showing where templates are located
+3. No structured Integration section documenting skill dependencies
+4. No prompt templates directory for agent dispatch consistency
+5. Missing blocked status handling with blocked_reason routing
+
+### Changes Applied
+
+1. **Added REQUIRED SUB-SKILLS Table** (after "Workflow Overview" header)
+   - Summary table showing required and conditional skills by phase
+   - All phases: persisting-agent-outputs, orchestrating-multi-agent-workflows
+   - Phase 1: brainstorming
+   - Phases 3-6: Conditional skills (developing-with-subagents, persisting-progress-across-sessions, dispatching-parallel-agents)
+
+2. **Added Inline Directives to Workflow Diagram**
+   - Phase 0: REQUIRED SUB-SKILL for persisting-agent-outputs and orchestrating-multi-agent-workflows
+   - Phase 1: REQUIRED SUB-SKILL for brainstorming
+   - Phase 2: PROMPT TEMPLATE directive + CONDITIONAL SUB-SKILL for dispatching-parallel-agents
+   - Phase 3: PROMPT TEMPLATE directive for architect
+   - Phase 4: PROMPT TEMPLATE directive + REQUIRED (in prompt) for developing-with-tdd and verifying-before-completion
+   - Phase 5: PROMPT TEMPLATE directive for reviewer
+   - Phase 6: PROMPT TEMPLATE directives for test-lead and tester + REQUIRED (in tester prompt) for developing-with-tdd
+
+3. **Replaced "Related Skills" with Integration Section**
+   - Called By: /capability command, direct skill invocation
+   - Requires: persisting-agent-outputs (Phase 0), orchestrating-multi-agent-workflows (when blocked)
+   - Calls: brainstorming (Phase 1), discovering-reusable-code (Phase 2)
+   - Conditional: developing-with-subagents, persisting-progress-across-sessions, dispatching-parallel-agents
+   - Agent Skills: developing-with-tdd, verifying-before-completion, adhering-to-dry, adhering-to-yagni
+   - Prompt Templates: 6 templates in references/prompts/
+   - Alternative Workflows: orchestrating-fingerprintx-development, orchestrating-feature-development
+
+4. **Created references/prompts/ Directory with 6 Templates**
+   - explore-prompt.md (3,136 bytes) - Phase 2 Explore agent
+   - architect-prompt.md (3,621 bytes) - Phase 3 capability-lead
+   - developer-prompt.md (4,215 bytes) - Phase 4 capability-developer
+   - reviewer-prompt.md (4,292 bytes) - Phase 5 capability-reviewer
+   - test-lead-prompt.md (6,319 bytes) - Phase 6 Steps 1 and 3
+   - tester-prompt.md (4,847 bytes) - Phase 6 Step 2
+
+   Each template includes:
+   - Usage example with Task tool
+   - Context placeholders (design.md, discovery.md, architecture.md)
+   - OUTPUT_DIRECTORY placeholder
+   - MANDATORY SKILLS list with reasons
+   - Structured output format (JSON metadata)
+   - Blocked status handling with blocked_reason
+
+### GREEN Phase Verification
+
+✅ Line count: 428 lines (added 77 lines, under 500-line limit)
+✅ REQUIRED SUB-SKILLS table: Added at line 70
+✅ Inline directives: Added to all 7 phases (0-6) in workflow diagram
+✅ Integration section: Replaced Related Skills section at line 332
+✅ Prompt templates: 6 templates created in references/prompts/
+✅ All templates follow consistent structure with blocked status handling
+✅ Template references match workflow diagram directives
+✅ Backup created: .local/SKILL.md.backup-20260106-062811
+
+### Skill Metadata Update
+
+- **Line Count**: 428 lines (was 351, added 77)
+- **Reference Files**: 17 files (added 6 prompt templates)
+- **Total Reference Content**: ~108KB (was ~88KB, added ~20KB of templates)
+
+### Reference Implementation
+
+Based on orchestrating-feature-development skill:
+- SKILL.md lines 70-180: REQUIRED SUB-SKILLS table and inline directives
+- SKILL.md lines 415-491: Integration section structure
+- references/prompts/*.md: 6 template files
+
+### Why These Changes
+
+1. **REQUIRED SUB-SKILL directives** - Explicit inline markers ensure skills are invoked (no inference needed)
+2. **Integration section** - Documents dependencies for Phase 28 audit compliance
+3. **Prompt templates** - Orchestrator controls subagent context, mandatory skills embedded in prompts
+4. **Blocked status handling** - Standardized blocked_reason routing via orchestrating-multi-agent-workflows
+
+**Status**: Update complete and verified
+**Impact**: Orchestrators now have explicit composition patterns, traceable workflows, and consistent agent prompting
+
+## [2026-01-06] Explicit Spawns Section Update
+
+### Changes Applied
+
+Added explicit "Spawns (agent-dispatch via Task tool)" section to Integration:
+
+| Agent | Phase | Mandatory Skills in Prompt |
+|-------|-------|---------------------------|
+| `Explore` | Phase 2 | discovering-reusable-code, persisting-agent-outputs |
+| `capability-lead` | Phase 3 | adhering-to-dry, adhering-to-yagni, persisting-agent-outputs |
+| `capability-developer` | Phase 4 | developing-with-tdd, verifying-before-completion, persisting-agent-outputs |
+| `capability-reviewer` | Phase 5 | adhering-to-dry, adhering-to-yagni, persisting-agent-outputs |
+| `test-lead` | Phase 6.1, 6.3 | persisting-agent-outputs |
+| `capability-tester` | Phase 6.2 | developing-with-tdd, persisting-agent-outputs |
+
+### Why This Change
+
+Previously the Integration section only had "Calls (during execution)" which conflated:
+- Skills invoked via Skill tool (like brainstorming)
+- Agents spawned via Task tool (like capability-developer)
+
+Now explicit:
+- **Calls** = skill-invocation via Skill tool
+- **Spawns** = agent-dispatch via Task tool with mandatory skills in prompt
+
+### Compliance
+
+- **Line Count**: 438/500 lines
+- Consistent with orchestrating-fingerprintx-development pattern
+
+**Status**: Update complete
+
+## [2026-01-06] Python-to-Go Porting Workflow Integration
+
+### Changes Applied
+
+1. **Added Phase 1.5: Work Type Decision Point**
+   - After brainstorming, determine if porting Python or greenfield development
+   - If porting: invoke `porting-python-capabilities-to-go` (coordinates 3 sub-skills)
+   - If greenfield: skip to Phase 2
+
+2. **Updated REQUIRED SUB-SKILLS Table**
+   - Added Phase 1.5 conditional: `porting-python-capabilities-to-go` (if porting Python)
+
+3. **Added Integration Section: Conditional (based on work type)**
+   - `porting-python-capabilities-to-go` - Trigger: Porting Python to Go (Phase 1.5)
+   - Coordinates: mapping-python-dependencies → translating-python-idioms-to-go → verifying-port-equivalent
+
+### Why This Pattern
+
+Following superpowers principle: when multiple skills must be called in order, create a wrapper skill that encapsulates the sequence rather than inlining the order in the orchestrator.
+
+**Precedent**: orchestrating-fingerprintx-development calls `researching-version-markers` (an 8-phase skill) rather than inlining those phases.
+
+### Compliance
+
+- **Line Count**: 469/500 lines
+- Decision point follows fingerprintx open-source pattern
+
+**Status**: Update complete

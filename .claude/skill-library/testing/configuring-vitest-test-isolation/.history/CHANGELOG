@@ -1,0 +1,51 @@
+# Changelog
+
+## 2026-01-03 - Initial Creation
+
+**Type:** Process/Pattern skill
+**Category:** testing (library)
+**Location:** `.claude/skill-library/testing/configuring-vitest-test-isolation/`
+
+### RED Phase Documentation
+
+**Problem Identified:**
+Unit tests accidentally spawn real child processes (MCP servers, Go backends, etc.) causing tests to hang for 30+ minutes, blocking CI/CD pipelines.
+
+**Root Causes:**
+1. Integration tests incorrectly named as `*.test.ts` instead of `*.integration.test.ts`
+2. No global setupFiles safety guard to catch unmocked process spawns
+3. No Vitest projects config to separate unit vs integration test runs
+
+**Failure Behavior:**
+Without this skill, testing agents (mcp-tool-tester, backend-tester, frontend-tester) write tests that spawn real processes, causing expensive hangs and CI failures.
+
+**Why Skill Needed:**
+Testing agents lack guidance on:
+- File naming conventions that prevent accidental process spawning
+- Vitest projects configuration for test isolation
+- Global safety guards that fail fast when unmocked spawns occur
+- Defense-in-depth mocking strategies
+
+### Initial Content
+
+**Structure:**
+- File naming convention (MANDATORY section)
+- Core configuration (vitest.config.ts + vitest.setup.ts)
+- MCP-specific configuration
+- Per-test mocking patterns
+- Anti-patterns table
+- Validation checklist
+- Troubleshooting guide
+
+**Line Count:** 279 lines (under 500 limit)
+
+**References Prepared:**
+- references/ directory created (content to be populated via research)
+- examples/ directory created (examples to be created)
+
+### Next Steps
+
+- Phase 6: Research and populate reference content
+- Phase 7: Update gateway-testing or gateway-testing2
+- Phase 8: GREEN verification (test skill works)
+- Phase 9: REFACTOR pressure testing

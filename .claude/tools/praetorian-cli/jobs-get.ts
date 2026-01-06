@@ -4,6 +4,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const InputSchema = z.object({
   key: z.string().min(1).startsWith('#job#')
@@ -17,7 +18,7 @@ const FilteredOutputSchema = z.object({
   config: z.record(z.any()).optional(),
   created: z.string().optional(),
   updated: z.string().optional(),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 }).nullable();
 
 export const jobsGet = {
@@ -33,15 +34,19 @@ export const jobsGet = {
       return null;
     }
 
-    return FilteredOutputSchema.parse({
+    const filtered = {
       key: rawResult.key,
       status: rawResult.status,
       dns: rawResult.dns,
       capabilities: rawResult.capabilities,
       config: rawResult.config,
       created: rawResult.created,
-      updated: rawResult.updated,
-      estimated_tokens: 180
+      updated: rawResult.updated
+    };
+
+    return FilteredOutputSchema.parse({
+      ...filtered,
+      estimatedTokens: estimateTokens(filtered)
     });
   }
 };

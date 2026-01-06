@@ -22,31 +22,35 @@ Enable granular agent access control for perplexity operations.
 ## Available Tools (Auto-discovered: 4 wrappers)
 
 ### perplexity_ask
+
 - **Purpose:** MCP wrapper for perplexity_ask
 - **Import:** `import { perplexity_ask } from '$ROOT/.claude/tools/perplexity/perplexity_ask.ts'`
 - **Token cost:** ~unknown tokens
 
 ### perplexity_reason
+
 - **Purpose:** MCP wrapper for perplexity_reason
 - **Import:** `import { perplexity_reason } from '$ROOT/.claude/tools/perplexity/perplexity_reason.ts'`
 - **Token cost:** ~unknown tokens
 
 ### perplexity_research
+
 - **Purpose:** MCP wrapper for perplexity_research
 - **Import:** `import { perplexity_research } from '$ROOT/.claude/tools/perplexity/perplexity_research.ts'`
 - **Token cost:** ~unknown tokens
 
 ### perplexity_search
+
 - **Purpose:** MCP wrapper for perplexity_search
 - **Import:** `import { perplexity_search } from '$ROOT/.claude/tools/perplexity/perplexity_search.ts'`
 - **Token cost:** ~unknown tokens
-
 
 ## Quick Examples
 
 See mcp-tools-registry for complete Bash + tsx execution patterns.
 
 **Inline execution:**
+
 ```bash
 # Note: 2>/dev/null suppresses MCP debug logs
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {

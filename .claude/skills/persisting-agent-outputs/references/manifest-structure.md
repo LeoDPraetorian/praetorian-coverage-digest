@@ -39,32 +39,32 @@ artifacts:
 
 ### Top-Level Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `feature_name` | string | Yes | Human-readable feature name |
-| `feature_slug` | string | Yes | Kebab-case identifier matching directory |
-| `created_at` | ISO 8601 | Yes | Timestamp of directory creation |
-| `created_by` | string | Yes | Name of agent that created directory |
-| `description` | multiline string | Yes | Detailed feature description (used for semantic matching) |
-| `status` | enum | Yes | One of: `in-progress`, `complete`, `blocked` |
-| `agents_contributed` | array | Yes | List of agents and their artifacts (chronological) |
-| `artifacts` | array | Yes | List of all output files |
+| Field                | Type             | Required | Description                                               |
+| -------------------- | ---------------- | -------- | --------------------------------------------------------- |
+| `feature_name`       | string           | Yes      | Human-readable feature name                               |
+| `feature_slug`       | string           | Yes      | Kebab-case identifier matching directory                  |
+| `created_at`         | ISO 8601         | Yes      | Timestamp of directory creation                           |
+| `created_by`         | string           | Yes      | Name of agent that created directory                      |
+| `description`        | multiline string | Yes      | Detailed feature description (used for semantic matching) |
+| `status`             | enum             | Yes      | One of: `in-progress`, `complete`, `blocked`              |
+| `agents_contributed` | array            | Yes      | List of agents and their artifacts (chronological)        |
+| `artifacts`          | array            | Yes      | List of all output files                                  |
 
 ### agents_contributed Entry
 
 ```yaml
-- agent: "frontend-lead"              # Agent name (from agent definition)
-  artifact: "frontend-lead-*.md"      # Filename of output
-  timestamp: "2025-12-30T14:30:22Z"   # When agent completed work
-  status: "complete"                  # complete | in-progress | blocked
+- agent: "frontend-lead" # Agent name (from agent definition)
+  artifact: "frontend-lead-*.md" # Filename of output
+  timestamp: "2025-12-30T14:30:22Z" # When agent completed work
+  status: "complete" # complete | in-progress | blocked
 ```
 
 ### artifacts Entry
 
 ```yaml
-- path: "frontend-lead-architecture-review.md"  # Relative filename
-  type: "architecture-review"                    # Output type
-  agent: "frontend-lead"                         # Who created it
+- path: "frontend-lead-architecture-review.md" # Relative filename
+  type: "architecture-review" # Output type
+  agent: "frontend-lead" # Who created it
 ```
 
 ## Update Protocol
@@ -79,11 +79,11 @@ artifacts:
 
 ## Status Values
 
-| Status | Meaning |
-|--------|---------|
-| `in-progress` | Feature work is ongoing |
-| `complete` | All agents finished, feature ready |
-| `blocked` | Work stopped, requires intervention |
+| Status        | Meaning                             |
+| ------------- | ----------------------------------- |
+| `in-progress` | Feature work is ongoing             |
+| `complete`    | All agents finished, feature ready  |
+| `blocked`     | Work stopped, requires intervention |
 
 ## Examples by Scenario
 

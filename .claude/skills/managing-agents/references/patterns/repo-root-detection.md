@@ -2,7 +2,7 @@
 
 **Every agent operation MUST start by navigating to super-repo root.**
 
-Referenced by: All agent-management skills (`updating-agents`, `creating-agents`, `auditing-agents`, `fixing-agents`, `renaming-agents`, `finding-skills-for-agents`, `testing-agent-skills`, `listing-agents`, `searching-agents`)
+Referenced by: All agent-management skills (`updating-agents`, `creating-agents`, `auditing-agents`, `fixing-agents`, `renaming-agents`, `finding-skills-for-agents`, `verifying-agent-skill-invocation`, `listing-agents`, `searching-agents`)
 
 ---
 
@@ -173,13 +173,13 @@ find .claude/agents -name "foo.md"
 
 ## Quick Reference
 
-| Component                      | Command                                                                                          |
-| ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| Component                      | Command                                                                                             |
+| ------------------------------ | --------------------------------------------------------------------------------------------------- |
 | **Navigate to root (Step 0)**  | `ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel \| head -1)" && cd "$ROOT"` |
-| Get repo root (detection only) | `ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel \| head -1)"`              |
-| Agents directory               | `$ROOT/.claude/agents`                                                                           |
-| Skill library                  | `$ROOT/.claude/skill-library`                                                                    |
-| Core skills                    | `$ROOT/.claude/skills`                                                                           |
+| Get repo root (detection only) | `ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel \| head -1)"`               |
+| Agents directory               | `$ROOT/.claude/agents`                                                                              |
+| Skill library                  | `$ROOT/.claude/skill-library`                                                                       |
+| Core skills                    | `$ROOT/.claude/skills`                                                                              |
 
 ---
 

@@ -52,7 +52,7 @@ You're creating a gateway if:
 
 **WHY**: Template workflow ensures:
 
-- Complete structure (Understanding section, IMPORTANT block, two-tier table)
+- Complete structure (EXTREMELY-IMPORTANT block, Progressive Disclosure, Intent Detection, Skill Registry)
 - Current anti-patterns (your manual version WILL be outdated)
 - Gateway audit compliance (phases 17-20 validate template structure)
 - Domain-specific details in descriptions
@@ -89,8 +89,9 @@ This enables Claude Code's Skill tool to invoke them, which then route to librar
 **Create directory**:
 
 ```bash
-mkdir -p .claude/skills/gateway-{domain}/references
-mkdir -p .claude/skills/gateway-{domain}/examples
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+mkdir -p "$ROOT/.claude/skills/gateway-{domain}/references"
+mkdir -p "$ROOT/.claude/skills/gateway-{domain}/examples"
 ```
 
 ### Phase 3: Category (Skip Entirely)
@@ -190,30 +191,33 @@ You can also leave this empty and use the syncing-gateways workflow later to aut
 
 1. Frontmatter
    - `name: gateway-{domain}`
-   - `description: Use when developing {domain} applications - access {categories}.`
+   - `description: Routes {domain} tasks to library skills. Intent detection + progressive loading.`
    - `allowed-tools: Read`
 
-2. Understanding This Gateway
-   - How you got here (Skill tool invocation)
-   - What this gateway provides (routing table)
-   - How to load library skills (Read tool)
+2. EXTREMELY-IMPORTANT Block
+   - 1% Rule (NON-NEGOTIABLE) - invoke skill if any chance it applies
+   - Skill Announcement (MANDATORY) - announce before using
 
-3. Critical: Two-Tier Skill System
-   - Table showing Core vs Library tiers
-   - IMPORTANT block with anti-patterns
+3. Progressive Disclosure
+   - 3-tier loading explanation (Level 1/2/3)
+   - Token estimate for routing tables
 
-4. How to Use This Gateway
-   - 4-step workflow for finding and loading skills
+4. Intent Detection
+   - Table: Task Intent | Route To
+   - Keyword-based routing patterns
 
-5. Routing Table: Library Skills
+5. Routing Algorithm
+   - 5-step numbered process for skill loading
+
+6. Skill Registry
    - Categorized sections (from Q2)
-   - Skills with full paths (from Q3 or empty)
+   - Table: Skill | Path | Triggers (from Q3 or empty)
 
-6. Quick Lookup by Task (optional)
-   - Task-based index
+7. Cross-Gateway Routing
+   - Table: If Task Involves | Also Invoke
 
-7. Related Gateways
-   - Links to other gateway skills
+8. Loading Skills
+   - Path convention and Read tool example
 
 **Write generated content**:
 
@@ -227,7 +231,8 @@ Write {
 ### Phase 7: Create Initial Changelog
 
 ```bash
-mkdir -p .claude/skills/gateway-{domain}/.history
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+mkdir -p "$ROOT/.claude/skills/gateway-{domain}/.history"
 ```
 
 **Entry**:
@@ -252,9 +257,8 @@ mkdir -p .claude/skills/gateway-{domain}/.history
 
 Run the standard audit:
 
-```bash
-cd .claude
-npm run audit -- gateway-{domain}
+```markdown
+Audit gateway-{domain} to verify compliance with all 28 phase requirements.
 ```
 
 **Must pass phases 1-21** (all structural validation phases).
@@ -263,20 +267,18 @@ npm run audit -- gateway-{domain}
 
 **Run gateway audit** (includes gateway-specific phases 17-20):
 
-```bash
-ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$ROOT/.claude" && npm run audit -- gateway-{domain}
+```markdown
+Audit gateway-{domain} to verify compliance with all 28 phase requirements, including gateway-specific phases 20-23.
 ```
 
 **Gateway validation phases**:
 
-| Phase  | Validates            | Failure Criteria                                                                      |
-| ------ | -------------------- | ------------------------------------------------------------------------------------- |
-| **17** | Gateway Structure    | Missing "Understanding This Gateway", missing IMPORTANT block, missing two-tier table |
-| **18** | Routing Table Format | Using skill names instead of full paths, abbreviated paths                            |
-| **19** | Path Resolution      | Referenced paths don't exist in library                                               |
-| **20** | Coverage Check       | Library skills missing from appropriate gateways                                      |
+| Phase  | Validates            | Failure Criteria                                                                            |
+| ------ | -------------------- | ------------------------------------------------------------------------------------------- |
+| **17** | Gateway Structure    | Missing EXTREMELY-IMPORTANT block, missing Progressive Disclosure, missing Intent Detection |
+| **18** | Routing Table Format | Using skill names instead of full paths, missing Triggers column, abbreviated paths         |
+| **19** | Path Resolution      | Referenced paths don't exist in library                                                     |
+| **20** | Coverage Check       | Library skills missing from appropriate gateways                                            |
 
 **All phases must pass** before proceeding.
 
@@ -306,7 +308,7 @@ If any skill path fails to load, return to Phase 6 and fix the paths.
 
 **Standard pressure testing applies** to gateway creation.
 
-Use `testing-skills-with-subagents` skill with gateway-specific scenarios:
+Use `pressure-testing-skill-content` skill with gateway-specific scenarios:
 
 **Pressure test scenarios**:
 
@@ -316,10 +318,10 @@ Use `testing-skills-with-subagents` skill with gateway-specific scenarios:
 
 **Gateway must enforce**:
 
-- Complete template structure (Understanding section, IMPORTANT block, two-tier table)
-- Full paths in routing table (not abbreviated)
+- Complete template structure (EXTREMELY-IMPORTANT block, Progressive Disclosure, Intent Detection, Skill Registry)
+- Full paths in Skill Registry table with Triggers column
 - Path validation (all paths exist)
-- Proper categorization
+- Intent-based routing (not role-based)
 
 ---
 
@@ -419,23 +421,24 @@ Gateways with empty routing tables are confusing. Either:
 
 ```markdown
 ❌ WRONG:
-| Skill | Path |
-|-------|------|
-| Frontend TanStack | `frontend-tanstack/SKILL.md` |
+| Skill | Path | Triggers |
+|-------|------|----------|
+| Frontend TanStack | `frontend-tanstack/SKILL.md` | TanStack |
 
 ✅ CORRECT:
-| Skill | Path |
-|-------|------|
-| Frontend TanStack | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md` |
+| Skill | Path | Triggers |
+|-------|------|----------|
+| Frontend TanStack | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md` | TanStack, cache, fetch |
 ```
 
 ### ❌ Don't Skip Gateway Structure
 
-The "Understanding This Gateway" section and IMPORTANT block are mandatory. They teach agents:
+The EXTREMELY-IMPORTANT block and Progressive Disclosure section are mandatory. They teach agents:
 
-- How the two-tier system works
+- The 1% Rule for skill invocation
+- How the 3-tier progressive loading works
 - Why they can't use Skill tool for library skills
-- Correct patterns for loading library skills
+- Intent-based routing patterns
 
 ### ❌ Don't Create Gateways for Single Skills
 
@@ -508,12 +511,14 @@ Before completing gateway creation:
 - [ ] Name matches `gateway-{domain}` pattern
 - [ ] Location is Core (`.claude/skills/`)
 - [ ] SKILL.md has complete gateway structure
-- [ ] "Understanding This Gateway" section present
-- [ ] IMPORTANT block with anti-patterns present
-- [ ] Two-tier system table present
-- [ ] Routing table uses full paths (not abbreviated)
-- [ ] All paths in routing table exist
-- [ ] All 22 phases pass audit
+- [ ] EXTREMELY-IMPORTANT block with 1% Rule and Skill Announcement present
+- [ ] Progressive Disclosure section with 3-tier explanation present
+- [ ] Intent Detection table (Task Intent | Route To) present
+- [ ] Routing Algorithm (numbered steps) present
+- [ ] Skill Registry tables use full paths with Triggers column
+- [ ] Cross-Gateway Routing table present
+- [ ] All paths in Skill Registry exist
+- [ ] All audit phases pass
 - [ ] Changelog entry created
 - [ ] Manual load test successful
 - [ ] REFACTOR phase completed

@@ -55,9 +55,12 @@ Use this skill when:
 
 Each gateway contains:
 
-1. **Two-tier explanation** - How core/library routing works
-2. **Routing table** - Maps skill names to full paths
-3. **Usage instructions** - How agents access library skills
+1. **EXTREMELY-IMPORTANT block** - 1% Rule and Skill Announcement mandates
+2. **Progressive Disclosure** - 3-tier loading explanation
+3. **Intent Detection** - Task Intent → Route To mapping
+4. **Skill Registry** - Tables with Skill | Path | Triggers
+5. **Cross-Gateway Routing** - Domain handoff table
+6. **Loading Skills** - Path convention and Read tool example
 
 ---
 
@@ -77,12 +80,12 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 ---
 
-**Routing table format:**
+**Skill Registry format:**
 
 ```markdown
-| Skill          | Path                                                                                |
-| -------------- | ----------------------------------------------------------------------------------- |
-| TanStack Query | `.claude/skill-library/development/frontend/state/frontend-tanstack-query/SKILL.md` |
+| Skill          | Path                                                                                | Triggers               |
+| -------------- | ----------------------------------------------------------------------------------- | ---------------------- |
+| TanStack Query | `.claude/skill-library/development/frontend/state/frontend-tanstack-query/SKILL.md` | TanStack, cache, fetch |
 ```
 
 ### What Can Go Stale
@@ -161,9 +164,10 @@ npm run -w @chariot/auditing-skills gateway -- sync
 **Critical rules enforced by CLI:**
 
 - Preserves gateway header and explanation sections
-- Only modifies routing table rows
+- Only modifies Skill Registry table rows
 - Uses full paths (`.claude/skill-library/...`) not skill names
-- Sorts routing table alphabetically by skill name
+- Includes Triggers column with keywords
+- Sorts Skill Registry alphabetically by skill name
 - Never removes skills if path exists (only removes broken paths)
 
 ### 3. Gateway-Specific Sync

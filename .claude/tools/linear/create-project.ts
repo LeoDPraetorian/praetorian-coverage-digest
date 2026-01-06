@@ -1,12 +1,12 @@
 /**
- * create_project - Linear MCP Wrapper
+ * create_project - Linear GraphQL Wrapper
  *
- * Create a new project in Linear via MCP server
+ * Create a new project in Linear via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~500 tokens (creation response)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -31,7 +31,7 @@
  *   - url: string - Linear URL for the project
  *
  * Edge cases discovered:
- * - MCP returns { success: true, project: {...} } on success
+ * - Uses projectCreate mutation with standard Linear project fields
  * - Team must exist or error is thrown
  * - Lead can be "me" to assign current user
  *
@@ -54,12 +54,31 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL mutation for creating a project
+ */
+const CREATE_PROJECT_MUTATION = `
+  mutation ProjectCreate($input: ProjectCreateInput!) {
+    projectCreate(input: $input) {
+      success
+      project {
+        id
+        name
+        url
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -131,13 +150,28 @@ export const createProjectOutput = z.object({
     id: z.string(),
     name: z.string(),
     url: z.string()
-  })
+  }),
+  estimatedTokens: z.number()
 });
 
 export type CreateProjectOutput = z.infer<typeof createProjectOutput>;
 
 /**
- * Create a new project in Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface ProjectCreateResponse {
+  projectCreate: {
+    success: boolean;
+    project?: {
+      id: string;
+      name: string;
+      url: string;
+    };
+  };
+}
+
+/**
+ * Create a new project in Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -166,29 +200,90 @@ export const createProject = {
   description: 'Create a new project in Linear',
   parameters: createProjectParams,
 
-  async execute(input: CreateProjectInput): Promise<CreateProjectOutput> {
+  async execute(
+    input: CreateProjectInput,
+    testToken?: string
+  ): Promise<CreateProjectOutput> {
     // Validate input
     const validated = createProjectParams.parse(input);
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'create_project',
-      validated
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Build GraphQL input
+    const mutationInput: {
+      name: string;
+      description?: string;
+      summary?: string;
+      teamId: string;
+      leadId?: string;
+      stateId?: string;
+      startDate?: string;
+      targetDate?: string;
+      priority?: number;
+      labelIds?: string[];
+    } = {
+      name: validated.name,
+      teamId: validated.team,
+    };
+
+    if (validated.description) {
+      mutationInput.description = validated.description;
+    }
+    if (validated.summary) {
+      mutationInput.summary = validated.summary;
+    }
+    if (validated.lead) {
+      mutationInput.leadId = validated.lead;
+    }
+    if (validated.state) {
+      mutationInput.stateId = validated.state;
+    }
+    if (validated.startDate) {
+      mutationInput.startDate = validated.startDate;
+    }
+    if (validated.targetDate) {
+      mutationInput.targetDate = validated.targetDate;
+    }
+    if (validated.priority !== undefined) {
+      mutationInput.priority = validated.priority;
+    }
+    if (validated.labels) {
+      mutationInput.labelIds = validated.labels;
+    }
+
+    // Execute GraphQL mutation
+    const response = await executeGraphQL<ProjectCreateResponse>(
+      client,
+      CREATE_PROJECT_MUTATION,
+      { input: mutationInput }
     );
 
-    if (!rawData?.success) {
+    if (!response.projectCreate?.success || !response.projectCreate?.project) {
       throw new Error('Failed to create project');
     }
 
     // Filter to essential fields
-    const filtered = {
-      success: rawData.success,
+    const baseData = {
+      success: response.projectCreate.success,
       project: {
-        id: rawData.project?.id,
-        name: rawData.project?.name,
-        url: rawData.project?.url
+        id: response.projectCreate.project.id,
+        name: response.projectCreate.project.name,
+        url: response.projectCreate.project.url
       }
+    };
+
+
+
+    const filtered = {
+
+
+      ...baseData,
+
+
+      estimatedTokens: estimateTokens(baseData)
+
+
     };
 
     // Validate output

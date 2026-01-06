@@ -10,24 +10,27 @@
 arxiv:YYMM.NNNNN
 ```
 
-| Component | Meaning | Example |
-| --------- | ------- | ------- |
-| YY | Year (2 digits) | 24 = 2024 |
-| MM | Month (2 digits) | 01 = January |
-| NNNNN | Paper ID (5 digits) | 12345 |
+| Component | Meaning             | Example      |
+| --------- | ------------------- | ------------ |
+| YY        | Year (2 digits)     | 24 = 2024    |
+| MM        | Month (2 digits)    | 01 = January |
+| NNNNN     | Paper ID (5 digits) | 12345        |
 
 **Examples:**
+
 - `arxiv:2401.12345` - Paper from January 2024
 - `arxiv:2312.09876` - Paper from December 2023
 
 ### URL Format
 
 **Abstract page:**
+
 ```
 https://arxiv.org/abs/YYMM.NNNNN
 ```
 
 **PDF:**
+
 ```
 https://arxiv.org/pdf/YYMM.NNNNN.pdf
 ```
@@ -43,11 +46,13 @@ As shown in arxiv:2401.12345, the technique achieves 95% accuracy.
 ```
 
 ✅ CORRECT:
+
 - `arxiv:2401.12345` - Machine-readable
 - Permanent identifier
 - Easy to grep: `rg "arxiv:\d+\.\d+"`
 
 ❌ INCORRECT:
+
 - `arXiv.org/2401.12345` - Wrong format
 - `the paper` - Not specific
 - No citation - Can't verify claim
@@ -61,11 +66,13 @@ See [Paper Title](https://arxiv.org/abs/2401.12345) for details.
 ```
 
 ✅ CORRECT:
+
 - Descriptive link text (title)
 - Direct arxiv URL
 - Markdown link format
 
 ❌ INCORRECT:
+
 - `[arxiv:2401.12345](URL)` - Use title, not ID
 - `[Click here](URL)` - Not descriptive
 - `URL` - Raw URL not formatted
@@ -78,6 +85,7 @@ See [Paper Title](https://arxiv.org/abs/2401.12345) for details.
 
 ```markdown
 **1. {Paper Title}**
+
 - **arxiv:** {arxiv-id} - [Link](https://arxiv.org/abs/{arxiv-id})
 - **Authors:** {authors}
 - **Date:** {publication-date}
@@ -90,6 +98,7 @@ See [Paper Title](https://arxiv.org/abs/2401.12345) for details.
 
 ```markdown
 **1. Attention Is All You Need**
+
 - **arxiv:** 1706.03762 - [Link](https://arxiv.org/abs/1706.03762)
 - **Authors:** Vaswani et al.
 - **Date:** June 2017
@@ -193,6 +202,7 @@ The {technique} approach, validated in arxiv:{id}, consists of:
 ## Papers Analyzed
 
 ### {Paper Title}
+
 - **arxiv:** {id} - [Link](URL)
 - **Authors:** {authors}
 - **Date:** {date}
@@ -300,6 +310,7 @@ done
 ### Mistake 1: Inconsistent Format
 
 ❌ INCORRECT:
+
 ```markdown
 - Paper 1: arXiv:2401.12345
 - Paper 2: arxiv 2402.67890
@@ -307,6 +318,7 @@ done
 ```
 
 ✅ CORRECT:
+
 ```markdown
 - arxiv:2401.12345
 - arxiv:2402.67890
@@ -316,11 +328,13 @@ done
 ### Mistake 2: Vague References
 
 ❌ INCORRECT:
+
 ```markdown
 Research shows this approach works well.
 ```
 
 ✅ CORRECT:
+
 ```markdown
 arxiv:2401.12345 demonstrates 95% accuracy on benchmark X.
 ```
@@ -328,11 +342,13 @@ arxiv:2401.12345 demonstrates 95% accuracy on benchmark X.
 ### Mistake 3: Broken Links
 
 ❌ INCORRECT:
+
 ```markdown
-[Paper](arxiv.org/abs/2401.12345)  # Missing https://
+[Paper](arxiv.org/abs/2401.12345) # Missing https://
 ```
 
 ✅ CORRECT:
+
 ```markdown
 [Paper](https://arxiv.org/abs/2401.12345)
 ```
@@ -340,11 +356,13 @@ arxiv:2401.12345 demonstrates 95% accuracy on benchmark X.
 ### Mistake 4: Outdated Citations
 
 ❌ INCORRECT:
+
 ```markdown
-Recent research (arxiv:1706.03762) shows...  # 2017 is not recent
+Recent research (arxiv:1706.03762) shows... # 2017 is not recent
 ```
 
 ✅ CORRECT:
+
 ```markdown
 Foundational work (arxiv:1706.03762) established...
 ```

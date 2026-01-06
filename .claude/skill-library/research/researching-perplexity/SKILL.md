@@ -151,7 +151,7 @@ $ROOT/.claude/bin/perplexity.ts reason "your problem here"
 
 ### Phase 5: Output Formatting
 
-Structure output to match `researching-skills` synthesis requirements.
+Structure output to match research orchestration synthesis requirements.
 
 **See:** [references/output-format.md](references/output-format.md) for complete template.
 
@@ -199,9 +199,26 @@ Structure output to match `researching-skills` synthesis requirements.
 - **Staleness**: Research as of {date} - may become outdated
 ```
 
-**Save to file** (for researching-skills router):
+**Output location depends on invocation mode:**
 
-When called from `researching-skills` router, output is saved to `perplexity.md` in the research directory. The router handles file creation in Phase 6.
+**Mode 1: Standalone (invoked directly)**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+TIMESTAMP=$(date +"%Y-%m-%d-%H%M%S")
+TOPIC="{semantic-topic-name}"
+mkdir -p "$ROOT/.claude/.output/research/${TIMESTAMP}-${TOPIC}-perplexity"
+# Write synthesis to: $ROOT/.claude/.output/research/${TIMESTAMP}-${TOPIC}-perplexity/SYNTHESIS.md
+```
+
+**Mode 2: Orchestrated (invoked by orchestrating-research)**
+
+When parent skill provides `OUTPUT_DIR`:
+
+- Write synthesis to: `${OUTPUT_DIR}/perplexity.md`
+- Do NOT create directory (parent already created it)
+
+**Detection logic:** If parent skill passed an output directory path, use Mode 2. Otherwise use Mode 1.
 
 ---
 
@@ -212,7 +229,7 @@ When called from `researching-skills` router, output is saved to `perplexity.md`
 3. **Citation Tracking** - Extract URLs from Perplexity response
 4. **AI Synthesis Note** - Always clarify content is AI-aggregated
 5. **Date Everything** - Research timestamps enable staleness tracking
-6. **Structured Output** - Compatible with researching-skills synthesis
+6. **Structured Output** - Compatible with research orchestration synthesis
 
 ## Common Scenarios
 
@@ -242,7 +259,7 @@ If Perplexity returns sparse results:
 
 ### Combining with Traditional Web Research
 
-User may select both "Perplexity" and "Web" from researching-skills router:
+User may select both "Perplexity" and "Web" from research orchestration:
 
 - Perplexity: Fast AI synthesis with citations
 - Web: Exhaustive manual search+fetch with validation
@@ -264,12 +281,12 @@ Router synthesizes both outputs. Each provides different perspective.
 
 ## Related Skills
 
-| Skill                    | Access Method                                                                            | Purpose                                   |
-| ------------------------ | ---------------------------------------------------------------------------------------- | ----------------------------------------- |
-| **researching-skills**   | `skill: "researching-skills"` (CORE)                                                     | Router orchestrating all research methods |
-| **researching-web**      | `Read(".claude/skill-library/research/researching-web/SKILL.md")` (LIBRARY)              | Traditional WebSearch + WebFetch          |
-| **researching-context7** | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)         | npm/library documentation                 |
-| **researching-github**   | `Read(".claude/skill-library/research/researching-github/SKILL.md")` (LIBRARY)           | Open-source repos, issues, discussions    |
-| **researching-arxiv**    | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)            | Academic papers                           |
-| **researching-codebase** | `Read(".claude/skill-library/research/researching-codebase/SKILL.md")` (LIBRARY)         | Local pattern discovery                   |
-| **mcp-tools-perplexity** | `Read(".claude/skill-library/claude/mcp-tools/mcp-tools-perplexity/SKILL.md")` (LIBRARY) | Perplexity MCP wrapper catalog            |
+| Skill                      | Access Method                                                                            | Purpose                                |
+| -------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------- |
+| **orchestrating-research** | `skill: "orchestrating-research"` (CORE)                                                 | Orchestrator for all research methods  |
+| **researching-web**        | `Read(".claude/skill-library/research/researching-web/SKILL.md")` (LIBRARY)              | Traditional WebSearch + WebFetch       |
+| **researching-context7**   | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)         | npm/library documentation              |
+| **researching-github**     | `Read(".claude/skill-library/research/researching-github/SKILL.md")` (LIBRARY)           | Open-source repos, issues, discussions |
+| **researching-arxiv**      | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)            | Academic papers                        |
+| **researching-codebase**   | `Read(".claude/skill-library/research/researching-codebase/SKILL.md")` (LIBRARY)         | Local pattern discovery                |
+| **mcp-tools-perplexity**   | `Read(".claude/skill-library/claude/mcp-tools/mcp-tools-perplexity/SKILL.md")` (LIBRARY) | Perplexity MCP wrapper catalog         |

@@ -5,12 +5,14 @@ Solves the "mach-o file, but is an incompatible architecture" error.
 ## Problem
 
 **Symptom**:
+
 ```
 dlopen(/Users/.../site-packages/regex/_regex.cpython-312-darwin.so, 0x0002):
 mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')
 ```
 
 **Cause**:
+
 - Go binary running under Rosetta (x86_64 emulation)
 - Python is universal binary (x86_64 + arm64)
 - Python defaults to x86_64 architecture
@@ -70,11 +72,13 @@ python3 -c "import regex; print('OK')"
 ## When to Apply
 
 Apply this fix on:
+
 - macOS with Apple Silicon (M1/M2/M3 processors)
 - When Go tests run but Python subprocess fails with architecture errors
 - When `file $(which python3)` shows "universal binary"
 
 Do NOT apply on:
+
 - Linux (no arm64/x86_64 mixing)
 - Windows (no `arch` command)
 - macOS Intel (all x86_64)

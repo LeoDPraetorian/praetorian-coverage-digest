@@ -1,12 +1,12 @@
 /**
- * list_issues - Linear MCP Wrapper
+ * list_issues - Linear GraphQL Wrapper
  *
- * List issues from Linear workspace with filters via MCP server
+ * List issues from Linear workspace with filters via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~1000 tokens (filtered response)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: 46,000 tokens at start
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -27,30 +27,94 @@
  * - identifier: string (optional)
  * - title: string (required)
  * - description: string | null (truncated to 200 chars)
- * - priority: object | null ⚠️ TYPE VARIANCE - object with {name: string, value: number}
+ * - priority: object | null - {name: string, value: number}
  * - state: object | null - {id, name, type}
  * - status: string | null
- * - assignee: string | null - appears as string (assignee name), NOT object
- * - assigneeId: string | null
+ * - assignee: string | null - assignee name (extracted from assignee object)
+ * - assigneeId: string | null - assignee ID (extracted from assignee object)
  * - url: string
  * - createdAt: string
  * - updatedAt: string
  *
  * Edge cases discovered:
- * - MCP returns array directly [issue1, issue2], NOT { issues: [...] }
+ * - GraphQL returns { issues: { nodes: [...] } }, NOT array directly
  * - priority is an OBJECT {name, value}, NOT a number
- * - assignee is a STRING (name only), NOT an object
+ * - assignee is an OBJECT, we extract name as string
  * - Empty results returns [], not null
  * - descriptions are truncated to 200 chars for token efficiency
+ *
+ * @example
+ * ```typescript
+ * // List my issues
+ * const myIssues = await listIssues.execute({ assignee: 'me' });
+ *
+ * // List issues in a team
+ * const teamIssues = await listIssues.execute({ team: 'Engineering' });
+ *
+ * // Search issues
+ * const searchResults = await listIssues.execute({ query: 'authentication' });
+ * ```
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL query for listing issues with filters
+ *
+ * Note: Linear's GraphQL API uses filter objects for filtering.
+ * We build the filter based on input parameters.
+ */
+const LIST_ISSUES_QUERY = `
+  query IssuesList(
+    $first: Int
+    $after: String
+    $filter: IssueFilter
+    $orderBy: PaginationOrderBy
+  ) {
+    issues(
+      first: $first
+      after: $after
+      filter: $filter
+      orderBy: $orderBy
+    ) {
+      nodes {
+        id
+        identifier
+        title
+        description
+        priority {
+          name: label
+          value: priority
+        }
+        state {
+          id
+          name
+          type
+        }
+        assignee {
+          id
+          name
+        }
+        url
+        createdAt
+        updatedAt
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -105,7 +169,7 @@ export type ListIssuesInput = z.infer<typeof listIssuesParams>;
  *
  * Schema aligned with get-issue.ts based on real API testing:
  * - priority: object {name, value}, NOT number
- * - assignee: string (name only), NOT object
+ * - assignee: string (name only), extracted from assignee object
  */
 export const listIssuesOutput = z.object({
   issues: z.array(z.object({
@@ -124,7 +188,7 @@ export const listIssuesOutput = z.object({
       type: z.string()
     }).optional(),
     status: z.string().optional(),
-    // Assignee is a STRING (name only), not an object - matches get-issue.ts
+    // Assignee is a STRING (name only), extracted from assignee object
     assignee: z.string().optional(),
     assigneeId: z.string().optional(),
     url: z.string().optional(),
@@ -132,13 +196,82 @@ export const listIssuesOutput = z.object({
     updatedAt: z.string().optional()
   })),
   totalIssues: z.number(),
-  nextOffset: z.string().optional()
+  nextOffset: z.string().optional(),
+  estimatedTokens: z.number()
 });
 
 export type ListIssuesOutput = z.infer<typeof listIssuesOutput>;
 
 /**
- * List issues from Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface IssuesListResponse {
+  issues: {
+    nodes: Array<{
+      id: string;
+      identifier?: string | null;
+      title: string;
+      description?: string | null;
+      priority?: {
+        name: string;
+        value: number;
+      } | null;
+      state?: {
+        id: string;
+        name: string;
+        type: string;
+      } | null;
+      assignee?: {
+        id: string;
+        name: string;
+      } | null;
+      url?: string;
+      createdAt?: string;
+      updatedAt?: string;
+    }>;
+    pageInfo: {
+      hasNextPage: boolean;
+      endCursor?: string | null;
+    };
+  } | null;
+}
+
+/**
+ * Build GraphQL filter object from input parameters
+ */
+function buildIssueFilter(input: ListIssuesInput): Record<string, any> | undefined {
+  const filter: Record<string, any> = {};
+
+  if (input.assignee) {
+    filter.assignee = { name: { eq: input.assignee } };
+  }
+  if (input.team) {
+    filter.team = { name: { eq: input.team } };
+  }
+  if (input.state) {
+    filter.state = { name: { eq: input.state } };
+  }
+  if (input.project) {
+    filter.project = { name: { eq: input.project } };
+  }
+  if (input.label) {
+    filter.labels = { some: { name: { eq: input.label } } };
+  }
+  if (input.query) {
+    filter.or = [
+      { title: { contains: input.query } },
+      { description: { contains: input.query } }
+    ];
+  }
+  if (input.includeArchived !== undefined && !input.includeArchived) {
+    filter.archived = { eq: false };
+  }
+
+  return Object.keys(filter).length > 0 ? filter : undefined;
+}
+
+/**
+ * List issues from Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -152,6 +285,9 @@ export type ListIssuesOutput = z.infer<typeof listIssuesOutput>;
  *
  * // Search issues
  * const searchResults = await listIssues.execute({ query: 'authentication' });
+ *
+ * // With test token
+ * const issues = await listIssues.execute({ team: 'Eng' }, 'Bearer test-token');
  * ```
  */
 export const listIssues = {
@@ -159,33 +295,43 @@ export const listIssues = {
   description: 'List issues from Linear with optional filters',
   parameters: listIssuesParams,
 
-  async execute(input: ListIssuesInput): Promise<ListIssuesOutput> {
+  async execute(
+    input: ListIssuesInput,
+    testToken?: string
+  ): Promise<ListIssuesOutput> {
     // Validate input
     const validated = listIssuesParams.parse(input);
 
-    // Call MCP tool with proper name
-    const rawData = await callMCPTool(
-      'linear',
-      'list_issues',
-      validated
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Build filter from input
+    const filter = buildIssueFilter(validated);
+
+    // Build order by
+    const orderBy = validated.orderBy === 'createdAt' ? 'createdAt' : 'updatedAt';
+
+    // Execute GraphQL query
+    const response = await executeGraphQL<IssuesListResponse>(
+      client,
+      LIST_ISSUES_QUERY,
+      {
+        first: validated.limit,
+        filter,
+        orderBy
+      }
     );
 
-    // Handle null/undefined responses gracefully
-    if (!rawData) {
-      return { issues: [], totalIssues: 0 };
-    }
+    // Extract issues array (handle null/undefined)
+    const issues = response.issues?.nodes || [];
 
-    // Linear MCP returns array directly, not { issues: [...] }
-    const issues = Array.isArray(rawData) ? rawData : (rawData.issues || []);
-
-    // Filter to essential fields only
-    const filtered = {
-      issues: issues.map((issue: any) => ({
+    // Filter to essential fields
+    const baseData = {
+      issues: issues.map((issue) => ({
         id: issue.id,
-        identifier: issue.identifier,
+        identifier: issue.identifier || undefined,
         title: issue.title,
-        description: issue.description?.substring(0, 200), // Truncate for token efficiency
-        // Priority is an object {name, value} - extract correctly
+        description: issue.description?.substring(0, 200) || undefined, // Truncate for token efficiency
         priority: issue.priority ? {
           name: issue.priority.name,
           value: issue.priority.value
@@ -195,16 +341,22 @@ export const listIssues = {
           name: issue.state.name,
           type: issue.state.type
         } : undefined,
-        status: issue.status,
-        // Assignee is a string (name only) - matches get-issue.ts pattern
-        assignee: issue.assignee || undefined,
-        assigneeId: issue.assigneeId || undefined,
-        url: issue.url,
-        createdAt: issue.createdAt,
-        updatedAt: issue.updatedAt
+        status: issue.state?.name || undefined,
+        assignee: issue.assignee?.name || undefined, // Extract name as string
+        assigneeId: issue.assignee?.id || undefined, // Extract ID separately
+        url: issue.url || undefined,
+        createdAt: issue.createdAt || undefined,
+        updatedAt: issue.updatedAt || undefined
       })),
       totalIssues: issues.length,
-      nextOffset: (rawData as any).nextOffset
+      nextOffset: response.issues?.pageInfo.hasNextPage
+        ? response.issues.pageInfo.endCursor || undefined
+        : undefined
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

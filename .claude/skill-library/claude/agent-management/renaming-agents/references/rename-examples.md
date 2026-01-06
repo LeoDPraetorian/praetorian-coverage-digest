@@ -55,7 +55,7 @@ You (following 7-step workflow):
 ## Example 2: Rename with References
 
 ```
-User: "Rename react-developer to frontend-react-developer"
+User: "Rename frontend-developer to frontend-react-developer"
 
 You:
 
@@ -63,7 +63,7 @@ You:
 2. Validate target: ✅ Available
 
 3. Find references (preview):
-   Grep -rw "react-developer" .claude/
+   Grep -rw "frontend-developer" .claude/
 
    Found in:
    - agent-manager/SKILL.md (5 matches)
@@ -74,7 +74,7 @@ You:
    Total: 25 references across 10 files
 
 4. Confirm with user:
-   "Rename react-developer → frontend-react-developer?
+   "Rename frontend-developer → frontend-react-developer?
     Will update 25 references in 10 files.
     Proceed?"
 
@@ -95,11 +95,11 @@ You:
    [Continue for all 10 files...]
 
 8. Verify integrity:
-   Grep -rw "react-developer" .claude/
+   Grep -rw "frontend-developer" .claude/
    Result: 0 matches ✅
 
 9. Report:
-   "✅ Renamed react-developer → frontend-react-developer
+   "✅ Renamed frontend-developer → frontend-react-developer
     Updated 25 references across 10 files
     Verification: Complete ✅"
 ```
@@ -146,13 +146,13 @@ You:
 ## Example 4: Dry Run (Preview Only)
 
 ```
-User: "Show me what would change if I rename go-developer to backend-go-developer"
+User: "Show me what would change if I rename backend-developer to backend-go-developer"
 
 You:
 
 1. Validate both names: ✅
 2. Find references:
-   Grep -rw "go-developer" .claude/
+   Grep -rw "backend-developer" .claude/
 
    Found in 8 files:
    - agent-manager/SKILL.md (2 refs)
@@ -164,7 +164,7 @@ You:
    Total: 15 references
 
 3. Preview changes:
-   "Preview: Rename go-developer → backend-go-developer
+   "Preview: Rename backend-developer → backend-go-developer
 
     Will update:
     ┌─────────────────────────────────────────┬──────┐
@@ -191,16 +191,16 @@ You:
 ### Scenario 1: Rename with Category Change
 
 ```
-User: "Rename and move go-developer from development/ to architecture/"
+User: "Rename and move backend-developer from development/ to architecture/"
 
 You:
 "⚠️ This requires TWO operations:
 
-1. Rename: go-developer → go-architect (semantic change)
+1. Rename: backend-developer → backend-architect (semantic change)
 2. Move: development/ → architecture/ (category change)
 
 Recommendation:
-- Use this skill to rename: go-developer → go-architect
+- Use this skill to rename: backend-developer → backend-architect
 - Manually move file to architecture/ after
 - OR keep in development/ if architecture role isn't primary
 

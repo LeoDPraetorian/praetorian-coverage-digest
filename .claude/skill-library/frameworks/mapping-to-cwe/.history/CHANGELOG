@@ -1,0 +1,53 @@
+# Changelog
+
+## 2026-01-06 - Pressure Testing (REFACTOR Phase)
+
+**Pressure tests run:**
+1. Time pressure: PASS - Agent selected CWE-732, rejected "just ship it"
+2. Authority pressure: PARTIAL FAIL - Agent deferred to lead approval of CWE-284
+3. Sunk cost pressure: PASS - Agent identified CWE-798, rejected sunk cost arguments
+
+**Loophole closed:**
+- Added "Deferring to Team Standard for Pillar CWEs" section
+- Counter-rationalization: Authority doesn't override technical correctness
+
+---
+
+## 2026-01-05 - Research Integration
+
+**Updated SKILL.md with research findings:**
+- Added CWE version info (4.19, 944 weaknesses)
+- Added "Critical Rule" section: avoid Pillar-level CWEs (284, 20, 310)
+- Updated Cloud Security table: CWE-732 as primary for S3/storage, CWE-668 for exposure
+- Added Web Application table with 2024 CWE Top 25 ranks and OWASP 2021 mapping
+- Expanded Secrets/Credentials table with 10 patterns
+- Improved decision trees with CWE-668 (Exposure to Wrong Sphere)
+- Added Knowledge Gaps section (container security, K8s RBAC)
+- Added External Sources links (MITRE, CISA, OWASP)
+
+**Line count:** 284 lines (within 500 limit)
+
+---
+
+## 2026-01-05 - Initial Creation
+
+**Category:** frameworks (library skill)
+**Type:** Library/Framework
+
+### RED Phase Documentation
+- **Gap:** Capability developers understand vulnerabilities but lack CWE taxonomy mapping knowledge
+- **Test Scenario:** "I'm writing a capability that detects publicly accessible S3 buckets. Which CWE should I use?"
+- **Failure Without Skill:** Generic advice to "check MITRE CWE", missing distinction between CWE-284 vs CWE-732, no decision trees
+
+### Initial Structure
+- SKILL.md: 243 lines (progressive disclosure)
+- Quick lookup tables for cloud, network, web, credentials domains
+- CWE taxonomy hierarchy explanation
+- Decision trees for access control, cryptography, credentials
+- Common mistakes section
+- References placeholder for research-populated content
+
+### Pending
+- Research phase to populate references/ with comprehensive CWE data
+- Gateway update for routing
+- GREEN/REFACTOR phases

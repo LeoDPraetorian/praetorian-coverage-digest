@@ -1,0 +1,66 @@
+# Changelog
+
+## 2026-01-02 (v2)
+
+### Major Restructure: Multi-Tool 100% Coverage Workflow
+
+#### Added
+- **Phase 2: Tool Discovery** - Discovers ALL tools in an MCP service (not just one)
+- **Batching Strategy** - Process 3-5 tools in parallel batches for Phases 4, 6, 7
+- **Shared Architecture (Phase 3)** - Design patterns that apply across all tools
+- **Per-Tool Work (Phase 4)** - Batched architecture + test planning + test implementation
+- **tools-manifest.json** - Tracks all discovered tools and their completion status
+- **100% tool coverage** - Wraps ALL tools in an MCP service by default
+- **Multi-tool metadata schema** - Tracks per-tool progress for each phase
+- **tools/ subdirectory structure** - Organize per-tool artifacts
+
+#### Changed
+- **Workflow scope**: Single-tool wrapper → Multi-tool service wrapper (100% coverage)
+- **Phase count**: 12 phases → 11 phases (consolidated per-tool work)
+- **Phase 2**: "Schema Discovery" → "Tool Discovery" (discovers ALL tools + schemas)
+- **Phase 3**: Individual architecture → Shared architecture for all tools
+- **Phase 4**: "Test Planning" → "Per-Tool Work" (batched: architecture + test planning + test impl)
+- **Phase 5**: "Test Implementation" → "RED Gate" (renumbered)
+- **Phase 6**: "RED Gate" → "Implementation" (BATCHED)
+- **Phase 7**: "Implementation" → "Code Review" (BATCHED, 1 retry/tool)
+- **Phase 8**: "Code Review" → "GREEN Gate" (renumbered)
+- **Phase 9**: "GREEN Gate" → "Audit" (renumbered)
+- **Phase 10**: "Audit" → "Completion" (renumbered, removed Phase 11)
+- **Setup (Phase 0)**: Creates SERVICE workspace (not per-tool)
+- **metadata.json**: Single-tool tracking → Multi-tool tracking with per_tool object
+- **Output directory**: Flat structure → Hierarchical with tools/ subdirectories
+- **Exit criteria**: Updated to reflect 100% tool coverage requirement
+- **Line count**: 457 lines → 680 lines (within 800-line extended limit for orchestrators)
+
+#### Related Skills
+- Added **dispatching-parallel-agents** - For handling batch failures across multiple tools
+
+#### Rationale
+The previous workflow wrapped ONE tool at a time, requiring multiple invocations for complete MCP coverage. This update enables:
+1. Discovering ALL tools in one pass
+2. Establishing shared patterns (token optimization, error handling, security)
+3. Processing tools in efficient batches
+4. Achieving 100% tool coverage with consistent quality
+
+## 2026-01-02 (v1)
+
+### Added
+- Phase 1: MCP Setup - Ensures MCP server is configured before schema discovery
+- Integration with setting-up-mcp-servers skill for automated MCP installation
+- mcp-setup-result.json to output directory structure
+- mcp_setup phase to metadata.json schema with configured status tracking
+
+### Changed
+- Renumbered all phases: Schema Discovery (1→2), Architecture (2→3), Test Planning (3→4), Test Implementation (4→5), RED Gate (5→6), Implementation (6→7), Code Review (7→8), GREEN Gate (8→9), Audit (9→10), Completion (10→11)
+- Updated Quick Reference table to show 12 phases (0-11)
+- Updated Agent Matrix phase numbers
+- Updated all cross-references to phase numbers throughout document
+- Updated Exit Criteria to reflect new phase count (11 total phases)
+- Added setting-up-mcp-servers to Related Skills section
+- Extracted Shared Infrastructure section to references/shared-infrastructure.md
+- Extracted Critical Rules section to references/critical-rules.md
+- Reduced SKILL.md from 553 lines to 457 lines (below 500-line limit)
+
+### Fixed
+- Phase number consistency across all sections
+- Line count compliance (<500 lines)

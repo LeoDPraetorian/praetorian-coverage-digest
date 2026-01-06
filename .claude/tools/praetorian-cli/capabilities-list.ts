@@ -4,6 +4,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const InputSchema = z.object({
   name: z.string().optional(),
@@ -25,7 +26,7 @@ const FilteredOutputSchema = z.object({
     executor: z.string().optional(),
     surface: z.string().optional()
   })),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 });
 
 export const capabilitiesList = {
@@ -62,15 +63,19 @@ function filterCapabilitiesResult(rawResult: any): any {
     surface: cap.surface
   }));
 
-  return {
+  const result = {
     summary: {
       total_count: capabilities.length,
       returned_count: filteredCapabilities.length,
       executors,
       targets
     },
-    capabilities: filteredCapabilities,
-    estimated_tokens: 2000
+    capabilities: filteredCapabilities
+  };
+
+  return {
+    ...result,
+    estimatedTokens: estimateTokens(result)
   };
 }
 

@@ -11,6 +11,7 @@
 
 import { execSync } from 'child_process';
 import { join } from 'path';
+import { mcpLog } from './debug.js';
 
 /**
  * Cached super-repo root to avoid repeated git calls
@@ -100,7 +101,7 @@ export function getSuperRepoRoot(): string {
     }
 
     // Ultimate fallback: use process.cwd()
-    console.warn('Warning: Could not detect git repository root, using current directory');
+    mcpLog.warn('Could not detect git repository root, using current directory');
     cachedSuperRepoRoot = process.cwd();
     return process.cwd();
   }

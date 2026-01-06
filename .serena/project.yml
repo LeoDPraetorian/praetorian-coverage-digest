@@ -1,0 +1,560 @@
+# Chariot Development Platform - Super-Repository Structure Reference
+#
+# PURPOSE: Pre-computed structure map for Serena MCP to eliminate cold-start scanning
+# USAGE: Semantic router reads this to determine which module(s) to pass to Serena
+#
+# This file follows Serena's project configuration schema with extensions for
+# semantic routing. It eliminates the need for Serena to scan 100+ .gitignore
+# files and detect languages on every connection.
+
+name: chariot-development-platform
+type: super-repository
+version: "1.0"
+
+# Languages for which Serena will start language servers
+# See: serena project create --help for full list
+# NOTE: Go disabled temporarily due to gopls performance issues in super-repo
+languages:
+  - typescript    # Chariot UI, chariot-ui-components, Claude tools (also handles JS/JSX/TSX)
+
+# Standard Serena project settings
+encoding: "utf-8"
+ignore_all_files_in_gitignore: true
+ignored_paths:
+  - node_modules
+  - .git
+  - dist
+  - build
+  - coverage
+  - .venv
+  - __pycache__
+  - target
+  - modules/ai-research              # Too large to index
+  - modules/chariot-aegis-capabilities  # YAML capabilities - use standard tools
+  - modules/chariot-devops              # DevOps configs - use standard tools
+  - modules/nuclei-templates            # YAML templates - use standard tools
+read_only: false
+excluded_tools: []
+project_name: "chariot-development-platform"
+
+# =============================================================================
+# MODULE DEFINITIONS
+# =============================================================================
+# Each module has:
+#   - path: Relative path from repo root
+#   - languages: Programming languages used (for LSP selection)
+#   - concerns: Domain keywords for semantic routing
+#   - description: Human-readable purpose
+#   - entry_points: Key files for code navigation (optional)
+
+modules:
+  # ---------------------------------------------------------------------------
+  # CORE PLATFORM
+  # ---------------------------------------------------------------------------
+  chariot:
+    path: modules/chariot
+    languages: [go, typescript]
+    concerns:
+      - backend
+      - api
+      - lambda
+      - dynamodb
+      - neo4j
+      - frontend
+      - react
+      - ui
+      - vite
+      - tailwind
+      - tanstack
+      - state_management
+      - authentication
+      - cognito
+      - capabilities
+      - security_scanning
+      - attack_surface
+      - e2e_testing
+      - playwright
+    description: "Core platform - Go Lambda backend API + React 19 TypeScript UI"
+
+  # Chariot sub-modules for faster routing (avoid loading all nested Go modules)
+  chariot-ui:
+    path: modules/chariot/ui
+    languages: [typescript]
+    concerns:
+      - frontend
+      - react
+      - ui
+      - component
+      - hook
+      - vite
+      - tailwind
+      - tanstack
+      - state
+      - form
+      - modal
+      - table
+      - dashboard
+      - tsx
+      - jsx
+    description: "Chariot React 19 TypeScript UI (faster than full chariot module)"
+
+  chariot-backend:
+    path: modules/chariot/backend
+    languages: [go]
+    concerns:
+      - backend
+      - api
+      - handler
+      - lambda
+      - dynamodb
+      - neo4j
+      - capability
+      - job
+      - asset
+      - risk
+      - seed
+      - webhook
+      - integration
+    description: "Chariot Go Lambda backend (faster than full chariot module)"
+    entry_points:
+      - backend/cmd/api/main.go
+      - ui/src/main.tsx
+      - ui/src/app/AppRoute.tsx
+
+  chariot-ui-components:
+    path: modules/chariot-ui-components
+    languages: [typescript]
+    concerns:
+      - components
+      - design_system
+      - react_components
+      - ui_library
+      - buttons
+      - forms
+      - tables
+      - modals
+      - tailwind
+      - accessibility
+    description: "Shared React component library (being end-of-lifed)"
+    entry_points:
+      - src/index.ts
+
+  # ---------------------------------------------------------------------------
+  # DATA & SCHEMA
+  # ---------------------------------------------------------------------------
+  tabularium:
+    path: modules/tabularium
+    languages: [go]
+    concerns:
+      - schema
+      - data_models
+      - code_generation
+      - openapi
+      - pydantic
+      - model
+      - asset
+      - risk
+      - job
+      - integration
+      - registry
+    description: "Universal data schema and code generation"
+    entry_points:
+      - pkg/model/model/asset.go
+      - pkg/model/model/risk.go
+      - cmd/schemagen/main.go
+
+  msp-definitions:
+    path: modules/msp-definitions
+    languages: []
+    concerns:
+      - msp
+      - service_provider
+      - definitions
+      - configuration
+    description: "MSP (Managed Service Provider) definitions"
+
+  # ---------------------------------------------------------------------------
+  # SECURITY FRAMEWORKS
+  # ---------------------------------------------------------------------------
+  janus-framework:
+    path: modules/janus-framework
+    languages: [go]
+    concerns:
+      - framework
+      - tool_orchestration
+      - pipelines
+      - concurrency
+      - errgroup
+      - scanner_framework
+      - plugin_system
+    description: "Go framework for security tool chains and pipelines"
+    entry_points:
+      - pkg/janus/janus.go
+
+  janus:
+    path: modules/janus
+    languages: [go]
+    concerns:
+      - orchestration
+      - tool_chains
+      - security_tools
+      - scanner_integration
+      - workflow
+    description: "Security tool orchestration system"
+
+  nebula:
+    path: modules/nebula
+    languages: [go]
+    concerns:
+      - cloud_security
+      - aws
+      - azure
+      - gcp
+      - multi_cloud
+      - scanning
+      - posture_management
+      - mcp_server
+    description: "Multi-cloud security scanning CLI with MCP server"
+    entry_points:
+      - main.go
+      - cmd/mcp-server/main.go
+
+  # ---------------------------------------------------------------------------
+  # VELOCIRAPTOR / AEGIS
+  # ---------------------------------------------------------------------------
+  aegiscli:
+    path: modules/aegiscli
+    languages: [go]
+    concerns:
+      - velociraptor
+      - vql
+      - agent_orchestration
+      - endpoint_security
+      - forensics
+      - artifact_collection
+    description: "Velociraptor-based security orchestration CLI"
+
+  chariot-aegis-capabilities:
+    path: modules/chariot-aegis-capabilities
+    languages: [yaml]
+    concerns:
+      - vql
+      - capabilities
+      - security_capabilities
+      - velociraptor_artifacts
+      - offsec
+      - monitors
+      - healthchecks
+      - windows
+      - linux
+    description: "VQL security capabilities for Velociraptor"
+
+  # ---------------------------------------------------------------------------
+  # VULNERABILITY SCANNING
+  # ---------------------------------------------------------------------------
+  nuclei-templates:
+    path: modules/nuclei-templates
+    languages: [yaml]
+    concerns:
+      - nuclei
+      - vulnerability_templates
+      - cve
+      - security_scanning
+      - web_vulnerabilities
+      - dast
+      - network_scanning
+    description: "Nuclei vulnerability templates"
+
+  # ---------------------------------------------------------------------------
+  # SECRET SCANNING
+  # ---------------------------------------------------------------------------
+  noseyparker:
+    path: modules/noseyparker
+    languages: [rust]
+    concerns:
+      - secret_scanning
+      - rust
+      - credentials
+      - api_keys
+      - secrets
+      - regex_patterns
+    description: "Secret scanning engine (Rust)"
+
+  noseyparkerplusplus:
+    path: modules/noseyparkerplusplus
+    languages: [rust]
+    concerns:
+      - secret_scanning
+      - enhanced_scanner
+      - rust
+      - credentials
+    description: "Enhanced secret scanner (Rust)"
+
+  noseyparker-explorer:
+    path: modules/noseyparker-explorer
+    languages: [python]
+    concerns:
+      - web_ui
+      - secret_results
+      - visualization
+      - explorer
+      - dashboard
+    description: "Web UI for secret scan results"
+
+  # ---------------------------------------------------------------------------
+  # CLI & SDK
+  # ---------------------------------------------------------------------------
+  praetorian-cli:
+    path: modules/praetorian-cli
+    languages: [python]
+    concerns:
+      - cli
+      - sdk
+      - python
+      - api_client
+      - chariot_sdk
+      - mcp_server
+    description: "Python CLI and SDK for Chariot API"
+    entry_points:
+      - praetorian_cli/cli.py
+
+  # ---------------------------------------------------------------------------
+  # AI & AGENTS
+  # ---------------------------------------------------------------------------
+  praetorian-agent-workflows:
+    path: modules/praetorian-agent-workflows
+    languages: [python]
+    concerns:
+      - ai_agents
+      - workflows
+      - llm
+      - orchestration
+      - automation
+    description: "AI agent workflow orchestration"
+
+  # ai-research: EXCLUDED - too large to index (31k+ files)
+  # Use standard Read/Grep tools for modules/ai-research
+
+  # ---------------------------------------------------------------------------
+  # INFRASTRUCTURE
+  # ---------------------------------------------------------------------------
+  chariot-devops:
+    path: modules/chariot-devops
+    languages: [yaml]
+    concerns:
+      - devops
+      - infrastructure
+      - terraform
+      - cloudformation
+      - ci_cd
+      - deployment
+    description: "DevOps and infrastructure automation"
+
+  redteam-attack-infrastructure:
+    path: modules/redteam-attack-infrastructure
+    languages: []
+    concerns:
+      - red_team
+      - attack_infrastructure
+      - c2
+      - offensive_security
+    description: "Red team attack infrastructure"
+
+  # ---------------------------------------------------------------------------
+  # OTHER
+  # ---------------------------------------------------------------------------
+  nexus:
+    path: modules/nexus
+    languages: [go]
+    concerns:
+      - nexus
+      - service
+      - integration
+    description: "Nexus service integration"
+
+  fingerprintx:
+    path: modules/fingerprintx
+    languages: [go]
+    concerns:
+      - fingerprinting
+      - service_detection
+      - protocol_detection
+      - network
+      - port_scanning
+    description: "Service fingerprinting module"
+
+  # ---------------------------------------------------------------------------
+  # CLAUDE CODE INFRASTRUCTURE
+  # ---------------------------------------------------------------------------
+  claude:
+    path: .claude
+    languages: [typescript]
+    concerns:
+      - mcp
+      - mcp_tools
+      - mcp_wrappers
+      - skills
+      - agents
+      - serena
+      - pool
+      - connection_pool
+      - linear
+      - currents
+      - context7
+      - chrome_devtools
+      - praetorian_cli_mcp
+      - testing
+      - lib
+      - hooks
+      - commands
+    description: "Claude Code infrastructure - MCP tools, skills, agents, testing lib"
+    entry_points:
+      - tools/config/lib/mcp-client.ts
+      - tools/config/lib/serena-pool.ts
+      - skills/using-skills/SKILL.md
+
+# =============================================================================
+# SEMANTIC ROUTING HINTS
+# =============================================================================
+# Maps keywords/phrases to relevant modules for intelligent scoping
+# Used by semantic router to determine which module(s) to pass to Serena
+
+routing_hints:
+  # Frontend keywords - prefer chariot-ui for faster loading
+  react: [chariot-ui, chariot, chariot-ui-components]
+  component: [chariot-ui, chariot-ui-components, chariot]
+  ui: [chariot-ui, chariot, chariot-ui-components]
+  frontend: [chariot-ui, chariot, chariot-ui-components]
+  tailwind: [chariot-ui, chariot, chariot-ui-components]
+  tanstack: [chariot-ui, chariot]
+  vite: [chariot-ui, chariot]
+  typescript: [chariot-ui, chariot, chariot-ui-components]
+  hooks: [chariot-ui, chariot]
+  state: [chariot-ui, chariot]
+  tsx: [chariot-ui, chariot]
+  jsx: [chariot-ui, chariot]
+  form: [chariot-ui, chariot]
+  modal: [chariot-ui, chariot]
+  table: [chariot-ui, chariot]
+  dashboard: [chariot-ui, chariot]
+
+  # Backend keywords - prefer chariot-backend for faster loading
+  lambda: [chariot-backend, chariot]
+  dynamodb: [chariot-backend, chariot]
+  api: [chariot-backend, chariot, praetorian-cli]
+  handler: [chariot-backend, chariot]
+  backend: [chariot-backend, chariot]
+  go: [chariot-backend, chariot, nebula, janus-framework, janus, aegiscli, tabularium, nexus, fingerprintx]
+  serverless: [chariot-backend, chariot]
+  cognito: [chariot-backend, chariot]
+  authentication: [chariot-backend, chariot]
+  neo4j: [chariot-backend, chariot]
+  webhook: [chariot-backend, chariot]
+  integration: [chariot-backend, chariot]
+
+  # Data/Schema keywords
+  schema: [tabularium]
+  model: [tabularium, chariot]
+  data: [tabularium]
+  openapi: [tabularium]
+  codegen: [tabularium]
+  asset: [tabularium, chariot]
+  risk: [tabularium, chariot]
+
+  # Security keywords
+  vulnerability: [nuclei-templates, chariot, chariot-aegis-capabilities]
+  scan: [nebula, nuclei-templates, aegiscli, noseyparker]
+  security: [chariot, nebula, nuclei-templates, chariot-aegis-capabilities]
+  capability: [chariot-aegis-capabilities, chariot]
+  vql: [chariot-aegis-capabilities, aegiscli]
+  velociraptor: [aegiscli, chariot-aegis-capabilities]
+  nuclei: [nuclei-templates]
+  cve: [nuclei-templates]
+
+  # Cloud keywords
+  cloud: [nebula, chariot-devops]
+  aws: [nebula, chariot]
+  azure: [nebula]
+  gcp: [nebula]
+
+  # Secret scanning
+  secret: [noseyparker, noseyparkerplusplus]
+  credential: [noseyparker, noseyparkerplusplus]
+
+  # CLI/SDK
+  cli: [praetorian-cli, aegiscli, nebula]
+  sdk: [praetorian-cli]
+  python: [praetorian-cli, praetorian-agent-workflows, noseyparker-explorer]
+
+  # AI/Agents
+  agent: [claude, praetorian-agent-workflows]
+  ai: [praetorian-agent-workflows]
+  llm: [praetorian-agent-workflows]
+  workflow: [praetorian-agent-workflows, janus]
+
+  # Framework
+  framework: [janus-framework]
+  pipeline: [janus-framework, janus]
+  orchestration: [janus, praetorian-agent-workflows]
+
+  # Infrastructure
+  devops: [chariot-devops]
+  terraform: [chariot-devops]
+  infrastructure: [chariot-devops, redteam-attack-infrastructure]
+  deployment: [chariot-devops, chariot]
+
+  # Testing
+  test: [chariot]
+  e2e: [chariot]
+  playwright: [chariot]
+  vitest: [chariot]
+
+  # Rust
+  rust: [noseyparker, noseyparkerplusplus]
+
+  # Fingerprinting
+  fingerprint: [fingerprintx]
+  protocol: [fingerprintx]
+  service_detection: [fingerprintx]
+
+  # Claude Code Infrastructure
+  mcp: [claude]
+  mcp_tool: [claude]
+  mcp_wrapper: [claude]
+  wrapper: [claude]
+  skill: [claude]
+  serena: [claude]
+  pool: [claude]
+  connection_pool: [claude]
+  linear_mcp: [claude]
+  currents_mcp: [claude]
+  context7: [claude]
+  chrome_devtools: [claude]
+  hook: [claude]
+  slash_command: [claude]
+
+# =============================================================================
+# DEFAULT MODULE
+# =============================================================================
+# When semantic routing cannot determine a specific module, default to chariot
+# as it's the most comprehensive and commonly accessed module
+
+default_module: chariot-ui
+
+# =============================================================================
+# EXCLUDED PATHS
+# =============================================================================
+# Paths that Serena should never scan (already in .gitignore but explicit here)
+
+excluded_paths:
+  - node_modules
+  - .git
+  - dist
+  - build
+  - coverage
+  - .venv
+  - __pycache__
+  - target
+  - .claude/node_modules
+  - "*.log"
+  - "*.tmp"

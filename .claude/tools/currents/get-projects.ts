@@ -24,6 +24,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 // Raw MCP response interface (based on schema discovery)
 interface RawProjectData {
@@ -82,14 +83,10 @@ export const getProjects = {
         // Removed: createdAt, failFast, inactivityTimeoutSeconds, etc.
       }));
 
-    // Calculate token estimate (0 for empty projects)
-    const jsonString = JSON.stringify(projects);
-    const estimatedTokens = projects.length === 0 ? 0 : Math.ceil(jsonString.length / 4);
-
     const filtered = {
       projects,
       totalProjects: projects.length,
-      estimatedTokens,
+      estimatedTokens: estimateTokens(projects),
     };
 
     return GetProjectsOutputSchema.parse(filtered);

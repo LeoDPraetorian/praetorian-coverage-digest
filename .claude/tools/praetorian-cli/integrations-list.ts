@@ -7,6 +7,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const InputSchema = z.object({
   name_filter: z.string().default(''),
@@ -27,7 +28,7 @@ const FilteredOutputSchema = z.object({
     status: z.string().optional()
   })),
   next_offset: z.number().nullable(),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 });
 
 export const integrationsList = {
@@ -65,15 +66,19 @@ function filterIntegrationsResult(rawResult: any): any {
     status: int.status
   }));
 
-  return {
+  const result = {
     summary: {
       total_count: integrations.length,
       returned_count: filteredIntegrations.length,
       integration_types: integrationTypes
     },
     integrations: filteredIntegrations,
-    next_offset: nextOffset,
-    estimated_tokens: 800
+    next_offset: nextOffset
+  };
+
+  return {
+    ...result,
+    estimatedTokens: estimateTokens(result)
   };
 }
 

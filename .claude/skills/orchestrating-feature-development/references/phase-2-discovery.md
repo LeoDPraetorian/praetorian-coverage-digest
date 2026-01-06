@@ -1,10 +1,10 @@
 # Phase 2: Discovery
 
-**Parallel pattern analysis before architecture decisions.**
+**Parallel reuse discovery using native Explore agents (very thorough mode).**
 
 ## Overview
 
-The Discovery phase executes AFTER Brainstorming (Phase 1) and BEFORE Planning (Phase 3). It spawns parallel `code-pattern-analyzer` agents to exhaustively search the codebase for reusable patterns, preventing the #1 implementation failure: creating new code when reusable code exists.
+The Discovery phase executes AFTER Brainstorming (Phase 1) and BEFORE Planning (Phase 3). It spawns parallel `Explore` agents (native Claude Code agent) to exhaustively search the codebase for reusable patterns, preventing the #1 implementation failure: creating new code when reusable code exists.
 
 **Why this phase exists:**
 
@@ -24,151 +24,199 @@ Discovery ensures developers and leads know what patterns exist BEFORE making de
 
 ## Quick Reference
 
-| Aspect           | Details                                                       |
-| ---------------- | ------------------------------------------------------------- |
-| **Execution**    | PARALLEL - frontend + backend analyzers run simultaneously    |
-| **Agents**       | 2 × code-pattern-analyzer                                     |
-| **Input**        | design.md from Phase 1 (Brainstorming)                        |
-| **Output**       | frontend-discovery.md, backend-discovery.md                   |
-| **Checkpoint**   | NONE - feeds directly into Planning and Architecture          |
-| **Skill Used**   | discovering-reusable-code                                     |
-| **Objective**    | Report patterns objectively (no judgment on code quality)     |
+| Aspect         | Details                                                         |
+| -------------- | --------------------------------------------------------------- |
+| **Execution**  | PARALLEL - frontend + backend Explore agents run simultaneously |
+| **Agents**     | 2 × Explore (native Claude Code agent)                          |
+| **Mode**       | **very thorough** (always)                                      |
+| **Input**      | design.md from Phase 1 (Brainstorming)                          |
+| **Output**     | frontend-discovery.md, backend-discovery.md                     |
+| **Checkpoint** | NONE - feeds directly into Planning and Architecture            |
+| **Objective**  | Find reusable code; report what CAN BE EXTENDED vs must create  |
 
 ## Agent Spawning
 
 **CRITICAL: Spawn BOTH agents in a SINGLE Task message for parallel execution.**
 
-```typescript
-// Correct - parallel execution
-Task("code-pattern-analyzer", {
-  prompt: `Analyze frontend patterns for feature: ${featureDescription}
-    Scope: modules/*/ui/src/*
-    Use discovering-reusable-code skill methodology.
-    Output to: ${featureDir}/frontend-discovery.md`,
-  subagent_type: "code-pattern-analyzer"
-})
-Task("code-pattern-analyzer", {
-  prompt: `Analyze backend patterns for feature: ${featureDescription}
-    Scope: modules/*/backend/*
-    Use discovering-reusable-code skill methodology.
-    Output to: ${featureDir}/backend-discovery.md`,
-  subagent_type: "code-pattern-analyzer"
-})
+### Frontend Discovery Prompt
+
+```
+Task(subagent_type: "Explore", description: "Frontend reuse discovery")
 ```
 
-**Why parallel?** Context window limits (~10K-15K lines) mean a single agent cannot analyze the full codebase. Domain-specific agents ensure comprehensive coverage.
+**Prompt:**
 
-## Discovery Agent Responsibilities
+```markdown
+Perform a VERY THOROUGH reuse discovery analysis for the frontend codebase.
 
-Each `code-pattern-analyzer` agent must:
+FEATURE CONTEXT:
+[Paste design.md summary here]
 
-1. **Extract requirements** from design.md
-2. **Run exhaustive searches** with documented commands
-3. **Apply reusability matrix** (100%/80%/60%/40%/0%)
-4. **Enforce 10-file rule** for any "create new" proposals
-5. **Generate discovery report** in standard format
+SEARCH OBJECTIVES:
 
-### Frontend Agent Scope
+1. Find ALL existing components that could be extended for this feature
+2. Find ALL existing hooks, utilities, and helpers that apply
+3. Find ALL existing patterns (state management, API calls, error handling) we must follow
+4. Identify the exact files where new code should be placed based on existing structure
 
-```bash
-# Search patterns for frontend analyzer
-grep -r "[keyword]" modules/*/ui/src/ --include="*.tsx" -l
-grep -r "[keyword]" modules/*/ui/src/ --include="*.ts" -l
-grep -r "export.*use" modules/*/ui/src/hooks/ -l
-grep -r "const.*Component" modules/*/ui/src/components/ -l
+OUTPUT REQUIREMENTS - Structure your response as:
+
+## Reusable Components
+
+| Component | Location | Can Extend? | Extension Point |
+| --------- | -------- | ----------- | --------------- |
+| ...       | ...      | Yes/No      | What to modify  |
+
+## Reusable Utilities
+
+| Utility | Location | Usage Pattern |
+| ------- | -------- | ------------- |
+| ...     | ...      | How to use it |
+
+## Patterns to Follow
+
+| Pattern | Example Location | Must Follow? |
+| ------- | ---------------- | ------------ |
+| ...     | ...              | Yes/No       |
+
+## Recommended File Placement
+
+| New Code Type | Suggested Location | Rationale |
+| ------------- | ------------------ | --------- |
+| ...           | ...                | Why here  |
+
+## Anti-Pattern Warnings
+
+List any existing code that does something similar that we MUST NOT duplicate.
+
+## Summary
+
+- **Reuse Percentage:** X%
+- **Files to Extend:** N
+- **Files to Create:** M
+
+CRITICAL: Do NOT just list what exists. For each finding, explicitly state whether it CAN BE EXTENDED for this feature and HOW.
+
+OUTPUT_FILE: {feature_dir}/frontend-discovery.md
 ```
 
-**Focus areas:**
+**Path:** `modules/chariot/ui` (or relevant frontend path)
 
-- React components (pages, features, shared)
-- Custom hooks (data fetching, state, utilities)
-- UI patterns (forms, tables, modals, filters)
-- State management (Zustand stores, TanStack Query)
+### Backend Discovery Prompt
 
-### Backend Agent Scope
-
-```bash
-# Search patterns for backend analyzer
-grep -r "[keyword]" modules/*/backend/pkg/ --include="*.go" -l
-grep -r "type.*Handler" modules/*/backend/pkg/handler/ -l
-grep -r "interface.*Service" modules/*/backend/pkg/service/ -l
-grep -r "func.*Repository" modules/*/backend/pkg/repository/ -l
+```
+Task(subagent_type: "Explore", description: "Backend reuse discovery")
 ```
 
-**Focus areas:**
+**Prompt:**
 
-- Handler patterns (REST, GraphQL)
-- Service layer implementations
-- Repository patterns (DynamoDB, Neo4j)
-- Lambda function patterns
+```markdown
+Perform a VERY THOROUGH reuse discovery analysis for the backend codebase.
+
+FEATURE CONTEXT:
+[Paste design.md summary here]
+
+SEARCH OBJECTIVES:
+
+1. Find ALL existing handlers, services, or packages that could be extended
+2. Find ALL existing utilities, helpers, and shared code that apply
+3. Find ALL existing patterns (error handling, validation, DB access) we must follow
+4. Identify the exact packages where new code should be placed based on existing structure
+
+OUTPUT REQUIREMENTS - Structure your response as:
+
+## Reusable Packages/Services
+
+| Package | Location | Can Extend? | Extension Point |
+| ------- | -------- | ----------- | --------------- |
+| ...     | ...      | Yes/No      | What to modify  |
+
+## Reusable Utilities
+
+| Utility | Location | Usage Pattern |
+| ------- | -------- | ------------- |
+| ...     | ...      | How to use it |
+
+## Patterns to Follow
+
+| Pattern | Example Location | Must Follow? |
+| ------- | ---------------- | ------------ |
+| ...     | ...              | Yes/No       |
+
+## Recommended File Placement
+
+| New Code Type | Suggested Location | Rationale |
+| ------------- | ------------------ | --------- |
+| ...           | ...                | Why here  |
+
+## Anti-Pattern Warnings
+
+List any existing code that does something similar that we MUST NOT duplicate.
+
+## Summary
+
+- **Reuse Percentage:** X%
+- **Files to Extend:** N
+- **Files to Create:** M
+
+CRITICAL: Do NOT just list what exists. For each finding, explicitly state whether it CAN BE EXTENDED for this feature and HOW.
+
+OUTPUT_FILE: {feature_dir}/backend-discovery.md
+```
+
+**Path:** `modules/chariot/backend` (or relevant backend path)
+
+## Why "Very Thorough" Mode
+
+The Explore agent supports three thoroughness levels: `quick`, `medium`, `very thorough`.
+
+**Always use `very thorough` for Discovery because:**
+
+1. **Context window efficiency** - Explore manages its own context, so thoroughness doesn't impact orchestrator
+2. **Prevent false negatives** - Missing reusable code leads to duplication
+3. **One-time cost** - Discovery runs once per feature; thoroughness pays dividends in implementation
+4. **Architecture quality** - Leads make better decisions with comprehensive discovery reports
 
 ## Discovery Report Format
 
-Each agent outputs a structured markdown report:
+Each Explore agent outputs a structured markdown report:
 
 ```markdown
-# Exhaustive Reuse Analysis Report
+# Reuse Discovery Report
 
 ## Feature: [Feature Name]
 
+## Domain: frontend|backend
+
 ## Date: [ISO timestamp]
 
-## Analyst: code-pattern-analyzer (frontend|backend)
-
 ---
 
-## COMPLIANCE CONFIRMATION
+## Reusable Components
 
-COMPLIANCE CONFIRMED: Exhaustive analysis performed, reuse prioritized over creation.
+| Component | Location | Can Extend? | Extension Point |
+| --------- | -------- | ----------- | --------------- |
 
----
+## Reusable Utilities
 
-## SEARCH METHODOLOGY EXECUTED
+| Utility | Location | Usage Pattern |
+| ------- | -------- | ------------- |
 
-### Commands Run
+## Patterns to Follow
 
-[Actual commands with result counts]
+| Pattern | Example Location | Must Follow? |
+| ------- | ---------------- | ------------ |
 
-### Coverage Verification
+## Recommended File Placement
 
-- [x] modules/chariot/[scope] searched (X files)
-- [x] Related documentation reviewed
+| New Code Type | Suggested Location | Rationale |
+| ------------- | ------------------ | --------- |
 
----
+## Anti-Pattern Warnings
 
-## EXISTING IMPLEMENTATIONS DISCOVERED
+[Existing code that does something similar - MUST NOT duplicate]
 
-### 100% Reusable (Use As-Is)
-
-[Implementations that can be imported directly]
-
-### 80% Reusable (Extend)
-
-[Implementations needing minor extension]
-
-### 60% Reusable (Adapt)
-
-[Implementations needing adaptation]
-
-### 0% Reusable (New Code Required)
-
-[With EXHAUSTIVE JUSTIFICATION - minimum 10 files analyzed]
-
----
-
-## PATTERN INVENTORY
-
-[Patterns identified with extension points]
-
----
-
-## INTEGRATION RECOMMENDATIONS
-
-[Recommended approach based on discovery]
-
----
-
-## KEY FINDINGS
+## Summary
 
 - **Reuse Percentage:** X%
 - **Files to Extend:** N
@@ -182,9 +230,9 @@ Discovery outputs feed into Planning:
 ```json
 {
   "status": "complete",
-  "agent": "code-pattern-analyzer",
+  "agent": "Explore",
   "domain": "frontend|backend",
-  "output_file": ".claude/features/{feature-id}/[frontend|backend]-discovery.md",
+  "output_file": ".claude/.output/features/{feature-id}/[frontend|backend]-discovery.md",
   "summary": {
     "reuse_percentage": 75,
     "files_to_extend": 4,
@@ -210,11 +258,11 @@ Lead agents in Phase 4 receive discovery reports and must:
 
 Leads evaluate discovered patterns for:
 
-| Pattern Quality | Characteristics                               | Action                      |
-| --------------- | --------------------------------------------- | --------------------------- |
-| **Good**        | Clean, extensible, documented                 | Extend as recommended       |
-| **Tech Debt**   | Special-casing, tight coupling, duplication   | Propose refactoring plan    |
-| **Mixed**       | Partially good, some issues                   | Document trade-offs         |
+| Pattern Quality | Characteristics                             | Action                   |
+| --------------- | ------------------------------------------- | ------------------------ |
+| **Good**        | Clean, extensible, documented               | Extend as recommended    |
+| **Tech Debt**   | Special-casing, tight coupling, duplication | Propose refactoring plan |
+| **Mixed**       | Partially good, some issues                 | Document trade-offs      |
 
 ### Tech Debt Registry Update
 
@@ -252,7 +300,7 @@ After discovery completes, update phase status:
 
 ### Agent Timeout
 
-If one analyzer times out:
+If one Explore agent times out:
 
 1. Mark that domain as incomplete in metadata.json
 2. Proceed with available report
@@ -262,7 +310,7 @@ If one analyzer times out:
 
 If exhaustive search finds no reusable patterns:
 
-1. Verify search methodology was complete
+1. Verify search was truly thorough
 2. Document "greenfield" justification
 3. Proceed to Planning with explicit "no reuse" rationale
 
@@ -278,16 +326,16 @@ If frontend and backend reports conflict:
 
 Discovery phase is complete when:
 
-- [ ] Frontend analyzer completed (or explicitly timed out)
-- [ ] Backend analyzer completed (or explicitly timed out)
+- [ ] Frontend Explore agent completed (or explicitly timed out)
+- [ ] Backend Explore agent completed (or explicitly timed out)
 - [ ] frontend-discovery.md written to feature directory
 - [ ] backend-discovery.md written to feature directory
 - [ ] metadata.json updated with discovery status
-- [ ] Both reports contain COMPLIANCE CONFIRMATION
+- [ ] Both reports contain structured reuse tables
 
 ## Related
 
-- **discovering-reusable-code skill** - Methodology used by analyzers
-- **code-pattern-analyzer agent** - Executes the analysis
+- **discovering-reusable-code skill** - Methodology reference (prompts now baked into Explore)
+- **Native Explore agent** - Executes the analysis (very thorough mode)
 - **Phase 3: Planning** - Consumes discovery reports
 - **Phase 4: Architecture** - Performs tech debt assessment

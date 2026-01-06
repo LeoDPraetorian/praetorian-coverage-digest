@@ -4,6 +4,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const InputSchema = z.object({
   key: z.string().min(1, 'Risk key is required'),
@@ -29,7 +30,7 @@ const FilteredOutputSchema = z.object({
       value: z.string()
     }))
   }).optional(),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 });
 
 export const risksGet = {
@@ -57,18 +58,20 @@ function filterRiskDetails(rawRisk: any, includeDetails: boolean): any {
     dns: rawRisk.dns,
     created: rawRisk.created,
     updated: rawRisk.updated,
-    comment: rawRisk.comment,
-    estimated_tokens: includeDetails ? 1000 : 150
+    comment: rawRisk.comment
   };
 
   if (!includeDetails) {
-    return base;
+    return {
+      ...base,
+      estimatedTokens: estimateTokens(base)
+    };
   }
 
   const assets = rawRisk.affected_assets || [];
   const attributes = rawRisk.attributes || [];
 
-  return {
+  const result = {
     ...base,
     affected_assets_summary: {
       total_count: assets.length,
@@ -81,6 +84,11 @@ function filterRiskDetails(rawRisk: any, includeDetails: boolean): any {
         value: a.value
       }))
     }
+  };
+
+  return {
+    ...result,
+    estimatedTokens: estimateTokens(result)
   };
 }
 

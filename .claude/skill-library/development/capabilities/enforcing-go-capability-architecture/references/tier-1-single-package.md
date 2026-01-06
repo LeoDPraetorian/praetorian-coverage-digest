@@ -8,7 +8,7 @@
 pkg/probes/
 ├── probe.go          # Interface + base type + registry
 ├── blank.go          # Implementation
-├── echo.go           # Implementation  
+├── echo.go           # Implementation
 └── probe_test.go     # All tests
 ```
 

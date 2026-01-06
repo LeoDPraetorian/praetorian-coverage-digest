@@ -122,3 +122,128 @@
 ### Verification
 - Audit: PASSED
 - Line count: 99 lines (well under 500 limit)
+## 2026-01-02 - Prevent Placeholder/TODO Generation
+
+**Problem**: Skill updates with detailed prompts produced placeholders instead of real content.
+
+**Changes**:
+1. Updated Step 4 (line 74) to explicitly require real content, not placeholders/TODOs
+2. Added explicit instructions for "No research" path (lines 130-136)
+3. Added explicit instructions for post-research content incorporation (lines 150-155)
+
+**Impact**: Both research paths now have clear directives to populate content from available sources.
+
+**Quality Gate**: Phrase "not placeholders or TODOs" now appears in Step 4.
+
+## 2026-01-03 - Replace researching-skills with orchestrating-research
+
+**Problem**: The skill referenced the older `researching-skills` which provides sequential research. The new `orchestrating-research` skill is superior with parallel execution and intent expansion.
+
+**Changes**:
+1. Line 60: Changed "consider using researching-skills" to "consider using orchestrating-research"
+2. Line 86: Changed "using `researching-skills` before editing" to "using `orchestrating-research` before editing"
+3. Line 120: Updated AskUserQuestion label from "Yes, invoke researching-skills" to "Yes, invoke orchestrating-research"
+4. Line 141: Changed skill invocation from `skill: "researching-skills"` to `skill: "orchestrating-research"`
+5. Lines 144-149: Updated skill capabilities description to reflect:
+   - Intent expansion (handles vague update topics)
+   - Parallel research across 6 sources (vs sequential)
+   - Cross-source conflict detection
+   - Comprehensive SYNTHESIS.md with actionable findings
+6. Lines 151-154: Added explicit instruction to read ${OUTPUT_DIR}/SYNTHESIS.md after research completes
+7. Line 191: Updated Related Skills section to reference `orchestrating-research` instead of `researching-skills`
+
+**Rationale**: orchestrating-research provides parallel execution and intent expansion, making research faster and more comprehensive for skill updates.
+
+**Impact**: Users now get better research results with parallel source execution and vague query handling.
+
+**Quality Gate**: All references to `researching-skills` have been replaced with `orchestrating-research`.
+
+## 2026-01-03 - Add Workflow Continuation Safeguards
+
+**Problem** (RED): Workflow could stop after Step 3.5 (orchestrating-research) due to ambiguous continuation instructions. When updating-skills invokes orchestrating-research, the assistant may interpret "Then proceed to Step 4 with this content" as "tell the user about the content, then proceed when they confirm" rather than "immediately continue without user interaction".
+
+**Root Cause**: Lines 151-157 told what TO DO after research but lacked explicit "DO NOT" warnings to prevent the assistant from reporting results and waiting for user continuation.
+
+**Changes** (GREEN):
+1. **Added new section "Workflow Continuation Rules"** (lines 53-61) AFTER Step 0 and BEFORE Step 1:
+   - Explicit rule: "7 steps run automatically Step 1 → 7. ONLY stop for: AskUserQuestion (research decision), Step 5 GREEN verification approval, Step 7 REFACTOR pressure tests"
+   - Visual WRONG ❌ vs RIGHT ✅ example showing the premature stop pattern
+   - Key principle: "Subskills are steps, not endpoints. Parent workflow continues automatically after child returns"
+
+2. **Replaced "After orchestrating-research completes" section** (lines 164-180) with explicit DO/DO NOT checklist:
+   - ✅ DO (immediately, without user input): Read SYNTHESIS.md, extract patterns, incorporate findings, proceed directly to Step 4, continue through Steps 5-7 automatically
+   - ❌ DO NOT: Report "Research complete!", summarize and wait for user, stop workflow execution, update todo list showing all tasks completed
+   - Added reminder: "Research is Step 3.5 of a 7-step workflow, not the final step"
+
+3. **Updated Success Criteria section** (line 198): Added note "Automatic Completion: All success criteria should be achieved in a single continuous workflow without stopping for user continuation prompts between steps"
+
+**Impact**: Prevents premature workflow termination after research. Ensures automatic continuation from Step 3.5 → 4 → 5 → 6 → 7 without user intervention.
+
+**Verification**: Test by running `/skill-manager update some-existing-skill 'Add new section about X - research the latest patterns first'` and selecting "Yes, invoke orchestrating-research". Workflow should continue automatically through all steps without stopping after research.
+
+**Quality Gate**: Explicit DO/DO NOT continuation rules now present at lines 166-178 with visual examples at lines 57-58.
+
+
+## [2026-01-03] - Delete Orphaned TypeScript Infrastructure
+
+### Context
+
+The updating-skills TypeScript (scripts/) was orphaned and unused:
+- SKILL.md already instruction-based (no npm/CLI references)
+- Actual CHANGELOGs use complex format with sections (## [date] - title, ### Changed, ### Reason)
+- TypeScript created simple format (`- **date**: desc`) that doesn't match reality
+- Workflows operate instruction-based via update-workflow.md
+
+### Changed
+
+**Deleted scripts/ directory:**
+- package.json, package-lock.json
+- tsconfig.json
+- src/update.ts (~500 lines TypeScript)
+- node_modules/
+- All TypeScript infrastructure
+
+**No SKILL.md changes needed:**
+- Already instruction-based (no npm/CLI refs)
+- References update-workflow.md which documents actual changelog format
+- References context7-refresh.md which documents staleness detection
+
+### Preserved
+
+**All documentation:**
+- SKILL.md - Complete TDD update workflow
+- references/update-workflow.md - Actual changelog format documented
+- references/context7-refresh.md - Context7 staleness logic documented
+- references/backup-strategy.md, tdd-methodology.md, etc.
+
+**Supporting directories:**
+- .history/ - Changelog preserved
+- .local/ - Backups preserved
+
+### Verification
+
+Evidence TypeScript was unused:
+1. SKILL.md has 0 npm/CLI references (already instruction-based)
+2. Actual CHANGELOGs (auditing-skills, fixing-skills, updating-skills) all use complex format
+3. TypeScript format doesn't match any real CHANGELOG in the codebase
+4. Workflows reference update-workflow.md, not TypeScript
+
+### Impact
+
+**Positive:**
+- Removed unused code (~30KB)
+- Simpler architecture (markdown documentation only)
+- No maintenance burden
+- update-workflow.md is source of truth
+
+**No breaking changes:**
+- Workflows already operated instruction-based
+- Documentation already captured all logic
+- No CLI commands to migrate
+
+### Method
+
+- Updated via updating-skills workflow (self-update)
+- No backup needed (no SKILL.md changes)
+- Deleted orphaned scripts/ directory
+- Changelog documents migration

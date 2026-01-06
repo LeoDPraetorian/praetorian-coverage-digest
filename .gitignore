@@ -28,9 +28,8 @@ claude-flow.bat
 claude-flow.ps1
 hive-mind-prompt-*.txt
 
-# Einstein generated files
-.claude/features/*
-!.claude/features/.gitkeep
+.claude/.output/*
+!.claude/.output/.gitkeep
 .claude/pipeline/*
 !.claude/pipeline/.gitkeep
 __pycache__/
@@ -52,5 +51,8 @@ docs/plans/
 .claude/tools/config/credentials.json
 
 # Research outputs (keep directory, ignore contents)
-.claude/research/*
-!.claude/research/.gitkeep
+.claude/.output/research/*
+!.claude/.output/research/.gitkeep
+
+# Serena warmup logs
+.serena-warmup.log

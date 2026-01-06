@@ -1,0 +1,50 @@
+## 2026-01-01 - Initial Creation
+
+**RED Phase Documentation:**
+
+Without this skill, Claude Code fails in three ways when asked to design TypeScript applications with clean architecture:
+
+1. **Creates monolithic, tightly-coupled code** - No separation between business logic and infrastructure, everything mixed together
+2. **Doesn't understand ports/adapters pattern** - Doesn't know how to create interfaces (ports) and separate implementations (adapters)
+3. **Creates untestable architecture** - Direct dependencies on databases, APIs, making unit testing impossible without real services
+
+**Example failure (without skill):**
+```typescript
+// Claude creates this (BAD):
+class UserService {
+  constructor(private db: PostgresClient) {}  // Direct dependency on concrete DB
+  async createUser(data) {
+    const result = await this.db.query('INSERT INTO...');  // Business logic mixed with DB
+    await sendEmail(data.email);  // Direct external API call
+  }
+}
+```
+
+**What we need (with skill):**
+```typescript
+// Hexagonal architecture (GOOD):
+interface UserRepository { save(user: User): Promise<void>; }
+
+class UserService {
+  constructor(private repo: UserRepository) {}  // Depends on interface
+  async createUser(data) {
+    const user = new User(data);
+    await this.repo.save(user);  // Business logic isolated
+  }
+}
+```
+
+**Skill Details:**
+
+- **Location:** Library skill (`.claude/skill-library/development/typescript/`)
+- **Category:** `development/typescript`
+- **Type:** Process/Pattern (architectural methodology)
+- **Line count:** 310 lines (well under 500 line limit)
+
+**Files Created:**
+
+- `SKILL.md` - Main skill with progressive disclosure
+- `references/common-mistakes.md` - Anti-patterns to avoid
+- `references/advanced-patterns.md` - Event-driven, CQRS, decorators, transactions
+- `references/migration-strategy.md` - Incremental refactoring guide
+- `.history/CHANGELOG` - This file

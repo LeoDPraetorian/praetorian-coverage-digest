@@ -208,29 +208,31 @@ The agent MUST have a Skill Loading Protocol section with Step 1/2/3 structure:
 
 **Every [agent type] task requires these (in order):**
 
-| Skill | Why Always Invoke |
-|-------|-------------------|
-| `calibrating-time-estimates` | Prevents "no time to read skills" rationalization |
-| `gateway-[domain]` | Routes to mandatory + task-specific library skills |
-| ... | ... |
+| Skill                        | Why Always Invoke                                  |
+| ---------------------------- | -------------------------------------------------- |
+| `calibrating-time-estimates` | Prevents "no time to read skills" rationalization  |
+| `gateway-[domain]`           | Routes to mandatory + task-specific library skills |
+| ...                          | ...                                                |
 
 ### Step 2: Invoke Core Skills Based on Task Context
 
 Your `skills` frontmatter makes these core skills available. **Invoke based on semantic relevance to your task**:
 
-| Trigger | Skill | When to Invoke |
-|---------|-------|----------------|
-| [Task pattern 1] | `skill-name` | [When to use] |
+| Trigger                         | Skill                      | When to Invoke                     |
+| ------------------------------- | -------------------------- | ---------------------------------- |
+| [Task pattern 1]                | `skill-name`               | [When to use]                      |
 | Bug, error, unexpected behavior | `debugging-systematically` | Investigating issues before fixing |
-| Multi-step task (≥2 steps) | `using-todowrite` | [Domain tracking needs] |
+| Multi-step task (≥2 steps)      | `using-todowrite`          | [Domain tracking needs]            |
 
 **Semantic matching guidance:**
+
 - [Scenario 1]? → [Skill combination]
 - [Scenario 2]? → [Skill combination]
 
 ### Step 3: Load Library Skills from Gateway
 
 The gateway provides:
+
 1. **Mandatory library skills** - Read ALL skills in "Mandatory" section
 2. **Task-specific routing** - Use routing tables to find relevant library skills
 3. **[Domain-specific guidance]** - [What gateway provides]
@@ -529,7 +531,7 @@ skills: debugging-systematically, gateway-backend, verifying-before-completion
 **Use same process as creating-agents Phase 9**:
 
 ```
-skill: "testing-skills-with-subagents"
+Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")
 Read `.claude/skills/creating-agents/references/pressure-testing.md`
 ```
 
@@ -561,7 +563,7 @@ Update complete when:
 ## Related Skills
 
 - `creating-agents` - Create new agents
-- `testing-skills-with-subagents` - Pressure testing (if REFACTOR needed)
+- `pressure-testing-skill-content` - Pressure testing (if REFACTOR needed)
 - `agent-manager` - Router to this skill
 - `developing-with-tdd` - TDD philosophy
 - `verifying-before-completion` - Final validation

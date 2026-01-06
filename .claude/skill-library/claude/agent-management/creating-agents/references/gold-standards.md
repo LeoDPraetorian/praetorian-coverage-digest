@@ -23,12 +23,12 @@
 
 ### Overview
 
-| Agent | Type | Lines | Location | Key Features |
-|-------|------|-------|----------|--------------|
-| **frontend-lead** | architecture | 151 | `.claude/agents/architecture/frontend-lead.md` | Step 1/2/3, Core Responsibilities, 6-point Anti-Bypass |
-| **frontend-tester** | testing | 277 | `.claude/agents/testing/frontend-tester.md` | Mode-based structure, comprehensive test guidance |
-| **security-lead** | architecture | 185 | `.claude/agents/architecture/security-lead.md` | Security-specific responsibilities, threat modeling |
-| **frontend-developer** | development | 160 | `.claude/agents/development/frontend-developer.md` | Implementation focus, TDD enforcement |
+| Agent                  | Type         | Lines | Location                                           | Key Features                                           |
+| ---------------------- | ------------ | ----- | -------------------------------------------------- | ------------------------------------------------------ |
+| **frontend-lead**      | architecture | 151   | `.claude/agents/architecture/frontend-lead.md`     | Step 1/2/3, Core Responsibilities, 6-point Anti-Bypass |
+| **frontend-tester**    | testing      | 277   | `.claude/agents/testing/frontend-tester.md`        | Mode-based structure, comprehensive test guidance      |
+| **security-lead**      | architecture | 185   | `.claude/agents/architecture/security-lead.md`     | Security-specific responsibilities, threat modeling    |
+| **frontend-developer** | development  | 160   | `.claude/agents/development/frontend-developer.md` | Implementation focus, TDD enforcement                  |
 
 **These agents represent the ACTUAL pattern.** They are the source of truth, not documentation that has drifted.
 
@@ -66,33 +66,34 @@ FROM frontend-lead.md lines 40-91:
 
 **Every architecture task requires these (in order):**
 
-| Skill | Why Always Invoke |
-|-------|-------------------|
-| `calibrating-time-estimates` | Prevents "no time to read skills" rationalization |
-| `gateway-frontend` | Routes to mandatory + task-specific library skills |
-| `brainstorming` | MANDATORY for architects - explore alternatives |
-| `writing-plans` | Document architectural decisions |
-| `enforcing-evidence-based-analysis` | Read source files before designing |
-| `verifying-before-completion` | Ensures outputs are verified before claiming done |
+| Skill                               | Why Always Invoke                                  |
+| ----------------------------------- | -------------------------------------------------- |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization  |
+| `gateway-frontend`                  | Routes to mandatory + task-specific library skills |
+| `brainstorming`                     | MANDATORY for architects - explore alternatives    |
+| `writing-plans`                     | Document architectural decisions                   |
+| `enforcing-evidence-based-analysis` | Read source files before designing                 |
+| `verifying-before-completion`       | Ensures outputs are verified before claiming done  |
 
 ### Step 2: Invoke Core Skills Based on Task Context
 
 Your `skills` frontmatter makes these core skills available. **Invoke based on semantic relevance to your task**:
 
-| Trigger | Skill | When to Invoke |
-|---------|-------|----------------|
-| Creating implementation plan | `enforcing-evidence-based-analysis` | BEFORE planning - read all relevant source files |
-| Evaluating multiple approaches | `brainstorming` | Exploring alternatives before recommending |
-| Documenting architecture decisions | `writing-plans` | Creating formal design artifacts |
-| Bug, error, unexpected behavior | `debugging-systematically` | Investigating issues before fixing |
-| Multi-step task (≥2 steps) | `using-todowrite` | Track architecture decisions and validation steps |
+| Trigger                            | Skill                               | When to Invoke                                    |
+| ---------------------------------- | ----------------------------------- | ------------------------------------------------- |
+| Creating implementation plan       | `enforcing-evidence-based-analysis` | BEFORE planning - read all relevant source files  |
+| Evaluating multiple approaches     | `brainstorming`                     | Exploring alternatives before recommending        |
+| Documenting architecture decisions | `writing-plans`                     | Creating formal design artifacts                  |
+| Bug, error, unexpected behavior    | `debugging-systematically`          | Investigating issues before fixing                |
+| Multi-step task (≥2 steps)         | `using-todowrite`                   | Track architecture decisions and validation steps |
 
 ### Step 3: Load Library Skills from Gateway
 
 The gateway provides:
+
 1. **Mandatory library skills** - Read ALL skills in "Mandatory" section for architects
 2. **Task-specific routing** - Use routing tables to find relevant library skills
-...
+   ...
 ```
 
 **3. Core Responsibilities Section**
@@ -103,6 +104,7 @@ FROM frontend-lead.md lines 16-31:
 ## Core Responsibilities
 
 ### Architecture for New Features
+
 - Design component hierarchies
 - Define state management strategy (TanStack Query vs Zustand vs Context)
 - Plan file organization and module boundaries
@@ -110,6 +112,7 @@ FROM frontend-lead.md lines 16-31:
 - Document architectural decisions
 
 ### Architecture Review for Refactoring
+
 - Analyze existing code structure
 - Identify technical debt and architectural smells
 - Design refactoring approach with minimal risk
@@ -187,6 +190,7 @@ NOT a single `skills_read` array.
 **1. Higher Line Count for Testing Agents**
 
 Testing agents have 200-280 lines because they need mode-specific guidance:
+
 - Unit testing mode
 - Integration testing mode
 - E2E testing mode
@@ -241,12 +245,14 @@ Each mode has specific patterns, tools, and verification steps.
 ## Core Responsibilities
 
 ### Threat Modeling
+
 - Identify attack surfaces and trust boundaries
 - Enumerate potential threat actors and motivations
 - Map attack vectors and exploitation paths
 - Prioritize threats by business impact
 
 ### Security Architecture Design
+
 - Design authentication and authorization flows
 - Specify encryption and key management strategies
 - Define secure coding practices and validation requirements
@@ -256,12 +262,12 @@ Each mode has specific patterns, tools, and verification steps.
 
 Different mandatory skills for security domain:
 
-| Skill | Why Always Invoke |
-|-------|-------------------|
-| `calibrating-time-estimates` | Security work takes time - prevent rushed decisions |
-| `gateway-security` | Routes to auth, crypto, threat modeling library skills |
-| `brainstorming` | MANDATORY - explore attack vectors and mitigations |
-| `enforcing-evidence-based-analysis` | Security claims require evidence |
+| Skill                               | Why Always Invoke                                      |
+| ----------------------------------- | ------------------------------------------------------ |
+| `calibrating-time-estimates`        | Security work takes time - prevent rushed decisions    |
+| `gateway-security`                  | Routes to auth, crypto, threat modeling library skills |
+| `brainstorming`                     | MANDATORY - explore attack vectors and mitigations     |
+| `enforcing-evidence-based-analysis` | Security claims require evidence                       |
 
 **3. Domain-Specific Anti-Bypass**
 
@@ -291,13 +297,13 @@ Different mandatory skills for security domain:
 
 **1. Development-Specific Step 1 Skills**
 
-| Skill | Why Always Invoke |
-|-------|-------------------|
-| `calibrating-time-estimates` | Prevents "no time to read skills" rationalization |
-| `gateway-frontend` | Routes to React patterns, testing, state management |
-| `developing-with-tdd` | Write test FIRST - RED → GREEN → REFACTOR |
-| `adhering-to-yagni` | Build only what's needed, not what might be needed |
-| `verifying-before-completion` | Run tests and build before claiming done |
+| Skill                         | Why Always Invoke                                   |
+| ----------------------------- | --------------------------------------------------- |
+| `calibrating-time-estimates`  | Prevents "no time to read skills" rationalization   |
+| `gateway-frontend`            | Routes to React patterns, testing, state management |
+| `developing-with-tdd`         | Write test FIRST - RED → GREEN → REFACTOR           |
+| `adhering-to-yagni`           | Build only what's needed, not what might be needed  |
+| `verifying-before-completion` | Run tests and build before claiming done            |
 
 **2. Implementation-Focused Output**
 
@@ -306,7 +312,9 @@ Different mandatory skills for security domain:
   "status": "complete",
   "summary": "Implemented UserProfile component with TDD",
   "skills_invoked": ["developing-with-tdd", "gateway-frontend"],
-  "library_skills_read": [".claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md"],
+  "library_skills_read": [
+    ".claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md"
+  ],
   "files_modified": ["src/components/UserProfile.tsx", "src/components/UserProfile.test.tsx"],
   "verification": {
     "tests_passed": true,
@@ -354,6 +362,7 @@ Different mandatory skills for security domain:
 ### 4. Anti-Bypass with 5-6 Detailed Points (UNIVERSAL)
 
 Each point has:
+
 - Rationalization: "I already know this"
 - Counter: → Your training data is stale, read current skills
 
@@ -391,6 +400,7 @@ All gold standards have **2-3 examples** in description showing diverse use case
 ### ❌ WRONG: Single skills_read Array
 
 **Bad**:
+
 ```json
 {
   "skills_read": ["all", "skills", "together"]
@@ -398,6 +408,7 @@ All gold standards have **2-3 examples** in description showing diverse use case
 ```
 
 **Good**:
+
 ```json
 {
   "skills_invoked": ["core-skills"],
@@ -422,6 +433,7 @@ All gold standards have **2-3 examples** in description showing diverse use case
 ### ❌ WRONG: 3 Brief Anti-Bypass Points
 
 **Bad**:
+
 ```markdown
 ## Anti-Bypass
 
@@ -441,6 +453,7 @@ All gold standards have **2-3 examples** in description showing diverse use case
 **Bad**: "All agents: <150 lines"
 
 **Good**:
+
 - Architecture: 150-200 lines
 - Development: 150-180 lines
 - Testing: 200-280 lines

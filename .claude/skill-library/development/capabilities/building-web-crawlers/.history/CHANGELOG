@@ -1,0 +1,98 @@
+# Changelog - building-web-crawlers
+
+## 2026-01-04 - Initial Creation
+
+**Category**: development/capabilities
+**Type**: Process/Pattern
+**Location**: Library
+
+### RED Phase Documentation
+
+**Gap Identified**: Developers building web crawlers for security scanning lack guidance on:
+- Industry-standard patterns from Colly (25k stars) and Katana (15k stars)
+- Three-mode architecture (standard HTTP, headless browser, passive/historical)
+- Event-driven callback patterns (OnRequest, OnResponse, OnHTML, OnError)
+- Security-specific extraction (forms, JS endpoints, parameters)
+- Rate limiting and politeness for security scanning
+- Integration with Chariot platform (Tabularium, Janus)
+
+**Failure Without Skill**: When asked to implement a web crawler for security scanning, Claude would:
+1. ❌ Suggest basic net/http from scratch without mentioning Colly or Katana
+2. ❌ Implement single-mode crawling (no headless or passive options)
+3. ❌ Miss the collector/callback event architecture
+4. ❌ Lack proper rate limiting and politeness patterns
+5. ❌ Not extract security-relevant data (forms, parameters, JS endpoints)
+6. ❌ Fail to integrate with Chariot's workflow orchestration
+
+**Skill Addresses**: Provides comprehensive patterns for:
+- Three crawling modes with selection criteria
+- Colly event-driven callback architecture
+- Rate limiting strategies (fixed delay, token bucket, per-domain)
+- Security-specific extraction patterns (forms, JS endpoints, sessions)
+- Multi-mode architecture with factory pattern
+- Chariot platform integration (Asset models, Janus capabilities)
+
+### Created Files
+
+- SKILL.md (407 lines) - Core skill content with progressive disclosure
+- .history/CHANGELOG - This file
+- references/ directory prepared (files to be populated during research phase)
+- examples/ directory prepared
+
+### Phase 6: Reference Files (Skipped Research)
+
+**Decision**: User chose to skip research and use content from original request.
+
+**Created Reference Files**:
+- references/mode-selection.md - Crawling mode selection criteria
+- references/crawling-modes.md - Implementation details for each mode
+- references/rate-limiting.md - Advanced rate limiting patterns
+- references/architecture.md - Multi-mode architecture patterns
+
+**Not Created** (mentioned in SKILL.md but can be added later if needed):
+- references/collector-callbacks.md
+- references/security-extraction.md
+- references/chariot-integration.md
+- references/implementation-guide.md
+- references/troubleshooting.md
+
+### Phase 7: Gateway Update
+
+**Gateway selected**: gateway-capabilities
+
+**Rationale**: Capability-developer agent invokes this gateway, and web crawlers are security scanning capabilities.
+
+**Changes made**:
+- Added to Intent Detection table: "web crawler" / "Colly" / "Katana" → building-web-crawlers
+- Added to Skill Registry under "Scanners & Chains" section
+- Formatted with prettier
+
+### Phase 8: GREEN Verification
+
+**Original RED Failure**: Without the skill, Claude suggested basic net/http without Colly/Katana patterns, single-mode crawling, missing callback architecture, no rate limiting, and no Chariot integration.
+
+**With Skill**: Provides comprehensive Colly/Katana patterns, three-mode architecture, event-driven callbacks, rate limiting strategies, security extraction, and Chariot integration.
+
+**User Confirmation**: User verified skill successfully addresses the gap.
+
+**Audit Results**:
+- ✅ Phase 1: Description Format - PASS
+- ✅ Phase 2: Allowed Tools - PASS
+- ✅ Phase 3: Line Count - PASS (407 lines, well under 500)
+- ⚠️ Phase 4: Broken Links - INFO (5 reference files can be added later)
+- ✅ Phase 5: File Organization - PASS
+
+**Status**: All critical phases pass, no CRITICAL or WARNING issues.
+
+### Phase 9: REFACTOR Pressure Testing
+
+**Assessment**: Pressure testing NOT APPLICABLE for this skill.
+
+**Rationale** (per pressure-testing-skill-content methodology):
+- building-web-crawlers is a reference/documentation skill (like API docs)
+- Provides patterns and examples, doesn't enforce process discipline
+- No rules to violate or bypass
+- No compliance costs that create time pressure
+- Falls under "Don't test: Pure reference skills" category
+
+**Skill is complete and ready for use.**

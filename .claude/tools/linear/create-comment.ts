@@ -1,12 +1,12 @@
 /**
- * create_comment - Linear MCP Wrapper
+ * create_comment - Linear GraphQL Wrapper
  *
- * Create a comment on a Linear issue via MCP server
+ * Create a comment on a Linear issue via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~500 tokens (creation response)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -24,8 +24,8 @@
  *   - createdAt: string - ISO timestamp of creation
  *
  * Edge cases discovered:
- * - MCP returns {success: true, comment: {...}} on success
- * - On error, MCP may return {success: false} or throw
+ * - GraphQL returns {commentCreate: {success: true, comment: {...}}} on success
+ * - On error, GraphQL returns errors array or throws
  * - Issue ID can be identifier (CHARIOT-1234) or UUID
  * - Parent ID enables threaded/nested comments
  * - Body supports full Markdown including code blocks
@@ -48,12 +48,31 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL mutation for creating a comment
+ */
+const CREATE_COMMENT_MUTATION = `
+  mutation CommentCreate($issueId: String!, $body: String!, $parentId: String) {
+    commentCreate(input: { issueId: $issueId, body: $body, parentId: $parentId }) {
+      success
+      comment {
+        id
+        body
+        createdAt
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -92,13 +111,28 @@ export const createCommentOutput = z.object({
     id: z.string(),
     body: z.string(),
     createdAt: z.string()
-  })
+  }),
+  estimatedTokens: z.number()
 });
 
 export type CreateCommentOutput = z.infer<typeof createCommentOutput>;
 
 /**
- * Create a comment on a Linear issue using MCP wrapper
+ * GraphQL response type
+ */
+interface CommentCreateResponse {
+  commentCreate: {
+    success: boolean;
+    comment?: {
+      id: string;
+      body: string;
+      createdAt: string;
+    };
+  };
+}
+
+/**
+ * Create a comment on a Linear issue using GraphQL API
  *
  * @example
  * ```typescript
@@ -123,29 +157,44 @@ export const createComment = {
   description: 'Create a comment on a Linear issue',
   parameters: createCommentParams,
 
-  async execute(input: CreateCommentInput): Promise<CreateCommentOutput> {
+  async execute(
+    input: CreateCommentInput,
+    testToken?: string
+  ): Promise<CreateCommentOutput> {
     // Validate input
     const validated = createCommentParams.parse(input);
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'create_comment',
-      validated
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Execute GraphQL mutation
+    const response = await executeGraphQL<CommentCreateResponse>(
+      client,
+      CREATE_COMMENT_MUTATION,
+      {
+        issueId: validated.issueId,
+        body: validated.body,
+        parentId: validated.parentId,
+      }
     );
 
-    if (!rawData.success) {
+    if (!response.commentCreate?.success || !response.commentCreate?.comment) {
       throw new Error('Failed to create comment');
     }
 
     // Filter to essential fields
-    const filtered = {
-      success: rawData.success,
+    const baseData = {
+      success: response.commentCreate.success,
       comment: {
-        id: rawData.comment?.id,
-        body: rawData.comment?.body,
-        createdAt: rawData.comment?.createdAt
+        id: response.commentCreate.comment.id,
+        body: response.commentCreate.comment.body,
+        createdAt: response.commentCreate.comment.createdAt
       }
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

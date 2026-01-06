@@ -11,6 +11,7 @@ allowed-tools: Read
 ## When to Use
 
 Use when:
+
 - Porting Python capabilities to Go (garak → venator)
 - Converting Python classes, decorators, generators
 - Unsure how to translate specific Python pattern
@@ -25,17 +26,17 @@ Use when:
 
 ## Quick Reference
 
-| Python Pattern | Go Equivalent | Go Version | See |
-|----------------|---------------|------------|-----|
-| `yield` generators | `iter.Seq[T]` | 1.23+ | §1 |
-| Class inheritance | Interface + embedding | Any | §2 |
-| `@decorator` | Middleware/options | Any | §3 |
-| `try/except` | `if err != nil` | Any | §4 |
-| `async/await` | Goroutines + errgroup | Any | §5 |
-| `@dataclass` | Struct + constructor | Any | §6 |
-| `[x for x...]` | Loop or Map generic | 1.18+ | §7 |
-| `Optional[T]` | `*T` pointer | Any | §8 |
-| `Union[A,B]` | `A \| B` constraint | 1.18+ | §8 |
+| Python Pattern     | Go Equivalent         | Go Version | See |
+| ------------------ | --------------------- | ---------- | --- |
+| `yield` generators | `iter.Seq[T]`         | 1.23+      | §1  |
+| Class inheritance  | Interface + embedding | Any        | §2  |
+| `@decorator`       | Middleware/options    | Any        | §3  |
+| `try/except`       | `if err != nil`       | Any        | §4  |
+| `async/await`      | Goroutines + errgroup | Any        | §5  |
+| `@dataclass`       | Struct + constructor  | Any        | §6  |
+| `[x for x...]`     | Loop or Map generic   | 1.18+      | §7  |
+| `Optional[T]`      | `*T` pointer          | Any        | §8  |
+| `Union[A,B]`       | `A \| B` constraint   | 1.18+      | §8  |
 
 **For detailed examples**, see [references/pattern-catalog.md](references/pattern-catalog.md)
 
@@ -173,6 +174,7 @@ Complex/reusable: Generic helpers
 ## Pattern 8: Type Hints → Native Types
 
 **Python typing → Go**:
+
 - `List[T]` → `[]T`
 - `Dict[K,V]` → `map[K]V`
 - `Optional[T]` → `*T`
@@ -206,6 +208,7 @@ func init() {
 ## Pattern Selection
 
 **Identify Python pattern in source:**
+
 1. Has `yield`? → iter.Seq (§1)
 2. Has `class(Base)`? → Interface + embedding (§2)
 3. Has `@decorator`? → Middleware or options (§3)
@@ -220,9 +223,11 @@ func init() {
 ## Garak-Specific Examples
 
 **For concrete garak → venator examples:**
+
 - [references/garak-examples.md](references/garak-examples.md)
 
 Covers:
+
 - Probe.probe() → Prober.Probe()
 - Generator.generate() → Generator.Generate()
 - Detector.detect() → Detector.Detect()
@@ -232,6 +237,7 @@ Covers:
 ## Integration
 
 **Phase 2.5** of porting workflow:
+
 1. Architecture Analysis
 2. Dependency Mapping
 3. **Idiom Translation** ← THIS SKILL

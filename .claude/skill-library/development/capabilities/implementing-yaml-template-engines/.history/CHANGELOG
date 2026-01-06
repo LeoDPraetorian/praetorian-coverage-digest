@@ -1,0 +1,43 @@
+# Changelog - implementing-yaml-template-engines
+
+## [1.0.0] - 2026-01-04
+
+### Initial Creation
+
+**RED Phase Documentation:**
+- **Gap Identified**: Developers lack guidance for implementing YAML-based template engines for security scanners
+- **Current Failure**: Claude provides generic YAML parsing advice without Nuclei patterns, DSL evaluation, matcher/extractor engines, or Chariot integration
+- **Expected Behavior**: Guide through Parser → Compiler → Executor → Matcher → Extractor architecture with DSL expressions, template caching, and Chariot integration
+
+**Skill Metadata:**
+- **Location**: Library (.claude/skill-library/development/capabilities/)
+- **Category**: development/capabilities
+- **Type**: Process/Pattern
+- **Line Count**: 498 lines (under 500 limit)
+
+**Architecture Covered:**
+- Five core components (Parser, Compiler, Executor, Matcher, Extractor)
+- Nuclei template structure (id, info, protocol, matchers, extractors)
+- DSL expression evaluation with variable interpolation
+- Template registry patterns with caching
+- Request clustering optimization
+- Integration with Tabularium Risk model and Janus framework
+
+**Key References Prepared:**
+- parser-implementation.md (validation, error handling)
+- compiler-architecture.md (compilation pipeline, caching)
+- dsl-evaluation.md (variable context, helper functions)
+- matcher-implementation.md (condition trees, optimization)
+- extractor-implementation.md (extraction logic, JSON/XML parsing)
+- chariot-integration.md (Risk mapping, Janus registration)
+- registry-patterns.md (concurrent access, hot-reloading)
+- clustering-optimization.md (clustering algorithms, performance)
+- error-handling.md (validation rules, debugging)
+- performance-tuning.md (benchmarks, profiling)
+- testing-patterns.md (test fixtures, coverage targets)
+
+**Next Steps:**
+- Phase 6: Research and populate reference files
+- Phase 7: Add to gateway-capabilities routing table
+- Phase 8: GREEN verification with audit
+- Phase 9: REFACTOR pressure testing

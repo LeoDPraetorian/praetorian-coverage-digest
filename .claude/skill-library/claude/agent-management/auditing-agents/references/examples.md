@@ -3,11 +3,11 @@
 ### Example 1: Audit After Edit
 
 ```
-User: "I just updated the react-developer agent description. Audit it."
+User: "I just updated the frontend-developer agent description. Audit it."
 
 You:
 1. cd .claude/skills/agent-manager/scripts
-2. npm run audit-critical -- react-developer
+2. npm run audit-critical -- frontend-developer
 3. Interpret results:
    - Exit code 0 → "✅ No critical issues found. Ready to commit."
    - Exit code 1 → "❌ Found issues: [list them with line numbers and fixes]"
@@ -59,20 +59,20 @@ You:
 
    ✗ Critical issues found
 
-   react-developer.md:
+   frontend-developer.md:
      Block scalar pipe detected (line 5)
        Fix: Convert to single-line with \n escapes
 
-   go-architect.md:
+   backend-architect.md:
      Name mismatch (line 3)
-       Frontmatter name: "golang-architect"
-       Filename: "go-architect"
-       Fix: Update name to "go-architect"
+       Frontmatter name: "backend-arch"
+       Filename: "backend-architect"
+       Fix: Update name to "backend-architect"
 
    Checked 49 agent(s)
    Found 2 critical issue(s)
 
-3. Summarize: "Found issues in 2 agents (react-developer, go-architect)"
+3. Summarize: "Found issues in 2 agents (frontend-developer, backend-architect)"
 4. Ask: "Would you like me to fix these automatically?"
 ```
 

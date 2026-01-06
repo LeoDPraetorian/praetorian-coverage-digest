@@ -1,12 +1,12 @@
 /**
- * list_comments - Linear MCP Wrapper
+ * list_comments - Linear GraphQL Wrapper
  *
- * List comments for a specific issue via MCP server
+ * List comments for a specific issue via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~700 tokens (comment list)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -27,10 +27,10 @@
  * - totalComments: number - Count of comments returned
  *
  * Edge cases discovered:
- * - MCP may return array directly or wrapped in { comments: [...] }
  * - Body is truncated to 300 chars to reduce token usage
  * - User object may be undefined if author information unavailable
  * - Issue ID can be identifier (CHARIOT-1234) or UUID
+ * - Empty comments returns empty array, not null
  *
  * @example
  * ```typescript
@@ -43,12 +43,39 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL query for listing comments on an issue
+ */
+const LIST_COMMENTS_QUERY = `
+  query IssueComments($id: String!) {
+    issue(id: $id) {
+      id
+      comments {
+        nodes {
+          id
+          body
+          user {
+            id
+            name
+            email
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -81,20 +108,46 @@ export const listCommentsOutput = z.object({
     createdAt: z.string(),
     updatedAt: z.string()
   })),
-  totalComments: z.number()
+  totalComments: z.number(),
+  estimatedTokens: z.number()
 });
 
 export type ListCommentsOutput = z.infer<typeof listCommentsOutput>;
 
 /**
- * List comments for a Linear issue using MCP wrapper
+ * GraphQL response type
+ */
+interface IssueCommentsResponse {
+  issue: {
+    id: string;
+    comments?: {
+      nodes: Array<{
+        id: string;
+        body?: string | null;
+        user?: {
+          id: string;
+          name: string;
+          email: string;
+        } | null;
+        createdAt?: string;
+        updatedAt?: string;
+      }>;
+    } | null;
+  } | null;
+}
+
+/**
+ * List comments for a Linear issue using GraphQL API
  *
  * @example
  * ```typescript
  * import { listComments } from './.claude/tools/linear';
  *
  * // List comments for an issue
- * const comments = await listComments.execute({ issueId: 'abc123...' });
+ * const comments = await listComments.execute({ issueId: 'CHARIOT-1234' });
+ *
+ * // With test token
+ * const comments2 = await listComments.execute({ issueId: 'abc123...' }, 'test-token');
  * ```
  */
 export const listComments = {
@@ -102,34 +155,49 @@ export const listComments = {
   description: 'List comments for a specific Linear issue',
   parameters: listCommentsParams,
 
-  async execute(input: ListCommentsInput): Promise<ListCommentsOutput> {
+  async execute(
+    input: ListCommentsInput,
+    testToken?: string
+  ): Promise<ListCommentsOutput> {
     // Validate input
     const validated = listCommentsParams.parse(input);
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'list_comments',
-      validated
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Execute GraphQL query
+    const response = await executeGraphQL<IssueCommentsResponse>(
+      client,
+      LIST_COMMENTS_QUERY,
+      { id: validated.issueId }
     );
 
-    // Linear MCP returns array directly, not { comments: [...] }
-    const comments = Array.isArray(rawData) ? rawData : (rawData.comments || []);
+    if (!response.issue) {
+      throw new Error(`Issue not found: ${validated.issueId}`);
+    }
+
+    // Extract comments array (handle null/undefined)
+    const comments = response.issue.comments?.nodes || [];
 
     // Filter to essential fields
-    const filtered = {
-      comments: comments.map((comment: any) => ({
+    const baseData = {
+      comments: comments.map((comment) => ({
         id: comment.id,
-        body: comment.body?.substring(0, 300), // Truncate for token efficiency
+        body: comment.body?.substring(0, 300) || '', // Truncate for token efficiency
         user: comment.user ? {
           id: comment.user.id,
           name: comment.user.name,
           email: comment.user.email
         } : undefined,
-        createdAt: comment.createdAt,
-        updatedAt: comment.updatedAt
+        createdAt: comment.createdAt || '',
+        updatedAt: comment.updatedAt || ''
       })),
       totalComments: comments.length
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

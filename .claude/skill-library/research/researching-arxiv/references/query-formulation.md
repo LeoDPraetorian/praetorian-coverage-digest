@@ -6,33 +6,33 @@
 
 ### AI/ML Domain
 
-| Colloquial Term            | Academic Term                          | Why It Matters                    |
-| -------------------------- | -------------------------------------- | --------------------------------- |
-| "LLM hacking"              | "adversarial attacks on language models" | Indexed in security papers     |
-| "AI hallucination"         | "factual inconsistency in generation"  | Precise technical term            |
-| "making AI safe"           | "alignment techniques"                 | Established research area         |
-| "AI agents"                | "autonomous agent architectures"       | Academic terminology              |
-| "chatbot"                  | "conversational AI system"             | Broader technical scope           |
-| "prompt engineering"       | "input optimization for LLMs"          | Research-focused terminology      |
+| Colloquial Term      | Academic Term                            | Why It Matters               |
+| -------------------- | ---------------------------------------- | ---------------------------- |
+| "LLM hacking"        | "adversarial attacks on language models" | Indexed in security papers   |
+| "AI hallucination"   | "factual inconsistency in generation"    | Precise technical term       |
+| "making AI safe"     | "alignment techniques"                   | Established research area    |
+| "AI agents"          | "autonomous agent architectures"         | Academic terminology         |
+| "chatbot"            | "conversational AI system"               | Broader technical scope      |
+| "prompt engineering" | "input optimization for LLMs"            | Research-focused terminology |
 
 ### Security Domain
 
-| Colloquial Term     | Academic Term                | Why It Matters               |
-| ------------------- | ---------------------------- | ---------------------------- |
-| "finding bugs"      | "vulnerability discovery"    | Security research terminology |
-| "breaking security" | "cryptanalytic attack"       | Precise attack classification |
-| "network scanning"  | "service enumeration"        | Network security terminology  |
-| "hacking tools"     | "penetration testing frameworks" | Professional terminology |
-| "data leak"         | "information disclosure"     | Academic classification       |
+| Colloquial Term     | Academic Term                    | Why It Matters                |
+| ------------------- | -------------------------------- | ----------------------------- |
+| "finding bugs"      | "vulnerability discovery"        | Security research terminology |
+| "breaking security" | "cryptanalytic attack"           | Precise attack classification |
+| "network scanning"  | "service enumeration"            | Network security terminology  |
+| "hacking tools"     | "penetration testing frameworks" | Professional terminology      |
+| "data leak"         | "information disclosure"         | Academic classification       |
 
 ### System/Architecture Domain
 
-| Colloquial Term        | Academic Term                     | Why It Matters                |
-| ---------------------- | --------------------------------- | ----------------------------- |
-| "microservices"        | "distributed system architecture" | Broader research context      |
-| "cloud computing"      | "distributed computing infrastructure" | Academic framing       |
-| "API design"           | "interface specification"         | Formal terminology            |
-| "database performance" | "query optimization"              | Research-focused term         |
+| Colloquial Term        | Academic Term                          | Why It Matters           |
+| ---------------------- | -------------------------------------- | ------------------------ |
+| "microservices"        | "distributed system architecture"      | Broader research context |
+| "cloud computing"      | "distributed computing infrastructure" | Academic framing         |
+| "API design"           | "interface specification"              | Formal terminology       |
+| "database performance" | "query optimization"                   | Research-focused term    |
 
 ## Query Patterns
 
@@ -77,16 +77,19 @@ Query 3 (Application): "attention-based security analysis"
 ### Boolean Operators
 
 **AND (implicit with +):**
+
 ```
 query=adversarial+attacks+AND+language+models
 ```
 
 **OR:**
+
 ```
 query=prompt+injection+OR+jailbreak
 ```
 
 **NOT:**
+
 ```
 query=LLM+security+NOT+vision
 ```
@@ -94,30 +97,34 @@ query=LLM+security+NOT+vision
 ### Category Filtering
 
 **Single category:**
+
 ```
 query=cs.CR+prompt+injection
 ```
+
 - `cs.CR` = Cryptography and Security
 
 **Multiple categories:**
+
 ```
 query=(cs.AI+OR+cs.LG)+AND+adversarial
 ```
+
 - `cs.AI` = Artificial Intelligence
 - `cs.LG` = Machine Learning
 
 ### Common arXiv Categories
 
-| Code    | Category                          | Use For                      |
-| ------- | --------------------------------- | ---------------------------- |
-| cs.AI   | Artificial Intelligence           | LLM, agents, planning        |
-| cs.CR   | Cryptography and Security         | Security, attacks, defenses  |
-| cs.LG   | Machine Learning                  | ML techniques, algorithms    |
-| cs.SE   | Software Engineering              | Development practices        |
-| cs.NI   | Networking and Internet Architecture | Protocols, fingerprinting |
-| cs.CY   | Computers and Society             | Ethics, policy               |
-| cs.HC   | Human-Computer Interaction        | UI/UX research               |
-| stat.ML | Machine Learning (Statistics)     | Statistical ML methods       |
+| Code    | Category                             | Use For                     |
+| ------- | ------------------------------------ | --------------------------- |
+| cs.AI   | Artificial Intelligence              | LLM, agents, planning       |
+| cs.CR   | Cryptography and Security            | Security, attacks, defenses |
+| cs.LG   | Machine Learning                     | ML techniques, algorithms   |
+| cs.SE   | Software Engineering                 | Development practices       |
+| cs.NI   | Networking and Internet Architecture | Protocols, fingerprinting   |
+| cs.CY   | Computers and Society                | Ethics, policy              |
+| cs.HC   | Human-Computer Interaction           | UI/UX research              |
+| stat.ML | Machine Learning (Statistics)        | Statistical ML methods      |
 
 ## Date Filtering
 
@@ -142,6 +149,7 @@ query=prompt+injection+AND+submittedDate:[202506+TO+202512]
 ```
 
 **Why date filtering matters:**
+
 - AI/ML field moves rapidly (techniques become outdated in 6-12 months)
 - Security research responds to new threats (need recent papers)
 - Foundational work can be older (e.g., attention mechanisms from 2017)

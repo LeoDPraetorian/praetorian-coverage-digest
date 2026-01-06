@@ -4,6 +4,7 @@
  * Discovers actual response format from real Context7 MCP server
  */
 import { callMCPTool } from '../../config/lib/mcp-client';
+import { estimateTokens } from '../../config/lib/response-utils.js';
 
 async function discoverSchemas() {
   console.log('🔍 Context7 Schema Discovery\n');
@@ -110,7 +111,7 @@ async function discoverSchemas() {
       console.log(`\n   Response Type: ${typeof rawResponse}`);
 
       if (typeof rawResponse === 'string') {
-        console.log(`   Response Length: ${rawResponse.length} characters (~${Math.ceil(rawResponse.length / 4)} tokens)`);
+        console.log(`   Response Length: ${rawResponse.length} characters (~${estimateTokens(rawResponse)} tokens)`);
         console.log(`   Response Format: Text documentation`);
 
         // Show first 300 chars

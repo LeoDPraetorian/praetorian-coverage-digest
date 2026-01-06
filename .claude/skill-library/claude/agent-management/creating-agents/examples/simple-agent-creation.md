@@ -477,7 +477,7 @@ All compliance checks passed.
 "Loading pressure testing methodology...
 
 ```
-skill: "testing-skills-with-subagents"
+Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")
 
 Read `.claude/skills/creating-agents/references/pressure-testing.md`
 ```

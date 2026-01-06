@@ -1,0 +1,30 @@
+# Changelog
+
+## 2026-01-04 - Initial Creation
+
+**Why Created:**
+Extracted embedded Security Review Framework and Review Process from backend-security agent to enable reuse and reduce agent bloat from 204 to ~130 lines.
+
+**RED Phase Documentation:**
+- **Gap**: backend-security.md contained embedded framework (OWASP Top 10, Go patterns, severity classification, findings template)
+- **Failure**: Framework inaccessible to other agents needing security review patterns, violated lean agent architecture (<150 lines)
+- **Test Scenario**: Other security reviewers (capability-developer, frontend-security) would need to duplicate framework content
+
+**Skill Details:**
+- **Category**: security (library skill)
+- **Type**: Process/Pattern
+- **Location**: `.claude/skill-library/security/reviewing-backend-security/SKILL.md`
+- **Line Count**: 144 lines (safe, well under 500 limit)
+
+**Content Extracted:**
+1. OWASP Top 10 Focus list (Injection, Broken auth, Sensitive data, etc.)
+2. Go-Specific Patterns (Race conditions, Context.Context, Prepared statements, TLS, Error handling)
+3. Severity Classification table (CRITICAL, HIGH, MEDIUM, LOW with examples)
+4. Review Process: Write Security Findings (complete markdown template)
+
+**Next Steps:**
+- Research phase to populate additional content
+- Update gateway-security routing table
+- Update backend-security.md to reference this skill
+- GREEN phase verification
+- REFACTOR phase pressure testing

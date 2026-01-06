@@ -90,7 +90,7 @@ ls ~/.claude/plugins/marketplaces/superpowers-dev/
 - `debugging-systematically` (9 references)
 - `verifying-before-completion` (12 references)
 - `developing-with-tdd` (8 references)
-- `testing-skills-with-subagents` (4 references)
+- `pressure-testing-skill-content` (4 references)
 - `claude-skill-write` (3 references)
 
 **Critical component:**

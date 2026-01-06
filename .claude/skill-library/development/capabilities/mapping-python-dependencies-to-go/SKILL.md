@@ -11,6 +11,7 @@ allowed-tools: Read, WebSearch, WebFetch, Bash, Grep, TodoWrite
 ## When to Use
 
 Use this skill when:
+
 - Porting Python projects to Go (like garak → venator)
 - Analyzing Python dependencies for Go alternatives
 - Creating dependency mapping tables for porting documentation
@@ -21,6 +22,7 @@ Use this skill when:
 ## Real Failure This Skill Prevents
 
 **Without this skill** (RED phase documentation):
+
 ```
 Initial claim: "litellm, transformers, torch have no Go equivalent"
 Result: Would have planned custom implementations
@@ -28,6 +30,7 @@ Impact: Months of unnecessary work
 ```
 
 **With mandatory research** (GREEN phase):
+
 ```
 Actual finding: All have mature Go libraries
 - litellm → LangChainGo (8.3k stars), Bifrost (1.4k stars)
@@ -39,13 +42,13 @@ Impact: Port proceeds with confidence
 
 ## Quick Reference
 
-| Phase | Purpose | Time |
-|-------|---------|------|
-| 1. Extract | Parse pyproject.toml/requirements.txt | 5min |
-| 2. Research | **MANDATORY** web search for each dependency | 30-60min |
-| 3. Categorize | Direct/Partial/None/Proto/N/A | 10min |
-| 4. Document | Tables with stars, status, notes | 15min |
-| 5. Identify Blockers | Blocking vs non-blocking | 5min |
+| Phase                | Purpose                                      | Time     |
+| -------------------- | -------------------------------------------- | -------- |
+| 1. Extract           | Parse pyproject.toml/requirements.txt        | 5min     |
+| 2. Research          | **MANDATORY** web search for each dependency | 30-60min |
+| 3. Categorize        | Direct/Partial/None/Proto/N/A                | 10min    |
+| 4. Document          | Tables with stars, status, notes             | 15min    |
+| 5. Identify Blockers | Blocking vs non-blocking                     | 5min     |
 
 **Total time**: 1-2 hours for ~40 dependencies (like garak)
 
@@ -54,6 +57,7 @@ Impact: Port proceeds with confidence
 🚨 **NEVER claim a dependency has no Go equivalent without web research first.**
 
 **Why this rule exists:**
+
 - Training data is 12-18 months stale
 - Go ecosystem evolves rapidly (new libraries monthly)
 - Official vendor SDKs often exist (cohere-ai/cohere-go pattern)
@@ -64,11 +68,13 @@ Impact: Port proceeds with confidence
 ### No "Obvious" Exception
 
 **Not even for "common" dependencies:**
+
 - ❌ "requests is obviously net/http, skip research"
 - ❌ "I know colorama has Go equivalent, skip research"
 - ❌ "numpy is common, defer research for niche ones"
 
 **Reality check:**
+
 - "Obvious" litellm had 3 Go equivalents we initially missed
 - "Common" transformers has 2 approaches we didn't know
 - "Simple" base2048 has a Go port despite being obscure
@@ -90,15 +96,15 @@ cat setup.py | grep -A 20 "install_requires"
 
 **Categorize by domain:**
 
-| Category | Examples |
-|----------|----------|
+| Category         | Examples                                     |
+| ---------------- | -------------------------------------------- |
 | LLM/AI Providers | openai, anthropic, cohere, mistralai, ollama |
-| ML Frameworks | torch, transformers, accelerate |
-| NLP Libraries | nltk, spacy, sentencepiece |
-| Data Processing | numpy, pandas, pillow |
-| Web/HTTP | requests, aiohttp, httpx |
-| Utilities | colorama, tqdm, jinja2, backoff |
-| Domain-Specific | (project-specific packages) |
+| ML Frameworks    | torch, transformers, accelerate              |
+| NLP Libraries    | nltk, spacy, sentencepiece                   |
+| Data Processing  | numpy, pandas, pillow                        |
+| Web/HTTP         | requests, aiohttp, httpx                     |
+| Utilities        | colorama, tqdm, jinja2, backoff              |
+| Domain-Specific  | (project-specific packages)                  |
 
 **Output**: Categorized list of ALL dependencies (including optional/dev).
 
@@ -107,6 +113,7 @@ cat setup.py | grep -A 20 "install_requires"
 For **EVERY** dependency, perform web search using current year (2025):
 
 **Search query templates:**
+
 ```
 golang {package-name} equivalent library 2025 github
 golang {functionality} library 2025 github
@@ -133,14 +140,14 @@ go {package-name} client API github
 
 **Collect for each dependency:**
 
-| Data Point | Why It Matters |
-|------------|----------------|
-| Go package name + GitHub URL | Direct reference |
-| Star count | Community adoption signal |
-| Import count (pkg.go.dev) | Production usage indicator |
-| Last update date | Maintenance status |
-| Official vs community | Support expectations |
-| Feature coverage | Full port vs partial |
+| Data Point                   | Why It Matters             |
+| ---------------------------- | -------------------------- |
+| Go package name + GitHub URL | Direct reference           |
+| Star count                   | Community adoption signal  |
+| Import count (pkg.go.dev)    | Production usage indicator |
+| Last update date             | Maintenance status         |
+| Official vs community        | Support expectations       |
+| Feature coverage             | Full port vs partial       |
 
 **For complete search patterns and source prioritization**, see [references/research-methodology.md](references/research-methodology.md).
 
@@ -150,13 +157,13 @@ Assign each dependency to one status category:
 
 **Status Categories:**
 
-| Symbol | Status | Definition | Action |
-|--------|--------|------------|--------|
-| ✅ | **Direct** | Full-featured Go equivalent (>500 stars preferred) | Use directly |
-| ⚠️ | **Partial** | Go library exists but missing features | Use with workarounds |
-| ❌ | **None** | No Go equivalent after research | Custom implementation |
-| 🔧 | **Proto/gRPC** | Protocol buffer definitions exist | Generate Go bindings |
-| ⏭️ | **N/A** | Not needed for port scope | Skip (e.g., training-only) |
+| Symbol | Status         | Definition                                         | Action                     |
+| ------ | -------------- | -------------------------------------------------- | -------------------------- |
+| ✅     | **Direct**     | Full-featured Go equivalent (>500 stars preferred) | Use directly               |
+| ⚠️     | **Partial**    | Go library exists but missing features             | Use with workarounds       |
+| ❌     | **None**       | No Go equivalent after research                    | Custom implementation      |
+| 🔧     | **Proto/gRPC** | Protocol buffer definitions exist                  | Generate Go bindings       |
+| ⏭️     | **N/A**        | Not needed for port scope                          | Skip (e.g., training-only) |
 
 **Categorization criteria:**
 
@@ -172,32 +179,32 @@ Create structured tables for each category:
 
 #### Direct Equivalents Table
 
-| Python | Go Equivalent | Stars | Status | Notes |
-|--------|---------------|-------|--------|-------|
-| openai | github.com/sashabaranov/go-openai | 9k+ | ✅ Official-quality | Widely used |
-| cohere | github.com/cohere-ai/cohere-go | 69 | ✅ Official | Vendor SDK |
-| boto3 | github.com/aws/aws-sdk-go-v2 | 2.5k | ✅ Official | AWS maintained |
+| Python | Go Equivalent                     | Stars | Status              | Notes          |
+| ------ | --------------------------------- | ----- | ------------------- | -------------- |
+| openai | github.com/sashabaranov/go-openai | 9k+   | ✅ Official-quality | Widely used    |
+| cohere | github.com/cohere-ai/cohere-go    | 69    | ✅ Official         | Vendor SDK     |
+| boto3  | github.com/aws/aws-sdk-go-v2      | 2.5k  | ✅ Official         | AWS maintained |
 
 #### Partial Equivalents Table
 
-| Python | Go Equivalent | Stars | Gap | Workaround |
-|--------|---------------|-------|-----|------------|
-| transformers | github.com/knights-analytics/hugot | 200 | ONNX only | Use for inference, API for training |
-| fschat | github.com/nexptr/llmchain/llms/fschat | ~10 | API only | Missing conversation templates |
+| Python       | Go Equivalent                          | Stars | Gap       | Workaround                          |
+| ------------ | -------------------------------------- | ----- | --------- | ----------------------------------- |
+| transformers | github.com/knights-analytics/hugot     | 200   | ONNX only | Use for inference, API for training |
+| fschat       | github.com/nexptr/llmchain/llms/fschat | ~10   | API only  | Missing conversation templates      |
 
 #### No Equivalent (Custom Implementation)
 
-| Python | Functionality | Effort | Recommendation |
-|--------|---------------|--------|----------------|
-| ftfy | Mojibake detection | High | Port heuristics or defer (edge case) |
-| avidtools | AI vuln database | Medium | Port data classes (structured data) |
+| Python    | Functionality      | Effort | Recommendation                       |
+| --------- | ------------------ | ------ | ------------------------------------ |
+| ftfy      | Mojibake detection | High   | Port heuristics or defer (edge case) |
+| avidtools | AI vuln database   | Medium | Port data classes (structured data)  |
 
 #### Not Applicable
 
-| Python | Reason |
-|--------|--------|
-| accelerate | Training-only, not needed for inference port |
-| datasets | Training data loading, unnecessary for scanner |
+| Python     | Reason                                         |
+| ---------- | ---------------------------------------------- |
+| accelerate | Training-only, not needed for inference port   |
+| datasets   | Training data loading, unnecessary for scanner |
 
 **For template examples and formatting guidelines**, see [references/output-templates.md](references/output-templates.md).
 
@@ -207,11 +214,11 @@ Classify each dependency by criticality:
 
 **Classification:**
 
-| Level | Definition | Example | Action |
-|-------|------------|---------|--------|
-| **Blocking** | Core functionality, must have | LLM API clients (openai, anthropic) | Must resolve before port |
-| **Non-blocking** | Nice-to-have, workarounds exist | Specific text encodings (ecoji, base2048) | Defer or simplify |
-| **Skip** | Not relevant to port scope | Training frameworks (accelerate) | Exclude from port |
+| Level            | Definition                      | Example                                   | Action                   |
+| ---------------- | ------------------------------- | ----------------------------------------- | ------------------------ |
+| **Blocking**     | Core functionality, must have   | LLM API clients (openai, anthropic)       | Must resolve before port |
+| **Non-blocking** | Nice-to-have, workarounds exist | Specific text encodings (ecoji, base2048) | Defer or simplify        |
+| **Skip**         | Not relevant to port scope      | Training frameworks (accelerate)          | Exclude from port        |
 
 **Output**: Prioritized list of what MUST be resolved vs what can be deferred.
 
@@ -235,11 +242,13 @@ Before completing dependency mapping, verify:
 ### ❌ Claiming "No Equivalent" Without Research
 
 **Wrong:**
+
 ```
 "litellm has no Go port, need custom implementation"
 ```
 
 **Right:**
+
 ```
 1. Search: "golang litellm equivalent 2025 github"
 2. Find: LangChainGo (8.3k stars), Bifrost (1.4k stars), gollm (600 stars)
@@ -249,11 +258,13 @@ Before completing dependency mapping, verify:
 ### ❌ Using Stale Search Results
 
 **Wrong:**
+
 ```
 "Search says 2024, probably still accurate"
 ```
 
 **Right:**
+
 ```
 Always use current year (2025) in queries
 Re-verify star counts and update dates
@@ -263,11 +274,13 @@ Check for recent releases (libraries evolve)
 ### ❌ Missing Official Vendor SDKs
 
 **Wrong:**
+
 ```
 "cohere → custom HTTP client"
 ```
 
 **Right:**
+
 ```
 Check: github.com/cohere-ai/cohere-go
 Find: Official SDK (69 stars, maintained)
@@ -277,11 +290,13 @@ Use: Vendor SDK with support
 ### ❌ Ignoring Star Counts
 
 **Wrong:**
+
 ```
 "Found a library, any Go port works"
 ```
 
 **Right:**
+
 ```
 <100 stars → Community experiment
 100-500 → Growing adoption
@@ -293,11 +308,13 @@ Check import count on pkg.go.dev
 ### ❌ Skipping pkg.go.dev
 
 **Wrong:**
+
 ```
 "GitHub has it, that's enough"
 ```
 
 **Right:**
+
 ```
 Check pkg.go.dev for:
 - Import count (usage indicator)
@@ -309,11 +326,13 @@ Check pkg.go.dev for:
 ### ❌ Assuming Niche = Non-Existent
 
 **Wrong:**
+
 ```
 "base2048, ecoji, zalgo are obscure → no Go ports"
 ```
 
 **Right:**
+
 ```
 Research found ALL have Go implementations:
 - base2048 → github.com/Milly/go-base2048
@@ -324,14 +343,14 @@ Even niche encodings have Go ports
 
 ## Example Corrections From Real Research
 
-| Initially Assumed | Actual Finding | Lesson |
-|-------------------|----------------|--------|
-| "litellm has no Go equivalent" | LangChainGo (8.3k stars), Bifrost (1.4k stars), gollm (600 stars) | Always check multi-provider frameworks |
-| "transformers needs subprocess" | hugot (ONNX pipelines), go-huggingface (API client) | Check both local + API approaches |
-| "torch not available in Go" | gotch (LibTorch bindings), gorgonia (pure Go) | Both bindings AND native ports exist |
-| "nltk is Python-only" | prose (3k stars - tokenization, POS, NER) | Mature NLP ecosystem in Go |
-| "rapidfuzz is Python C++" | fuzzysearch (1k+ stars), closestmatch (20x faster) | Go optimizations can exceed Python |
-| "Niche libs don't have ports" | base2048, ecoji, zalgo all have Go implementations | Even obscure encodings ported |
+| Initially Assumed               | Actual Finding                                                    | Lesson                                 |
+| ------------------------------- | ----------------------------------------------------------------- | -------------------------------------- |
+| "litellm has no Go equivalent"  | LangChainGo (8.3k stars), Bifrost (1.4k stars), gollm (600 stars) | Always check multi-provider frameworks |
+| "transformers needs subprocess" | hugot (ONNX pipelines), go-huggingface (API client)               | Check both local + API approaches      |
+| "torch not available in Go"     | gotch (LibTorch bindings), gorgonia (pure Go)                     | Both bindings AND native ports exist   |
+| "nltk is Python-only"           | prose (3k stars - tokenization, POS, NER)                         | Mature NLP ecosystem in Go             |
+| "rapidfuzz is Python C++"       | fuzzysearch (1k+ stars), closestmatch (20x faster)                | Go optimizations can exceed Python     |
+| "Niche libs don't have ports"   | base2048, ecoji, zalgo all have Go implementations                | Even obscure encodings ported          |
 
 **Pattern**: Initial assumptions are systematically wrong. Research always reveals more than expected.
 
@@ -361,11 +380,11 @@ This skill is **Phase 2** of the porting workflow:
 
 **See [references/research-rationalizations.md](references/research-rationalizations.md)** for complete list of excuses that lead to failure:
 
-| Rationalization | Reality | Why It Fails |
-|----------------|---------|--------------|
-| "I already know this" | Training data 12-18 months stale | Libraries evolve monthly |
-| "Simple libs don't need research" | base2048, ecoji, zalgo all have ports | Even niche libs ported |
-| "No time for research" | 15min research prevents hours of work | False paths cost days |
-| "Obvious from name" | litellm ≠ no Go equiv | Assumptions systematically wrong |
+| Rationalization                   | Reality                               | Why It Fails                     |
+| --------------------------------- | ------------------------------------- | -------------------------------- |
+| "I already know this"             | Training data 12-18 months stale      | Libraries evolve monthly         |
+| "Simple libs don't need research" | base2048, ecoji, zalgo all have ports | Even niche libs ported           |
+| "No time for research"            | 15min research prevents hours of work | False paths cost days            |
+| "Obvious from name"               | litellm ≠ no Go equiv                 | Assumptions systematically wrong |
 
 **Cannot skip research. This is not negotiable.** ✅

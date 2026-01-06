@@ -1,3 +1,11 @@
+# API credentials (never commit!)
+tools/config/credentials.json
 
 # Threat modeling session outputs (generated artifacts)
 .threat-model/
+
+# Serena MCP local data (logs, caches, auto-generated project configs)
+# The serena_config.yml IS version-controlled (shared settings)
+.serena/logs/
+.serena/*.db
+.serena/language_servers/

@@ -1,12 +1,12 @@
 /**
- * create_bug - Linear MCP Wrapper
+ * create_bug - Linear GraphQL Wrapper
  *
- * Create a bug issue in Linear via MCP server (convenience wrapper)
+ * Create a bug issue in Linear via GraphQL API (convenience wrapper)
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~500 tokens (creation response)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -29,7 +29,7 @@
  *   - url: string - Linear URL for the issue
  *
  * Edge cases discovered:
- * - Uses create_issue MCP with labels including 'bug'
+ * - Uses issueCreate mutation with labels including 'bug'
  * - Default priority is 2 (High) for bugs
  * - Team must exist or error is thrown
  *
@@ -54,12 +54,32 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL mutation for creating an issue
+ */
+const CREATE_ISSUE_MUTATION = `
+  mutation IssueCreate($input: IssueCreateInput!) {
+    issueCreate(input: $input) {
+      success
+      issue {
+        id
+        identifier
+        title
+        url
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -118,13 +138,29 @@ export const createBugOutput = z.object({
     identifier: z.string(),
     title: z.string(),
     url: z.string()
-  })
+  }),
+  estimatedTokens: z.number()
 });
 
 export type CreateBugOutput = z.infer<typeof createBugOutput>;
 
 /**
- * Create a bug issue in Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface IssueCreateResponse {
+  issueCreate: {
+    success: boolean;
+    issue?: {
+      id: string;
+      identifier: string;
+      title: string;
+      url: string;
+    };
+  };
+}
+
+/**
+ * Create a bug issue in Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -151,49 +187,82 @@ export const createBug = {
   description: 'Create a bug issue in Linear',
   parameters: createBugParams,
 
-  async execute(input: CreateBugInput): Promise<CreateBugOutput> {
+  async execute(
+    input: CreateBugInput,
+    testToken?: string
+  ): Promise<CreateBugOutput> {
     // Validate input
     const validated = createBugParams.parse(input);
 
     // Build labels array with 'bug' always included
-    const labels = ['bug'];
+    const labelIds = ['bug'];
     if (validated.labels) {
       // Add additional labels, avoiding duplicates
       validated.labels.forEach(label => {
-        if (label.toLowerCase() !== 'bug' && !labels.includes(label)) {
-          labels.push(label);
+        if (label.toLowerCase() !== 'bug' && !labelIds.includes(label)) {
+          labelIds.push(label);
         }
       });
     }
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'create_issue',
-      {
-        title: validated.title,
-        description: validated.description,
-        team: validated.team,
-        assignee: validated.assignee,
-        priority: validated.priority ?? 2,
-        state: validated.state,
-        labels,
-      }
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Build GraphQL input
+    const mutationInput: {
+      title: string;
+      description?: string;
+      teamId: string;
+      assigneeId?: string;
+      priority?: number;
+      stateId?: string;
+      labelIds: string[];
+    } = {
+      title: validated.title,
+      teamId: validated.team,
+      labelIds,
+    };
+
+    if (validated.description) {
+      mutationInput.description = validated.description;
+    }
+    if (validated.assignee) {
+      mutationInput.assigneeId = validated.assignee;
+    }
+    if (validated.priority !== undefined) {
+      mutationInput.priority = validated.priority;
+    } else {
+      mutationInput.priority = 2; // Default to High for bugs
+    }
+    if (validated.state) {
+      mutationInput.stateId = validated.state;
+    }
+
+    // Execute GraphQL mutation
+    const response = await executeGraphQL<IssueCreateResponse>(
+      client,
+      CREATE_ISSUE_MUTATION,
+      { input: mutationInput }
     );
 
-    if (!rawData?.success) {
+    if (!response.issueCreate?.success || !response.issueCreate?.issue) {
       throw new Error('Failed to create bug');
     }
 
     // Filter to essential fields
-    const filtered = {
-      success: rawData.success,
+    const baseData = {
+      success: response.issueCreate.success,
       issue: {
-        id: rawData.issue?.id,
-        identifier: rawData.issue?.identifier,
-        title: rawData.issue?.title,
-        url: rawData.issue?.url
+        id: response.issueCreate.issue.id,
+        identifier: response.issueCreate.issue.identifier,
+        title: response.issueCreate.issue.title,
+        url: response.issueCreate.issue.url
       }
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

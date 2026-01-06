@@ -1,12 +1,12 @@
 /**
- * create_issue - Linear MCP Wrapper
+ * create_issue - Linear GraphQL Wrapper
  *
- * Create a new issue in Linear via MCP server
+ * Create a new issue in Linear via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~500 tokens (creation response)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -33,11 +33,10 @@
  *   - url: string - Direct link to the issue
  *
  * Edge cases discovered:
- * - MCP returns the issue object directly, not wrapped in {success, issue}
- * - On error, MCP returns a string error message, not an object
- * - Team can be name ("Chariot Team") or UUID
- * - Assignee "me" resolves to authenticated user
- * - Labels must be valid label names or UUIDs
+ * - GraphQL returns {success, issue} structure via issueCreate mutation
+ * - Team can be name ("Chariot Team") or UUID (mapped to teamId)
+ * - Assignee "me" resolves to authenticated user (mapped to assigneeId)
+ * - Labels must be valid label names or UUIDs (mapped to labelIds)
  * - Invalid team/assignee/state throws descriptive errors from Linear API
  * - Cycle parameter triggers automatic orchestration: create issue, then update with cycle
  * - If cycle assignment fails, issue is still created (warning logged, no error thrown)
@@ -64,13 +63,33 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoControlCharsAllowWhitespace,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL mutation for creating an issue
+ */
+const CREATE_ISSUE_MUTATION = `
+  mutation IssueCreate($input: IssueCreateInput!) {
+    issueCreate(input: $input) {
+      success
+      issue {
+        id
+        identifier
+        title
+        url
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -144,13 +163,29 @@ export const createIssueOutput = z.object({
     identifier: z.string(),
     title: z.string(),
     url: z.string()
-  })
+  }),
+  estimatedTokens: z.number()
 });
 
 export type CreateIssueOutput = z.infer<typeof createIssueOutput>;
 
 /**
- * Create a new issue in Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface IssueCreateResponse {
+  issueCreate: {
+    success: boolean;
+    issue?: {
+      id: string;
+      identifier: string;
+      title: string;
+      url: string;
+    };
+  };
+}
+
+/**
+ * Create a new issue in Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -180,28 +215,71 @@ export const createIssue = {
   description: 'Create a new issue in Linear',
   parameters: createIssueParams,
 
-  async execute(input: CreateIssueInput): Promise<CreateIssueOutput> {
+  async execute(
+    input: CreateIssueInput,
+    testToken?: string
+  ): Promise<CreateIssueOutput> {
     // Validate input
     const validated = createIssueParams.parse(input);
 
-    // Extract cycle parameter (not supported by Linear create_issue API)
+    // Extract cycle parameter (not supported by Linear issueCreate mutation)
     const { cycle, ...createParams } = validated;
 
-    // Call MCP tool to create issue (without cycle)
-    const rawData = await callMCPTool(
-      'linear',
-      'create_issue',
-      createParams
-    );
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
 
-    // Linear MCP returns the issue directly, not wrapped in {success, issue}
-    // Check if we got an error message instead of an issue
-    if (typeof rawData === 'string') {
-      throw new Error(`Failed to create issue: ${rawData}`);
+    // Build GraphQL input - map field names to Linear API format
+    const mutationInput: {
+      title: string;
+      description?: string;
+      teamId: string;
+      assigneeId?: string;
+      stateId?: string;
+      priority?: number;
+      projectId?: string;
+      labelIds?: string[];
+      dueDate?: string;
+      parentId?: string;
+    } = {
+      title: createParams.title,
+      teamId: createParams.team, // team → teamId
+    };
+
+    // Add optional fields if present
+    if (createParams.description) {
+      mutationInput.description = createParams.description;
+    }
+    if (createParams.assignee) {
+      mutationInput.assigneeId = createParams.assignee; // assignee → assigneeId
+    }
+    if (createParams.state) {
+      mutationInput.stateId = createParams.state; // state → stateId
+    }
+    if (createParams.priority !== undefined) {
+      mutationInput.priority = createParams.priority;
+    }
+    if (createParams.project) {
+      mutationInput.projectId = createParams.project; // project → projectId
+    }
+    if (createParams.labels) {
+      mutationInput.labelIds = createParams.labels; // labels → labelIds
+    }
+    if (createParams.dueDate) {
+      mutationInput.dueDate = createParams.dueDate;
+    }
+    if (createParams.parentId) {
+      mutationInput.parentId = createParams.parentId;
     }
 
-    if (!rawData.id) {
-      throw new Error('Failed to create issue: No issue ID returned');
+    // Execute GraphQL mutation
+    const response = await executeGraphQL<IssueCreateResponse>(
+      client,
+      CREATE_ISSUE_MUTATION,
+      { input: mutationInput }
+    );
+
+    if (!response.issueCreate?.success || !response.issueCreate?.issue) {
+      throw new Error('Failed to create issue');
     }
 
     // If cycle was provided, update the issue to assign it
@@ -210,9 +288,9 @@ export const createIssue = {
       try {
         const { updateIssue } = await import('./update-issue.js');
         await updateIssue.execute({
-          id: rawData.identifier,
+          id: response.issueCreate.issue.identifier,
           cycle
-        });
+        }, testToken);
       } catch (error) {
         // Issue was created successfully, but cycle assignment failed
         // Log warning but don't fail the entire operation
@@ -221,14 +299,19 @@ export const createIssue = {
     }
 
     // Filter to essential fields
-    const filtered = {
-      success: true,
+    const baseData = {
+      success: response.issueCreate.success,
       issue: {
-        id: rawData.id,
-        identifier: rawData.identifier,
-        title: rawData.title,
-        url: rawData.url
+        id: response.issueCreate.issue.id,
+        identifier: response.issueCreate.issue.identifier,
+        title: response.issueCreate.issue.title,
+        url: response.issueCreate.issue.url
       }
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

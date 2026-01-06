@@ -9,6 +9,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const GetTestsPerformanceInputSchema = z.object({
   projectId: z.string().min(1),
@@ -67,7 +68,7 @@ export const getTestsPerformance = {
       totalTests: (rawData.tests || []).length,
       page: validated.page,
       hasMore: (rawData.tests || []).length > validated.limit,
-      estimatedTokens: Math.ceil(JSON.stringify(tests).length / 4),
+      estimatedTokens: estimateTokens(tests),
     };
 
     return GetTestsPerformanceOutputSchema.parse(filtered);

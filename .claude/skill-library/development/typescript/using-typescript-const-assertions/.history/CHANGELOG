@@ -1,0 +1,112 @@
+# Changelog: using-typescript-const-assertions
+
+## [Initial Creation] - 2026-01-01
+
+### 🔴 RED Phase: Gap Documentation
+
+**Why this skill is needed:**
+- TypeScript 3.4+ feature (2019) that is underutilized
+- Official docs cover syntax but lack practical patterns
+- Key enabler for deriving union types from values (common pattern)
+- Alternative to string enums with better ergonomics
+- Not well-covered in most TypeScript learning materials
+
+**Failure behavior without skill:**
+When developers ask Claude how to derive union types from runtime values or preserve literal types:
+1. Claude may suggest enums (more verbose, tree-shaking issues)
+2. May not mention `as const` pattern
+3. Suggests type annotations that lose literal types
+
+None show the **idiomatic `as const` + `typeof` pattern** for deriving unions.
+
+**Expected failure scenario:**
+- User: "How do I get a union type from my route object values?"
+- Claude: Suggests enum or manual union type definition
+- Result: Miss the elegant `typeof ROUTES[keyof typeof ROUTES]` pattern
+
+### Metadata
+
+- **Category:** Library skill - `development/typescript/`
+- **Skill Type:** Library/Framework (TypeScript language feature)
+- **Location:** `.claude/skill-library/development/typescript/using-typescript-const-assertions/`
+- **Line Count:** 330 lines (SKILL.md)
+- **TypeScript Version:** 3.4+ (March 2019)
+
+### Content Structure
+
+**SKILL.md (330 lines):**
+- When to Use (clear decision criteria)
+- Quick Reference (comparison table)
+- The Problem (type widening demonstration)
+- Basic Patterns (object, array, nested as const)
+- Chariot Patterns (3 real examples):
+  1. Asset Status Codes (Tabularium 'A', 'D', 'U')
+  2. Icon/Color Mappings (status → color, class → icon)
+  3. Route Definitions (Chariot UI routes)
+- vs Enums (detailed comparison table - when to use each)
+- Deriving Union Types (typeof patterns for objects, arrays, nested)
+- Integration Patterns (React props, TanStack Router)
+- Common Patterns (lookup tables, test fixtures)
+- Anti-patterns (3 common mistakes)
+- Related Patterns (satisfies, branded types)
+
+### Key Decisions
+
+**Target Length: 150-200 lines**
+- Actual: 330 lines (exceeded target but under 500 limit)
+- Rationale: Needed comprehensive enum comparison and typeof patterns
+
+**Focus on Complementary Patterns:**
+- Positioned as companion to `satisfies` operator skill
+- Cross-references branded types skill
+- Shows how these patterns work together
+
+**Practical Chariot Examples:**
+- Status codes from Tabularium
+- Route definitions from UI
+- Icon/color mappings (actual patterns used)
+
+### Real Chariot Examples Found
+
+**Opportunities for `as const` in codebase:**
+- Status arrays: `['A', 'D', 'U']` throughout codebase
+- Asset class arrays: `['ipv4', 'domain', 'certificate']`
+- Route path constants in `modules/chariot/ui/src/routes/`
+- Icon/color mapping objects
+- API endpoint path constants
+
+### Testing Plan
+
+**🟢 GREEN Phase:**
+- Test scenario: "Derive union type from route object values"
+- Expected: Claude suggests `as const` + `typeof` pattern
+- Verify: Skill shows exact syntax and explains readonly implications
+
+**🔵 REFACTOR Phase:**
+- Skipped (reference/documentation skill, not workflow)
+
+### Audit Results
+
+**Status:** PENDING
+
+Will run audit after gateway update to check:
+- Line count (330, under 500 ✅)
+- Description format (third person, keywords)
+- Table formatting
+- TodoWrite false positive (expected for reference skills)
+
+### Next Steps
+
+1. Update gateway-frontend routing table
+2. Run audit for compliance
+3. Document audit exceptions (if any)
+4. Finalize changelog
+
+### Skill Positioning
+
+This is the **third TypeScript skill** created today, forming a complete trilogy:
+1. `using-typescript-satisfies-operator` - Type validation + literal preservation
+2. `implementing-branded-types-typescript` - Nominal typing for domain models
+3. `using-typescript-const-assertions` - Deriving unions from values + readonly
+
+All three work together for advanced TypeScript type safety.

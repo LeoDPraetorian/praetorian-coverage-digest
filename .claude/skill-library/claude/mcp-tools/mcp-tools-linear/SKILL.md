@@ -1,267 +1,364 @@
 ---
 name: mcp-tools-linear
-description: Use when accessing linear services - provides 19 tools for create-bug, create-comment, create-issue, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
+description: Use when accessing Linear services - provides 40+ GraphQL HTTP wrappers with OAuth 2.0 support. Direct API access, no MCP server dependency. Supports initiatives, issue relations, cycles, roadmaps, and more.
 allowed-tools: Read, Bash
-skills: [mcp-tools-registry]
+skills: []
 ---
 
-# Linear MCP Tools
+# Linear GraphQL HTTP Client
 
-**GRANULAR ACCESS CONTROL:** Include this skill to give agent linear access ONLY.
-
-> **Execution patterns:** See mcp-tools-registry for Bash + npx tsx usage
-> This skill provides linear-specific tool catalog.
+**Direct GraphQL API access with OAuth 2.0 support. No MCP server dependency.**
 
 ## Purpose
 
-Enable granular agent access control for linear operations.
+Enable Linear operations through direct GraphQL HTTP calls with OAuth 2.0 authentication.
 
-**Include this skill when:** Agent needs linear access
-**Exclude this skill when:** Agent should NOT access linear
+**Architecture Change:** This skill uses **Direct GraphQL HTTP Client** (not MCP server).
 
-## Authentication: OAuth (No API Key)
+## Authentication
 
-Linear uses **OAuth 2.0 via mcp-remote** - more secure than API keys:
+**OAuth 2.0 ONLY.** API keys are NOT supported.
 
-| Aspect         | How It Works                            |
-| -------------- | --------------------------------------- |
-| **Storage**    | Tokens in `~/.mcp-auth/` (outside repo) |
-| **Lifetime**   | 7-day tokens with automatic refresh     |
-| **Scopes**     | `read,write,issues:create,admin`        |
-| **First-time** | Browser opens for explicit consent      |
+### OAuth 2.0 Benefits
 
-**First-time setup**: On first MCP call, browser opens for Linear OAuth authorization.
+- Short-lived tokens with automatic refresh
+- Explicit user consent flow
+- Secure storage outside repository (~/.claude-oauth/)
+- Auto-expires if leaked (vs manual revocation for API keys)
 
-**Re-authentication**: If tokens expire or you need to re-auth:
+### Setup Instructions
+
+1. **Create OAuth app** at https://linear.app/settings/api/applications
+   - Name: "Claude Code"
+   - Redirect URI: `http://localhost:3847/callback`
+   - Copy the Client ID
+
+2. **Add to credentials.json:**
+
+   ```json
+   {
+     "linear": {
+       "clientId": "your-oauth-client-id"
+     }
+   }
+   ```
+
+3. **First API call triggers browser authorization**
+   - Browser opens automatically
+   - Authorize Linear access
+   - Tokens saved to `~/.claude-oauth/linear.json`
+
+4. **Tokens refresh automatically** (5 minutes before expiry)
+
+**Token storage:**
 
 ```bash
-rm -rf ~/.mcp-auth/mcp-remote-*/*linear*
-# Then run any Linear wrapper - will prompt for OAuth
+~/.claude-oauth/linear.json  # Tokens (outside repository)
 ```
 
-**No credentials.json entry needed** - OAuth is handled entirely by mcp-remote.
+**To re-authorize:**
 
-## Available Tools (Auto-discovered: 19 wrappers)
+```bash
+rm ~/.claude-oauth/linear.json
+# Next API call will open browser for auth
+```
 
-### create-bug
+## GraphQL vs MCP Architecture
 
-- **Purpose:** MCP wrapper for create-bug
-- **Import:** `import { createBug } from '$ROOT/.claude/tools/linear/create-bug.ts'`
-- **Token cost:** ~unknown tokens
+### Why Direct GraphQL?
 
-### create-comment
+| Aspect            | Direct GraphQL HTTP (New)     | MCP Server (Old)      |
+| ----------------- | ----------------------------- | --------------------- |
+| **Startup**       | 0ms (no server spawn)         | ~2-5s per spawn       |
+| **Auth**          | OAuth 2.0 + API key           | OAuth via mcp-remote  |
+| **Dependencies**  | None (native fetch)           | mcp-remote package    |
+| **Token Storage** | `~/.claude-oauth/`            | `~/.mcp-auth/`        |
+| **Complexity**    | Simple HTTP client            | MCP protocol overhead |
+| **Token Control** | Direct access, manual refresh | Handled by mcp-remote |
 
-- **Purpose:** MCP wrapper for create-comment
-- **Import:** `import { createComment } from '$ROOT/.claude/tools/linear/create-comment.ts'`
-- **Token cost:** ~unknown tokens
+### Migration Benefits
 
-### create-issue
+1. **Faster:** No server spawn delay
+2. **Simpler:** Direct HTTP calls, no protocol wrapper
+3. **More Control:** Direct token management
+4. **Backward Compatible:** API key fallback preserved
 
-- **Purpose:** MCP wrapper for create-issue
-- **Import:** `import { createIssue } from '$ROOT/.claude/tools/linear/create-issue.ts'`
-- **Token cost:** ~unknown tokens
+## Available Wrappers (40+ GraphQL Tools)
 
-### create-jira-bug
+### Issues
 
-- **Purpose:** MCP wrapper for create-jira-bug
-- **Import:** `import { createJiraBug } from '$ROOT/.claude/tools/linear/create-jira-bug.ts'`
-- **Token cost:** ~unknown tokens
+| Wrapper            | Purpose                 | Key Parameters                                            |
+| ------------------ | ----------------------- | --------------------------------------------------------- |
+| `create-issue`     | Create new issue        | `title`, `team`, `description`, `assignee`, `priority`    |
+| `get-issue`        | Get issue by ID         | `id` (e.g., "CHARIOT-1234")                               |
+| `find-issue`       | Search issues           | `query`, `limit`                                          |
+| `list-issues`      | List recent issues      | `limit` (default: 20)                                     |
+| `update-issue`     | Update issue fields     | `id`, `title`, `state`, `priority`, `assignee`, `project` |
+| `check-full-issue` | Get complete issue data | `id`                                                      |
 
-### create-project
+### Issue Relations
 
-- **Purpose:** MCP wrapper for create-project
-- **Import:** `import { createProject } from '$ROOT/.claude/tools/linear/create-project.ts'`
-- **Token cost:** ~unknown tokens
+| Wrapper                 | Purpose                  | Key Parameters                      |
+| ----------------------- | ------------------------ | ----------------------------------- |
+| `create-issue-relation` | Link two issues          | `issueId`, `relatedIssueId`, `type` |
+| `list-issue-relations`  | List issue relationships | `issueId`                           |
+| `delete-issue-relation` | Remove issue link        | `relationId`                        |
 
-### find-issue
+### Projects
 
-- **Purpose:** MCP wrapper for find-issue
-- **Import:** `import { findIssue } from '$ROOT/.claude/tools/linear/find-issue.ts'`
-- **Token cost:** ~unknown tokens
+| Wrapper          | Purpose            | Key Parameters                                     |
+| ---------------- | ------------------ | -------------------------------------------------- |
+| `create-project` | Create new project | `name`, `description`, `teamId`, `leadId`          |
+| `get-project`    | Get project by ID  | `id`                                               |
+| `list-projects`  | List all projects  | None                                               |
+| `update-project` | Update project     | `id`, `name`, `description`, `state`, `targetDate` |
+| `delete-project` | Delete project     | `id`                                               |
 
-### find-user
+### Initiatives
 
-- **Purpose:** MCP wrapper for find-user
-- **Import:** `import { findUser } from '$ROOT/.claude/tools/linear/find-user.ts'`
-- **Token cost:** ~unknown tokens
+| Wrapper                      | Purpose                     | Key Parameters              |
+| ---------------------------- | --------------------------- | --------------------------- |
+| `create-initiative`          | Create strategic initiative | `name`, `description`       |
+| `get-initiative`             | Get initiative by ID        | `id`                        |
+| `list-initiatives`           | List all initiatives        | None                        |
+| `update-initiative`          | Update initiative           | `id`, `name`, `description` |
+| `delete-initiative`          | Delete initiative           | `id`                        |
+| `link-project-to-initiative` | Link project to initiative  | `projectId`, `initiativeId` |
 
-### get-issue
+### Cycles
 
-- **Purpose:** MCP wrapper for get-issue
-- **Import:** `import { getIssue } from '$ROOT/.claude/tools/linear/get-issue.ts'`
-- **Token cost:** ~unknown tokens
+| Wrapper        | Purpose             | Key Parameters                         |
+| -------------- | ------------------- | -------------------------------------- |
+| `create-cycle` | Create sprint/cycle | `teamId`, `name`, `startsAt`, `endsAt` |
+| `get-cycle`    | Get cycle by ID     | `id`                                   |
+| `list-cycles`  | List team cycles    | `teamId`                               |
+| `update-cycle` | Update cycle        | `id`, `name`, `startsAt`, `endsAt`     |
 
-### get-project
+### Roadmaps
 
-- **Purpose:** MCP wrapper for get-project
-- **Import:** `import { getProject } from '$ROOT/.claude/tools/linear/get-project.ts'`
-- **Token cost:** ~unknown tokens
+| Wrapper          | Purpose                | Key Parameters              |
+| ---------------- | ---------------------- | --------------------------- |
+| `create-roadmap` | Create product roadmap | `name`, `description`       |
+| `get-roadmap`    | Get roadmap by ID      | `id`                        |
+| `list-roadmaps`  | List all roadmaps      | None                        |
+| `update-roadmap` | Update roadmap         | `id`, `name`, `description` |
 
-### get-team
+### Documents
 
-- **Purpose:** MCP wrapper for get-team
-- **Import:** `import { getTeam } from '$ROOT/.claude/tools/linear/get-team.ts'`
-- **Token cost:** ~unknown tokens
+| Wrapper           | Purpose            | Key Parameters           |
+| ----------------- | ------------------ | ------------------------ |
+| `create-document` | Create doc page    | `title`, `content`       |
+| `get-document`    | Get document by ID | `id`                     |
+| `list-documents`  | List documents     | None                     |
+| `update-document` | Update document    | `id`, `title`, `content` |
 
-### list-comments
+### Comments
 
-- **Purpose:** MCP wrapper for list-comments
-- **Import:** `import { listComments } from '$ROOT/.claude/tools/linear/list-comments.ts'`
-- **Token cost:** ~unknown tokens
+| Wrapper          | Purpose             | Key Parameters    |
+| ---------------- | ------------------- | ----------------- |
+| `create-comment` | Add issue comment   | `issueId`, `body` |
+| `list-comments`  | List issue comments | `issueId`         |
 
-### list-cycles
+### Teams & Users
 
-- **Purpose:** MCP wrapper for list-cycles
-- **Import:** `import { listCycles } from '$ROOT/.claude/tools/linear/list-cycles.ts'`
-- **Token cost:** ~unknown tokens
+| Wrapper      | Purpose              | Key Parameters    |
+| ------------ | -------------------- | ----------------- |
+| `get-team`   | Get team info        | `teamId`          |
+| `list-teams` | List all teams       | None              |
+| `find-user`  | Search for user      | `email` or `name` |
+| `list-users` | List workspace users | None              |
 
-### list-issues
+### Special Tools
 
-- **Purpose:** MCP wrapper for list-issues
-- **Import:** `import { listIssues } from '$ROOT/.claude/tools/linear/list-issues.ts'`
-- **Token cost:** ~unknown tokens
+| Wrapper           | Purpose                      | Key Parameters                 |
+| ----------------- | ---------------------------- | ------------------------------ |
+| `create-bug`      | Create bug (preset priority) | `title`, `team`, `description` |
+| `create-jira-bug` | Create bug with Jira import  | `title`, `team`, `jiraUrl`     |
 
-### list-projects
+## Usage Examples
 
-- **Purpose:** MCP wrapper for list-projects
-- **Import:** `import { listProjects } from '$ROOT/.claude/tools/linear/list-projects.ts'`
-- **Token cost:** ~unknown tokens
+### OAuth Setup (First Time)
 
-### list-teams
+```bash
+# 1. Add clientId to credentials.json
+# 2. Run any Linear command:
 
-- **Purpose:** MCP wrapper for list-teams
-- **Import:** `import { listTeams } from '$ROOT/.claude/tools/linear/list-teams.ts'`
-- **Token cost:** ~unknown tokens
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { listIssues } = await import('$ROOT/.claude/tools/linear/list-issues.ts');
+  const result = await listIssues.execute({ limit: 5 });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
 
-### list-users
+# Browser will open for authorization
+# After approval, tokens saved automatically
+```
 
-- **Purpose:** MCP wrapper for list-users
-- **Import:** `import { listUsers } from '$ROOT/.claude/tools/linear/list-users.ts'`
-- **Token cost:** ~unknown tokens
+### Common Operations
 
-### update-cycle
-
-- **Purpose:** MCP wrapper for update-cycle
-- **Import:** `import { updateCycle } from '$ROOT/.claude/tools/linear/update-cycle.ts'`
-- **Token cost:** ~unknown tokens
-
-### update-issue
-
-- **Purpose:** MCP wrapper for update-issue
-- **Import:** `import { updateIssue } from '$ROOT/.claude/tools/linear/update-issue.ts'`
-- **Token cost:** ~unknown tokens
-
-### update-project
-
-- **Purpose:** MCP wrapper for update-project
-- **Import:** `import { updateProject } from '$ROOT/.claude/tools/linear/update-project.ts'`
-- **Token cost:** ~unknown tokens
-
-## Common Operations with Parameters
-
-### Create Issue
+**Create Issue:**
 
 ```bash
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
   const { createIssue } = await import('$ROOT/.claude/tools/linear/create-issue.ts');
   const result = await createIssue.execute({
-    title: 'Issue title here',
-    description: 'Optional description in Markdown',
-    team: 'Chariot'  // Team name OR team ID works
+    title: 'Add OAuth support to Linear client',
+    description: 'Implement OAuth 2.0 PKCE flow with token refresh',
+    team: 'Chariot',  // Team name OR team UUID
+    priority: 2,      // 0=None, 1=Urgent, 2=High, 3=Normal, 4=Low
+    assignee: 'me'    // 'me', email, name, or user ID
   });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
 ```
 
-**Key parameters:**
-
-- `title` (required) - Issue title string
-- `description` (optional) - Markdown description
-- `team` (required) - **Team name like "Chariot"** OR team UUID
-- `assignee` (optional) - User ID, name, email, or "me"
-- `priority` (optional) - 0=No priority, 1=Urgent, 2=High, 3=Normal, 4=Low
-- `state` (optional) - State name or ID
-- `labels` (optional) - Array of label names or IDs
-
-### Get Issue
-
-```bash
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
-  const { getIssue } = await import('$ROOT/.claude/tools/linear/get-issue.ts');
-  const result = await getIssue.execute({
-    id: 'CHARIOT-1234'  // Issue identifier
-  });
-  console.log(JSON.stringify(result, null, 2));
-})();" 2>/dev/null
-```
-
-### List Issues
-
-```bash
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
-  const { listIssues } = await import('$ROOT/.claude/tools/linear/list-issues.ts');
-  const result = await listIssues.execute({
-    limit: 20  // Optional, defaults to 20
-  });
-  console.log(JSON.stringify(result, null, 2));
-})();" 2>/dev/null
-```
-
-### List Projects
-
-```bash
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
-  const { listProjects } = await import('$ROOT/.claude/tools/linear/list-projects.ts');
-  const result = await listProjects.execute({});
-  console.log(JSON.stringify(result, null, 2));
-})();" 2>/dev/null
-```
-
-**Returns:** Projects array with id, name, description, lead, status fields.
-
-### Update Issue
+**Update Issue:**
 
 ```bash
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
   const { updateIssue } = await import('$ROOT/.claude/tools/linear/update-issue.ts');
   const result = await updateIssue.execute({
     id: 'CHARIOT-1234',
-    title: 'Updated title',  // Optional
-    state: 'In Progress',    // Optional
-    priority: 1,             // Optional
-    project: 'Agentic Development'  // Optional - Project name or ID
+    state: 'In Progress',
+    project: 'Agentic Development'  // Project name or ID
   });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
 ```
 
-**Key parameters:**
-
-- `id` (required) - Issue identifier (e.g., CHARIOT-1234)
-- `title` (optional) - Updated title
-- `state` (optional) - State name or ID
-- `priority` (optional) - 0=No priority, 1=Urgent, 2=High, 3=Normal, 4=Low
-- `assignee` (optional) - User ID, name, email, or "me"
-- `project` (optional) - Project name or ID
-
-## Quick Reference
-
-See mcp-tools-registry for complete Bash + tsx execution patterns.
-
-**Generic inline execution:**
+**Create Initiative:**
 
 ```bash
-# Note: 2>/dev/null suppresses MCP debug logs
-# ROOT pattern works from any directory including submodules
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
-  const { toolName } = await import('$ROOT/.claude/tools/linear/tool-name.ts');
-  const result = await toolName.execute({ /* params */ });
+  const { createInitiative } = await import('$ROOT/.claude/tools/linear/create-initiative.ts');
+  const result = await createInitiative.execute({
+    name: 'Q1 2026 Platform Improvements',
+    description: 'Enhance developer experience and performance'
+  });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
 ```
 
+**Link Project to Initiative:**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { linkProjectToInitiative } = await import('$ROOT/.claude/tools/linear/link-project-to-initiative.ts');
+  const result = await linkProjectToInitiative.execute({
+    projectId: 'project-uuid-here',
+    initiativeId: 'initiative-uuid-here'
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+**Create Issue Relations:**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { createIssueRelation } = await import('$ROOT/.claude/tools/linear/create-issue-relation.ts');
+  const result = await createIssueRelation.execute({
+    issueId: 'issue-uuid-1',
+    relatedIssueId: 'issue-uuid-2',
+    type: 'blocks'  // blocks, blocked, related, duplicate
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+**Create Cycle:**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { createCycle } = await import('$ROOT/.claude/tools/linear/create-cycle.ts');
+  const result = await createCycle.execute({
+    teamId: 'team-uuid-here',
+    name: 'Sprint 24',
+    startsAt: '2026-01-06',
+    endsAt: '2026-01-20'
+  });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+### Generic Execution Pattern
+
+```bash
+# Works from any directory (including submodules)
+# 2>/dev/null suppresses debug logs
+
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { toolName } = await import('$ROOT/.claude/tools/linear/tool-name.ts');
+  const result = await toolName.execute({ /* parameters */ });
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+## Troubleshooting
+
+### OAuth Issues
+
+**Browser doesn't open:**
+
+```bash
+# Manual authorization - visit the URL printed in terminal
+```
+
+**"No credentials configured" error:**
+
+```bash
+# Check credentials.json has clientId OR apiKey
+cat ~/.claude/tools/config/credentials.json
+```
+
+**Token refresh fails:**
+
+```bash
+# Clear tokens and re-authorize
+rm ~/.claude-oauth/linear.json
+# Next API call will prompt
+```
+
+### API Key Issues
+
+**"Invalid API key" error:**
+
+```bash
+# Regenerate at https://linear.app/settings/api
+# Update credentials.json with new key
+```
+
+## Rate Limits
+
+| Auth Method | Rate Limit          |
+| ----------- | ------------------- |
+| OAuth       | 500 requests/hour   |
+| API Key     | 1,500 requests/hour |
+
+**Note:** API keys have higher limits but OAuth is more secure.
+
 ## Related Skills
 
-- **mcp-tools-registry** - Execution patterns (REQUIRED - see for Bash + tsx usage)
-- **mcp-code-create** - Create new wrappers
-- **mcp-code-test** - Test wrappers
+- **mcp-tools-registry** - Execution patterns for other MCP tools
+- **gateway-mcp-tools** - MCP tools gateway routing
+
+## Implementation Details
+
+**Architecture:**
+
+- Direct GraphQL HTTP client (no MCP server)
+- OAuth 2.0 PKCE flow with automatic token refresh
+- Secure token storage in `~/.claude-oauth/`
+- Graceful fallback to API key authentication
+
+**Files:**
+
+- Client: `.claude/tools/linear/client.ts`
+- OAuth Manager: `.claude/tools/config/lib/oauth-manager.ts`
+- Browser Flow: `.claude/tools/config/lib/oauth-browser-flow.ts`
+- GraphQL Helpers: `.claude/tools/linear/graphql-helpers.ts`
+
+**Token Refresh:**
+
+- Automatic refresh 5 minutes before expiry
+- Refresh token rotation supported
+- Browser re-auth if refresh fails

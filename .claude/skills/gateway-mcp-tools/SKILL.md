@@ -1,134 +1,172 @@
 ---
 name: gateway-mcp-tools
-description: Use when calling external APIs (Linear, Praetorian CLI, Context7, Perplexity, Chrome DevTools, Currents, Nebula, Chariot). Routes to 9 MCP wrapper skills with 0 tokens at startup. Two-tier gateway system for progressive loading.
-allowed-tools: Read, Bash
+description: Routes MCP tool tasks to service skills. Intent detection + progressive loading.
+allowed-tools: Read
 ---
 
-# MCP Tools Gateway
+<EXTREMELY-IMPORTANT>
+# STOP. READ THIS FIRST. DO NOT SKIP.
 
-## Understanding This Gateway
+## The 1% Rule (NON-NEGOTIABLE)
 
-This gateway uses Chariot's **two-tier skill system**:
+If there is even a **1% chance** a skill might apply to your task:
 
-- **Tier 1 (Core)**: This gateway skill in `.claude/skills/` - lightweight routing directory
-- **Tier 2 (Library)**: Service skills in `.claude/skill-library/claude/mcp-tools/` - detailed implementation patterns
+- You MUST invoke that skill
+- This is not optional
+- This is not negotiable
+- You cannot rationalize your way out of this
 
-The gateway provides 0 tokens at session start (was 71.8k with native MCPs) by loading wrapper skills only when needed.
+Uncertainty = Invocation. Period.
 
-## How to Use
+## Skill Announcement (MANDATORY)
 
-This skill serves as a master directory for all MCP tool wrapper skills. When you need to call external APIs:
+Before using any skill, you MUST announce it in your response:
 
-1. **Identify the service skill** from the list below
-2. **Use the Read tool** with the provided path to load the service skill
-3. **Follow the service skill's patterns** for execution
+"I am invoking `{skill-name}` because {reason}."
 
-<IMPORTANT>
-Library skills are NOT automatically loaded. You MUST:
+This announcement must appear BEFORE you begin work.
+No announcement = no invocation = PROTOCOL VIOLATION = FAILURE!
+</EXTREMELY-IMPORTANT>
 
-1. Invoke this gateway: `skill: "gateway-mcp-tools"`
-2. Read the service skill path from Service Skills section below
-3. Follow service patterns for wrapper execution via `npx tsx`
+# Gateway: MCP Tools
 
-Example: For Linear API calls, use `Read(".claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md")`
+Routes MCP tool tasks to appropriate library skills. Does NOT contain methodology—skills do.
 
-❌ WRONG: Calling MCP tools directly without loading service skill
-✅ RIGHT: Read service skill first, then follow its execution patterns
-</IMPORTANT>
+## Progressive Disclosure
 
-## Service Skills
+This gateway implements 3-tier loading:
 
-### Praetorian CLI (Chariot API)
+- **Level 1 (now):** Routing tables (~300 tokens)
+- **Level 2 (on-demand):** Skill SKILL.md loaded when routed
+- **Level 3 (as-needed):** Skill resources loaded during execution
 
-**Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-praetorian-cli/SKILL.md`
+**Token savings:** 0 tokens at session start (was 71.8k with native MCP)
 
-Use for: Assets, risks, jobs, seeds, integrations, capabilities, and all Chariot platform operations.
+## Intent Detection
 
-### Linear (Issue Tracking)
+**Match your task to a routing pattern:**
 
-**Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md`
+| Task Intent                                   | Route To                                   |
+| --------------------------------------------- | ------------------------------------------ |
+| "Chariot assets" / "risks" / "jobs"           | → `mcp-tools-praetorian-cli`               |
+| "Linear issues" / "projects" / "tickets"      | → `mcp-tools-linear`                       |
+| "library docs" / "Context7" / "documentation" | → `mcp-tools-context7`                     |
+| "AI search" / "Perplexity" / "research"       | → `mcp-tools-perplexity`                   |
+| "browser" / "Playwright" / "screenshot"       | → `mcp-tools-chrome-devtools`              |
+| "CI metrics" / "Currents" / "test runs"       | → `mcp-tools-currents`                     |
+| "Chariot platform" / "graph query"            | → `mcp-tools-chariot`                      |
+| "cloud security" / "Nebula" / "AWS scan"      | → `mcp-tools-nebula`                       |
+| "semantic code" / "Serena" / "LSP"            | → `mcp-tools-serena`                       |
+| "Shodan" / "host search" / "recon"            | → `mcp-tools-shodan-api`                   |
+| "tool discovery" / "MCP registry"             | → `mcp-tools-registry`                     |
+| "create wrapper" / "new MCP tool"             | → `creating-mcp-wrappers`                  |
+| "wrapper architecture" / "token optimization" | → `designing-progressive-loading-wrappers` |
+| "review wrapper" / "validate implementation"  | → `reviewing-mcp-wrappers`                 |
+| "MCP setup" / "server config"                 | → `setting-up-mcp-servers`                 |
+| "orchestrate MCP" / "complete wrapper flow"   | → `orchestrating-mcp-development`          |
+| "orchestrate API" / "REST API wrapper"        | → `orchestrating-api-tool-development`     |
 
-Use for: Issues, projects, teams, comments, and Linear workflow automation.
+## Routing Algorithm
 
-### Context7 (Library Documentation)
-
-**Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-context7/SKILL.md`
-
-Use for: Looking up library documentation, API references, and package docs.
-
-### Perplexity (AI Search & Research)
-
-**Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-perplexity/SKILL.md`
-
-Use for: Web search, conversational AI, deep research with citations, advanced reasoning.
-
-### Chrome DevTools (Browser Automation)
-
-**Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-chrome-devtools/SKILL.md`
-
-Use for: Playwright browser automation, screenshots, page interactions.
-
-### Currents (CI Test Metrics)
-
-**Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-currents/SKILL.md`
-
-Use for: CI test performance metrics, flaky test detection, test analytics.
-
-### Chariot (Platform)
-
-**Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-chariot/SKILL.md`
-
-Use for: Chariot-specific platform operations and integrations.
-
-### Nebula (Multi-Cloud Security)
-
-**Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-nebula/SKILL.md`
-
-Use for: Multi-cloud security scanning, access key operations, public resource discovery.
-
-### MCP Registry (Tool Discovery)
-
-**Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-registry/SKILL.md`
-
-Use for: Registry of all MCP tool wrappers, progressive loading patterns, tool discovery.
-
-## Dynamic Discovery
-
-For the latest available tools, use the discovery script:
-
-```bash
-# List all services and tools
-npx tsx .claude/tools/discover.ts
-
-# List tools for a specific service
-npx tsx .claude/tools/discover.ts praetorian-cli
-
-# Search for tools by name
-npx tsx .claude/tools/discover.ts linear issue
+```
+1. Parse task for trigger keywords from Intent Detection
+2. Match triggers → route to skill(s) from Skill Registry
+3. Check Cross-Gateway Routing for domain-specific gateways
+4. Load skill via Read(path)
+5. Follow skill instructions
+6. Execute wrapper via `npx tsx` as documented in skill
 ```
 
-## Quick Reference
+## Skill Registry
 
-| Need                      | Read This Skill Path                                                        |
-| ------------------------- | --------------------------------------------------------------------------- |
-| Chariot assets/risks/jobs | `.claude/skill-library/claude/mcp-tools/mcp-tools-praetorian-cli/SKILL.md`  |
-| Linear issues/projects    | `.claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md`          |
-| Library documentation     | `.claude/skill-library/claude/mcp-tools/mcp-tools-context7/SKILL.md`        |
-| AI search/research        | `.claude/skill-library/claude/mcp-tools/mcp-tools-perplexity/SKILL.md`      |
-| Browser automation        | `.claude/skill-library/claude/mcp-tools/mcp-tools-chrome-devtools/SKILL.md` |
-| CI test metrics           | `.claude/skill-library/claude/mcp-tools/mcp-tools-currents/SKILL.md`        |
+### Chariot Platform
 
-## Agent Requirements
+| Skill          | Path                                                                       | Triggers                   |
+| -------------- | -------------------------------------------------------------------------- | -------------------------- |
+| Praetorian CLI | `.claude/skill-library/claude/mcp-tools/mcp-tools-praetorian-cli/SKILL.md` | assets, risks, jobs, seeds |
+| Chariot Graph  | `.claude/skill-library/claude/mcp-tools/mcp-tools-chariot/SKILL.md`        | graph query, platform      |
 
-Agents using MCP wrappers MUST have:
+### Issue Tracking
 
-```yaml
-tools:
-  - Bash # REQUIRED: Execute TypeScript (npx tsx)
-  - Read # REQUIRED: Load service skills and discover tools
+| Skill  | Path                                                               | Triggers                  |
+| ------ | ------------------------------------------------------------------ | ------------------------- |
+| Linear | `.claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md` | issues, projects, tickets |
+
+### Documentation
+
+| Skill    | Path                                                                 | Triggers                    |
+| -------- | -------------------------------------------------------------------- | --------------------------- |
+| Context7 | `.claude/skill-library/claude/mcp-tools/mcp-tools-context7/SKILL.md` | library docs, API reference |
+
+### Search & Research
+
+| Skill      | Path                                                                   | Triggers            |
+| ---------- | ---------------------------------------------------------------------- | ------------------- |
+| Perplexity | `.claude/skill-library/claude/mcp-tools/mcp-tools-perplexity/SKILL.md` | AI search, research |
+
+### Browser Automation
+
+| Skill           | Path                                                                        | Triggers                 |
+| --------------- | --------------------------------------------------------------------------- | ------------------------ |
+| Chrome DevTools | `.claude/skill-library/claude/mcp-tools/mcp-tools-chrome-devtools/SKILL.md` | browser, screenshot, DOM |
+
+### CI/CD
+
+| Skill    | Path                                                                 | Triggers              |
+| -------- | -------------------------------------------------------------------- | --------------------- |
+| Currents | `.claude/skill-library/claude/mcp-tools/mcp-tools-currents/SKILL.md` | test runs, CI metrics |
+
+### Cloud Security
+
+| Skill  | Path                                                               | Triggers                 |
+| ------ | ------------------------------------------------------------------ | ------------------------ |
+| Nebula | `.claude/skill-library/claude/mcp-tools/mcp-tools-nebula/SKILL.md` | AWS scan, cloud security |
+
+### Reconnaissance
+
+| Skill      | Path                                                                   | Triggers                              |
+| ---------- | ---------------------------------------------------------------------- | ------------------------------------- |
+| Shodan API | `.claude/skill-library/claude/mcp-tools/mcp-tools-shodan-api/SKILL.md` | Shodan, host search, recon, IP lookup |
+
+### Code Analysis
+
+| Skill  | Path                                                               | Triggers                    |
+| ------ | ------------------------------------------------------------------ | --------------------------- |
+| Serena | `.claude/skill-library/claude/mcp-tools/mcp-tools-serena/SKILL.md` | semantic code, LSP, symbols |
+
+### Infrastructure
+
+| Skill        | Path                                                                          | Triggers       |
+| ------------ | ----------------------------------------------------------------------------- | -------------- |
+| MCP Registry | `.claude/skill-library/claude/mcp-tools/mcp-tools-registry/SKILL.md`          | tool discovery |
+| MCP Setup    | `.claude/skill-library/claude/mcp-management/setting-up-mcp-servers/SKILL.md` | server config  |
+
+### Development
+
+| Skill                | Path                                                                                          | Triggers                      |
+| -------------------- | --------------------------------------------------------------------------------------------- | ----------------------------- |
+| Creating Wrappers    | `.claude/skill-library/mcp-management/creating-mcp-wrappers/SKILL.md`                         | new wrapper, TDD              |
+| Orchestrating MCP    | `.claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md`          | orchestration, complete flow  |
+| Orchestrating API    | `.claude/skill-library/claude/mcp-management/orchestrating-api-tool-development/SKILL.md`     | REST API, HTTP wrappers       |
+| Wrapper Architecture | `.claude/skill-library/claude/mcp-management/designing-progressive-loading-wrappers/SKILL.md` | token optimization            |
+| Reviewing Wrappers   | `.claude/skill-library/claude/mcp-management/reviewing-mcp-wrappers/SKILL.md`                 | review, validate, code review |
+
+## Cross-Gateway Routing
+
+| If Task Involves       | Also Invoke          |
+| ---------------------- | -------------------- |
+| TypeScript, Zod, types | `gateway-typescript` |
+| Testing wrappers       | `gateway-testing`    |
+
+## Loading Skills
+
+**Path convention:** `.claude/skill-library/claude/mcp-tools/{skill-name}/SKILL.md`
+
+```
+Read(".claude/skill-library/claude/mcp-tools/{skill-name}/SKILL.md")
 ```
 
-**MANDATORY**: You MUST use TodoWrite before starting to track all workflow steps when working with multiple MCP wrapper calls or complex API integrations.
+Do NOT use `skill: "skill-name"` for library skills—they require Read tool.
 
 ## Execution Pattern
 
@@ -141,72 +179,3 @@ npx tsx -e "(async () => {
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
 ```
-
-## Token Savings
-
-- **Session start**: 0 tokens (was 71.8k)
-- **Per import**: ~50-100 tokens
-- **On-demand only**: Tools load when used
-
-## When to Use This Gateway
-
-Use this gateway when:
-
-- Starting work that requires external API calls
-- Unsure which MCP service skill to use
-- Need overview of available MCP wrapper capabilities
-
-For specific implementations, load the individual service skill.
-
-## Creating MCP Wrappers
-
-**When**: Creating new MCP wrappers
-
-**Skill**: [creating-mcp-wrappers](../creating-mcp-wrappers/SKILL.md)
-
-**What it provides**:
-
-- Schema discovery (Claude explores MCP interactively)
-- Test design (Claude reasons about test cases - ≥18 tests across 6 categories)
-- Implementation guidance (Claude implements from schema discovery docs)
-- CLI gates (verify-red, verify-green enforce TDD mechanically)
-
-**Use this for**: End-to-end wrapper creation with hybrid approach (instruction-based discovery/design + CLI enforcement).
-
-**Time**: ~20-30 minutes (vs ~45 minutes manual workflow)
-
-## Related
-
-- **managing-mcp-wrappers**: Wrapper lifecycle management - update/audit/fix existing wrappers (use `/mcp-manager` command)
-- **creating-mcp-wrappers**: Create new wrappers with instruction-driven workflow (use skill above)
-- **Full architecture**: `docs/MCP-TOOLS-ARCHITECTURE.md`
-
-## MCP Tools
-
-**Mcp Tools Chariot**: `.claude/skill-library/claude/mcp-tools/mcp-tools-chariot/SKILL.md`
-- Use when accessing chariot services - provides 2 tools for query, schema. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
-
-
-**Mcp Tools Chrome Devtools**: `.claude/skill-library/claude/mcp-tools/mcp-tools-chrome-devtools/SKILL.md`
-- Use when accessing chrome-devtools services - provides 26 tools for click, close-page, drag, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
-
-**Mcp Tools Context7**: `.claude/skill-library/claude/mcp-tools/mcp-tools-context7/SKILL.md`
-- Use when accessing context7 services - provides 2 tools for get-library-docs, resolve-library-id. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
-
-**Mcp Tools Currents**: `.claude/skill-library/claude/mcp-tools/mcp-tools-currents/SKILL.md`
-- Use when accessing currents services - provides 8 tools for get-projects, get-run-details, get-runs, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
-
-**Mcp Tools Linear**: `.claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md`
-- Use when accessing linear services - provides 19 tools for create-bug, create-comment, create-issue, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
-
-**Mcp Tools Nebula**: `.claude/skill-library/claude/mcp-tools/mcp-tools-nebula/SKILL.md`
-- Use when accessing nebula services - provides 5 tools for access-key-to-account-id, apollo, public-resources, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
-
-**Mcp Tools Perplexity**: `.claude/skill-library/claude/mcp-tools/mcp-tools-perplexity/SKILL.md`
-- Use when accessing perplexity services - provides 4 tools for search, ask, research, reason. References mcp-tools-registry for Bash + tsx execution patterns.
-
-**Mcp Tools Praetorian Cli**: `.claude/skill-library/claude/mcp-tools/mcp-tools-praetorian-cli/SKILL.md`
-- Use when accessing praetorian-cli services - provides 15 tools for aegis-list, assets-get, assets-list, and more. References mcp-tools-registry for Bash + tsx execution patterns. Enables granular agent access control.
-
-**Mcp Tools Registry**: `.claude/skill-library/claude/mcp-tools/mcp-tools-registry/SKILL.md`
-- Use when calling any external API or service (Linear, Praetorian CLI, GitHub, Playwright) - provides registry of MCP tool wrappers in .claude/tools/ with TRUE progressive loading achieving 0 tokens at session start (was 71.8k tokens). REQUIRED before implementing API calls. Tools load ONLY when imported.

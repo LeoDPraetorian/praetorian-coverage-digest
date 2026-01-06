@@ -7,6 +7,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const InputSchema = z.object({
   prefix_filter: z.string().default(''),
@@ -29,7 +30,7 @@ const FilteredOutputSchema = z.object({
     status: z.string().optional()
   })),
   next_offset: z.number().nullable(),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 });
 
 export const preseedsList = {
@@ -72,7 +73,7 @@ function filterPreseedsResult(rawResult: any): any {
     status: preseed.status
   }));
 
-  return {
+  const result = {
     summary: {
       total_count: preseeds.length,
       returned_count: filteredPreseeds.length,
@@ -80,8 +81,12 @@ function filterPreseedsResult(rawResult: any): any {
       statuses
     },
     preseeds: filteredPreseeds,
-    next_offset: nextOffset,
-    estimated_tokens: 900
+    next_offset: nextOffset
+  };
+
+  return {
+    ...result,
+    estimatedTokens: estimateTokens(result)
   };
 }
 

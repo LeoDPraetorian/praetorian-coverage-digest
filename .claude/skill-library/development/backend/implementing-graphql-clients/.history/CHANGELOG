@@ -1,0 +1,37 @@
+# Changelog
+
+## 2026-01-04 - Compliance Fixes via auditing-skills + fixing-skills
+
+### Issues Fixed
+
+**Phase 4: Broken Links (CRITICAL)**
+- Created 6 missing reference files with comprehensive content from research
+
+**Phase 26: Reference Content Quality (WARNING)**
+- Populated 2 placeholder reference files with verified patterns
+
+**Phase 18: Orphan Detection (WARNING)**
+- Added skill to `gateway-backend` routing table with comprehensive triggers
+
+### Method
+
+- **Phase 4**: Claude-Automated (orchestrating-research + content generation)
+- **Phase 26**: Claude-Automated (orchestrating-research skill invoked)
+- **Phase 18**: Claude-Automated (gateway routing table update)
+
+---
+ - implementing-graphql-clients
+
+## 2026-01-01 - Initial Creation
+
+**Type:** Library/Framework (GraphQL API documentation)
+**Category:** Library (development/backend)
+**Created by:** Claude (via /skill-manager create)
+
+**Problem**: Implementing GraphQL clients with performance optimization (batch queries achieve 3x improvement: 1,666 → 5,000 repos/hour), rate limiting (GitHub 5,000 points/hour), and security (variable binding prevents injection).
+
+**Content**: Batch query patterns (50-100 items/request), variable binding security, cursor pagination, rate limiting with proactive throttling (5% remaining), cost estimation, Gato-X production example, provider differences (GitHub/GitLab/Azure DevOps).
+
+**SKILL.md**: 495 lines - Batch queries, variable binding, rate limiting, pagination, client implementation, production example (Gato-X), quick reference
+
+**References**: rate-limiting-patterns.md, pagination-patterns.md, client-implementation.md, cost-calculation.md, production-examples.md, common-pitfalls.md, testing-patterns.md, provider-differences.md

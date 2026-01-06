@@ -73,15 +73,15 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 ## Edit Patterns
 
-| Issue                   | Edit Pattern                                                                  |
-| ----------------------- | ----------------------------------------------------------------------------- |
-| Block scalar            | `description: \|...` → `description: Use when...`                             |
-| Name mismatch           | `name: wrong` → `name: {filename}`                                            |
-| Field order             | Reorder: name, description, type, permissionMode, tools, skills, model, color |
-| Table format            | `npx prettier --write --parser markdown {file}`                               |
-| Core Responsibilities   | Add 2-4 subsections defining agent duties (see references)                    |
-| Skill Loading Protocol  | Add Step 1/2/3 structure with two-tier intro (see references)                 |
-| Output Format           | Add `skills_invoked` + `library_skills_read` fields (see references)         |
+| Issue                  | Edit Pattern                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| Block scalar           | `description: \|...` → `description: Use when...`                             |
+| Name mismatch          | `name: wrong` → `name: {filename}`                                            |
+| Field order            | Reorder: name, description, type, permissionMode, tools, skills, model, color |
+| Table format           | `npx prettier --write --parser markdown {file}`                               |
+| Core Responsibilities  | Add 2-4 subsections defining agent duties (see references)                    |
+| Skill Loading Protocol | Add Step 1/2/3 structure with two-tier intro (see references)                 |
+| Output Format          | Add `skills_invoked` + `library_skills_read` fields (see references)          |
 
 **Complete patterns:** [references/fix-procedures.md](references/fix-procedures.md)
 

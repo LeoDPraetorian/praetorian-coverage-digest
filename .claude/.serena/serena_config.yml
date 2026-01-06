@@ -1,0 +1,64 @@
+# Serena Configuration for Chariot Development Platform
+# This file is version-controlled and shared between developers.
+# User-specific settings should go in ~/.serena/serena_config.yml
+#
+# SERENA_HOME is set to this directory by .claude/hooks/session-start.sh
+
+language_backend: LSP
+# the language backend to use for code understanding and manipulation.
+# Possible values are:
+#  * LSP: Use the language server protocol (LSP), spawning freely available language servers
+#      via the SolidLSP library that is part of Serena.
+#  * JetBrains: Use the Serena plugin in your JetBrains IDE.
+
+gui_log_window: false
+# whether to open a graphical window with Serena's logs.
+# Not available on macOS.
+
+web_dashboard: true
+# whether to open the Serena web dashboard (accessible through your web browser)
+
+web_dashboard_listen_address: 127.0.0.1
+# The address where the web dashboard will listen on
+
+web_dashboard_open_on_launch: false
+# whether to open a browser window with the web dashboard when Serena starts
+
+log_level: 20
+# the minimum log level (10 = debug, 20 = info, 30 = warning, 40 = error)
+
+trace_lsp_communication: false
+# whether to trace the communication between Serena and the language servers
+
+ls_specific_settings: {}
+# Advanced configuration option for language server specific options
+
+tool_timeout: 600
+# timeout, in seconds, after which tool executions are terminated
+# Increased to 10 minutes for Go modules with large go.work workspaces
+
+excluded_tools: []
+# list of tools to be globally excluded
+
+included_optional_tools: []
+# list of optional tools (which are disabled by default) to be included
+
+default_max_tool_answer_chars: 150000
+# default maximal answer length for tools
+
+token_count_estimator: CHAR_COUNT
+# the name of the token count estimator to use for tool usage statistics
+
+# Projects are NOT listed here because:
+# 1. Absolute paths are user-specific and won't work across machines
+# 2. Path-based routing (2026-01-04 fix) auto-registers projects on first use
+# 3. This allows the config to be version-controlled and shared
+#
+# Projects will be auto-registered when accessed via semantic routing.
+# See: .claude/docs/mcps/SERENA-ARCHITECTURE.md
+# NOTE: Do not add absolute paths here - they won't work on other machines.
+# Path-based routing auto-registers projects on first use.
+projects:
+- /Users/nathansportsman/chariot-development-platform2/modules/chariot
+- /Users/nathansportsman/chariot-development-platform2/modules/chariot/backend
+- /Users/nathansportsman/chariot-development-platform2/modules/fingerprintx

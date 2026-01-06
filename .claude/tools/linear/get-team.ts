@@ -1,12 +1,12 @@
 /**
- * get_team - Linear MCP Wrapper
+ * get_team - Linear GraphQL Wrapper
  *
- * Get detailed information about a specific team via MCP server
+ * Get detailed information about a specific team via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~500 tokens (single team)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -23,7 +23,7 @@
  * - updatedAt: string (optional) - ISO timestamp
  *
  * Edge cases discovered:
- * - Query can match by UUID, key, or name (fuzzy matching)
+ * - Query matches by UUID, key, or name
  * - Returns null/undefined if team not found
  * - Description truncated to 500 chars for token efficiency
  *
@@ -41,19 +41,39 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL query for getting a team
+ */
+const GET_TEAM_QUERY = `
+  query Team($id: String!) {
+    team(id: $id) {
+      id
+      key
+      name
+      description
+      createdAt
+      updatedAt
+    }
+  }
+`;
 
 /**
  * Input validation schema
  * Maps to get_team params
+ *
+ * Security: Uses individual validators for specific attack detection
  */
 export const getTeamParams = z.object({
-  // Reference/search field - full validation
   query: z.string()
     .min(1)
     .refine(validateNoControlChars, 'Control characters not allowed')
@@ -73,13 +93,28 @@ export const getTeamOutput = z.object({
   name: z.string(),
   description: z.string().optional(),
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
+  estimatedTokens: z.number()
 });
 
 export type GetTeamOutput = z.infer<typeof getTeamOutput>;
 
 /**
- * Get a Linear team by UUID, key, or name using MCP wrapper
+ * GraphQL response type
+ */
+interface TeamResponse {
+  team: {
+    id: string;
+    key?: string | null;
+    name: string;
+    description?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+  } | null;
+}
+
+/**
+ * Get a Linear team by UUID, key, or name using GraphQL API
  *
  * @example
  * ```typescript
@@ -100,29 +135,40 @@ export const getTeam = {
   description: 'Get detailed information about a specific Linear team',
   parameters: getTeamParams,
 
-  async execute(input: GetTeamInput): Promise<GetTeamOutput> {
+  async execute(
+    input: GetTeamInput,
+    testToken?: string
+  ): Promise<GetTeamOutput> {
     // Validate input
     const validated = getTeamParams.parse(input);
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'get_team',
-      validated
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Execute GraphQL query
+    const response = await executeGraphQL<TeamResponse>(
+      client,
+      GET_TEAM_QUERY,
+      { id: validated.query }
     );
 
-    if (!rawData) {
+    if (!response.team) {
       throw new Error(`Team not found: ${validated.query}`);
     }
 
     // Filter to essential fields
+    const baseData = {
+      id: response.team.id,
+      key: response.team.key || undefined,
+      name: response.team.name,
+      description: response.team.description?.substring(0, 500), // Truncate for token efficiency
+      createdAt: response.team.createdAt,
+      updatedAt: response.team.updatedAt
+    };
+
     const filtered = {
-      id: rawData.id,
-      key: rawData.key,
-      name: rawData.name,
-      description: rawData.description?.substring(0, 500), // Truncate for token efficiency
-      createdAt: rawData.createdAt,
-      updatedAt: rawData.updatedAt
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

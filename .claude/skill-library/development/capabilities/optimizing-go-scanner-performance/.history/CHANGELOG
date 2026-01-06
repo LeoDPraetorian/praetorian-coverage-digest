@@ -1,0 +1,58 @@
+# optimizing-go-scanner-performance Changelog
+
+## 2026-01-01 - Initial Creation
+
+**RED Phase (Gap Proven)**:
+- Problem: Go scanners plateau at 5-10K items/hour with basic errgroup/semaphore patterns
+- Without this skill: Developers lack proven optimization techniques to achieve 40K-540K items/hour
+- Gap areas identified:
+  - Multi-pattern matching (800+ detectors) becomes O(n × m) bottleneck
+  - Duplicate findings waste verification API calls
+  - Network-heavy scanning makes redundant HTTP requests
+  - CI/CD re-scans unchanged files every commit
+  - Stage imbalances cause worker underutilization
+
+**Category**: development/backend (Library skill)
+
+**Skill Type**: Process/Pattern (performance optimization methodology)
+
+**Research Completed**:
+- TruffleHog Engine struct analysis (Aho-Corasick + LRU + pipeline)
+- Nuclei architecture (request clustering, concurrency modes, rate limiting)
+- golangci-lint (file-level caching, incremental analysis)
+- Production benchmarks and throughput comparisons
+- Worker pool multiplier patterns across 3 codebases
+
+**Structure Created**:
+- 322-line SKILL.md (under 500-line limit)
+- Decision tree: Bottleneck → Optimization mapping
+- Quick Reference table with 6 optimizations
+- Code examples for each technique
+- Production benchmarks from 3 tools
+- 7 reference files for deep dives
+
+**Key Optimizations Documented**:
+1. Aho-Corasick pre-filtering (10-100x): Multi-pattern matching in O(n + m)
+2. LRU deduplication cache (50-90%): Avoid duplicate verification
+3. Request clustering (2-10x): Deduplicate HTTP requests
+4. Buffered channel sizing (2-5x): Smooth pipeline variance
+5. Worker pool multipliers (2-3x): Stage-specific concurrency
+6. Incremental caching (10-100x): Skip unchanged files in CI/CD
+
+**Production Examples Referenced**:
+- TruffleHog: 40K+ items/hour (Aho-Corasick + LRU + multipliers)
+- Nuclei: 540K requests/hour (clustering + bounded concurrency)
+- golangci-lint: 10-100x CI/CD speedup (file-level caching)
+
+**Libraries Documented**:
+- github.com/cloudflare/ahocorasick (Aho-Corasick)
+- github.com/hashicorp/golang-lru/v2 (LRU cache)
+- runtime/pprof (profiling)
+
+**Related Skills Cross-Referenced**:
+- go-errgroup-concurrency (Pattern 7 - stage multipliers)
+- implementing-go-semaphore-pools (bounded concurrency)
+- implementing-go-pipelines (multi-stage processing)
+- implementing-go-plugin-registries (30-100+ plugins)
+
+**Next Steps**: Reference files populated, gateway-backend updated, compliance audit passed

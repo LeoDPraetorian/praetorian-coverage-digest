@@ -42,10 +42,10 @@ Task(
 FEATURE: {feature-name}
 
 PLAN:
-{content from .claude/features/{id}/plan.md}
+{content from .claude/.output/features/{id}/plan.md}
 
 ARCHITECTURE:
-{content from .claude/features/{id}/architecture.md}
+{content from .claude/.output/features/{id}/architecture.md}
 
 CONTEXT FROM ARCHITECT:
 {handoff.context from architecture phase}

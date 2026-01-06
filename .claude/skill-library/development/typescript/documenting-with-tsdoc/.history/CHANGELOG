@@ -1,0 +1,58 @@
+## 2026-01-01 - Initial Creation
+
+**RED Phase Documentation:**
+
+Without this skill, Claude Code fails in two ways when asked to document TypeScript APIs:
+
+1. **No TypeDoc generation guidance** - Doesn't know how to set up TypeDoc, generate HTML/JSON docs, or configure typedoc.json properly
+2. **Poor documentation structure** - Creates verbose comments without clear structure, missing @example blocks, doesn't follow TSDoc conventions
+
+**Example failure (without skill):**
+```typescript
+// Claude creates verbose docs without structure
+/**
+ * This function gets a user. It takes an id parameter which is a string
+ * and it returns a Promise that resolves to either a User object or null
+ * if the user is not found. (No examples, no @throws, verbose)
+ */
+export async function getUser(id: string): Promise<User | null> {
+  // ...
+}
+```
+
+**What we need (with skill):**
+```typescript
+/**
+ * Retrieves a user by their unique identifier.
+ *
+ * @param id - The user's unique identifier
+ * @returns The user object or null if not found
+ *
+ * @throws {@link NotFoundError}
+ * Thrown when the user doesn't exist
+ *
+ * @example
+ * ```typescript
+ * const user = await getUser('abc123');
+ * console.log(user.name);
+ * ```
+ *
+ * @public
+ */
+export async function getUser(id: string): Promise<User | null> {
+  // ...
+}
+```
+
+**Skill Details:**
+
+- **Location:** Library skill (`.claude/skill-library/development/typescript/`)
+- **Category:** `development/typescript`
+- **Type:** Library/Framework (TSDoc specification + TypeDoc tool)
+- **Line count:** 392 lines (well under 500 limit)
+
+**Files Created:**
+
+- `SKILL.md` - Main skill with TSDoc syntax, TypeDoc commands, best practices
+- `references/` - Placeholder files for detailed content (to be populated via research)
+- `.history/CHANGELOG` - This file

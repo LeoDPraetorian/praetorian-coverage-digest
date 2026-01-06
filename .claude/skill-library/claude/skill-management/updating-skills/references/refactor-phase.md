@@ -40,7 +40,7 @@
 **Invoke the testing skill:**
 
 ```
-skill: "testing-skills-with-subagents"
+Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")
 ```
 
 This skill provides:

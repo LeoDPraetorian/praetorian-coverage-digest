@@ -1,0 +1,109 @@
+# Changelog: using-typescript-satisfies-operator
+
+## [Initial Creation] - 2026-01-01
+
+### 🔴 RED Phase: Gap Documentation
+
+**Why this skill is needed:**
+- TypeScript 4.9 `satisfies` operator (Nov 2022) is a critical 2025 best practice not strongly represented in Claude's training data
+- Official TypeScript docs cover syntax but lack practical application guidance
+- Solves the "type validation vs literal preservation" dilemma
+
+**Failure behavior without skill:**
+When developers ask for type-safe config objects, routes, or status enums, Claude typically suggests:
+1. Type annotations (`: Type`) - validates but loses literal types
+2. Type assertions (`as Type`) - preserves literals but no validation
+
+Neither approach provides both benefits. Claude may not suggest `satisfies` because it's a recent feature with limited documentation on when to use it vs alternatives.
+
+**Expected failure scenario:**
+- User: "Create a type-safe route configuration that preserves literal path strings"
+- Claude: Suggests type annotations (loses path literals) or type assertions (no validation)
+- Result: Developer gets either type safety OR literal preservation, not both
+
+### Metadata
+
+- **Category:** Library skill - `development/typescript/`
+- **Skill Type:** Library/Framework (TypeScript language feature documentation)
+- **Location:** `.claude/skill-library/development/typescript/using-typescript-satisfies-operator/`
+- **Line Count:** 460 lines (SKILL.md) + 2 reference files
+- **TypeScript Version:** 4.9+ (November 2022)
+
+### Content Structure
+
+**SKILL.md (460 lines):**
+- When to Use (decision criteria)
+- Quick Reference (comparison table)
+- Core Problem Solved (3 approaches compared)
+- Basic Syntax & Examples (4 progressive examples)
+- vs Type Annotations (comparison table + references)
+- vs Type Assertions (comparison table + references)
+- Chariot Patterns (4 quick examples with references)
+- Common Use Cases (3 patterns with references)
+- Limitations & Trade-offs (4 key limitations)
+- Anti-patterns (3 common mistakes)
+- Decision Tree (4-step flowchart)
+
+**references/comparison-table.md:**
+- Complete feature matrix (9 aspects compared)
+- When to use each approach (decision criteria)
+- Side-by-side examples (2 detailed comparisons)
+- Performance comparison (compile time, runtime, bundle size)
+- Migration guide (from annotations/assertions to satisfies)
+- Common confusion (3 Q&A)
+
+**references/chariot-examples.md:**
+- 6 complete examples from Chariot codebase:
+  1. Tabularium Status Codes (`"A"`, `"D"`, `"U"`)
+  2. Asset Class Registry (`ipv4`, `domain`, `certificate`)
+  3. React Router Configuration (UI routes)
+  4. Backend API Endpoint Registry (Lambda handlers)
+  5. Nebula Scanner Configuration (multi-cloud)
+  6. VQL Capability Registry (security capabilities)
+- Pattern: Combining with `as const` for complete immutability
+
+### Key Decisions
+
+**Progressive Disclosure:**
+- SKILL.md kept concise (460 lines)
+- Detailed comparisons → `references/comparison-table.md`
+- Complete Chariot examples → `references/chariot-examples.md`
+
+**Chariot-Specific Examples:**
+- Real patterns from codebase, not generic examples
+- References actual locations (Tabularium, `modules/chariot/ui/`, `modules/chariot/backend/`)
+- Demonstrates 2025 best practices applied to security platform
+
+**Decision Tree:**
+- 4-step flowchart for when to use satisfies vs alternatives
+- Covers validation needs, literal preservation, immutability, TypeScript version
+
+### Testing Plan
+
+**🟢 GREEN Phase:**
+- Test scenario: "Create a type-safe route configuration with literal path preservation"
+- Expected: Claude suggests `satisfies` operator with explanation
+- Verify: Skill provides decision criteria, comparison tables, and Chariot examples
+
+**🔵 REFACTOR Phase:**
+- Pressure test 1: Time pressure (emergency deploy)
+- Pressure test 2: Authority pressure (senior says "just use as")
+- Pressure test 3: Sunk cost pressure (already written with annotations)
+
+### Audit Results
+
+**Status:** PASSED (with documented exception)
+
+**Audit Issues Addressed:**
+1. ✅ Description enhanced with keywords (390 chars)
+2. ✅ Gateway-frontend routing table updated
+3. ✅ Line count within limits (468 lines)
+
+**TodoWrite False Positive:**
+Audit flagged "Complex skill missing TodoWrite mandate" as CRITICAL. This is a FALSE POSITIVE because:
+- This is a **documentation/reference skill** (TypeScript language feature)
+- Users READ this when implementing, not EXECUTE workflows
+- Similar TypeScript docs skills (`validating-with-zod-schemas`, `implementing-result-either-pattern`) don't have TodoWrite
+- Section count (14) doesn't determine if TodoWrite needed - skill NATURE does
+
+**Decision:** TodoWrite not applicable for reference/documentation skills. Documented in changelog.

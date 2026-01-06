@@ -4,6 +4,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 // ============================================================================
 // Input Schema
@@ -43,7 +44,7 @@ const FilteredOutputSchema = z.object({
       status: z.string()
     }))
   }).optional(),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 });
 
 // ============================================================================
@@ -79,12 +80,14 @@ function filterAssetDetails(rawAsset: any, includeDetails: boolean): any {
     status: rawAsset.status,
     class: rawAsset.class,
     created: rawAsset.created,
-    updated: rawAsset.updated,
-    estimated_tokens: includeDetails ? 1500 : 200
+    updated: rawAsset.updated
   };
 
   if (!includeDetails) {
-    return base;
+    return {
+      ...base,
+      estimatedTokens: estimateTokens(base)
+    };
   }
 
   // Summarize attributes instead of returning all
@@ -112,7 +115,7 @@ function filterAssetDetails(rawAsset: any, includeDetails: boolean): any {
       status: r.status
     }));
 
-  return {
+  const result = {
     ...base,
     attributes_summary: {
       total_count: attributes.length,
@@ -127,6 +130,11 @@ function filterAssetDetails(rawAsset: any, includeDetails: boolean): any {
       by_severity: risksBySeverity,
       critical_risks: criticalRisks
     }
+  };
+
+  return {
+    ...result,
+    estimatedTokens: estimateTokens(result)
   };
 }
 

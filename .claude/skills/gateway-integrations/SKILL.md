@@ -1,107 +1,116 @@
 ---
 name: gateway-integrations
-description: Use when building third-party integrations (Jira, Microsoft Defender, HackerOne) - access API research, Chariot patterns, and validation workflows.
+description: Routes integration tasks to library skills. Intent detection + progressive loading.
 allowed-tools: Read
 ---
 
-# Integrations Gateway
+<EXTREMELY-IMPORTANT>
+# STOP. READ THIS FIRST. DO NOT SKIP.
 
-## Understanding This Gateway
+## The 1% Rule (NON-NEGOTIABLE)
 
-Chariot uses a **two-tier skill system**:
+If there is even a **1% chance** a skill might apply to your task:
 
-1. **Core Skills** (~25): High-frequency skills in `.claude/skills/` - auto-discovered by Claude Code
-2. **Library Skills** (~120): Specialized skills in `.claude/skill-library/` - loaded on-demand via Read tool
+- You MUST invoke that skill
+- This is not optional
+- This is not negotiable
+- You cannot rationalize your way out of this
 
-**This gateway is a core skill** that routes you to specialized library skills for integration development. The gateway itself does NOT contain implementation details - it serves as a directory.
+Uncertainty = Invocation. Period.
 
-**How to invoke this gateway:**
+## Skill Announcement (MANDATORY)
+
+Before using any skill, you MUST announce it in your response:
+
+"I am invoking `{skill-name}` because {reason}."
+
+This announcement must appear BEFORE you begin work.
+No announcement = no invocation = PROTOCOL VIOLATION = FAILURE!
+</EXTREMELY-IMPORTANT>
+
+# Gateway: Integrations
+
+Routes integration tasks to appropriate library skills. Does NOT contain methodology—skills do.
+
+## Progressive Disclosure
+
+This gateway implements 3-tier loading:
+
+- **Level 1 (now):** Routing tables (~250 tokens)
+- **Level 2 (on-demand):** Skill SKILL.md loaded when routed
+- **Level 3 (as-needed):** Skill resources loaded during execution
+
+## Intent Detection
+
+**Match your task to a routing pattern:**
+
+| Task Intent                               | Route To                            |
+| ----------------------------------------- | ----------------------------------- |
+| "create integration" / "new integration"  | → `developing-integrations`         |
+| "integration test" / "API test"           | → `writing-integration-tests-first` |
+| "AWS" / "Lambda" / "DynamoDB" / "S3"      | → `integrating-with-aws`            |
+| "Azure" / "Microsoft Azure" / "Key Vault" | → `integrating-with-azure`          |
+| "GCP" / "Google Cloud" / "Cloud Storage"  | → `integrating-with-gcp`            |
+| "Bugcrowd" / "bug bounty"                 | → `integrating-with-bugcrowd`       |
+| "GitHub" / "GitHub API" / "webhooks"      | → `integrating-with-github`         |
+| "GitLab" / "GitLab API" / "CI/CD"         | → `integrating-with-gitlab`         |
+| "HackerOne" / "H1"                        | → `integrating-with-hackerone`      |
+| "Bitbucket" / "Bitbucket API"             | → `integrating-with-bitbucket`      |
+| "Jira" / "JQL" / "Atlassian"              | → `integrating-with-jira`           |
+| "OCI" / "Oracle Cloud" / "Oracle"         | → `integrating-with-oracle-cloud`   |
+| "Panorama" / "Palo Alto"                  | → `integrating-with-panorama`       |
+| "testing" (general)                       | → also invoke `gateway-testing`     |
+| "Go patterns"                             | → also invoke `gateway-backend`     |
+
+## Routing Algorithm
 
 ```
-skill: "gateway-integrations"
+1. Parse task for trigger keywords from Intent Detection
+2. Match triggers → route to skill(s) from Skill Registry
+3. Check Cross-Gateway Routing for domain-specific gateways
+4. Load skill via Read(path)
+5. Follow skill instructions
 ```
 
-**How to load a library skill from this gateway:**
+## Skill Registry
+
+### Patterns & Testing
+
+| Skill                   | Path                                                                              | Triggers                            |
+| ----------------------- | --------------------------------------------------------------------------------- | ----------------------------------- |
+| Developing Integrations | `.claude/skill-library/development/integrations/developing-integrations/SKILL.md` | create integration, new integration |
+| Integration Tests       | `.claude/skill-library/testing/writing-integration-tests-first/SKILL.md`          | integration test, API test          |
+
+### Third-Party Integrations
+
+| Skill        | Path                                                                                    | Triggers                                                                                                                                    |
+| ------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| AWS          | `.claude/skill-library/development/integrations/integrating-with-aws/SKILL.md`          | AWS, Lambda, DynamoDB, S3, CloudFormation, SDK v2                                                                                           |
+| Azure        | `.claude/skill-library/development/integrations/integrating-with-azure/SKILL.md`        | Azure, Microsoft Azure, Key Vault, managed identity, DefaultAzureCredential, RBAC, service principal, Terraform Azure, Bicep, ARM templates |
+| Bitbucket    | `.claude/skill-library/development/integrations/integrating-with-bitbucket/SKILL.md`    | Bitbucket, Bitbucket API, API tokens                                                                                                        |
+| Bugcrowd     | `.claude/skill-library/development/integrations/integrating-with-bugcrowd/SKILL.md`     | Bugcrowd, bug bounty                                                                                                                        |
+| GCP          | `.claude/skill-library/development/integrations/integrating-with-gcp/SKILL.md`          | GCP, Google Cloud, Cloud Storage, Cloud Functions, Pub/Sub, BigQuery, Workload Identity, ADC                                                |
+| GitHub       | `.claude/skill-library/development/integrations/integrating-with-github/SKILL.md`       | GitHub, webhooks                                                                                                                            |
+| GitLab       | `.claude/skill-library/development/integrations/integrating-with-gitlab/SKILL.md`       | GitLab, GitLab API, CI/CD, runners, GATO, GLATO                                                                                             |
+| HackerOne    | `.claude/skill-library/development/integrations/integrating-with-hackerone/SKILL.md`    | HackerOne, H1                                                                                                                               |
+| Jira         | `.claude/skill-library/development/integrations/integrating-with-jira/SKILL.md`         | Jira, JQL, Atlassian                                                                                                                        |
+| Oracle Cloud | `.claude/skill-library/development/integrations/integrating-with-oracle-cloud/SKILL.md` | OCI, Oracle Cloud, Oracle                                                                                                                   |
+| Panorama     | `.claude/skill-library/development/integrations/integrating-with-panorama/SKILL.md`     | Panorama, Palo Alto                                                                                                                         |
+
+## Cross-Gateway Routing
+
+| If Task Involves  | Also Invoke         |
+| ----------------- | ------------------- |
+| Go implementation | `gateway-backend`   |
+| Testing patterns  | `gateway-testing`   |
+| MCP services      | `gateway-mcp-tools` |
+
+## Loading Skills
+
+**Path convention:** `.claude/skill-library/development/integrations/{skill-name}/SKILL.md`
 
 ```
-Read(".claude/skill-library/development/integrations/jira-integration/SKILL.md")
+Read(".claude/skill-library/development/integrations/{skill-name}/SKILL.md")
 ```
 
-<IMPORTANT>
-DO NOT work from this gateway alone. This is a routing table, not an implementation guide.
-
-After identifying the skill you need:
-
-1. Use the Read tool with the EXACT path shown below
-2. Follow the loaded skill's instructions completely
-3. The library skill contains the actual patterns and implementation details
-
-❌ WRONG: "I'll use gateway-integrations to build the Jira integration"
-✅ RIGHT: "I'll load jira-integration via Read tool and follow its instructions"
-</IMPORTANT>
-
-## Quick Reference
-
-| Need                           | Skill Path                                                                             |
-| ------------------------------ | -------------------------------------------------------------------------------------- |
-| Chariot conventions            | `.claude/skill-library/development/integrations/integration-chariot-patterns/SKILL.md` |
-| Test integrations              | `.claude/skill-library/testing/writing-integration-tests-first/SKILL.md`               |
-| Validate workflows             | `.claude/skill-library/development/integrations/integration-step-validator/SKILL.md`   |
-| Jira Cloud integration         | `.claude/skill-library/development/integrations/jira-integration/SKILL.md`             |
-| Microsoft Defender integration | `.claude/skill-library/development/integrations/ms-defender-integration/SKILL.md`      |
-| HackerOne integration          | `.claude/skill-library/development/integrations/hackerone-integration/SKILL.md`        |
-
-## Implementation Patterns
-
-**Integration Chariot Patterns**: `.claude/skill-library/development/integrations/integration-chariot-patterns/SKILL.md`
-
-- Chariot-specific integration patterns, platform conventions, data mapping
-
-## Testing & Validation
-
-**Integration First Testing**: `.claude/skill-library/testing/writing-integration-tests-first/SKILL.md`
-
-- Testing external API integrations, contract testing, mock strategies
-
-**Integration Step Validator**: `.claude/skill-library/development/integrations/integration-step-validator/SKILL.md`
-
-- Validating multi-step integration workflows, state machine patterns
-
-## Third-Party Integrations
-
-**Jira Cloud Integration**: `.claude/skill-library/development/integrations/jira-integration/SKILL.md`
-
-- Integrate Jira Cloud with Chariot platform for issue tracking and security findings sync
-
-**Microsoft Defender Integration**: `.claude/skill-library/development/integrations/ms-defender-integration/SKILL.md`
-
-- Integrate Microsoft Defender for Endpoint with Chariot platform for threat detection, vulnerability management, and device inventory sync
-
-**HackerOne Integration**: `.claude/skill-library/development/integrations/hackerone-integration/SKILL.md`
-
-- Integrate HackerOne bug bounty platform with Chariot for vulnerability report ingestion, researcher collaboration, and bounty management
-
-## When to Use This Gateway
-
-Use this gateway skill when:
-
-- Building a new third-party integration
-- Maintaining existing integrations
-- Testing integration reliability
-- Validating multi-step workflows
-
-## Integration Development Workflow
-
-You MUST use TodoWrite before starting to track all workflow steps.
-
-When building integrations, follow this sequence:
-
-1. **Design**: Load and apply `integration-chariot-patterns` for Chariot conventions
-2. **Test**: Load and use `writing-integration-tests-first` for reliable test coverage
-3. **Validate**: Load and apply `integration-step-validator` for complex workflows
-
-## Related Gateways
-
-- **gateway-backend**: Backend patterns (error handling, concurrency) - use for Go implementation details
-- **gateway-mcp-tools**: MCP service wrappers (Linear, Praetorian CLI, Context7)
-- **gateway-testing**: Testing patterns (mocking, contract validation)
+Do NOT use `skill: "skill-name"` for library skills—they require Read tool.

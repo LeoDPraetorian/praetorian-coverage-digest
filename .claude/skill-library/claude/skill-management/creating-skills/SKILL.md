@@ -20,17 +20,17 @@ Use this skill when:
 
 ## Quick Reference
 
-| Phase          | Purpose                                              | Tools Used                   |
-| -------------- | ---------------------------------------------------- | ---------------------------- |
-| 1. 🔴 RED      | Prove gap exists, test fails without skill           | AskUserQuestion, manual test |
-| 2. Validation  | Name format, check existence                         | Grep                         |
-| 3. Location    | Core vs Library                                      | AskUserQuestion              |
-| 4. Category    | Which library folder                                 | AskUserQuestion, Bash        |
-| 5. Skill Type  | Process/Library/Integration/Tool-wrapper             | AskUserQuestion              |
-| 6. Generation  | Create directory, SKILL.md (<500 lines), references/ | Write                        |
-| 7. Research    | Populate content with progressive disclosure         | `researching-skills` skill   |
-| 8. 🟢 GREEN    | Verify skill works, test passes                      | manual test                  |
-| 9. 🔵 REFACTOR | Pressure test, close loopholes                       | Task (spawn subagents)       |
+| Phase             | Purpose                                              |
+| ----------------- | ---------------------------------------------------- |
+| 1. 🔴 RED         | Prove gap exists, test fails without skill           |
+| 2. Validation     | Name format, check existence                         |
+| 3. Location & Cat | Core vs Library, which folder                        |
+| 4. Skill Type     | Process/Library/Integration/Tool-wrapper             |
+| 5. Generation     | Create directory, SKILL.md (<500 lines), references/ |
+| 6. Research       | Populate content with progressive disclosure         |
+| 7. Gateway Update | Add to routing table (library skills only)           |
+| 8. 🟢 GREEN       | Verify skill works, test passes                      |
+| 9. 🔵 REFACTOR    | Pressure test, close loopholes                       |
 
 ---
 
@@ -42,11 +42,19 @@ Use this skill when:
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
-**See:** [Repository Root Navigation](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
+**See:** [Repository Root Navigation](.claude/skills/managing-skills/references/patterns/repo-root-detection.md)
 
 **⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
 
 **Cannot proceed without navigating to repo root** ✅
+
+---
+
+## Workflow Continuation Rules
+
+**9 phases run automatically Phase 1 → 9. ONLY stop for:** AskUserQuestion prompts, Phase 8 GREEN approval, Phase 9 pressure test spawning.
+
+**Research continuation:** Phase 6.2 writes remaining phases to TodoWrite → orchestrating-research returns → Check TodoWrite → Continue Phase 6.3-9 automatically. Don't stop to report research findings.
 
 ---
 
@@ -56,7 +64,17 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 If agent is more appropriate: `agent-manager create`
 
 **Compliance Target:**
-Skills created by this workflow must comply with the [Skill Compliance Contract](../../../../skills/managing-skills/references/skill-compliance-contract.md).
+Skills created by this workflow must comply with the [Skill Compliance Contract](.claude/skills/managing-skills/references/skill-compliance-contract.md).
+
+---
+
+## Rationalization Prevention
+
+Skill creation has many shortcuts that lead to low-quality skills. Watch for warning phrases and use evidence-based gates.
+
+**References**: [Shared prevention patterns](../using-skills/references/rationalization-prevention.md) | [Skill-specific rationalizations](references/rationalization-table.md)
+
+**Key principle**: Detect rationalization phrases → STOP → Return to phase checklist → Complete all items.
 
 ---
 
@@ -64,7 +82,9 @@ Skills created by this workflow must comply with the [Skill Compliance Contract]
 
 **You CANNOT skip this phase. TDD is mandatory.**
 
-For complete TDD methodology, see [TDD Methodology for Skills](../../../../skills/managing-skills/references/tdd-methodology.md).
+**Statistical evidence**: Skills created without RED phase have ~40% failure rate (don't solve the actual problem). The 5 minutes to document failure prevents hours of building the wrong thing.
+
+For complete TDD methodology, see [TDD Methodology for Skills](.claude/skills/managing-skills/references/tdd-methodology.md).
 
 ### 1.1 Document the Gap
 
@@ -109,7 +129,7 @@ Ask: "Does this failure accurately capture why we need this skill?"
 
 ### 2.1 Validate Skill Name
 
-For complete naming conventions (gerund form, kebab-case, what to avoid), see [Anthropic Best Practices - Naming Conventions](../../../../skills/managing-skills/references/anthropic-best-practices.md#naming-conventions).
+For complete naming conventions (gerund form, kebab-case, what to avoid), see [Anthropic Best Practices - Naming Conventions](.claude/skills/managing-skills/references/anthropic-best-practices.md#naming-conventions).
 
 **Quick validation:**
 
@@ -155,7 +175,7 @@ fi
 
 ---
 
-## Phase 2-3: Location and Category Selection
+## Phase 3: Location and Category Selection
 
 For detailed location selection (Core vs Library) and category selection guidance, see **[Location and Category Selection](references/location-and-category-selection.md)**.
 
@@ -190,29 +210,33 @@ Options:
 
 ### 5.1 Create Directory Structure
 
-For complete file organization requirements, see [File Organization](../../../../skills/managing-skills/references/file-organization.md).
+For complete file organization requirements, see [File Organization](.claude/skills/managing-skills/references/file-organization.md).
+
+**⚠️ PATH WARNING**: All paths below use `$ROOT` from Step 0. **NEVER** run from inside `.claude/` - this causes `.claude/.claude/` duplication.
 
 Based on location selection:
 
 **Core skill**:
 
 ```bash
-mkdir -p .claude/skills/{skill-name}/references
-mkdir -p .claude/skills/{skill-name}/examples
+# $ROOT is set in Step 0 - ALWAYS use it for path operations
+mkdir -p $ROOT/.claude/skills/{skill-name}/references
+mkdir -p $ROOT/.claude/skills/{skill-name}/examples
 ```
 
 **Library skill**:
 
 ```bash
-mkdir -p .claude/skill-library/{category}/{skill-name}/references
-mkdir -p .claude/skill-library/{category}/{skill-name}/examples
+# $ROOT is set in Step 0 - ALWAYS use it for path operations
+mkdir -p $ROOT/.claude/skill-library/{category}/{skill-name}/references
+mkdir -p $ROOT/.claude/skill-library/{category}/{skill-name}/examples
 ```
 
 ### 5.2 Generate SKILL.md with Progressive Disclosure
 
 **🚨 CRITICAL: Design for progressive disclosure from the start.**
 
-For complete progressive disclosure patterns, see [Progressive Disclosure](../../../../skills/managing-skills/references/progressive-disclosure.md).
+For complete progressive disclosure patterns, see [Progressive Disclosure](.claude/skills/managing-skills/references/progressive-disclosure.md).
 
 **Note**: Gateways use gateway-template.md (see [references/gateway-creation.md](references/gateway-creation.md)).
 
@@ -235,53 +259,73 @@ For complete progressive disclosure patterns, see [Progressive Disclosure](../..
 
 **Target**: SKILL.md < 500 lines (ideally 300-450). Use references/ for detailed content.
 
+#### 🚨 Integration Section (MANDATORY)
+
+Every skill MUST include an Integration section documenting dependencies. This is validated by Phase 28 of the audit.
+
+**Required subsections:**
+
+```markdown
+## Integration
+
+### Called By
+
+- [What invokes this skill - commands, agents, or other skills]
+
+### Requires (invoke before starting)
+
+| Skill        | When  | Purpose    |
+| ------------ | ----- | ---------- |
+| `skill-name` | Start | Why needed |
+
+### Calls (during execution)
+
+| Skill        | Phase/Step | Purpose      |
+| ------------ | ---------- | ------------ |
+| `skill-name` | Phase N    | What it does |
+
+### Pairs With (conditional)
+
+| Skill        | Trigger | Purpose    |
+| ------------ | ------- | ---------- |
+| `skill-name` | When X  | Why paired |
+```
+
+**If no dependencies**: Still include section with "None - standalone skill" or "None - terminal skill"
+
+**Why required**: Based on [obra/superpowers](https://github.com/obra/superpowers) analysis, skills with explicit Integration sections are never orphaned, have clear dependencies, and form traceable workflow chains.
+
+**See**: [Phase 28 details](.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md#phase-28-integration-section)
+
 #### 🚨 Code Reference Pattern (MANDATORY)
 
-**When referencing code examples in SKILL.md:**
+❌ **NEVER**: `file.go:123-127` (line numbers drift with every change)
+✅ **USE**: `file.go - func MethodName()` or `file.go (between Match() and Invoke())`
 
-❌ **NEVER use static line numbers** - they become outdated with every code change:
-
-```markdown
-❌ BAD: `file.go:123-127`
-❌ BAD: See line 154 in nuclei.go
-```
-
-✅ **USE durable patterns** - stable across refactors:
-
-```markdown
-✅ GOOD: `file.go` - `func (t *Type) MethodName(...)`
-✅ GOOD: `file.go (between Match() and Invoke() methods)`
-✅ GOOD: `file.go` (for general file reference)
-```
-
-**Why this matters:**
-
-- Line numbers drift with every insert/deletion/refactor
-- Method signatures are stable and grep-friendly: `rg "func.*MethodName"`
-- Phase 21 audit will flag line number references as compliance failures
-
-**See:** [code-reference-patterns.md](../../../../skills/managing-skills/references/patterns/code-reference-patterns.md)
+**See:** [code-reference-patterns.md](.claude/skills/managing-skills/references/patterns/code-reference-patterns.md)
 
 ### 5.3 Verify Line Count (MANDATORY)
 
-See [Line Count Limits](../../../../skills/managing-skills/references/patterns/line-count-limits.md) for complete thresholds and extraction strategy.
+See [Line Count Limits](.claude/skills/managing-skills/references/patterns/line-count-limits.md) for complete thresholds and extraction strategy.
 
 ```bash
-wc -l {skill-path}/SKILL.md  # Must be <500
+wc -l $ROOT/{skill-path}/SKILL.md  # Must be <500
 ```
 
 **Quick reference:** <350 = safe, 350-450 = caution, 450-500 = warning, >500 = FAIL.
 
 **Cannot proceed to research phase if > 500 lines** ✅
 
-**Format tables:** Run `npx prettier --write` on .md files. See [Table Formatting](../../../../skills/managing-skills/references/table-formatting.md)
+**Format tables:** Run `npx prettier --write` on .md files. See [Table Formatting](.claude/skills/managing-skills/references/table-formatting.md)
 
 ### 5.4 Create Initial Changelog
 
-See [Changelog Format](../../../../skills/managing-skills/references/patterns/changelog-format.md) for complete entry format.
+See [Changelog Format](.claude/skills/managing-skills/references/patterns/changelog-format.md) for complete entry format.
+
+**CRITICAL**: Use `$ROOT` to avoid `.claude/.claude/` path duplication:
 
 ```bash
-mkdir -p {skill-path}/.history
+mkdir -p $ROOT/{skill-path}/.history
 ```
 
 Create `.history/CHANGELOG` with "Initial Creation" entry including:
@@ -290,11 +334,11 @@ Create `.history/CHANGELOG` with "Initial Creation" entry including:
 - Category (library-category or core)
 - Skill type (process/library/integration/tool-wrapper)
 
-### 5.5 Create Reference File Structure
+### 5.5 Prepare Reference File Structure
 
-Create placeholder files based on skill type. Use [references/skill-templates.md](references/skill-templates.md) for complete templates.
+Prepare `references/` directory. Files created later when you have content. **Do NOT create empty placeholder files.**
 
-**Common reference files:**
+**Common reference files (create only with content):**
 
 | Skill Type        | Reference Files                        |
 | ----------------- | -------------------------------------- |
@@ -303,52 +347,84 @@ Create placeholder files based on skill type. Use [references/skill-templates.md
 | Integration       | `api-reference.md`, `configuration.md` |
 | Tool Wrapper      | `commands.md`, `error-handling.md`     |
 
-**Create structure:**
-
 ```bash
-mkdir -p {skill-path}/references
-touch {skill-path}/references/{appropriate-file}.md
+mkdir -p $ROOT/{skill-path}/references
 ```
 
 ## Phase 6: Research & Populate Content
 
-**🚨 YOU MUST invoke researching-skills before writing content. Do not skip.**
+### 6.1 Research Decision
 
-```
-skill: "researching-skills"
-```
+Ask user via AskUserQuestion: "Would you like to conduct research to populate the skill content?"
+Options: "Yes, research sources (Recommended)" or "No, skip research"
 
-The researching-skills skill will guide you through:
+**If "No":** Populate from original request (not templates), create reference files only with actual content, skip to Phase 7 (library) or 8 (core), document in changelog.
+**If "Yes":** Continue to Phase 6.2.
 
-1. Codebase research (find similar skills, patterns)
-2. Context7 research (library documentation)
-3. Web research (supplemental sources)
-4. Content generation with real examples
+### 6.2 Execute Research
 
-### Common Rationalizations (DO NOT SKIP RESEARCH)
+**BEFORE invoking orchestrating-research, set up continuation state:**
 
-Agents frequently skip research with excuses like "I already know this" or "No time." These are wrong.
+1. Write remaining phases to TodoWrite (these persist across the research context switch):
 
-**See [Research Rationalizations Table](references/research-rationalizations.md)** for complete list of excuses and why they fail:
+   ```
+   TodoWrite([
+     { content: 'Phase 6.2: Execute research', status: 'in_progress', activeForm: 'Executing research' },
+     { content: 'Phase 6.3: Incorporate research into skill', status: 'pending', activeForm: 'Incorporating research' },
+     { content: 'Phase 7: Gateway update', status: 'pending', activeForm: 'Updating gateway' },
+     { content: 'Phase 8: GREEN verification', status: 'pending', activeForm: 'Verifying skill works' },
+     { content: 'Phase 9: REFACTOR pressure tests', status: 'pending', activeForm: 'Pressure testing' }
+   ])
+   ```
 
-- "I already know this" → Training data is 12-18 months stale
-- "Simple task" → Even basic topics evolve (React 16→19 changed everything)
-- "No time" → 15 min research prevents hours of fixes
-- "Optional for Library skills" → WRONG - these change most frequently
+2. Then invoke orchestrating-research:
 
-**Cannot proceed to Phase 7 without completing research phase.** ✅
+   ```
+   skill: "orchestrating-research"
+   ```
+
+3. When orchestrating-research returns with 'WORKFLOW_CONTINUATION_REQUIRED':
+   - Mark Phase 6.2 as complete in TodoWrite
+   - Read the SYNTHESIS.md from the output directory
+   - Continue immediately to Phase 6.3 (next pending todo)
+
+**Do NOT:**
+
+- Report 'Research complete!' to user
+- Summarize research findings and stop
+- Wait for user to say 'continue'
+- Mark all phases complete when only 6.2 is done
+
+The orchestrating-research skill provides:
+
+- Intent expansion (derives multiple semantic interpretations from vague queries)
+- Parallel research across 6 sources (Codebase, Context7, GitHub, arxiv, Perplexity, Web)
+- Cross-interpretation conflict detection
+- Comprehensive SYNTHESIS.md with executive summary, findings, recommendations
+
+**Common Rationalizations:** See [research-rationalizations.md](references/research-rationalizations.md) for why "I already know this", "Simple task", "No time", etc. fail.
+
+**Statistical evidence**: Skills populated from training data instead of research have ~30% stale/incorrect information. Research takes 10-15 minutes but prevents weeks of propagating wrong patterns.
+
+### 6.3 Incorporate Research into Skill ← POST-RESEARCH RESUME POINT
+
+**This phase executes IMMEDIATELY after Phase 6.2 returns.**
+
+Read SYNTHESIS.md from `.claude/.output/research/{timestamp}-{topic}/` (orchestrating-research creates OUTPUT_DIR with SYNTHESIS.md and source files), update SKILL.md with patterns/docs/practices, populate references/, replace placeholders with real examples.
+
+**See:** [research-integration.md](references/research-integration.md). **Cannot proceed to Phase 7 until skill reflects research findings.** ✅
 
 ## Phase 7: Gateway Update (Library Skills Only)
 
-If creating a library skill, update the appropriate gateway:
+If creating a library skill, add it to the appropriate gateway(s).
 
-1. **Identify gateway**: Match category to gateway
-   - `development/frontend/` → `gateway-frontend`
-   - `development/backend/` → `gateway-backend`
-   - `testing/` → `gateway-testing`
-   - `claude/mcp-tools/` → `gateway-mcp-tools`
+**Do NOT use deterministic path-to-gateway mapping.** Paths are organizational; skill PURPOSE determines the gateway. Analyze:
 
-2. **Add skill to gateway**: Edit the gateway's routing table to include the new skill path
+- **Primary consumers**: Which agents use this? READ their definition to verify which gateway they invoke in Step 1
+- **Skill purpose**: Testing methodology? Backend patterns? Frontend?
+- **Nested paths**: `testing/backend/` could route to `gateway-testing` OR `gateway-backend`
+
+**Confirm with user** via AskUserQuestion - NO EXCEPTIONS, even under time pressure. Present your analysis (purpose, consumer, gateway they invoke, recommendation) and ask which gateway(s) to use.
 
 ---
 
@@ -386,10 +462,10 @@ Options:
 
 ### 8.3 Run Audit
 
-Verify compliance (from anywhere in the repo):
+Verify compliance:
 
-```bash
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run audit -- {skill-name}
+```markdown
+Audit {skill-name} to verify compliance with all 28 phase requirements.
 ```
 
 **For gateways**: Also run gateway-specific audit (phases 17-20). See [references/gateway-creation.md](references/gateway-creation.md#phase-8-green-verification).
@@ -400,14 +476,14 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 ## Phase 9: 🔵 REFACTOR Phase (Pressure Test)
 
-**Skills must resist rationalization under pressure.** For REFACTOR scope rules and creating vs updating differences, see [REFACTOR Rules Reference](../../../../skills/managing-skills/references/patterns/refactor-rules.md).
+**Skills must resist rationalization under pressure.** For REFACTOR scope rules and creating vs updating differences, see [REFACTOR Rules Reference](.claude/skills/managing-skills/references/patterns/refactor-rules.md).
 
 ### 9.1 Load Pressure Testing Methodology
 
-**Invoke the `testing-skills-with-subagents` skill:**
+**Invoke the `pressure-testing-skill-content` skill:**
 
 ```
-skill: "testing-skills-with-subagents"
+Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")
 ```
 
 This skill provides the complete methodology for:
@@ -421,7 +497,7 @@ This skill provides the complete methodology for:
 
 ### 9.2 Run Three Pressure Tests
 
-Follow the `testing-skills-with-subagents` methodology to test:
+Follow the `pressure-testing-skill-content` methodology to test:
 
 1. **Time pressure**: Emergency, deadline, deploy window closing
 2. **Authority pressure**: Senior says skip it, "I'll take responsibility"
@@ -431,10 +507,10 @@ Follow the `testing-skills-with-subagents` methodology to test:
 
 ### 9.3 Final Verification
 
-Run audit and confirm all phases pass (from anywhere in the repo):
+Run audit and confirm all phases pass:
 
-```bash
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run audit -- {skill-name}
+```markdown
+Audit {skill-name} to verify compliance with all 28 phase requirements.
 ```
 
 **Skill is complete when:**
@@ -457,6 +533,6 @@ Before completing skill creation, review the validation checklist and common ant
 
 ## Related Skills
 
-- `researching-skills` - Research workflow for populating skill content
-- `managing-skills` - Audit and fix existing skills (TypeScript CLI)
-- `testing-skills-with-subagents` - Detailed pressure testing methodology for REFACTOR phase
+- `orchestrating-research` - Parallel research orchestrator for populating skill content
+- `managing-skills` - Audit and fix existing skills (instruction-based)
+- `pressure-testing-skill-content` - Detailed pressure testing methodology for REFACTOR phase

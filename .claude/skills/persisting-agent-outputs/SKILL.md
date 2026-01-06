@@ -21,7 +21,7 @@ Without this skill, agents:
 
 This skill defines:
 
-1. **WHERE** - Directory structure (`.claude/features/{timestamp}-{slug}/`)
+1. **WHERE** - Directory from orchestrator context OR fallback to `.claude/.output/agents/{timestamp}-{slug}/`
 2. **HOW** - File naming (`{agent-name}-{output-type}.md`)
 3. **WHAT** - JSON metadata block format
 4. **DISCOVERY** - Protocol for finding/creating feature directories
@@ -49,7 +49,7 @@ This skill defines:
 
 Pass feature_directory in the task prompt:
 
-feature_directory: ".claude/features/2025-12-30-143022-tanstack-migration"
+feature_directory: ".claude/.output/agents/2025-12-30-143022-tanstack-migration"
 
 This ensures all agents write to the same location.
 ```
@@ -58,10 +58,21 @@ This ensures all agents write to the same location.
 
 ## Directory Structure
 
+**Orchestrated contexts** (directory provided by orchestrator):
+
 ```
-.claude/features/{YYYY-MM-DD-HHMMSS}-{feature-slug}/
+.claude/.output/features/{timestamp}-{name}/      # Feature development
+.claude/.output/research/{timestamp}-{topic}/     # Research tasks
+.claude/.output/capabilities/{timestamp}-{name}/  # Capability development
+.claude/.output/mcp-wrappers/{timestamp}-{service}/ # MCP wrapper development
+.claude/.output/threat-modeling/{timestamp}-{target}/ # Threat modeling
+```
+
+**Standalone context** (agent creates when no orchestrator):
+
+```
+.claude/.output/agents/{timestamp}-{slug}/
 ├── MANIFEST.yaml
-├── {agent-name}-{output-type}.md
 ├── {agent-name}-{output-type}.md
 └── ...
 ```
@@ -69,7 +80,7 @@ This ensures all agents write to the same location.
 **Example:**
 
 ```
-.claude/features/2025-12-30-143022-tanstack-migration/
+.claude/.output/agents/2025-12-30-143022-tanstack-migration/
 ├── MANIFEST.yaml
 ├── frontend-lead-architecture-review.md
 ├── frontend-developer-implementation.md
@@ -83,7 +94,38 @@ This ensures all agents write to the same location.
 
 **Agents determine the feature directory using this priority:**
 
-### 1. Explicit Parameter (PREFERRED)
+### 0. Parse Orchestrator-Provided Path (HIGHEST PRIORITY)
+
+Check your task prompt for ANY of these patterns:
+
+| Pattern                     | Example                                                                |
+| --------------------------- | ---------------------------------------------------------------------- |
+| `OUTPUT_DIRECTORY: {path}`  | `OUTPUT_DIRECTORY: .claude/.output/features/2026-01-04-asset-filter/`  |
+| `Save to: {path}`           | `Save to: .claude/.output/features/2026-01-04/architecture.md`         |
+| `Write output to: {path}`   | `Write output to: .claude/.output/mcp-wrappers/linear/architecture.md` |
+| `feature_directory: {path}` | `feature_directory: .claude/.output/agents/2026-01-04-task/`           |
+
+**If pattern found:**
+
+1. Extract the path
+2. If path ends with `.md` (includes filename):
+   - Directory = path up to last /
+   - Filename = the .md file specified
+3. If path is directory only (ends with /):
+   - Directory = the path
+   - Filename = your agent's **Primary output:** OR fallback to `{agent-name}-{output-type}.md`
+
+**Example parsing:**
+
+| Prompt Contains                                                | Directory                                 | Filename                    |
+| -------------------------------------------------------------- | ----------------------------------------- | --------------------------- |
+| `Save to: .claude/.output/features/2026-01-04/architecture.md` | `.claude/.output/features/2026-01-04/`    | `architecture.md`           |
+| `OUTPUT_DIRECTORY: .claude/.output/mcp-wrappers/linear/`       | `.claude/.output/mcp-wrappers/linear/`    | Agent's **Primary output:** |
+| `feature_directory: .claude/.output/agents/2026-01-04-task/`   | `.claude/.output/agents/2026-01-04-task/` | Agent's **Primary output:** |
+
+**If orchestrator path found → SKIP Steps 1-2, go directly to writing output.**
+
+### 1. Explicit feature_directory Parameter (Legacy)
 
 ```typescript
 // If caller provides feature_directory in task prompt:
@@ -98,28 +140,71 @@ If no parameter provided:
 
 ```bash
 # Find MANIFEST.yaml files modified in last 60 minutes
-find .claude/features -name "MANIFEST.yaml" -mmin -60
+find .claude/.output/agents -name "MANIFEST.yaml" -mmin -60
 ```
 
 - **Exactly ONE found** → use it
 - **Multiple found** → read each MANIFEST.yaml, select best match by feature_name/description
 - **None found** → create new directory (you are the first agent)
 
-### 3. Create New Directory
+### 3. Create Standalone Directory (No Orchestrator Context)
+
+**Only use this if:**
+
+- No orchestrator path found in prompt (Step 0)
+- No feature_directory parameter (Step 1)
+- No recent MANIFEST.yaml found (Step 2)
+
+This creates a standalone output directory for ad-hoc agent tasks:
+
+**YOU MUST run the actual `date` command — DO NOT approximate or invent timestamps.**
 
 ```bash
-# Generate timestamp
-TIMESTAMP=$(date +"%Y-%m-%d-%H%M%S")
+# Step 1: Get EXACT timestamp by running this command
+date +"%Y-%m-%d-%H%M%S"
+# Example output: 2026-01-03-115247
 
-# Generate slug from task description
-# Examples: tanstack-migration, user-auth-refactor, asset-table-virtualization
-SLUG="feature-slug-from-task"
+# Step 2: Generate slug from task description (lowercase, hyphenated)
+# Examples: serena-pool-analysis, tanstack-migration, user-auth-refactor
 
-# Create directory
-mkdir -p .claude/features/${TIMESTAMP}-${SLUG}
+# Step 3: Create directory with EXACT timestamp from Step 1
+mkdir -p ".claude/.output/agents/2026-01-03-115247-your-slug-here"
+```
+
+**WRONG:** Guessing `113000` (rounded to 11:30:00)
+**RIGHT:** Using actual output like `115247` (11:52:47)
+
+**One-liner alternative:**
+
+```bash
+SLUG="your-feature-slug" && mkdir -p ".claude/.output/agents/$(date +%Y-%m-%d-%H%M%S)-${SLUG}"
 ```
 
 **For complete discovery algorithm, see:** [references/discovery-protocol.md](references/discovery-protocol.md)
+
+---
+
+## Filename Resolution
+
+**Priority order for determining output filename:**
+
+| Priority | Source                                         | Example                                                           |
+| -------- | ---------------------------------------------- | ----------------------------------------------------------------- |
+| 1        | Orchestrator specifies full path with filename | `Save to: .../architecture.md` → `architecture.md`                |
+| 2        | Agent's **Primary output:** in Output Format   | `**Primary output:** architecture.md` → `architecture.md`         |
+| 3        | Skill's naming convention                      | `{agent-name}-{output-type}.md` → `mcp-lead-architecture-plan.md` |
+
+**Agents should define their Primary output in their Output Format section:**
+
+```markdown
+## Output Format
+
+Follow `persisting-agent-outputs` skill for directory discovery.
+
+**Primary output:** `architecture.md`
+```
+
+When orchestrated, the orchestrator may override with a specific filename. When standalone, the agent uses its Primary output or falls back to the skill's naming convention.
 
 ---
 
@@ -190,7 +275,7 @@ artifacts:
   "agent": "frontend-lead",
   "output_type": "architecture-review",
   "timestamp": "2025-12-30T14:30:22Z",
-  "feature_directory": ".claude/features/2025-12-30-143022-tanstack-migration",
+  "feature_directory": ".claude/.output/agents/2025-12-30-143022-tanstack-migration",
   "skills_invoked": ["enforcing-evidence-based-analysis", "gateway-frontend"],
   "library_skills_read": [".claude/skill-library/path/to/skill.md"],
   "source_files_verified": ["src/state/auth.tsx:490-590"],
@@ -202,6 +287,8 @@ artifacts:
 }
 ```
 ````
+
+When `status` is `blocked`, include `blocked_reason` and `attempted` fields. See [references/metadata-format.md](references/metadata-format.md) for blocked example.
 
 **For complete field definitions, see:** [references/metadata-format.md](references/metadata-format.md)
 
@@ -265,10 +352,10 @@ User: "have frontend-lead review the tanstack migration plan"
 
 frontend-lead:
   1. No feature_directory provided
-  2. Check for recent .claude/features/*/MANIFEST.yaml
+  2. Check for recent .claude/.output/agents/*/MANIFEST.yaml
   3. None found → create new directory
   4. Generate slug: "tanstack-migration"
-  5. Create: .claude/features/2025-12-30-143022-tanstack-migration/
+  5. Create: .claude/.output/agents/2025-12-30-143022-tanstack-migration/
   6. Write MANIFEST.yaml
   7. Write frontend-lead-architecture-review.md
   8. Return feature_directory in output
@@ -293,7 +380,7 @@ frontend-developer:
 User: "/feature implement tanstack migration"
 
 Orchestrator:
-  1. Create: .claude/features/2025-12-30-143022-tanstack-migration/
+  1. Create: .claude/.output/agents/2025-12-30-143022-tanstack-migration/
   2. Write initial MANIFEST.yaml
   3. Spawn frontend-lead WITH feature_directory
   4. Spawn frontend-developer WITH feature_directory

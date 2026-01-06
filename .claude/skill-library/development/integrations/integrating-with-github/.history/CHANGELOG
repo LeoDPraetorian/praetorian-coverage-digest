@@ -1,0 +1,48 @@
+# Changelog: integrating-with-github
+
+## 2026-01-03 - Initial Creation
+
+**RED Phase Documentation:**
+
+**Gap Identified:**
+Claude currently struggles with GitHub integrations due to:
+1. Authentication method selection - defaults to Personal Access Tokens instead of more secure GitHub Apps
+2. Rate limiting - missing or naive implementation, no exponential backoff, doesn't handle secondary limits
+3. API efficiency - uses REST API with multiple calls when GraphQL would be more efficient
+4. Security patterns - hardcodes secrets, insufficient permission scopes, missing webhook validation
+5. Self-hosted runners - complex security implications not documented
+6. Comprehensive knowledge gap across all GitHub integration aspects
+
+**Failure Behavior:**
+Without this skill, Claude implements GitHub integrations that:
+- Use less secure authentication (PAT instead of GitHub App with granular permissions)
+- Implement naive retry logic without checking X-RateLimit-Remaining headers
+- Make 20+ REST calls when a single GraphQL query would suffice
+- Hardcode tokens instead of using secrets management
+- Miss critical webhook signature validation (X-Hub-Signature-256)
+- Expose self-hosted runners to security risks
+
+**User Confirmation:**
+User confirmed all failure patterns observed in production:
+- Authentication - wrong method chosen (PAT vs OAuth vs GitHub App)
+- Rate limiting - naive or missing retry logic
+- API efficiency - uses REST when GraphQL would be better
+- Comprehensive gap - all GitHub integration aspects
+
+**Metadata:**
+- Location: Library
+- Category: development/integrations
+- Skill Type: Integration
+- Line Count: 283 lines (well under 500-line limit)
+
+**Created Structure:**
+- SKILL.md with progressive disclosure (283 lines)
+- references/ directory prepared for detailed content
+- examples/ directory prepared for code examples
+- .history/CHANGELOG created
+
+**Next Steps:**
+- Phase 6: Research and populate reference files
+- Phase 7: Update gateway-integrations routing table
+- Phase 8 (GREEN): Verify skill resolves documented failures
+- Phase 9 (REFACTOR): Pressure test with time/authority/sunk-cost scenarios

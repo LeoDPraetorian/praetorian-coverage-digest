@@ -4,9 +4,9 @@
 
 This pattern is referenced by:
 
-- `auditing-skills` - Validates table, code block, and header formatting (Phase 14a-c)
+- `auditing-skills` - Validates table, code block, and header formatting (Phases 14-16)
 - `creating-skills` - Ensures new skills follow style guidelines
-- `fixing-skills` - Restores style compliance (Phase 14a deterministic fixes)
+- `fixing-skills` - Restores style compliance (Phase 14 deterministic fixes)
 
 ---
 
@@ -23,19 +23,19 @@ This pattern is referenced by:
 
 ---
 
-## Phase 14 Sub-phases
+## Visual/Style Phases
 
-| Phase | Name                 | Type             | What It Checks                             |
-| ----- | -------------------- | ---------------- | ------------------------------------------ |
-| 14a   | Table Formatting     | Deterministic    | Header rows, separators, column counts     |
-| 14b   | Code Block Quality   | Validation-Only  | Language tags, line length, content match  |
-| 14c   | Header Hierarchy     | Validation-Only  | H1 count, level skipping, orphan headers   |
+| Phase | Name               | Type            | What It Checks                            |
+| ----- | ------------------ | --------------- | ----------------------------------------- |
+| 14    | Table Formatting   | Deterministic   | Header rows, separators, column counts    |
+| 15    | Code Block Quality | Validation-Only | Language tags, line length, content match |
+| 16    | Header Hierarchy   | Validation-Only | H1 count, level skipping, orphan headers  |
 
-> **Note:** Section organization, visual readability, and example quality are checked during **Post-Audit Semantic Review**, not as numbered phases. See [audit-phases.md](../audit-phases.md#post-audit-semantic-review).
+> **Note:** Section organization, visual readability, and example quality are checked during **Post-Audit Semantic Review**. See [auditing-skills](.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md) for semantic review details.
 
 ---
 
-## Phase 14a: Table Formatting
+## Phase 14: Table Formatting
 
 ### Requirements
 
@@ -63,7 +63,7 @@ This pattern is referenced by:
 
 ---
 
-## Phase 14b: Code Block Quality
+## Phase 15: Code Block Quality
 
 ### Requirements
 
@@ -96,7 +96,7 @@ This pattern is referenced by:
 
 ---
 
-## Phase 14c: Header Hierarchy
+## Phase 16: Header Hierarchy
 
 ### Requirements
 
@@ -150,27 +150,20 @@ Content here...
 ### Running Phase 14 Audit
 
 ```bash
-# Navigate to repo root
-ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
-ROOT="${ROOT:-$(git rev-parse --show-toplevel)}"
-cd "$ROOT/.claude"
+To audit visual style compliance, invoke auditing-skills to verify compliance with all phase requirements.
 
-# Run specific Phase 14 sub-phase
-npm run -w @chariot/auditing-skills audit -- <skill-name> --phase 14
-
-# Run full audit including Phase 14
-npm run -w @chariot/auditing-skills audit -- <skill-name>
-````
+This will check Phase 14 (table formatting), Phase 15 (code block quality), and Phase 16 (header hierarchy).
+```
 
 ### Auto-fixable Issues
 
-| Phase | Issue                 | Auto-fix Available                   |
-| ----- | --------------------- | ------------------------------------ |
-| 14a   | Missing separator row | Yes (add separator row)              |
-| 14b   | Missing language tag  | No (validation only)                 |
-| 14c   | Skipped header level  | No (validation only)                 |
+| Phase | Issue                 | Auto-fix Available      |
+| ----- | --------------------- | ----------------------- |
+| 14    | Missing separator row | Yes (add separator row) |
+| 15    | Missing language tag  | No (validation only)    |
+| 16    | Skipped header level  | No (validation only)    |
 
-> **Note:** Section organization, visual readability, and example quality are checked during **Post-Audit Semantic Review**. See [audit-phases.md](../audit-phases.md#post-audit-semantic-review).
+> **Note:** Section organization, visual readability, and example quality are checked during **Post-Audit Semantic Review**. See [auditing-skills](.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md) for semantic review details.
 
 ---
 

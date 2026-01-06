@@ -33,11 +33,11 @@ description: Use when creating skills - guides through TDD workflow (RED-GREEN-R
 
 ### Recommended Todo List
 
-**Create these todos at start** (22 phases + CLI + consolidate + fix + re-audit = 25 steps):
+**Create these todos at start** (28 phases + CLI + consolidate + fix + re-audit = 31 steps):
 
-1. Run CLI audit | 2-13. Phases 1-12 | 14-17. Gateway phases (if applicable) | 18. Consolidate | 19. Fix & re-audit
+1. Run CLI audit | 2-29. Phases 1-28 | 30. Consolidate | 31. Fix & re-audit
 
-**Why mandatory:** 22 phases are easy to skip. TodoWrite prevents oversight.
+**Why mandatory:** 28 phases are easy to skip. TodoWrite prevents oversight.
 
 ---
 
@@ -122,6 +122,5 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 ## Related
 
-- [Line Count Limits](../../../../skills/managing-skills/references/patterns/line-count-limits.md) - Extraction strategy
-- [Phase 01 Description](../../../../skills/managing-skills/references/phase-01-description.md) - Format requirements
-- [Repo Root Detection](../../../../skills/managing-skills/references/patterns/repo-root-detection.md) - cd pattern
+- [Line Count Limits](.claude/skills/managing-skills/references/patterns/line-count-limits.md) - Extraction strategy
+- [Repo Root Detection](.claude/skills/managing-skills/references/patterns/repo-root-detection.md) - cd pattern

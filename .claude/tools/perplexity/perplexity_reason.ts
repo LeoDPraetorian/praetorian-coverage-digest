@@ -120,7 +120,7 @@ export const perplexityReason = {
       'perplexity',
       'perplexity_reason',
       validated,
-      { timeoutMs: 60000 } // 60s timeout for complex reasoning
+      { timeoutMs: 120000 } // 2 min timeout for complex reasoning
     );
 
     if (!rawData) {

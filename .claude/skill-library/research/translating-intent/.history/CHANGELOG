@@ -1,0 +1,47 @@
+# Changelog
+
+## [Initial Creation] - 2026-01-01
+
+### Added
+- Initial skill creation with TDD workflow
+- RED phase: Documented gap in research query generation
+  - Research skills use template-guided queries, not semantic intent analysis
+  - Missing: multiple interpretation generation, gap identification, prioritized clarifications
+  - Test failure: "research authentication" generates 3 linear queries instead of exploring OAuth/JWT/Basic/MFA interpretation space
+- Two execution modes:
+  - `analyze` mode: Structured JSON output for research/automation (no user interaction)
+  - `interactive` mode: AskUserQuestion for high-priority clarifications
+- Core capabilities: Parse & Decompose, Identify Gaps, Document Assumptions, Generate Clarifications
+- Integration patterns for research skills and implementation planning
+
+### Category
+- Location: core
+- Skill Type: process/pattern
+
+### Research Enhancements - 2026-01-01
+
+#### Research Conducted
+- GitHub: Instructor (12K⭐), Pydantic-AI (14K⭐), Outlines (13K⭐), snips-nlu, JointBERT
+- arxiv: 7 papers on intent recognition, AMD framework (SIGKDD 2025), query expansion
+- Perplexity/Web: ConRAP (87% F2), AQE (70% time reduction), INVEST criteria
+- Web: 11 requirements techniques, Haystack patterns, 50% defect statistic
+
+#### Enhancements Added
+- **Ambiguity categorization**: Added `ambiguity_type` field (vagueness|incompleteness|referential|scope) to clarification output
+- **Confidence thresholds**: Explicit scoring guidance (>0.9 high, 0.6-0.9 medium, <0.6 low)
+- **Workflow Phase 2**: Added ambiguity detection & categorization with indicators table
+- **Workflow Phase 4**: Added clarification generation with 5-step process
+- **Confidence field**: Added to analyze mode output schema
+
+#### Reference Files Populated
+- parsing-strategies.md: Schema-driven parsing, dependency mapping, Plan-and-Solve patterns
+- gap-analysis.md: 4 gap categories, detection signals, confidence scoring
+- clarification-templates.md: Funnel technique, templates by ambiguity type, priority filtering
+- assumption-patterns.md: Security/performance/architecture defaults
+- research-integration.md: AMD framework integration, query expansion workflow
+- planning-integration.md: Interactive mode integration with planning agents
+
+### Context
+- Based on deleted `intent-translator` agent (git history)
+- Purpose: Enable semantic query expansion for research workflows
+- Integration point: `researching-skills` will consume analyze mode output

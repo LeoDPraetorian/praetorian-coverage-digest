@@ -4,6 +4,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const InputSchema = z.object({});
 
@@ -24,7 +25,7 @@ const FilteredOutputSchema = z.object({
     is_online: z.boolean(),
     has_tunnel: z.boolean()
   })),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 });
 
 export const aegisList = {
@@ -67,7 +68,7 @@ function filterAegisResult(rawResult: any): any {
     has_tunnel: agent.has_tunnel
   }));
 
-  return {
+  const result = {
     summary: {
       total_count: agents.length,
       online_count: onlineCount,
@@ -77,8 +78,12 @@ function filterAegisResult(rawResult: any): any {
         inactive: tunnelInactive
       }
     },
-    agents: filteredAgents,
-    estimated_tokens: 600
+    agents: filteredAgents
+  };
+
+  return {
+    ...result,
+    estimatedTokens: estimateTokens(result)
   };
 }
 

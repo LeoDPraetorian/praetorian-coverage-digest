@@ -115,6 +115,7 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 ```
 
 **Why this works:**
+
 - `--show-superproject-working-tree --show-toplevel` returns super-repo root from submodules
 - `| head -1` picks first non-empty result
 - `$ROOT` expands in double-quoted string before tsx sees it

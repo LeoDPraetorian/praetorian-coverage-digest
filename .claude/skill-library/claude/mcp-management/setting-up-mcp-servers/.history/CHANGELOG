@@ -1,0 +1,38 @@
+# Changelog
+
+## 2026-01-02 - Initial Creation
+
+**RED Phase Documentation:**
+
+Gap: Currently, when developers want to create MCP wrappers (via `orchestrating-mcp-development`), there's no systematic way to:
+1. Detect if an MCP server is already configured in `.claude/tools/config/lib/mcp-client.ts`
+2. Guide users through installation from various sources (npm, PyPI, GitHub, local)
+3. Automatically configure the MCP server with the correct command/args/envVars
+4. Verify the MCP server is working before proceeding to schema discovery
+
+Failure Scenario: The `orchestrating-mcp-development` skill would fail at Phase 1 (schema discovery) because the MCP isn't configured. The developer would need to manually search for the MCP package, determine if it's npm/PyPI/local, figure out the correct command syntax, edit `mcp-client.ts`, and test if it works.
+
+**Category:** claude/mcp-tools (library skill)
+
+**Skill Type:** Process/Pattern (MCP server setup workflow and configuration patterns)
+
+**Content Source:** User-provided comprehensive workflow with 8 steps, 4 detailed examples, error handling patterns, and integration guidance. Research phase skipped per user request - content derived from original specification.
+
+**Files Created:**
+- SKILL.md (325 lines - within 500 line limit)
+- references/command-configurations.md (patterns for npm, Python/uvx, Go, OAuth)
+- references/example-configurations.md (6 complete examples with context)
+- references/error-handling.md (recovery strategies, validation patterns)
+
+**Integration Points:**
+- Invoked at Phase 0.5 by `orchestrating-mcp-development`
+- Modifies `.claude/tools/config/lib/mcp-client.ts`
+- Optionally modifies `.claude/tools/config/credentials.json`
+
+**Changes:**
+- Initial skill structure created
+- Progressive disclosure architecture with references/
+- 8-step workflow for MCP server setup
+- Support for npm (npx), Python (uvx), Go, and OAuth MCPs
+- Comprehensive error handling patterns
+- 6 real-world configuration examples

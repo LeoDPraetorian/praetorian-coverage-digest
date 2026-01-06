@@ -17,6 +17,7 @@
 **Cause:** More than 60 minutes since last MANIFEST update
 
 **Fix:**
+
 - Pass feature_directory explicitly, OR
 - Accept new directory creation (stale workflow restarted)
 
@@ -27,6 +28,7 @@
 **Cause:** Poor semantic match (similar descriptions)
 
 **Fix:**
+
 - Improve slug generation (more specific keywords)
 - Add detailed description to MANIFEST.yaml
 - Pass feature_directory explicitly to avoid ambiguity
@@ -45,5 +47,4 @@
 
 **Cause:** Agent didn't include full path
 
-**Fix:** Return absolute path: `.claude/features/{timestamp}-{slug}/{filename}`
-
+**Fix:** Return absolute path: `.claude/.output/agents/{timestamp}-{slug}/{filename}`

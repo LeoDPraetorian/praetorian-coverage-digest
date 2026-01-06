@@ -304,7 +304,26 @@ staleTime: 5 _ 60 _ 1000 // 5 minutes
 - ❌ Don't call hooks conditionally (violates Rules of Hooks)
 ```
 
-**Save synthesis** to `.local/context7-research-{library-name}.md` for reference during skill creation.
+**Output location depends on invocation mode:**
+
+**Mode 1: Standalone (invoked directly)**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+TIMESTAMP=$(date +"%Y-%m-%d-%H%M%S")
+LIBRARY="{library-name-slug}"
+mkdir -p "$ROOT/.claude/.output/research/${TIMESTAMP}-${LIBRARY}-context7"
+# Write synthesis to: $ROOT/.claude/.output/research/${TIMESTAMP}-${LIBRARY}-context7/SYNTHESIS.md
+```
+
+**Mode 2: Orchestrated (invoked by orchestrating-research)**
+
+When parent skill provides `OUTPUT_DIR`:
+
+- Write synthesis to: `${OUTPUT_DIR}/context7.md`
+- Do NOT create directory (parent already created it)
+
+**Detection logic:** If parent skill passed an output directory path, use Mode 2. Otherwise use Mode 1.
 
 ---
 
@@ -354,14 +373,14 @@ staleTime: 5 _ 60 _ 1000 // 5 minutes
 
 ## Related Skills
 
-| Skill                   | Purpose                                                   |
-| ----------------------- | --------------------------------------------------------- |
-| `researching-skills`    | Orchestrates all research types (CORE skill)              |
-| `researching-protocols` | Research network protocols and specifications             |
-| `researching-arxiv`     | Research academic papers and ML techniques                |
-| `mcp-tools-context7`    | Raw MCP tool catalog for Context7 service                 |
-| `creating-skills`       | Skill creation workflow (uses this skill)                 |
-| `updating-skills`       | Skill update workflow (uses this skill)                   |
+| Skill                    | Purpose                                       |
+| ------------------------ | --------------------------------------------- |
+| `orchestrating-research` | Orchestrates all research types (CORE skill)  |
+| `researching-protocols`  | Research network protocols and specifications |
+| `researching-arxiv`      | Research academic papers and ML techniques    |
+| `mcp-tools-context7`     | Raw MCP tool catalog for Context7 service     |
+| `creating-skills`        | Skill creation workflow (uses this skill)     |
+| `updating-skills`        | Skill update workflow (uses this skill)       |
 
 ---
 

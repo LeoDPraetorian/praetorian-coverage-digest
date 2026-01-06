@@ -22,7 +22,8 @@
     "vitest": "^1.6.1"
   },
   "scripts": {
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:run": "vitest run",
     "test:unit": "vitest run **/*.unit.test.ts",
     "test:integration": "vitest run **/*.integration.test.ts",
@@ -36,5 +37,12 @@
     "update": "npm run -w @chariot/updating-skills update --",
     "agent:audit": "npm run -w @chariot/auditing-agents audit-critical --",
     "agent:fix": "npm run -w @chariot/fixing-agents fix --"
+  },
+  "dependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "async-mutex": "^0.5.0",
+    "js-yaml": "^4.1.1",
+    "ky": "^1.14.2",
+    "msw": "^2.12.7"
   }
 }

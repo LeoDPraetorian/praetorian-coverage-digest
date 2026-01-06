@@ -8,9 +8,9 @@
 
 Gateway skills require special handling because they route agents to library skills. Updates fall into three categories:
 
-1. **Adding Skills** - Add new library skill to gateway routing table
+1. **Adding Skills** - Add new library skill to gateway Skill Registry
 2. **Removing Skills** - Remove stale/deprecated skills from gateway
-3. **Reorganizing** - Move skills between gateway sections
+3. **Reorganizing** - Move skills between Skill Registry sections
 
 ---
 
@@ -62,21 +62,22 @@ Options:
 **Step 4: Add Table Row in Proper Format**
 
 ```markdown
-| Skill Display Name | `.claude/skill-library/{domain}/{category}/{skill-name}/SKILL.md` |
+| Skill Display Name | `.claude/skill-library/{domain}/{category}/{skill-name}/SKILL.md` | {triggers} |
 ```
 
 **Example:**
 
 ```markdown
-| TanStack Query Patterns | `.claude/skill-library/frontend/state/frontend-tanstack-query/SKILL.md` |
+| TanStack Query Patterns | `.claude/skill-library/frontend/state/frontend-tanstack-query/SKILL.md` | TanStack, cache, fetch |
 ```
 
 **CRITICAL RULES:**
 
 - ❌ NEVER add skill names without full paths
-- ✅ ALWAYS use table format with backtick-wrapped path
+- ✅ ALWAYS use table format with backtick-wrapped path and Triggers column
 - ✅ Path must be relative to repo root (start with `.claude/skill-library/`)
 - ✅ Path must end with `/SKILL.md`
+- ✅ Triggers must be comma-separated keywords matching Intent Detection
 
 **Step 5: Run Gateway Audit**
 
@@ -195,25 +196,31 @@ npm run audit -- gateway-frontend --phase 19
 ✅ **CORRECT:**
 
 ```markdown
-| Skill Name | `.claude/skill-library/frontend/state/frontend-tanstack/SKILL.md` |
+| Skill Name | `.claude/skill-library/frontend/state/frontend-tanstack/SKILL.md` | TanStack, cache |
 ```
 
 ❌ **WRONG - Skill name instead of path:**
 
 ```markdown
-| Skill Name | frontend-tanstack |
+| Skill Name | frontend-tanstack | TanStack |
 ```
 
 ❌ **WRONG - Relative path without repo root:**
 
 ```markdown
-| Skill Name | `skill-library/frontend/state/frontend-tanstack/SKILL.md` |
+| Skill Name | `skill-library/frontend/state/frontend-tanstack/SKILL.md` | TanStack |
 ```
 
 ❌ **WRONG - Missing /SKILL.md:**
 
 ```markdown
-| Skill Name | `.claude/skill-library/frontend/state/frontend-tanstack` |
+| Skill Name | `.claude/skill-library/frontend/state/frontend-tanstack` | TanStack |
+```
+
+❌ **WRONG - Missing Triggers column:**
+
+```markdown
+| Skill Name | `.claude/skill-library/frontend/state/frontend-tanstack/SKILL.md` |
 ```
 
 ### Verification Rules

@@ -182,7 +182,7 @@ Even then: If you reference ANY existing file, API, or interface → evidence-ba
 
 ---
 
-**Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md` OR `docs/plans/YYYY-MM-DD-<feature-name>/` (for phased plans)
+**Save plans to:** `.claude/.output/plans/{timestamp}-{slug}/` (ALWAYS a directory, even for single-file plans)
 
 ## Plan Decomposition (Large Features)
 
@@ -191,7 +191,8 @@ Even then: If you reference ANY existing file, API, or interface → evidence-ba
 For large features, create **phased plans** instead of monolithic files:
 
 ```
-docs/plans/YYYY-MM-DD-feature-name/
+.claude/.output/plans/YYYY-MM-DD-HHMMSS-feature-name/
+├── MANIFEST.yaml                # Feature metadata (REQUIRED)
 ├── PLAN.md                      # Manifest: phases, dependencies, progress
 ├── phase-0-foundation.md        # Self-contained, 10-20 tasks
 ├── phase-1-component-a.md       # Self-contained, 10-20 tasks
@@ -214,6 +215,33 @@ docs/plans/YYYY-MM-DD-feature-name/
 - Handoff to next phase
 
 **For complete decomposition strategy, see:** [references/plan-decomposition.md](references/plan-decomposition.md)
+
+---
+
+## Output Directory Structure
+
+**CRITICAL:** Plans MUST be saved to `.claude/.output/plans/{timestamp}-{slug}/` directory structure with MANIFEST.yaml and metadata blocks.
+
+**Quick Start:**
+
+```bash
+# Create output directory with EXACT timestamp
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && \
+SLUG="your-feature-slug" && \
+OUTPUT_DIR="$ROOT/.claude/.output/plans/$(date +%Y-%m-%d-%H%M%S)-${SLUG}" && \
+mkdir -p "$OUTPUT_DIR"
+```
+
+**For complete details on:**
+
+- Directory creation protocol (MUST run actual `date` command)
+- MANIFEST.yaml structure (REQUIRED in every plan directory)
+- Plan file metadata blocks (REQUIRED in every plan file)
+- Directory structure examples (single-file vs phased)
+- Implementation checklist (8-step sequence)
+- Output anti-patterns (what NOT to do)
+
+**See:** [references/output-structure.md](references/output-structure.md)
 
 ## Bite-Sized Task Granularity
 
@@ -290,11 +318,18 @@ git commit -m "feat: add specific feature"
 ```
 
 ## Remember
+- Run `date +"%Y-%m-%d-%H%M%S"` for EXACT timestamp - NEVER round or approximate
+- ALWAYS create directory under `.claude/.output/plans/` - NEVER use `docs/plans/`
+- Create MANIFEST.yaml with feature metadata BEFORE writing plan files
+- Add metadata JSON block to EVERY plan file (including phase files)
+- Return directory path (not file path) in completion messages
 - Exact file paths always
 - Complete code in plan (not "add validation")
 - Exact commands with expected output
 - Reference relevant skills with @ syntax
 - DRY, YAGNI, TDD, frequent commits
+
+**For output anti-patterns and implementation checklist, see:** [references/output-structure.md](references/output-structure.md)
 
 ## Execution Handoff
 
@@ -304,7 +339,7 @@ git commit -m "feat: add specific feature"
 
 When called from orchestrating-feature-development:
 - **Do NOT** offer execution choices
-- **Simply announce:** "Plan complete and saved to `docs/plans/<path>`. Returning control to orchestration workflow."
+- **Simply announce:** "Plan complete and saved to `.claude/.output/plans/{timestamp}-{slug}/`. Returning control to orchestration workflow."
 - The orchestration skill will handle Phase 4 (Architecture) next
 
 ### If Used Standalone
@@ -312,10 +347,19 @@ When called from orchestrating-feature-development:
 After saving the plan, offer execution choice:
 
 **For single-file plans:**
-"Plan complete and saved to `docs/plans/<filename>.md`."
+"Plan complete and saved to `.claude/.output/plans/{timestamp}-{slug}/`
+
+Contains:
+- MANIFEST.yaml (feature metadata)
+- implementation-plan.md (N tasks, TDD workflow)"
 
 **For phased plans:**
-"Phased plan complete and saved to `docs/plans/<feature-name>/` with PLAN.md manifest and N phase files."
+"Phased plan complete and saved to `.claude/.output/plans/{timestamp}-{slug}/`
+
+Contains:
+- MANIFEST.yaml (feature metadata)
+- PLAN.md (phase manifest)
+- phase-0-*.md through phase-N-*.md (N phase files with M total tasks)"
 
 **Two execution options:**
 

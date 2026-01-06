@@ -1,15 +1,15 @@
 # Routing Table Format
 
-**Exact formatting requirements for gateway routing tables.**
+**Exact formatting requirements for gateway Skill Registry tables.**
 
 ## Standard Format
 
-Every gateway MUST use this exact table format:
+Every gateway MUST use this exact table format for the Skill Registry:
 
 ```markdown
-| Skill      | Path                                                 |
-| ---------- | ---------------------------------------------------- |
-| Skill Name | `.claude/skill-library/category/skill-name/SKILL.md` |
+| Skill      | Path                                                 | Triggers           |
+| ---------- | ---------------------------------------------------- | ------------------ |
+| Skill Name | `.claude/skill-library/category/skill-name/SKILL.md` | keyword1, keyword2 |
 ```
 
 ## Header Requirements
@@ -18,10 +18,11 @@ Every gateway MUST use this exact table format:
 
 - First column: `Skill` (capital S)
 - Second column: `Path` (capital P)
+- Third column: `Triggers` (capital T)
 
 **Separator row:**
 
-- Must use dashes: `|-------|------|`
+- Must use dashes: `|-------|------|----------|`
 - Must align with header columns
 - No other characters allowed
 
@@ -75,6 +76,25 @@ frontend-tanstack                                  # Missing full path
 `~/.claude/skill-library/frontend-tanstack`        # Using ~
 ```
 
+### Triggers Column
+
+**Format:** Comma-separated keywords that trigger routing to this skill
+
+**Rules:**
+
+- Use lowercase keywords
+- Separate multiple triggers with commas
+- Keep concise (3-5 keywords typically)
+- Match keywords to Intent Detection table entries
+
+**Examples:**
+
+- ✅ "TanStack, React Query, caching"
+- ✅ "state, zustand, store"
+- ✅ "API, REST, endpoint"
+- ❌ "Use this skill when working with TanStack Query" (too verbose)
+- ❌ "" (empty - must have at least one trigger)
+
 ## Sorting
 
 **Rows MUST be sorted alphabetically by skill name (case-insensitive).**
@@ -82,25 +102,25 @@ frontend-tanstack                                  # Missing full path
 **Example:**
 
 ```markdown
-| Skill                  | Path                                                                          |
-| ---------------------- | ----------------------------------------------------------------------------- |
-| Frontend Accessibility | `.claude/skill-library/development/frontend/accessibility/...`                |
-| Frontend Performance   | `.claude/skill-library/development/frontend/performance/...`                  |
-| React Patterns         | `.claude/skill-library/development/frontend/patterns/...`                     |
-| TanStack Query         | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md` |
-| Zustand State          | `.claude/skill-library/development/frontend/state/frontend-zustand/SKILL.md`  |
+| Skill                  | Path                                                                          | Triggers                 |
+| ---------------------- | ----------------------------------------------------------------------------- | ------------------------ |
+| Frontend Accessibility | `.claude/skill-library/development/frontend/accessibility/...`                | a11y, WCAG, aria         |
+| Frontend Performance   | `.claude/skill-library/development/frontend/performance/...`                  | optimize, slow, render   |
+| React Patterns         | `.claude/skill-library/development/frontend/patterns/...`                     | component, hook, pattern |
+| TanStack Query         | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md` | TanStack, cache, fetch   |
+| Zustand State          | `.claude/skill-library/development/frontend/state/frontend-zustand/SKILL.md`  | zustand, store, state    |
 ```
 
 **NOT:**
 
 ```markdown
-| Skill                  | Path |
-| ---------------------- | ---- |
-| TanStack Query         | ...  |
-| Frontend Performance   | ...  |
-| Zustand State          | ...  |
-| React Patterns         | ...  |
-| Frontend Accessibility | ...  |
+| Skill                  | Path | Triggers |
+| ---------------------- | ---- | -------- |
+| TanStack Query         | ...  | ...      |
+| Frontend Performance   | ...  | ...      |
+| Zustand State          | ...  | ...      |
+| React Patterns         | ...  | ...      |
+| Frontend Accessibility | ...  | ...      |
 ```
 
 ## Whitespace
@@ -147,18 +167,22 @@ frontend-tanstack                                  # Missing full path
 
 ## Validation
 
-After modifying a routing table, verify:
+After modifying a Skill Registry table, verify:
 
-1. **Header row matches exactly:** `| Skill | Path |`
-2. **Separator row matches exactly:** `|-------|------|`
+1. **Header row matches exactly:** `| Skill | Path | Triggers |`
+2. **Separator row matches exactly:** `|-------|------|----------|`
 3. **All paths:**
    - Start with `.claude/skill-library/`
    - End with `/SKILL.md`
    - Are wrapped in backticks
    - Use forward slashes only
-4. **Rows are sorted alphabetically by skill name**
-5. **No duplicate entries** (same path appears multiple times)
-6. **All paths exist in filesystem** (verify with `test -f`)
+4. **All triggers:**
+   - Are comma-separated keywords
+   - Are not empty
+   - Match Intent Detection entries
+5. **Rows are sorted alphabetically by skill name**
+6. **No duplicate entries** (same path appears multiple times)
+7. **All paths exist in filesystem** (verify with `test -f`)
 
 ## Common Errors
 
@@ -228,7 +252,7 @@ After modifying a routing table, verify:
 
 ## Edit Tool Usage
 
-When using Edit tool to update routing table:
+When using Edit tool to update Skill Registry table:
 
 **old_string:** Entire current table (header + separator + all rows)
 **new_string:** Entire new table (header + separator + updated rows)
@@ -238,15 +262,15 @@ When using Edit tool to update routing table:
 ```typescript
 Edit({
   file_path: ".claude/skills/gateway-frontend/SKILL.md",
-  old_string: `| Skill | Path |
-|-------|------|
-| React Patterns | \`.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md\` |
-| TanStack Query | \`.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md\` |`,
-  new_string: `| Skill | Path |
-|-------|------|
-| Frontend Performance | \`.claude/skill-library/development/frontend/performance/frontend-performance/SKILL.md\` |
-| React Patterns | \`.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md\` |
-| TanStack Query | \`.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md\` |`,
+  old_string: `| Skill | Path | Triggers |
+|-------|------|----------|
+| React Patterns | \`.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md\` | component, hook |
+| TanStack Query | \`.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md\` | TanStack, cache |`,
+  new_string: `| Skill | Path | Triggers |
+|-------|------|----------|
+| Frontend Performance | \`.claude/skill-library/development/frontend/performance/frontend-performance/SKILL.md\` | optimize, slow |
+| React Patterns | \`.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md\` | component, hook |
+| TanStack Query | \`.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md\` | TanStack, cache |`,
 });
 ```
 

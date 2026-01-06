@@ -48,6 +48,7 @@ export {
   Context7Responses,
   LinearResponses,
   CurrentsResponses,
+  SerenaResponses,
   GenericResponses,
   TestData,
 } from './mocks/response-builders';

@@ -1,11 +1,9 @@
 ---
-description: Complete feature development - brainstorm, plan, architect, implement, review, test (8 phases with parallel agents)
+description: Complete feature development - brainstorm, plan, architect, implement, review, test (10 phases with parallel agents)
 allowed-tools: Skill, AskUserQuestion
 argument-hint: <feature-description>
 ---
 
-**ACTION:** Invoke the `orchestrating-feature-development` skill.
+Invoke the `orchestrating-feature-development` skill and follow it exactly.
 
-**Feature:** $ARGUMENTS
-
-**Output:** Display results verbatim.
+**Feature Request:** $ARGUMENTS

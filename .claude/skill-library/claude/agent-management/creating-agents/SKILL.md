@@ -14,19 +14,19 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Skill, AskUserQue
 
 ## Quick Reference
 
-| Phase               | Purpose             | Time     | Reference                       |
-| ------------------- | ------------------- | -------- | ------------------------------- |
-| **0. Navigate**     | Repo root           | 1 min    | patterns/repo-root-detection.md |
-| **1. 🔴 RED**       | Prove gap exists    | 5 min    | tdd-workflow.md                 |
-| **2. Define**       | Type, tools, skills | 5 min    | frontmatter-reference.md        |
-| **3. Template**     | Use gold standard   | 2 min    | agent-templates.md              |
-| **4. Content**      | Core sections       | 10 min   | gold-standards.md               |
-| **5. Skills**       | Integration         | 5 min    | skill-integration-guide.md      |
-| **6. Examples**     | 2-3 in description  | 5 min    | gold-standards.md               |
-| **7. 🟢 GREEN**     | Verify works        | 5 min    | tdd-workflow.md                 |
-| **8. Audit**        | Compliance          | 5 min    | auditing-agents                 |
-| **9. Fix**          | Issues              | 5-10 min | fixing-agents                   |
-| **10. 🔵 REFACTOR** | Pressure test       | 15 min   | testing-agent-skills            |
+| Phase               | Purpose             | Time     | Reference                        |
+| ------------------- | ------------------- | -------- | -------------------------------- |
+| **0. Navigate**     | Repo root           | 1 min    | patterns/repo-root-detection.md  |
+| **1. 🔴 RED**       | Prove gap exists    | 5 min    | tdd-workflow.md                  |
+| **2. Define**       | Type, tools, skills | 5 min    | frontmatter-reference.md         |
+| **3. Template**     | Use gold standard   | 2 min    | agent-templates.md               |
+| **4. Content**      | Core sections       | 10 min   | gold-standards.md                |
+| **5. Skills**       | Integration         | 5 min    | skill-integration-guide.md       |
+| **6. Examples**     | 2-3 in description  | 5 min    | gold-standards.md                |
+| **7. 🟢 GREEN**     | Verify works        | 5 min    | tdd-workflow.md                  |
+| **8. Audit**        | Compliance          | 5 min    | auditing-agents                  |
+| **9. Fix**          | Issues              | 5-10 min | fixing-agents                    |
+| **10. 🔵 REFACTOR** | Pressure test       | 15 min   | verifying-agent-skill-invocation |
 
 **Total**: 60-75 minutes
 
@@ -76,7 +76,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Skill, AskUserQue
 
 **Document rationalizations, add counters** ✅
 
-**Details**: `skill: "testing-agent-skills"`
+**Details**: Read `.claude/skill-library/claude/agent-management/verifying-agent-skill-invocation/SKILL.md`
 
 ---
 
@@ -164,7 +164,7 @@ fi
 
 - `auditing-agents` - Phase 8 validation
 - `fixing-agents` - Phase 9 fixes
-- `testing-agent-skills` - Phase 10 REFACTOR
+- `verifying-agent-skill-invocation` - Phase 10 REFACTOR
 - `updating-agents` - Modify existing agents
 - `managing-agents` - Router
 

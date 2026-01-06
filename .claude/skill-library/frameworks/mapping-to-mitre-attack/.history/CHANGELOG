@@ -1,0 +1,100 @@
+# Changelog
+
+## 2026-01-06 - Initial Creation
+
+**Type:** Library skill (Framework/Reference)
+**Category:** frameworks/
+**Created by:** Nathan (via creating-skills workflow)
+
+### RED Phase Documentation
+
+**Gap Identified:**
+Capability developers at Chariot create security scanners that detect vulnerabilities, misconfigurations, and threats. However, these findings exist in isolation without threat intelligence context. To make findings actionable for security teams, they need to be mapped to MITRE ATT&CK techniques.
+
+**Test Scenario (RED - Expected to Fail):**
+"I found a vulnerability where an EC2 instance has IMDSv1 enabled, allowing SSRF attacks to steal IAM credentials. What MITRE ATT&CK technique should I tag this with?"
+
+**Expected Failure Without Skill:**
+Claude provides generic "this is privilege escalation" or "T1078 Valid Accounts" without recognizing this is specifically T1552.005 (Unsecured Credentials: Cloud Instance Metadata API).
+
+**Current Behavior:**
+- Confuses tactics (TA####) with techniques (T####)
+- Misses sub-technique granularity
+- Doesn't understand platform filtering (Cloud vs Enterprise matrix)
+- Lacks structured decision trees for vulnerability → ATT&CK mappings
+
+### Skill Structure
+
+**Location:** `.claude/skill-library/frameworks/mapping-to-mitre-attack/`
+
+**Contents:**
+- `SKILL.md` (427 lines) - Main reference with quick lookup tables, decision trees, common mistakes
+- `references/` - Prepared for detailed reference files (to be populated in research phase)
+- `examples/` - Prepared for example mappings
+
+**Skill Type:** Library/Framework (similar to mapping-to-cwe, mapping-to-sans-top-25)
+
+**Target Audience:** Capability developers writing Nebula, Diocletian, Janus, VQL capabilities
+
+### Initial Content
+
+Skill includes:
+- Critical rules (use techniques not tactics, prefer sub-techniques, matrix selection)
+- Quick reference tables for Cloud, Network, Web, Secrets, Container security
+- ATT&CK taxonomy overview (tactics vs techniques vs sub-techniques)
+- Decision trees for ambiguous mappings
+- Common mistakes section with disambiguation
+- Integration patterns for Go capability development
+- Detection vs vulnerability perspective guidance
+
+### Research Completed (Phase 6.2-6.3)
+
+**Research Output Directory:** `.claude/.output/research/2026-01-06-051018-mitre-attack-framework/`
+
+**Research Method:** Orchestrated research via `orchestrating-research` skill
+- 3 interpretations: Taxonomy Structure, Platform Matrices, Detection-to-TTP Mapping
+- 3 sources: GitHub, Perplexity, Classic Web
+- 8 successful agents (1 rate-limited)
+- Comprehensive SYNTHESIS.md created (50+ sources)
+
+**Key Research Findings:**
+- ATT&CK v18.1 (December 2025): 14 tactics, 216 techniques, 475 sub-techniques
+- v16 (October 2024) cloud platform consolidation: AWS/Azure/GCP → IaaS
+- v18 (October 2025) detection revolution: 691 Detection Strategies, 1,739 Analytics
+- Three standardized mapping methodologies: Vulnerability Type, Functionality, Exploit Technique
+- Production code patterns from Sigma, DeTT&CT, CVE2CAPEC
+
+**Reference Files Created:**
+- `references/tactic-reference.md` - Complete 14-tactic reference with kill chain mapping
+- Additional research available in synthesis document
+
+### Gateway Integration (Phase 7)
+
+**Gateway Added:** `gateway-capabilities`
+- Added to Intent Detection table with triggers: "MITRE ATT&CK" / "technique" / "tactic" / "TTP" / "kill chain"
+- Added to Security Framework Mapping section in Skill Registry
+- Placed alongside existing framework skills: `mapping-to-cwe`, `mapping-to-sans-top-25`
+
+### GREEN Phase Verification (Phase 8)
+
+**Test Scenario:** "EC2 instance has IMDSv1 enabled, allowing SSRF attacks to steal IAM credentials. What MITRE ATT&CK technique?"
+
+**Skill Performance:**
+✅ Quick reference table correctly shows: IMDSv1 → T1552.005
+✅ Sub-technique precision guidance provided
+✅ Decision trees lead to correct technique
+✅ Code examples demonstrate proper tagging
+
+**Result:** PASS - Skill correctly identifies T1552.005 (Unsecured Credentials: Cloud Instance Metadata API) instead of generic responses like "privilege escalation" or "T1078 Valid Accounts".
+
+### Completion Status
+
+**Phases Completed:**
+- ✅ Phase 0-5: Skill structure created (427 lines, <500 limit)
+- ✅ Phase 6: Research completed (8/9 agents, comprehensive synthesis)
+- ✅ Phase 7: Gateway integration (gateway-capabilities)
+- ✅ Phase 8: GREEN verification passed
+
+**Phase 9 (REFACTOR/Pressure Testing):** Deferred to future iteration
+
+**Skill Ready for Use:** Yes - capability developers can now use this skill for ATT&CK technique mapping

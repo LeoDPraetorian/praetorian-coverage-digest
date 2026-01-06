@@ -14,6 +14,7 @@ import {
   validateNoCommandInjection,
   validateNoControlChars,
 } from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 const GetSpecInstanceInputSchema = z.object({
   instanceId: z
@@ -112,7 +113,7 @@ export const getSpecInstance = {
 
     const filtered = {
       instance,
-      estimatedTokens: Math.ceil(JSON.stringify(instance).length / 4),
+      estimatedTokens: estimateTokens(instance),
     };
 
     return GetSpecInstanceOutputSchema.parse(filtered);

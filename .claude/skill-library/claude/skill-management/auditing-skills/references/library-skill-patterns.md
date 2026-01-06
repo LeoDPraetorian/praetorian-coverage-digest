@@ -241,6 +241,5 @@ If library skill is missing external docs:
 
 ## Related
 
-- [External Documentation Links Pattern](../../creating-skills/references/skill-templates.md#external-documentation-links-pattern) - Template guidance
-- [Post-Audit Semantic Review](../../../skills/managing-skills/references/audit-phases.md#post-audit-semantic-review) - Complete semantic review checklist
-- [Progressive Disclosure](../../../skills/managing-skills/references/progressive-disclosure.md) - When to use comprehensive file vs brief list
+- [External Documentation Links Pattern](.claude/skill-library/claude/skill-management/creating-skills/references/skill-templates.md#external-documentation-links-pattern) - Template guidance
+- [Progressive Disclosure](.claude/skills/managing-skills/references/progressive-disclosure.md) - When to use comprehensive file vs brief list

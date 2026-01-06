@@ -1,0 +1,18 @@
+## 2026-01-04 - Initial Creation
+
+**RED Phase:**
+- Gap: No orchestration skill for REST API wrapper development
+- Test scenario: Ask Claude to "create a VirusTotal API wrapper" without skill → Claude wouldn't know to use http-client infrastructure, TDD workflow, or agent coordination
+- Failure: Missing workflow documentation for REST API wrappers (MCP has orchestrating-mcp-development, REST APIs have none)
+
+**Location:** .claude/skill-library/claude/mcp-management/orchestrating-api-tool-development/
+**Category:** claude/mcp-management
+**Type:** Process/Pattern (orchestration workflow)
+
+**Context:**
+- REST API wrapper infrastructure exists at .claude/tools/config/lib/http-client.ts
+- Shodan reference implementation complete (.claude/tools/shodan/ with 51 passing tests)
+- Architecture documented at .claude/.output/api-wrappers/http-client-architecture.md
+
+**Rationale:**
+Parallel to orchestrating-mcp-development but for REST APIs. Guides TDD workflow (RED-GREEN-REFACTOR), agent coordination (mcp-tool-tester → mcp-tool-developer → mcp-tool-reviewer), and token optimization patterns.

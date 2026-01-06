@@ -1,0 +1,21 @@
+## [2026-01-04] - Initial Creation
+
+### Context
+- **Gap**: security-controls-mapper agent exceeded 274 lines (target <200, max 200)
+- **RED test**: Agent contains 122 lines of embedded methodology (lines 98-220)
+- **Category**: Library skill (security)
+- **Type**: Process/methodology
+
+### Content Extracted
+- Operating Modes (mode detection, triggers, outputs)
+- Per-Concern Investigation (5-step workflow)
+- Full Mapping Methodology (10 control categories with descriptions)
+- Gap Analysis Levels (severity classification)
+- STRIDE Alignment (control-to-threat mapping)
+- Output Schemas (per-concern and full mapping directory structures)
+
+### Purpose
+- Reduce agent line count to ~150 lines
+- Make methodology reusable across multiple agents
+- Enable consistent control mapping workflows
+- Support threat modeling Phase 4 orchestration

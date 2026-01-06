@@ -40,9 +40,14 @@ Ensure this requires updating the skill (not an agent or other component).
 ### 2.1 Find Skill File
 
 ```bash
-# Search both core and library
-cd .claude && npm run search -- "keyword"
+# Search both core and library (from repo root)
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude" && npm run search -- "keyword"
 ```
+
+> **⚠️ PATH WARNING**: All `{skill-path}` placeholders in this file are **relative to $ROOT** (repo root).
+> Example: `{skill-path}` = `$ROOT/.claude/skill-library/claude/mcp-management/testing-mcp-wrappers`
+> **NEVER** run path commands from inside `.claude/` directory - this causes `.claude/.claude/` duplication.
 
 ### 2.2 Read Current Skill
 
@@ -61,7 +66,8 @@ Read('.claude/skill-library/{category}/{name}/SKILL.md')
 ### 3.1 Check Current Line Count
 
 ```bash
-wc -l {skill-path}/SKILL.md
+# {skill-path} is relative to $ROOT (e.g., $ROOT/.claude/skill-library/category/name)
+wc -l $ROOT/{skill-path}/SKILL.md
 ```
 
 ### 3.2 Determine Strategy
@@ -92,7 +98,8 @@ wc -l {skill-path}/SKILL.md
 2. **Create reference file**:
 
    ```bash
-   mkdir -p {skill-path}/references
+   # Ensure you're at repo root first (Step 0)
+   mkdir -p $ROOT/{skill-path}/references
    ```
 
 3. **Write content**:
@@ -170,7 +177,7 @@ wc -l {skill-path}/SKILL.md
    }
    ```
 
-3. **Format tables**:
+4. **Format tables**:
    ```bash
    npx prettier --write --parser markdown {skill-path}/SKILL.md
    ```
@@ -181,9 +188,15 @@ wc -l {skill-path}/SKILL.md
 
 ### 5.1 Create .history directory
 
+**YOU MUST be at repo root ($ROOT) before running this command.**
+
 ```bash
-mkdir -p {skill-path}/.history
+# CRITICAL: Run from repo root to avoid .claude/.claude/ path duplication
+mkdir -p $ROOT/{skill-path}/.history
 ```
+
+**WRONG:** `mkdir -p .claude/skill-library/...` (if already inside `.claude/` directory)
+**RIGHT:** `mkdir -p $ROOT/.claude/skill-library/...` (always uses absolute path from repo root)
 
 ### 5.2 Append entry
 
@@ -238,13 +251,15 @@ If not PASS, return to Phase 4 and iterate.
 ### 7.1 Run Audit
 
 ```bash
-cd .claude && npm run audit -- {skill-name}
+# Navigate to repo root first, then .claude for npm commands
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+cd "$ROOT/.claude" && npm run audit -- {skill-name}
 ```
 
 ### 7.2 Line Count Check
 
 ```bash
-wc -l {skill-path}/SKILL.md
+wc -l $ROOT/{skill-path}/SKILL.md
 ```
 
 **Hard limit**: <500 lines
@@ -277,7 +292,7 @@ If audit fails, fix deterministically:
 
 ### Procedure
 
-Use `skill: "testing-skills-with-subagents"` for pressure testing:
+Use `Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")` for pressure testing:
 
 1. Time pressure scenarios
 2. Authority bypass attempts

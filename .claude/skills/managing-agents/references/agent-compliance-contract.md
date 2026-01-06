@@ -8,16 +8,16 @@ All operations (create, update, audit, fix) reference this contract.
 
 ## Operation Relationships
 
-| Operation              | Relationship to Contract           |
-| ---------------------- | ---------------------------------- |
-| `creating-agents`      | **FOLLOWS** this contract          |
-| `updating-agents`      | **MAINTAINS** this contract        |
-| `auditing-agents`      | **CHECKS** this contract           |
-| `fixing-agents`        | **RESTORES** this contract         |
-| `renaming-agents`      | **FOLLOWS** naming rules           |
-| `testing-agent-skills` | **VERIFIES** behavioral compliance |
-| `searching-agents`     | **USES** for discovery             |
-| `listing-agents`       | **USES** for organization          |
+| Operation                          | Relationship to Contract           |
+| ---------------------------------- | ---------------------------------- |
+| `creating-agents`                  | **FOLLOWS** this contract          |
+| `updating-agents`                  | **MAINTAINS** this contract        |
+| `auditing-agents`                  | **CHECKS** this contract           |
+| `fixing-agents`                    | **RESTORES** this contract         |
+| `renaming-agents`                  | **FOLLOWS** naming rules           |
+| `verifying-agent-skill-invocation` | **VERIFIES** behavioral compliance |
+| `searching-agents`                 | **USES** for discovery             |
+| `listing-agents`                   | **USES** for organization          |
 
 ---
 

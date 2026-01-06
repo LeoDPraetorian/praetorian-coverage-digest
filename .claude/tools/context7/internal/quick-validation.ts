@@ -5,6 +5,7 @@
 
 import { resolveLibraryId } from '../resolve-library-id';
 import { getLibraryDocs } from '../get-library-docs';
+import { estimateTokens } from '../../config/lib/response-utils.js';
 
 console.log('🧪 Context7 Quick Validation\n');
 console.log('Testing actual wrapper schemas...\n');
@@ -58,7 +59,7 @@ try {
     context7CompatibleLibraryID: '/facebook/react'
   });
 
-  const tokens = Math.ceil(JSON.stringify(result).length / 4);
+  const tokens = estimateTokens(result);
   console.log(`  ✓ Returned documentation`);
   console.log(`  ℹ Estimated tokens: ${tokens}`);
   console.log(`  ℹ Reported tokens: ${result.estimatedTokens}`);

@@ -1,8 +1,57 @@
 #!/usr/bin/env bash
 # SessionStart hook for Chariot
 # Injects using-skills content so Claude uses skill-search CLI + Read tool pattern
+# Starts Serena in SSE mode for persistent session-long connection
 
 set -euo pipefail
+
+# Set SERENA_HOME to project-local config (version-controlled, shared between developers)
+SCRIPT_DIR_EARLY="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+export SERENA_HOME="${SCRIPT_DIR_EARLY}/../.serena"
+
+# =============================================================================
+# SERENA DISABLED (2026-01-04)
+# Reason: Performance issues in super-repo (Go queries timeout, added complexity)
+# To re-enable: Uncomment the section below
+# =============================================================================
+
+# # Serena SSE configuration
+# SERENA_SSE_PORT=9121
+# export SERENA_SSE_PORT
+#
+# # Determine default project path (use chariot UI for TypeScript-only)
+# PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(cd "${SCRIPT_DIR_EARLY}/../.." && pwd)}"
+# SERENA_DEFAULT_PROJECT="${PROJECT_ROOT}/modules/chariot/ui"
+#
+# # Cross-platform port check function (works on macOS and Linux)
+# check_port() {
+#     local port=$1
+#     nc -z -w1 localhost "$port" 2>/dev/null
+#     return $?
+# }
+#
+# # Check if Serena is already running on port 9121
+# if ! check_port "${SERENA_SSE_PORT}"; then
+#     SERENA_LOG="${SERENA_HOME}/serena-sse.log"
+#     mkdir -p "$(dirname "${SERENA_LOG}")"
+#
+#     # Start Serena with Streamable HTTP transport
+#     nohup uvx --from git+https://github.com/oraios/serena \
+#         serena start-mcp-server \
+#         --context claude-code \
+#         --project "${SERENA_DEFAULT_PROJECT}" \
+#         --transport streamable-http \
+#         --port "${SERENA_SSE_PORT}" \
+#         >> "${SERENA_LOG}" 2>&1 &
+#
+#     # Wait for server to start
+#     for i in {1..30}; do
+#         if check_port "${SERENA_SSE_PORT}"; then
+#             break
+#         fi
+#         sleep 0.1
+#     done
+# fi
 
 # Use CLAUDE_PROJECT_DIR if available (set by Claude Code), fallback to script-relative path
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"

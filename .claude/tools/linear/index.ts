@@ -59,10 +59,19 @@ export { getTeam, type GetTeamInput, type GetTeamOutput } from './get-team';
 
 // User operations
 export { listUsers, type ListUsersInput, type ListUsersOutput } from './list-users';
+export { findUser, type FindUserInput, type FindUserOutput } from './find-user';
 
 // Comment operations
 export { listComments, type ListCommentsInput, type ListCommentsOutput } from './list-comments';
 export { createComment, type CreateCommentInput, type CreateCommentOutput } from './create-comment';
+
+// Initiative operations
+export { createInitiative, type CreateInitiativeInput, type CreateInitiativeOutput } from './create-initiative';
+export { getInitiative, type GetInitiativeInput, type GetInitiativeOutput } from './get-initiative';
+export { listInitiatives, type ListInitiativesInput, type ListInitiativesOutput } from './list-initiatives';
+export { updateInitiative, type UpdateInitiativeInput, type UpdateInitiativeOutput } from './update-initiative';
+export { deleteInitiative, type DeleteInitiativeInput, type DeleteInitiativeOutput } from './delete-initiative';
+export { linkProjectToInitiative, type LinkProjectToInitiativeInput, type LinkProjectToInitiativeOutput } from './link-project-to-initiative';
 
 /**
  * Token Reduction Summary

@@ -14,36 +14,32 @@ This document contains comprehensive guides for each operation delegated by the 
 Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")
 ```
 
-Guides through validation, location, category, type, generation, and research. After creation, run audit:
+Guides through validation, location, category, type, generation, and research. After creation, audit the skill:
 
-```bash
-npm run audit -- my-new-skill
+```markdown
+Audit {skill-name} to verify compliance with all phase requirements.
 ```
+
+Or invoke the auditing-skills library skill directly.
 
 ---
 
 ## Update (Test-Guarded Changes)
 
-**Ensures no regressions via TDD. Supports context7 refresh for library skills.**
+**Use the updating-skills library skill:**
 
-```bash
-# Standard update
-npm run update -- frontend-patterns "Add React 19 hooks patterns"
-
-# With suggest mode (outputs JSON for Claude)
-npm run update -- frontend-patterns --suggest
-
-# Refresh context7 documentation for library skills
-npm run update -- tanstack-query-skill --refresh-context7 --context7-data /tmp/new-docs.json
 ```
+Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")
+```
+
+Ensures no regressions via TDD. Follows an 8-step workflow with optional research integration.
 
 **Context7 Refresh Workflow:**
 
-1. When updating a context7-enabled skill, use `--suggest` to see if updates are available
-2. Re-query context7 for updated documentation
-3. Run with `--refresh-context7 --context7-data /path/to/new-data.json`
-4. Review the diff summary showing new APIs, deprecated APIs, changed signatures
-5. Updated files: references/api-reference.md, references/patterns.md, examples/basic-usage.md
+1. When updating a context7-enabled skill, check `.local/context7-source.json` for staleness
+2. If >30 days old, re-query context7 for updated documentation
+3. Review the diff summary showing new APIs, deprecated APIs, changed signatures
+4. Update files: references/api-reference.md, references/patterns.md, examples/basic-usage.md
 
 **Standard Workflow:**
 
@@ -88,87 +84,41 @@ Safely removes skills with comprehensive reference cleanup using Claude's native
 
 ---
 
-## Audit (22-Phase Structural + Semantic Review)
+## Audit (Compliance Validation)
 
-**Validates skill against 22 structural phases, then Claude performs semantic review.**
+**Validates skill against the [Skill Compliance Contract](skill-compliance-contract.md).**
 
-```bash
-# Audit single skill (auto-detects location)
-npm run audit -- frontend-patterns
+**Use the auditing-skills library skill:**
 
-# Audit all skills (both core and library)
-npm run audit
-
-# Audit specific phase
-npm run audit -- frontend-patterns --phase 1
+```
+Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")
 ```
 
-**21 Structural Phases:**
+Validates skills against the Skill Compliance Contract. Follows instruction-based workflow with 28 compliance phases.
 
-1. Description Format (first/second person, "Use when" trigger)
-2. Allowed-Tools Field
-3. Word Count
-4. Broken Links
-5. File Organization
-6. Script Organization
-7. Output Directory Pattern
-8. TypeScript Project Structure (tsc compilation, vitest types, 100% test pass)
-9. Non-TypeScript Script Migration
-10. Reference Audit
-11. Command Example Audit
-12. CLI Error Handling
-13. State Externalization
-14. Visual/Style (14a: Table Formatting, 14b: Code Block Quality, 14c: Header Hierarchy)
-15. Orphan Detection
-16. Windows Path Detection
-17. Gateway Structure (gateway skills only)
-18. Routing Table Format (gateway skills only)
-19. Path Resolution (gateway skills only)
-20. Coverage Check (gateway skills only)
-21. Line Number References
+For phase details, see [auditing-skills](.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md).
 
-**Post-Audit Semantic Review (Claude performs after structural audit):**
-
-After structural audit output, Claude MUST perform semantic review:
-
-1. **Description Quality (CSO)** - Does description include key trigger terms? Specific enough for discovery?
-2. **Skill Categorization** - Is this frontend/backend/testing/security/tooling?
-3. **Gateway Membership** - Should this be in gateway-frontend? gateway-testing? Is it missing from appropriate gateway?
-4. **Tool Appropriateness** - Are allowed-tools appropriate for skill's actual purpose?
-5. **Content Density** - If >500 lines warning, is length justified?
-
-**Example semantic issue:** `eslint-smart` skill lints TypeScript/React but isn't listed in `gateway-frontend`. Agents using frontend gateway would never discover it.
-
-**Output:** Pre-formatted markdown report (display verbatim), then semantic review findings
-
-**See:** [audit-phases.md](audit-phases.md) (includes semantic review checklist)
+For fix categories (deterministic vs hybrid vs human-required), see [phase-details.md](.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md).
 
 ---
 
 ## Fix (Compliance Remediation)
 
-**Three modes: default (auto-apply deterministic), suggest (JSON for Claude), apply (targeted fix).**
+**Use the fixing-skills library skill:**
 
-```bash
-# Preview fixes (dry-run)
-npm run fix -- frontend-patterns --dry-run
-
-# Apply deterministic fixes only
-npm run fix -- frontend-patterns
-
-# Claude-mediated mode (outputs JSON for semantic decisions)
-npm run fix -- frontend-patterns --suggest
-
-# Apply specific semantic fix
-npm run fix -- frontend-patterns --apply phase1-description --value "new description"
-npm run fix -- frontend-patterns --apply phase13-todowrite
 ```
+Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")
+```
+
+Remediates compliance issues following procedures in phase-categorization.md. Uses instruction-based workflow with guidance from phase-details.md.
 
 **Fix Categories:**
 
-- **Deterministic (auto-apply):** Phases 2,4,5,6,7,10,12
-- **Semantic (Claude-mediated):** Phases 1,3,9,11,13 - use `--suggest` mode
-- **Specialized CLI:** Phases 8,11 (guidance provided)
+For current phase-to-category mapping, see `.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md`
+
+- **Deterministic:** Auto-applied following patterns (format fixes, directory creation)
+- **Semantic:** Claude-mediated decisions for content changes
+- **Human-Required:** Manual intervention needed
 
 **Semantic Fix IDs:**
 | ID | Phase | Description |
@@ -179,7 +129,7 @@ npm run fix -- frontend-patterns --apply phase13-todowrite
 | `phase11-command` | 11 | Fix cd command portability |
 | `phase13-todowrite` | 13 | Add TodoWrite mandate |
 
-**See:** [fix-workflow.md](fix-workflow.md)
+**See:** [fixing-skills](.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md)
 
 ---
 
@@ -221,19 +171,13 @@ Safely moves skills between core and library using Claude's native tools.
 
 ## Search (Enhanced Dual-Location Discovery)
 
-**Find skills by keyword in BOTH core and library.**
+**Use the searching-skills library skill:**
 
-```bash
-# Search all locations
-npm run search -- "react"
-
-# Limit results
-npm run search -- "testing" --limit 5
-
-# Filter by location
-npm run search -- "backend" --location core
-npm run search -- "backend" --location library
 ```
+Read(".claude/skill-library/claude/skill-management/searching-skills/SKILL.md")
+```
+
+Find skills by keyword in BOTH core and library using Grep and Glob patterns.
 
 **Search locations:**
 
@@ -249,7 +193,7 @@ npm run search -- "backend" --location library
 
 **Output:** Scored results with location indicators
 
-**See:** [search-workflow.md](search-workflow.md)
+**See:** [searching-skills](.claude/skill-library/claude/skill-management/searching-skills/SKILL.md)
 
 ---
 
@@ -267,7 +211,7 @@ Display all skills using Claude's native tools (Glob, Read).
 | mcp-manager       | CORE     | ./.claude/skills/...   |
 | tanstack-query    | LIBRARY  | ./.claude/skill-lib... |
 
-**See:** [list-workflow.md](list-workflow.md)
+**See:** [listing-skills](.claude/skill-library/claude/skill-management/listing-skills/SKILL.md)
 
 ---
 

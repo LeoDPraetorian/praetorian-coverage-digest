@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-01-04T20:18:06Z",
+  "typescript_warmup": {
+    "project": "/Users/nathansportsman/chariot-development-platform2/modules/chariot",
+    "duration_seconds": 2,
+    "success": true
+  },
+  "go_warmup": {
+    "project": "/Users/nathansportsman/chariot-development-platform2/modules/chariot/backend",
+    "duration_seconds": 60,
+    "success": true
+  }
+}

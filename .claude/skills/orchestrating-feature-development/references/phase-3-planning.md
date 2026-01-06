@@ -31,7 +31,7 @@ The writing-plans skill creates comprehensive plans with:
 The writing-plans skill should save to:
 
 ```
-.claude/features/{feature-id}/plan.md
+.claude/.output/features/{feature-id}/plan.md
 ```
 
 Plan structure:
@@ -120,7 +120,7 @@ If "Let me review": Provide path to plan.md
     "planning": {
       "status": "complete",
       "approved": true,
-      "plan_file": ".claude/features/{id}/plan.md",
+      "plan_file": ".claude/.output/features/{id}/plan.md",
       "task_count": 8,
       "completed_at": "2024-12-13T11:00:00Z"
     },

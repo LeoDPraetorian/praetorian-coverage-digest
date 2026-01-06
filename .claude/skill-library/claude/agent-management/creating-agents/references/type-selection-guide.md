@@ -188,8 +188,7 @@ What is the primary purpose?
 **Examples**:
 
 - web-research-specialist: General web research
-- code-pattern-analyzer: Codebase pattern research
-- (Most research is handled by Explore agent - only create custom if specialized need)
+- (Most research is handled by native Explore agent - only create custom if specialized need)
 
 ---
 

@@ -47,12 +47,12 @@ The CLI will:
 
 ## What Gets Updated
 
-| File                              | Content                                         | Source                   |
-| --------------------------------- | ----------------------------------------------- | ------------------------ |
-| `references/api-reference.md`     | API functions, signatures, parameters           | Extracted from docs      |
-| `references/patterns.md`          | Usage patterns, best practices                  | Extracted from docs      |
-| `examples/basic-usage.md`         | Code examples (basic, advanced, edge cases)     | Extracted from docs      |
-| `.local/context7-source.json`     | Metadata: library name, version, fetchedAt, hash | Generated from docs data |
+| File                          | Content                                          | Source                   |
+| ----------------------------- | ------------------------------------------------ | ------------------------ |
+| `references/api-reference.md` | API functions, signatures, parameters            | Extracted from docs      |
+| `references/patterns.md`      | Usage patterns, best practices                   | Extracted from docs      |
+| `examples/basic-usage.md`     | Code examples (basic, advanced, edge cases)      | Extracted from docs      |
+| `.local/context7-source.json` | Metadata: library name, version, fetchedAt, hash | Generated from docs data |
 
 **Note:** `SKILL.md` is NOT auto-updated. Review generated files and manually update `SKILL.md` if needed.
 

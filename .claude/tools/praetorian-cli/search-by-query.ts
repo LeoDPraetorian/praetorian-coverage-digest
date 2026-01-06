@@ -7,6 +7,7 @@
 
 import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 // Simplified query schema (full schema in SDK documentation)
 const QueryNodeSchema: any = z.lazy(() =>
@@ -40,7 +41,7 @@ const FilteredOutputSchema = z.object({
     status: z.string().optional()
   })),
   next_offset: z.number().nullable(),
-  estimated_tokens: z.number()
+  estimatedTokens: z.number()
 });
 
 export const searchByQuery = {
@@ -89,15 +90,19 @@ function filterQueryResults(rawResult: any): any {
     status: r.status
   }));
 
-  return {
+  const result = {
     summary: {
       total_count: results.length,
       node_types: nodeTypes,
       sample_result_types: Array.from(sampleTypes)
     },
     results: filteredResults,
-    next_offset: nextOffset,
-    estimated_tokens: 2500 // vs 50,000+ for complex queries
+    next_offset: nextOffset
+  };
+
+  return {
+    ...result,
+    estimatedTokens: estimateTokens(result)
   };
 }
 

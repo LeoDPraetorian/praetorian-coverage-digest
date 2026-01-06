@@ -1,0 +1,22 @@
+# Changelog - pressure-testing-skill-content
+
+## 2026-01-04 - Output Path Migration
+
+**Change Type:** Path Update
+
+**What Changed:**
+- Updated all references from `.claude/features/` to `.claude/.output/testing/`
+- Added timestamp format documentation: `date +"%Y-%m-%d-%H%M%S"`
+- Aligned with new output structure convention used by orchestrating-research
+
+**Files Modified:**
+- SKILL.md:78 - Agent output path verification
+- SKILL.md:121 - Directory check in verification steps
+- SKILL.md:122 - Added timestamp format documentation with example
+- SKILL.md:133 - JSON metadata feature_directory field
+
+**Reason:**
+The `.claude/features/` directory was removed from the repository. Test outputs now go to `.claude/.output/testing/` subdirectory to maintain consistency across the skill system and follow the pattern established by other output-generating skills like orchestrating-research.
+
+**Impact:**
+Agents using pressure-testing-skill-content will now write test outputs to the correct location that exists in the repository structure.

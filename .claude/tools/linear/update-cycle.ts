@@ -42,12 +42,38 @@
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL mutation for updating a cycle
+ */
+const UPDATE_CYCLE_MUTATION = `
+  mutation UpdateCycle($id: String!, $input: CycleUpdateInput!) {
+    cycleUpdate(id: $id, input: $input) {
+      success
+      cycle {
+        id
+        name
+        number
+        team {
+          id
+          name
+        }
+        startsAt
+        endsAt
+        updatedAt
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -93,13 +119,35 @@ export const updateCycleOutput = z.object({
   }).optional(),
   startsAt: z.string().optional(),
   endsAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
+  estimatedTokens: z.number()
 });
 
 export type UpdateCycleOutput = z.infer<typeof updateCycleOutput>;
 
 /**
- * Update a cycle in Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface CycleUpdateResponse {
+  cycleUpdate: {
+    success: boolean;
+    cycle: {
+      id: string;
+      name: string;
+      number?: number;
+      team?: {
+        id: string;
+        name: string;
+      } | null;
+      startsAt?: string;
+      endsAt?: string;
+      updatedAt?: string;
+    } | null;
+  };
+}
+
+/**
+ * Update a cycle in Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -114,33 +162,50 @@ export const updateCycle = {
   description: 'Update a cycle in Linear workspace',
   parameters: updateCycleParams,
 
-  async execute(input: UpdateCycleInput): Promise<UpdateCycleOutput> {
+  async execute(
+    input: UpdateCycleInput,
+    testToken?: string
+  ): Promise<UpdateCycleOutput> {
     // Validate input
     const validated = updateCycleParams.parse(input);
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'update_cycle',
-      validated
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Build mutation input (only include fields that were provided)
+    const mutationInput: Record<string, any> = {};
+    if (validated.name !== undefined) mutationInput.name = validated.name;
+    if (validated.startsAt !== undefined) mutationInput.startsAt = validated.startsAt;
+    if (validated.endsAt !== undefined) mutationInput.endsAt = validated.endsAt;
+
+    // Execute GraphQL mutation
+    const response = await executeGraphQL<CycleUpdateResponse>(
+      client,
+      UPDATE_CYCLE_MUTATION,
+      { id: validated.id, input: mutationInput }
     );
 
-    if (!rawData) {
+    if (!response.cycleUpdate.cycle) {
       throw new Error(`Cycle not found: ${validated.id}`);
     }
 
     // Filter to essential fields
-    const filtered = {
-      id: rawData.id,
-      name: rawData.name,
-      number: rawData.number,
-      team: rawData.team ? {
-        id: rawData.team.id,
-        name: rawData.team.name
+    const baseData = {
+      id: response.cycleUpdate.cycle.id,
+      name: response.cycleUpdate.cycle.name,
+      number: response.cycleUpdate.cycle.number,
+      team: response.cycleUpdate.cycle.team ? {
+        id: response.cycleUpdate.cycle.team.id,
+        name: response.cycleUpdate.cycle.team.name
       } : undefined,
-      startsAt: rawData.startsAt,
-      endsAt: rawData.endsAt,
-      updatedAt: rawData.updatedAt
+      startsAt: response.cycleUpdate.cycle.startsAt,
+      endsAt: response.cycleUpdate.cycle.endsAt,
+      updatedAt: response.cycleUpdate.cycle.updatedAt
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

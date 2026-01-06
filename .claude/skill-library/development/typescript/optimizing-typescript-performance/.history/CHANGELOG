@@ -1,0 +1,44 @@
+# Changelog
+
+## 2026-01-02 - Initial Creation
+
+**RED Phase Documentation:**
+
+Large TypeScript codebases suffer from severe compilation performance issues:
+- Build times of 5-10+ minutes block CI/CD pipelines
+- Type instantiation depth errors halt development
+- Complex generated types can 10x+ compilation time
+- IDE performance degradation makes development painful
+
+Current failure behavior without this skill:
+- Developers search for generic advice without diagnostic methodology
+- Trial-and-error optimization without measurement
+- No systematic approach to type instantiation depth errors
+- Lack of monorepo-specific optimization patterns (project references)
+
+**Category:** development/typescript (library)
+**Skill Type:** Process/Pattern (methodology and workflow)
+
+**Content Extracted From:** `.claude/skill-library/development/typescript/typescript-advanced/SKILL.md` lines 693-699 (deleted skill)
+- Avoid deeply nested conditional types
+- Use simple types when possible
+- Cache complex type computations
+- Limit recursion depth in recursive types
+- Skip type checking in production builds
+
+**Expanded With:**
+- Diagnostic tools (`--diagnostics`, `--extendedDiagnostics`, `--generateTrace`)
+- Type instantiation depth error patterns and solutions
+- Project references for monorepo optimization
+- TypeScript 5.x performance characteristics
+- Systematic measurement methodology (BEFORE/AFTER metrics)
+
+**Structure:** 494 lines (within <500 limit)
+
+**Target Use Cases:**
+- Build times >1 minute
+- Type instantiation depth errors
+- Out of memory errors during compilation
+- IDE performance degradation
+- Large monorepo with multiple TypeScript projects (Chariot: 16 submodules)
+- Generated code with large type files (Tabularium)

@@ -69,7 +69,7 @@ Safely migrates skills by:
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
-**See:** [Repository Root Navigation](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
+**See:** [Repository Root Navigation](.claude/skills/managing-skills/references/patterns/repo-root-detection.md)
 
 **⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
 

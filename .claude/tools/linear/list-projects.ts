@@ -1,12 +1,12 @@
 /**
- * list_projects - Linear MCP Wrapper
+ * list_projects - Linear GraphQL Wrapper
  *
- * List projects from Linear workspace via MCP server
+ * List projects from Linear workspace via GraphQL API
  *
  * Token Optimization:
  * - Session start: 0 tokens (filesystem discovery)
  * - When used: ~800 tokens (project list)
- * - vs Direct MCP: 46,000 tokens at start
+ * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
  * Schema Discovery Results (tested with CHARIOT workspace):
@@ -18,6 +18,7 @@
  * - includeArchived: boolean (optional) - Include archived projects
  * - limit: number (optional) - Max projects to return (1-250, default 50)
  * - orderBy: enum (optional) - Sort order: 'createdAt' | 'updatedAt'
+ * - fullDescription: boolean (optional) - Return full description without truncation (default: false)
  *
  * OUTPUT (after filtering):
  * - projects: array of project objects
@@ -34,30 +35,65 @@
  * - nextOffset: string (optional) - Pagination cursor
  *
  * Edge cases discovered:
- * - MCP returns array directly, not wrapped in { projects: [...] }
- * - Empty search returns empty array, not error
+ * - Body is truncated to 200 chars to reduce token usage
+ * - Empty projects returns empty array, not null
  * - Description truncated to 200 chars for token efficiency
  *
  * @example
  * ```typescript
- * // List all projects
+ * // List all projects (descriptions truncated to 200 chars)
  * await listProjects.execute({});
  *
  * // Filter by team
  * await listProjects.execute({ team: 'Engineering' });
  *
- * // Search projects
- * await listProjects.execute({ query: 'Q2 2025' });
+ * // Search projects with full descriptions
+ * await listProjects.execute({ query: 'Q2 2025', fullDescription: true });
  * ```
  */
 
 import { z } from 'zod';
-import { callMCPTool } from '../config/lib/mcp-client';
+import { createLinearClient } from './client.js';
+import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
   validateNoPathTraversal,
   validateNoCommandInjection,
-} from '../config/lib/sanitize';
+} from '../config/lib/sanitize.js';
+import { estimateTokens } from '../config/lib/response-utils.js';
+import type { HTTPPort } from '../config/lib/http-client.js';
+
+/**
+ * GraphQL query for listing projects
+ */
+const LIST_PROJECTS_QUERY = `
+  query Projects($first: Int, $includeArchived: Boolean, $orderBy: PaginationOrderBy) {
+    projects(first: $first, includeArchived: $includeArchived, orderBy: $orderBy) {
+      nodes {
+        id
+        name
+        description
+        state {
+          id
+          name
+          type
+        }
+        lead {
+          id
+          name
+        }
+        startDate
+        targetDate
+        createdAt
+        updatedAt
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
 
 /**
  * Input validation schema
@@ -87,7 +123,9 @@ export const listProjectsParams = z.object({
     .describe('Search for content in project name'),
   includeArchived: z.boolean().default(false).optional(),
   limit: z.number().min(1).max(250).default(50).optional(),
-  orderBy: z.enum(['createdAt', 'updatedAt']).default('updatedAt').optional()
+  orderBy: z.enum(['createdAt', 'updatedAt']).default('updatedAt').optional(),
+  fullDescription: z.boolean().default(false).optional()
+    .describe('Return full description without truncation (default: false for token efficiency)')
 });
 
 export type ListProjectsInput = z.infer<typeof listProjectsParams>;
@@ -115,13 +153,44 @@ export const listProjectsOutput = z.object({
     updatedAt: z.string()
   })),
   totalProjects: z.number(),
-  nextOffset: z.string().optional()
+  nextOffset: z.string().optional(),
+  estimatedTokens: z.number()
 });
 
 export type ListProjectsOutput = z.infer<typeof listProjectsOutput>;
 
 /**
- * List projects from Linear using MCP wrapper
+ * GraphQL response type
+ */
+interface ProjectsResponse {
+  projects: {
+    nodes: Array<{
+      id: string;
+      name: string;
+      description?: string | null;
+      state?: {
+        id: string;
+        name: string;
+        type: string;
+      } | null;
+      lead?: {
+        id: string;
+        name: string;
+      } | null;
+      startDate?: string | null;
+      targetDate?: string | null;
+      createdAt: string;
+      updatedAt: string;
+    }>;
+    pageInfo?: {
+      hasNextPage?: boolean;
+      endCursor?: string | null;
+    } | null;
+  };
+}
+
+/**
+ * List projects from Linear using GraphQL API
  *
  * @example
  * ```typescript
@@ -135,6 +204,9 @@ export type ListProjectsOutput = z.infer<typeof listProjectsOutput>;
  *
  * // Search projects
  * const searchResults = await listProjects.execute({ query: 'Q2 2025' });
+ *
+ * // With test token
+ * const projects2 = await listProjects.execute({}, 'Bearer test-token');
  * ```
  */
 export const listProjects = {
@@ -142,43 +214,68 @@ export const listProjects = {
   description: 'List projects from Linear workspace',
   parameters: listProjectsParams,
 
-  async execute(input: ListProjectsInput): Promise<ListProjectsOutput> {
+  async execute(
+    input: ListProjectsInput,
+    testToken?: string
+  ): Promise<ListProjectsOutput> {
     // Validate input
     const validated = listProjectsParams.parse(input);
 
-    // Call MCP tool
-    const rawData = await callMCPTool(
-      'linear',
-      'list_projects',
-      validated
+    // Create client (with optional test token)
+    const client = await createLinearClient(testToken);
+
+    // Build GraphQL variables
+    const variables: Record<string, unknown> = {};
+
+    if (validated.limit !== undefined) {
+      variables.first = validated.limit;
+    }
+    if (validated.includeArchived !== undefined) {
+      variables.includeArchived = validated.includeArchived;
+    }
+    if (validated.orderBy !== undefined) {
+      variables.orderBy = validated.orderBy;
+    }
+
+    // Execute GraphQL query
+    const response = await executeGraphQL<ProjectsResponse>(
+      client,
+      LIST_PROJECTS_QUERY,
+      variables
     );
 
-    // callMCPTool already parses JSON from MCP response
-    // Linear returns { content: [{project1}, {project2}, ...] }
-    const projects = rawData.content || rawData.projects || (Array.isArray(rawData) ? rawData : []);
+    // Extract projects array (handle null/undefined)
+    const projects = response.projects?.nodes || [];
 
     // Filter to essential fields
-    const filtered = {
-      projects: projects.map((project: any) => ({
+    const baseData = {
+      projects: projects.map((project) => ({
         id: project.id,
         name: project.name,
-        description: project.description?.substring(0, 200), // Truncate for token efficiency
+        description: validated.fullDescription
+          ? project.description || undefined
+          : project.description?.substring(0, 200) || undefined, // Truncate for token efficiency when fullDescription is false
         state: project.state ? {
           id: project.state.id,
           name: project.state.name,
           type: project.state.type
         } : undefined,
-        lead: (project.lead && project.lead.id) ? {
+        lead: project.lead ? {
           id: project.lead.id,
           name: project.lead.name
         } : undefined,
-        startDate: project.startDate,
-        targetDate: project.targetDate,
+        startDate: project.startDate || undefined,
+        targetDate: project.targetDate || undefined,
         createdAt: project.createdAt,
         updatedAt: project.updatedAt
       })),
       totalProjects: projects.length,
-      nextOffset: (rawData as any).nextOffset
+      nextOffset: response.projects?.pageInfo?.endCursor || undefined
+    };
+
+    const filtered = {
+      ...baseData,
+      estimatedTokens: estimateTokens(baseData)
     };
 
     // Validate output

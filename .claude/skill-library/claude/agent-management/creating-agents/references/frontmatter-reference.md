@@ -296,10 +296,10 @@ description: Use when developing Python applications - CLI tools, pytest
 - Reason: Mechanical tasks (CDK patterns, resource configuration)
 - Benefit: Faster execution, sufficient reasoning for patterns
 
-**Pattern analysis** (code-pattern-analyzer):
+**Pattern analysis** (use native Explore agent):
 
-- Reason: Pattern matching, not complex reasoning
-- Benefit: Faster iterative refinement
+- Reason: Native Explore agent handles codebase discovery
+- Benefit: Built-in tooling optimized for exploration
 
 **Benefit**: Faster execution for tasks that don't benefit from Opus-level reasoning.
 

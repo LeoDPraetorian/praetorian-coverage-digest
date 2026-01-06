@@ -7,7 +7,7 @@ Reference file for fixing-agents - complete examples of fix workflows.
 ## Example 1: Auto-Fix Block Scalar
 
 ```
-User: "Fix the block scalar in react-developer"
+User: "Fix the block scalar in frontend-developer"
 
 You:
 1. Run audit:
@@ -17,7 +17,7 @@ You:
    ❌ Block scalar pipe detected (line 5)
 
 2. Read agent file:
-   Read .claude/agents/development/react-developer.md
+   Read .claude/agents/development/frontend-developer.md
 
    Found:
    description: |
@@ -37,7 +37,7 @@ You:
    ✅ Critical audit passed
 
 6. Report:
-   "✅ Fixed block scalar in react-developer
+   "✅ Fixed block scalar in frontend-developer
 
     Changed:
       description: | → single-line format
@@ -52,24 +52,24 @@ You:
 ## Example 2: Auto-Fix Name Mismatch
 
 ```
-User: "Fix name mismatch in go-developer"
+User: "Fix name mismatch in backend-developer"
 
 You:
 1. Run audit:
    skill: "auditing-agents"
 
    Result:
-   ❌ Name mismatch: frontmatter="golang-dev", filename="go-developer"
+   ❌ Name mismatch: frontmatter="backend-dev", filename="backend-developer"
 
 2. Read agent file:
-   Read .claude/agents/development/go-developer.md
+   Read .claude/agents/development/backend-developer.md
 
    Found:
-   name: golang-dev  # Line 3
+   name: backend-dev  # Line 3
 
 3. Update frontmatter:
-   Edit(old: "name: golang-dev",
-        new: "name: go-developer")
+   Edit(old: "name: backend-dev",
+        new: "name: backend-developer")
 
 4. Re-audit:
    skill: "auditing-agents"
@@ -78,10 +78,10 @@ You:
    ✅ Critical audit passed
 
 5. Report:
-   "✅ Fixed name mismatch in go-developer
+   "✅ Fixed name mismatch in backend-developer
 
     Changed:
-      name: golang-dev → go-developer
+      name: backend-dev → backend-developer
 
     Verification:
       Re-audit passed ✅"
@@ -255,7 +255,7 @@ You:
 ### Scenario 1: Batch Fix All Auto-Fixable
 
 ```
-User: "Fix everything you can automatically in react-developer"
+User: "Fix everything you can automatically in frontend-developer"
 
 You:
 1. Audit → get issues
@@ -268,7 +268,7 @@ You:
 ### Scenario 2: Preview Before Applying
 
 ```
-User: "Show me what would be fixed in react-developer"
+User: "Show me what would be fixed in frontend-developer"
 
 You:
 1. Audit → get issues
@@ -284,7 +284,7 @@ You:
 ### Scenario 3: Fix Only Specific Issue
 
 ```
-User: "Fix only the block scalar in react-developer, leave other issues"
+User: "Fix only the block scalar in frontend-developer, leave other issues"
 
 You:
 1. Audit → get all issues
@@ -313,7 +313,7 @@ Re-audit → Verifies success
 **Example:**
 
 ```
-User: "Audit and fix react-developer"
+User: "Audit and fix frontend-developer"
 
 You:
 1. skill: "auditing-agents"

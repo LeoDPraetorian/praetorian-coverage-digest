@@ -1,5 +1,46 @@
 # enforcing-go-capability-architecture Changelog
 
+## 2026-01-04 - Audit Error - Reverted Incorrect Fix
+
+**Audit Error**: Phase 10 audit incorrectly flagged references to `designing-go-interfaces` skill as non-existent
+- Skill exists at `.claude/skill-library/development/backend/designing-go-interfaces/SKILL.md`
+- Initial search was flawed (searched for directories only, not SKILL.md frontmatter)
+- Incorrectly removed valid cross-references at lines 109, 158, 282
+
+**Revert Applied**: Restored original file from backup `.local/2026-01-04-17-57-49-pre-fix.bak`
+
+**Lesson**: When Phase 10 flags missing skill references, must search both:
+1. Directory names: `find .claude -type d -name "*skill-name*"`
+2. SKILL.md frontmatter: `find .claude -type f -name "SKILL.md" -exec grep -l "^name: skill-name" {} \;`
+
+**Current Status**: Skill passes Phase 10 - all references to `designing-go-interfaces` are valid
+
+## 2026-01-01 - Cross-Reference to designing-go-interfaces Skill
+
+**RED Phase (Gap Identified)**:
+- Problem: Skill provided interface design guidance but lacked cross-reference to comprehensive `designing-go-interfaces` skill
+- Without guidance: Developers might miss Dave Cheney's "accept interfaces, return structs" principle, small interface composition patterns, and detailed fat interface warnings
+- Gap: Need explicit pointers to the interface design skill for comprehensive guidance
+
+**GREEN Phase (Implementation)**:
+- Updated "Interface Design" section (lines 97-116) with cross-reference to `designing-go-interfaces` skill
+- Added "Key principle from that skill" subsection explaining "accept interfaces, return structs" for capability libraries
+- Added "Mistake 4: Fat Interfaces" to "Common Mistakes" section with before/after examples
+- Updated "HTTP Client Standards" section with reference to `designing-go-interfaces` for generic interface design principles
+
+**Changes**:
+1. Interface Design section now includes:
+   - Link to `designing-go-interfaces` skill
+   - "Accept interfaces, return structs" principle with 3 bullet points
+   - Still references original interface-design.md reference file
+2. Common Mistakes section now includes:
+   - Mistake 4: Fat Interfaces with detailed guidance
+   - Code examples showing wrong (10+ methods) vs correct (composed small interfaces)
+   - Guidance from designing-go-interfaces: 1-3 methods ideal, 5 max
+3. HTTP Client Standards section includes reference to designing-go-interfaces
+
+**Impact**: Line count increased from 286 to ~335 lines (still under 500-line hard limit)
+
 ## 2025-12-30 - HTTP Client Standards Section Added
 
 **RED Phase (Gap Identified)**:

@@ -1,0 +1,78 @@
+## [2026-01-02] - Lean Agent Refactor
+
+### Changed
+- Reduced from 266 lines to 121 lines (54% reduction)
+- Removed hardcoded TypeScript skill paths table
+- Added `gateway-typescript` to skills frontmatter
+- Agents now load TypeScript patterns via gateway, not hardcoded paths
+- Simplified architecture output section (details in orchestrating-mcp-development)
+- Changed model from opus to sonnet (lean agents use sonnet)
+
+### Reason
+- Follow lean agent pattern per AGENT-ARCHITECTURE.md
+- Architecture agents target: <250 lines (was 266, now 121)
+- Delegate detailed patterns to gateways and skills
+
+---
+
+## [2026-01-02] - Initial Creation
+
+### Created
+- New mcp-tool-lead agent for designing MCP wrapper architecture
+- Modeled after frontend-lead agent structure
+- Integrated with orchestrating-mcp-development workflow (Phase 2)
+
+### Architecture
+- Type: architecture
+- Permission Mode: plan
+- Model: opus
+- Color: blue
+
+### Skills Integrated
+**Step 1 (Always Invoke):**
+- `calibrating-time-estimates` - Grounds effort estimates
+- `enforcing-evidence-based-analysis` - Prevents hallucinations
+- `semantic-code-operations` - Semantic code search
+- `gateway-mcp-tools` - Routes to MCP wrapper patterns
+- `persisting-agent-outputs` - File output protocol
+- `brainstorming` - Explore alternatives
+- `writing-plans` - Document decisions
+- `verifying-before-completion` - Final verification
+
+**Step 2 (TypeScript Library Skills):**
+- `designing-progressive-loading-wrappers` - Token optimization
+- `optimizing-llm-api-responses` - Response filtering
+- `implementing-result-either-pattern` - Error handling
+- `validating-with-zod-schemas` - Input validation
+- `implementing-retry-with-backoff` - Resilience
+- `sanitizing-inputs-securely` - Security
+- `structuring-hexagonal-typescript` - Structure
+
+**Step 3 (Context-Based):**
+- `adhering-to-dry` - Duplication concerns
+- `adhering-to-yagni` - Scope creep detection
+- `debugging-systematically` - Root cause analysis
+- `using-todowrite` - Task tracking
+
+### Architecture Output Structure
+1. Token Optimization Strategy (80-99% reduction target)
+2. Response Filtering Rules (keep/drop/conditional fields)
+3. Error Handling Pattern (Result type vs exceptions)
+4. Zod Schema Design (InputSchema + OutputSchema)
+5. Security Validation Layers
+6. Implementation Checklist
+
+### Integration Points
+- Input: schema-discovery.md from Phase 1
+- Output: architecture.md
+- Parallel: Runs with security-lead in Phase 2
+- Next: Returns to orchestrator for Phase 3 (test planning)
+
+### Reason
+- orchestrating-mcp-development skill requires dedicated architect agent
+- Provides consistent architecture design across MCP wrappers
+- Creates contract that implementation follows and reviewer validates
+
+### Verification
+- GREEN: Agent created and structured
+- Compliance: Follows frontend-lead pattern

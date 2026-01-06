@@ -44,10 +44,48 @@ Multi-phase orchestration involves coordinating multiple agents across sequentia
 
 **Delegate directly when:**
 
-- Simple single-agent task (bug fix, add one component)
+- Simple single-agent task (bug fix, add one component) - see Effort Scaling tiers
 - Pure architecture question → architect agent directly
 - Pure implementation → developer agent directly
 - Pure testing → test engineer directly
+- Task complexity is 'Simple' tier (3-10 tool calls expected)
+
+## Effort Scaling
+
+Match agent count to task complexity. Multi-agent systems use ~15x more tokens than single-agent chat—ensure the complexity justifies the cost.
+
+### Scaling Tiers
+
+| Complexity   | Agents           | Tool Calls               | Examples                                            |
+| ------------ | ---------------- | ------------------------ | --------------------------------------------------- |
+| **Simple**   | 1 agent directly | 3-10 calls               | Bug fix, add prop, typo fix, single component       |
+| **Moderate** | 2-4 agents       | 10-15 each               | Compare approaches, implement + test one feature    |
+| **Complex**  | 5-10 agents      | Divided responsibilities | Full feature with architecture, impl, review, tests |
+| **Major**    | 10+ agents       | Parallel phases          | Cross-cutting refactor, new subsystem               |
+
+### Decision Checklist
+
+Before spawning multiple agents, ask:
+
+1. **Can one agent complete this?** If yes, delegate directly (skip orchestrator)
+2. **Are the subtasks truly independent?** If no, sequential/manual is better
+3. **Does complexity justify 15x token cost?** Simple tasks don't need orchestration
+4. **Would parallel execution save significant time?** If tasks are serial anyway, single agent may be better
+
+### Interdependent Task Warning
+
+Multi-agent systems are LESS effective for tightly interdependent tasks. Signs to watch for:
+
+- Each step requires output from previous step (can't parallelize)
+- Shared state that agents would conflict on
+- Tight coupling where one change affects multiple areas
+- Iterative refinement cycles (review → fix → review)
+
+For interdependent work, prefer:
+
+- Single agent with TodoWrite tracking
+- Sequential agent spawning with explicit handoffs
+- Manual orchestration with human checkpoints
 
 ## Quick Reference
 
@@ -156,10 +194,44 @@ If testing phase reveals 3+ independent failures across different files, use the
 When an agent returns:
 
 1. **Check status**: `complete`, `blocked`, or `needs_review`
-2. **If blocked**: Address blocker or escalate to user
+2. **If blocked**: Use the routing table below to determine next agent
 3. **If needs_review**: Evaluate and decide next step
 4. **If complete**: Mark todo complete, proceed to next phase
 5. **Capture handoff context**: Agent may recommend follow-up actions
+
+### Agent Routing Table
+
+When an agent returns `blocked`, use this table to determine the next agent:
+
+| Agent Type   | Blocked Reason                | Next Agent                        |
+| ------------ | ----------------------------- | --------------------------------- |
+| \*-developer | Security concern              | \*-security                       |
+| \*-developer | Architecture decision needed  | \*-lead                           |
+| \*-developer | Test failures persist         | \*-tester                         |
+| \*-tester    | Missing test plan             | test-lead                         |
+| \*-tester    | Coverage requirements unclear | test-lead                         |
+| \*-reviewer  | Implementation unclear        | \*-developer (with clarification) |
+| \*-security  | Requires architecture changes | \*-lead                           |
+| \*-lead      | Cross-domain coordination     | appropriate orchestrator          |
+| Any agent    | Unknown/complex blocker       | Ask user via AskUserQuestion      |
+
+**Pattern matching**: Replace `*` with the domain prefix (e.g., `frontend-developer` → `frontend-security`).
+
+### Structured Blocked Response Format
+
+Agents should return this structure when blocked:
+
+```json
+{
+  "status": "blocked",
+  "blocked_reason": "security_concern|architecture_decision|test_failures|missing_requirements|unknown",
+  "context": "Description of the specific blocker",
+  "attempted": ["What the agent tried before giving up"],
+  "recommendation": "Optional hint, but orchestrator makes final routing decision"
+}
+```
+
+The orchestrator uses `blocked_reason` to look up the routing table and spawn the appropriate next agent. Agents should NOT include routing logic in their definitions—that responsibility belongs exclusively to the orchestrator.
 
 ### Conflict Detection
 
@@ -228,18 +300,27 @@ Return orchestration results as:
 
 ## Escalation Protocol
 
+> **Note**: This skill is the single source of truth for all escalation routing logic. Individual agents do NOT contain escalation routing logic. Agents return structured status with blocked reasons (see [Structured Blocked Response Format](#structured-blocked-response-format)), and orchestrators use this skill to determine next steps. This maintains separation of concerns and prevents routing logic from being scattered across 29+ agent definitions.
+
 **Stop and escalate to user if:**
 
 - Architecture decision has major trade-offs requiring user input
 - Agent is blocked by missing requirements
 - Multiple agents return conflicting recommendations
 - Task scope significantly larger than initially understood
+- Agent returns `blocked_reason: "unknown"` (routing table has no match)
 
-**Escalate to different orchestrator if:**
+**Escalate to user if:**
 
-- Task requires different domain (frontend ↔ backend)
-- Task requires full-stack coordination (use both orchestrators)
-- Task is pure research/exploration (use specialist directly)
+- Task requires cross-domain coordination (frontend ↔ backend)
+- Task requires full-stack coordination (user should decide approach)
+- Task is pure research/exploration (use research skill or specialist directly)
+
+**Spawn next agent (do NOT escalate) if:**
+
+- Agent returns with recognized `blocked_reason` that maps to the [Agent Routing Table](#agent-routing-table)
+- The blocker is within the current domain (e.g., frontend-developer blocked → route to frontend-security)
+- No user decision is required
 
 ## Anti-Patterns
 
@@ -249,6 +330,8 @@ Return orchestration results as:
 4. **Scope creep**: Keep each agent focused on their specialty
 5. **Skipping progress tracking**: Always use TodoWrite for multi-phase work
 6. **Implementing yourself**: Orchestrators coordinate, they don't code
+7. **Ignoring token cost**: Multi-agent uses 15x more tokens—don't orchestrate simple tasks
+8. **Parallelizing interdependent work**: Serial tasks should stay serial, don't force parallel
 
 ## Related Skills
 

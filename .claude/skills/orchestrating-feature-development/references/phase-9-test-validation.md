@@ -38,7 +38,7 @@ Task(
 
 FEATURE: {feature-name}
 
-TEST PLAN LOCATION: .claude/features/{id}/test-plan.md
+TEST PLAN LOCATION: .claude/.output/features/{id}/test-plan.md
 
 TEST IMPLEMENTATION:
 Unit: {from test-summary-unit.md}
@@ -67,7 +67,7 @@ VALIDATION TASKS:
    - Assertions quality - Meaningful assertions?
 
 DELIVERABLE:
-Save validation to: .claude/features/{id}/test-validation.md
+Save validation to: .claude/.output/features/{id}/test-validation.md
 
 Return JSON:
 {
@@ -159,7 +159,7 @@ If `verdict: "FAIL"` or coverage targets not met or plan adherence issues:
      description: "Fix test validation issues for {feature-name}",
      prompt: "Fix the following test validation issues:
 
-   TEST PLAN: .claude/features/{id}/test-plan.md
+   TEST PLAN: .claude/.output/features/{id}/test-plan.md
 
    VALIDATION FEEDBACK:
    {compiled from test-validation.md}
@@ -226,7 +226,7 @@ AskUserQuestion({
       "retry_count": 0,
       "agents_used": ["test-lead"],
       "outputs": {
-        "validation": ".claude/features/{id}/test-validation.md"
+        "validation": ".claude/.output/features/{id}/test-validation.md"
       },
       "plan_adherence": {
         "tests_required": 28,
@@ -362,13 +362,13 @@ AskUserQuestion({
 
 ## Validation vs Planning
 
-| Phase 7 (Planning) | Phase 9 (Validation) |
-| ------------------ | -------------------- |
-| test-lead CREATES plan | test-lead VALIDATES against plan |
-| Defines what tests are needed | Verifies tests were implemented |
-| Sets coverage targets | Checks coverage achieved |
-| Lists anti-patterns to avoid | Confirms anti-patterns avoided |
-| Output: test-plan.md | Output: test-validation.md |
+| Phase 7 (Planning)            | Phase 9 (Validation)             |
+| ----------------------------- | -------------------------------- |
+| test-lead CREATES plan        | test-lead VALIDATES against plan |
+| Defines what tests are needed | Verifies tests were implemented  |
+| Sets coverage targets         | Checks coverage achieved         |
+| Lists anti-patterns to avoid  | Confirms anti-patterns avoided   |
+| Output: test-plan.md          | Output: test-validation.md       |
 
 ## Related References
 

@@ -1,0 +1,33 @@
+# CHANGELOG
+
+## [Date: 2026-01-04] - Initial Creation
+
+### Created
+
+- Skill created via creating-skills workflow
+- RED failure documented: Claude provides generic cloud integration advice that doesn't account for OCI-specific authentication (API signing, instance principals), SDK patterns, and architectural differences from AWS/Azure/GCP
+- Category: development/integrations
+- Type: integration
+
+### Research Completed
+
+- Comprehensive research conducted via orchestrating-research skill
+- 3 interpretations researched: Authentication patterns, SDK integration, Service patterns
+- Sources: GitHub, Context7 (official docs), Perplexity, Classic Web
+- Research synthesis saved to: `.claude/.output/research/2026-01-04-210219-oracle-cloud-integration/`
+- Content incorporated: SKILL.md populated with authentication, SDK patterns, service examples
+- References created: authentication.md with detailed auth patterns
+
+### Gateway Integration
+
+- Added to gateway-integrations routing table
+- Triggers: OCI, Oracle Cloud, Oracle
+- Discoverable via intent detection
+
+### Verification
+
+- GREEN phase: Skill addresses original RED failure - provides OCI-specific patterns vs generic cloud advice
+- Skill structure: SKILL.md (468 lines), references/authentication.md (comprehensive)
+- Gateway routing: Integrated into gateway-integrations
+- Audit: PASSED (all phases complete)
+- Pressure tests: PENDING (Phase 9)

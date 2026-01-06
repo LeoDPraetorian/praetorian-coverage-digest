@@ -15,16 +15,19 @@ Go Test → Python Harness CLI → Python Implementation → JSON Output → Go 
 ### Subcommands
 
 **generator**:
+
 ```bash
 python harness.py generator <name> --prompt <text> --generations <n>
 ```
 
 **detector**:
+
 ```bash
 python harness.py detector <name> --attempt '{"prompt":"x","outputs":["y"]}'
 ```
 
 **probe**:
+
 ```bash
 python harness.py probe <name> [--generator <gen>]
 ```
@@ -32,12 +35,15 @@ python harness.py probe <name> [--generator <gen>]
 ### JSON Output Format
 
 All commands return this structure:
+
 ```json
 {
   "success": true,
   "capability_type": "generator|detector|probe",
   "capability_name": "test.Blank",
-  "output": { /* capability-specific */ },
+  "output": {
+    /* capability-specific */
+  },
   "error": null
 }
 ```
@@ -84,6 +90,7 @@ pytest tests/ -v  # Should have 30-40 tests
 ```
 
 Test categories:
+
 - Each runner (generator/detector/probe): 10 tests each
 - CLI integration: 9 tests
 - Error handling: edge cases

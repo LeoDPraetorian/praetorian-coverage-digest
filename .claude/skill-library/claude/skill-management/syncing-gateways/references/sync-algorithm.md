@@ -59,24 +59,24 @@ For each skill, determine gateway using mapping rules (see gateway-mapping.md):
 For each gateway (e.g., `gateway-frontend`):
 
 1. Read `.claude/skills/gateway-frontend/SKILL.md`
-2. Find routing table section (starts with `| Skill | Path |`)
+2. Find Skill Registry section (starts with `| Skill | Path | Triggers |`)
 3. Parse table rows to extract entries
 
 **Example parsing:**
 
 ```markdown
-| Skill          | Path                                                                                   |
-| -------------- | -------------------------------------------------------------------------------------- |
-| TanStack Query | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          |
-| React Patterns | `.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md` |
+| Skill          | Path                                                                                   | Triggers               |
+| -------------- | -------------------------------------------------------------------------------------- | ---------------------- |
+| TanStack Query | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          | TanStack, cache, fetch |
+| React Patterns | `.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md` | component, hook        |
 ```
 
 **Data structure after parsing:**
 
 ```javascript
 {
-  "TanStack Query": ".claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md",
-  "React Patterns": ".claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md"
+  "TanStack Query": { path: ".claude/skill-library/...", triggers: "TanStack, cache, fetch" },
+  "React Patterns": { path: ".claude/skill-library/...", triggers: "component, hook" }
 }
 ```
 
@@ -174,14 +174,14 @@ New table (sorted):
 
 ### Step 3.2: Format Table Rows
 
-Convert data structure to markdown table format:
+Convert data structure to markdown Skill Registry table format:
 
 ```markdown
-| Skill                | Path                                                                                   |
-| -------------------- | -------------------------------------------------------------------------------------- |
-| Frontend Performance | `.claude/skill-library/development/frontend/performance/frontend-performance/SKILL.md` |
-| React Patterns       | `.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md` |
-| TanStack Query       | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          |
+| Skill                | Path                                                                                   | Triggers               |
+| -------------------- | -------------------------------------------------------------------------------------- | ---------------------- |
+| Frontend Performance | `.claude/skill-library/development/frontend/performance/frontend-performance/SKILL.md` | optimize, slow, render |
+| React Patterns       | `.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md` | component, hook        |
+| TanStack Query       | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          | TanStack, cache, fetch |
 ```
 
 ### Step 3.3: Apply Edit
@@ -191,20 +191,20 @@ Use Edit tool to replace old table with new table:
 **old_string:**
 
 ```markdown
-| Skill          | Path                                                                                   |
-| -------------- | -------------------------------------------------------------------------------------- |
-| React Patterns | `.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md` |
-| TanStack Query | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          |
+| Skill          | Path                                                                                   | Triggers               |
+| -------------- | -------------------------------------------------------------------------------------- | ---------------------- |
+| React Patterns | `.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md` | component, hook        |
+| TanStack Query | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          | TanStack, cache, fetch |
 ```
 
 **new_string:**
 
 ```markdown
-| Skill                | Path                                                                                   |
-| -------------------- | -------------------------------------------------------------------------------------- |
-| Frontend Performance | `.claude/skill-library/development/frontend/performance/frontend-performance/SKILL.md` |
-| React Patterns       | `.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md` |
-| TanStack Query       | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          |
+| Skill                | Path                                                                                   | Triggers               |
+| -------------------- | -------------------------------------------------------------------------------------- | ---------------------- |
+| Frontend Performance | `.claude/skill-library/development/frontend/performance/frontend-performance/SKILL.md` | optimize, slow, render |
+| React Patterns       | `.claude/skill-library/development/frontend/patterns/frontend-react-patterns/SKILL.md` | component, hook        |
+| TanStack Query       | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          | TanStack, cache, fetch |
 ```
 
 ### Step 3.4: Verify Edit

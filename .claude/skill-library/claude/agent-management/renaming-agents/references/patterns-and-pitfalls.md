@@ -52,7 +52,7 @@ Grep pattern: "\\bfrontend-developer\\b"
 ```bash
 # Searching for "test" finds:
 - test-engineer ✅ (want to rename this)
-- testing-agent-skills ✗ (don't want to change)
+- verifying-agent-skill-invocation ✗ (don't want to change)
 - backend-tester ✗ (don't want to change)
 ```
 

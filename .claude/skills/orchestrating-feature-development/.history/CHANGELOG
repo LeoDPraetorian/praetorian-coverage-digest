@@ -2,6 +2,149 @@
 
 All notable changes to the orchestrating-feature-development skill will be documented in this file.
 
+## [Date: 2026-01-06]
+
+### Added - Skill Composition Patterns (MAJOR ARCHITECTURE UPDATE)
+
+Based on analysis of [obra/superpowers](https://github.com/obra/superpowers), implemented explicit skill chaining patterns.
+
+#### REQUIRED SUB-SKILL Directives
+- Added `**REQUIRED SUB-SKILL:**` inline directives to each phase in workflow diagram
+- Added summary table of required and conditional sub-skills at top of workflow section
+- Each phase now explicitly declares which skills must be invoked
+
+#### Integration Section (replaces Related Skills)
+- **Called By**: Documents what invokes this skill (/feature command)
+- **Requires**: Skills that must be invoked before/at start (persisting-agent-outputs, orchestrating-multi-agent-workflows)
+- **Calls**: Skills invoked during execution (brainstorming, writing-plans, finishing-a-development-branch)
+- **Conditional**: Skills triggered by complexity (developing-with-subagents, persisting-progress-across-sessions, dispatching-parallel-agents)
+- **Agent Skills**: Skills embedded in prompt templates for subagents
+- **Alternative Workflows**: When to use executing-plans vs developing-with-subagents
+
+#### Prompt Templates (NEW)
+Created `references/prompts/` directory with 6 prompt templates:
+- `explore-prompt.md` - Phase 2 Discovery agents
+- `architect-prompt.md` - Phase 4 Lead agents
+- `developer-prompt.md` - Phase 5 Implementation agents
+- `reviewer-prompt.md` - Phase 6 Review agents (two-stage: spec compliance + code quality)
+- `test-lead-prompt.md` - Phase 7 and 9 Test Lead
+- `tester-prompt.md` - Phase 8 Tester agents
+
+Each template includes:
+- MANDATORY SKILLS list embedded in prompt
+- OUTPUT_DIRECTORY placeholder
+- Structured output format with metadata JSON
+- Blocked status handling with blocked_reason
+
+#### Two-Stage Review Pattern
+- Phase 6 now has explicit two-stage review following obra pattern:
+  1. **Spec Compliance Review** - Does code match plan? (must pass first)
+  2. **Code Quality Review** - Is code well-built? (only after spec compliance passes)
+
+#### /feature Command
+- Simplified to thin wrapper: "Invoke the skill and follow it exactly"
+- Updated description to reflect 10 phases
+
+### Changed
+- **Workflow diagram**: Enhanced with REQUIRED SUB-SKILL and PROMPT TEMPLATE references
+- **Phase 6 gate checklist**: Added spec compliance confirmation before code quality
+- **Related Skills section**: Replaced with comprehensive Integration section
+
+### Technical Details
+- SKILL.md: Updated workflow section with skill composition patterns
+- 6 new files in references/prompts/ (~200 lines each)
+- /feature command simplified to 9 lines
+
+### Reason
+- **Gap Identified**: Skills listed in agent `skills:` field but not reliably invoked
+- **Gap Identified**: Orchestrator doesn't control subagent context
+- **Gap Identified**: Missing spec compliance validation before code quality review
+- **Solution**: Adopt obra/superpowers patterns - explicit REQUIRED SUB-SKILL directives, Integration sections, prompt templates with mandatory skills embedded
+
+### Related Architecture Documentation
+- `.claude/docs/orchestration/MULTI-AGENT-ORCHESTRATION-ARCHITECTURE.md` - Updated with Skill Composition Patterns section
+
+---
+
+## [Date: 2026-01-05]
+
+### Added - Rationalization Prevention (MAJOR WORKFLOW ENHANCEMENT)
+- **New Section: Rationalization Prevention** - Added after "Critical Rules" with references to shared prevention patterns
+- **New File: references/rationalization-table.md** - Domain-specific rationalization table with phase-by-phase denial patterns
+- **Gate Checklists Added** - Explicit gate checklists for phases 1, 3, 4, 6, and 9 with human checkpoints
+- **Updated Exit Criteria** - Added three new criteria for rationalization detection and gate checklist compliance
+
+### Changed
+- **Phase 1 Gate**: Added checklist with design.md existence, user requirement capture, edge case identification, human approval
+- **Phase 3 Gate**: Added checklist with plan.md steps, file paths, code examples, dependencies, human approval
+- **Phase 4 Gate**: Added checklist with architecture artifacts, security assessment, tech debt analysis, registry update, human approval
+- **Phase 6 Gate**: Added checklist with reviewer approval status, retry limit (max 1), escalation requirement
+- **Phase 9 Gate**: Added checklist with test-lead validation, quality score threshold (≥70), retry limit, escalation requirement
+
+### Rationalization Prevention Details
+- **Statistical Evidence**: References shared data (technical debt ~10% fix rate, 'later' ~5% completion)
+- **Phrase Detection**: Links to pattern detection ('close enough', 'just this once', 'I'll fix it later')
+- **Override Protocol**: Requires AskUserQuestion with explicit risk disclosure
+- **10 Phase-Specific Tables**: Covers all phases from Brainstorming through Completion
+- **Cross-Phase Patterns**: Includes rationalizations that span multiple phases
+
+### Technical Details
+- SKILL.md: Updated from 354 lines to 403 lines (under 500-line limit ✅)
+- New file: references/rationalization-table.md (88 lines)
+- Workflow diagram enhanced with gate checklists embedded in phase boxes
+- Exit criteria expanded from 9 items to 12 items
+
+### Reason
+- **RED Failure**: Agents were able to rationalize skipping critical phases without explicit detection or enforcement
+- **Missing Gates**: No explicit checklist requirements before proceeding from human checkpoint phases
+- **Implicit Standards**: Exit criteria lacked explicit rationalization and gate checklist verification
+- **Solution**: Add comprehensive rationalization prevention with phase-specific denial patterns and explicit gate checklists
+
+### Related Skills
+- `using-skills` - Shared rationalization prevention reference material
+- `persisting-agent-outputs` - Agent output format compliance
+- `orchestrating-multi-agent-workflows` - Agent routing and workflow patterns
+
+---
+
+## [Date: 2026-01-04]
+
+### Changed - Centralized Handoff Format (DOCUMENTATION REFACTOR)
+- **Standardized output format**: All agents must now follow `persisting-agent-outputs` skill for handoff structure
+- **Removed duplicate format definition**: references/agent-handoffs.md now references centralized format instead of defining its own
+- **Updated field names**: `recommended_agent` → `next_agent` to match centralized format
+- **Added orchestrator routing**: When `status: blocked`, agents set `next_agent: null` and orchestrator uses `orchestrating-multi-agent-workflows` routing table based on `blocked_reason`
+
+### Added
+- **New required fields for blocked status**:
+  - `blocked_reason`: Category for routing table lookup (security_concern, architecture_decision, missing_requirements, test_failures, out_of_scope, unknown)
+  - `attempted`: Array documenting what agent tried before blocking
+- **Cross-references**: Added `persisting-agent-outputs` and `orchestrating-multi-agent-workflows` to Related Skills section
+
+### Updated Examples
+- **Standard Handoff Format**: Now references `persisting-agent-outputs` with key rules for blocked vs complete status
+- **Field Descriptions**: References `persisting-agent-outputs/references/metadata-format.md` for complete definitions
+- **Blocked Handoff Example**: Updated to match centralized format with `blocked_reason` and `attempted` fields
+- **handoff.next_agent section**: Explains orchestrator-based routing pattern
+
+### Reason
+- **RED Failure**: orchestrating-feature-development had duplicate handoff format definition that conflicted with centralized `persisting-agent-outputs` skill
+- **Routing Contradiction**: Used `recommended_agent` field contradicting "orchestrator decides routing" principle from `orchestrating-multi-agent-workflows`
+- **Missing Routing Fields**: Lacked `blocked_reason` and `attempted` fields needed for routing table lookup
+- **Solution**: Centralize to single source of truth (`persisting-agent-outputs`) and enforce orchestrator-based routing when blocked
+
+### Technical Details
+- SKILL.md: Updated from 355 lines to 354 lines (under 500-line limit ✅)
+- references/agent-handoffs.md: Updated from 347 lines to 365 lines (under 500-line limit ✅)
+- All `recommended_agent` references replaced with `next_agent` pattern
+- Zero grep matches for `recommended_agent` after update
+
+### Related Skills
+- `persisting-agent-outputs` - Single source of truth for agent output format
+- `orchestrating-multi-agent-workflows` - Agent routing table for blocked status handling
+
+---
+
 ## [Date: 2025-12-30]
 
 ### Added - Phase 2: Discovery (MAJOR WORKFLOW ADDITION)
@@ -97,7 +240,7 @@ All notable changes to the orchestrating-feature-development skill will be docum
 - **Phase 7: Test Assessment (NEW)** - Quality gate using test-lead with feedback loop (MAX 1 RETRY)
 - **Feedback Loop Pattern**: MAX 1 RETRY then escalate to user (no infinite loops)
 - **Parallel Execution Rules**: MANDATORY for independent agents in single Task message
-- **Feature Directory Structure**: Centralized outputs to `.claude/features/YYYY-MM-DD-{name}/`
+- **Feature Directory Structure**: Centralized outputs to `.claude/.output/features/YYYY-MM-DD-{name}/`
 
 ### New Reference Files
 - `references/phase-5-code-review.md` - Parallel reviewers + feedback loop workflow
@@ -215,3 +358,39 @@ Consider adding explicit counter in Step 8: "CRITICAL: This step is MANDATORY re
 **Test Plan Output**:
 - test-plan.md with coverage targets, required tests, security test cases, acceptance criteria tests, anti-patterns to avoid
 
+
+## [2026-01-06] Explicit Spawns Section Update
+
+### Changes Applied
+
+Added explicit "Spawns (agent-dispatch via Task tool)" section to Integration:
+
+| Agent | Phase | Key Mandatory Skills |
+|-------|-------|---------------------|
+| `Explore` ×2 | Phase 2 | discovering-reusable-code |
+| `frontend-lead` + `security-lead` | Phase 4 | adhering-to-dry, adhering-to-yagni |
+| `frontend-developer` | Phase 5 | developing-with-tdd, verifying-before-completion |
+| `frontend-reviewer` + `frontend-security` | Phase 6 | adhering-to-dry |
+| `test-lead` | Phase 7, 9 | - |
+| `frontend-tester` ×3 | Phase 8 | developing-with-tdd |
+
+All agents receive `persisting-agent-outputs` in prompt.
+
+### Why This Change
+
+Previously the Integration section only had "Calls (during execution)" which conflated:
+- Skills invoked via Skill tool (like brainstorming, writing-plans)
+- Agents spawned via Task tool (like frontend-developer)
+
+Now explicit:
+- **Calls** = skill-invocation via Skill tool
+- **Spawns** = agent-dispatch via Task tool with mandatory skills in prompt
+
+Also condensed Exit Criteria section to fit within 500-line limit after adding Spawns table.
+
+### Compliance
+
+- **Line Count**: 499/500 lines
+- Consistent with orchestrating-fingerprintx-development and orchestrating-capability-development patterns
+
+**Status**: Update complete

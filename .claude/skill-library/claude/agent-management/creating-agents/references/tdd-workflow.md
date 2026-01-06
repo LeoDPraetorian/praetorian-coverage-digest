@@ -542,7 +542,7 @@ Ensure agent resists rationalization when users apply pressure to cut corners.
 **Invoke methodology**:
 
 ```
-skill: "testing-skills-with-subagents"
+Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")
 ```
 
 **Read detailed guide**:
@@ -804,7 +804,7 @@ Final Status: {ALL PASS = Ready | Any FAIL = More iteration needed}
 
 **Cannot mark agent complete until**:
 
-- [ ] `testing-skills-with-subagents` skill invoked
+- [ ] `pressure-testing-skill-content` skill invoked
 - [ ] `pressure-testing.md` reference read
 - [ ] 3 pressure scenarios designed (time, authority, sunk cost)
 - [ ] 3 agents spawned (one per scenario, via Task tool)

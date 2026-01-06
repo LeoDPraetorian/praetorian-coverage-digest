@@ -18,11 +18,7 @@ Move skill to `.claude/skills/`
 - Becomes cross-cutting concern
 - Should be in session-start hook
 
-**Example:**
-
-```bash
-npm run migrate -- my-skill to-core
-```
+**Example:** Migrate my-skill to `.claude/skills/` core location.
 
 ### to-library:<category>
 
@@ -34,21 +30,13 @@ Move skill to `.claude/skill-library/<category>/`
 - Specialized use case
 - Not needed in most conversations
 
-**Example:**
-
-```bash
-npm run migrate -- my-skill to-library:development/frontend
-```
+**Example:** Migrate my-skill to `.claude/skill-library/development/frontend/`
 
 ### to-library:<domain>/<category>
 
 Move to nested library location
 
-**Example:**
-
-```bash
-npm run migrate -- neo4j-patterns to-library:databases/graph
-```
+**Example:** Migrate neo4j-patterns to `.claude/skill-library/databases/graph/`
 
 ## Migration Steps
 
@@ -160,11 +148,7 @@ Update any hardcoded paths.
 
 ### 4. Re-audit
 
-```bash
-npm run audit -- my-skill
-```
-
-Verify compliance after migration.
+Audit the skill by invoking auditing-skills to verify compliance after migration.
 
 ## Common Migration Scenarios
 
@@ -175,9 +159,7 @@ Verify compliance after migration.
 
 **Reason:** Usage increased to 85% of conversations
 
-```bash
-npm run migrate -- react-patterns to-core
-```
+**Action:** Use migrating-skills to move react-patterns to core location.
 
 ### Scenario 2: Demote to Library
 
@@ -186,9 +168,7 @@ npm run migrate -- react-patterns to-core
 
 **Reason:** Rarely used, specialized
 
-```bash
-npm run migrate -- obscure-pattern to-library:archived
-```
+**Action:** Use migrating-skills to move obscure-pattern to library archived category.
 
 ### Scenario 3: Reorganize Library
 
@@ -197,9 +177,7 @@ npm run migrate -- obscure-pattern to-library:archived
 
 **Reason:** Better categorization
 
-```bash
-npm run migrate -- neo4j-queries to-library:databases/graph
-```
+**Action:** Use migrating-skills to move neo4j-queries to databases/graph category.
 
 ## Safety Features
 

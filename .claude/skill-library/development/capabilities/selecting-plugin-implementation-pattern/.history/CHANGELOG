@@ -1,0 +1,38 @@
+# Changelog
+
+## 2026-01-06 - Initial Creation
+
+**RED Phase Documentation:**
+
+**Gap Identified**: Developers building security capabilities lack guidance on when to use YAML template-based detection (Nuclei templates, Augustus) versus Go plugin-based detection (fingerprintx, janus capabilities).
+
+**Test Scenario**: Developer needs to create admin panel detection capability - should they use YAML or Go?
+
+**Failure Without Skill**:
+- No systematic decision framework → arbitrary choice
+- Missing critical factors (maintainer persona, community contributions, iteration speed)
+- No awareness of hybrid approaches (JavaScript protocol, flow field)
+- Potential anti-patterns (over-engineering simple tasks, under-engineering complex ones)
+
+**Category**: development/capabilities (library skill)
+
+**Skill Type**: Process/Pattern (decision framework and routing skill)
+
+**Initial Implementation**:
+- Decision matrix comparing YAML vs Go across 7 criteria
+- Decision tree for systematic evaluation
+- Detailed criteria tables for both approaches
+- Hybrid approaches documentation (Nuclei v3 features)
+- Chariot-specific module guidance
+- Anti-patterns to avoid
+- Common scenario walkthroughs (5 examples)
+- Routes to implementing-yaml-template-engines or implementing-detection-plugins
+
+**Line Count**: 351 lines (within 300-450 ideal range)
+
+**Pressure Test Results** (Phase 9):
+- Test 1 (Time Pressure): ✅ PASSED - Correctly chose Go plugin (fingerprintx) for Redis protocol detection
+- Test 2 (Authority Pressure): ✅ PASSED - Correctly chose Go plugin (fingerprintx) for MongoDB protocol detection despite authority bias
+- Test 3 (Sunk Cost Pressure): ✅ PASSED - Correctly evaluated YAML (Nuclei v3) vs Go, chose YAML based on deadline + sufficiency (not sunk cost avoidance)
+
+All three tests demonstrated proper decision framework application under realistic pressure scenarios.

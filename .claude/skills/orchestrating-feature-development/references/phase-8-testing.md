@@ -28,9 +28,10 @@ All test types are independent and can run simultaneously:
 
 **CRITICAL:** All testers must follow the test plan created by test-lead in Phase 7.
 
-**PLAN LOCATION:** `.claude/features/{id}/test-plan.md`
+**PLAN LOCATION:** `.claude/.output/features/{id}/test-plan.md`
 
 The test plan specifies:
+
 - Coverage targets (Security: 95%, Business Logic: 80%, Integration: 90%)
 - Required test cases with rationale
 - Anti-patterns to avoid
@@ -65,7 +66,7 @@ Task(
 FEATURE: {feature-name}
 TEST MODE: unit
 
-PLAN LOCATION: .claude/features/{id}/test-plan.md
+PLAN LOCATION: .claude/.output/features/{id}/test-plan.md
 
 FILES TO TEST:
 {from implementation-log.md}
@@ -78,7 +79,7 @@ REQUIREMENTS:
 5. Use Vitest + React Testing Library
 6. Verify tests pass
 
-Save summary to: .claude/features/{id}/test-summary-unit.md
+Save summary to: .claude/.output/features/{id}/test-summary-unit.md
 
 Return JSON:
 {
@@ -100,7 +101,7 @@ Task(
 FEATURE: {feature-name}
 TEST MODE: integration
 
-PLAN LOCATION: .claude/features/{id}/test-plan.md
+PLAN LOCATION: .claude/.output/features/{id}/test-plan.md
 
 FILES TO TEST:
 {from implementation-log.md}
@@ -114,7 +115,7 @@ REQUIREMENTS:
 6. Avoid anti-patterns specified in plan
 7. Verify tests pass
 
-Save summary to: .claude/features/{id}/test-summary-integration.md
+Save summary to: .claude/.output/features/{id}/test-summary-integration.md
 
 Return JSON:
 {
@@ -135,7 +136,7 @@ Task(
 FEATURE: {feature-name}
 TEST MODE: e2e
 
-PLAN LOCATION: .claude/features/{id}/test-plan.md
+PLAN LOCATION: .claude/.output/features/{id}/test-plan.md
 
 USER WORKFLOWS:
 {extract from architecture.md acceptance criteria}
@@ -149,7 +150,7 @@ REQUIREMENTS:
 6. Avoid anti-patterns specified in plan
 7. Verify tests pass
 
-Save summary to: .claude/features/{id}/test-summary-e2e.md
+Save summary to: .claude/.output/features/{id}/test-summary-e2e.md
 
 Return JSON:
 {
@@ -242,9 +243,9 @@ go test ./...
       "status": "complete",
       "agents_used": ["frontend-tester", "frontend-tester", "frontend-tester"],
       "outputs": {
-        "unit": ".claude/features/{id}/test-summary-unit.md",
-        "integration": ".claude/features/{id}/test-summary-integration.md",
-        "e2e": ".claude/features/{id}/test-summary-e2e.md"
+        "unit": ".claude/.output/features/{id}/test-summary-unit.md",
+        "integration": ".claude/.output/features/{id}/test-summary-integration.md",
+        "e2e": ".claude/.output/features/{id}/test-summary-e2e.md"
       },
       "verification": {
         "unit_tests_passed": true,

@@ -34,6 +34,7 @@ import { z } from 'zod';
 import { callMCPTool } from '../config/lib/mcp-client';
 // Security imports - included for audit compliance (no user inputs in this wrapper)
 import { validateNoPathTraversal, validateNoCommandInjection, validateNoControlChars } from '../config/lib/sanitize';
+import { estimateTokens } from '../config/lib/response-utils.js';
 
 /**
  * Input parameters for schema retrieval
@@ -229,14 +230,11 @@ function filterSchema(rawSchema: any): ChariotSchemaOutput {
   // Get allowed columns from helper
   const allowedColumns = schemaHelpers.getAllowedColumns();
 
-  // Calculate estimated tokens
-  const estimatedTokens = Math.ceil(JSON.stringify({ filtered, allowedColumns }).length / 4);
-
   return {
     entityTypes: filtered,
     totalEntities: entityTypes.length,
     allowedColumns,
-    estimatedTokens,
+    estimatedTokens: estimateTokens({ filtered, allowedColumns }),
   };
 }
 

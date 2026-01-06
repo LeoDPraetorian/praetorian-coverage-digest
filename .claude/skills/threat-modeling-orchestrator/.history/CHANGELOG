@@ -53,3 +53,41 @@
 - Line count after hardening: 425 → 437 lines (+12 lines)
 - Re-test result: **PASSED** - All three scenarios now explicitly countered
 - Skill is bulletproof against Phase 0 bypass attempts
+
+## [Date: 2026-01-04] - Directory Structure Alignment
+
+### Changed
+- **BREAKING**: Changed directory location from `.claude/.threat-model/{session-id}/` to `.claude/.output/threat-modeling/{timestamp}-{slug}/`
+- **BREAKING**: Replaced nested subdirectories with flat file structure
+- **BREAKING**: Replaced Step 0 session setup with exact timestamp pattern requiring actual `date` command execution
+- Updated agent spawning to include `OUTPUT_DIRECTORY` parameter for orchestrated mode
+- Changed artifact paths to flat structure:
+  - `phase-0/` subdirectory → `business-context.md` (consolidated)
+  - `phase-1/` subdirectory → `codebase-mapping.md` + `codebase-mapping-{component}.md`
+  - `phase-2/` subdirectory → `security-controls.md` + `security-controls-{component}.md`
+  - `phase-3/` subdirectory → `threat-model.md`
+  - `phase-4/` subdirectory → `test-plan.md`
+  - `checkpoints/phase-N-checkpoint.json` → `checkpoint-phase-N.json` (flat)
+  - `handoffs/phase-N-to-M.json` → `handoff-phase-N-to-M.json` (flat)
+  - `final-report/` subdirectory → `SYNTHESIS.md` (single file)
+- Added explicit instructions for agents to use orchestrator's directory structure
+- Updated parallel execution examples to include OUTPUT_DIRECTORY in prompts
+- Updated handoff protocol to use flat file naming
+
+### Reason
+- Align with `orchestrating-feature-development` pattern for consistency across orchestration skills
+- Flat structure simplifies file discovery and reduces directory management overhead
+- OUTPUT_DIRECTORY parameter ensures agents use orchestrator's structure instead of creating their own
+
+### Impact
+- Line count: 437 → 520 lines (+83 lines)
+- **BREAKING**: Existing threat modeling sessions in `.claude/.threat-model/` will need manual migration to new structure if resuming
+- Improved consistency with other orchestration workflows
+- Clearer agent coordination through explicit OUTPUT_DIRECTORY parameter
+
+### Verification
+- ✅ Step 0 requires actual `date` command execution
+- ✅ All paths use `.claude/.output/threat-modeling/{timestamp}-{slug}/`
+- ✅ No nested subdirectories remain
+- ✅ Agent spawning includes OUTPUT_DIRECTORY parameter
+- ✅ metadata.json initialization is present

@@ -1,0 +1,34 @@
+## 2026-01-04 - Initial Creation
+
+**RED Phase Documentation:**
+
+**Gap**: The security-test-planner agent (243 lines) exceeds the 200-line agent best practice. Lines 122-213 contain an 84-line embedded Phase 6 test planning workflow with:
+- 5-step methodology (load phases, prioritization formula, 4 test categories, priority matrix, summary)
+- Detailed artifact schemas and field requirements
+- Prioritization formula with crown jewel and compliance bonuses
+- Critical rules about evidence-based planning
+
+**Problem**: This embedded workflow makes the agent too long and violates the principle of extracting reusable methodology into library skills for reference.
+
+**Test Scenario**: Without this skill, the security-test-planner agent must embed all workflow details inline, causing:
+- Agent line count to exceed recommended limits
+- Workflow knowledge duplicated if multiple agents need test planning
+- Harder to maintain and update test planning methodology
+- Reduced agent clarity (methodology embedded vs referenced)
+
+**Solution**: Extract the Phase 6 test planning methodology into this library skill, allowing security-test-planner to reference it via gateway-security routing.
+
+**Category**: security (library skill)
+**Type**: Process/Pattern (threat modeling workflow)
+**Location**: .claude/skill-library/security/planning-security-tests/SKILL.md
+
+**Content Source**: Extracted directly from .claude/agents/analysis/security-test-planner.md lines 122-213
+- Step 1: Load Phase Outputs (Phase 1/3/5 artifacts)
+- Step 2: Apply Prioritization Formula (Risk + Crown Jewel + Compliance)
+- Step 3: Generate Test Recommendations (4 categories with schemas)
+- Step 4: Generate Prioritization Matrix (ranked by formula)
+- Step 5: Generate Summary (<2000 tokens)
+
+**Research**: Skipped - content extracted from existing agent definition
+
+**Line count**: 386 lines (within 500-line limit for skills)

@@ -108,7 +108,7 @@ Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md");
 
 **Not an error** - This skill is in a category without a dedicated gateway. It's still accessible via:
 
-- skill-search CLI: `npm run -w @chariot/auditing-skills search -- "code review"`
+- searching-skills: Search for "code review"
 - Direct path in skill invocation
 
 ### Section Detection

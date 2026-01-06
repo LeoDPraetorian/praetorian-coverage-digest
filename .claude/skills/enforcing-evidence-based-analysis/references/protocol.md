@@ -19,9 +19,9 @@ For each file/API you will use or modify:
 \`\`\`typescript
 // QUOTED FROM SOURCE (lines 72-77):
 return {
-  navigation: { goToNextStep, goToPreviousStep, ... },
-  progress: { currentStep, totalSteps, ... },
-  validation: { isValid, errors, ... },
+navigation: { goToNextStep, goToPreviousStep, ... },
+progress: { currentStep, totalSteps, ... },
+validation: { isValid, errors, ... },
 }
 \`\`\`
 
