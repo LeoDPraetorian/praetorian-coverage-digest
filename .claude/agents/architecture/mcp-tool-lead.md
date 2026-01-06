@@ -19,6 +19,7 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 | Skill                               | Why Always Invoke                                                                                    |
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
+| `discovering-reusable-code`         | Before proposing a plan, a fix, or any change exhaustively search for reusable patterns              |
 | `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
 | `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
 | `enforcing-evidence-based-analysis` | **Prevents hallucinations** - you WILL fail catastrophically without this                            |
@@ -37,7 +38,6 @@ Your `skills` frontmatter makes these core skills available. **Invoke based on s
 
 | Trigger                    | Skill                       | When to Invoke                                                           |
 | -------------------------- | --------------------------- | ------------------------------------------------------------------------ |
-| Adding new features        | `discovering-reusable-code` | Before creating new code, exhaustively search for reusable patterns      |
 | Code duplication concerns  | `adhering-to-dry`           | Reviewing for patterns, architecting plans, eliminating duplication      |
 | Scope creep risk           | `adhering-to-yagni`         | Adding features that were not requested, ask questions for clarification |
 | Investigating issues       | `debugging-systematically`  | Root cause analysis during review                                        |
