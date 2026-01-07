@@ -1,0 +1,47 @@
+# Changelog
+
+## [1.0.0] - 2025-01-07
+
+### Added
+- Initial creation of migrating-saved-queries skill
+- Systematic workflow for Query Builder migration (old → new format)
+- Complete operator mapping table (19 operators)
+- Entity type transformation rules
+- ActiveDirectory special case handling
+- Filter group flattening algorithms
+- Relationship divider transformation
+- Field validation against allowed_columns.go
+
+### RED Phase Documentation
+**Gap**: Users have saved queries in old Query Builder format (EntityBlock/LogicalOperator/RelationshipDivider) that need migration to new format (GraphQuery). Without systematic guidance, Claude:
+- Skips reading the 8 documentation files
+- Misses operator name changes (equals → =, is any of → IN, etc.)
+- Doesn't handle ActiveDirectory entity transformations
+- Forgets field validation against allowed_columns.go
+- Loses relationship configurations in multi-block queries
+
+**Test Scenario**: "Migrate old saved query with Vulnerability entity, multiple filters, KEV attribute"
+
+**Expected**: Systematic transformation following 6-phase workflow with validation
+
+**Current Failure**: Claude would infer structure instead of reading docs, miss operator mappings, skip validation
+
+### Metadata
+- **Category**: frontend/data-migration
+- **Location**: Library (.claude/skill-library/)
+- **Type**: Process/Pattern
+- **Line count**: 471 lines (SKILL.md)
+- **References created**:
+  - transformation-rules.md (complete algorithms)
+  - operator-mappings.md (19 operator mappings with examples)
+
+### Documentation Source
+- 8 analysis documents in repository root
+- SavedQuery.ts (new format definition)
+- Real-world example query from user
+
+### Next Steps (GREEN phase pending)
+- Test with example query from user
+- Verify operator transformations work
+- Validate against GraphQuery schema
+- Confirm field names in allowed_columns.go

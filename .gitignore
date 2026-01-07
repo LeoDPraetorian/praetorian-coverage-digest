@@ -32,6 +32,7 @@ hive-mind-prompt-*.txt
 !.claude/.output/.gitkeep
 .claude/pipeline/*
 !.claude/pipeline/.gitkeep
+.claude/features/*
 __pycache__/
 .claude/config/credentials.json
 .claude/node_modules/

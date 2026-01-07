@@ -61,6 +61,7 @@ This gateway implements 3-tier loading:
 | "styling" / "brand" / "colors" / "design"    | → `chariot-brand-guidelines`           |
 | "security" / "XSS" / "auth"                  | → `securing-react-implementations`     |
 | "graph query" / "Neo4j" / "filter"           | → `constructing-graph-queries`         |
+| "migrate" / "query builder" / "old format"   | → `migrating-saved-queries`            |
 | "architecture" / "state design"              | → `architecting-state-management`      |
 | "review" / "code review" / "PR review"       | → `reviewing-frontend-implementations` |
 | "testing" (general)                          | → also invoke `gateway-testing`        |
@@ -122,10 +123,11 @@ This gateway implements 3-tier loading:
 
 ### Security & Data
 
-| Skill          | Path                                                                                 | Triggers            |
-| -------------- | ------------------------------------------------------------------------------------ | ------------------- |
-| Securing React | `.claude/skill-library/development/frontend/securing-react-implementations/SKILL.md` | security, XSS, CSRF |
-| Graph Queries  | `.claude/skill-library/development/frontend/constructing-graph-queries/SKILL.md`     | graph, Neo4j, query |
+| Skill                   | Path                                                                                 | Triggers                           |
+| ----------------------- | ------------------------------------------------------------------------------------ | ---------------------------------- |
+| Securing React          | `.claude/skill-library/development/frontend/securing-react-implementations/SKILL.md` | security, XSS, CSRF                |
+| Graph Queries           | `.claude/skill-library/development/frontend/constructing-graph-queries/SKILL.md`     | graph, Neo4j, query                |
+| Migrating Saved Queries | `.claude/skill-library/frontend/data-migration/migrating-saved-queries/SKILL.md`     | migrate, query builder, old format |
 
 ### Code Review
 
