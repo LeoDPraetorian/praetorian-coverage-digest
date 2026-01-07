@@ -10,37 +10,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Super-Repository Structure
 
-This is a **super-repository** containing 16 submodules organized under `/modules/`:
+This is a **super-repository** containing submodules organized under `/modules/`:
 
 ```
 chariot-development-platform/                  # Super-repo root
-├── modules/                                   # All submodules (16 total)
+├── modules/                                   # Core platform submodules
 │   ├── chariot/                               # Core platform (backend API + React UI)
 │   ├── chariot-ui-components/                 # Shared React component library (end-of-lifing)
 │   ├── tabularium/                            # Universal data schema and models
 │   ├── janus-framework/                       # Go framework for security tool chains
 │   ├── janus/                                 # Tool orchestration system
-│   ├── nebula/                                # Multi-cloud security scanning CLI
 │   ├── aegiscli/                              # Velociraptor-based security orchestration
 │   ├── chariot-aegis-capabilities/            # VQL security capabilities
 │   ├── chariot-devops/                        # DevOps and infrastructure automation
-│   ├── nuclei-templates/                      # Security vulnerability templates
 │   ├── praetorian-cli/                        # Python CLI and SDK
 │   ├── praetorian-agent-workflows/            # AI agent workflow orchestration
-│   ├── noseyparker/                           # Secret scanning engine (Rust)
-│   ├── noseyparkerplusplus/                   # Enhanced secret scanner (Rust)
-│   ├── noseyparker-explorer/                  # Web UI for secret scan results
 │   └── ai-research/                           # AI security research and experiments
 ├── Makefile                                   # Super-repo automation
 ├── docs/CLEAN_CODE.md                         # Summary of 'Clean code' by Robert C. Martin
 ```
+
+**Note:** Security scanning tools (nebula, fingerprintx, noseyparker, nuclei-templates, etc.) have been migrated to [praetorian-inc/capabilities](https://github.com/praetorian-inc/capabilities).
 
 ## Initial Repository Setup (First Time Only)
 
 **Critical**: This super-repository requires recursive submodule cloning:
 
 ```bash
-# Initial clone with all 16 submodules
+# Initial clone with all submodules
 git clone --recurse-submodules https://github.com/praetorian-inc/chariot-development-platform.git
 
 # Complete setup sequence
@@ -99,7 +96,6 @@ cd modules/chariot/backend && make deploy    # Deploy backend only
 cd modules/chariot/ui && npm start           # Frontend development server
 cd modules/chariot/e2e && npm test           # Run E2E test suite
 
-cd modules/nebula             # Multi-cloud security scanning
 cd modules/janus              # Security tool orchestration
 cd modules/tabularium         # Data schema management
 ```
@@ -293,7 +289,7 @@ Capability  // Security scanning tools and orchestration
 - Backend: `modules/chariot/backend/CLAUDE.md` - Go serverless architecture
 - Frontend: `modules/chariot/ui/CLAUDE.md` - React TypeScript patterns
 
-### For Security Framework Development (janus/nebula/aegiscli)
+### For Security Framework Development (janus/aegiscli)
 
 - Follow Go patterns from `docs/DESIGN-PATTERNS.md`
 - Use Janus framework for tool orchestration

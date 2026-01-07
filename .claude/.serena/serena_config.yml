@@ -61,4 +61,3 @@ token_count_estimator: CHAR_COUNT
 projects:
 - /Users/nathansportsman/chariot-development-platform2/modules/chariot
 - /Users/nathansportsman/chariot-development-platform2/modules/chariot/backend
-- /Users/nathansportsman/chariot-development-platform2/modules/fingerprintx
