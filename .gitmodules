@@ -18,10 +18,6 @@
 	path = modules/chariot-ui-components
 	url = https://github.com/praetorian-inc/chariot-ui-components
 	branch = main
-[submodule "modules/nebula"]
-	path = modules/nebula
-	url = https://github.com/praetorian-inc/nebula
-	branch = main
 [submodule "modules/praetorian-cli"]
 	path = modules/praetorian-cli
 	url = https://github.com/praetorian-inc/praetorian-cli
@@ -29,10 +25,6 @@
 [submodule "modules/praetorian-agent-workflows"]
 	path = modules/praetorian-agent-workflows
 	url = https://github.com/praetorian-inc/praetorian-agent-workflows
-	branch = main
-[submodule "modules/nuclei-templates"]
-	path = modules/nuclei-templates
-	url = https://github.com/praetorian-inc/nuclei-templates
 	branch = main
 [submodule "modules/aegiscli"]
 	path = modules/aegiscli
@@ -46,15 +38,6 @@
 	path = modules/chariot-devops
 	url = https://github.com/praetorian-inc/chariot-devops
 	branch = main
-[submodule "modules/noseyparker"]
-	path = modules/noseyparker
-	url = https://github.com/praetorian-inc/noseyparker
-[submodule "modules/noseyparkerplusplus"]
-	path = modules/noseyparkerplusplus
-	url = https://github.com/praetorian-inc/noseyparkerplusplus
-[submodule "modules/noseyparker-explorer"]
-	path = modules/noseyparker-explorer
-	url = https://github.com/praetorian-inc/noseyparker-explorer
 [submodule "modules/ai-research"]
 	path = modules/ai-research
 	url = https://github.com/praetorian-inc/ai-research
@@ -67,9 +50,6 @@
 [submodule "modules/msp-definitions"]
 	path = modules/msp-definitions
 	url = https://github.com/praetorian-inc/msp-definitions
-[submodule "modules/fingerprintx"]
-	path = modules/fingerprintx
-	url = https://github.com/praetorian-inc/fingerprintx
 [submodule "modules/venator"]
 	path = modules/venator
 	url = https://github.com/praetorian-inc/venator.git
