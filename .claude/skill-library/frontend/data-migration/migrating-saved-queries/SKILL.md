@@ -182,17 +182,31 @@ blocks.forEach((block, index) => {
 ### 3.1 Create New SavedQuery Skeleton
 
 ```typescript
+// Generate UUID for the query
+const queryId = generateUUID();
+
+// Create the SavedQuery object
 const newQuery: SavedQuery = {
-  id: generateUUID(),
+  id: queryId,
   type: "graph",
   name: oldQuery.name,
   description: oldQuery.description || "",
-  folderId: "user-queries",
+  folderId: "custom-queries",
   query: {
     /* Built in next steps */
   },
 };
+
+// Wrap in Setting structure
+const setting: Setting = {
+  name: `saved_query#${queryId}`,
+  value: newQuery,
+};
 ```
+
+**CRITICAL**: The final output must be wrapped in a `Setting` structure where:
+- `Setting.name` = `"saved_query#" + query.id`
+- `Setting.value` = the entire SavedQuery object
 
 ### 3.2 Transform Components
 
@@ -264,18 +278,27 @@ Old fields that do NOT transfer:
 
 ### 6.1 Check Required Fields
 
-**New SavedQuery must have:**
+**Final Setting structure must have:**
 
 ```typescript
+interface Setting {
+  name: string; // ✅ Format: "saved_query#<uuid>"
+  value: SavedQuery; // ✅ Complete SavedQuery object below
+}
+
 interface SavedQuery {
-  id: string; // ✅ Generated UUID
+  id: string; // ✅ Generated UUID (must match ID in Setting.name)
   type: "graph" | "table"; // ✅ Set to 'graph' or 'table'
   name: string; // ✅ From old query
   description: string; // ✅ From old query or empty string
-  folderId: string; // ✅ Default or user-specified
+  folderId: string; // ✅ Default "custom-queries" or user-specified
   query: GraphQuery; // ✅ Transformed structure
 }
 ```
+
+**CRITICAL**: Ensure `Setting.name` ID matches `SavedQuery.id`:
+- ✅ Correct: `name: "saved_query#550e8400-..."` and `value.id: "550e8400-..."`
+- ❌ Wrong: Mismatched IDs between Setting.name and value.id
 
 ### 6.2 Validate Field Names Against allowed_columns.go
 
@@ -350,31 +373,35 @@ Read("modules/chariot/ui/src/types.ts");
 
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "type": "graph",
-  "name": "PANW KEV",
-  "description": "",
-  "folderId": "user-queries",
-  "query": {
-    "node": {
-      "labels": ["Risk"],
-      "filters": [
-        { "field": "kev", "operator": "=", "value": "true" },
-        { "field": "status", "operator": "=", "value": "O" }
-      ]
-    },
-    "limit": 100
+  "name": "saved_query#550e8400-e29b-41d4-a716-446655440000",
+  "value": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "type": "graph",
+    "name": "PANW KEV",
+    "description": "",
+    "folderId": "custom-queries",
+    "query": {
+      "node": {
+        "labels": ["Risk"],
+        "filters": [
+          { "field": "kev", "operator": "=", "value": "true" },
+          { "field": "status", "operator": "=", "value": "O" }
+        ]
+      },
+      "limit": 100
+    }
   }
 }
 ```
 
 **Key transformations:**
 
-1. `entityType: "Vulnerability"` → `labels: ["Risk"]`
-2. `attribute` → `field`
-3. `operator: "equals"` → `operator: "="`
-4. Added `id`, `type`, `folderId`, `query.limit`
-5. Flattened `filterGroups` (only one group with AND)
+1. Wrapped entire query in `Setting` structure with `name: "saved_query#<id>"`
+2. `entityType: "Vulnerability"` → `labels: ["Risk"]`
+3. `attribute` → `field`
+4. `operator: "equals"` → `operator: "="`
+5. Added `id`, `type`, `folderId`, `query.limit`
+6. Flattened `filterGroups` (only one group with AND)
 
 **For more examples, see:** [examples/](examples/)
 

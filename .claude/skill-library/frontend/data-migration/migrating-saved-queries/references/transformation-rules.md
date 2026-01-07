@@ -2,6 +2,38 @@
 
 Complete transformation rules for migrating old saved queries to new format.
 
+## Output Structure: Setting Wrapper
+
+**CRITICAL**: The migrated SavedQuery must be wrapped in a `Setting` structure.
+
+```typescript
+interface Setting {
+  name: string;      // Format: "saved_query#<uuid>"
+  value: SavedQuery; // The complete SavedQuery object
+}
+```
+
+**Example:**
+
+```json
+{
+  "name": "saved_query#d32227a5-e4b1-483e-bae6-3fed50163807",
+  "value": {
+    "id": "d32227a5-e4b1-483e-bae6-3fed50163807",
+    "name": "My Query",
+    "type": "graph",
+    "folderId": "custom-queries",
+    "description": "...",
+    "query": { ... }
+  }
+}
+```
+
+**Requirements:**
+1. `Setting.name` must follow pattern: `"saved_query#" + queryId`
+2. The UUID in `Setting.name` must match `Setting.value.id`
+3. The entire SavedQuery object goes in `Setting.value`
+
 ## Entity Type to Label Mapping
 
 | Old Entity Type   | New Label    | Notes                           |
@@ -318,11 +350,20 @@ If `adObjectTypesNegated: true`:
 
 ### Fields That Are Generated
 
-| New Field  | Source                | Generation Rule                  |
-| ---------- | --------------------- | -------------------------------- |
-| `id`       | Generated             | New UUID (do NOT reuse old IDs)  |
-| `type`     | Default or inferred   | `'graph'` (default) or `'table'` |
-| `folderId` | Default or user input | `'user-queries'` (default)       |
+**Setting wrapper:**
+
+| New Field       | Source                      | Generation Rule                      |
+| --------------- | --------------------------- | ------------------------------------ |
+| `Setting.name`  | Generated from query ID     | `"saved_query#" + queryId`           |
+| `Setting.value` | Complete SavedQuery object  | Entire migrated query                |
+
+**SavedQuery fields:**
+
+| New Field  | Source                | Generation Rule                    |
+| ---------- | --------------------- | ---------------------------------- |
+| `id`       | Generated             | New UUID (do NOT reuse old IDs)    |
+| `type`     | Default or inferred   | `'graph'` (default) or `'table'`   |
+| `folderId` | Default or user input | `'custom-queries'` (default)       |
 
 ### Fields That Are Dropped
 
@@ -339,11 +380,13 @@ If `adObjectTypesNegated: true`:
 
 ## Format Comparison Summary
 
-| Aspect        | Old Format                  | New Format                    |
-| ------------- | --------------------------- | ----------------------------- |
-| Structure     | Flat blocks array           | Nested node/relationships     |
-| Operators     | Verbose names               | Symbols/UPPERCASE             |
-| Relationships | Separate dividers array     | Nested in node.relationships  |
-| Filter Groups | Array with logicalOperator  | Flattened or nested structure |
-| AD Entities   | Special adObjectTypes field | Class filter                  |
-| Metadata      | Embedded in query           | Separate (id, type, folderId) |
+| Aspect        | Old Format                  | New Format                          |
+| ------------- | --------------------------- | ----------------------------------- |
+| Container     | Direct SavedQuery object    | Wrapped in Setting structure        |
+| Structure     | Flat blocks array           | Nested node/relationships           |
+| Operators     | Verbose names               | Symbols/UPPERCASE                   |
+| Relationships | Separate dividers array     | Nested in node.relationships        |
+| Filter Groups | Array with logicalOperator  | Flattened or nested structure       |
+| AD Entities   | Special adObjectTypes field | Class filter                        |
+| Metadata      | Embedded in query           | Separate (id, type, folderId)       |
+| Naming        | N/A                         | Setting.name = "saved_query#<uuid>" |
