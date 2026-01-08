@@ -31,9 +31,12 @@
     "typescriptreact"
   ],
   "search.exclude": {
-    "**/modules/chariot/backend/build": true
+    "**/modules/chariot/backend/build": true,
+    "**/modules/chariot/ui/build": true,
+    "**/modules/chariot/build": true
   },
   "files.exclude": {
-    "**/modules/chariot/backend/build": true
-  }
+    "**/modules/chariot/backend/build": true,
+    "**/modules/chariot/ui/build": true,
+    "**/modules/chariot/build": true  }
 }
