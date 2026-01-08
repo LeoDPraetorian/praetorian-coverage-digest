@@ -1,0 +1,28 @@
+# Changelog: mapping-to-iso-27001
+
+## 2026-01-06 - Initial Creation
+
+**RED Phase Documentation:**
+- Gap: Organizations with ISO 27001:2022 certification lack systematic mapping of security findings to Annex A controls
+- Test failure: Without this skill, Claude provides outdated 2013 control references (A.9.x instead of 2022 A.5.x)
+- Expected behavior: Cannot accurately map capability findings to control objectives or audit evidence requirements
+
+**Skill Metadata:**
+- Category: frameworks/
+- Type: Library/Framework
+- Location: .claude/skill-library/frameworks/mapping-to-iso-27001/
+- Line count: 361 lines
+
+**Content Structure:**
+- ISO 27001:2022 Annex A structure (93 controls, 4 themes)
+- Quick reference tables for cloud, network, web, secrets, container findings
+- Control themes: Organizational (A.5.x), People (A.6.x), Physical (A.7.x), Technological (A.8.x)
+- Decision trees for control selection
+- Audit evidence requirements
+- 2013 to 2022 migration guidance (to be populated in research phase)
+
+**Next Steps:**
+- Phase 6: Research ISO 27001:2022 Annex A details via orchestrating-research
+- Phase 7: Add to gateway-security routing table
+- Phase 8: GREEN verification with test scenario
+- Phase 9: REFACTOR pressure testing

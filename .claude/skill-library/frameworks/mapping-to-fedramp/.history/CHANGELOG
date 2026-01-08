@@ -1,0 +1,107 @@
+# Changelog
+
+## 2026-01-06 - Initial Creation
+
+**Type:** New skill creation
+**Category:** frameworks (library)
+**Skill Type:** process/pattern
+
+### RED Phase Documentation
+
+**Gap Identified:**
+FedRAMP (Federal Risk and Authorization Management Program) authorization requires mapping security findings to NIST 800-53 Rev 5 controls at Low/Moderate/High baselines. Currently, no systematic way exists to:
+- Map security findings to FedRAMP control requirements
+- Validate findings against baseline-specific controls (Low: 156, Moderate: 325, High: 421)
+- Generate POA&Ms (Plans of Action and Milestones) with proper control context
+- Determine continuous monitoring (ConMon) requirements for controls
+
+**Test Scenario:**
+"I have a vulnerability scanner finding that shows weak TLS configurations on an API endpoint. Which FedRAMP controls does this map to, and is it required for FedRAMP Moderate baseline?"
+
+**Expected Failure Without Skill:**
+- General security guidance without specific control mappings
+- Reference to NIST 800-53 without baseline-specific context
+- No POA&M generation guidance
+- No ConMon frequency recommendations
+
+**User Acceptance:** Gap documented and accepted as sufficient for RED phase
+
+### Skill Structure
+
+**Location:** `.claude/skill-library/frameworks/mapping-to-fedramp/`
+**Line Count:** 397 lines (within 500-line progressive disclosure target)
+**Files Created:**
+- SKILL.md (process/pattern template)
+- references/ (directory prepared for research content)
+- examples/ (directory prepared for examples)
+- .history/CHANGELOG (this file)
+
+### Research Phase
+
+**Status:** Completed
+**Research Method:** orchestrating-research skill (web sources: traditional search + authoritative content)
+**Research Date:** 2026-01-06
+**Output Directory:** `/Users/nathansportsman/chariot-development-platform2/.claude/.output/research/2026-01-06-224020-fedramp-nist-mapping/`
+
+**Research Findings:**
+1. **FedRAMP Baseline Control Counts Validated** (Low: 156, Moderate: 325, High: 421)
+2. **Official Resources Identified** (Baseline spreadsheets, ConMon templates, POA&M templates)
+3. **Finding-to-Control Mappings Documented** (RA-5, SI-2, SC-8, IA-5, AC-2, AU-2, AU-6)
+4. **ConMon Frequencies Confirmed** (Monthly scans, quarterly reviews, annual assessments)
+5. **POA&M Requirements Detailed** (Templates, timelines, required fields)
+
+**References Populated** (2026-01-06):
+- `references/fedramp-baselines.md` - Complete baseline matrices and selection guidance
+- `references/finding-control-mappings.md` - Comprehensive vulnerability → control mappings
+- `references/poam-generation.md` - POA&M templates, examples, and workflows
+- `references/continuous-monitoring.md` - ConMon frequencies, deliverables, and automation
+
+**Sources Used:**
+- FedRAMP.gov official resources
+- NIST SP 800-53 Rev 5 documentation
+- Community compliance vendor guidance (Secureframe, Sprinto, 38North Security)
+
+### Gateway Update Phase
+
+**Status:** Completed
+**Gateway:** gateway-capabilities
+**User Selection:** Capability developers are primary consumers for tagging findings with FedRAMP controls
+**Changes Made:**
+- Added to Intent Detection table with triggers: FedRAMP, NIST 800-53, baseline, POA&M, ConMon, federal compliance, control mapping
+- Added to Skill Registry under "Security Framework Mapping" section
+- Path: `.claude/skill-library/frameworks/mapping-to-fedramp/SKILL.md`
+
+### GREEN Phase
+
+**Status:** Completed
+**Verification Method:** Original test scenario from RED phase
+**Test Scenario:** "Weak TLS configurations on API endpoint - which FedRAMP controls and baseline requirements?"
+**Result:** PASS - Skill successfully provides:
+- Specific control mappings (SC-8 primary, SC-13 related)
+- Baseline validation (required for Low/Moderate/High)
+- POA&M generation guidance (references/poam-generation.md)
+- ConMon frequency requirements (references/continuous-monitoring.md)
+
+**User Acceptance:** Confirmed skill addresses the gap
+
+### REFACTOR Phase
+
+**Status:** Completed
+**Approach:** Light pressure testing (reference/documentation skill type)
+**Rationalization Mitigations:**
+1. **Time Pressure** ("too slow to look up") → Quick reference tables in SKILL.md (lines 26-52)
+2. **Accuracy Pressure** ("I'll guess the controls") → Research-backed authoritative sources
+3. **Completeness Pressure** ("skip baseline validation") → Explicit workflow Step 4
+4. **Template Pressure** ("POA&M optional") → Dedicated references/poam-generation.md
+
+**Assessment:** Reference skills resist rationalization through ease-of-use and factual authority. Full process-style pressure testing not applicable to documentation skills.
+
+## Skill Creation Complete
+
+**Final Status:** COMPLETE - Ready for use
+**Created:** 2026-01-06
+**Phases Completed:** RED → GREEN → REFACTOR (full TDD cycle)
+**Line Count:** 397 lines (within 500-line target)
+**Research Quality:** High (official FedRAMP + NIST sources)
+**Gateway Integration:** gateway-capabilities
+**Reference Files:** 4 comprehensive files (baselines, mappings, POA&M, ConMon)

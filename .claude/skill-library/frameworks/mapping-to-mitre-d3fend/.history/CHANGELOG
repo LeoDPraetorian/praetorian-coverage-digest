@@ -1,0 +1,82 @@
+# Changelog
+
+## 2026-01-06 - Initial Creation
+
+**Type:** Library skill (Framework/Reference)
+**Category:** frameworks/
+**Created by:** Nathan (via creating-skills workflow)
+
+### RED Phase Documentation
+
+**Gap Identified:**
+Capability developers at Chariot detect vulnerabilities and map them to MITRE ATT&CK techniques, but security findings are incomplete without remediation guidance. Teams need to know which defensive techniques counter specific ATT&CK techniques, how to prioritize defensive controls, and what security architecture changes to recommend.
+
+**Test Scenario (RED - Expected to Fail):**
+"I detected T1059.001 (PowerShell execution) being exploited. What MITRE D3FEND defensive techniques should I recommend to prevent this attack?"
+
+**Expected Failure Without Skill:**
+Claude provides generic responses like "use application whitelisting" or "disable PowerShell" without recognizing these map to specific D3FEND techniques:
+- D3-PSA (Process Spawn Analysis)
+- D3-SCA (Script Content Analysis)
+- D3-EAL (Execution Application Allow Listing)
+
+**Failure Indicators:**
+1. No standardized D3FEND technique IDs
+2. Missing ATT&CK → D3FEND mapping tables
+3. No decision framework for selecting defensive controls
+4. Missing CWE → ATT&CK → D3FEND integration chain
+
+### Skill Structure
+
+**Location:** `.claude/skill-library/frameworks/mapping-to-mitre-d3fend/`
+
+**Contents:**
+- `SKILL.md` (403 lines) - Main reference with D3FEND taxonomy, ATT&CK-to-D3FEND mappings, decision trees
+- `references/` - Prepared for detailed reference files
+- `examples/` - Prepared for example mappings
+
+**Skill Type:** Library/Framework (defensive countermeasure framework)
+
+**Target Audience:** Capability developers writing remediation guidance for security findings
+
+### Initial Content
+
+Skill includes:
+- Six D3FEND defense categories (Model, Harden, Detect, Isolate, Deceive, Evict)
+- ATT&CK-to-D3FEND mapping tables for common techniques
+- Quick reference tables for Cloud, Network, Application, Credential security
+- Decision trees for defense category selection
+- Remediation template with priority guidance
+- Code integration patterns for Tabularium findings
+- Defense-in-depth approach with multiple defenses
+- Cost-benefit analysis of defense categories
+
+### Completion Status
+
+**Phases Completed:**
+- ✅ Phase 0-5: Skill structure created (403 lines, <500 limit)
+- ✅ Phase 6: Research skipped (comprehensive initial content from knowledge base)
+- ✅ Phase 7: Gateway integration (gateway-capabilities)
+- ✅ Phase 8: GREEN verification passed
+- ⏭️ Phase 9: REFACTOR (deferred to future iteration)
+
+### Gateway Integration (Phase 7)
+
+**Gateway Added:** `gateway-capabilities`
+- Added to Intent Detection table with triggers: "D3FEND" / "defensive technique" / "remediation" / "countermeasure" / "defensive control"
+- Added to Security Framework Mapping section in Skill Registry
+- Placed alongside `mapping-to-cwe`, `mapping-to-sans-top-25`, `mapping-to-mitre-attack`
+
+### GREEN Phase Verification (Phase 8)
+
+**Test Scenario:** "I detected T1059.001 (PowerShell execution) being exploited. What MITRE D3FEND defensive techniques should I recommend?"
+
+**Skill Performance:**
+✅ ATT&CK-to-D3FEND mapping table shows: T1059.001 → D3-SCA (Script Content Analysis) primary, D3-PSA and D3-EAL secondary
+✅ Provides specific D3FEND technique IDs (not generic "block PowerShell")
+✅ Defense-in-depth approach with multiple techniques
+✅ Implementation guidance in quick reference tables
+
+**Result:** PASS - Skill correctly identifies D3-SCA (Script Content Analysis), D3-PSA (Process Spawn Analysis), and D3-EAL (Execution Application Allow Listing) instead of generic defensive advice.
+
+**Skill Ready for Use:** Yes - capability developers can now use this skill for defensive technique mapping and remediation guidance

@@ -61,6 +61,8 @@ This gateway implements 3-tier loading:
 | "codebase size" / "complexity"                 | → `codebase-sizing`              |
 | "security review" / "OWASP" / "Go security"    | → `reviewing-backend-security`   |
 | "frontend security" / "React security" / "XSS" | → `reviewing-frontend-security`  |
+| "CIS" / "benchmark" / "compliance mapping"     | → `mapping-to-cis-benchmarks`    |
+| "FDA" / "medical device" / "510(k)" / "SBOM"   | → `mapping-to-fda-cybersecurity` |
 | "Shodan" / "host search" / "recon"             | → use `gateway-mcp-tools`        |
 | "testing" (general)                            | → also invoke `gateway-testing`  |
 
@@ -115,6 +117,13 @@ This gateway implements 3-tier loading:
 | ------------------------ | --------------------------------------------------------------------- | -------------------------------------- |
 | Backend Security Review  | `.claude/skill-library/security/reviewing-backend-security/SKILL.md`  | security review, OWASP, Go security    |
 | Frontend Security Review | `.claude/skill-library/security/reviewing-frontend-security/SKILL.md` | frontend security, React security, XSS |
+
+### Compliance Frameworks
+
+| Skill                           | Path                                                                           | Triggers                               |
+| ------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------- |
+| Mapping to CIS Benchmarks       | `.claude/skill-library/frameworks/mapping-to-cis-benchmarks/SKILL.md`          | CIS, benchmark, compliance mapping     |
+| Mapping to FDA Cybersecurity    | `.claude/skill-library/frameworks/mapping-to-fda-cybersecurity/SKILL.md`       | FDA, medical device, 510(k), SBOM, CVD |
 
 ### Reconnaissance Tools
 

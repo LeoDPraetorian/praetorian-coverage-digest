@@ -46,6 +46,7 @@ This gateway implements 3-tier loading:
 
 | Task Intent                                                                                                       | Route To                                                            |
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| "review capability" / "code review" / "VQL review" / "Nuclei review" / "Janus review" / "fingerprintx review"    | → `reviewing-capability-implementations`                            |
 | "YAML or Go?" / "template vs plugin" / "Nuclei vs fingerprintx" / "implementation pattern" / "decision framework" | → `selecting-plugin-implementation-pattern`                         |
 | "CLI" / "command-line" / "Cobra" / "Kong" / "Viper" / "Koanf" / "POSIX"                                           | → `implementing-go-cli-applications`                                |
 | "Go architecture" / "capability structure"                                                                        | → `enforcing-go-capability-architecture`                            |
@@ -86,13 +87,14 @@ This gateway implements 3-tier loading:
 
 ### Capability Architecture
 
-| Skill                         | Path                                                                                              | Triggers                                                                                           |
-| ----------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Plugin Implementation Pattern | `.claude/skill-library/development/capabilities/selecting-plugin-implementation-pattern/SKILL.md` | YAML or Go, template vs plugin, Nuclei vs fingerprintx, implementation pattern, decision framework |
-| Go CLI Applications           | `.claude/skill-library/development/capabilities/implementing-go-cli-applications/SKILL.md`        | CLI, command-line, Cobra, Kong, Viper, Koanf, POSIX                                                |
-| Go Capability Architecture    | `.claude/skill-library/development/capabilities/enforcing-go-capability-architecture/SKILL.md`    | Go architecture, structure                                                                         |
-| Go Plugin Registries          | `.claude/skill-library/development/capabilities/implementing-go-plugin-registries/SKILL.md`       | plugin registry, init() registration, factory pattern, sync.RWMutex                                |
-| Standalone Integration        | `.claude/skill-library/development/capabilities/integrating-standalone-capabilities/SKILL.md`     | standalone, tool integration                                                                       |
+| Skill                          | Path                                                                                                   | Triggers                                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Reviewing Implementations      | `.claude/skill-library/development/capabilities/reviewing-capability-implementations/SKILL.md`         | review capability, code review, VQL review, Nuclei review, Janus review, fingerprintx review       |
+| Plugin Implementation Pattern  | `.claude/skill-library/development/capabilities/selecting-plugin-implementation-pattern/SKILL.md`      | YAML or Go, template vs plugin, Nuclei vs fingerprintx, implementation pattern, decision framework |
+| Go CLI Applications            | `.claude/skill-library/development/capabilities/implementing-go-cli-applications/SKILL.md`             | CLI, command-line, Cobra, Kong, Viper, Koanf, POSIX                                                |
+| Go Capability Architecture     | `.claude/skill-library/development/capabilities/enforcing-go-capability-architecture/SKILL.md`         | Go architecture, structure                                                                         |
+| Go Plugin Registries           | `.claude/skill-library/development/capabilities/implementing-go-plugin-registries/SKILL.md`            | plugin registry, init() registration, factory pattern, sync.RWMutex                                |
+| Standalone Integration         | `.claude/skill-library/development/capabilities/integrating-standalone-capabilities/SKILL.md`          | standalone, tool integration                                                                       |
 
 ### VQL & Templates
 

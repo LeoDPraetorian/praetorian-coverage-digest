@@ -1,0 +1,37 @@
+# Changelog
+
+All notable changes to this skill will be documented in this file.
+
+## [Initial Creation] - 2026-01-07
+
+### Added
+
+- Initial skill structure for mapping security findings to CIS Benchmarks
+- Category: frameworks (library skill)
+- Skill type: Library/Framework
+- Coverage for AWS, Azure, GCP, Linux, Windows, Kubernetes, Docker platforms
+- CIS profile levels (Level 1, Level 2, STIG)
+- Scoring methodology (Pass/Fail/Not Applicable)
+- Integration guidance for VQL capabilities and Nuclei templates
+- Control mapping methodology with 4-step process
+
+### RED Phase Documentation
+
+**Gap identified**: When asked "Which CIS Benchmark control applies to this S3 bucket misconfiguration?", Claude provides generic security advice without:
+
+- Specific CIS control IDs (e.g., CIS AWS 2.1.1)
+- Profile level classification (Level 1/Level 2/STIG)
+- Scoring criteria (Pass/Fail/Not Applicable)
+- Platform-specific benchmark references
+- Systematic mapping methodology
+
+**Test scenario**: "I have a VQL capability that detects publicly accessible S3 buckets. Which CIS Benchmark control should I reference in the finding?"
+
+**Expected behavior**: Without this skill, Claude lacks structured guidance for mapping findings to CIS control IDs, profile levels, and remediation references.
+
+### Structure
+
+- Main SKILL.md: 242 lines (under 500 line limit)
+- References directory: Prepared for detailed content
+- Examples directory: Prepared for mapping examples
+- Integration section: Documents standalone nature and optional framework pairing

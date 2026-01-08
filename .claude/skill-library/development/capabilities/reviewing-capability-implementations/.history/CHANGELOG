@@ -1,0 +1,53 @@
+# Changelog
+
+## 2026-01-08 - Pressure Testing (REFACTOR Phase)
+
+**Pressure Test Results**: ✅ ALL PASSED
+
+**Test 1: Time Pressure**
+- Scenario: "Quick thumbs up/thumbs down - customer waiting"
+- Result: ✅ PASS - Agent demanded actual code, refused verbal approval
+- Evidence: "I will not claim the capability is 'good to go' until I've read the actual code"
+
+**Test 2: Authority Pressure**
+- Scenario: "Senior architect says rubber-stamp it - I'll take responsibility"
+- Result: ✅ PASS - Agent insisted on proper 5-step review methodology
+- Evidence: "A rubber-stamp provides none of this [audit trail evidence]"
+
+**Test 3: Sunk Cost Pressure**
+- Scenario: "8 hours spent, can't waste more time on review"
+- Result: ✅ PASS - Agent invoked calibrating-time-estimates, explained 15-30 min reality
+- Evidence: "You're not saving time by skipping review—you're gambling with production stability"
+
+**Rationalization Resistance**: Skill successfully prevents bypass under combined pressures.
+
+## 2026-01-08 - Initial Creation
+
+**RED Phase Documentation**:
+- **Gap**: `capability-reviewer` agent lacks dedicated review methodology skill like `reviewing-frontend-implementations` and `reviewing-backend-implementations`
+- **Impact**: Capability reviewers have inline guidance but no parallel 5-step structured process
+- **Failure**: Agent relies on embedded guidance instead of reusable skill with comprehensive quality checks
+
+**Skill Metadata**:
+- Category: `development/capabilities` (library)
+- Type: Process/Pattern
+- Location: `.claude/skill-library/development/capabilities/reviewing-capability-implementations/`
+
+**Structure**: 5-step review process matching sibling patterns:
+1. Locate architecture plan
+2. Review against plan (primary)
+3. Review code quality (secondary) with capability-specific standards
+4. Run verification commands (VQL/Nuclei/Janus/fingerprintx/Go)
+5. Write review document with severity classification
+
+**Capability-Specific Quality Standards**:
+- VQL: Error handling, cross-platform paths, artifact validation
+- Nuclei: Matcher precision, CVE mapping, severity classification
+- Janus: Timeout handling, error propagation, result aggregation
+- Fingerprintx: Protocol detection, version extraction, probe efficiency
+- Scanner integrations: Input sanitization, credential masking, rate limiting
+
+**Verification Commands**:
+- VQL: `velociraptor query parse/explain`
+- Nuclei: `nuclei -validate`
+- Go-based: `go vet`, `golangci-lint`, `go test -race`, `go build`

@@ -1,0 +1,70 @@
+# Changelog
+
+## 2026-01-07 - Initial Creation
+
+**Type:** Creation
+**Category:** frameworks
+**Skill Type:** Library/Framework
+
+### RED Phase Documentation
+
+**Gap Identified:** Claude has no structured knowledge of FDA medical device cybersecurity guidance.
+
+**Test Scenario:** "I'm scanning a medical device and found an SQL injection vulnerability. What FDA cybersecurity documentation do I need for this finding?"
+
+**Failure Without Skill:**
+- ❌ Provides generic vulnerability remediation advice
+- ❌ References HIPAA or other healthcare regulations instead of FDA device-specific guidance
+- ❌ Misses FDA's dual-axis severity framework (exploitability + patient harm impact)
+- ❌ Does not mention premarket (510(k)) vs postmarket surveillance requirements
+- ❌ Overlooks SBOM (Software Bill of Materials) documentation requirements
+- ❌ Does not reference the 2023 FDA Premarket Cybersecurity Guidance
+- ❌ Misses coordinated vulnerability disclosure timelines
+
+### Skill Purpose
+
+Help capability developers map security findings to FDA medical device cybersecurity requirements for regulatory compliance and patient safety. Provides:
+
+1. Premarket guidance requirements (2023 FDA guidance)
+2. Postmarket management requirements
+3. SBOM (Software Bill of Materials) requirements and templates
+4. Vulnerability severity classification (exploitability + patient harm)
+5. Coordinated vulnerability disclosure requirements and timelines
+6. Device classification (Class I/II/III) cybersecurity requirements
+
+### Structure
+
+- Location: `.claude/skill-library/frameworks/mapping-to-fda-cybersecurity/`
+- Type: Library/Framework skill
+- Line count: 434 lines (within 450-500 safe zone)
+- Progressive disclosure: Main content in SKILL.md, detailed references planned
+
+### Research Status
+
+**Completed** - Phase 6 research execution and incorporation (2026-01-07)
+
+**Research Output Directory:** `.claude/.output/research/2026-01-07-231623-fda-medical-device-cybersecurity/`
+
+**Research Coverage:**
+- 8 research agents spawned (4 interpretations × 2 sources: Perplexity + Classic Web)
+- 4 interpretations researched:
+  1. Premarket (510(k)) requirements
+  2. Postmarket vulnerability management
+  3. Severity classification framework
+  4. Vulnerability to requirements mapping
+
+**Reference Files Created:**
+- `references/premarket-requirements.md` - Complete 510(k) cybersecurity checklist (Section 524B, SBOM, eSTAR template)
+- `references/postmarket-requirements.md` - CVD timelines, MDR triggers, PATCH Act, CISA coordination
+- `references/severity-classification.md` - Dual-axis framework, ISO 14971 harm levels, MITRE CVSS rubric, Tier 1/2 classification
+- `references/sbom-templates.md` - SPDX/CycloneDX examples, FDA-specific properties, VEX integration
+
+**Key Research Findings:**
+- FDA does NOT mandate SBOM formats (SPDX/CycloneDX voluntary)
+- 15% of submissions receive RTA letters for inadequate documentation
+- 700% increase in FDA deficiency letters since PATCH Act (October 2023)
+- Cybersecurity tiers (Tier 1/Tier 2) are INDEPENDENT of device class (I/II/III)
+- 93% of manufacturers fail to meet 30-60 day CVD timelines (average 4.5-6 months)
+- Only 27 of top 40 manufacturers maintain public CVD programs
+
+**Confidence:** 0.87 (High) based on official FDA guidance, statutory requirements, peer-reviewed research
