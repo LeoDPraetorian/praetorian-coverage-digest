@@ -69,7 +69,7 @@ cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
-    "additionalContext": "<EXTREMELY_IMPORTANT>\nYou have superpowers (via Chariot).\n\n**Below is your 'using-skills' skill - READ THIS CAREFULLY. It explains the HYBRID skill system:**\n- Core skills (~25) in .claude/skills/ -> Use Skill tool\n- Library skills (~120) in .claude/skill-library/ -> Use skill-search CLI + Read tool\n\n${using_skills_escaped}\n\n\n</EXTREMELY_IMPORTANT>"
+    "additionalContext": "<EXTREMELY_IMPORTANT>\nYou have superpowers (via Chariot).\n\n**Below is your 'using-skills' skill - READ THIS CAREFULLY. It explains the HYBRID skill system:**\n- Core skills (~25) in .claude/skills/ -> Use Skill tool\n- Library skills (~120) in .claude/skill-library/ -> Use Read tool\n\n${using_skills_escaped}\n\n\n</EXTREMELY_IMPORTANT>"
   }
 }
 EOF
