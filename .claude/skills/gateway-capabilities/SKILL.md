@@ -62,6 +62,7 @@ This gateway implements 3-tier loading:
 | "live validation" / "Shodan" / "metrics"                                                                          | → `validating-fingerprintx-live`                                    |
 | "protocol" / "banner" / "handshake"                                                                               | → `researching-protocols`                                           |
 | "version marker" / "fingerprint"                                                                                  | → `researching-version-markers`                                     |
+| "NoseyParker" / "secret scanning" / "credential detection" / "creating rules"                                     | → `creating-noseyparker-rules`                                      |
 | "standalone" / "tool integration"                                                                                 | → `integrating-standalone-capabilities`                             |
 | "detection plugin" / "XSS" / "SQLi"                                                                               | → `implementing-detection-plugins`                                  |
 | "Python to Go" / "dependency mapping"                                                                             | → `mapping-python-dependencies-to-go`                               |
@@ -113,6 +114,7 @@ This gateway implements 3-tier loading:
 | Web Crawlers        | `.claude/skill-library/development/capabilities/building-web-crawlers/SKILL.md`             | web crawler, Colly, Katana, scraping                      |
 | Janus Chains        | `.claude/skill-library/development/capabilities/capabilities-janus-chains/SKILL.md`         | Janus, chain, pipeline                                    |
 | Detection Plugins   | `.claude/skill-library/development/capabilities/implementing-detection-plugins/SKILL.md`    | detection plugin, XSS, SQLi, SSRF, OWASP                  |
+| NoseyParker Rules   | `.claude/skill-library/development/capabilities/creating-noseyparker-rules/SKILL.md`        | NoseyParker, secret scanning, credential detection        |
 
 ### Fingerprintx
 
