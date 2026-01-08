@@ -55,10 +55,7 @@ make setup
 make create branch=<branch-name>
 
 # launch claude code
-claude 
-
-# use einstein to develop your feature
-[claude] /einstein implement cha-2455
+claude
 
 # Create PRs across all submodules
 make create-prs
