@@ -217,6 +217,22 @@ When version cannot be determined: `cpe:2.3:a:{vendor}:{product}:*:::::::*`
 ````markdown
 # {Protocol} Validation Report
 
+## Prerequisite Checks
+
+### Docker
+- **Status**: {AVAILABLE / UNAVAILABLE}
+- **Check command**: `docker ps`
+- **Action**: {TESTED / SKIPPED}
+- **If skipped, user response**: "{quoted verbatim or N/A}"
+
+### Shodan API
+- **Status**: {CONFIGURED / MISSING}
+- **Check command**: `[ -n "$SHODAN_API_KEY" ]`
+- **Action**: {TESTED / SKIPPED}
+- **If skipped, user response**: "{quoted verbatim or N/A}"
+
+---
+
 ## Build Verification
 
 ```bash
@@ -291,6 +307,19 @@ $ ./fingerprintx -t localhost:{port} --json
 ## Issues Found
 
 {List any issues discovered during validation, or "None"}
+
+## Limitations
+
+{If any prerequisites were skipped, document here:}
+
+### {Step Name}: SKIPPED
+- **Reason**: {Why it was skipped}
+- **User acknowledgment**: "{Quoted response from AskUserQuestion}"
+- **Impact**: {What validation was missed}
+- **Confidence adjustment**: REDUCED
+
+{If no limitations:}
+None - all validation steps completed successfully.
 
 ## Overall Status
 

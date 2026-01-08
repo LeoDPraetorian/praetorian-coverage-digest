@@ -1,3 +1,78 @@
+## [Bug Fix] - 2026-01-08 - Mandatory Prerequisite Checks
+
+### Problem
+
+Two users reported that the workflow completed without prompting them when:
+1. Shodan API key was not configured (Phase 7.4 silently skipped)
+2. Docker was not running/installed (Phase 7.3 silently skipped)
+
+Both steps are MANDATORY but the workflow allowed silent completion instead of blocking with an explicit prompt.
+
+### Root Cause
+
+- No prerequisite validation before Docker/Shodan steps
+- No mandatory AskUserQuestion when prerequisites fail
+- Gate conditions checked 'does file exist?' not 'did step actually execute?'
+- Silent failures treated as completion
+
+### Changes Applied
+
+1. **SKILL.md - Added Mandatory Prerequisite Checks Section** (after Phase 7 header, line 241)
+   - Docker Check (Before Phase 7.3) with `docker ps` verification
+   - Shodan API Key Check (Before Phase 7.4) with `SHODAN_API_KEY` verification
+   - Both include mandatory AskUserQuestion prompts with explicit options
+   - Cannot proceed without user choice - silent skipping PROHIBITED
+   - Documents what to do if user skips (limitations section, MANIFEST update, PR notes)
+
+2. **references/gate-checklist.md - Added Evidence Requirements**
+   - New Sub-Phase 7.3: Docker Container Testing checklist with prerequisite check
+   - New Sub-Phase 7.4: Live Shodan Validation checklist with prerequisite check
+   - Evidence Requirement section showing mandatory validation-report.md format
+   - Gate FAILS if Prerequisite Checks section missing or incomplete
+
+3. **references/rationalization-table.md - Added Phase 7 Prerequisite Rationalizations**
+   - 7 new rationalizations covering silent skips, "later" promises, redundancy claims
+   - Explicit DENIED responses with mandatory AskUserQuestion requirements
+   - Documents that workflow prerequisites are NOT optional based on user mention
+
+4. **references/troubleshooting.md - Added Mandatory Action Sections**
+   - Phase 7.3: Docker Unavailable with symptoms, required actions, skip documentation
+   - Phase 7.4: Shodan API Key Missing with symptoms, setup instructions, skip documentation
+   - Both emphasize "DO NOT silently skip" and include Common Fixes tables
+
+5. **references/artifact-templates.md - Updated Validation Report Template**
+   - Added Prerequisite Checks section at report beginning
+   - Added Limitations section documenting skipped steps with user acknowledgment
+   - Templates show exact format for Docker and Shodan status documentation
+
+### GREEN Phase Verification
+
+✅ **Test Scenario**: Docker not installed AND SHODAN_API_KEY not set
+✅ **Expected**: Workflow STOPS at Phase 7.3 and 7.4 with AskUserQuestion prompts
+✅ **Verified**: All 5 files contain explicit "MUST", "CANNOT SKIP SILENTLY", "REQUIRED" language
+✅ **Backups**: Created for all 5 modified files with timestamps
+✅ **Line Count**: 566 lines (was 493, +73 for prerequisite checks, under 600 hard limit)
+
+### Impact
+
+- **Silent skips**: Now impossible - workflow blocks until user makes explicit choice
+- **Documentation**: Skipped prerequisites documented with user acknowledgment quotes
+- **Gate enforcement**: Validation reports MUST contain prerequisite checks or gate fails
+- **Rationalizations**: 7 new blocks prevent agents from bypassing prerequisite prompts
+- **User experience**: Clear prompts with setup instructions and skip impact explanations
+
+### Files Modified
+
+- `.claude/skills/orchestrating-fingerprintx-development/SKILL.md` (+73 lines)
+- `.claude/skills/orchestrating-fingerprintx-development/references/gate-checklist.md` (+54 lines)
+- `.claude/skills/orchestrating-fingerprintx-development/references/rationalization-table.md` (+7 rows)
+- `.claude/skills/orchestrating-fingerprintx-development/references/troubleshooting.md` (+106 lines)
+- `.claude/skills/orchestrating-fingerprintx-development/references/artifact-templates.md` (+21 lines)
+
+### Related Issues
+
+Resolves user reports of silent prerequisite skips in Phase 7 validation workflow.
+
 # Changelog
 
 All notable changes to the orchestrating-fingerprintx-development skill will be documented in this file.

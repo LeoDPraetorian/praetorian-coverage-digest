@@ -376,3 +376,105 @@ If you encounter issues not covered here:
 4. Ask user for guidance on domain-specific protocol knowledge
 
 **Do not proceed with uncertain gate passes** - blocked is better than wrong.
+
+---
+
+## Phase 7.3: Docker Unavailable
+
+### Symptoms
+- `docker ps` returns error or 'command not found'
+- Docker daemon not running
+- Permission denied errors
+
+### Required Action (MANDATORY)
+
+1. **DO NOT silently skip** - this violates the workflow
+2. **Issue AskUserQuestion** with these options:
+   - Install/start Docker and retry (RECOMMENDED)
+   - Skip Docker testing and document limitation
+3. **Wait for explicit user choice** - cannot proceed without it
+4. **Document the outcome** in validation-report.md
+
+### If User Chooses to Skip
+
+Add to validation-report.md:
+
+```markdown
+## Prerequisite Checks
+
+### Docker
+- Status: UNAVAILABLE
+- Action: SKIPPED
+- User response: "[paste their exact response]"
+
+## Limitations
+
+### Docker Container Testing: SKIPPED
+- Reason: Docker unavailable, user acknowledged limitation
+- Impact: Multi-version validation not performed
+- Confidence: REDUCED - version detection unverified across deployments
+```
+
+### Common Docker Fixes
+
+| Issue | Solution |
+|-------|----------|
+| Docker not installed | Direct user to https://docs.docker.com/get-docker/ |
+| Docker daemon not running | `sudo systemctl start docker` or start Docker Desktop |
+| Permission denied | Add user to docker group: `sudo usermod -aG docker $USER` |
+
+---
+
+## Phase 7.4: Shodan API Key Missing
+
+### Symptoms
+- SHODAN_API_KEY environment variable empty or unset
+- Shodan queries return authentication errors
+- Empty results when targets should exist
+
+### Required Action (MANDATORY)
+
+1. **DO NOT silently skip** - this violates the workflow
+2. **Issue AskUserQuestion** with these options:
+   - Configure API key and retry (RECOMMENDED)
+   - Skip live validation and document limitation
+3. **Wait for explicit user choice** - cannot proceed without it
+4. **Document the outcome** in validation-report.md
+
+### If User Chooses to Skip
+
+Add to validation-report.md:
+
+```markdown
+## Prerequisite Checks
+
+### Shodan API
+- Status: MISSING
+- Action: SKIPPED
+- User response: "[paste their exact response]"
+
+## Limitations
+
+### Live Shodan Validation: SKIPPED
+- Reason: API key not configured, user acknowledged limitation
+- Impact: Production accuracy unverified
+- Confidence: REDUCED - real-world detection rate unknown
+```
+
+### Shodan Setup Instructions
+
+1. Create account: https://account.shodan.io/register
+2. Get API key: https://account.shodan.io/ (shown on account page)
+3. Set environment variable:
+   ```bash
+   export SHODAN_API_KEY="your-api-key-here"
+   # Add to ~/.bashrc or ~/.zshrc for persistence
+   ```
+4. Verify: `echo $SHODAN_API_KEY` should show the key
+
+### Verifying API Key Works
+
+```bash
+curl "https://api.shodan.io/api-info?key=$SHODAN_API_KEY"
+# Should return JSON with query_credits, not an error
+```

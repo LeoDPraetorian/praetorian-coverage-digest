@@ -238,6 +238,79 @@ Follow the complete 8-phase workflow from researching-version-markers skill.
 
 ### Phase 7: Validation (BLOCKING GATE)
 
+### Mandatory Prerequisite Checks (CANNOT SKIP SILENTLY)
+
+Before executing Phase 7 sub-phases, you MUST verify prerequisites and prompt the user if they fail. Silent skipping is PROHIBITED.
+
+#### Docker Check (Before Phase 7.3)
+
+**Verification:**
+```bash
+docker ps
+```
+
+**If command fails (Docker unavailable), MUST use AskUserQuestion:**
+
+```
+Docker is required for Phase 7.3 multi-version container testing but is unavailable.
+
+Without Docker testing:
+- Version detection accuracy unverified across different versions
+- Edge cases in version-specific deployments untested
+- Plugin confidence level will be marked as REDUCED
+
+How would you like to proceed?
+
+Options:
+- Install/start Docker and retry (RECOMMENDED)
+- Skip Docker testing and document limitation
+```
+
+**Cannot proceed without explicit user choice. Cannot silently skip.**
+
+#### Shodan API Key Check (Before Phase 7.4)
+
+**Verification:**
+```bash
+[ -n "$SHODAN_API_KEY" ] && echo "Configured" || echo "MISSING"
+```
+
+**If MISSING, MUST use AskUserQuestion:**
+
+```
+Shodan API key is required for Phase 7.4 live validation but is not configured.
+
+Setup instructions:
+1. Create account at https://account.shodan.io/
+2. Copy your API key from the account page
+3. Set environment variable: export SHODAN_API_KEY="your-key"
+
+Without live validation:
+- Production accuracy unverified against real-world deployments
+- Detection rate metric unavailable
+- Plugin confidence level will be marked as REDUCED
+
+How would you like to proceed?
+
+Options:
+- Configure API key and retry (RECOMMENDED)
+- Skip live validation and document limitation
+```
+
+**Cannot proceed without explicit user choice. Cannot silently skip.**
+
+#### If User Chooses to Skip
+
+When user explicitly skips Docker or Shodan:
+1. Quote their choice verbatim in validation-report.md
+2. Add 'Limitations' section documenting what was skipped
+3. Update MANIFEST.yaml gate status to 'passed_with_limitations'
+4. Add comment in PR description noting reduced confidence
+
+This is NOT a gate override - it's an acknowledged limitation with documentation.
+
+---
+
 Phase 7 has **5 sub-phases** that must pass sequentially:
 
 | Sub-Phase                    | Purpose                  | Key Metric                    |

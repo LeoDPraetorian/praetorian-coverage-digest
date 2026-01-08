@@ -190,6 +190,60 @@ If gate fails, return to `researching-version-markers` skill and complete missin
   - Version substitution works
   - Fallback CPE used when version unknown
 
+### Sub-Phase 7.3: Docker Container Testing
+
+- [ ] **Docker prerequisite check executed**
+  - Command: `docker ps`
+  - Result logged in validation-report.md: 'Docker status: AVAILABLE' or 'Docker status: UNAVAILABLE'
+
+- [ ] **Docker testing executed OR explicitly skipped**
+  - IF executed:
+    - Container IDs logged for each version tested
+    - Fingerprintx commands with localhost targets shown
+    - Results for each version documented
+  - IF skipped:
+    - AskUserQuestion was issued (REQUIRED)
+    - User's response quoted verbatim
+    - Limitation documented in report
+  - **Cannot have neither - one MUST be documented**
+
+### Sub-Phase 7.4: Live Shodan Validation
+
+- [ ] **Shodan prerequisite check executed**
+  - SHODAN_API_KEY environment variable checked
+  - Result logged in validation-report.md: 'Shodan API: CONFIGURED' or 'Shodan API: MISSING'
+
+- [ ] **Shodan testing executed OR explicitly skipped**
+  - IF executed:
+    - Query string logged
+    - Target count logged (even if 0)
+    - Raw results saved to {protocol}-shodan-targets.json
+    - Detection rate calculated
+  - IF skipped:
+    - AskUserQuestion was issued (REQUIRED)
+    - User's response quoted verbatim
+    - Limitation documented in report
+  - **Cannot have neither - one MUST be documented**
+
+### Evidence Requirement
+
+The validation-report.md MUST contain:
+```markdown
+## Prerequisite Checks
+
+### Docker
+- Status: [AVAILABLE/UNAVAILABLE]
+- Action: [TESTED/SKIPPED]
+- If skipped, user response: "[quoted verbatim]"
+
+### Shodan API
+- Status: [CONFIGURED/MISSING]
+- Action: [TESTED/SKIPPED]
+- If skipped, user response: "[quoted verbatim]"
+```
+
+Gate FAILS if this section is missing or incomplete.
+
 ### Pass Criteria
 
 **PASS** if:

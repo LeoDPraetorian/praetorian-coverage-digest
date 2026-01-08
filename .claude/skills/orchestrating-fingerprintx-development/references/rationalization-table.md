@@ -49,6 +49,18 @@ Complete list of agent rationalizations for skipping gates and the correct respo
 | "Can't test all versions, tested 3"             | Must test all version ranges from matrix       | NOT ACCEPTED. Test all matrix ranges.            |
 | "CPE format close enough"                       | Must match exact CPE 2.3 format                | GATE FAILS. Fix CPE format.                      |
 
+## Phase 7 Prerequisite Rationalizations
+
+| Rationalization | Why It's Wrong | Correct Response |
+|-----------------|----------------|------------------|
+| "Docker failed so I moved to the next step" | Silent skip violates mandatory prompt requirement | DENIED. Must issue AskUserQuestion and get explicit user choice. |
+| "No Shodan key configured, will add later" | Live validation is mandatory, 'later' has ~10% completion rate | DENIED. Must prompt user for explicit skip or configure now. |
+| "Shodan returned 0 targets, validation complete" | 0 targets may indicate API failure or bad query, not empty results | NOT ACCEPTED. Verify API key works, log query, confirm 0 is genuine. |
+| "Docker tests passed so Shodan is redundant" | Both are required - Docker=controlled, Shodan=production diversity | DENIED. Each validates different aspects. Both mandatory. |
+| "User didn't mention Shodan/Docker" | Workflow requires them regardless of user mention | DENIED. Prerequisites are workflow requirements, not user requests. |
+| "I'll document the skip in the PR" | Documentation without prompt is silent skip | DENIED. Must prompt FIRST via AskUserQuestion, then document. |
+| "The skill doesn't explicitly say to prompt" | This update makes it explicit. Prompt is mandatory. | DENIED. Prerequisite checks with AskUserQuestion are required. |
+
 ## Cross-Phase Rationalizations
 
 | Rationalization                           | Why It's Wrong                                                      | Correct Response                                |
