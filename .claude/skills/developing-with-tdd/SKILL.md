@@ -213,6 +213,49 @@ Next failing test for next feature.
 | **Clear**        | Name describes behavior             | `test('test1')`                                     |
 | **Shows intent** | Demonstrates desired API            | Obscures what code should do                        |
 
+## The Cardinal Sin: Simulating Production Logic
+
+**Never duplicate production logic in tests. Always call actual code.**
+
+The test must fail if you delete the production code. If it doesn't, it's worthless.
+
+<Bad>
+```go
+func TestExcludeSeverity(t *testing.T) {
+    // SIMULATING logic - duplicates production code
+    excludeSeverity := "unknown,low,info"
+    if fullScan {
+        excludeSeverity = "unknown"
+    }
+    assert.Equal(t, expected, excludeSeverity)
+}
+// If you delete production code, this test STILL PASSES. Useless.
+```
+</Bad>
+
+<Good>
+```go
+// Production code: extract testable unit
+func getExcludeSeverity(full bool) string {
+    if full {
+        return "unknown"
+    }
+    return "unknown,low,info"
+}
+
+// Test calls ACTUAL function
+func TestGetExcludeSeverity(t *testing.T) {
+    result := getExcludeSeverity(true)  // Calls real code
+    assert.Equal(t, "unknown", result)
+}
+// Delete production code → test fails to compile. Correct.
+```
+</Good>
+
+**The rule:** If logic is buried in untestable code, extract it to a testable function. Then test the function.
+
+**Red flag:** Test contains `if/else`, loops, or calculations matching production code. That's simulation, not testing.
+
 ## Why Order Matters
 
 **"I'll write tests after to verify it works"**
@@ -282,6 +325,7 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 | "TDD will slow me down"                | TDD faster than debugging. Pragmatic = test-first.                      |
 | "Manual test faster"                   | Manual doesn't prove edge cases. You'll re-test every change.           |
 | "Existing code has no tests"           | You're improving it. Add tests for existing code.                       |
+| "I'll simulate the logic in my test"   | Simulation ≠ testing. Delete production code, test still passes = useless. |
 
 ## Red Flags - STOP and Start Over
 
@@ -298,6 +342,7 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 - "Already spent X hours, deleting is wasteful"
 - "TDD is dogmatic, I'm being pragmatic"
 - "This is different because..."
+- Test contains if/else or loops matching production logic (simulation)
 
 **All of these mean: Delete code. Start over with TDD.**
 

@@ -4,7 +4,7 @@ description: Use when developing offensive security capabilities - Porting Capab
 type: development
 permissionMode: default
 tools: Bash, BashOutput, Edit, Glob, Grep, KillBash, MultiEdit, Read, Skill, TodoWrite, WebFetch, WebSearch, Write
-skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, debugging-strategies, discovering-reusable-code, debugging-systematically, developing-with-tdd, enforcing-evidence-based-analysis, executing-plans, gateway-backend, gateway-capabilities, gateway-integrations, persisting-agent-outputs, semantic-code-operations, tracing-root-causes, using-skills, using-todowrite, verifying-before-completion
+skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, debugging-strategies, discovering-reusable-code, debugging-systematically, developing-with-tdd, enforcing-evidence-based-analysis, executing-plans, gateway-backend, gateway-capabilities, gateway-integrations, persisting-agent-outputs, preferring-simple-solutions, semantic-code-operations, tracing-root-causes, using-skills, using-todowrite, verifying-before-completion
 model: sonnet
 color: purple
 ---
