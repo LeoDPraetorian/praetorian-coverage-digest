@@ -44,7 +44,8 @@ For each task:
 **Dispatch fresh subagent:**
 
 ```
-Task tool (general-purpose):
+Task tool:
+  subagent_type: [appropriate specialized agent - e.g., frontend-developer, backend-developer, capability-developer, integration-developer]
   description: "Implement Task N: [task name]"
   prompt: |
     You are implementing Task N from [plan-file].

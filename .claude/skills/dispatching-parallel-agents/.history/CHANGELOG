@@ -1,0 +1,28 @@
+# Changelog
+
+## 2026-01-07 - Update Task() Examples to Show subagent_type Parameter
+
+**Problem (RED):**
+- Examples showed generic Task() calls without the required subagent_type parameter
+- Users reading the skill would see: `Task("Fix agent-tool-abort.test.ts failures");`
+- This pattern would fail in practice since Task tool requires explicit subagent_type
+
+**Changes:**
+1. Section "### 3. Dispatch in Parallel" (lines 71-77):
+   - Updated from: `Task("Fix agent-tool-abort.test.ts failures");`
+   - Updated to: `Task({ subagent_type: 'frontend-tester', description: 'Fix abort tests', prompt: '...' });`
+   - Shows proper Task tool invocation with all required parameters
+
+2. Section "## Real Example from Session" under "Dispatch:" (lines 150-156):
+   - Updated from: `Agent 1 → Fix agent-tool-abort.test.ts`
+   - Updated to: `Agent 1 (frontend-tester) → Fix agent-tool-abort.test.ts`
+   - Clarifies which agent type is being dispatched
+
+**Verification (GREEN):**
+- Examples now accurately reflect Task tool API requirements
+- Users can copy-paste examples and they will work correctly
+- Agent type is explicit in both code examples and real-world scenario
+
+**Compliance:**
+- Line count: 192 lines (within 500-line limit)
+- All other content unchanged

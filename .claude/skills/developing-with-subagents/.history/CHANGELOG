@@ -1,0 +1,7 @@
+# Changelog
+
+## 2026-01-07
+
+**Changed**: Replaced hardcoded `general-purpose` subagent with dynamic `subagent_type` parameter requiring selection of appropriate specialized agent (frontend-developer, backend-developer, capability-developer, integration-developer) based on task domain.
+
+**Impact**: Enables proper agent specialization dispatch instead of always using general-purpose agent.

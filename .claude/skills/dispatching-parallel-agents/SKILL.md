@@ -70,9 +70,9 @@ Each agent gets:
 
 ```typescript
 // In Claude Code / AI environment
-Task("Fix agent-tool-abort.test.ts failures");
-Task("Fix batch-completion-behavior.test.ts failures");
-Task("Fix tool-approval-race-conditions.test.ts failures");
+Task({ 'frontend-tester', description: 'Fix abort tests', prompt: 'Fix agent-tool-abort.test.ts failures' });
+Task({ 'frontend-tester', description: 'Fix batch tests', prompt: 'Fix batch-completion-behavior.test.ts failures' });
+Task({ 'frontend-tester', description: 'Fix race condition tests', prompt: 'Fix tool-approval-race-conditions.test.ts failures' });
 // All three run concurrently
 ```
 
@@ -150,9 +150,9 @@ Return: Summary of what you found and what you fixed.
 **Dispatch:**
 
 ```
-Agent 1 → Fix agent-tool-abort.test.ts
-Agent 2 → Fix batch-completion-behavior.test.ts
-Agent 3 → Fix tool-approval-race-conditions.test.ts
+Agent 1 (frontend-tester) → Fix agent-tool-abort.test.ts
+Agent 2 (frontend-tester) → Fix batch-completion-behavior.test.ts
+Agent 3 (frontend-tester) → Fix tool-approval-race-conditions.test.ts
 ```
 
 **Results:**
