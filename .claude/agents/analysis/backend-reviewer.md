@@ -4,7 +4,7 @@ description: Use when reviewing backend implementations - validates developer's 
 type: analysis
 permissionMode: plan
 tools: Glob, Grep, Read, Write, Skill, TodoWrite, WebFetch, WebSearch
-skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, debugging-systematically, enforcing-evidence-based-analysis, gateway-backend, persisting-agent-outputs, semantic-code-operations, using-skills, using-todowrite, verifying-before-completion
+skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, discovering-reusable-code, debugging-systematically, enforcing-evidence-based-analysis, gateway-backend, persisting-agent-outputs, semantic-code-operations, using-skills, using-todowrite, verifying-before-completion
 model: sonnet
 color: cyan
 ---
@@ -19,6 +19,7 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 | Skill                               | Why Always Invoke                                                                                    |
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
+| `discovering-reusable-code`         | When reviewing new code exhaustively search for reusable patterns that should have been used         |
 | `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
 | `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
 | `enforcing-evidence-based-analysis` | **Prevents hallucinations** - you WILL fail catastrophically without this                            |

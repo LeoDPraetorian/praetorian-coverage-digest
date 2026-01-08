@@ -1,530 +1,277 @@
 # Gold Standard Agents
 
-**Purpose**: Analysis of exemplar agents to understand what makes them excellent
+**Purpose**: Analysis of exemplar agents to understand what makes them excellent.
 
-**When to read**: During agent creation to understand quality patterns, or when customizing templates
-
----
-
-## What Makes an Agent "Gold Standard"
-
-**Criteria**:
-
-1. **Lean** - Appropriate size for agent type (150-280 lines)
-2. **Complete** - All required sections present
-3. **Compliant** - Passes all audit phases
-4. **Tested** - Proven in production use
-5. **Clear** - Instructions unambiguous
-6. **Effective** - Actually solves problems well
+**Key insight**: The gold standard pattern emerged from testing, not theory. Agents with `<EXTREMELY-IMPORTANT>` blocks achieve 100% skill invocation. Polite alternatives fail.
 
 ---
 
-## The Four Gold Standard Agents
+## Gold Standard Criteria
 
-### Overview
+An agent is gold standard when it has:
 
-| Agent                  | Type         | Lines | Location                                           | Key Features                                           |
-| ---------------------- | ------------ | ----- | -------------------------------------------------- | ------------------------------------------------------ |
-| **frontend-lead**      | architecture | 151   | `.claude/agents/architecture/frontend-lead.md`     | Step 1/2/3, Core Responsibilities, 6-point Anti-Bypass |
-| **frontend-tester**    | testing      | 277   | `.claude/agents/testing/frontend-tester.md`        | Mode-based structure, comprehensive test guidance      |
-| **security-lead**      | architecture | 185   | `.claude/agents/architecture/security-lead.md`     | Security-specific responsibilities, threat modeling    |
-| **frontend-developer** | development  | 160   | `.claude/agents/development/frontend-developer.md` | Implementation focus, TDD enforcement                  |
-
-**These agents represent the ACTUAL pattern.** They are the source of truth, not documentation that has drifted.
+1. **EXTREMELY-IMPORTANT block** - Immediately after frontmatter, contains Step 1/2/3
+2. **7 universal skills** - All present in frontmatter
+3. **Step 1/2/3 structure** - NOT "Tier 1/2/3"
+4. **Detailed anti-rationalization** - 5-10 traps with counters
+5. **Two skill tracking arrays** - `skills_invoked` + `library_skills_read`
+6. **Type-appropriate line count** - 130-280 depending on type
+7. **Compliant frontmatter** - All fields, correct order
 
 ---
 
-## Gold Standard #1: frontend-lead (Architecture Pattern)
+## Reference Agents
 
-**Location**: `.claude/agents/architecture/frontend-lead.md`
-**Size**: 151 lines
-**Type**: architecture
-**Model**: opus
-**Pattern**: Step 1/2/3 Skill Loading Protocol
+| Agent                    | Type         | Lines | Location                                             |
+| ------------------------ | ------------ | ----- | ---------------------------------------------------- |
+| **frontend-lead**        | architecture | ~136  | `.claude/agents/architecture/frontend-lead.md`       |
+| **frontend-developer**   | development  | ~139  | `.claude/agents/development/frontend-developer.md`   |
+| **backend-developer**    | development  | ~139  | `.claude/agents/development/backend-developer.md`    |
+| **capability-developer** | development  | ~158  | `.claude/agents/development/capability-developer.md` |
+| **test-lead**            | testing      | ~131  | `.claude/agents/testing/test-lead.md`                |
 
-### Why It's a Gold Standard
+**Use these as templates.** They represent the actual working pattern.
 
-**1. Two-Tier Skill System (CRITICAL PATTERN)**
+---
 
-FROM frontend-lead.md lines 34-37:
+## The Critical Pattern: EXTREMELY-IMPORTANT Block
+
+### Why It Works
+
+Testing revealed:
+
+- **With aggressive `<EXTREMELY-IMPORTANT>` block** → 100% skill invocation
+- **With polite table-based instructions** → Failed to invoke Step 1 skills
+
+The aggressive language is intentional:
+
+- "STOP. READ THIS FIRST. DO NOT SKIP."
+- "Your VERY FIRST ACTION must be invoking skills."
+- "IF YOU ARE THINKING ANY OF THESE, YOU ARE ABOUT TO FAIL."
+
+### Block Structure
 
 ```markdown
-- **Core skills** (in `.claude/skills/`): Invoke via Skill tool → `skill: "skill-name"`
-- **Library skills** (in `.claude/skill-library/`): Load via Read tool → `Read("path/from/gateway")`
+<EXTREMELY-IMPORTANT>
+# STOP. READ THIS FIRST. DO NOT SKIP.
 
-**Library skill paths come FROM the gateway—do NOT hardcode them.**
-```
+Your VERY FIRST ACTION must be invoking skills.
 
-This is **NOT** "Read() for all skills" - it's a **TWO-TIER** system.
-
-**2. Step 1/2/3 Structure (NOT Tier 1/2/3)**
-
-FROM frontend-lead.md lines 40-91:
-
-```markdown
 ### Step 1: Always Invoke First
 
-**Every architecture task requires these (in order):**
+| Skill                               | Why Always Invoke         |
+| ----------------------------------- | ------------------------- |
+| `using-skills`                      | Non-negotiable first read |
+| `semantic-code-operations`          | Core code tool            |
+| `calibrating-time-estimates`        | Prevents rationalization  |
+| `gateway-[domain]`                  | Routes to library skills  |
+| `enforcing-evidence-based-analysis` | Prevents hallucinations   |
+| `persisting-agent-outputs`          | WHERE to write output     |
+| `[domain-specific]`                 | [reason]                  |
+| `verifying-before-completion`       | Final verification        |
 
-| Skill                               | Why Always Invoke                                  |
-| ----------------------------------- | -------------------------------------------------- |
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization  |
-| `gateway-frontend`                  | Routes to mandatory + task-specific library skills |
-| `brainstorming`                     | MANDATORY for architects - explore alternatives    |
-| `writing-plans`                     | Document architectural decisions                   |
-| `enforcing-evidence-based-analysis` | Read source files before designing                 |
-| `verifying-before-completion`       | Ensures outputs are verified before claiming done  |
+DO THIS NOW. BEFORE ANYTHING ELSE.
 
 ### Step 2: Invoke Core Skills Based on Task Context
 
-Your `skills` frontmatter makes these core skills available. **Invoke based on semantic relevance to your task**:
-
-| Trigger                            | Skill                               | When to Invoke                                    |
-| ---------------------------------- | ----------------------------------- | ------------------------------------------------- |
-| Creating implementation plan       | `enforcing-evidence-based-analysis` | BEFORE planning - read all relevant source files  |
-| Evaluating multiple approaches     | `brainstorming`                     | Exploring alternatives before recommending        |
-| Documenting architecture decisions | `writing-plans`                     | Creating formal design artifacts                  |
-| Bug, error, unexpected behavior    | `debugging-systematically`          | Investigating issues before fixing                |
-| Multi-step task (≥2 steps)         | `using-todowrite`                   | Track architecture decisions and validation steps |
+| Trigger   | Skill   | When to Invoke |
+| --------- | ------- | -------------- |
+| [pattern] | `skill` | [when]         |
 
 ### Step 3: Load Library Skills from Gateway
 
-The gateway provides:
+[Gateway instructions]
 
-1. **Mandatory library skills** - Read ALL skills in "Mandatory" section for architects
-2. **Task-specific routing** - Use routing tables to find relevant library skills
-   ...
+## WHY THIS IS NON-NEGOTIABLE
+
+[Explanation]
+
+## IF YOU ARE THINKING ANY OF THESE, YOU ARE ABOUT TO FAIL
+
+- "Time pressure" → WRONG. [counter]
+- "Simple task" → WRONG. [counter]
+- [5-10 traps total]
+  </EXTREMELY-IMPORTANT>
 ```
 
-**3. Core Responsibilities Section**
+---
 
-FROM frontend-lead.md lines 16-31:
+## 7 Universal Skills
 
-```markdown
-## Core Responsibilities
+**Every agent MUST have these in frontmatter:**
 
-### Architecture for New Features
+| Skill                               | Purpose                                     |
+| ----------------------------------- | ------------------------------------------- |
+| `using-skills`                      | Skill discovery and invocation protocol     |
+| `calibrating-time-estimates`        | Prevents "no time" rationalization          |
+| `enforcing-evidence-based-analysis` | Prevents hallucination - read before acting |
+| `persisting-agent-outputs`          | Output file location and format             |
+| `semantic-code-operations`          | Code search and editing via Serena          |
+| `using-todowrite`                   | Progress tracking for multi-step tasks      |
+| `verifying-before-completion`       | Final verification before claiming done     |
 
-- Design component hierarchies
-- Define state management strategy (TanStack Query vs Zustand vs Context)
-- Plan file organization and module boundaries
-- Specify performance requirements
-- Document architectural decisions
+**Plus at least one gateway skill.**
 
-### Architecture Review for Refactoring
+---
 
-- Analyze existing code structure
-- Identify technical debt and architectural smells
-- Design refactoring approach with minimal risk
-- Plan incremental migration strategy
-- Document trade-offs and alternatives considered
-```
+## Type-Specific Standards
 
-**4. Anti-Bypass with 6 Detailed Points**
+### Architecture (plan mode, opus)
 
-FROM frontend-lead.md lines 93-99:
+| Metric             | Target                                |
+| ------------------ | ------------------------------------- |
+| **Lines**          | 130-200                               |
+| **permissionMode** | plan                                  |
+| **Model**          | opus                                  |
+| **Tools**          | Read-focused (no Edit/Write for most) |
 
-```markdown
-## Anti-Bypass
+**Step 1 additions**: `brainstorming`, `writing-plans`
 
-Do NOT rationalize skipping skills:
+### Development (default mode, sonnet)
 
-- "No time" → calibrating-time-estimates exists precisely because this rationalization is a trap. You are 100x faster than a human
-- "Simple task" → Step 1 + verifying-before-completion still apply
-- "I already know this" → Your training data is stale, you are often not up to date on the latest libraries and patterns, read current skills
-- "Solution is obvious" → That's coder thinking, not lead thinking - explore alternatives with brainstorming
-- "Just this once" → "Just this once" becomes "every time" - follow the workflow
-- "I'm confident I know the code. Code is constantly evolving" → `enforcing-evidence-based-analysis` exists because confidence without evidence = **hallucination**
-```
+| Metric             | Target            |
+| ------------------ | ----------------- |
+| **Lines**          | 130-180           |
+| **permissionMode** | default           |
+| **Model**          | sonnet            |
+| **Tools**          | Edit, Write, Bash |
 
-NOT "3 brief bullet points."
+**Step 1 additions**: `developing-with-tdd`, `adhering-to-yagni`
 
-**5. Output Format with Two Arrays**
+### Testing (default mode, sonnet)
 
-FROM frontend-lead.md lines 133-145:
+| Metric             | Target            |
+| ------------------ | ----------------- |
+| **Lines**          | 130-280           |
+| **permissionMode** | default           |
+| **Model**          | sonnet            |
+| **Tools**          | Bash, Edit, Write |
+
+**Note**: Higher line count due to mode-specific sections (Unit/Integration/E2E)
+
+**Step 1 additions**: `developing-with-tdd`, `gateway-testing`
+
+### Analysis (plan mode, opus)
+
+| Metric             | Target                    |
+| ------------------ | ------------------------- |
+| **Lines**          | 130-210                   |
+| **permissionMode** | plan                      |
+| **Model**          | opus                      |
+| **Tools**          | Read-only (NO Edit/Write) |
+
+### Quality (plan mode, sonnet)
+
+| Metric             | Target                    |
+| ------------------ | ------------------------- |
+| **Lines**          | 120-160                   |
+| **permissionMode** | plan                      |
+| **Model**          | sonnet                    |
+| **Tools**          | Read-only (NO Edit/Write) |
+
+---
+
+## Output Format Standard
+
+**Two separate arrays** (NOT a single `skills_read`):
 
 ```json
 {
   "status": "complete|blocked|needs_review",
   "summary": "What was done",
-  "skills_invoked": ["writing-plans", "brainstorming", "gateway-frontend"],
-  "library_skills_read": [".claude/skill-library/architecture/frontend/..."],
-  "architecture": {
-    "components": ["ComponentA", "ComponentB"],
-    "state_management": "TanStack Query + Zustand",
-    "file_organization": "Feature-based with shared UI",
-    "trade_offs": {
-      "chosen_approach": "...",
-      "alternatives_considered": ["..."],
-      "reasoning": "..."
-    }
-  },
-  ...
-}
-```
-
-NOT a single `skills_read` array.
-
-### Lessons from frontend-lead
-
-- ✅ Use Step 1/2/3 structure (NOT Tier 1/2/3)
-- ✅ Document two-tier skill system explicitly
-- ✅ Include Core Responsibilities with subsections
-- ✅ 6 detailed Anti-Bypass points with explanations
-- ✅ Output format with `skills_invoked` + `library_skills_read`
-- ✅ Table format for Step 1 (Skill | Why Always Invoke)
-- ✅ Table format for Step 2 (Trigger | Skill | When to Invoke)
-
----
-
-## Gold Standard #2: frontend-tester (Testing Pattern)
-
-**Location**: `.claude/agents/testing/frontend-tester.md`
-**Size**: 277 lines
-**Type**: testing
-**Model**: sonnet
-**Pattern**: Mode-based with Step 1/2/3
-
-### Why It's a Gold Standard
-
-**1. Higher Line Count for Testing Agents**
-
-Testing agents have 200-280 lines because they need mode-specific guidance:
-
-- Unit testing mode
-- Integration testing mode
-- E2E testing mode
-
-Each mode has specific patterns, tools, and verification steps.
-
-**2. Same Core Structure as frontend-lead**
-
-- Two-tier skill system documented
-- Step 1/2/3 structure
-- Core Responsibilities section
-- Detailed Anti-Bypass
-- Output with `skills_invoked` + `library_skills_read`
-
-**3. Mode-Specific Sections**
-
-```markdown
-## Unit Testing Mode
-
-[Specific guidance for unit tests with Vitest]
-
-## Integration Testing Mode
-
-[Specific guidance for integration tests with MSW]
-
-## E2E Testing Mode
-
-[Specific guidance for E2E tests with Playwright]
-```
-
-### Lessons from frontend-tester
-
-- ✅ Testing agents need more lines (200-280) for mode-specific content
-- ✅ Same core structure applies to all agent types
-- ✅ Mode-based organization for agents with multiple operational contexts
-
----
-
-## Gold Standard #3: security-lead (Architecture + Security Pattern)
-
-**Location**: `.claude/agents/architecture/security-lead.md`
-**Size**: 185 lines
-**Type**: architecture
-**Model**: opus
-**Pattern**: Step 1/2/3 with security focus
-
-### Why It's a Gold Standard
-
-**1. Security-Specific Core Responsibilities**
-
-```markdown
-## Core Responsibilities
-
-### Threat Modeling
-
-- Identify attack surfaces and trust boundaries
-- Enumerate potential threat actors and motivations
-- Map attack vectors and exploitation paths
-- Prioritize threats by business impact
-
-### Security Architecture Design
-
-- Design authentication and authorization flows
-- Specify encryption and key management strategies
-- Define secure coding practices and validation requirements
-```
-
-**2. Security-Focused Step 1 Skills**
-
-Different mandatory skills for security domain:
-
-| Skill                               | Why Always Invoke                                      |
-| ----------------------------------- | ------------------------------------------------------ |
-| `calibrating-time-estimates`        | Security work takes time - prevent rushed decisions    |
-| `gateway-security`                  | Routes to auth, crypto, threat modeling library skills |
-| `brainstorming`                     | MANDATORY - explore attack vectors and mitigations     |
-| `enforcing-evidence-based-analysis` | Security claims require evidence                       |
-
-**3. Domain-Specific Anti-Bypass**
-
-```markdown
-- "I'm confident this is secure" → enforcing-evidence-based-analysis exists because confidence without evidence = **security vulnerability**
-- "Standard pattern is fine" → Security patterns evolve - read current skills
-```
-
-### Lessons from security-lead
-
-- ✅ Core structure applies to all domains
-- ✅ Customize Core Responsibilities for domain
-- ✅ Adjust Step 1 skills for domain requirements
-- ✅ Add domain-specific Anti-Bypass counters
-
----
-
-## Gold Standard #4: frontend-developer (Development Pattern)
-
-**Location**: `.claude/agents/development/frontend-developer.md`
-**Size**: 160 lines
-**Type**: development
-**Model**: opus
-**Pattern**: Step 1/2/3 with development focus
-
-### Why It's a Gold Standard
-
-**1. Development-Specific Step 1 Skills**
-
-| Skill                         | Why Always Invoke                                   |
-| ----------------------------- | --------------------------------------------------- |
-| `calibrating-time-estimates`  | Prevents "no time to read skills" rationalization   |
-| `gateway-frontend`            | Routes to React patterns, testing, state management |
-| `developing-with-tdd`         | Write test FIRST - RED → GREEN → REFACTOR           |
-| `adhering-to-yagni`           | Build only what's needed, not what might be needed  |
-| `verifying-before-completion` | Run tests and build before claiming done            |
-
-**2. Implementation-Focused Output**
-
-```json
-{
-  "status": "complete",
-  "summary": "Implemented UserProfile component with TDD",
-  "skills_invoked": ["developing-with-tdd", "gateway-frontend"],
-  "library_skills_read": [
-    ".claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md"
-  ],
-  "files_modified": ["src/components/UserProfile.tsx", "src/components/UserProfile.test.tsx"],
+  "skills_invoked": ["core-skill-1", "gateway-domain"],
+  "library_skills_read": [".claude/skill-library/path/SKILL.md"],
+  "files_modified": ["paths"],
   "verification": {
     "tests_passed": true,
-    "test_command": "npm test UserProfile",
-    "test_output": "✓ renders user data\n✓ handles loading state",
-    "build_success": true,
-    "build_command": "npm run build"
+    "build_success": true
+  },
+  "handoff": {
+    "recommended_agent": "next-agent",
+    "context": "What next"
   }
 }
 ```
 
-### Lessons from frontend-developer
-
-- ✅ Development agents need TDD enforcement in Step 1
-- ✅ Verification section in output is mandatory
-- ✅ files_modified tracks implementation
-
 ---
 
-## Common Patterns Across All Gold Standards
+## Anti-Patterns
 
-### 1. Two-Tier Skill System (UNIVERSAL)
+### ❌ Using "Tier 1/2/3" terminology
 
-**ALL gold standard agents document this:**
+**Wrong**: "### Tier 1: Always Read"
+**Correct**: "### Step 1: Always Invoke First"
 
-```markdown
-- **Core skills** (in `.claude/skills/`): Invoke via Skill tool → `skill: "skill-name"`
-- **Library skills** (in `.claude/skill-library/`): Load via Read tool → `Read("path/from/gateway")`
+### ❌ Polite instructions
+
+**Wrong**: "Please invoke these skills when appropriate"
+**Correct**: "STOP. READ THIS FIRST. DO NOT SKIP."
+
+### ❌ Skill Loading Protocol as separate section
+
+**Wrong**:
+
+```
+# Agent Title
+## Core Responsibilities
+## Skill Loading Protocol  ← Separate section
 ```
 
-**This is NOT "Read() for all skills."**
+**Correct**:
 
-### 2. Step 1/2/3 Structure (UNIVERSAL)
+```
+<EXTREMELY-IMPORTANT>
+### Step 1: Always Invoke First  ← Inside block
+</EXTREMELY-IMPORTANT>
 
-**Step 1**: Always Invoke First (table: Skill | Why Always Invoke)
-**Step 2**: Invoke Core Skills Based on Task Context (table: Trigger | Skill | When to Invoke)
-**Step 3**: Load Library Skills from Gateway
-
-**NOT "Tier 1/2/3".**
-
-### 3. Core Responsibilities Section (UNIVERSAL)
-
-**2-4 subsections** defining what the agent does.
-
-### 4. Anti-Bypass with 5-6 Detailed Points (UNIVERSAL)
-
-Each point has:
-
-- Rationalization: "I already know this"
-- Counter: → Your training data is stale, read current skills
-
-**NOT "3 brief bullet points."**
-
-### 5. Output Format with Two Arrays (UNIVERSAL)
-
-```json
-{
-  "skills_invoked": ["core-skill-1", "gateway-domain"],
-  "library_skills_read": [".claude/skill-library/path/SKILL.md"]
-}
+# Agent Title
+## Core Responsibilities
 ```
 
-**NOT a single `skills_read` array.**
+### ❌ Single skills_read array
 
-### 6. Multi-Example Descriptions (UNIVERSAL)
+**Wrong**: `"skills_read": ["all", "together"]`
+**Correct**: Separate `skills_invoked` + `library_skills_read`
 
-All gold standards have **2-3 examples** in description showing diverse use cases.
+### ❌ Brief anti-bypass points
 
----
-
-## Anti-Patterns (What Gold Standards Avoid)
-
-### ❌ WRONG: "Read() for all skills"
-
-**Bad**: Documentation that says "Use Read() for ALL skills. Do NOT use Skill tool."
-
-**Good**: Two-tier system - Skill tool for core, Read for library.
-
-**Why**: Core skills are available via Skill tool. Documentation saying otherwise is factually incorrect.
-
----
-
-### ❌ WRONG: Single skills_read Array
-
-**Bad**:
-
-```json
-{
-  "skills_read": ["all", "skills", "together"]
-}
-```
-
-**Good**:
-
-```json
-{
-  "skills_invoked": ["core-skills"],
-  "library_skills_read": ["library-skills"]
-}
-```
-
-**Why**: Different invocation methods require separate tracking.
-
----
-
-### ❌ WRONG: Tier 1/2/3 Structure
-
-**Bad**: "### Tier 1: Always Read (Every Task)"
-
-**Good**: "### Step 1: Always Invoke First"
-
-**Why**: Actual gold standard agents use Step 1/2/3 terminology.
-
----
-
-### ❌ WRONG: 3 Brief Anti-Bypass Points
-
-**Bad**:
-
-```markdown
-## Anti-Bypass
-
-- Simple task → Step 1 applies
-- No time → Read skills
-- I know this → Training stale
-```
-
-**Good**: 5-6 points with full explanations (see frontend-lead example above).
-
-**Why**: Brief points don't provide effective counters to rationalization.
-
----
-
-### ❌ WRONG: Unrealistic Line Count Targets
-
-**Bad**: "All agents: <150 lines"
-
-**Good**:
-
-- Architecture: 150-200 lines
-- Development: 150-180 lines
-- Testing: 200-280 lines
-- Analysis: 120-160 lines
-
-**Why**: Actual gold standard agents are 151-277 lines depending on type.
-
----
-
-## Applying Gold Standard Patterns
-
-### When Creating New Agent
-
-1. **Use agent-templates.md** (now aligned with gold standards)
-2. **Add 2-3 examples in description**
-3. **Include Core Responsibilities with 2-4 subsections**
-4. **Use Step 1/2/3 structure (NOT Tier 1/2/3)**
-5. **Document two-tier skill system**
-6. **6 detailed Anti-Bypass points**
-7. **Output with skills_invoked + library_skills_read**
-8. **Aim for type-appropriate line count**
-
-### When Reviewing Existing Agent
-
-**Compare to gold standards**:
-
-- Step 1/2/3 structure? (NOT Tier 1/2/3)
-- Two-tier skill system documented?
-- Core Responsibilities with subsections?
-- 5-6 detailed Anti-Bypass points?
-- Output has both skill arrays?
-- Line count appropriate for type?
-
-**If gaps**: Update to match gold standard pattern.
+**Wrong**: `- Simple task → applies`
+**Correct**: `- "Simple task" → WRONG. That's what every failed agent thought.`
 
 ---
 
 ## Gold Standard Checklist
 
-**An agent is gold standard quality when**:
+Use this to validate any agent:
 
 ### Structure (MANDATORY)
 
-- [ ] Two-tier skill system documented (Skill tool for core, Read for library)
-- [ ] Step 1/2/3 structure (NOT Tier 1/2/3)
-- [ ] **3 mandatory universal skills in Step 1**: `calibrating-time-estimates`, `enforcing-evidence-based-analysis`, `verifying-before-completion`
-- [ ] Core Responsibilities section with 2-4 subsections
-- [ ] Anti-Bypass with 5-6 detailed points
-- [ ] Output format with `skills_invoked` + `library_skills_read`
+- [ ] `<EXTREMELY-IMPORTANT>` block exists immediately after frontmatter
+- [ ] Block contains Step 1/2/3 structure (NOT Tier 1/2/3)
+- [ ] Block contains "WHY THIS IS NON-NEGOTIABLE" section
+- [ ] Block contains rationalization traps (5-10 items)
+- [ ] `# Agent Title` comes AFTER `</EXTREMELY-IMPORTANT>`
+- [ ] `## Core Responsibilities` with 2-4 subsections
+- [ ] `## Output Format` with both skill arrays
 
-### Content (MANDATORY)
+### Frontmatter (MANDATORY)
 
-- [ ] Description: 2-3 examples, <1024 chars, single-line
-- [ ] Frontmatter: All fields correct, alphabetized
-- [ ] Step 1 table: Skill | Why Always Invoke
-- [ ] Step 2 table: Trigger | Skill | When to Invoke
-- [ ] Escalation Protocol: Clear handoff guidance
+- [ ] All 7 universal skills present
+- [ ] At least one gateway skill
+- [ ] `Skill` tool in tools list
+- [ ] Fields in canonical order
+- [ ] Description single-line with `\n` escapes
 
-### Size (TYPE-DEPENDENT)
+### Content Quality
 
-- [ ] Architecture: 150-200 lines
-- [ ] Development: 150-180 lines
-- [ ] Testing: 200-280 lines
-- [ ] Analysis: 120-160 lines
-
-**All checkboxes = production-ready gold standard agent** ✅
+- [ ] 2-3 examples in description
+- [ ] Detailed rationalization counters (not brief)
+- [ ] Domain-specific Step 1 skills where appropriate
+- [ ] Line count in type-appropriate range
 
 ---
 
-## Related Documents
+## Related
 
-- **`agent-templates.md`** - Templates aligned with gold standards
-- **`../SKILL.md`** - Agent creation workflow
-- **Gold standard agents**: frontend-lead (151L), frontend-tester (277L), security-lead (185L), frontend-developer (160L)
+- **[agent-templates.md](agent-templates.md)** - Copy-paste template
+- **[../SKILL.md](../SKILL.md)** - Full creation workflow

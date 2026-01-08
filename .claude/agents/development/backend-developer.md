@@ -4,7 +4,7 @@ description: Use when developing Go backend applications - REST/GraphQL APIs, La
 type: development
 permissionMode: default
 tools: Bash, BashOutput, Edit, Glob, Grep, KillBash, MultiEdit, Read, Skill, TodoWrite, WebFetch, WebSearch, Write
-skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, debugging-strategies, debugging-systematically, developing-with-tdd, enforcing-evidence-based-analysis, executing-plans, gateway-backend, persisting-agent-outputs, semantic-code-operations, tracing-root-causes, using-skills, using-todowrite, verifying-before-completion
+skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, discovering-reusable-code, debugging-strategies, debugging-systematically, developing-with-tdd, enforcing-evidence-based-analysis, executing-plans, gateway-backend, persisting-agent-outputs, semantic-code-operations, tracing-root-causes, using-skills, using-todowrite, verifying-before-completion
 model: sonnet
 color: green
 ---
@@ -19,6 +19,7 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 | Skill                               | Why Always Invoke                                                                                    |
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
+| `discovering-reusable-code`         | Before implement any change exhaustively search for reusable patterns                                |
 | `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
 | `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
 | `enforcing-evidence-based-analysis` | **Prevents hallucinations** - you WILL fail catastrophically without this                            |

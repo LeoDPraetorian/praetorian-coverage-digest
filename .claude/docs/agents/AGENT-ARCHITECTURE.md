@@ -570,7 +570,6 @@ Agents exceeding maximums fail audit. Extract content to skills.
 .claude/agent-library/             # Library agents (spawned by orchestration skills)
  integration/                   # Integration workflow agents
     integration-researcher.md  # Spawned via orchestrating-research skill
-    integration-developer.md   # Spawned via orchestrating-research skill
  research/                      # Research workflow agents
      codebase-researcher.md     # Spawned via orchestrating-research skill
      context7-researcher.md     # Spawned via orchestrating-research skill

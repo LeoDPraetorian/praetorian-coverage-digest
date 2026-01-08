@@ -1,6 +1,6 @@
 ---
 name: managing-agents
-description: Use when managing agents (create, update, audit, fix, rename, test, search, list) - pure router delegating to library skills with TDD enforcement and lean agent pattern (<150 lines).
+description: Use when managing agents (create, update, audit, fix, rename, test, search, list) - pure router delegating to library skills with TDD enforcement and gold standard pattern (EXTREMELY-IMPORTANT block, Step 1/2/3, 130-280 lines by type).
 allowed-tools: Read, Skill, TodoWrite, AskUserQuestion
 ---
 
@@ -28,7 +28,7 @@ Modifying existing agent?
 
 Validating agent?
 ├─ Quick check → skill: "auditing-agents" (Phase 0 CLI)
-├─ Full audit → Read auditing-agents (Phases 1-18)
+├─ Full audit → Read auditing-agents (9 phases)
 └─ Test behavior → Read verifying-agent-skill-invocation
 
 Discovery?
@@ -43,6 +43,9 @@ Discovery?
 ❌ **WRONG**: Create agent without TDD
 ✅ **RIGHT**: Read creating-agents → Follow RED-GREEN-REFACTOR
 
+❌ **WRONG**: Missing EXTREMELY-IMPORTANT block
+✅ **RIGHT**: Block immediately after frontmatter (100% skill invocation)
+
 ❌ **WRONG**: Create agent with Tier 1/2/3 structure
 ✅ **RIGHT**: Use Step 1/2/3 structure per gold standard
 
@@ -56,7 +59,7 @@ Discovery?
 ✅ **RIGHT**: 5-6 detailed points with explanations
 
 ❌ **WRONG**: Target <150 lines for all agents
-✅ **RIGHT**: 150-280 lines depending on agent type
+✅ **RIGHT**: 130-280 lines depending on agent type
 
 ❌ **WRONG**: Edit agent without audit first
 ✅ **RIGHT**: Read auditing-agents → Fix issues → Re-audit
@@ -65,7 +68,7 @@ Discovery?
 ✅ **RIGHT**: Read fixing-agents → Creates backup automatically
 
 ❌ **WRONG**: Agent >300 lines "because it's complex"
-✅ **RIGHT**: Type-specific targets (Architecture: 150-200, Development: 150-180, Testing: 200-280)
+✅ **RIGHT**: Type-specific targets (Architecture: 130-200, Development: 130-180, Testing: 130-280)
 
 ❌ **WRONG**: Use block scalars in description
 ✅ **RIGHT**: Single-line with \n escapes
@@ -96,7 +99,7 @@ Discovery?
 
 **Audit failing**: Run Phase 0 CLI first, then manual phases. See auditing-agents.
 
-**Agent exceeds type-specific target**: Extract to references. See updating-agents for extraction workflow. Targets: Architecture 150-200, Development 150-180, Testing 200-280.
+**Agent exceeds type-specific target**: Extract to references. See updating-agents for extraction workflow. Targets: Architecture 130-200, Development 130-180, Testing 130-280.
 
 **TDD skipped**: Creating/updating agents enforce TDD. Cannot bypass.
 

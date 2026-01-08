@@ -1,12 +1,12 @@
 ---
 name: creating-agents
-description: Use when creating new agents - TDD workflow (RED-GREEN-REFACTOR) enforcing Claude 4.5+ template from agent-templates.md as ONLY valid structure.
+description: Use when creating new agents - TDD workflow (RED-GREEN-REFACTOR) enforcing gold standard structure with EXTREMELY-IMPORTANT block, Step 1/2/3, and 7 universal skills.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Skill, AskUserQuestion
 ---
 
 # Creating Agents
 
-**TDD-driven agent creation enforcing Claude 4.5+ gold standard template.**
+**TDD-driven agent creation enforcing the gold standard pattern.**
 
 > **MANDATORY**: You MUST use TodoWrite to track all 10 phases. Cannot skip TDD cycle.
 
@@ -14,19 +14,19 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Skill, AskUserQue
 
 ## Quick Reference
 
-| Phase               | Purpose             | Time     | Reference                        |
-| ------------------- | ------------------- | -------- | -------------------------------- |
-| **0. Navigate**     | Repo root           | 1 min    | patterns/repo-root-detection.md  |
-| **1. 🔴 RED**       | Prove gap exists    | 5 min    | tdd-workflow.md                  |
-| **2. Define**       | Type, tools, skills | 5 min    | frontmatter-reference.md         |
-| **3. Template**     | Use gold standard   | 2 min    | agent-templates.md               |
-| **4. Content**      | Core sections       | 10 min   | gold-standards.md                |
-| **5. Skills**       | Integration         | 5 min    | skill-integration-guide.md       |
-| **6. Examples**     | 2-3 in description  | 5 min    | gold-standards.md                |
-| **7. 🟢 GREEN**     | Verify works        | 5 min    | tdd-workflow.md                  |
-| **8. Audit**        | Compliance          | 5 min    | auditing-agents                  |
-| **9. Fix**          | Issues              | 5-10 min | fixing-agents                    |
-| **10. 🔵 REFACTOR** | Pressure test       | 15 min   | verifying-agent-skill-invocation |
+| Phase               | Purpose                        | Time     | Reference                        |
+| ------------------- | ------------------------------ | -------- | -------------------------------- |
+| **0. Navigate**     | Repo root                      | 1 min    | -                                |
+| **1. 🔴 RED**       | Prove gap exists               | 5 min    | tdd-workflow.md                  |
+| **2. Define**       | Type, tools, skills            | 5 min    | frontmatter-reference.md         |
+| **3. Template**     | Use gold standard              | 2 min    | agent-templates.md               |
+| **4. Content**      | EXTREMELY-IMPORTANT + sections | 10 min   | gold-standards.md                |
+| **5. Skills**       | 7 universal + gateway          | 5 min    | skill-integration-guide.md       |
+| **6. Examples**     | 2-3 in description             | 5 min    | gold-standards.md                |
+| **7. 🟢 GREEN**     | Verify works                   | 5 min    | tdd-workflow.md                  |
+| **8. Audit**        | 9-phase compliance             | 5 min    | auditing-agents                  |
+| **9. Fix**          | Issues found                   | 5-10 min | fixing-agents                    |
+| **10. 🔵 REFACTOR** | Pressure test                  | 15 min   | verifying-agent-skill-invocation |
 
 **Total**: 60-75 minutes
 
@@ -42,6 +42,50 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Skill, AskUserQue
 
 ---
 
+## The Gold Standard Structure
+
+**ALL agents MUST have this exact structure:**
+
+```markdown
+---
+[Frontmatter with 7 universal skills + gateway]
+---
+
+<EXTREMELY-IMPORTANT>
+### Step 1: Always Invoke First
+[Table: Skill | Why Always Invoke]
+
+### Step 2: Invoke Core Skills Based on Task Context
+
+[Table: Trigger | Skill | When to Invoke]
+
+### Step 3: Load Library Skills from Gateway
+
+[Instructions]
+
+## WHY THIS IS NON-NEGOTIABLE
+
+## IF YOU ARE THINKING ANY OF THESE, YOU ARE ABOUT TO FAIL
+
+[Rationalization traps]
+</EXTREMELY-IMPORTANT>
+
+# [Agent Title]
+
+## Core Responsibilities
+
+## Escalation
+
+## Output Format
+```
+
+**Why this structure?** Testing showed:
+
+- With `<EXTREMELY-IMPORTANT>` block → **100% skill invocation**
+- With polite alternatives → **Failed to invoke skills**
+
+---
+
 ## TDD Cycle (Phases 1, 7, 10)
 
 ### Phase 1: 🔴 RED - Prove Gap Exists
@@ -54,15 +98,13 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Skill, AskUserQue
 
 **Cannot proceed without failing test** ✅
 
-**Details**: See [tdd-workflow.md](references/tdd-workflow.md)
-
 ### Phase 7: 🟢 GREEN - Verify Agent Works
 
 **After creation, re-test scenario:**
 
 1. Invoke new agent with same test case
 2. **MUST PASS** - agent solves problem
-3. Verify no regression in existing behavior
+3. Verify no regression
 
 **Cannot proceed without passing test** ✅
 
@@ -76,46 +118,126 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Skill, AskUserQue
 
 **Document rationalizations, add counters** ✅
 
-**Details**: Read `.claude/skill-library/claude/agent-management/verifying-agent-skill-invocation/SKILL.md`
-
 ---
 
-## Phase 0: Navigate to Repo Root (MANDATORY)
+## Phase 0: Navigate to Repo Root
 
 ```bash
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
-**Cannot proceed without navigating to repo root** ✅
+---
+
+## Phase 2: Define Frontmatter
+
+### Required Fields (in order)
+
+```yaml
+name: agent-name
+description: Use when [trigger].\n\n<example>...\n</example>
+type: architecture|development|testing|analysis|quality
+permissionMode: plan|default
+tools: [Alphabetized, include Skill if skills exist]
+skills: [7 universal + gateway + domain-specific]
+model: opus|sonnet
+color: blue|green|cyan|pink|purple|orange|red
+```
+
+### 7 Universal Skills (REQUIRED)
+
+Every agent MUST have these in `skills:` field:
+
+1. `using-skills`
+2. `calibrating-time-estimates`
+3. `enforcing-evidence-based-analysis`
+4. `persisting-agent-outputs`
+5. `semantic-code-operations`
+6. `using-todowrite`
+7. `verifying-before-completion`
+
+**Plus at least one gateway** (`gateway-frontend`, `gateway-backend`, etc.)
 
 ---
 
 ## Phase 3: Use Gold Standard Template
 
-**CRITICAL**: Use [agent-templates.md](references/agent-templates.md) as ONLY valid structure.
+**CRITICAL**: Use [agent-templates.md](references/agent-templates.md) as the ONLY valid structure.
 
-**Gold standard patterns** (type-specific line counts: 150-280 lines):
+**Key elements**:
 
-- **Step 1/2/3 Skill Loading Protocol** (NOT Tier 1/2/3)
-- **Two-tier skill system**: Skill tool for core skills, Read for library skills
-- **Core Responsibilities section**: 2-4 subsections defining agent duties
-- **Anti-Bypass**: 5-6 detailed points with explanations
-- **Output format**: skills_invoked + library_skills_read arrays (two separate)
+1. **EXTREMELY-IMPORTANT block** - Immediately after frontmatter
+2. **Step 1/2/3 structure** - Inside the block (NOT "Tier 1/2/3")
+3. **Anti-rationalization** - 5-10 traps with counters
+4. **Core Responsibilities** - 2-4 subsections after block
+5. **Output format** - `skills_invoked` + `library_skills_read` (two arrays)
 
-**Gold standards**: frontend-lead (151 lines), frontend-tester (277 lines), security-lead (185 lines), frontend-developer (160 lines)
+**Line count targets by type**:
 
-**Analysis**: See [gold-standards.md](references/gold-standards.md)
+| Type         | Lines   |
+| ------------ | ------- |
+| architecture | 130-200 |
+| development  | 130-180 |
+| testing      | 130-280 |
+| analysis     | 130-210 |
+| quality      | 120-160 |
 
 ---
 
-## Phases 2-6, 8-9: Quick Links
+## Phase 4: Populate Content
 
-- **Phase 2**: Define type, tools, skills → [frontmatter-reference.md](references/frontmatter-reference.md)
-- **Phase 4**: Populate sections → [gold-standards.md](references/gold-standards.md)
-- **Phase 5**: Skill integration → [skill-integration-guide.md](references/skill-integration-guide.md)
-- **Phase 6**: Add examples → [gold-standards.md](references/gold-standards.md)
-- **Phase 8**: Audit compliance → `skill: "auditing-agents"`
-- **Phase 9**: Fix issues → `Read("fixing-agents/SKILL.md")`
+### Inside EXTREMELY-IMPORTANT Block
+
+1. **Step 1 table**: Universal skills + domain-specific
+2. **Step 2 table**: Trigger-based skill invocation
+3. **Step 3**: Gateway loading instructions
+4. **WHY THIS IS NON-NEGOTIABLE**: Explanation
+5. **Rationalization traps**: 5-10 detailed items with counters
+
+### After the Block
+
+1. **# Agent Title**: Role statement
+2. **## Core Responsibilities**: 2-4 subsections
+3. **## Escalation**: When to hand off
+4. **## Output Format**: JSON with both skill arrays
+
+---
+
+## Phase 5: Skill Integration
+
+1. Verify all 7 universal skills in frontmatter
+2. Add appropriate gateway skill
+3. Add domain-specific skills
+4. Ensure `Skill` tool in tools list
+
+---
+
+## Phase 6: Add Examples
+
+Add 2-3 examples in description:
+
+```yaml
+description: Use when [trigger].\n\n<example>\nContext: [scenario]\nuser: '[request]'\nassistant: 'I will use [agent-name]'\n</example>
+```
+
+---
+
+## Phase 8: Run Audit
+
+```
+skill: "auditing-agents"
+```
+
+All 9 phases should PASS.
+
+---
+
+## Phase 9: Fix Issues
+
+If audit fails, use fixing workflow:
+
+```
+Read(".claude/skill-library/claude/agent-management/fixing-agents/SKILL.md")
+```
 
 ---
 
@@ -123,40 +245,18 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 Agent complete when:
 
-1. ✅ RED documented (failing test)
-2. ✅ Uses agent-templates.md structure
-3. ✅ Type-appropriate line count (Architecture: 150-200, Development: 150-180, Testing: 200-280)
-4. ✅ Core Responsibilities section with 2-4 subsections
-5. ✅ Step 1/2/3 Skill Loading Protocol (NOT Tier 1/2/3)
-6. ✅ Two-tier skill system documented (Skill tool for core, Read for library)
-7. ✅ Output format has skills_invoked + library_skills_read (two arrays)
-8. ✅ 2-3 examples in description
-9. ✅ **Skill tool present** (if `skills:` field has values) - Section 12
-10. ✅ GREEN passed (test works)
-11. ✅ Audit passed (compliance)
-12. ✅ REFACTOR passed (pressure tests)
-13. ✅ TodoWrite complete
-
-### Frontmatter Validation (Before Phase 7 GREEN)
-
-**CRITICAL CHECK**: If agent has `skills:` in frontmatter → `Skill` MUST be in `tools:` list
-
-**Why**: Core skills require Skill tool to invoke via `skill: "name"` syntax. Without it, agent is broken at runtime.
-
-**Check before saving**:
-
-```bash
-# If skills exist
-if agent has skills: field with values; then
-  # Verify Skill tool present
-  if "Skill" not in tools: field; then
-    ERROR: Add Skill to tools list in alphabetical order
-    Reference: agent-compliance-contract.md Section 12
-  fi
-fi
-```
-
-**This prevents**: Creating broken agents (4+ existing agents were created without this validation)
+- [ ] 🔴 RED documented (failing test)
+- [ ] `<EXTREMELY-IMPORTANT>` block present
+- [ ] Step 1/2/3 structure (NOT Tier 1/2/3)
+- [ ] 7 universal skills + gateway in frontmatter
+- [ ] `Skill` tool in tools list
+- [ ] Core Responsibilities with 2-4 subsections
+- [ ] Output has `skills_invoked` + `library_skills_read`
+- [ ] 2-3 examples in description
+- [ ] Line count in type-appropriate range
+- [ ] 🟢 GREEN passed
+- [ ] Audit passed (9 phases)
+- [ ] 🔵 REFACTOR passed (pressure tests)
 
 ---
 
@@ -170,8 +270,7 @@ fi
 
 **References**:
 
-- [agent-templates.md](references/agent-templates.md) - ONLY valid structure
+- [agent-templates.md](references/agent-templates.md) - Gold standard template
 - [gold-standards.md](references/gold-standards.md) - Exemplar analysis
 - [tdd-workflow.md](references/tdd-workflow.md) - RED-GREEN-REFACTOR
 - [frontmatter-reference.md](references/frontmatter-reference.md) - Field specs
-- [skill-integration-guide.md](references/skill-integration-guide.md) - Skills field
