@@ -18,19 +18,30 @@
  *   perplexityReason
  * } from './.claude/tools/perplexity';
  *
- * // Web search
+ * // Web search (always uses query parameter)
  * const searchResults = await perplexitySearch.execute({
  *   query: 'TypeScript best practices 2025'
  * });
  *
- * // Conversational AI
- * const answer = await perplexityAsk.execute({
+ * // Conversational AI (convenience: query OR advanced: messages)
+ * const quickAnswer = await perplexityAsk.execute({
+ *   query: 'What is Model Context Protocol?'
+ * });
+ *
+ * const conversation = await perplexityAsk.execute({
  *   messages: [
- *     { role: 'user', content: 'What is Model Context Protocol?' }
+ *     { role: 'user', content: 'What are REST APIs?' },
+ *     { role: 'assistant', content: 'REST APIs are...' },
+ *     { role: 'user', content: 'How do they compare to GraphQL?' }
  *   ]
  * });
  *
- * // Deep research with citations
+ * // Deep research with citations (convenience: query OR advanced: messages)
+ * const quickResearch = await perplexityResearch.execute({
+ *   query: 'Research large language model developments',
+ *   strip_thinking: true
+ * });
+ *
  * const research = await perplexityResearch.execute({
  *   messages: [
  *     { role: 'user', content: 'Research large language model developments' }
@@ -38,7 +49,11 @@
  *   strip_thinking: true
  * });
  *
- * // Advanced reasoning
+ * // Advanced reasoning (convenience: query OR advanced: messages)
+ * const quickReasoning = await perplexityReason.execute({
+ *   query: 'Explain the logic behind this problem'
+ * });
+ *
  * const reasoning = await perplexityReason.execute({
  *   messages: [
  *     { role: 'user', content: 'Explain the logic behind this problem' }

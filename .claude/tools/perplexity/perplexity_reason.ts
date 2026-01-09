@@ -57,12 +57,22 @@ const messageSchema = z.object({
 export const perplexityReasonParams = z.object({
   messages: z.array(messageSchema)
     .min(1, 'At least one message is required')
+    .optional()
     .describe('Array of conversation messages'),
+
+  // Convenience parameter - converts to messages internally
+  query: z.string()
+    .min(1, 'Query cannot be empty')
+    .optional()
+    .describe('Convenience: auto-wrapped into messages array'),
 
   strip_thinking: z.boolean()
     .optional()
     .describe('If true, removes <think>...</think> tags to save context tokens')
-});
+}).refine(
+  data => data.messages || data.query,
+  'Either messages or query is required'
+);
 
 export type PerplexityReasonInput = z.infer<typeof perplexityReasonParams>;
 
@@ -87,7 +97,12 @@ export type PerplexityReasonOutput = z.infer<typeof perplexityReasonOutput>;
  * ```typescript
  * import { perplexityReason } from './.claude/tools/perplexity';
  *
- * // Logical reasoning with thinking process
+ * // Convenience: simple query string (auto-wrapped into messages)
+ * const quickReasoning = await perplexityReason.execute({
+ *   query: 'If all cats are animals, and some animals are pets, what can we conclude?'
+ * });
+ *
+ * // Advanced: full messages array for multi-turn reasoning
  * const reasoning = await perplexityReason.execute({
  *   messages: [
  *     { role: 'user', content: 'If all cats are animals, and some animals are pets, what can we conclude?' }
@@ -96,9 +111,7 @@ export type PerplexityReasonOutput = z.infer<typeof perplexityReasonOutput>;
  *
  * // Mathematical reasoning without thinking tags
  * const math = await perplexityReason.execute({
- *   messages: [
- *     { role: 'user', content: 'Explain why the sum of angles in a triangle is 180 degrees' }
- *   ],
+ *   query: 'Explain why the sum of angles in a triangle is 180 degrees',
  *   strip_thinking: true
  * });
  *
@@ -115,11 +128,24 @@ export const perplexityReason = {
     // Validate input
     const validated = perplexityReasonParams.parse(input);
 
+    // Convert query to messages format if query was provided
+    const effectiveMessages = validated.messages ?? [
+      { role: 'user' as const, content: validated.query! }
+    ];
+
+    // Prepare params for MCP (messages + optional strip_thinking)
+    const mcpParams: { messages: typeof effectiveMessages; strip_thinking?: boolean } = {
+      messages: effectiveMessages
+    };
+    if (validated.strip_thinking !== undefined) {
+      mcpParams.strip_thinking = validated.strip_thinking;
+    }
+
     // Call MCP tool with longer timeout (complex reasoning takes time)
     const rawData = await callMCPTool(
       'perplexity',
       'perplexity_reason',
-      validated,
+      mcpParams,
       { timeoutMs: 120000 } // 2 min timeout for complex reasoning
     );
 
@@ -142,7 +168,7 @@ export const perplexityReason = {
     return perplexityReasonOutput.parse({
       content: truncated,
       metadata: {
-        messageCount: validated.messages.length,
+        messageCount: effectiveMessages.length,
         thinkingStripped: validated.strip_thinking || false,
         hasThinkingTags
       }

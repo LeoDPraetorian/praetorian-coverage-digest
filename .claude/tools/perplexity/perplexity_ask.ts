@@ -53,8 +53,18 @@ const messageSchema = z.object({
 export const perplexityAskParams = z.object({
   messages: z.array(messageSchema)
     .min(1, 'At least one message is required')
-    .describe('Array of conversation messages')
-});
+    .optional()
+    .describe('Array of conversation messages'),
+
+  // Convenience parameter - converts to messages internally
+  query: z.string()
+    .min(1, 'Query cannot be empty')
+    .optional()
+    .describe('Convenience: auto-wrapped into messages array')
+}).refine(
+  data => data.messages || data.query,
+  'Either messages or query is required'
+);
 
 export type PerplexityAskInput = z.infer<typeof perplexityAskParams>;
 
@@ -77,14 +87,19 @@ export type PerplexityAskOutput = z.infer<typeof perplexityAskOutput>;
  * ```typescript
  * import { perplexityAsk } from './.claude/tools/perplexity';
  *
- * // Simple question
+ * // Convenience: simple query string (auto-wrapped into messages)
+ * const quickAnswer = await perplexityAsk.execute({
+ *   query: 'What is TypeScript?'
+ * });
+ *
+ * // Advanced: full messages array for simple questions
  * const answer = await perplexityAsk.execute({
  *   messages: [
  *     { role: 'user', content: 'What is TypeScript?' }
  *   ]
  * });
  *
- * // Multi-turn conversation
+ * // Multi-turn conversation (requires messages array)
  * const response = await perplexityAsk.execute({
  *   messages: [
  *     { role: 'user', content: 'What are REST APIs?' },
@@ -105,11 +120,16 @@ export const perplexityAsk = {
     // Validate input
     const validated = perplexityAskParams.parse(input);
 
+    // Convert query to messages format if query was provided
+    const effectiveMessages = validated.messages ?? [
+      { role: 'user' as const, content: validated.query! }
+    ];
+
     // Call MCP tool
     const rawData = await callMCPTool(
       'perplexity',
       'perplexity_ask',
-      validated
+      { messages: effectiveMessages }
     );
 
     if (!rawData) {
@@ -128,7 +148,7 @@ export const perplexityAsk = {
     return perplexityAskOutput.parse({
       content: truncated,
       metadata: {
-        messageCount: validated.messages.length
+        messageCount: effectiveMessages.length
       }
     });
   },

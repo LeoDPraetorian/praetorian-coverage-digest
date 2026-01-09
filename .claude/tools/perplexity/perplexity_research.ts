@@ -57,12 +57,22 @@ const messageSchema = z.object({
 export const perplexityResearchParams = z.object({
   messages: z.array(messageSchema)
     .min(1, 'At least one message is required')
+    .optional()
     .describe('Array of conversation messages'),
+
+  // Convenience parameter - converts to messages internally
+  query: z.string()
+    .min(1, 'Query cannot be empty')
+    .optional()
+    .describe('Convenience: auto-wrapped into messages array'),
 
   strip_thinking: z.boolean()
     .optional()
     .describe('If true, removes <think>...</think> tags to save context tokens')
-});
+}).refine(
+  data => data.messages || data.query,
+  'Either messages or query is required'
+);
 
 export type PerplexityResearchInput = z.infer<typeof perplexityResearchParams>;
 
@@ -87,7 +97,12 @@ export type PerplexityResearchOutput = z.infer<typeof perplexityResearchOutput>;
  * ```typescript
  * import { perplexityResearch } from './.claude/tools/perplexity';
  *
- * // Deep research with citations
+ * // Convenience: simple query string (auto-wrapped into messages)
+ * const quickResearch = await perplexityResearch.execute({
+ *   query: 'Research the latest developments in large language models'
+ * });
+ *
+ * // Advanced: full messages array for multi-turn conversations
  * const research = await perplexityResearch.execute({
  *   messages: [
  *     { role: 'user', content: 'Research the latest developments in large language models' }
@@ -96,9 +111,7 @@ export type PerplexityResearchOutput = z.infer<typeof perplexityResearchOutput>;
  *
  * // Research without thinking tags (saves tokens)
  * const concise = await perplexityResearch.execute({
- *   messages: [
- *     { role: 'user', content: 'Compare React state management approaches' }
- *   ],
+ *   query: 'Compare React state management approaches',
  *   strip_thinking: true
  * });
  *
@@ -114,11 +127,24 @@ export const perplexityResearch = {
     // Validate input
     const validated = perplexityResearchParams.parse(input);
 
+    // Convert query to messages format if query was provided
+    const effectiveMessages = validated.messages ?? [
+      { role: 'user' as const, content: validated.query! }
+    ];
+
+    // Prepare params for MCP (messages + optional strip_thinking)
+    const mcpParams: { messages: typeof effectiveMessages; strip_thinking?: boolean } = {
+      messages: effectiveMessages
+    };
+    if (validated.strip_thinking !== undefined) {
+      mcpParams.strip_thinking = validated.strip_thinking;
+    }
+
     // Call MCP tool with longer timeout (research takes time)
     const rawData = await callMCPTool(
       'perplexity',
       'perplexity_research',
-      validated,
+      mcpParams,
       { timeoutMs: 120000 } // 2 min timeout for deep research
     );
 
@@ -142,7 +168,7 @@ export const perplexityResearch = {
     return perplexityResearchOutput.parse({
       content: truncated,
       metadata: {
-        messageCount: validated.messages.length,
+        messageCount: effectiveMessages.length,
         citationCount,
         thinkingStripped: validated.strip_thinking || false
       }
