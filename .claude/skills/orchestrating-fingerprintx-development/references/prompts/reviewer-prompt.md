@@ -1,12 +1,12 @@
-# Reviewer Subagent Prompt Template
+# Capability Reviewer Prompt Template (Fingerprintx)
 
-Use this template when dispatching reviewer subagents in Phase 6.
+Use this template when dispatching capability-reviewer agent in Phase 6.5.
 
 ## Two-Stage Review Process
 
 Following the obra/superpowers pattern, code review has TWO stages:
 
-1. **Spec Compliance Review** - Does the code match the plan?
+1. **Spec Compliance Review** - Does the code match the protocol research?
 2. **Code Quality Review** - Is the code well-built?
 
 **IMPORTANT:** Do NOT start code quality review until spec compliance is confirmed.
@@ -17,8 +17,8 @@ Following the obra/superpowers pattern, code review has TWO stages:
 
 ```typescript
 Task({
-  subagent_type: "frontend-reviewer", // or "backend-reviewer"
-  description: "Spec compliance review for [feature]",
+  subagent_type: "capability-reviewer",
+  description: "Spec compliance review for [protocol]",
   prompt: `[Use spec compliance template below]`,
 });
 ```
@@ -27,8 +27,8 @@ Task({
 
 ```typescript
 Task({
-  subagent_type: "frontend-reviewer", // or "backend-reviewer"
-  description: "Code quality review for [feature]",
+  subagent_type: "capability-reviewer",
+  description: "Code quality review for [protocol]",
   prompt: `[Use code quality template below]`,
 });
 ```
@@ -38,15 +38,15 @@ Task({
 ## Stage 1: Spec Compliance Review Template
 
 ````markdown
-You are reviewing code for SPEC COMPLIANCE: [FEATURE_NAME]
+You are reviewing fingerprintx plugin for SPEC COMPLIANCE: [PROTOCOL_NAME]
 
 ## Your Single Focus
 
-Does the implementation match the specification in plan.md?
+Does the implementation match the specification in protocol-research.md?
 
-- Nothing missing (all requirements implemented)
+- Nothing missing (all detection strategies implemented)
 - Nothing extra (no unrequested features)
-- Correct behavior (matches spec, not "close enough")
+- Correct behavior (matches protocol research, not "close enough")
 
 ---
 
@@ -54,20 +54,20 @@ Does the implementation match the specification in plan.md?
 
 **The implementer may have finished quickly. Their report may be:**
 
-- **Incomplete** - Missing requirements they didn't mention
-- **Inaccurate** - Claiming things work that don't
-- **Optimistic** - Glossing over issues or edge cases
+- **Incomplete** - Missing detection strategies they didn't mention
+- **Inaccurate** - Claiming detection works when it doesn't
+- **Optimistic** - Glossing over edge cases or validation issues
 
 **You MUST verify independently:**
 
 1. **Read the actual code** - Do NOT trust the implementer's summary
-2. **Compare line-by-line** - Check each plan requirement against actual implementation
-3. **Test claims** - If they say "all tests pass", verify test files exist and cover the requirement
+2. **Compare line-by-line** - Check each protocol research requirement against actual implementation
+3. **Test claims** - If they say "all probes work", verify probe bytes exist and match protocol spec
 4. **Look for omissions** - What did they NOT mention? Often more important than what they did
 
 ### Verification Checklist
 
-For EACH requirement in the plan:
+For EACH requirement in protocol research:
 
 | Requirement | Claimed Status | Verified Status | Evidence |
 |-------------|----------------|-----------------|----------|
@@ -77,16 +77,21 @@ For EACH requirement in the plan:
 ### Red Flags to Watch For
 
 - "Implemented as specified" without details
-- Vague summaries ("added the feature")
-- No test file references
+- Vague summaries ("added the plugin")
+- No test file references for detection logic
 - Suspiciously fast completion
-- Claims that can't be verified from code
+- Claims about detection accuracy that can't be verified from code
+- TODO comments for CPE or version (must be complete)
 
 ---
 
-## Plan Requirements
+## Protocol Research Requirements
 
-[PASTE the full task specifications from plan.md]
+[PASTE the full detection strategy specifications from protocol-research.md]
+
+## Version Matrix (if applicable)
+
+[PASTE the version fingerprint matrix from version-matrix.md, or "N/A - closed-source"]
 
 ## Implementation Summary
 
@@ -94,7 +99,7 @@ For EACH requirement in the plan:
 
 ## Files to Review
 
-[LIST of files created/modified by developer]
+[LIST of files created by developer]
 
 ## Output Directory
 
@@ -102,11 +107,14 @@ OUTPUT_DIRECTORY: [FEATURE_DIR]
 
 ## MANDATORY CHECK
 
-For EACH requirement in the plan:
+For EACH detection strategy in protocol research:
 
 1. Is it implemented? (Yes/No - verify in code, not summary)
-2. Does it match the spec exactly? (Yes/No/Deviation noted)
-3. Is there anything extra not in the spec? (List extras)
+2. Does it match the protocol spec exactly? (Yes/No/Deviation noted)
+3. Is there anything extra not in the protocol research? (List extras)
+4. Are probe bytes correct for the protocol?
+5. Is version extraction implemented per version matrix?
+6. Is CPE generation complete (no TODO comments)?
 
 ## Spec Compliance Checklist
 
@@ -118,36 +126,42 @@ For EACH requirement in the plan:
 
 ## Verdict
 
-**SPEC_COMPLIANT** - All requirements met, nothing extra
+**SPEC_COMPLIANT** - All protocol requirements met, nothing extra
 **NOT_COMPLIANT** - Issues found (list below)
 
 ### Issues (if NOT_COMPLIANT)
 
 **Missing:**
 
-- [Requirements not implemented]
+- [Detection strategies not implemented]
 
 **Extra (unrequested):**
 
-- [Features added that weren't in spec]
+- [Features added that weren't in protocol research]
 
 **Deviations:**
 
-- [Behaviors that don't match spec]
+- [Behaviors that don't match protocol spec]
+
+**Incomplete:**
+
+- [TODO comments for CPE/version]
+- [Hardcoded values that should be extracted]
 
 ## Output Format
 
 ```json
 {
-  "agent": "frontend-reviewer",
+  "agent": "capability-reviewer",
   "output_type": "spec-compliance-review",
+  "protocol": "[PROTOCOL_NAME]",
   "feature_directory": "[FEATURE_DIR]",
   "skills_invoked": ["persisting-agent-outputs"],
   "status": "complete",
   "verdict": "SPEC_COMPLIANT|NOT_COMPLIANT",
   "issues_found": [],
   "handoff": {
-    "next_agent": "frontend-reviewer (code quality)",
+    "next_agent": "capability-reviewer (code quality)",
     "context": "Spec compliance confirmed, proceed to code quality review"
   }
 }
@@ -156,14 +170,12 @@ For EACH requirement in the plan:
 
 If NOT_COMPLIANT, orchestrator returns to developer for fixes before code quality review.
 
-````
-
 ---
 
 ## Stage 2: Code Quality Review Template
 
-```markdown
-You are reviewing code for QUALITY: [FEATURE_NAME]
+````markdown
+You are reviewing fingerprintx plugin for QUALITY: [PROTOCOL_NAME]
 
 **PREREQUISITE:** Spec compliance review must be PASSED before this review.
 
@@ -172,37 +184,45 @@ You are reviewing code for QUALITY: [FEATURE_NAME]
 Is the code well-built?
 
 - Clean and maintainable
-- Follows project patterns
+- Follows fingerprintx patterns (5-method interface)
 - Proper error handling
 - Good test coverage
-- No security issues
+- No magic numbers or hardcoded values
 
 ## Code Quality Checklist
 
 ### Architecture & Design
-- [ ] Follows project patterns and conventions
-- [ ] Proper separation of concerns
+- [ ] Implements 5-method plugin interface correctly
+  - `Type() plugins.Protocol`
+  - `Priority() int`
+  - `Run(conn net.Conn, timeout time.Duration, target plugins.Target) (*plugins.Service, error)`
+  - `PortPriority(port uint16) bool`
+  - `Name() string`
+- [ ] Two-phase detection (detect then enrich)
+- [ ] Type constants alphabetically ordered in types.go
+- [ ] Plugin import alphabetically ordered in plugin_list.go
 - [ ] No unnecessary coupling
-- [ ] DRY principle followed
 
 ### Code Quality
-- [ ] Clear, descriptive names
+- [ ] Clear, descriptive function names
 - [ ] Functions are small and focused
-- [ ] No magic numbers/strings
-- [ ] Proper error handling
+- [ ] No magic probe bytes (documented with comments)
+- [ ] Proper error handling (connection failures, timeouts)
 - [ ] No commented-out code
+- [ ] Package comment documents detection strategy
+
+### Fingerprintx-Specific
+- [ ] Probe bytes match protocol specification
+- [ ] Version extraction uses documented markers
+- [ ] CPE generation follows cpe:2.3 format
+- [ ] No TODO comments (especially for CPE/version)
+- [ ] PortPriority returns true for default ports
 
 ### Testing
-- [ ] Tests verify behavior (not implementation)
-- [ ] Edge cases covered
+- [ ] Tests verify detection behavior (not implementation)
+- [ ] Edge cases covered (timeouts, malformed responses)
 - [ ] Tests are readable and maintainable
 - [ ] No flaky tests
-
-### Security (if applicable)
-- [ ] Input validation present
-- [ ] No hardcoded secrets
-- [ ] Proper authentication/authorization
-- [ ] XSS/injection prevention
 
 ## Files to Review
 
@@ -212,13 +232,13 @@ Is the code well-built?
 
 OUTPUT_DIRECTORY: [FEATURE_DIR]
 
-Write your review to: [FEATURE_DIR]/review.md
+Write your review to: [FEATURE_DIR]/code-quality-review.md
 
 ## Issue Categories
 
 When reporting issues, categorize as:
 
-- **Critical (must fix)** - Bugs, security issues, broken functionality
+- **Critical (must fix)** - Bugs, incorrect probes, broken detection
 - **Important (should fix)** - Code quality, maintainability concerns
 - **Suggestion (nice to have)** - Style, minor improvements
 
@@ -231,7 +251,7 @@ When reporting issues, categorize as:
 ## Review Document Structure
 
 ```markdown
-# Code Quality Review: [Feature]
+# Code Quality Review: [Protocol] Fingerprintx Plugin
 
 ## Summary
 [2-3 sentences on overall quality]
@@ -251,14 +271,15 @@ When reporting issues, categorize as:
 - [File:line] [Description]
 
 ## Verdict: [APPROVED|APPROVED_WITH_NOTES|CHANGES_REQUESTED]
-````
+```
 
 ## Output Format
 
 ```json
 {
-  "agent": "frontend-reviewer",
+  "agent": "capability-reviewer",
   "output_type": "code-quality-review",
+  "protocol": "[PROTOCOL_NAME]",
   "feature_directory": "[FEATURE_DIR]",
   "skills_invoked": ["persisting-agent-outputs"],
   "status": "complete",
@@ -267,14 +288,11 @@ When reporting issues, categorize as:
   "important_issues": 0,
   "suggestions": 2,
   "handoff": {
-    "next_agent": "test-lead",
-    "context": "Code review approved, ready for test planning"
+    "next_agent": null,
+    "context": "Code review approved, ready for validation"
   }
 }
 ```
+````
 
 If CHANGES_REQUESTED, orchestrator returns to developer for fixes (max 1 retry).
-
-```
-
-```

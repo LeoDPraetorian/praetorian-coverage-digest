@@ -34,12 +34,13 @@ Use this skill when you need to:
 | 2: Discovery       | Explore (frontend + backend)               | **PARALLEL**             | -                  |
 | 3: Planning        | writing-plans skill                        | Sequential               | 🛑 Human           |
 | 4: Architecture    | frontend-lead + security-lead              | **PARALLEL**             | 🛑 Human           |
-| 5: Implementation  | frontend-developer                         | Sequential               | -                  |
-| 6: Code Review     | frontend-reviewer + frontend-security      | **PARALLEL**             | 1 retry → escalate |
-| 7: Test Planning   | test-lead                                  | Sequential               | -                  |
-| 8: Testing         | frontend-tester (unit + integration + e2e) | **PARALLEL**             | -                  |
-| 9: Test Validation | test-lead                                  | Sequential               | 1 retry → escalate |
-| 10: Completion     | -                                          | Final verification       | -                  |
+| 5: Implementation  | frontend-developer (batch or per-task)     | Mode-dependent           | Per-task if 4+     |
+| 6: Plan Review     | -                                          | Verification             | All reqs complete  |
+| 7: Code Review     | Stage 1 (spec) → Stage 2 (quality+sec)     | Sequential → Parallel    | 2+1 retry → escalate |
+| 8: Test Planning   | test-lead                                  | Sequential               | -                  |
+| 9: Testing         | frontend-tester (unit + integration + e2e) | **PARALLEL**             | -                  |
+| 10: Test Validation | test-lead                                 | Sequential               | 1 retry → escalate |
+| 11: Completion     | -                                          | Final verification       | -                  |
 
 ## Table of Contents
 
@@ -51,11 +52,13 @@ Each phase has detailed documentation in the references/ directory:
 - **[Phase 2: Discovery](references/phase-2-discovery.md)** - Parallel pattern analysis (frontend + backend)
 - **[Phase 3: Planning](references/phase-3-planning.md)** - Detailed implementation plan creation
 - **[Phase 4: Architecture](references/phase-4-architecture.md)** - Parallel leads + security assessment + tech debt analysis
-- **[Phase 5: Implementation](references/phase-5-implementation.md)** - Code development via developer agents
-- **[Phase 6: Code Review](references/phase-6-code-review.md)** - Parallel reviewers with feedback loop
-- **[Phase 7: Test Planning](references/phase-7-test-planning.md)** - test-lead creates test plan
-- **[Phase 8: Testing](references/phase-8-testing.md)** - Parallel test modes following plan
-- **[Phase 9: Test Validation](references/phase-9-test-validation.md)** - test-lead validates against plan
+- **[Phase 5: Implementation](references/phase-5-implementation.md)** - Batch mode (1-3 tasks) code development
+- **[Phase 5: Per-Task Mode](references/phase-5-per-task-mode.md)** - Per-task review cycle (4+ tasks)
+- **[Phase 6: Plan Completion](references/phase-6-plan-completion-review.md)** - Verify all requirements implemented
+- **[Phase 7: Code Review](references/phase-7-code-review.md)** - Two-stage gated review (spec → quality)
+- **[Phase 8: Test Planning](references/phase-8-test-planning.md)** - test-lead creates test plan
+- **[Phase 9: Testing](references/phase-9-testing.md)** - Parallel test modes following plan
+- **[Phase 10: Test Validation](references/phase-10-test-validation.md)** - test-lead validates against plan
 
 ### Supporting Documentation
 
@@ -156,6 +159,7 @@ Cross-cutting concerns and troubleshooting guides:
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 5: Implementation                                                │
+│  Review Mode: 1-3 tasks (Batch) | 4+ tasks (Per-Task)                  │
 │  Agent: frontend-developer (+ backend-developer if full-stack)          │
 │  **PROMPT TEMPLATE:** references/prompts/developer-prompt.md            │
 │  Input: architecture.md + security-assessment.md + tech-debt.md         │
@@ -163,18 +167,28 @@ Cross-cutting concerns and troubleshooting guides:
 │                                                                         │
 │  **REQUIRED (in prompt):** developing-with-tdd                          │
 │  **REQUIRED (in prompt):** verifying-before-completion                  │
+│  **NEW:** STEP 0 Clarification gate (mandatory)                         │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 6: Code Review (PARALLEL, MAX 1 RETRY)                           │
-│  Stage 1: Spec Compliance Review (does code match plan?)                │
-│  Stage 2: Code Quality Review (is code well-built?)                     │
+│  Phase 6: Plan Completion Review                                        │
+│  Verify all plan requirements implemented before code review            │
+│  Output: plan-completion-review.md + requirements checklist             │
+│  Gate: All requirements have implementation OR user-approved deferral   │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 7: Code Review (TWO-STAGE GATED)                                 │
+│  Stage 1: Spec Compliance (BLOCKING) - Does code match plan?            │
+│    Agent: frontend-reviewer (single) - MAX 2 RETRIES                    │
+│    Gate: MUST be SPEC_COMPLIANT before Stage 2                          │
+│  Stage 2: Quality + Security (PARALLEL) - Is code well-built?           │
+│    Agents: frontend-reviewer + frontend-security - MAX 1 RETRY          │
 │  **PROMPT TEMPLATE:** references/prompts/reviewer-prompt.md             │
-│  Agents: frontend-reviewer + frontend-security                          │
-│  Output: review.md, security-review.md                                  │
-│  Loop: If CHANGES_REQUESTED → developer fixes → re-review ONCE          │
-│  Escalate: If still failing → AskUserQuestion                           │
+│  Output: spec-compliance-review.md, code-quality-review.md, security-review.md │
+│  Escalate: After max retries → AskUserQuestion                          │
 │                                                                         │
 │  Gate Checklist:                                                        │
 │  - [ ] Spec compliance confirmed (code matches plan.md)                 │
@@ -186,7 +200,7 @@ Cross-cutting concerns and troubleshooting guides:
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 7: Test Planning                                                 │
+│  Phase 8: Test Planning                                                 │
 │  Agent: test-lead (creates test plan)                                   │
 │  **PROMPT TEMPLATE:** references/prompts/test-lead-prompt.md            │
 │  Output: test-plan.md                                                   │
@@ -194,7 +208,7 @@ Cross-cutting concerns and troubleshooting guides:
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 8: Testing (PARALLEL - all 3 modes)                              │
+│  Phase 9: Testing (PARALLEL - all 3 modes)                              │
 │  Agents: frontend-tester × 3 (unit, integration, e2e)                   │
 │  **PROMPT TEMPLATE:** references/prompts/tester-prompt.md               │
 │  Input: test-plan.md (follow plan requirements)                         │
@@ -205,7 +219,7 @@ Cross-cutting concerns and troubleshooting guides:
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 9: Test Validation (MAX 1 RETRY)                                 │
+│  Phase 10: Test Validation (MAX 1 RETRY)                                │
 │  Agent: test-lead (validates against plan)                              │
 │  Output: test-validation.md                                             │
 │  Loop: If plan not met → tester fixes → re-validate ONCE                │
@@ -220,7 +234,7 @@ Cross-cutting concerns and troubleshooting guides:
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 10: Completion                                                   │
+│  Phase 11: Completion                                                   │
 │  **REQUIRED SUB-SKILL:** finishing-a-development-branch                 │
 │  Final verification: npm run build, npx tsc --noEmit, npm test          │
 │  Update metadata.json status: "complete"                                │
@@ -228,54 +242,17 @@ Cross-cutting concerns and troubleshooting guides:
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
+## Checkpoint Configuration
+
+Human approval required at phases 1, 3, and 4. For large plans (>5 tasks), add intermediate checkpoints during implementation. See [Checkpoint Configuration](references/checkpoint-configuration.md) for complete details.
+
+## Context Management
+
+Each Task dispatch creates a fresh agent instance. Do not manually fix agent work or reuse agents across tasks. See [Context Management](references/context-management.md) for details.
+
 ## Phase 0: Setup
 
-Create feature workspace with semantic naming:
-
-```bash
-FEATURE_NAME="<semantic-abbreviation>"  # e.g., "asset-filtering"
-FEATURE_ID="$(date +%Y-%m-%d-%H%M%S)-${FEATURE_NAME}"
-FEATURE_DIR=".claude/.output/features/${FEATURE_ID}"
-
-mkdir -p "${FEATURE_DIR}"
-```
-
-**Semantic naming rules:**
-
-- 2-4 words describing the feature, lowercase with hyphens
-- Examples: `asset-filtering`, `dark-mode-toggle`, `settings-refactor`
-
-**Initialize metadata.json:**
-
-```json
-{
-  "feature_id": "2025-12-28-100000-asset-filtering",
-  "description": "Original feature description",
-  "created": "2025-12-28T10:00:00Z",
-  "status": "in_progress",
-  "current_phase": "brainstorming",
-  "phases": {
-    "brainstorming": { "status": "in_progress" },
-    "discovery": {
-      "status": "pending",
-      "frontend_complete": false,
-      "backend_complete": false
-    },
-    "planning": { "status": "pending" },
-    "architecture": {
-      "status": "pending",
-      "tech_debt_identified": [],
-      "human_decision": null
-    },
-    "implementation": { "status": "pending" },
-    "review": { "status": "pending", "retry_count": 0 },
-    "test_planning": { "status": "pending" },
-    "testing": { "status": "pending" },
-    "validation": { "status": "pending", "retry_count": 0 },
-    "completion": { "status": "pending" }
-  }
-}
-```
+Create feature workspace with semantic naming and initialize metadata. See [Phase 0: Setup](references/phase-0-setup.md) for complete details.
 
 ## Critical Rules
 
@@ -355,26 +332,7 @@ See [references/rationalization-table.md](references/rationalization-table.md) f
 
 ## Feature Directory Structure
 
-```text
-.claude/.output/features/YYYY-MM-DD-HHMMSS-{semantic-name}/
-├── metadata.json              # Status, timestamps, phase tracking
-├── design.md                  # Phase 1: brainstorming output
-├── frontend-discovery.md      # Phase 2: frontend pattern analysis
-├── backend-discovery.md       # Phase 2: backend pattern analysis
-├── plan.md                    # Phase 3: planning output
-├── architecture.md            # Phase 4: frontend-lead output
-├── security-assessment.md     # Phase 4: security-lead output
-├── tech-debt-assessment.md    # Phase 4: tech debt analysis by leads
-├── backend-architecture.md    # Phase 4: backend-lead output (if applicable)
-├── implementation-log.md      # Phase 5: developer output
-├── review.md                  # Phase 6: frontend-reviewer output
-├── security-review.md         # Phase 6: security-reviewer output
-├── test-plan.md               # Phase 7: test-lead test plan
-├── test-summary-unit.md       # Phase 8: unit test output
-├── test-summary-integration.md # Phase 8: integration test output
-├── test-summary-e2e.md        # Phase 8: e2e test output
-└── test-validation.md         # Phase 9: test-lead validation
-```
+See [Feature Directory Structure](references/directory-structure.md) for complete file organization.
 
 ## Troubleshooting
 

@@ -18,7 +18,7 @@ Use this skill when:
 
 **DO NOT use individual skills directly** - this orchestrator enforces the proper workflow with blocking gates.
 
-**You MUST use TodoWrite before starting** to track all 8 phases. Mental tracking = steps get skipped.
+**You MUST use TodoWrite before starting** to track all 10 phases. Mental tracking = steps get skipped.
 
 ## Foundational Patterns
 
@@ -31,16 +31,18 @@ Use this skill when:
 
 ## Quick Reference
 
-| Phase                      | Gate Type    | Output Artifact             | Can Skip?             |
-| -------------------------- | ------------ | --------------------------- | --------------------- |
-| 1. Requirements Gathering  | —            | requirements.md             | NO                    |
-| 2. Open-Source Decision    | —            | Workflow path determination | NO                    |
-| 3. Protocol Research       | **BLOCKING** | protocol-research.md        | NO                    |
-| 4. Version Marker Research | CONDITIONAL  | version-matrix.md           | Only if closed-source |
-| 5. Implementation          | —            | Plugin code                 | NO                    |
-| 6. Testing                 | —            | Unit tests                  | NO                    |
-| 7. Validation              | BLOCKING     | validation-report.md        | NO                    |
-| 8. Integration & PR Prep   | —            | pr-description.md           | NO                    |
+| Phase                           | Gate Type    | Output Artifact              | Can Skip?             |
+| ------------------------------- | ------------ | ---------------------------- | --------------------- |
+| 1. Requirements Gathering       | —            | requirements.md              | NO                    |
+| 2. Open-Source Decision         | —            | Workflow path determination  | NO                    |
+| 3. Protocol Research            | **BLOCKING** | protocol-research.md         | NO                    |
+| 4. Version Marker Research      | CONDITIONAL  | version-matrix.md            | Only if closed-source |
+| 5. Implementation               | —            | Plugin code                  | NO                    |
+| 5.5. Requirements Verification  | —            | requirements-verification.md | NO                    |
+| 6. Testing                      | —            | Unit tests                   | NO                    |
+| 6.5. Code Review (Two-Stage)    | **BLOCKING** | review files                 | NO                    |
+| 7. Validation                   | BLOCKING     | validation-report.md         | NO                    |
+| 8. Integration & PR Prep        | —            | pr-description.md            | NO                    |
 
 **For complete gate checklists**, see [references/gate-checklist.md](references/gate-checklist.md)
 
@@ -79,13 +81,13 @@ This orchestrator invokes five specialized skills:
 | **researching-version-markers**  | `.claude/skill-library/research/researching-version-markers/SKILL.md`                  | Version marker analysis (8 phases)             | CONDITIONAL |
 | **writing-fingerprintx-modules** | `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md` | Plugin implementation (5-method interface)     | —           |
 | **writing-fingerprintx-tests**   | `.claude/skill-library/development/capabilities/writing-fingerprintx-tests/SKILL.md`   | Unit test implementation (table-driven, mocks) | —           |
-| **validating-fingerprintx-live** | `.claude/skill-library/development/capabilities/validating-fingerprintx-live/SKILL.md` | Live Shodan validation (Phase 7.5)             | BLOCKING    |
+| **validating-live-with-shodan** | `.claude/skill-library/development/capabilities/validating-live-with-shodan/SKILL.md` | Live Shodan validation (Phase 7.5)             | BLOCKING    |
 
 **Critical**: The orchestrator does NOT duplicate sub-skill content - it invokes them and enforces gates.
 
 ---
 
-## Workflow (8 Phases)
+## Workflow (10 Phases)
 
 **REQUIRED SUB-SKILLS for this workflow:**
 
@@ -97,7 +99,7 @@ This orchestrator invokes five specialized skills:
 | 4     | -                                                       | `researching-version-markers` (if open-source) |
 | 5     | `writing-fingerprintx-modules`                          | -                                              |
 | 6     | `writing-fingerprintx-tests`                            | -                                              |
-| 7.4   | `validating-fingerprintx-live`                          | -                                              |
+| 7.4   | `validating-live-with-shodan`                          | -                                              |
 
 ### Phase 1: Requirements Gathering
 
@@ -215,6 +217,22 @@ Follow the complete 8-phase workflow from researching-version-markers skill.
 
 ---
 
+### Phase 5.5: Requirements Verification
+
+Verify all protocol research requirements were implemented before testing.
+
+**Purpose**: Catch missing detection strategies before Phase 6 (Testing), where they're harder to identify.
+
+**Workflow**: Generate checklist from protocol-research.md, cross-reference implementation, handle missing requirements (implement, defer, or remove with user approval).
+
+**For complete workflow**, see [references/phase-5.5-requirements-verification.md](references/phase-5.5-requirements-verification.md)
+
+**Output Artifact**: `requirements-verification.md`
+
+**TodoWrite**: Mark as BLOCKED until all requirements have implementation OR user-approved deferral/removal.
+
+---
+
 ### Phase 6: Testing
 
 **Spawn Agent**: `capability-tester`
@@ -233,6 +251,28 @@ Follow the complete 8-phase workflow from researching-version-markers skill.
 **Output Artifact**: `{protocol}_test.go` + test-summary.md
 
 **TodoWrite**: Mark as in_progress, completed when agent returns status: complete.
+
+---
+
+### Phase 6.5: Code Review (Two-Stage Gated)
+
+Two-stage code review: Spec compliance FIRST (blocking), then code quality.
+
+**Stage 1: Spec Compliance Review (BLOCKING)**
+- Agent: `capability-reviewer` (single)
+- Focus: Does code match protocol research?
+- Max 2 retries, then escalate via AskUserQuestion
+
+**Stage 2: Code Quality Review**
+- Agent: `capability-reviewer`
+- Focus: Is code well-built? Follows fingerprintx patterns?
+- Max 1 retry, then escalate
+
+**For complete workflow**, see [references/phase-6.5-code-review.md](references/phase-6.5-code-review.md)
+
+**Output Artifacts**: `spec-compliance-review.md`, `code-quality-review.md`
+
+**TodoWrite**: Mark as BLOCKED until Stage 1 passes, then Stage 2 passes (or user explicitly approves despite issues).
 
 ---
 
@@ -324,7 +364,7 @@ Phase 7 has **5 sub-phases** that must pass sequentially:
 **For Phase 7.4**, invoke:
 
 ```
-Read('.claude/skill-library/development/capabilities/validating-fingerprintx-live/SKILL.md')
+Read('.claude/skill-library/development/capabilities/validating-live-with-shodan/SKILL.md')
 ```
 
 **Gate Conditions**: ALL sub-phases must pass to proceed to Phase 8.
@@ -365,13 +405,50 @@ Use TodoWrite to track progress. Create these todos at workflow start:
 3. 'Complete protocol research for {protocol}' (Phase 3) - BLOCKING
 4. 'Complete version marker research for {protocol}' (Phase 4) - CONDITIONAL
 5. 'Implement {protocol} fingerprintx plugin' (Phase 5)
+5.5. 'Verify all protocol requirements implemented' (Phase 5.5)
 6. 'Write unit tests for {protocol} plugin' (Phase 6)
+6.5. 'Two-stage code review (spec + quality)' (Phase 6.5) - BLOCKING
 7. 'Validate {protocol} plugin against live services' (Phase 7) - BLOCKING
 8. 'Prepare PR for {protocol} plugin' (Phase 8)
 
 Update todo status as each phase completes. Mark BLOCKED phases clearly.
 
 **Cannot proceed without TodoWrite tracking** - mental tracking = steps get skipped.
+
+---
+
+## Checkpoint Configuration
+
+Human approval required at strategic points to ensure alignment and catch issues early.
+
+**Phase-Level Checkpoints:**
+- Phase 1: Requirements gathering confirmation
+- Phase 3: Protocol research gate (BLOCKING)
+- Phase 4: Version marker research gate (CONDITIONAL)
+
+**Validation-Level Checkpoints:**
+- Docker prerequisite fails → Mandatory human approval
+- Shodan API key missing → Mandatory human approval
+- After 3 validation sub-phases → Progress report
+- Any sub-phase fails → Mandatory human review
+
+**For complete checkpoint configuration**, see [references/checkpoint-configuration.md](references/checkpoint-configuration.md)
+
+---
+
+## Context Management
+
+Each Task dispatch creates a **NEW agent instance** with fresh context. This is intentional design.
+
+**DO NOT:**
+- Manually fix agent work (pollutes your context)
+- Ask agent to "continue" previous work (context lost)
+- Reuse agent instance across phases
+
+**If Agent Fails:**
+Dispatch NEW fix agent with specific instructions and full context (protocol research, version matrix, review feedback).
+
+**For complete context management protocol**, see [references/context-management.md](references/context-management.md)
 
 ---
 
@@ -497,17 +574,18 @@ Agents WILL try to bypass the orchestrator. **See**: [Orchestrator-Level Rationa
 
 ### Spawns (agent-dispatch via Task tool)
 
-| Agent                  | Phase   | Mandatory Skills in Prompt                                                     |
-| ---------------------- | ------- | ------------------------------------------------------------------------------ |
-| `capability-developer` | Phase 5 | writing-fingerprintx-modules, developing-with-tdd, verifying-before-completion |
-| `capability-tester`    | Phase 6 | writing-fingerprintx-tests, developing-with-tdd                                |
+| Agent                  | Phase     | Mandatory Skills in Prompt                                                     |
+| ---------------------- | --------- | ------------------------------------------------------------------------------ |
+| `capability-developer` | Phase 5   | writing-fingerprintx-modules, developing-with-tdd, verifying-before-completion |
+| `capability-tester`    | Phase 6   | writing-fingerprintx-tests, developing-with-tdd                                |
+| `capability-reviewer`  | Phase 6.5 | persisting-agent-outputs                                                       |
 
 ### Conditional (based on source availability)
 
 | Skill                          | Trigger             | Purpose                                    |
 | ------------------------------ | ------------------- | ------------------------------------------ |
 | `researching-version-markers`  | Open-source service | Version marker analysis (CONDITIONAL gate) |
-| `validating-fingerprintx-live` | Phase 7.4           | Live Shodan validation (BLOCKING gate)     |
+| `validating-live-with-shodan` | Phase 7.4           | Live Shodan validation (BLOCKING gate)     |
 
 ### Agent Skills (embedded in prompts)
 
@@ -520,16 +598,18 @@ Agents WILL try to bypass the orchestrator. **See**: [Orchestrator-Level Rationa
 
 Located in `references/prompts/`:
 
-| Template              | Used In   | Agents                               |
-| --------------------- | --------- | ------------------------------------ |
-| `developer-prompt.md` | Phase 5   | capability-developer                 |
-| `tester-prompt.md`    | Phase 6   | capability-tester                    |
-| `README.md`           | Reference | Skill-invocation for research phases |
+| Template              | Used In     | Agents                               |
+| --------------------- | ----------- | ------------------------------------ |
+| `developer-prompt.md` | Phase 5     | capability-developer                 |
+| `tester-prompt.md`    | Phase 6     | capability-tester                    |
+| `reviewer-prompt.md`  | Phase 6.5   | capability-reviewer                  |
+| `README.md`           | Reference   | Skill-invocation for research phases |
 
 **Note**: This orchestrator uses a **hybrid pattern**:
 
 - **Phases 3-4** (Research): Skill-invocation via Read tool
 - **Phases 5-6** (Implementation/Testing): Agent-dispatch via Task tool with prompt templates
+- **Phase 6.5** (Code Review): Agent-dispatch with two-stage gated review
 
 ### Alternative Workflows
 

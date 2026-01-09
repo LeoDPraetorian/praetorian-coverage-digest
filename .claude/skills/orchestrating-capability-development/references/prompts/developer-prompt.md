@@ -43,7 +43,71 @@ You MUST use these skills during this task:
 4. **adhering-to-yagni** - Implement only what's specified, no extras
 5. **verifying-before-completion** - Verify artifacts work before claiming done
 
-## Your Job
+## STEP 0: Clarification (MANDATORY)
+
+**Before ANY implementation work**, review the architecture specification and identify:
+
+1. **Ambiguous requirements** - Anything that could be interpreted multiple ways
+2. **Missing information** - Dependencies, APIs, protocols, data formats not specified
+3. **Assumptions you're making** - State them explicitly
+4. **Scope questions** - What's in/out of scope
+
+### If You Have Questions
+
+Return immediately with structured JSON:
+
+```json
+{
+  "status": "needs_clarification",
+  "questions": [
+    {
+      "category": "requirement|dependency|scope|assumption",
+      "question": "Specific question text",
+      "options": ["Option A", "Option B"],
+      "impact": "What happens if this is wrong"
+    }
+  ]
+}
+```
+
+**Example:**
+
+```json
+{
+  "status": "needs_clarification",
+  "questions": [
+    {
+      "category": "requirement",
+      "question": "Should the VQL query check all S3 buckets or only public ones?",
+      "options": ["All buckets", "Only public buckets"],
+      "impact": "Affects query performance and detection scope"
+    },
+    {
+      "category": "dependency",
+      "question": "Does Velociraptor have AWS API access configured?",
+      "options": ["Yes", "No", "Unknown - need to check"],
+      "impact": "May require additional AWS credential handling"
+    }
+  ]
+}
+```
+
+### If No Questions
+
+State explicitly:
+
+"I have reviewed the architecture specification. All requirements are clear. No clarification needed. Proceeding with implementation."
+
+### DO NOT
+
+- Assume answers to ambiguous questions
+- Skip clarification because "it seems simple"
+- Proceed with implementation when requirements are unclear
+- Guess at APIs, protocols, or data formats
+
+---
+
+## Your Job (After Clarification)
 
 1. Create capability artifacts (VQL queries, Nuclei templates, Go code, etc.)
 2. Follow TDD: Write tests first, verify they fail, then implement

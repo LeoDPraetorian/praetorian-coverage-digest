@@ -84,22 +84,20 @@ port:{default_port} product:{protocol_name} version:{major}
 
 | Total Results | Recommended Sample | Rationale             |
 | ------------- | ------------------ | --------------------- |
-| < 100         | All (up to 50)     | Small population      |
-| 100-1000      | 50                 | Good diversity        |
-| 1000-10000    | 50                 | Sufficient sample     |
-| > 10000       | 50                 | Rate limit constraint |
+| < 100         | All (up to 10)     | Small population      |
+| 100-1000      | 10                 | Good diversity        |
+| 1000-10000    | 10                 | Sufficient sample     |
+| > 10000       | 10                 | Rate limit constraint |
 
 ## Pagination for Sampling
 
 To get diverse samples, query multiple pages:
 
 ```typescript
-// Get 50 targets from different pages
-const page1 = await hostSearch.execute({ query, page: 1 }); // 20 targets
-const page2 = await hostSearch.execute({ query, page: 2 }); // 20 targets
-const page3 = await hostSearch.execute({ query, page: 3 }); // 10 targets
+// Get 10 targets from first page
+const result = await hostSearch.execute({ query, page: 1 });
 
-const targets = [...page1.matches, ...page2.matches, ...page3.matches.slice(0, 10)];
+const targets = result.matches.slice(0, 10);
 ```
 
 ## Protocol-Specific Notes

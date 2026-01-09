@@ -1,5 +1,55 @@
 # Changelog - orchestrating-capability-development
 
+## [2026-01-08] Orchestrator Refactor - 7 Improvements
+
+### RED Phase Documentation
+
+**Gap Identified**: Capability orchestration had same vulnerabilities as feature development before its refactor:
+- Rubber-stamp reviews accepting incomplete implementations
+- No clarification gate leading to assumed requirements
+- Single agent batch mode for large plans causing delayed issue detection
+- No intermediate checkpoints for progress visibility
+- Direct Phase 4→5 transition without completeness verification
+- Context pollution from reusing agents across tasks
+
+### Changes Applied (from ORCHESTRATOR-REFACTOR.md)
+
+**HIGH PRIORITY:**
+1. **Gated Two-Stage Review** - Phase 5 now has Stage 1 (Spec Compliance, max 2 retries) as blocking gate before Stage 2 (Code Quality, max 1 retry)
+2. **Per-Task Review Cycles** - For 4+ tasks, use per-task mode with spec+quality review after each task
+
+**MEDIUM PRIORITY:**
+3. **Explicit Skepticism** - reviewer-prompt.md now includes CRITICAL VERIFICATION RULE with red flags list
+4. **Formal Clarification Gate** - developer-prompt.md now includes STEP 0: Clarification (MANDATORY)
+5. **Intermediate Checkpoints** - SKILL.md now includes Checkpoint Configuration section (every 3 tasks, >2 retries, >5 issues)
+6. **Plan Completion Review** - Added Phase 4.5 between implementation and review to verify all requirements implemented
+
+**LOW PRIORITY:**
+7. **Context Pollution Warnings** - SKILL.md now includes Context Management section with fresh agent per task guidance
+
+### Files Created
+
+- `references/phase-4-per-task-mode.md` - Per-task review cycle workflow
+- `references/phase-4.5-implementation-review.md` - Implementation completion verification
+
+### Files Modified
+
+- `SKILL.md` - Added Phase 4.5 to workflow, Checkpoint Configuration, Context Management, updated Key Principles
+- `references/phase-4-implementation.md` - Added review mode selection (Step 2), clarification handling (Step 3.5)
+- `references/phase-5-review.md` - Refactored to two-stage gated review with retry limits
+- `references/prompts/developer-prompt.md` - Added STEP 0 Clarification (MANDATORY)
+- `references/prompts/reviewer-prompt.md` - Added CRITICAL VERIFICATION RULE, split into Stage 1/2 templates
+
+### Line Count
+
+- SKILL.md: 471 → 572 lines (acceptable for complex orchestration)
+
+### Verification
+
+All 7 improvements verified present in updated files via grep checks.
+
+---
+
 ## [2026-01-04] Initial Creation
 
 ### RED Phase Documentation

@@ -1,5 +1,5 @@
 ---
-name: validating-fingerprintx-live
+name: validating-live-with-shodan
 description: Use when validating fingerprintx plugins against real-world services via Shodan - queries for protocol matches, runs fingerprintx against live targets, analyzes detection/version/CPE rates
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 ---
@@ -80,7 +80,7 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 })();" 2>/dev/null
 ```
 
-**Sample size:** 20-50 targets (balances coverage vs. rate limits)
+**Sample size:** Up to 10 targets (balances coverage vs. rate limits)
 
 ### Step 3: Run Fingerprintx Against Targets
 
@@ -173,7 +173,7 @@ Create `{protocol}-live-validation.md`:
 **MANDATORY:** Follow these guidelines for responsible scanning.
 
 1. **Rate Limiting:** Maximum 1 request per second
-2. **Sample Size:** Maximum 50 targets per validation run
+2. **Sample Size:** Maximum 10 targets per validation run
 3. **Timeout Respect:** 5 second timeout, don't retry aggressively
 4. **No Exploitation:** Detection only, no authentication attempts
 5. **Documentation:** Log all targets scanned for audit trail
@@ -183,7 +183,7 @@ Create `{protocol}-live-validation.md`:
 Use TodoWrite to track progress:
 
 - [ ] Step 1: Generate protocol query
-- [ ] Step 2: Query Shodan for targets (20-50 sample)
+- [ ] Step 2: Query Shodan for targets (up to 10 sample)
 - [ ] Step 3: Run fingerprintx against each target (rate-limited)
 - [ ] Step 4: Calculate detection/version/CPE rates
 - [ ] Step 5: Generate live-validation.md report

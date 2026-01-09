@@ -105,12 +105,12 @@ Both fixes preserve functionality through progressive disclosure - detailed cont
 
 ### Added
 
-- **Phase 7.4: Live Shodan Validation** - New sub-phase using `validating-fingerprintx-live` skill
+- **Phase 7.4: Live Shodan Validation** - New sub-phase using `validating-live-with-shodan` skill
 - Integration with `mcp-tools-shodan-api` for querying real-world targets
 - Live validation workflow: Query Shodan → Run fingerprintx → Analyze results
 - Pass/fail thresholds: 80% detection, 50% version/CPE, 20% false negative
 - New output artifacts: `{protocol}-live-validation.md`, `{protocol}-shodan-targets.json`, `{protocol}-fingerprintx-results.json`
-- **validating-fingerprintx-live** skill added to coordinated skills (5th coordinated skill)
+- **validating-live-with-shodan** skill added to coordinated skills (5th coordinated skill)
 
 ### Changed
 
@@ -240,13 +240,13 @@ This orchestrator makes research BLOCKING - cannot proceed to implementation unt
    - Phase 4: researching-version-markers (CONDITIONAL - if open-source)
    - Phase 5: writing-fingerprintx-modules
    - Phase 6: writing-fingerprintx-tests
-   - Phase 7.4: validating-fingerprintx-live (BLOCKING)
+   - Phase 7.4: validating-live-with-shodan (BLOCKING)
 
 2. **Replaced "Related Skills" with Integration Section** (line 425)
    - Called By: /fingerprintx command, gateway-capabilities
    - Requires: persisting-agent-outputs (Phase 0), orchestrating-multi-agent-workflows (Start)
    - Calls: researching-protocols (Phase 3), writing-fingerprintx-modules (Phase 5), writing-fingerprintx-tests (Phase 6)
-   - Conditional: researching-version-markers (open-source), validating-fingerprintx-live (Phase 7.4)
+   - Conditional: researching-version-markers (open-source), validating-live-with-shodan (Phase 7.4)
    - Agent Skills: developing-with-tdd (Phases 5-6), verifying-before-completion (all implementation)
    - Prompt Templates: references/prompts/README.md
    - Alternative Workflows: orchestrating-capability-development
@@ -358,3 +358,44 @@ This is the correct pattern for gate-enforced workflows that delegate to special
 
 **Status**: Update complete
 **Impact**: Fingerprintx orchestrator now correctly uses hybrid pattern with agent-dispatch for implementation/testing
+## 2026-01-09 00:44:00 - Refactor: Add two-stage gated review and requirements verification
+
+Applied orchestrator refactor patterns from ORCHESTRATOR-REFACTOR.md to align with updated orchestrating-feature-development skill.
+
+### Added
+
+- Phase 5.5: Requirements Verification - Verify protocol research requirements before testing
+- Phase 6.5: Code Review (Two-Stage Gated) - Spec compliance (BLOCKING) → Quality review
+- Checkpoint Configuration section - Human approval points and validation checkpoints
+- Context Management section - Fresh agent protocol and fix agent patterns
+- references/phase-5.5-requirements-verification.md - Complete requirements checklist workflow
+- references/phase-6.5-code-review.md - Two-stage gated review workflow
+- references/prompts/reviewer-prompt.md - Spec compliance and code quality templates
+- references/checkpoint-configuration.md - Checkpoint configuration details
+- references/context-management.md - Context management protocol
+
+### Changed
+
+- SKILL.md: Updated from 8 phases to 10 phases (566 → 646 lines)
+- Quick Reference table: Added Phase 5.5 and Phase 6.5
+- Progress Tracking: Updated TodoWrite list with new phases
+- Integration section: Added capability-reviewer agent to Spawns table
+- Prompt Templates table: Added reviewer-prompt.md
+- references/prompts/developer-prompt.md: Added STEP 0: Clarification (MANDATORY)
+- references/rationalization-table.md: Added Phase 5.5 and 6.5 rationalizations
+
+### Gap Closure
+
+- ✅ Two-stage gated review (spec compliance → quality)
+- ✅ Clarification gate in developer prompt
+- ✅ Requirements verification phase
+- ✅ Checkpoint configuration
+- ✅ Context management warnings
+- ✅ capability-reviewer agent involvement
+
+### Related
+
+- Based on: ORCHESTRATOR-REFACTOR.md
+- Mirrors patterns from: orchestrating-feature-development/references/
+- Adapts for: fingerprintx domain (protocol research vs plan, capability-reviewer vs frontend-reviewer)
+

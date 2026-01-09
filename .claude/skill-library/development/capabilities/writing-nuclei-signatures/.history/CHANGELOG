@@ -1,0 +1,19 @@
+# Changelog
+
+## 2026-01-08 - Compliance Fix
+
+**Changes:**
+- Added Integration section with Called By, Requires, Calls, and Pairs With subsections
+
+**Method:** Claude-Automated (Phase 28)
+
+**Analysis:**
+- Called By: gateway-capabilities (routes Nuclei template queries)
+- Requires: None (standalone skill)
+- Calls: None (terminal skill providing guidance)
+- Pairs With: None
+
+**Result:**
+- Phase 28 validation now passes
+- Line count: 496 (within 500 limit)
+- Critical compliance issue resolved

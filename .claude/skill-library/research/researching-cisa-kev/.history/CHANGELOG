@@ -1,0 +1,85 @@
+# Changelog: researching-cisa-kev
+
+## 2026-01-08 - Initial Creation
+
+**Type:** Library skill creation
+**Category:** research
+**Skill Type:** Process/Pattern (research methodology)
+
+### RED Phase Documentation
+
+**Gap:** CISA KEV catalog is authoritative source for confirmed exploited CVEs. No structured methodology existed for querying, extracting, and synthesizing KEV data for security capability development and vulnerability prioritization.
+
+**Failure Scenario (Without Skill):**
+- User request: "Research Apache vulnerabilities in CISA KEV"
+- Claude manually constructs URLs without standardized patterns
+- Ad-hoc WebFetch without structured data extraction
+- Misses critical fields (remediation deadline, exploitation notes, federal due dates)
+- No consistent output format
+- Cannot integrate with orchestrating-research
+
+**Success Criteria:**
+- 5-phase methodology (Query Formulation → Search Execution → Vulnerability Analysis → Synthesis → Recommendation)
+- Standardized query patterns by vendor/product/CVE/vulnerability class
+- Complete KEV data extraction (CVE ID, vendor, product, date added, due date, required action, notes)
+- Integration with orchestrating-research (Mode 1: standalone, Mode 2: orchestrated)
+- Remediation priority matrix by federal deadline
+
+### Structure
+
+**Location:** `.claude/skill-library/research/researching-cisa-kev/`
+**Line Count:** 418 lines (under 500 limit)
+**Model:** Based on researching-arxiv structure
+
+### Phase Summary
+
+1. Query Formulation - Vendor/product/CVE/vulnerability class search strategies
+2. Search Execution - CISA KEV URL construction, date filtering, pagination
+3. Vulnerability Analysis - Extract all 9 KEV fields, prioritize by due date/relevance
+4. Synthesis - Remediation priority matrix, exploitation context, threat actors
+5. Recommendation - Detection/capability guidance, patch prioritization
+
+### Key Features
+
+- **CISA KEV-specific:** Tailored to KEV catalog structure (not generic CVE search)
+- **Federal deadline focus:** Prioritization by FCEB remediation due dates
+- **Exploitation confirmation:** Every entry represents active real-world exploitation
+- **Dual-mode output:** Standalone (timestamped directory) or orchestrated (OUTPUT_DIR)
+- **Detection integration:** Guides capability development with threat context
+
+### References Created
+
+- `references/query-patterns.md` - Vendor/product search strategies (populated from specs)
+- `references/remediation-analysis.md` - Due dates and federal deadlines (populated from specs)
+- `references/output-format.md` - Structured output templates (populated from specs)
+
+**Research Decision:** Skipped orchestrating-research, populated from user-provided specifications per user choice.
+
+### Gateway Integration
+
+Added to `gateway-capabilities`:
+- **Intent Detection:** "CISA KEV" / "known exploited" / "exploited vulnerability" / "CVE research"
+- **Skill Registry:** Under Fingerprintx section with other research skills
+
+### Completed Phases
+
+- [x] Phase 6: Research and populate reference files (populated from specs)
+- [x] Phase 7: Add to gateway-capabilities routing table
+- [x] Phase 8: GREEN verification (tested with Apache CISA KEV query - successful)
+- [x] Phase 9: REFACTOR - Skipped (research methodology skill, no discipline to enforce)
+
+### GREEN Verification Results
+
+**Test:** Query CISA KEV catalog for Apache vulnerabilities
+**URL:** `https://www.cisa.gov/known-exploited-vulnerabilities-catalog?search_api_fulltext=apache&...`
+**Result:** Successfully extracted 5 CVEs with all required fields:
+- CVE-2024-38475 (Apache HTTP Server RCE)
+- CVE-2025-24813 (Apache Tomcat RCE)
+- CVE-2017-3066 (Adobe ColdFusion/BlazeDS RCE)
+- CVE-2024-45195 (Apache OFBiz Forced Browsing)
+- CVE-2024-27348 (Apache HugeGraph RCE)
+
+### Skill Complete
+
+**Status:** Ready for use
+**Created:** 2026-01-08

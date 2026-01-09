@@ -1,5 +1,5 @@
 ---
-name: capabilities-nuclei-templates
+name: writing-nuclei-signatures
 description: Use when creating Nuclei templates - YAML syntax, matchers, extractors, vulnerability detection
 allowed-tools: Read, Write, Bash, Glob, Grep
 skill-type: process
@@ -469,6 +469,24 @@ Before submitting:
 | Timeout errors  | Reduce `max-request`, add `stop-at-first-match` |
 | Missing results | Check `matchers-condition` (and vs or)          |
 | CSRF failures   | Use extractors with `internal: true`            |
+
+## Integration
+
+### Called By
+
+- `gateway-capabilities` - Routes Nuclei template, CVE detection, and vulnerability scanner template queries to this skill
+
+### Requires (invoke before starting)
+
+None - standalone skill
+
+### Calls (during execution)
+
+None - terminal skill (provides template development guidance without invoking other skills)
+
+### Pairs With (conditional)
+
+None
 
 ## References
 

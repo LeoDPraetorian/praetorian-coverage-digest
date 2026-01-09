@@ -237,7 +237,7 @@ Generate structured output for report:
 {
   "protocol": "mongodb",
   "timestamp": "2024-01-15T10:30:00Z",
-  "sample_size": 50,
+  "sample_size": 10,
   "query": "port:27017 product:mongodb",
   "metrics": {
     "detection_rate": 85.0,

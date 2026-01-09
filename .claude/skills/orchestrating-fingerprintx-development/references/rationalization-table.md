@@ -38,7 +38,27 @@ Complete list of agent rationalizations for skipping gates and the correct respo
 | "CPE format looks right"                   | Must validate against CPE 2.3 spec and NVD                | NOT ACCEPTED. Validate CPE format.                   |
 | "Tests pass, manual verification overkill" | Manual verification catches integration issues tests miss | DENIED. Both tests AND manual verification required. |
 
-## Phase 6 Gate (Validation) Rationalizations
+## Phase 5.5 (Requirements Verification) Rationalizations
+
+| Rationalization                                   | Why It's Wrong                                                     | Correct Response                                           |
+| ------------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------- |
+| "Protocol is simple, skip requirements check"     | Complexity is not the issue, completeness is                       | DENIED. Complete requirements verification.                |
+| "I implemented everything from protocol research" | Must verify independently, not trust claim                         | DENIED. Generate checklist and verify each requirement.    |
+| "One missing detection strategy is fine"          | Partial implementation reduces detection accuracy                  | NOT ACCEPTED. Implement missing strategy or defer with approval. |
+| "Tests will catch missing requirements"           | Tests focus on "does it work?" not "is everything implemented?"    | DENIED. Requirements verification first, then testing.     |
+| "Can add missing strategies later"                | "Later" has ~5% completion rate                                    | DENIED. Complete now or defer with explicit user approval. |
+
+## Phase 6.5 (Code Review) Rationalizations
+
+| Rationalization                          | Why It's Wrong                                              | Correct Response                                     |
+| ---------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
+| "The code works, we don't need review"   | Working code != spec compliance, review catches deviations  | DENIED. Two-stage review required.                   |
+| "I verified my own work"                 | Self-review is insufficient, independent review required    | DENIED. capability-reviewer must perform review.     |
+| "Skip spec compliance, go to quality"    | Quality review wastes time if spec doesn't match            | DENIED. Spec compliance first (blocking gate).       |
+| "Reviewer is being too picky"            | Reviewer applies skepticism intentionally per protocol      | ACCEPTED. Address issues or escalate after max retries. |
+| "Code quality issues can be fixed later" | Technical debt has ~10% fix rate                            | DENIED. Fix quality issues now (max 1 retry).        |
+
+## Phase 7 Gate (Validation) Rationalizations
 
 | Rationalization                                 | Why It's Wrong                                 | Correct Response                                 |
 | ----------------------------------------------- | ---------------------------------------------- | ------------------------------------------------ |

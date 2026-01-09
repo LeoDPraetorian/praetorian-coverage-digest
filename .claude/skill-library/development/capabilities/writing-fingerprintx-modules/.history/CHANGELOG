@@ -36,3 +36,18 @@
 - MongoDB PR #45 analysis (comprehensive two-phase detection example)
 - fingerprintx codebase exploration (plugin architecture, type system)
 - Existing plugins: Redis (simple), MongoDB (complex), HTTPS (TLS), DNS (UDP)
+
+## $(date +%Y-%m-%d) - TLS Connection Handling Documentation
+
+**RED**: Kubernetes plugin (PR #61) shipped with TLS double-wrapping bug because skill didn't document that plugins.TCPTLS means connection is already TLS-wrapped.
+
+**Changes**:
+- Added "TLS Connection Handling (CRITICAL)" section after Protocol Type Reference
+- Documented what fingerprintx does (establishes TLS) vs plugin responsibility (use existing conn)
+- Included WRONG pattern (TLS-over-TLS with https:// scheme) with error symptom
+- Included CORRECT pattern (detect *tls.Conn, use http:// scheme for already-encrypted)
+- Added real-world example from kubernetes plugin bug
+- Added "TLS double-wrapping" to Common Pitfalls table
+- Added TCPTLS test requirement to Testing Checklist
+
+**GREEN**: Future developers implementing TCPTLS plugins will now see explicit documentation preventing this bug pattern.

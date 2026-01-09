@@ -63,9 +63,10 @@ Do not reinterpret these as something else.
 ## AGENT SELECTION (use THESE agents, not general-purpose ones)
 
 - MCP wrappers, TypeScript tooling, .claude/tools/ → mcp-tool-lead, mcp-tool-developer, mcp-tool-reviewer
-- Backend APIs, Lambda, AWS, Go services → backend-lead, backend-developer
-- React UI, frontend components → frontend-lead, frontend-developer
-- Test strategy, test implementation → test-lead, backend-tester, frontend-tester
+- Backend, backend APIs, Lambda, AWS, Go services → backend-lead, backend-developer, backend-reviewer, backend-security
+- React UI, frontend components → frontend-lead, frontend-developer, frontend-reviewer, frontend-security
+- Test strategy, test quality, test coverage → test-lead
+- Security strategy, security quality, security coverage → security-lead
 - Security scanners, capabilities, fingerprintx, VQL, Nuclei → capability-lead, capability-developer, capability-reviewer, capability-tester
 
 Do NOT use general-purpose agents (Explore, etc.) when a specialized agent exists.
@@ -82,7 +83,7 @@ YES → Use an ORCHESTRATION SKILL, not direct agent spawning:
 
 | Task Type | Skill to Invoke |
 |-----------|-----------------|
-| Complete feature (design + implement + test) | `orchestrating-feature-development` or `/feature` command |
+| Complete feature (design + implement + review +test) | `orchestrating-feature-development` or `/feature` command |
 | Execute existing plan | `developing-with-subagents` |
 | Research across sources | `orchestrating-research` or `/research` command |
 | Capability/scanner development | `orchestrating-capability-development` or `/capability` command |

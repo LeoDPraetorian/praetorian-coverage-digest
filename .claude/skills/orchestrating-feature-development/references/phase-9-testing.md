@@ -321,7 +321,7 @@ TodoWrite: Mark "Phase 9: Test Validation" as in_progress
 
 ## Related References
 
-- [Phase 7: Test Planning](phase-7-test-planning.md) - Previous phase (test plan creation)
-- [Phase 9: Test Validation](phase-9-test-validation.md) - Next phase (validation against plan)
+- [Phase 8: Test Planning](phase-8-test-planning.md) - Previous phase (test plan creation)
+- [Phase 10: Test Validation](phase-10-test-validation.md) - Next phase (validation against plan)
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Troubleshooting](troubleshooting.md) - Common issues

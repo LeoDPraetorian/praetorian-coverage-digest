@@ -31,15 +31,16 @@ Use this skill when you need to:
 
 ## Quick Reference
 
-| Phase             | Agents/Skills                 | Execution  | Checkpoint         |
-| ----------------- | ----------------------------- | ---------- | ------------------ |
-| 0: Setup          | -                             | Sequential | -                  |
-| 1: Brainstorming  | brainstorming skill           | Sequential | 🛑 Human           |
-| 2: Discovery      | Explore (very thorough)       | Sequential | -                  |
-| 3: Architecture   | capability-lead               | Sequential | 🛑 Human           |
-| 4: Implementation | capability-developer          | Sequential | -                  |
-| 5: Review         | capability-reviewer           | Sequential | 1 retry → escalate |
-| 6: Testing        | test-lead + capability-tester | Sequential | 1 retry → escalate |
+| Phase               | Agents/Skills                 | Execution      | Checkpoint            |
+| ------------------- | ----------------------------- | -------------- | --------------------- |
+| 0: Setup            | -                             | Sequential     | -                     |
+| 1: Brainstorming    | brainstorming skill           | Sequential     | 🛑 Human              |
+| 2: Discovery        | Explore (very thorough)       | Sequential     | -                     |
+| 3: Architecture     | capability-lead               | Sequential     | 🛑 Human              |
+| 4: Implementation   | capability-developer          | Mode-dependent | Per-task if 4+        |
+| 4.5: Plan Completion| orchestrator                  | Sequential     | 🛑 Human (if gaps)    |
+| 5: Review           | capability-reviewer           | Stage 1 → 2    | Stage 1: 2x, Stage 2: 1x |
+| 6: Testing          | test-lead + capability-tester | Sequential     | 1 retry → escalate    |
 
 ## Table of Contents
 
@@ -51,7 +52,9 @@ Each phase has detailed documentation in the references/ directory:
 - **[Phase 2: Discovery](references/phase-2-discovery.md)** - Search existing capabilities for reusable patterns
 - **[Phase 3: Architecture](references/phase-3-architecture.md)** - Design detection logic and data flow
 - **[Phase 4: Implementation](references/phase-4-implementation.md)** - Create VQL/Nuclei/Janus/Fingerprintx artifacts
-- **[Phase 5: Review](references/phase-5-review.md)** - Validate against architecture and quality standards
+- **[Phase 4: Per-Task Mode](references/phase-4-per-task-mode.md)** - Per-task review cycles (4+ tasks)
+- **[Phase 4.5: Plan Completion](references/phase-4.5-implementation-review.md)** - Verify all requirements implemented
+- **[Phase 5: Review](references/phase-5-review.md)** - Two-stage gated review (spec → quality)
 - **[Phase 6: Testing](references/phase-6-testing.md)** - Test detection accuracy and edge cases
 
 ### Supporting Documentation
@@ -153,32 +156,53 @@ Cross-cutting concerns and capability-specific guidance:
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 4: Implementation                                                │
+│  Phase 4: Implementation (MODE-DEPENDENT)                               │
 │  Agent: capability-developer                                            │
 │  **PROMPT TEMPLATE:** references/prompts/developer-prompt.md            │
 │  Input: architecture.md                                                 │
+│  Mode Selection: 1-3 tasks → Batch | 4+ tasks → Per-Task                │
 │  Create: VQL/Nuclei/Janus/Fingerprintx artifacts                        │
 │  Output: Capability files + implementation-log.md                       │
 │                                                                         │
 │  **REQUIRED (in prompt):** developing-with-tdd                          │
 │  **REQUIRED (in prompt):** verifying-before-completion                  │
+│  **PER-TASK MODE:** See references/phase-4-per-task-mode.md             │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 5: Review (MAX 1 RETRY)                                          │
+│  Phase 4.5: Implementation Completion Review                            │
+│  Orchestrator: (manual verification, no agent)                          │
+│  **REFERENCE:** references/phase-4.5-implementation-review.md           │
+│  Verify: ALL architecture requirements implemented                      │
+│  Generate: Requirements checklist from architecture.md                  │
+│  Cross-reference: implementation-log.md against checklist               │
+│  Output: implementation-completion-review.md                            │
+│  Gate Checklist:                                                        │
+│    - [ ] All requirements have evidence (file:line)                     │
+│    - [ ] OR deferred with user approval                                 │
+│    - [ ] OR removed with user approval                                  │
+│  Human Approval: Required if any gaps found                             │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 5: Review (TWO-STAGE GATED)                                      │
 │  Agent: capability-reviewer                                             │
 │  **PROMPT TEMPLATE:** references/prompts/reviewer-prompt.md             │
-│  Validate: Implementation against architecture plan                     │
-│  Check: Quality standards for capability type                           │
-│  Output: review.md                                                      │
-│  Gate Checklist:                                                        │
-│    - [ ] capability-reviewer returned APPROVED                          │
-│    - [ ] Implementation matches architecture plan                       │
-│    - [ ] Quality standards for capability type met                      │
-│    - [ ] OR max 1 retry completed, then escalate                        │
-│  Loop: If CHANGES_REQUESTED → developer fixes → re-review ONCE          │
-│  Escalate: If still failing → AskUserQuestion                           │
+│                                                                         │
+│  STAGE 1: Spec Compliance (BLOCKING GATE)                               │
+│    Focus: Does implementation match architecture exactly?               │
+│    Verdict: SPEC_COMPLIANT | NOT_COMPLIANT                              │
+│    Retry: MAX 2 attempts before escalate                                │
+│                                                                         │
+│  STAGE 2: Code Quality (after Stage 1 passes)                           │
+│    Focus: Is code well-built?                                           │
+│    Verdict: APPROVED | CHANGES_REQUESTED                                │
+│    Retry: MAX 1 attempt before escalate                                 │
+│                                                                         │
+│  Output: spec-compliance-review.md, code-quality-review.md              │
+│  Escalate: If retry limits exceeded → AskUserQuestion                   │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
@@ -430,14 +454,91 @@ Located in `references/prompts/`:
 | `orchestrating-fingerprintx-development` | Specialized orchestration for fingerprintx modules with blocking gates |
 | `orchestrating-feature-development`      | Frontend/backend feature development (not security capabilities)       |
 
+## Checkpoint Configuration
+
+### Phase-Level Checkpoints (Default)
+
+Human approval required at:
+- Phase 1 (brainstorming): Capability type and requirements confirmed
+- Phase 3 (architecture): Implementation plan approved
+- Phase 4.5 (completion review): If any requirements missing/deferred
+
+### Task-Level Checkpoints (For Large Plans)
+
+When implementation has 4+ tasks (per-task mode), add intermediate checkpoints:
+
+- **Every 3 tasks**: Generate progress report
+- **Any task >2 retries**: Mandatory human review before continuing
+- **Cumulative issues >5**: Stop and review before continuing
+
+### Progress Checkpoint Format
+
+```markdown
+## Progress Checkpoint - Tasks {X-Y}
+
+**Tasks completed**: X/Y
+**Issues encountered**:
+- [list issues or "None"]
+
+**Current blockers**:
+- [list blockers or "None"]
+
+**Retry counts**:
+- Task N: spec compliance X, code quality Y
+
+**Recommendation**: [Continue | Pause for review | Escalate]
+```
+
+## Context Management
+
+### Fresh Subagent Per Task
+
+Each task dispatch uses a NEW agent instance. This is intentional:
+
+- **No context pollution** from previous tasks
+- **Clean slate** for each implementation
+- **Parallel-safe** execution
+- **Consistent behavior** regardless of task order
+
+### DO NOT
+
+- Manually fix code then continue with same agent context
+- Ask agent to "continue from where you left off"
+- Reuse agent instance across multiple tasks
+- Assume agent remembers previous work
+
+### If Agent Fails
+
+Dispatch a NEW agent with:
+- The original task specification
+- Error context from failed attempt
+- Explicit instruction to start fresh
+
+```typescript
+Task({
+  subagent_type: "capability-developer",
+  description: "Implement {task} (fresh attempt)",
+  prompt: `
+    Previous attempt failed with: {error}
+
+    Start fresh. Do not assume any prior work exists.
+    Implement {task} from scratch following architecture.md.
+
+    [rest of prompt]
+  `
+});
+```
+
 ## Key Principles
 
-1. **Human Checkpoints**: Phases 1 (brainstorming) and 3 (architecture) require human approval
-2. **Single Retry**: Review (Phase 5) and Testing (Phase 6) allow ONE retry before escalation
-3. **Capability-Specific Quality**: Each capability type has different quality metrics
-4. **Output Persistence**: All agent outputs must follow `persisting-agent-outputs` format
-5. **Mandatory Skills**: All agents must invoke gateway-capabilities and persisting-agent-outputs
-6. **Sequential Execution**: Unlike feature development, capability phases run sequentially for quality control
+1. **Human Checkpoints**: Phases 1, 3, and 4.5 (if gaps) require human approval
+2. **Two-Stage Review**: Phase 5 uses spec compliance gate (2 retries) then code quality (1 retry)
+3. **Per-Task Mode**: 4+ tasks use per-task review cycles for early issue detection
+4. **Capability-Specific Quality**: Each capability type has different quality metrics
+5. **Output Persistence**: All agent outputs must follow `persisting-agent-outputs` format
+6. **Mandatory Skills**: All agents must invoke gateway-capabilities and persisting-agent-outputs
+7. **Fresh Agents**: Each task dispatch uses new agent instance (no context pollution)
+8. **Clarification Gate**: Developers must ask questions before assuming requirements
 
 ## Rationalization Prevention
 

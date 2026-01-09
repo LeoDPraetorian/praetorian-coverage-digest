@@ -45,20 +45,75 @@ You MUST use these skills during this task:
 4. **adhering-to-dry** - Don't duplicate existing code
 5. **adhering-to-yagni** - Only implement what's specified, nothing extra
 
-## Before You Begin
+## STEP 0: Clarification (MANDATORY)
 
-If you have questions about:
+**Before ANY implementation work**, review the task specification and identify:
 
-- The requirements or acceptance criteria
-- The approach or implementation strategy
-- Dependencies or assumptions
-- Anything unclear in the task description
+1. **Ambiguous requirements** - Anything that could be interpreted multiple ways
+2. **Missing information** - Dependencies, APIs, data formats not specified
+3. **Assumptions you're making** - State them explicitly
+4. **Scope questions** - What's in/out of scope
 
-**Ask them now.** Raise concerns before starting work.
+### If You Have Questions
+
+Return immediately with structured JSON:
+
+```json
+{
+  "status": "needs_clarification",
+  "questions": [
+    {
+      "category": "requirement|dependency|scope|assumption",
+      "question": "Specific question text",
+      "options": ["Option A", "Option B"],
+      "impact": "What happens if this is wrong"
+    }
+  ]
+}
+```
+
+**Example:**
+
+```json
+{
+  "status": "needs_clarification",
+  "questions": [
+    {
+      "category": "requirement",
+      "question": "Should the filter dropdown show all statuses or only active ones?",
+      "options": ["All statuses", "Only active statuses"],
+      "impact": "Affects UX and data loading performance"
+    },
+    {
+      "category": "dependency",
+      "question": "Does the backend /assets endpoint support status filtering?",
+      "options": ["Yes", "No", "Unknown - need to check"],
+      "impact": "May require backend work before frontend implementation"
+    }
+  ]
+}
+```
+
+### If No Questions
+
+State explicitly:
+
+"I have reviewed the task specification and have no clarifying questions.
+My understanding: [1-2 sentence summary of what you'll build]
+Proceeding with implementation."
+
+### DO NOT
+
+- Assume requirements that aren't stated
+- Make design decisions without asking
+- Proceed if anything is unclear
+- Skip this step because "it seems simple"
+
+---
 
 ## Your Job
 
-Once you're clear on requirements:
+Once requirements are clear and you've completed Step 0:
 
 1. **Write the failing test first** (TDD)
    - Test the behavior, not the implementation

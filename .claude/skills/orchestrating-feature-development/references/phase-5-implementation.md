@@ -29,7 +29,18 @@ Based on feature domain:
 - Yes (mocked APIs) → Parallel
 - No (needs real backend) → Sequential
 
-### Step 2: Spawn Developer Agent(s)
+### Step 2: Determine Review Mode
+
+**NEW:** Check task count in plan.md to select review mode:
+
+- **1-3 tasks**: Use **Batch Mode** (current workflow - implement all → review at phase end)
+- **4+ tasks**: Use **Per-Task Mode** (immediate review after each task)
+
+See [phase-5-per-task-mode.md](phase-5-per-task-mode.md) for per-task workflow details.
+
+**Remainder of this document describes Batch Mode workflow.**
+
+### Step 3: Spawn Developer Agent(s)
 
 #### Single Agent Pattern
 
@@ -80,6 +91,85 @@ Return JSON with:
 }
 "
 )
+```
+
+### Step 3.5: Handle Clarification Requests (MANDATORY)
+
+**NEW:** Developers may return with `status: "needs_clarification"` per the STEP 0 protocol.
+
+**If developer returns clarification request:**
+
+1. **Review all questions** in the `questions` array:
+
+```json
+{
+  "status": "needs_clarification",
+  "questions": [
+    {
+      "category": "requirement",
+      "question": "Should the filter dropdown show all statuses or only active ones?",
+      "options": ["All statuses", "Only active"],
+      "impact": "Affects UX and data loading performance"
+    },
+    {
+      "category": "dependency",
+      "question": "Does the backend /assets endpoint support status filtering?",
+      "options": ["Yes", "No", "Unknown - need to check"],
+      "impact": "May need backend work first"
+    }
+  ]
+}
+```
+
+2. **Answer each question explicitly**:
+   - For technical questions: research codebase, read documentation
+   - For requirements questions: use AskUserQuestion to get user input
+   - For architecture questions: refer to architecture.md or escalate
+
+3. **Re-dispatch developer with answers**:
+
+```
+Task(
+  subagent_type: "frontend-developer",
+  description: "Implement {feature-name} with clarifications",
+  prompt: "
+    CLARIFICATION ANSWERS:
+
+    Q1: Should the filter dropdown show all statuses or only active ones?
+    → A1: Show all statuses. Performance is acceptable per architecture.md.
+
+    Q2: Does the backend /assets endpoint support status filtering?
+    → A2: Yes, verified in backend/handlers/assets.go:45-67. Use query param ?status=X
+
+    Now proceed with implementation using these answers.
+
+    [rest of original prompt with plan, architecture, etc.]
+  "
+)
+```
+
+4. **Do NOT let developer proceed with assumptions**. If questions remain unanswered, gather information first.
+
+**Example user escalation** (when answer requires user decision):
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "Developer needs clarification: Should filter dropdown show all statuses or only active ones?",
+    header: "Requirement",
+    multiSelect: false,
+    options: [
+      {
+        label: "All statuses",
+        description: "Users see complete status list (Active, Inactive, Archived)"
+      },
+      {
+        label: "Only active statuses",
+        description: "Simpler UX, excludes Archived"
+      }
+    ]
+  }]
+})
 ```
 
 #### Parallel Pattern (Independent Work)

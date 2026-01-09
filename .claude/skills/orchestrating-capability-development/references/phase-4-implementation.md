@@ -13,14 +13,45 @@ Implement the security capability following the architecture plan with:
 
 ## Quick Reference
 
-| Aspect         | Details                                 |
-| -------------- | --------------------------------------- |
-| **Agent**      | capability-developer                    |
-| **Input**      | architecture.md from Phase 3            |
-| **Output**     | Capability code + implementation-log.md |
-| **Checkpoint** | NONE - automatic to Phase 5 (Review)    |
+| Aspect         | Details                                    |
+| -------------- | ------------------------------------------ |
+| **Agent**      | capability-developer                       |
+| **Input**      | architecture.md from Phase 3               |
+| **Output**     | Capability code + implementation-log.md    |
+| **Checkpoint** | NONE - automatic to Phase 4.5 (Completion) |
+| **Mode**       | Batch (1-3 tasks) or Per-Task (4+ tasks)   |
 
-## Agent Spawning
+## Step 1: Count Tasks in Architecture
+
+Before dispatching any agents, count the implementation tasks in architecture.md:
+
+```python
+task_count = count_tasks(architecture.md)
+```
+
+## Step 2: Select Review Mode
+
+Based on task count, select the appropriate mode:
+
+| Task Count | Mode      | Workflow                                           |
+| ---------- | --------- | -------------------------------------------------- |
+| 1-3 tasks  | **Batch** | Implement all → Phase 4.5 → Phase 5 review         |
+| 4+ tasks   | **Per-Task** | Implement each → Review each → Next task        |
+
+```python
+if task_count >= 4:
+    mode = "per-task"
+    # See phase-4-per-task-mode.md for workflow
+else:
+    mode = "batch"
+    # Continue with standard workflow below
+```
+
+**For Per-Task mode (4+ tasks):** See [Phase 4: Per-Task Mode](phase-4-per-task-mode.md) for complete workflow.
+
+**For Batch mode (1-3 tasks):** Continue with Agent Spawning below.
+
+## Step 3: Agent Spawning (Batch Mode)
 
 ```typescript
 Task("capability-developer", {
@@ -53,6 +84,66 @@ Task("capability-developer", {
   subagent_type: "capability-developer",
 });
 ```
+
+## Step 3.5: Handle Clarification Requests
+
+**IF developer returns `status: "needs_clarification"`:**
+
+The developer has questions that must be answered before proceeding.
+
+### Workflow
+
+1. **Review questions** in the `questions` array from developer output
+2. **Answer each question:**
+   - If you can answer from architecture.md or context → provide answer
+   - If requires user input → use AskUserQuestion
+3. **Re-dispatch developer** with answers:
+
+```typescript
+Task("capability-developer", {
+  description: "Continue implementation with clarifications",
+  prompt: `
+    CLARIFICATION ANSWERS:
+    Q1: ${question1} → A1: ${answer1}
+    Q2: ${question2} → A2: ${answer2}
+
+    Now proceed with implementation using these answers.
+
+    [rest of original prompt from Step 3]
+  `,
+  subagent_type: "capability-developer",
+});
+```
+
+### AskUserQuestion Template
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: `Developer needs clarification: "${developerQuestion}"`,
+    header: "Clarification",
+    multiSelect: false,
+    options: [
+      {
+        label: developerOptions[0],
+        description: "Option from developer"
+      },
+      {
+        label: developerOptions[1],
+        description: "Option from developer"
+      }
+    ]
+  }]
+})
+```
+
+### DO NOT
+
+- Let developer proceed with assumptions
+- Skip clarification because "it seems obvious"
+- Answer questions you're not certain about
+
+---
 
 ## Implementation Requirements by Type
 
@@ -297,7 +388,10 @@ Implementation phase is complete when:
 ## Related
 
 - [Phase 3: Architecture](phase-3-architecture.md) - Previous phase (provides plan)
+- [Phase 4: Per-Task Mode](phase-4-per-task-mode.md) - Per-task review cycle (4+ tasks)
+- [Phase 4.5: Implementation Completion](phase-4.5-implementation-review.md) - Verify all requirements implemented
 - [Phase 5: Review](phase-5-review.md) - Next phase (validates implementation)
 - [Capability Types](capability-types.md) - Type-specific implementation guidance
 - [Agent Handoffs](agent-handoffs.md) - Handoff format and blocked status
+- [Prompts: Developer](prompts/developer-prompt.md) - Developer prompt with clarification protocol
 - [Troubleshooting](troubleshooting.md) - Common implementation issues

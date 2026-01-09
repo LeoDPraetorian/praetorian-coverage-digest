@@ -372,7 +372,7 @@ AskUserQuestion({
 
 ## Related References
 
-- [Phase 7: Test Planning](phase-7-test-planning.md) - Test plan creation
-- [Phase 8: Testing](phase-8-testing.md) - Previous phase (test implementation)
+- [Phase 8: Test Planning](phase-8-test-planning.md) - Test plan creation
+- [Phase 9: Testing](phase-9-testing.md) - Previous phase (test implementation)
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Troubleshooting](troubleshooting.md) - Common issues

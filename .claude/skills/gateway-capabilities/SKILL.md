@@ -52,16 +52,18 @@ This gateway implements 3-tier loading:
 | "Go architecture" / "capability structure"                                                                        | → `enforcing-go-capability-architecture`                            |
 | "plugin registry" / "init() registration" / "factory pattern" / "sync.RWMutex"                                    | → `implementing-go-plugin-registries`                               |
 | "VQL" / "Aegis" / "Velociraptor"                                                                                  | → `capabilities-vql-development`                                    |
-| "Nuclei" / "template" / "CVE detection"                                                                           | → `capabilities-nuclei-templates`                                   |
+| "Nuclei" / "template" / "CVE detection"                                                                           | → `writing-nuclei-signatures`                                       |
 | "YAML template engine" / "template parser"                                                                        | → `implementing-yaml-template-engines`                              |
 | "scanner" / "tool chain"                                                                                          | → `capabilities-scanner-integration`                                |
 | "scanner performance" / "optimize" / "throughput" / "40K items/hour"                                              | → `optimizing-go-scanner-performance`                               |
 | "web crawler" / "Colly" / "Katana"                                                                                | → `building-web-crawlers`                                           |
 | "Janus" / "chain" / "pipeline"                                                                                    | → `capabilities-janus-chains`                                       |
 | "fingerprintx" / "service detection"                                                                              | → Use core skill: `skill: "orchestrating-fingerprintx-development"` |
-| "live validation" / "Shodan" / "metrics"                                                                          | → `validating-fingerprintx-live`                                    |
+| "live validation" / "Shodan" / "metrics"                                                                          | → `validating-live-with-shodan`                                     |
 | "protocol" / "banner" / "handshake"                                                                               | → `researching-protocols`                                           |
 | "version marker" / "fingerprint"                                                                                  | → `researching-version-markers`                                     |
+| "CISA KEV" / "known exploited" / "exploited vulnerability" / "CVE research"                                       | → `researching-cisa-kev`                                            |
+| "NVD" / "CVSS" / "CPE" / "CVE details" / "vulnerability database"                                                 | → `researching-nvd`                                                 |
 | "NoseyParker" / "secret scanning" / "credential detection" / "creating rules"                                     | → `creating-noseyparker-rules`                                      |
 | "standalone" / "tool integration"                                                                                 | → `integrating-standalone-capabilities`                             |
 | "detection plugin" / "XSS" / "SQLi"                                                                               | → `implementing-detection-plugins`                                  |
@@ -102,7 +104,7 @@ This gateway implements 3-tier loading:
 | Skill                 | Path                                                                                         | Triggers                          |
 | --------------------- | -------------------------------------------------------------------------------------------- | --------------------------------- |
 | VQL Development       | `.claude/skill-library/development/capabilities/capabilities-vql-development/SKILL.md`       | VQL, Aegis, Velociraptor          |
-| Nuclei Templates      | `.claude/skill-library/development/capabilities/capabilities-nuclei-templates/SKILL.md`      | Nuclei, template, CVE             |
+| Nuclei Templates      | `.claude/skill-library/development/capabilities/writing-nuclei-signatures/SKILL.md`          | Nuclei, template, CVE             |
 | YAML Template Engines | `.claude/skill-library/development/capabilities/implementing-yaml-template-engines/SKILL.md` | YAML parser, template engine, DSL |
 
 ### Scanners & Chains
@@ -120,9 +122,11 @@ This gateway implements 3-tier loading:
 
 | Skill                      | Path                                                                                   | Triggers                         |
 | -------------------------- | -------------------------------------------------------------------------------------- | -------------------------------- |
-| Fingerprintx Live Validate | `.claude/skill-library/development/capabilities/validating-fingerprintx-live/SKILL.md` | live validation, Shodan, metrics |
+| Fingerprintx Live Validate | `.claude/skill-library/development/capabilities/validating-live-with-shodan/SKILL.md`  | live validation, Shodan, metrics |
 | Protocol Research          | `.claude/skill-library/research/researching-protocols/SKILL.md`                        | protocol, banner, handshake      |
 | Version Markers            | `.claude/skill-library/research/researching-version-markers/SKILL.md`                  | version marker, fingerprint      |
+| CISA KEV Research          | `.claude/skill-library/research/researching-cisa-kev/SKILL.md`                         | CISA KEV, known exploited, CVE   |
+| NVD Research               | `.claude/skill-library/research/researching-nvd/SKILL.md`                              | NVD, CVSS, CPE, CVE details      |
 
 ### Go Porting
 

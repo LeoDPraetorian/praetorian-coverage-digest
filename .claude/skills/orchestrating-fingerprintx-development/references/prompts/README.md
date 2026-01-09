@@ -91,7 +91,7 @@ Read('.claude/skill-library/research/researching-version-markers/SKILL.md')
 ### Phase 7.4: Live Validation (BLOCKING)
 
 ```
-Read('.claude/skill-library/development/capabilities/validating-fingerprintx-live/SKILL.md')
+Read('.claude/skill-library/development/capabilities/validating-live-with-shodan/SKILL.md')
 ```
 
 **Gate Checklist**:

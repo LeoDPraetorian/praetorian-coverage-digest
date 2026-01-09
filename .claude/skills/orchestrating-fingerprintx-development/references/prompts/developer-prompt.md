@@ -41,6 +41,50 @@ OUTPUT_DIRECTORY: [FEATURE_DIR]
 
 Write implementation-log.md to this directory.
 
+## STEP 0: Clarification (MANDATORY)
+
+Before ANY implementation work, review the protocol research and identify:
+
+1. **Ambiguous requirements** - Anything that could be interpreted multiple ways
+2. **Missing information** - Protocol details, edge cases not specified
+3. **Assumptions you're making** - State them explicitly
+4. **Scope questions** - What's in/out of scope
+
+### If You Have Questions
+
+Return immediately with:
+
+```json
+{
+  "status": "needs_clarification",
+  "questions": [
+    {
+      "category": "requirement|protocol|scope|assumption",
+      "question": "Specific question",
+      "options": ["Option A", "Option B"],
+      "impact": "What happens if this is wrong"
+    }
+  ]
+}
+```
+
+### If No Questions
+
+State explicitly:
+
+"I have reviewed the protocol research and have no clarifying questions.
+My understanding: [1-2 sentence summary of what I'll build]
+Proceeding with implementation."
+
+### DO NOT
+
+- Assume protocol behaviors that aren't documented
+- Make design decisions without asking
+- Proceed if anything is unclear
+- Skip this step because "it seems simple"
+
+---
+
 ## MANDATORY SKILLS (invoke ALL before completing)
 
 You MUST use these skills during this task:

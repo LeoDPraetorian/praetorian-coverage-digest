@@ -1,55 +1,299 @@
-# Phase 5: Review
+# Phase 5: Code Review
 
-Validate implementation against architecture plan and capability-specific quality standards.
+**Two-stage gated review**: Spec compliance FIRST (blocking gate), then code quality (sequential).
 
 ## Purpose
 
-Ensure capability implementation:
+Validate implementation through sequential gates:
 
-- Matches architecture plan (Phase 3)
-- Follows capability-type best practices
-- Handles all edge cases from design
-- Meets quality standards for detection accuracy
+1. **Stage 1 (BLOCKING)**: Does code match architecture? (spec compliance)
+2. **Stage 2 (SEQUENTIAL)**: Is code well-built? (quality)
+
+**Why two stages?** Catching spec deviations BEFORE quality review prevents wasted effort reviewing code that doesn't meet requirements.
 
 ## Quick Reference
 
-| Aspect         | Details                                            |
-| -------------- | -------------------------------------------------- |
-| **Agent**      | capability-reviewer                                |
-| **Input**      | architecture.md, implementation-log.md, code files |
-| **Output**     | review.md                                          |
-| **Checkpoint** | 🔄 MAX 1 RETRY - then escalate to user             |
+| Aspect         | Details                                                  |
+| -------------- | -------------------------------------------------------- |
+| **Agent**      | capability-reviewer                                      |
+| **Input**      | architecture.md, implementation-log.md, code files       |
+| **Output**     | spec-compliance-review.md, code-quality-review.md        |
+| **Checkpoint** | Stage 1: MAX 2 RETRIES, Stage 2: MAX 1 RETRY             |
 
-## Agent Spawning
+## Two-Stage Review Pattern
+
+```
+Phase 4.5: Implementation Completion Review
+        ↓
+┌───────────────────────────────────────┐
+│  STAGE 1: Spec Compliance (BLOCKING)  │
+│  Agent: capability-reviewer (single)  │
+│  Focus: Code matches architecture?    │
+│  Verdict: SPEC_COMPLIANT | NOT_       │
+└─────────────┬─────────────────────────┘
+              │
+         NOT_COMPLIANT? ──→ Fix loop (max 2 attempts) ──→ Escalate
+              │
+        SPEC_COMPLIANT
+              ↓
+┌───────────────────────────────────────┐
+│  STAGE 2: Code Quality (SEQUENTIAL)   │
+│  Agent: capability-reviewer           │
+│  Focus: Is code well-built?           │
+│  Verdict: APPROVED | CHANGES_         │
+└─────────────┬─────────────────────────┘
+              │
+    CHANGES_REQUESTED? ──→ Fix loop (max 1 attempt) ──→ Escalate
+              │
+           APPROVED
+              ↓
+        Phase 6: Testing
+```
+
+## Stage 1: Spec Compliance Review (BLOCKING GATE)
+
+**Purpose**: Verify implementation matches architecture requirements exactly.
+
+**Focus**:
+- Nothing missing (all requirements implemented)
+- Nothing extra (no unrequested features)
+- Correct behavior (matches spec, not "close enough")
+
+**NOT evaluated here**: Code quality, style, performance - that's Stage 2.
+
+### Step 1: Spawn Spec Compliance Reviewer
+
+**CRITICAL:** Spawn SINGLE reviewer focused on spec compliance ONLY.
 
 ```typescript
-Task("capability-reviewer", {
-  description: "Review capability implementation",
-  prompt: `Review ${capabilityType} capability implementation against architecture plan.
-
-    INPUT_FILES:
-    - ${OUTPUT_DIR}/architecture.md (implementation plan)
-    - ${OUTPUT_DIR}/implementation-log.md (what was implemented)
-    - ${files_created} (actual code to review)
-
-    OUTPUT_DIRECTORY: ${OUTPUT_DIR}
-
-    MANDATORY SKILLS (invoke ALL before completing):
-    - persisting-agent-outputs: For writing output files
-    - gateway-capabilities: For capability-specific quality standards
-
-    Validate:
-    1. Architecture Compliance - Does implementation match plan?
-    2. Quality Standards - Meets capability-type best practices?
-    3. Error Handling - All edge cases from architecture addressed?
-    4. Code Quality - Follows conventions and patterns?
-
-    Output review.md with APPROVED or CHANGES_REQUESTED status.
-
-    COMPLIANCE: Document invoked skills in output metadata.`,
+Task({
   subagent_type: "capability-reviewer",
+  description: "Spec compliance review for {capability-name}",
+  prompt: `[Use SPEC COMPLIANCE template from prompts/reviewer-prompt.md]
+
+    Architecture Requirements: {from architecture.md}
+    Implementation: {from implementation-log.md}
+    Files: {files_modified list}
+
+    OUTPUT_DIRECTORY: {CAPABILITY_DIR}
+
+    Your ONLY focus: Does code match architecture exactly?
+
+    MANDATORY SKILLS:
+    - persisting-agent-outputs
+
+    Return verdict: SPEC_COMPLIANT | NOT_COMPLIANT
+  `
 });
 ```
+
+### Step 2: Evaluate Stage 1 Verdict
+
+**Gate check:**
+
+```python
+stage1_verdict = spec_compliance_reviewer.verdict
+
+if stage1_verdict == "SPEC_COMPLIANT":
+    proceed_to_stage_2()
+elif stage1_verdict == "NOT_COMPLIANT":
+    enter_stage1_fix_loop()
+```
+
+### Step 3: Stage 1 Fix Loop (MAX 2 ATTEMPTS)
+
+If `verdict: "NOT_COMPLIANT"`:
+
+#### Attempt 1: Developer Fixes
+
+1. Dispatch developer with spec compliance issues
+2. Re-run Stage 1 spec compliance review
+3. If SPEC_COMPLIANT → proceed to Stage 2
+4. If still NOT_COMPLIANT → Attempt 2
+
+#### Attempt 2: Developer Fixes Again
+
+1. Dispatch developer with remaining issues
+2. Re-run Stage 1 spec compliance review
+3. If SPEC_COMPLIANT → proceed to Stage 2
+4. If still NOT_COMPLIANT → Escalate
+
+#### Escalation After 2 Failures
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "Spec compliance failing after 2 attempts. How should we proceed?",
+    header: "Spec Review",
+    multiSelect: false,
+    options: [
+      {
+        label: "Show me the issues",
+        description: "Display spec compliance issues for debugging"
+      },
+      {
+        label: "Proceed to Stage 2 anyway",
+        description: "Accept deviations, document in tech debt"
+      },
+      {
+        label: "Revise architecture",
+        description: "Architecture may be unclear or incorrect"
+      },
+      {
+        label: "Cancel capability",
+        description: "Stop development, revisit design"
+      }
+    ]
+  }]
+});
+```
+
+**Do NOT retry more than twice.** Escalate to user.
+
+---
+
+## Stage 2: Code Quality Review (SEQUENTIAL)
+
+**PREREQUISITE:** Stage 1 (Spec Compliance) MUST pass before running Stage 2.
+
+**Purpose**: Validate code quality after confirming spec compliance.
+
+### Step 4: Spawn Code Quality Reviewer
+
+```typescript
+Task({
+  subagent_type: "capability-reviewer",
+  description: "Code quality review for {capability-name}",
+  prompt: `[Use CODE QUALITY template from prompts/reviewer-prompt.md]
+
+    Architecture: {from architecture.md}
+    Files: {files_modified}
+
+    CHECK:
+    - Code quality (structure, types)
+    - Capability-type best practices
+    - Performance implications
+    - Maintainability
+
+    OUTPUT_DIRECTORY: {CAPABILITY_DIR}
+
+    MANDATORY SKILLS:
+    - persisting-agent-outputs
+    - adhering-to-dry
+    - adhering-to-yagni
+
+    Return verdict: APPROVED | APPROVED_WITH_NOTES | CHANGES_REQUESTED
+  `
+});
+```
+
+### Step 5: Evaluate Stage 2 Verdict
+
+```python
+code_quality_verdict = reviewer.verdict
+
+if code_quality_verdict in ["APPROVED", "APPROVED_WITH_NOTES"]:
+    proceed_to_phase_6()  # Success!
+else:
+    enter_stage2_fix_loop()
+```
+
+### Step 6: Stage 2 Fix Loop (MAX 1 ATTEMPT)
+
+If reviewer returns `CHANGES_REQUESTED`:
+
+#### Attempt 1: Developer Fixes
+
+1. Compile feedback from reviewer
+2. Dispatch developer to fix quality issues
+3. Re-run Stage 2 (code quality review)
+4. If APPROVED → proceed to Phase 6
+5. If still issues → Escalate
+
+#### Escalation After 1 Failure
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "Code quality review failing after 1 retry. How should we proceed?",
+    header: "Review",
+    multiSelect: false,
+    options: [
+      {
+        label: "Show me the issues",
+        description: "Display quality feedback"
+      },
+      {
+        label: "Proceed anyway",
+        description: "Accept current state, document known issues"
+      },
+      {
+        label: "Cancel capability",
+        description: "Stop development, revisit design"
+      }
+    ]
+  }]
+});
+```
+
+**Do NOT retry more than once for Stage 2.** Escalate to user.
+
+---
+
+## Progress Tracking
+
+### Step 7: Update Progress
+
+```json
+{
+  "phases": {
+    "review": {
+      "status": "complete",
+      "stage1_retries": 1,
+      "stage2_retries": 0,
+      "agents_used": ["capability-reviewer"],
+      "outputs": {
+        "spec_compliance_review": ".claude/.output/capabilities/{id}/spec-compliance-review.md",
+        "code_quality_review": ".claude/.output/capabilities/{id}/code-quality-review.md"
+      },
+      "verdicts": {
+        "spec_compliance": "SPEC_COMPLIANT",
+        "code_quality": "APPROVED"
+      },
+      "completed_at": "2026-01-08T12:30:00Z"
+    },
+    "testing": {
+      "status": "in_progress"
+    }
+  },
+  "current_phase": "testing"
+}
+```
+
+### Step 8: Mark TodoWrite Complete
+
+```
+TodoWrite: Mark "Phase 5: Code Review" as completed
+TodoWrite: Mark "Phase 6: Testing" as in_progress
+```
+
+## Exit Criteria
+
+✅ Proceed to Phase 6 (Testing) when:
+
+- Stage 1: `verdict: "SPEC_COMPLIANT"` achieved
+- Stage 2: Reviewer returned `verdict: "APPROVED"` (or `"APPROVED_WITH_NOTES"`)
+- OR user explicitly approved despite issues
+- Review files saved:
+  - `spec-compliance-review.md` (Stage 1)
+  - `code-quality-review.md` (Stage 2)
+- Progress file updated with both stage results
+- TodoWrite marked complete
+
+❌ Do NOT proceed if:
+
+- Stage 1 NOT_COMPLIANT after 2 attempts without user approval
+- Stage 2 CHANGES_REQUESTED after 1 attempt without user approval
 
 ## Review Checklist by Type
 
@@ -99,249 +343,26 @@ Task("capability-reviewer", {
 - [ ] Error handling (timeouts, auth failures, rate limits)
 - [ ] Data mapping complete (all scanner fields)
 
-## Review Report Format
-
-The `capability-reviewer` agent must produce `review.md`:
-
-```markdown
-# Review Report - ${Capability Name}
-
-## Date: ${ISO timestamp}
-
-## Reviewer: capability-reviewer
-
-## Status: APPROVED | CHANGES_REQUESTED
-
----
-
-## ARCHITECTURE COMPLIANCE
-
-### Detection Logic
-
-[✅ Compliant | ❌ Issues found]
-
-[Details]
-
-### Data Flow
-
-[✅ Compliant | ❌ Issues found]
-
-[Details]
-
-### Error Handling
-
-[✅ Compliant | ❌ Issues found]
-
-[Details]
-
----
-
-## QUALITY STANDARDS (Capability-Specific)
-
-### [Standard 1 for capability type]
-
-[✅ Met | ❌ Not met]
-
-[Details]
-
-### [Standard 2 for capability type]
-
-[✅ Met | ❌ Not met]
-
-[Details]
-
----
-
-## CODE QUALITY
-
-### Conventions
-
-[✅ Followed | ❌ Violations]
-
-[Details]
-
-### Patterns
-
-[✅ Consistent | ❌ Inconsistent]
-
-[Details]
-
----
-
-## ISSUES IDENTIFIED
-
-[If CHANGES_REQUESTED]
-
-1. **Issue 1**: [Description]
-   - **Location**: path/to/file:line
-   - **Severity**: Critical | Major | Minor
-   - **Fix**: [Required action]
-
-2. **Issue 2**: [Description]
-   - **Location**: path/to/file:line
-   - **Severity**: Critical | Major | Minor
-   - **Fix**: [Required action]
-
----
-
-## RECOMMENDATIONS
-
-[Optional improvements, not blocking]
-
----
-
-## VERDICT
-
-[If APPROVED]
-Implementation approved. Ready for Phase 6 (Testing).
-
-[If CHANGES_REQUESTED]
-Implementation requires changes. Return to capability-developer with issue list.
-```
-
-## Retry Logic (MAX 1 RETRY)
-
-### First Review: CHANGES_REQUESTED
-
-1. **Extract issues** from review.md
-2. **Re-invoke capability-developer** with fix guidance:
-
-```typescript
-Task("capability-developer", {
-  description: "Fix review issues",
-  prompt: `Fix issues identified in review.md:
-
-    ISSUES TO FIX:
-    ${issues_from_review}
-
-    INPUT_FILES:
-    - ${OUTPUT_DIR}/review.md (review feedback)
-    - ${OUTPUT_DIR}/architecture.md (original plan)
-    - ${files_created} (code to fix)
-
-    OUTPUT_DIRECTORY: ${OUTPUT_DIR}
-
-    Fix all Critical and Major issues.
-    Update implementation-log.md with changes made.`,
-  subagent_type: "capability-developer",
-});
-```
-
-3. **Re-invoke capability-reviewer** after fixes
-4. **Update retry_count** in metadata.json
-
-### Second Review: CHANGES_REQUESTED
-
-If still CHANGES_REQUESTED after one retry:
-
-1. **ESCALATE to user** via AskUserQuestion:
-
-```
-The capability-reviewer has requested changes twice:
-
-Round 1 Issues:
-${round1_issues}
-
-Round 2 Issues (after fixes):
-${round2_issues}
-
-How would you like to proceed?
-
-Options:
-- Approve as-is - Accept implementation with known issues
-- Manual intervention - I'll fix the issues myself
-- Revise architecture - The plan needs adjustment
-- Abandon - Stop capability development
-```
-
-2. **Do NOT retry a third time** - manual intervention required
-
-## Handoff Format
-
-After review completes (APPROVED):
-
-```json
-{
-  "agent": "capability-reviewer",
-  "phase": "review",
-  "timestamp": "2026-01-04T15:10:00Z",
-  "output_file": "review.md",
-  "status": "complete",
-  "handoff": {
-    "next_phase": "testing",
-    "next_agent": "test-lead",
-    "context": "Implementation approved. ${capabilityType} capability validated against architecture. Key quality metrics: ${metrics}. Ready for test planning."
-  }
-}
-```
-
-## metadata.json Updates
-
-After review completes (APPROVED):
-
-```json
-{
-  "phases": {
-    "review": {
-      "status": "complete",
-      "output_file": "review.md",
-      "retry_count": 0,
-      "final_verdict": "APPROVED",
-      "completed_at": "2026-01-04T15:10:00Z",
-      "agent_invoked": "capability-reviewer"
-    },
-    "testing": {
-      "status": "in_progress",
-      "retry_count": 0
-    }
-  },
-  "current_phase": "testing"
-}
-```
-
-After retry (CHANGES_REQUESTED → developer fixes → re-review):
-
-```json
-{
-  "phases": {
-    "review": {
-      "status": "in_progress",
-      "retry_count": 1,
-      "round_1_issues": [...],
-      "agent_invoked": "capability-reviewer"
-    }
-  }
-}
-```
-
-## Exit Criteria
-
-Review phase is complete when:
-
-- [ ] capability-reviewer agent completed
-- [ ] review.md written to capability directory
-- [ ] Status is APPROVED (or user escalation resolved)
-- [ ] retry_count ≤ 1 (max one retry before escalation)
-- [ ] metadata.json updated with review status
-
 ## Common Issues
 
-### "Reviewer flagged style issues"
+### "Reviewers disagree on severity"
 
-**Solution**: Minor style issues should be recommendations, not blocking issues. Only Critical/Major issues block approval.
+**Solution**: Take the more conservative (higher severity) assessment.
 
-### "Implementation fundamentally wrong"
+### "Developer keeps introducing new issues when fixing"
 
-**Solution**: If architecture plan was flawed, escalate to user. May need to revise architecture (Phase 3) before proceeding.
+**Solution**: After retry limit, escalate to user. Do not enter infinite loop.
 
-### "Endless retry loop"
+### "Should I skip Stage 2 for small changes?"
 
-**Solution**: This is prevented by MAX 1 RETRY rule. After second CHANGES_REQUESTED, must escalate to user.
+**Answer**: No. Stage 2 runs sequentially, adding minimal overhead. Even small changes can introduce quality issues.
 
-## Related
+## Related References
 
-- [Phase 4: Implementation](phase-4-implementation.md) - Previous phase (produces code)
-- [Phase 6: Testing](phase-6-testing.md) - Next phase (validates behavior)
+- [Phase 4: Implementation](phase-4-implementation.md) - Previous phase
+- [Phase 4.5: Implementation Completion](phase-4.5-implementation-review.md) - Completeness check before review
+- [Phase 6: Testing](phase-6-testing.md) - Next phase
+- [Prompts: Reviewer](prompts/reviewer-prompt.md) - Stage 1 + Stage 2 templates
 - [Quality Standards](quality-standards.md) - Quality criteria by capability type
 - [Agent Handoffs](agent-handoffs.md) - Handoff format and retry logic
 - [Troubleshooting](troubleshooting.md) - Review failure patterns

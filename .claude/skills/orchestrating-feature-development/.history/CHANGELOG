@@ -394,3 +394,43 @@ Also condensed Exit Criteria section to fit within 500-line limit after adding S
 - Consistent with orchestrating-fingerprintx-development and orchestrating-capability-development patterns
 
 **Status**: Update complete
+
+## 2026-01-08 - orchestrator-refactor-superpowers-patterns
+
+**Type:** Enhancement (7 changes from ORCHESTRATOR-REFACTOR.md)
+
+**Problem:** Phase-level review granularity causes late issue detection. Missing patterns from obra/superpowers: gated review, per-task cycles, explicit skepticism, mandatory clarification, intermediate checkpoints.
+
+**Changes:**
+
+1. **Two-Stage Gated Review (Phase 6)**: Sequential spec compliance (BLOCKING) → parallel quality + security. Prevents wasted effort reviewing non-compliant code.
+   - Stage 1: Spec compliance (2 retries)
+   - Stage 2: Quality + security (1 retry)
+   - Files: `phase-6-code-review.md`, `reviewer-prompt.md`
+
+2. **Per-Task Review Mode (Phase 5)**: 4+ tasks trigger per-task review cycles for immediate feedback instead of accumulating issues.
+   - New file: `phase-5-per-task-mode.md`
+   - Updated: `phase-5-implementation.md` (review mode selection)
+
+3. **Explicit Skepticism**: Reviewer prompts now require independent verification with "CRITICAL VERIFICATION RULE" and red flags checklist.
+   - Files: `reviewer-prompt.md` (added skepticism section)
+
+4. **Mandatory Clarification Gate**: Developers MUST complete STEP 0 clarification protocol before implementation.
+   - Files: `developer-prompt.md` (STEP 0 mandatory), `phase-5-implementation.md` (Step 3.5 clarification handling)
+
+5. **Intermediate Checkpoints**: Task-level checkpoints every 3 tasks (>5 task plans), mandatory review on >2 retries.
+   - Files: `SKILL.md` (Checkpoint Configuration section)
+
+6. **Plan Completion Review (Phase 5.5)**: NEW phase verifying all requirements implemented BEFORE code review catches missing items early.
+   - New file: `phase-5.5-plan-completion-review.md`
+   - Updated: `SKILL.md` (workflow diagram, Quick Reference)
+
+7. **Context Management Warnings**: Explicit guidance on fresh subagents per task to prevent context pollution.
+   - Files: `SKILL.md` (Context Management section)
+
+**Impact:** Shifts from phase-level (late detection) to task-level (early detection) review granularity. Reduces rework cost by catching issues immediately.
+
+**Line Count:** 502 → 595 lines (+93, exceeds 500 soft limit but justified by essential workflow improvements)
+
+**Related:** ORCHESTRATOR-REFACTOR.md analysis of obra/superpowers patterns
+

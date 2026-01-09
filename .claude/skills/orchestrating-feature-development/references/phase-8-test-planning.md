@@ -278,8 +278,8 @@ AskUserQuestion({
 
 ## Related References
 
-- [Phase 6: Code Review](phase-6-code-review.md) - Previous phase
-- [Phase 8: Testing](phase-8-testing.md) - Next phase (testers implement plan)
-- [Phase 9: Test Validation](phase-9-test-validation.md) - test-lead validates against plan
+- [Phase 7: Code Review](phase-7-code-review.md) - Previous phase
+- [Phase 9: Testing](phase-9-testing.md) - Next phase (testers implement plan)
+- [Phase 10: Test Validation](phase-10-test-validation.md) - test-lead validates against plan
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format
 - [Troubleshooting](troubleshooting.md) - Common issues

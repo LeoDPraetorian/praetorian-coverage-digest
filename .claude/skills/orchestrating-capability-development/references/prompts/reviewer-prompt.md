@@ -1,21 +1,180 @@
 # Reviewer Subagent Prompt Template
 
-Use this template when dispatching capability-reviewer subagent in Phase 5.
+Use this template when dispatching reviewer subagents in Phase 5.
+
+## Two-Stage Review Process
+
+Code review has TWO stages:
+
+1. **Spec Compliance Review** - Does the code match the architecture?
+2. **Code Quality Review** - Is the code well-built?
+
+**IMPORTANT:** Do NOT start code quality review until spec compliance is confirmed.
 
 ## Usage
+
+### Stage 1: Spec Compliance Reviewer
 
 ```typescript
 Task({
   subagent_type: "capability-reviewer",
-  description: "Review [capability] implementation",
-  prompt: `[Use template below, filling in placeholders]`,
+  description: "Spec compliance review for [capability]",
+  prompt: `[Use spec compliance template below]`,
 });
 ```
 
-## Template
+### Stage 2: Code Quality Reviewer
+
+```typescript
+Task({
+  subagent_type: "capability-reviewer",
+  description: "Code quality review for [capability]",
+  prompt: `[Use code quality template below]`,
+});
+```
+
+---
+
+## Stage 1: Spec Compliance Review Template
 
 ````markdown
-You are reviewing the implementation of capability: [CAPABILITY_NAME]
+You are reviewing code for SPEC COMPLIANCE: [CAPABILITY_NAME]
+
+## Your Single Focus
+
+Does the implementation match the specification in architecture.md?
+
+- Nothing missing (all requirements implemented)
+- Nothing extra (no unrequested features)
+- Correct behavior (matches spec, not "close enough")
+
+---
+
+## CRITICAL VERIFICATION RULE
+
+**The implementer may have finished quickly. Their report may be:**
+
+- **Incomplete** - Missing requirements they didn't mention
+- **Inaccurate** - Claiming things work that don't
+- **Optimistic** - Glossing over issues or edge cases
+
+**You MUST verify independently:**
+
+1. **Read the actual code** - Do NOT trust the implementer's summary
+2. **Compare line-by-line** - Check each architecture requirement against actual implementation
+3. **Test claims** - If they say "all tests pass", verify test files exist and cover the requirement
+4. **Look for omissions** - What did they NOT mention? Often more important than what they did
+
+### Verification Checklist
+
+For EACH requirement in the architecture:
+
+| Requirement | Claimed Status | Verified Status | Evidence |
+|-------------|----------------|-----------------|----------|
+| [req 1]     | [what dev said]| [what you found]| [file:line] |
+| [req 2]     | ...            | ...             | ... |
+
+### Red Flags to Watch For
+
+- "Implemented as specified" without details
+- Vague summaries ("added the capability")
+- No test file references
+- Suspiciously fast completion
+- Claims that can't be verified from code
+- Missing TDD evidence (no RED phase documented)
+
+---
+
+## Architecture Requirements
+
+[PASTE the full specification from architecture.md]
+
+## Implementation Summary
+
+[PASTE the implementation-log.md summary from developer]
+
+## Files to Review
+
+[LIST of files created/modified by developer]
+
+## Output Directory
+
+OUTPUT_DIRECTORY: [CAPABILITY_DIR]
+
+## MANDATORY CHECK
+
+For EACH requirement in the architecture:
+
+1. Is it implemented? (Yes/No - verify in code, not summary)
+2. Does it match the spec exactly? (Yes/No/Deviation noted)
+3. Is there anything extra not in the spec? (List extras)
+
+## Spec Compliance Checklist
+
+| Requirement | Implemented | Matches Spec | Notes |
+| ----------- | ----------- | ------------ | ----- |
+| [req 1]     | ✓/✗         | ✓/✗          |       |
+| [req 2]     | ✓/✗         | ✓/✗          |       |
+| ...         |             |              |       |
+
+## Verdict
+
+**SPEC_COMPLIANT** - All requirements met, nothing extra
+**NOT_COMPLIANT** - Issues found (list below)
+
+### Issues (if NOT_COMPLIANT)
+
+**Missing:**
+
+- [Requirements not implemented]
+
+**Extra (unrequested):**
+
+- [Features added that weren't in spec]
+
+**Deviations:**
+
+- [Behaviors that don't match spec]
+
+## Output Format
+
+```json
+{
+  "agent": "capability-reviewer",
+  "output_type": "spec-compliance-review",
+  "capability_directory": "[CAPABILITY_DIR]",
+  "skills_invoked": ["persisting-agent-outputs"],
+  "status": "complete",
+  "verdict": "SPEC_COMPLIANT|NOT_COMPLIANT",
+  "issues_found": [],
+  "handoff": {
+    "next_agent": "capability-reviewer (code quality)",
+    "context": "[Summary of spec compliance verdict]"
+  }
+}
+```
+````
+
+---
+
+## Stage 2: Code Quality Review Template
+
+````markdown
+You are reviewing code for QUALITY: [CAPABILITY_NAME]
+
+## Your Focus
+
+Is the code well-built?
+
+- Clean and maintainable
+- Follows capability-type patterns
+- Proper error handling
+- Good test coverage
+- Performance considerations
+
+**DO NOT check spec compliance here** - that was Stage 1.
+
+---
 
 ## Capability Context
 
@@ -45,56 +204,7 @@ You MUST use these skills during this task:
 2. **adhering-to-dry** - Verify no duplication exists
 3. **adhering-to-yagni** - Ensure no over-engineering
 
-## Your Job
-
-Perform two-stage review:
-
-### Stage 1: Spec Compliance Review
-
-Does the implementation match the architecture plan?
-
-1. Check detection logic matches architecture.md
-2. Verify all edge cases from architecture are handled
-3. Confirm quality targets are met
-4. Validate error handling approach
-
-### Stage 2: Code Quality Review
-
-Is the capability well-built?
-
-1. **Code Quality**: Clean, readable, well-documented
-2. **DRY Compliance**: Reuses patterns, no duplication
-3. **YAGNI Compliance**: No unnecessary features or abstractions
-4. **Test Coverage**: Adequate tests for detection scenarios
-5. **Performance**: Meets performance targets
-6. **Security**: Proper secret handling, input validation
-
-## Review Document Structure
-
-Your review.md MUST include:
-
-```markdown
-# [Capability] Review
-
-## Verdict
-
-**Status**: APPROVED | CHANGES_REQUESTED
-
-**Overall Assessment**: [2-3 sentences summary]
-
-## Stage 1: Spec Compliance Review
-
-### Detection Logic
-
-- [ ] Matches architecture.md approach
-- [ ] All edge cases handled
-- [ ] Quality targets met (accuracy, false positive rate)
-- [ ] Error handling implemented
-
-**Issues**:
-[List any spec compliance issues, or "None"]
-
-## Stage 2: Code Quality Review
+## Review Checklist
 
 ### Code Quality
 
@@ -130,8 +240,70 @@ Your review.md MUST include:
 - [ ] Input validation present
 - [ ] Output sanitization where needed
 
+## Review Document Structure
+
+Your review.md MUST include:
+
+```markdown
+# [Capability] Review
+
+## Verdict
+
+**Status**: APPROVED | CHANGES_REQUESTED
+
+**Overall Assessment**: [2-3 sentences summary]
+
+## Code Quality
+
+- [ ] Clean and readable
+- [ ] Well-documented
+- [ ] Follows capability-type conventions
+
 **Issues**:
 [List any quality issues, or "None"]
+
+## DRY Compliance
+
+- [ ] Reuses patterns from discovery
+- [ ] No unnecessary duplication
+
+**Issues**:
+[List any DRY issues, or "None"]
+
+## YAGNI Compliance
+
+- [ ] Only implements specified detection
+- [ ] No speculative features
+
+**Issues**:
+[List any YAGNI issues, or "None"]
+
+## Test Coverage
+
+- [ ] Tests for positive cases
+- [ ] Tests for negative cases
+- [ ] Tests for edge cases
+- [ ] All tests passing
+
+**Issues**:
+[List any test coverage issues, or "None"]
+
+## Performance
+
+- [ ] Meets performance targets
+- [ ] No obvious bottlenecks
+
+**Issues**:
+[List any performance issues, or "None"]
+
+## Security
+
+- [ ] Secrets properly managed
+- [ ] Input validation present
+- [ ] Output sanitization where needed
+
+**Issues**:
+[List any security issues, or "None"]
 
 ## Required Changes (if CHANGES_REQUESTED)
 
@@ -152,7 +324,6 @@ Your review.md MUST include:
 [If APPROVED]: Ready for testing
 [If CHANGES_REQUESTED]: Developer must address critical issues
 ```
-````
 
 ## Output Format
 
@@ -161,7 +332,7 @@ Create structured JSON metadata at the end of review.md:
 ```json
 {
   "agent": "capability-reviewer",
-  "output_type": "review",
+  "output_type": "code-quality-review",
   "verdict": "APPROVED|CHANGES_REQUESTED",
   "capability_type": "[type]",
   "skills_invoked": ["persisting-agent-outputs", "adhering-to-dry", "adhering-to-yagni"],
@@ -190,6 +361,7 @@ If you cannot complete review:
   }
 }
 ```
+````
 
 ```
 

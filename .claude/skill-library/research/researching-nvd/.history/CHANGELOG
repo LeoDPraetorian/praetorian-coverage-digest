@@ -1,0 +1,97 @@
+# Changelog: researching-nvd
+
+## 2026-01-08 - Initial Creation
+
+**Type:** Library skill creation
+**Category:** research
+**Skill Type:** Process/Pattern (research methodology)
+
+### RED Phase Documentation
+
+**Gap:** NIST NVD is the comprehensive, authoritative source for all CVE details (250,000+ CVEs) with CVSS scores, CPE (affected products), CWE classification, and references. No structured methodology existed for querying NVD API v2.0, extracting CVSS/CPE/CWE data, and cross-referencing with CISA KEV for exploitation status.
+
+**Failure Scenario (Without Skill):**
+- User request: "Research Apache Tomcat CVEs with CRITICAL severity"
+- Claude manually constructs URLs without API knowledge
+- Uses hash-based SPA URLs that fail server-side
+- Misses NVD API v2.0 with JSON responses
+- No CPE syntax or CVSS vector interpretation
+- Cannot cross-reference CISA KEV
+- Ignores rate limiting (causes API failures)
+
+**Success Criteria:**
+- 5-phase methodology using NVD API v2.0
+- JSON API queries with CPE/CVSS filtering
+- CVSS score AND vector interpretation
+- CPE-based product matching
+- CISA KEV cross-reference for exploitation status
+- Severity distribution and priority matrix (CVSS + KEV)
+- Integration with orchestrating-research (Mode 1/2)
+
+### Structure
+
+**Location:** `.claude/skill-library/research/researching-nvd/`
+**Line Count:** 442 lines (under 500 limit)
+**Model:** Based on researching-cisa-kev and researching-arxiv structure
+
+### Phase Summary
+
+1. Query Formulation - NVD API v2.0 query construction, CPE syntax, severity filtering
+2. Search Execution - JSON API calls with rate limiting (5 req/30s, 7s delays)
+3. CVE Analysis - Extract CVSS v3.1 (score/vector/severity), CPE, CWE, references
+4. Synthesis - CVSS distribution, KEV cross-reference, priority matrix
+5. Recommendation - Detection/capability guidance, CVSS + KEV prioritization
+
+### Key Features
+
+- **NVD API v2.0 focus:** JSON REST API (not web scraping)
+- **CVSS interpretation:** Score + vector breakdown (AV/AC/PR/UI/S/C/I/A)
+- **CPE matching:** Precise affected product/version identification
+- **CWE classification:** Weakness type categorization
+- **KEV cross-reference:** Exploitation status via CISA KEV integration
+- **Dual-mode output:** Standalone (timestamped directory) or orchestrated (OUTPUT_DIR)
+- **Prioritization:** CVSS + KEV combined (P0-P4)
+
+### Key Difference from CISA KEV
+
+- CISA KEV: ~1,200 exploited CVEs, federal deadlines, exploitation confirmation
+- NVD: 250,000+ all CVEs, CVSS/CPE/CWE details, comprehensive database
+- Use: NVD for DETAILS, CISA KEV for PRIORITIZATION
+
+### References Created
+
+- `references/query-patterns.md` - NVD API v2.0 construction, CPE syntax, rate limiting (populated from specs)
+- `references/cvss-interpretation.md` - CVSS v3.1 score/vector/severity breakdown (populated from specs)
+- `references/cpe-syntax.md` - CPE 2.3 format, wildcards, version ranges (populated from specs)
+- `references/output-format.md` - Structured output templates, priority matrix (populated from specs)
+
+**Research Decision:** Skipped orchestrating-research, populated from user-provided specifications per request.
+
+### Gateway Integration
+
+Added to `gateway-capabilities`:
+- **Intent Detection:** "NVD" / "CVSS" / "CPE" / "CVE details" / "vulnerability database"
+- **Skill Registry:** Under Fingerprintx section with other research skills
+
+### Completed Phases
+
+- [x] Phase 6: Populate reference files from specifications
+- [x] Phase 7: Add to gateway-capabilities routing table
+- [x] Phase 8: GREEN verification (tested with Tomcat CRITICAL query - successful)
+- [x] Phase 9: REFACTOR - Skipped (research methodology skill, no discipline to enforce)
+
+### GREEN Verification Results
+
+**Test:** Query NVD API for Apache Tomcat CRITICAL severity CVEs
+**URL:** `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=tomcat&cvssV3Severity=CRITICAL&resultsPerPage=5`
+**Result:** Successfully retrieved 3 CVEs with complete CVSS data:
+- CVE-2016-8735: 9.8 CRITICAL (RCE via JMX, vector: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)
+- CVE-2016-6808: 9.8 CRITICAL (Buffer overflow, mod_jk)
+- CVE-2017-5648: 9.1 CRITICAL (Facade object vulnerability)
+
+**Verification:** JSON API v2.0 working, CVSS scores + vectors extracted, proper API usage demonstrated
+
+### Skill Complete
+
+**Status:** Ready for use
+**Created:** 2026-01-08
