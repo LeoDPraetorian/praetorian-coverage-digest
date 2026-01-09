@@ -26,10 +26,6 @@
 	path = modules/praetorian-agent-workflows
 	url = https://github.com/praetorian-inc/praetorian-agent-workflows
 	branch = main
-[submodule "modules/aegiscli"]
-	path = modules/aegiscli
-	url = https://github.com/praetorian-inc/aegiscli
-	branch = main
 [submodule "modules/chariot-aegis-capabilities"]
 	path = modules/chariot-aegis-capabilities
 	url = https://github.com/praetorian-inc/chariot-aegis-capabilities

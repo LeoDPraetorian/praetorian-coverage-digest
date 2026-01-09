@@ -1,7 +1,6 @@
 go 1.25.3
 
 use (
-	./modules/aegiscli
 	./modules/augustus
 	./modules/capability-sdk
 	./modules/chariot-aegis-capabilities/aegis-registry

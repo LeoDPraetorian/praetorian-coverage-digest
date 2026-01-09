@@ -399,23 +399,24 @@ endif
 
 setup-mac:
 	@echo "Installing core packages on macOS..."
-	@brew install awscli aws-sam-cli jq node python docker go gh
+	@brew install awscli aws-sam-cli jq node python docker go gh pipx uv
+	@pipx ensurepath > /dev/null 2>&1 || true
 	@echo "Installing Praetorian CLI..."
-	@python3 -m pip install --no-cache-dir praetorian-cli > /dev/null
+	@pipx install praetorian-cli > /dev/null 2>&1 || pipx upgrade praetorian-cli > /dev/null 2>&1 || echo "⚠️  Warning: Praetorian CLI installation/upgrade failed"
 	@echo "Installing Claude Code..."
 	@npm install -g @anthropic-ai/claude-code > /dev/null
 	@echo "Installing Claude Agent SDK..."
-	@python3 -m pip install --no-cache-dir claude-agent-sdk > /dev/null
+	@uv pip install --system --break-system-packages claude-agent-sdk > /dev/null 2>&1 || uv pip install --system --break-system-packages --upgrade claude-agent-sdk > /dev/null 2>&1 || echo "⚠️  Warning: Claude Agent SDK installation/upgrade failed"
 
 update-mac:
 	@echo "Upgrading core packages on macOS..."
-	@brew upgrade awscli aws-sam-cli jq node python docker go gh
-	@echo "Installing Praetorian CLI..."
-	@python3 -m pip install --no-cache-dir --upgrade praetorian-cli > /dev/null
-	@echo "Installing Claude Code..."
+	@brew upgrade awscli aws-sam-cli jq node python docker go gh pipx uv
+	@echo "Updating Praetorian CLI..."
+	@pipx upgrade praetorian-cli > /dev/null 2>&1 || pipx install praetorian-cli > /dev/null 2>&1 || echo "⚠️  Warning: Praetorian CLI update/install failed"
+	@echo "Updating Claude Code..."
 	@npm update -g @anthropic-ai/claude-code > /dev/null
-	@echo "Installing Claude Agent SDK..."
-	@python3 -m pip install --no-cache-dir --upgrade claude-agent-sdk > /dev/null
+	@echo "Updating Claude Agent SDK..."
+	@uv pip install --system --break-system-packages --upgrade claude-agent-sdk > /dev/null 2>&1 || echo "⚠️  Warning: Claude Agent SDK update failed"
 	
 setup-ubuntu:
 	@echo "Installing additional core packages in devcontainer..."
