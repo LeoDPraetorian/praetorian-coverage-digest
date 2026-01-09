@@ -72,6 +72,8 @@ This document catalogs academic papers, research publications, and industry repo
 
 | Date       | Authors                       | Title                                                                                             | Link                                                                       |
 | ---------- | ----------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 2023-12-04 | Mehrotra A., Zampetakis M., Kassianik P., et al. | Tree of Attacks: Jailbreaking Black-Box LLMs Automatically                                        | [arXiv:2312.02119](https://arxiv.org/abs/2312.02119)                       |
+|            |                               | _Relevance: TAP method for automated jailbreak generation using attacker LLMs; adversarial testing patterns._ |                                                                            |
 | 2023-08-18 | Janisch J., Pevny T., Lisy V. | NASimEmu: Network Attack Simulator & Emulator for Training Agents Generalizing to Novel Scenarios | [DOI:10.48550/arXiv.2305.17246](https://doi.org/10.48550/arXiv.2305.17246) |
 |            |                               | _Relevance: Network simulation environment for training agents on diverse topologies._            |                                                                            |
 
