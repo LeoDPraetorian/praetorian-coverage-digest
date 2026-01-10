@@ -1,202 +1,782 @@
-# Remote Development
+# DevPod Remote Development
 
-This document walks through how to set up **DevPod** for remote development. DevPod implements the [`devcontainer`](https://containers.dev/)
-standard. It is an open-source alternative to GitHub Codespaces, without tight coupling to VS Code. The way devcontainer
-works is ingenious. Learn more on how it works [here](https://code.visualstudio.com/docs/devcontainers/containers).
+> **Modern cloud-based development environments for the Chariot platform**
+> Automatic setup • Multi-region support • Prebuilt containers • No VNC complexity
 
+## What is DevPod?
 
-## Install DevPod
-- Install the CLI: 
-  ```
-  curl -L -o /tmp/devpod "https://github.com/loft-sh/devpod/releases/latest/download/devpod-darwin-arm64"
-  sudo install -c -m 0755 /tmp/devpod /usr/local/bin
-  rm -f /tmp/devpod
-  ```
-- Install the Desktop App: 
-  
-  Click the **Download DevPod** button on this page: https://devpod.sh/
+DevPod is an open-source tool that creates cloud-based development environments using the industry-standard [devcontainer](https://containers.dev/) specification. Think of it as your own personal GitHub Codespaces that runs on AWS infrastructure you control.
 
-## Get Your DevPod Configured
+**Key Benefits:**
+- 🚀 **Fast startup** - Prebuilt containers ready in seconds
+- 🌍 **Multi-region** - 6 AWS regions with automatic latency-based selection
+- 🔒 **Secure** - SSH tunneling, no VNC ports exposed
+- 💰 **Cost-effective** - Auto-stop after 1 hour of inactivity
+- 🛠️ **Consistent** - Same environment for entire team
 
-### Set up the AWS provider
+---
 
-In DevPod, a **provider** is the entity that provides the compute for the devcontainer. In our use case, we run the devcontainers on AWS.
+## Quick Start
 
-- Make sure your `~/.aws/credentials` has valid API creds in it. Run `aws configure` to fix if needed.
+Get up and running in 3 commands (<3 minutes):
 
-- Use [this website](https://awsspeedtest.com/latency?regions=eu-south-2,us-east-1,us-east-2,us-west-1,us-west-2) to find the AWS region
-  with the lowest latency to you.
+```bash
+# 1. Install DevPod
+make devpod-install
 
-- Run the corresponding command below for your region to create the provider. The commands have different AMIs and VPCs.
-  - **Virginia (us-east-1):**
+# 2. Configure AWS providers (all 6 regions)
+make devpod-setup-provider
 
-    `devpod provider add aws -o AWS_REGION=us-east-1 -o AWS_AMI=ami-0360c520857e3138f -o AWS_INSTANCE_TYPE=c7i.4xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-05295a3b3e9c56627 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
+# 3. Create your workspace
+make devpod-create WORKSPACE=my-name
+```
 
-  - **Ohio (us-east-2):**
+**Access Chariot UI:**
+Open your local browser to `https://localhost:3000` (auto-forwarded by DevPod)
 
-    `devpod provider add aws -o AWS_REGION=us-east-2 -o AWS_AMI=ami-0cfde0ea8edd312d4 -o AWS_INSTANCE_TYPE=c7i.4xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-04ded0246f0e1cbb9 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
+---
 
-  - **Spain (eu-south-2):**
+## Installation
 
-    `devpod provider add aws -o AWS_REGION=eu-south-2 -o AWS_AMI=ami-0fd47a5cb59868dde -o AWS_INSTANCE_TYPE=c7i.4xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-0a680aa940edf918b -o INACTIVITY_TIMEOUT=1h --name aws-provider`
+### Prerequisites
 
-  - **California (us-west-1):**
+- **macOS** (arm64 or amd64)
+- **AWS credentials** configured (`~/.aws/credentials`)
+- **Git** and **GitHub** access
+- **Docker Desktop** (optional, for local testing)
 
-    `devpod provider add aws -o AWS_REGION=us-west-1 -o AWS_AMI=ami-00271c85bf8a52b84 -o AWS_INSTANCE_TYPE=c7i.4xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-060e44ce21af50236 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
+### Install DevPod
 
-  - **Oregon (us-west-2):**
+**Option 1: Automated (Recommended)**
+```bash
+make devpod-install
+```
+Installs DevPod CLI and opens Desktop App download page.
 
-    `devpod provider add aws -o AWS_REGION=us-west-2 -o AWS_AMI=ami-03aa99ddf5498ceb9 -o AWS_INSTANCE_TYPE=c7i.4xlarge -o AWS_DISK_SIZE=100 -o AWS_VPC_ID=vpc-0092000be10e2c104 -o INACTIVITY_TIMEOUT=1h --name aws-provider`
-    
+**Option 2: Homebrew (CLI-only)**
+```bash
+brew install devpod
+```
+Perfect for automation and scripting workflows.
 
-### Create a workspace
-- A **DevPod Workspace** is the container that runs the development environment.
+**Option 3: Manual Download**
+- CLI: https://github.com/loft-sh/devpod/releases
+- Desktop: https://devpod.sh/
 
-- Create a workspace off of the `chariot-development-platform` repo. Give it a name that has meaning to you, such a
-  "ui-refactor":
+---
 
-  - **Cursor:** 
-    - `devpod up --provider aws-provider github.com/praetorian-inc/chariot-development-platform --ide cursor --id {{YOUR_WORKSPACE_NAME}}`
-    - Once it is done initializing the container, a new IDE window will appear with the name of the workspace and an indication
-      that it operates over an SSH tunnel. This IDE should show the repo tree in the file explorer. It is the tree
-      in the container.
+## Configuration
 
-  - **GoLand:**
-    - `devpod up --provider aws-provider github.com/praetorian-inc/chariot-development-platform --ide goland --id {{YOUR_WORKSPACE_NAME}}`
-    - Once it is done initializing the container, it will bring up a **Connect to SSH** dialog window with default
-      filled in. Click **Check Connection and Continue**. It will initialize the GoLand project, dropping you in the
-      Readme file of the repo.
+### AWS Provider Setup
 
-- _All the communications between your laptop and the container are mediated by the IDE._
-  
-- Don't do any work in the container yet. You need to workaround a DevPod bug before doing so ([Issue #1925](https://github.com/loft-sh/devpod/issues/1925)).
-  - On your laptop, in the `chariot-development-platform` repo, run `./scripts/cycle-devpod.sh {{YOUR_WORKSPACE_NAME}}`
-  - Subsequent restart cycles will preserve the container.
+DevPod needs to know where to create your cloud development environments.
 
-### Set up the environment in the container
+**Automated Setup (Recommended):**
+```bash
+make devpod-setup-provider
+```
 
-This section is about cloning the repos, authenticating to various services, and viewing the
-desktop of the container.
+This configures all 6 AWS regions, tests latency, and selects the fastest:
 
-- Open up a terminal in the IDE. You will be dropped into the directory where the `chariot-development-platform` lives.
-  DevPod puts it at `/workspaces/{{YOUR_WORKSPACE_NAME}}`.
+| Region | Location | Use Case |
+|--------|----------|----------|
+| us-east-1 | Virginia | US East Coast developers |
+| us-east-2 | Ohio | US Central developers |
+| us-west-1 | California | US West Coast developers |
+| us-west-2 | Oregon | US Pacific Northwest developers |
+| eu-south-2 | Spain | European developers |
+| ap-southeast-1 | Singapore | Asia Pacific developers |
 
-- In DevPod, in the `chariot-development-platform` repo, run `make setup`. During this, your local Chrome will pop up for
-  authentication to GitHub.
-  - UI certificate set up: Answer "Y".
-  - AWS CLI configuration: Use the API credentials from your local `~/.aws/credentials`. Use `us-east-2` for default region and `json` for default format.
-  - GitHub: Answer "SSH" for protocol and you probably don't want to use a passphrase for the SSH key.
+**Switch Regions Anytime:**
+```bash
+make devpod-select-region
+```
+Re-tests latency and lets you choose the best region.
 
-### View the Fluxbox desktop and running Chrome
-- The devcontainer is pre-installed with a lightweight Fluxbox desktop environment. This allows us to run Chrome 
-  visually and login to Chariot with drag-and-drop keychain files.
+---
 
-- Forward the VNC _web_ port to your laptop:
-  - **Cursor:**
-    - Press `CMD+SHIFT+P` and type "ports view ↵". This will drop you in a **Ports** tab in the bottom pane.
-    - Click the **Forward a Port** button. Enter `6080`.
-    - This creates a new entry for port 6080. In the localhost:NNNNN column, click the **Preview in Editor** icon to open
-      the Cursor browser to view the noVNC webpage. Click **Connect**.
-    - Reference: https://code.visualstudio.com/docs/debugtest/port-forwarding
-    
-  - **GoLand:** 
-    - Open the **Backend Control Center** by clicking the DevPod workspace name on the top chrome of GoLand window.
-    - Click the **Ports** tab.
-    - Click Add for **Forward Remote -> Local**. 
-    - Enter `6080` for remote and a random open port on local, say, `60123`
-    - In your local browser, point it to **http://localhost:60123**. It will open up a noVNC page. Click **Connect**.
-    - Reference: https://www.jetbrains.com/help/idea/security-model.html#manage_ports
+## Workspace Management
 
-- You now see the Fluxbox desktop. You can run the file manager and terminal via the application menu in the lower
-  left corner.
+### Create a Workspace
 
-- In DevPod, in the `chariot-development-platform` repo, run `./scripts/launch-chrome.sh https://chariot.praetorian.com`.
-  Chrome should show up. We use a script to launch Chrome with options that support interaction with the chrome-devtools
-  MCP server and graphics acceleration.
+```bash
+make devpod-create WORKSPACE=feature-auth IDE=cursor
+```
 
-### Alternative to the web noVNC
+**Parameters:**
+- `WORKSPACE` (required) - Give your workspace a meaningful name
+- `IDE` (optional) - Default: `cursor`, also supports `goland`
 
-The above method use `noVNC`. It does not require any local software installation but it has clunky copy-and-paste between
-the local and remote desktops. An alternative is to use the TigerVNC viewer and get it to connect to port 5901, which talks
-the VNC protocol. To do that, install [TigerVNC](https://sourceforge.net/projects/tigervnc/files/stable/1.15.0/). Forward
-port 5901 from the container to your laptop using the same method above for port 6080.
+**What Happens:**
+1. DevPod creates c7i.4xlarge EC2 instance in your default region
+2. Downloads prebuild container (seconds, not minutes)
+3. Runs initial setup and cycle-devpod persistence workaround
+4. Opens your IDE connected via SSH tunnel
+5. Forwards ports 3000 (UI), 8080, 9222 (Chrome DevTools) automatically
 
-### Recommendation for keychain files
-- Put your keychain files in home directory in DevPod, `/home/vscode/*.ini`. For example, I have `prod-peter.ini` there.
-- Use Fluxbox's file manager in **Home** to drag-and-drop the keychain files to the Chariot login screen.
+### Start/Stop Workspaces
 
-### Running the frontend
-- In DevPod, in the `chariot-development-platform` repo.
-- Run `make start-ui`
-- Run `./scripts/launch-chrome.sh https://localhost:3000`
-- Login to any stack, including Prod, using keychain file drag-and-drop.
+```bash
+# Start existing workspace
+make devpod-start WORKSPACE=feature-auth
 
-### Deploying the backend
-- The `whoami` username is `vscode`. So, you need to update the config env files to point to your stack. 
-- Support only for deploying the SAM stack. No support for creating the docker image for the compute server. So, work
-  that requires iterating on the compute server code need to be done on your laptop.
-- In `modules/chariot/backend`, run `make build`. The first build takes between 5 to 10 minutes, with the `go mod download`
-  step looks like it is hanging for a couple of minute.
-- There is an open question to solve -- how to deploy only the SAM stack without updating the docker image?
+# Stop workspace (preserves state, stops EC2 billing)
+make devpod-stop WORKSPACE=feature-auth
 
-### Using Claude Code
-- Type `claude` in the remote terminal to get authenticated. Use the Anthropic Console Login option. You local Chrome will 
-  pop up for authentication.
-- Add the Claude Code extenion to your IDE.
+# List all your workspaces
+make devpod-list
 
-### Add your IDE extensions/plugins:
-- **Cursor:**
-    - Go to the **Extension** view. You will see your list of extensions with "Install in SSH: {{WORKSPACE_NAME}}" buttons.
-      Click that button to install in the container. If you will need to repeat this step for all containers you launch.
+# SSH into workspace
+make devpod-ssh WORKSPACE=feature-auth
 
-- **GoLand:**
-    - In Settings, you will see two Plugins menu entries: Host and Client. Install the plugins on **Host**.
-    - Reference: https://youtrack.jetbrains.com/articles/SUPPORT-A-696/Where-should-the-plugin-be-installed-in-the-client-or-on-the-host-for-remote-development
+# Delete workspace (asks for confirmation)
+make devpod-delete WORKSPACE=feature-auth
+```
 
-### Quirks
-- **chrome-devtools**
-  - It appears that chrome-devtools-mcp establishes a long-live connection to port 9222. If the Chrome session was
-    interrupted, such as restarting Chrome, the tools will stop working. When that happens, **restart Claude Code**.
+**💡 Tip:** Workspaces auto-stop after 1 hour of inactivity to save costs.
 
-- **The Go Extension in Cursor**
-  - It runs the Go Language Server (gopls). It is a memory and CPU intensive process. It is known to cause a 16GB EC2 instance
-    to lose the SSH tunnel due to 100% CPU for extended period of time.
-  - You can limit the extent to which gopls indexes the submodules by adding the following to your Cursor settings.json on your
-    laptop at `~/Library/Application Support/Cursor/User/settings.json`:
-    ```
-    "gopls": {
-  
-      "directoryFilters": [
-        "-/",
-        "+modules/chariot",
-        "+modules/tabularium",
-        "+modules/janus-framework"
-      ]
-    }
-    ```
+---
 
-## Variations
-- If you want to launch a DevPod workspace with a specific commit of the repo, add the version slug to it, such as
-`devpod up --provider aws-provider github.com/praetorian-inc/chariot-development-platform@peter/vnc --id workspace-at-a-branch`
-`devpod up --provider aws-provider github.com/praetorian-inc/chariot-development-platform@sha256:3f8179ae8deb7d2021406625c9444134b65952c4 --id workspace-at-a-hash`
+## Development Workflow
 
-- You can change the size of the VNC display with the `xrandr` command, such as `xrandr -s 1600x1200`.
+### Initial Workspace Setup
 
-# Building and publishing the devcontainer
-- The devcontainer is pre-built in [Praetorian's ghcr.io](https://github.com/praetorian-inc/chariot-development-platform/pkgs/container/chariot-devpod).
-- To update it on MacBook:
-  - Login to Docker with a PAT that can write ghcr.io packages.
-  - Run `make publish` in `.devcontainer/`.
+After creating your workspace, set up the development environment:
 
-# Set up notes:
-- Workaround DevPod v0.6.15 bug ([Issue #49](https://github.com/loft-sh/devpod-provider-aws/issues/49)) by making copies of
-  the Jammy Jellyfish Ubuntu AMI into our AWS Playground account with the description prefix that the code looks for.
-- Workaround DevPod persistence by running `scripts/cycle-devpod.sh`
-- Running Google Chrome with chrome-devtools-mcp
-  - Google Chrome official packages are only available for x86_64 on Linux. So we moved to an Intel instance type.
-  - Desktop environment is provided by the [desktop-lite](https://github.com/devcontainers/features/tree/main/src/desktop-lite). 
-    It contains TigerVNC and Fluxbox, just enough for us use Chrome visually and login using keychain files.
-  - Chrome needs a more memory in /dev/shm. Expanded that to 2GB from the 64MB default.
-  - Our sigma.js in the UI needs several specific packages and launch time options to run correctly.
-    See those in Dockerfile and launch-chrome.sh
-  - In order to the debug port 9222 to work, Chrome needs to be launched with `--user-data-dir`.
+```bash
+# Inside the DevPod workspace terminal
+make devpod-setup-remote
+```
+
+This runs complete initialization:
+- ✅ Initializes all git submodules
+- ✅ Installs Go, npm, Python dependencies
+- ✅ Configures AWS CLI
+- ✅ Authenticates with GitHub
+- ✅ Sets up Claude Code
+
+**You'll be prompted for:**
+- AWS region (use `us-east-2`)
+- GitHub SSH key setup (no passphrase recommended)
+- UI certificate acceptance (answer "Y")
+
+### Deploy Chariot Stack
+
+```bash
+# Deploy backend API + start frontend UI
+make chariot
+```
+
+This deploys the full Chariot platform to AWS and starts the React UI locally.
+
+### Access the Application
+
+**Three ways to access Chariot:**
+
+**1. Local Browser (Recommended - Simplest)**
+```
+https://localhost:3000
+```
+Port 3000 forwards automatically. Use your normal browser with all your extensions.
+
+**2. Headless Chrome (For Automated Testing)**
+```bash
+make devpod-chrome MODE=headless
+```
+Perfect for Playwright/Puppeteer tests. Chrome DevTools Protocol available on port 9222.
+
+**3. Chrome with GUI (For Manual Debugging)**
+```bash
+# One-time setup on your Mac:
+brew install --cask xquartz
+# In XQuartz → Preferences → Security → Enable "Allow connections from network clients"
+
+# Then in DevPod workspace:
+make devpod-chrome MODE=x11
+```
+Chrome GUI appears on your local Mac screen via X11 forwarding.
+
+### Authentication
+
+**Option A: Auto-Generated Login URL**
+```bash
+# Generate test user with login URL
+make user
+
+# Copy CHARIOT_LOGIN_URL from .env
+cat .env | grep CHARIOT_LOGIN_URL
+
+# Paste URL in your local browser
+```
+
+**Option B: Keychain File**
+```bash
+# Copy your keychain to the workspace
+scp ~/prod-myname.ini my-workspace.devpod:/home/vscode/
+
+# Use with praetorian CLI
+praetorian --keychain ~/prod-myname.ini account list
+```
+
+---
+
+## Advanced Features
+
+### Workspace from Specific Branch
+
+```bash
+make devpod-create WORKSPACE=test-feature IDE=cursor
+
+# Manually specify branch:
+devpod up --provider aws-provider \
+  github.com/praetorian-inc/chariot-development-platform@feature-branch \
+  --id workspace-name
+```
+
+### Region Switching
+
+```bash
+# Interactive region selection with latency testing
+make devpod-select-region
+
+# Or use the CLI directly:
+./scripts/devpod/select-region.sh --fastest     # Auto-switch to fastest
+./scripts/devpod/select-region.sh --current     # Show current region
+./scripts/devpod/select-region.sh us-west-2     # Switch to specific region
+```
+
+### Prebuilds
+
+Prebuilds dramatically speed up workspace creation:
+
+**Automatic:** GitHub Actions builds new prebuild whenever `.devcontainer/` changes
+**Manual:** `devpod build . --repository ghcr.io/praetorian-inc/chariot-devpod-prebuild --push`
+
+The prebuild is automatically used when creating new workspaces.
+
+### Chrome Modes
+
+```bash
+# Auto-detect best mode (checks for DISPLAY variable)
+make devpod-chrome
+
+# Force specific mode
+make devpod-chrome MODE=headless
+make devpod-chrome MODE=x11
+
+# Specify URL
+make devpod-chrome URL=https://chariot.praetorian.com MODE=headless
+```
+
+---
+
+## IDE Integration
+
+### Cursor
+
+When you create a workspace with `IDE=cursor`, DevPod automatically:
+1. Opens new Cursor window connected via SSH
+2. Displays workspace name in window title
+3. Shows repository file tree
+4. Forwards ports automatically
+
+**Install Extensions:**
+- Go to Extensions view
+- Click "Install in SSH: workspace-name" for each extension
+
+### GoLand
+
+When you create a workspace with `IDE=goland`, DevPod:
+1. Opens "Connect to SSH" dialog
+2. Pre-fills connection details
+3. Click "Check Connection and Continue"
+4. Initializes GoLand project
+
+**Install Plugins:**
+- Settings → Plugins → Host (install on remote)
+
+### Claude Code (AI-Assisted Development)
+
+Claude Code is pre-installed in all DevPod workspaces for AI-powered coding assistance.
+
+**Connect via SSH and use Claude Code:**
+```bash
+# SSH into your DevPod workspace
+devpod ssh feature-auth
+
+# Navigate to workspace
+cd /workspace
+
+# Start Claude Code interactive session
+claude
+
+# Or run specific commands
+claude "help me implement user authentication"
+claude "review this code for security issues"
+claude "write tests for the asset API"
+```
+
+**Configure Claude Code on First Use:**
+```bash
+# Set your Anthropic API key (inside DevPod)
+export ANTHROPIC_API_KEY="your-api-key-here"
+
+# Or add to your shell profile
+echo 'export ANTHROPIC_API_KEY="your-key"' >> ~/.bashrc
+```
+
+**Claude Code is automatically available** - no installation needed! The Dockerfile includes Claude Code CLI in every workspace prebuild.
+
+---
+
+## Troubleshooting
+
+### Workspace Won't Start
+
+```bash
+# Check workspace status
+devpod list
+
+# View logs
+devpod logs my-workspace
+
+# Try recreating
+devpod up my-workspace --recreate
+```
+
+### AWS Credentials Issues
+
+```bash
+# Verify credentials work
+aws sts get-caller-identity
+
+# Reconfigure if needed
+aws configure
+```
+
+### Port Not Forwarding
+
+Ports 3000, 8080, and 9222 forward automatically. If you need additional ports:
+
+**Cursor:**
+1. Press `CMD+SHIFT+P`
+2. Type "ports view"
+3. Click "Forward a Port"
+4. Enter port number
+
+**GoLand:**
+1. Open "Backend Control Center" (click workspace name)
+2. Click "Ports" tab
+3. Add port forwarding
+
+### Chrome DevTools Not Working
+
+```bash
+# Restart Chrome to reclaim port 9222
+ps aux | grep chrome | awk '{print $2}' | xargs kill
+
+# Relaunch
+make devpod-chrome
+```
+
+If chrome-devtools MCP server stops responding, restart Claude Code.
+
+### Cycle-DevPod Workaround
+
+The first time a workspace is created, run the cycle-devpod workaround:
+
+```bash
+# On your laptop (not in workspace)
+./scripts/cycle-devpod.sh my-workspace
+```
+
+This addresses a DevPod state preservation issue. Subsequent restarts work normally.
+
+**Note:** `make devpod-create` runs this automatically.
+
+### Performance Issues
+
+**Go Language Server (gopls) using too much CPU/RAM:**
+
+Limit gopls indexing in Cursor settings (`~/Library/Application Support/Cursor/User/settings.json`):
+```json
+{
+  "gopls": {
+    "directoryFilters": [
+      "-/",
+      "+modules/chariot",
+      "+modules/tabularium",
+      "+modules/janus-framework"
+    ]
+  }
+}
+```
+
+---
+
+## Reference
+
+### Quick Commands
+
+```bash
+# Setup
+make devpod-install
+make devpod-setup-provider
+make devpod-create WORKSPACE=name
+
+# Daily workflow
+make devpod-start WORKSPACE=name
+make devpod-ssh WORKSPACE=name
+make devpod-stop WORKSPACE=name
+
+# Inside workspace
+make devpod-setup-remote    # First time only
+make chariot                # Deploy stack
+make devpod-chrome          # Launch Chrome
+
+# Utilities
+make devpod-list            # Show all workspaces
+make devpod-select-region   # Switch regions
+make devpod-help            # Comprehensive reference
+```
+
+### Automatic Features
+
+DevPod automatically handles:
+- ✅ **Port forwarding** (3000, 8080, 9222)
+- ✅ **Git credentials** (SSH and HTTPS)
+- ✅ **Docker credentials** (for pulling images)
+- ✅ **AWS credentials** (via ~/.aws/credentials)
+- ✅ **SSH configuration** (workspace-name.devpod hostname)
+
+### Resource Specifications
+
+**Instance Type:** c7i.4xlarge
+- 16 vCPUs (Intel)
+- 32 GB RAM
+- 100 GB disk
+- Network-optimized
+
+**Why Intel (not ARM):**
+- Google Chrome x86_64 Linux packages only
+- Better compatibility with browser testing tools
+
+### Cost Management
+
+**Auto-Stop:** 1 hour inactivity timeout (configurable)
+**Manual Stop:** `make devpod-stop WORKSPACE=name`
+**Billing:** Only charged when workspace is running
+**Instance Cost:** ~$0.85/hour (c7i.4xlarge on-demand)
+
+---
+
+## Technical Details
+
+### Container Image
+
+**Base Image:** `ghcr.io/praetorian-inc/chariot-devpod:latest`
+- Ubuntu 24.04 (Noble)
+- Go 1.25.3
+- Node.js 24.x LTS
+- Python 3.10+
+- Google Chrome (x86_64)
+- Claude Code, Praetorian CLI
+
+**Prebuild:** `ghcr.io/praetorian-inc/chariot-devpod-prebuild`
+- Auto-builds on `.devcontainer/` changes
+- Includes all dependencies pre-installed
+- Dramatically speeds up workspace creation
+
+### Port Forwarding
+
+| Port | Service | Auto-Forward |
+|------|---------|--------------|
+| 3000 | Chariot UI | ✅ Yes |
+| 8080 | Backend API | ✅ Yes |
+| 9222 | Chrome DevTools | ✅ Yes |
+
+### Chrome Integration
+
+**Headless Mode:**
+- No GUI rendering
+- DevTools Protocol on port 9222
+- Perfect for Playwright, Puppeteer, Selenium
+- Lower resource usage
+
+**X11 Mode:**
+- GUI forwarded to your Mac via X11
+- Requires XQuartz installed locally
+- Native clipboard integration
+- Visual debugging capabilities
+
+**Automatic Detection:**
+- Script checks for `DISPLAY` environment variable
+- Falls back to headless if no X11 available
+- Override with `--headless` or `--x11` flags
+
+### Network Architecture
+
+```
+Your Mac
+   ↕ SSH Tunnel (DevPod agent)
+AWS EC2 (c7i.4xlarge)
+   ↕ Docker
+Development Container
+   ├── Chariot Backend (port 8080)
+   ├── Chariot UI (port 3000)
+   └── Chrome (port 9222)
+```
+
+All communication secured via SSH. No public ports exposed.
+
+---
+
+## Scripts Reference
+
+Located in `scripts/devpod/`:
+
+**setup-devpod.sh**
+- Installs DevPod CLI (if needed)
+- Configures all 6 AWS providers
+- Tests latency to each region
+- Sets fastest as default
+- Idempotent (safe to re-run)
+
+**select-region.sh**
+- Test latency to all regions
+- Interactive or automatic region switching
+- Show current provider status
+- Usage: `./select-region.sh --fastest`
+
+**copy-ami-singapore.sh**
+- Copies custom Ubuntu AMI to Singapore
+- Ensures consistency across regions
+- Waits for AMI availability
+- Auto-updates configuration
+
+**find-region-resources.sh**
+- Helper tool for adding new regions
+- Finds AMI and VPC IDs
+- Searches for custom or canonical AMIs
+- Usage: `./find-region-resources.sh eu-west-1`
+
+---
+
+## Best Practices
+
+### Workspace Naming
+
+Use descriptive names that identify the work:
+- ✅ `feature-auth-refactor`
+- ✅ `bugfix-asset-list`
+- ✅ `spike-neo4j-schema`
+- ❌ `workspace1`, `test`, `temp`
+
+### Resource Management
+
+**Stop workspaces when not in use:**
+```bash
+make devpod-stop WORKSPACE=old-feature
+```
+
+**Delete completed work:**
+```bash
+make devpod-delete WORKSPACE=merged-feature
+```
+
+**Check running workspaces:**
+```bash
+make devpod-list
+```
+
+### Development Tips
+
+**Use local browser for UI testing:**
+- Faster than container Chrome
+- Your familiar dev tools
+- Better extension support
+
+**Use headless Chrome for E2E tests:**
+- Faster test execution
+- Lower resource usage
+- Better for CI/CD
+
+**Use X11 Chrome only when needed:**
+- Visual debugging specific issues
+- Manual testing workflows
+- Screenshot/video capture
+
+### Team Collaboration
+
+**Shared Configuration:**
+All team members use same:
+- AMIs (region-specific)
+- VPCs (pre-configured)
+- Instance type (c7i.4xlarge)
+- Timeout (1 hour)
+
+**Region Selection:**
+Each developer chooses optimal region based on their location.
+
+**Workspace Isolation:**
+Workspaces are fully isolated - one per developer per feature.
+
+---
+
+## FAQ
+
+### Do I need the Desktop App?
+
+**No.** The CLI is sufficient for all operations. The Desktop App provides a GUI for visual preference but isn't required.
+
+### Can I use multiple workspaces?
+
+**Yes!** Create as many as you need:
+```bash
+make devpod-create WORKSPACE=feature-a
+make devpod-create WORKSPACE=feature-b
+make devpod-create WORKSPACE=spike-c
+```
+
+Each workspace is independent with its own EC2 instance.
+
+### How do I save costs?
+
+**Auto-stop:** Workspaces automatically stop after 1 hour of inactivity.
+**Manual stop:** `make devpod-stop WORKSPACE=name` when done for the day.
+**Delete unused:** `make devpod-delete WORKSPACE=name` when work is merged.
+
+### What if my region is slow?
+
+```bash
+# Test and switch to fastest region
+make devpod-select-region
+
+# New workspaces use the new region
+# Existing workspaces stay in current region
+```
+
+### Can I use my local browser?
+
+**Yes! This is recommended.** Port 3000 auto-forwards, so just open `https://localhost:3000` in your local browser.
+
+### Do I need VNC?
+
+**No.** Modern DevPod uses:
+- Headless Chrome for automated testing
+- X11 forwarding for visual debugging (requires XQuartz)
+- Direct port forwarding for web UIs
+
+VNC is legacy technology and no longer needed.
+
+### How do prebuilds work?
+
+**Automatic:** When `.devcontainer/` changes are merged to main, GitHub Actions builds a new prebuild.
+**Manual:** Run `devpod build . --repository ghcr.io/praetorian-inc/chariot-devpod-prebuild --push`
+**Usage:** Automatic when creating workspaces - no configuration needed.
+
+### What about cycle-devpod.sh?
+
+This workaround addresses a DevPod state preservation issue on first workspace creation.
+
+**`make devpod-create` runs it automatically** - you don't need to think about it.
+
+For manual workspace creation, run `./scripts/cycle-devpod.sh workspace-name` after first creation.
+
+### How do I update my workspace?
+
+**Apply devcontainer.json changes:**
+```bash
+devpod up my-workspace --recreate
+```
+
+**Update dependencies:**
+```bash
+# Inside workspace
+git pull
+make setup
+```
+
+---
+
+## Additional Resources
+
+### Documentation
+- [DevPod Official Docs](https://devpod.sh/docs)
+- [Devcontainer Specification](https://containers.dev/)
+- [AWS Provider Docs](https://github.com/loft-sh/devpod-provider-aws)
+
+### Internal Resources
+- Dockerfile: `devpod/Dockerfile`
+- Devcontainer config: `.devcontainer/devcontainer.json`
+- Prebuild workflow: `.github/workflows/devpod-prebuild.yml`
+- Setup scripts: `scripts/devpod/`
+
+### Quick Reference
+
+```bash
+make devpod-help    # Comprehensive command reference
+make help           # All Makefile targets
+```
+
+---
+
+## TODO: Container Image Updates
+
+The devcontainer image needs to be rebuilt to fully remove VNC dependencies:
+
+### Tasks
+
+**1. Update `devpod/Dockerfile`**
+- ❌ Remove desktop-lite feature dependencies
+- ❌ Remove TigerVNC packages
+- ❌ Remove Fluxbox desktop environment
+- ❌ Remove noVNC web interface
+- ✅ Keep Google Chrome (for headless/X11 modes)
+- ✅ Keep X11 client libraries (for X11 forwarding)
+
+**2. Update `.devcontainer/devcontainer.json`**
+- ✅ Already done - desktop-lite feature removed
+- ✅ Already done - X11 forwarding configured
+- ✅ Already done - Automatic port forwarding added
+
+**3. Rebuild and Publish Container**
+```bash
+cd devpod/
+make publish
+```
+
+This will:
+- Build new container without VNC
+- Push to `ghcr.io/praetorian-inc/chariot-devpod:latest`
+- Reduce image size by ~500MB
+- Lower RAM usage by ~300MB
+
+**4. Update Prebuild**
+```bash
+# Trigger GitHub Actions workflow
+gh workflow run devpod-prebuild.yml
+
+# Or build manually
+devpod build . --repository ghcr.io/praetorian-inc/chariot-devpod-prebuild --push
+```
+
+**Benefits of Cleanup:**
+- 📉 Smaller container image (~500MB reduction)
+- 💾 Lower memory footprint (~300MB less RAM)
+- ⚡ Faster startup (less to download/extract)
+- 🔒 Reduced attack surface (fewer packages)
+- 🧹 Cleaner, simpler codebase
+
+---
+
+## Summary
+
+DevPod provides cloud-based development environments that are:
+- **Fast** - Prebuilds start in seconds
+- **Consistent** - Same setup for entire team
+- **Flexible** - 6 AWS regions, multiple IDEs
+- **Modern** - No VNC complexity, automatic port forwarding
+- **Cost-effective** - Auto-stop, pay-per-use
+
+**Get started:** `make devpod-install && make devpod-setup-provider && make devpod-create WORKSPACE=my-name`
