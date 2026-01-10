@@ -271,6 +271,55 @@ mkdir -p "$OUTPUT_DIR"
 ---
 ```
 
+## Unambiguous Exit Criteria (MANDATORY)
+
+Every task and phase MUST have exit criteria that specify:
+1. **The exact metric** (files, tests, functions, endpoints)
+2. **The count** (if applicable)
+3. **The verification command**
+
+**BAD vs GOOD Examples:**
+
+| ❌ BAD (Ambiguous) | ✅ GOOD (Unambiguous) |
+|--------------------|----------------------|
+| 'Update navigation calls' | 'All 118 files importing react-router updated to @tanstack/react-router' |
+| 'Tests passing' | 'All 45 route tests passing (npm test -- routes/)' |
+| 'Components migrated' | '12 component files in src/sections/ migrated with no TypeScript errors' |
+| 'API endpoints updated' | 'All 8 endpoints in /api/v1/ returning new response format' |
+| 'Refactor complete' | '3 files refactored: auth.ts, session.ts, token.ts' |
+
+**Exit Criteria Template:**
+
+For each task, include:
+
+```markdown
+**Exit Criteria:**
+- [ ] [COUNT] [UNIT] [ACTION] (verify: [COMMAND])
+- [ ] [Observable outcome with specific metric]
+```
+
+**Example:**
+
+```markdown
+**Exit Criteria:**
+- [ ] 118 files importing 'react-router' updated to '@tanstack/react-router' (verify: grep -r 'react-router' src/ | wc -l returns 0)
+- [ ] npm run build succeeds with exit code 0
+- [ ] npm test passes with 0 failures
+```
+
+**Why This Matters:**
+
+Real failure: Plan said 'update 118 navigation calls'. Executing agent counted function calls (not files) and claimed completion at 118 calls when only 47 files were updated. Ambiguous criteria enabled the misinterpretation.
+
+**The Unit Must Be Explicit:**
+
+- If you mean FILES, say 'files'
+- If you mean FUNCTIONS, say 'functions'
+- If you mean LINES, say 'lines'
+- If you mean TESTS, say 'test functions' (not 'assertions')
+
+Never leave the unit implicit.
+
 ## Task Structure
 
 ````markdown

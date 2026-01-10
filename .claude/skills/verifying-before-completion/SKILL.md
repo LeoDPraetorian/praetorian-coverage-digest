@@ -50,6 +50,36 @@ Skip any step = lying, not verifying
 | Agent completed       | VCS diff shows changes          | Agent reports "success"        |
 | Requirements met      | Line-by-line checklist          | Tests passing                  |
 
+## Exit Criteria Interpretation (LITERAL RULE)
+
+When verifying against a plan's exit criteria, interpret the metric LITERALLY:
+
+| Exit Criteria Says      | You Must Count              | NOT This                      |
+| ----------------------- | --------------------------- | ----------------------------- |
+| '118 files updated'     | 118 FILES with changes      | Function calls, import stmts  |
+| '45 tests passing'      | 45 TEST FUNCTIONS passing   | Assertions within tests       |
+| '12 components migrated' | 12 COMPONENT FILES migrated | JSX elements                  |
+| 'All endpoints updated' | Each ENDPOINT (route)       | Handler functions             |
+
+**The Ambiguity Trap:**
+
+Real failure: Agent claimed '118 navigation calls updated' when exit criteria said '118 files'. Agent counted useNavigate() calls, not files. Only 47 files were actually updated.
+
+**Verification Protocol for Exit Criteria:**
+
+1. **Quote** the exit criteria EXACTLY as written in the plan
+2. **Identify** the unit of measurement (files? tests? components? endpoints?)
+3. **Count** actual completions of THAT unit
+4. **Compare** count against criteria number
+5. **Report** with evidence: 'Exit criteria: 118 files. Verified: 118 files updated (see file list below)'
+
+**If Ambiguous:**
+
+If exit criteria doesn't specify the unit clearly (e.g., 'update navigation'), ASK before claiming completion:
+- 'Exit criteria says update navigation. Does this mean files with navigation imports, or individual useNavigate calls?'
+
+**Never assume the favorable interpretation.**
+
 ## Red Flags - STOP
 
 - Using "should", "probably", "seems to"

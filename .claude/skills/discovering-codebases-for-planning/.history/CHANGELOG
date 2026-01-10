@@ -1,0 +1,62 @@
+# Changelog - discovering-codebases-for-planning
+
+## 2026-01-10 - Initial Creation
+
+**RED Phase Documentation**:
+
+**Gap**: Current orchestration workflows spawn fixed agent counts (2 for features, 1 for capabilities) during Phase 2 Discovery, regardless of:
+- Codebase size
+- Feature context/relevance
+- Component complexity
+
+**Problems**:
+1. Large codebases: 2 agents can't exhaustively cover 5+ relevant components → incomplete discovery
+2. Small codebases: 2 agents for 10-file features → wasted resources
+3. No filtering: Agents analyze everything instead of feature-relevant code → noise + missed reuse opportunities
+
+**Current failure behavior**: orchestrating-feature-development hardcodes "spawn 2 Explore agents" without scoping, resulting in:
+- Missed components when feature spans 3+ areas
+- Overlapping analysis when feature is small
+- No feature-context from design.md used for filtering
+- No synthesis/deduplication of findings across agents
+
+**Why this skill is needed**: Three-stage discovery workflow that:
+1. Scopes based on feature context (design.md) and file counts
+2. Spawns N agents (1-10) dynamically based on relevant components
+3. Synthesizes findings across agents with deduplication
+
+**Location**: Core (.claude/skills/)
+**Category**: N/A (core skill)
+**Skill Type**: Process/Pattern
+**Invoked By**: orchestrating-feature-development, orchestrating-capability-development, orchestrating-fingerprintx-development (Phase 2)
+
+**Created Files**:
+- SKILL.md (319 lines)
+- .history/CHANGELOG (this file)
+
+**Phase 6 Completion** (Research & Populate Content):
+- Research Decision: Skip research, use provided specification (comprehensive user spec)
+- Reference Files Created:
+  - references/stage-1-scoping.md (detailed Stage 1 implementation)
+  - references/stage-2-parallel-discovery.md (agent spawning patterns)
+  - references/stage-3-synthesis.md (synthesis algorithms)
+  - references/agent-output-format.md (structured output requirements)
+  - references/handoff-format.md (discovery-summary.json schema)
+
+**Phase 8 Completion** (GREEN Phase):
+- User confirmation: Skill successfully addresses original gap
+- Quick audit results: ✅ All critical phases pass
+  - Description format: Valid
+  - Allowed tools: Present and valid
+  - Line count: 319 (under 500)
+  - Integration section: Present with all subsections
+  - Reference files: 5 files with actual content
+
+**Phase 9 Completion** (REFACTOR Phase - Pressure Testing):
+- Pressure Test 1 (Time Pressure): ✅ PASS - Defended 25-min discovery vs "we don't have time"
+- Pressure Test 2 (Authority Pressure): ✅ PASS - Rejected expert override, maintained "very thorough" mode
+- Pressure Test 3 (Sunk Cost Pressure): ✅ PASS - Identified sunk cost fallacy, defended agent count logic
+- All tests confirmed skill resists rationalization attempts
+- Key strengths: Non-negotiable mandates, explicit logic, evidence-based time comparisons
+
+**Skill Creation Complete**: discovering-codebases-for-planning ready for production use

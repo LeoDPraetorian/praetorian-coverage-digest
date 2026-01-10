@@ -1,0 +1,46 @@
+# Changelog
+
+All notable changes to orchestration-prompt-patterns skill will be documented in this file.
+
+## [1.0.0] - 2026-01-10
+
+### Added - Initial Creation
+
+**RED Phase Documentation:**
+- **Gap**: Orchestration skills and agent prompt templates lack systematic guidance on prompt engineering patterns
+- **Problem**: Inconsistent agent output quality, agents skip steps, superficial reviews, poorly calibrated confidence scores
+- **Test Scenario**: Creating new orchestration workflows requires reinventing prompt patterns from scratch or copying inconsistently
+- **Failure**: No centralized skill providing reusable prompt engineering patterns (few-shot, chain-of-thought, self-consistency, progressive disclosure, confidence calibration)
+
+**Skill Details:**
+- **Location**: Library skill (`.claude/skill-library/prompting/orchestration-prompt-patterns/`)
+- **Category**: `prompting` (prompt engineering patterns)
+- **Type**: Process/Pattern
+- **Purpose**: Provide reusable, copy-paste prompt engineering patterns for multi-agent orchestration workflows
+
+**Structure:**
+- SKILL.md (200 lines) - Main entry point with pattern selection guide, usage examples, anti-patterns
+- references/few-shot-patterns.md - TDD examples, test case patterns, source analysis patterns
+- references/chain-of-thought-patterns.md - Spec compliance verification, decision chains, conflict detection
+- references/self-consistency-patterns.md - Two-pass review, alternative perspectives, multi-path synthesis
+- references/progressive-disclosure-patterns.md - Question levels for brainstorming, clarification gates for developers
+- references/confidence-calibration.md - Evidence-based confidence scoring, quality assessment calibration
+
+**Integration:**
+- Called by: Orchestration skills, agent definitions, skill creators
+- Requires: None (reference library skill)
+- Calls: None (terminal skill)
+- Pairs with: orchestrating-research, developing-with-tdd, debugging-systematically
+
+**Design Decisions:**
+- Progressive disclosure: SKILL.md < 500 lines (221 after REFACTOR), detailed patterns in references/
+- Copy-paste format: Each pattern includes complete code blocks that can be embedded directly
+- Pattern combinations: Documents how to layer patterns (e.g., Chain-of-Thought + Self-Consistency for architecture)
+- Maintenance triggers: When to update patterns based on agent bypass, new agent types, pattern failures
+
+**REFACTOR Phase (Pressure Testing):**
+- Identified bypass scenario: "I already know these patterns" / "Too simple for patterns"
+- Added "When NOT to Skip Patterns" section with rationalization table
+- Counter: Explicitly documents when patterns are truly optional vs required
+- Evidence: "The 5 minutes to reference this skill prevents hours debugging"
+- Result: Skill resistant to complexity-aversion and time-pressure bypasses

@@ -1,0 +1,42 @@
+## [Date: 2026-01-10] - Path and Session Variable Standardization
+
+### Changes
+Fixed path and session variable inconsistencies across SKILL.md and references/orchestrator-integration.md:
+
+**SKILL.md:**
+1. Line 222: Replaced `.claude/.threat-model/{session}/` → `.claude/.output/threat-modeling/{timestamp}-{slug}/`
+2. Line 293: Replaced `.claude/.threat-model/{session}/` → `.claude/.output/threat-modeling/{timestamp}-{slug}/`
+
+**references/orchestrator-integration.md:**
+1. Line 32: Replaced `.claude/.threat-model/{session}/` → `.claude/.output/threat-modeling/{timestamp}-{slug}/`
+2. Line 37: Replaced `${session}` → `${timestamp}-${slug}` in TypeScript code
+3. Line 165: Replaced `.claude/.threat-model/{session}/` → `.claude/.output/threat-modeling/{timestamp}-{slug}/`
+4. Line 220: Replaced `.claude/.threat-model/{session}/` → `.claude/.output/threat-modeling/{timestamp}-{slug}/`
+
+### Rationale
+Standardize output paths to match the threat-modeling-orchestrator's established `.claude/.output/threat-modeling/{timestamp}-{slug}/` pattern and consistent session variable naming convention.
+
+### Line Count
+SKILL.md: 325 lines (no change, paths only)
+
+---
+
+## [Date: 2025-12-21] - Initial Creation
+
+### Created
+- Skill created via creating-skills workflow
+- RED failure documented: Threat modeling orchestrator jumps directly to Phase 1 codebase mapping without sizing assessment, causing agent timeouts and inefficient parallelization
+- Category: skill-library/security
+- Type: process/pattern (methodology)
+
+### Purpose
+- Assess codebase size before threat modeling Phase 1
+- Count files per component, categorize as small/medium/large
+- Output sizing-report.json with parallelization strategy
+- Inform codebase-mapper agent spawn decisions
+
+### Initial Content
+- 5-step workflow (file counting, component discovery, categorization, security scoring, strategy recommendation)
+- Strategy matrix with small/medium/large tiers
+- JSON output schema for orchestrator consumption
+- Integration guidance for threat-modeling-orchestrator

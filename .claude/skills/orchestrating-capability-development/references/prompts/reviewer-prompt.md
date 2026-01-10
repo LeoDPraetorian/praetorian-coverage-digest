@@ -48,6 +48,45 @@ Does the implementation match the specification in architecture.md?
 - Nothing extra (no unrequested features)
 - Correct behavior (matches spec, not "close enough")
 
+## Chain-of-Thought Verification (REQUIRED)
+
+For EACH architecture requirement, follow this chain:
+
+### Step 1: State requirement
+"Requirement: [from architecture.md]"
+
+### Step 2: Locate implementation
+"Developer claims: [from implementation-log.md]"
+
+### Step 3: Verify independently
+"Examining [file]...
+Found: [actual implementation]
+Observation: [what it actually does]"
+
+### Step 4: Compare
+"Required: [X], Implemented: [Y], Match: Yes/No"
+
+### Step 5: Evidence
+"File:line - [specific evidence]"
+
+---
+
+### Capability-Specific Verification Points
+
+For detection capabilities:
+- Does detection logic match architecture exactly?
+- Are all specified indicators checked?
+- Is severity correctly assigned?
+- Are false positive mitigations implemented?
+
+For scanner integrations:
+- Does API client match documented endpoints?
+- Is authentication handled per architecture?
+- Are rate limits respected?
+- Is error handling complete?
+
+**Complete ALL 5 steps for EVERY requirement.**
+
 ---
 
 ## CRITICAL VERIFICATION RULE
@@ -173,6 +212,26 @@ Is the code well-built?
 - Performance considerations
 
 **DO NOT check spec compliance here** - that was Stage 1.
+
+## Self-Consistency: Two-Pass Review
+
+### Pass 1: Functional Review
+- Does the capability detect what it should?
+- Are edge cases handled?
+- Initial quality score: ___
+
+### Pass 2: Security Review (Adversarial)
+- Can this produce false positives?
+- Can this be evaded?
+- Are there injection risks in queries?
+- Pass 2 findings: [list]
+
+### Consistency Check
+| Issue | Pass 1 | Pass 2 |
+|-------|--------|--------|
+| [issue] | Found/Missed | Found/Missed |
+
+**Final verdict accounts for BOTH passes.**
 
 ---
 

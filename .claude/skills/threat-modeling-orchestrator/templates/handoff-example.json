@@ -1,0 +1,66 @@
+{
+  "sessionId": "tm-20241220-a1b2c3",
+  "fromPhase": 1,
+  "toPhase": 2,
+  "timestamp": "2024-12-20T15:45:00Z",
+  "summary": {
+    "keyFindings": [
+      "Application uses JWT-based authentication with Cognito",
+      "DynamoDB single-table design for all entity storage",
+      "Neo4j graph database for relationship mapping",
+      "Lambda functions expose REST API via API Gateway"
+    ],
+    "criticalRisks": [
+      "No input validation middleware identified",
+      "JWT secrets stored in environment variables",
+      "Database queries constructed with string concatenation"
+    ],
+    "crownJewels": [
+      "user_credentials",
+      "payment_data",
+      "api_keys"
+    ],
+    "complianceContext": [
+      "PCI-DSS Level 1 (handles payment card data)",
+      "SOC 2 Type II (customer audit requirements)"
+    ],
+    "userFeedback": [
+      "Confirmed payment processing is in-scope",
+      "Requested focus on API authentication flows"
+    ]
+  },
+  "artifacts": [
+    {
+      "name": "phase-1-summary",
+      "path": "phase-1/summary.md",
+      "loadWhen": "always",
+      "sizeBytes": 2847
+    },
+    {
+      "name": "entry-points",
+      "path": "phase-1/entry-points.json",
+      "loadWhen": "always",
+      "sizeBytes": 4521
+    },
+    {
+      "name": "data-flows",
+      "path": "phase-1/data-flows.json",
+      "loadWhen": "threat-modeling",
+      "sizeBytes": 8932
+    },
+    {
+      "name": "components-manifest",
+      "path": "phase-1/manifest.json",
+      "loadWhen": "as-needed",
+      "sizeBytes": 1234
+    }
+  ],
+  "nextPhaseGuidance": "Focus on authentication controls first (JWT validation, secret management). Then investigate input validation across all API handlers.",
+  "metrics": {
+    "duration_minutes": 45,
+    "files_analyzed": 127,
+    "components_identified": 8,
+    "entry_points_found": 23,
+    "data_flows_mapped": 15
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "scope": "./modules/chariot",
+  "metrics": {
+    "total_files": 2847,
+    "total_directories": 189,
+    "estimated_loc": 245680,
+    "files_by_extension": {
+      ".go": 1456,
+      ".ts": 892,
+      ".tsx": 234,
+      ".js": 123,
+      ".json": 89,
+      ".md": 45,
+      ".yaml": 8
+    }
+  },
+  "components": [
+    {
+      "path": "./modules/chariot/backend",
+      "files": 1456,
+      "priority": "high",
+      "security_relevant_files": 89,
+      "recommended_depth": "full"
+    },
+    {
+      "path": "./modules/chariot/ui",
+      "files": 892,
+      "priority": "medium",
+      "security_relevant_files": 23,
+      "recommended_depth": "full"
+    },
+    {
+      "path": "./modules/chariot/infrastructure",
+      "files": 234,
+      "priority": "high",
+      "security_relevant_files": 45,
+      "recommended_depth": "full"
+    },
+    {
+      "path": "./modules/chariot/shared",
+      "files": 265,
+      "priority": "low",
+      "security_relevant_files": 12,
+      "recommended_depth": "sampling"
+    }
+  ],
+  "strategy": {
+    "tier": "medium",
+    "parallelization": "by-component",
+    "sampling_required": false,
+    "recommended_agents": 3,
+    "components_to_analyze": [
+      {
+        "path": "./modules/chariot/backend",
+        "depth": "full"
+      },
+      {
+        "path": "./modules/chariot/ui",
+        "depth": "full"
+      },
+      {
+        "path": "./modules/chariot/infrastructure",
+        "depth": "full"
+      }
+    ],
+    "estimated_token_budget": 45000
+  }
+}

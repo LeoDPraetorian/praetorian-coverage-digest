@@ -1,0 +1,112 @@
+{
+  "sessionId": "tm-20241220-a1b2c3",
+  "phase": 0,
+  "timestamp": "2024-12-20T14:00:00Z",
+  "businessObjectives": {
+    "applicationPurpose": "Attack surface management platform for continuous security monitoring",
+    "primaryUsers": ["Security teams", "DevOps engineers", "Compliance officers"],
+    "businessValue": "Enables proactive vulnerability discovery before attackers exploit them",
+    "revenueModel": "SaaS subscription (tiered pricing based on assets monitored)"
+  },
+  "dataClassification": {
+    "crownJewels": [
+      {
+        "asset": "user_credentials",
+        "sensitivity": "critical",
+        "rationale": "Compromise enables account takeover and data exfiltration"
+      },
+      {
+        "asset": "api_keys",
+        "sensitivity": "critical",
+        "rationale": "Programmatic access to customer security data"
+      },
+      {
+        "asset": "payment_data",
+        "sensitivity": "critical",
+        "rationale": "PCI-DSS regulated, financial liability if breached"
+      },
+      {
+        "asset": "vulnerability_reports",
+        "sensitivity": "high",
+        "rationale": "Contains unpatched vulnerabilities that attackers could exploit"
+      }
+    ],
+    "pii": ["email", "name", "IP addresses"],
+    "phi": null,
+    "pci": ["credit_card_numbers", "cvv", "expiration_date"],
+    "financialData": ["subscription_amounts", "billing_history"]
+  },
+  "threatActors": [
+    {
+      "profile": "External Attacker (Opportunistic)",
+      "motivation": "Financial gain, credential theft",
+      "capability": "Medium (automated scanning, known exploits)",
+      "likelihood": "High",
+      "targets": ["Login endpoints", "API keys", "Payment processing"]
+    },
+    {
+      "profile": "External Attacker (Targeted)",
+      "motivation": "Competitive intelligence, customer data theft",
+      "capability": "High (custom exploits, social engineering)",
+      "likelihood": "Medium",
+      "targets": ["Vulnerability reports", "Customer configurations", "API"]
+    },
+    {
+      "profile": "Malicious Insider",
+      "motivation": "Data exfiltration, sabotage",
+      "capability": "High (privileged access, insider knowledge)",
+      "likelihood": "Low",
+      "targets": ["Database exports", "Admin panels", "Customer data"]
+    }
+  ],
+  "businessImpact": {
+    "dataBreach": {
+      "financial": "$5M-$50M (regulatory fines, legal fees, customer compensation)",
+      "operational": "6-12 months recovery time, loss of customer trust",
+      "regulatory": "PCI-DSS non-compliance, SOC 2 audit failure",
+      "reputational": "Critical - security platform breach destroys credibility"
+    },
+    "serviceDowntime": {
+      "financial": "$50K-$100K per hour (SLA penalties, lost revenue)",
+      "operational": "Customers cannot monitor their attack surface",
+      "reputational": "High - customers may switch to competitors"
+    },
+    "rto": "4 hours",
+    "rpo": "1 hour"
+  },
+  "complianceRequirements": [
+    {
+      "regulation": "PCI-DSS v4.0",
+      "level": "Level 1 (>6M transactions/year)",
+      "applicability": "Payment processing, cardholder data storage",
+      "keyControls": ["Encryption at rest/transit", "Access control", "Audit logging"]
+    },
+    {
+      "regulation": "SOC 2 Type II",
+      "trust": ["Security", "Availability", "Confidentiality"],
+      "applicability": "All customer-facing systems",
+      "keyControls": ["Access reviews", "Change management", "Incident response"]
+    },
+    {
+      "regulation": "GDPR",
+      "applicability": "EU customer data",
+      "keyControls": ["Data minimization", "Right to erasure", "Breach notification"]
+    }
+  ],
+  "securityObjectives": {
+    "confidentiality": {
+      "priority": "Critical",
+      "assets": ["user_credentials", "api_keys", "vulnerability_reports"]
+    },
+    "integrity": {
+      "priority": "High",
+      "assets": ["vulnerability_reports", "asset_inventory", "scan_results"]
+    },
+    "availability": {
+      "priority": "High",
+      "sla": "99.9% uptime",
+      "rto": "4 hours",
+      "rpo": "1 hour"
+    }
+  }
+}

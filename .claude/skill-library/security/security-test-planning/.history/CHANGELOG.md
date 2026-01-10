@@ -151,3 +151,109 @@
 - Crown jewel tests (+2 bonus) focus on high-value assets (payment_card_data)
 - Test priorities justified with actual cost ($365M breach + $100K/month fines vs "high priority")
 - Completes Task 5 of threat-model-business-integration.md (final phase skill integration)
+
+---
+
+## [Date: 2024-12-20] - CVSS 4.0 Scoring Integration
+
+### Changed
+- **Updated Test Priority Mapping** (lines 215-236)
+  - Replaced 1-12 risk matrix with CVSS Environmental Score (0.0-10.0)
+  - New priority bands: Critical (9.0-10.0) → P0, High (7.0-8.9) → P1, Medium (4.0-6.9) → P2, Low (0.1-3.9) → P3
+  - Priority now reads from `cvss.environmental.score` (NOT old `risk_score` field)
+
+- **Updated Phase 3 Input Schema** (lines 177-198)
+  - threat-model.json now includes full CVSS 4.0 structure
+  - Added CRITICAL note about cvss.environmental.score, cvss.overall.score fields
+  - Added cvss.base.vector, cvss.threat.vector, cvss.environmental.vector for traceability
+  - risk-matrix.json now contains CVSS band distribution
+
+- **Updated test-priorities.json Schema** (lines 308-327)
+  - Each test entry MUST include full CVSS structure
+  - Added cvss.environmental_score, cvss.overall_score, cvss.severity, cvss.vector fields
+  - Replaced priority_score calculation with direct priority mapping (P0/P1/P2/P3)
+
+- **Updated Core Workflow Overview** (lines 247-258)
+  - Step 1: Load Phase 3 context with CVSS scores
+  - Step 3: Prioritize by CVSS Environmental scores
+  - Step 4-5: Include CVSS vectors in SAST/DAST recommendations
+  - Step 7: Include CVSS traceability in manual test cases
+  - Step 8: CVSS-ranked ordering with priority bands
+
+- **Updated Critical Rules Section** (lines 271-276)
+  - "Risk-Based Prioritization" → "CVSS-Based Prioritization"
+  - Updated examples to show CVSS scores instead of old Risk scores
+  - Added note about using Environmental (business-contextualized) over Base (generic)
+
+- **Updated MUST Load Phase 3 Context** (lines 292-301)
+  - Added step to extract cvss.environmental_score and cvss.overall_score
+  - Added CRITICAL note about reading cvss fields (NOT old risk_score)
+
+- **Updated Troubleshooting** (lines 349-352)
+  - "Too Many P0 Tests" solution now references CVSS 9.0-10.0 threshold
+  - Added note to check Environmental scores incorporate Phase 0 correctly
+
+- **Updated No Exceptions List** (lines 244-248)
+  - Replaced "skip compliance/crown jewel weighting" with "skip CVSS-based prioritization"
+  - Replaced "use old risk_score" with "use cvss.environmental.score"
+  - Added requirement to include CVSS vectors for traceability
+
+- **Created references/prioritization-matrix.md** (518 lines, comprehensive)
+  - Complete CVSS-to-priority mapping table with resource allocation
+  - Why Environmental Score (vs Base Score) with examples
+  - Priority band details (P0-P4) with characteristics, scope, timeline
+  - CVSS vector traceability requirements
+  - Resource allocation strategy (30% P0, 40% P1, 20% P2, 10% P3)
+  - Migration guide from old 1-12 matrix to CVSS 4.0
+  - Anti-patterns (don't use Base score, don't manually adjust, don't average, don't skip P0)
+
+- **Updated References Section** (lines 366-369)
+  - Added prioritization-matrix.md reference (marked UPDATED with CVSS 4.0)
+  - Updated output-schemas.md reference to mention CVSS fields
+
+- **Updated Related Skills** (lines 373-378)
+  - Updated threat-modeling description to mention "with CVSS 4.0 scores" (marked UPDATED)
+  - Added cvss-scoring skill reference
+
+### Reason
+- **RED failure**: Phase 3 now produces CVSS 4.0 scores but Phase 4 still reads old risk_score field (1-12 matrix), causing test prioritization to fail
+- **Business impact**: CVSS Environmental scores systematically incorporate Phase 0 business context (CR/IR/AR requirements), but Phase 4 was ignoring this and using generic risk scores
+- **Industry standards**: CVSS 4.0 is recognized standard; test plans using old matrix aren't comparable across organizations or consumable by security tools
+- **Traceability**: CVSS vectors enable test-to-threat traceability for audits, compliance, SIEM/SOAR integration
+- **Precision**: 10-point decimal scale (0.0-10.0) enables more accurate prioritization than 12-point matrix (1-12)
+
+### TDD Workflow
+
+**🔴 RED Phase**: ✅ COMPLETE
+- Current failure documented: Phase 4 reads old risk_score (1-12) while Phase 3 produces cvss.environmental.score (0.0-10.0)
+- Gap: Priority mapping logic uses outdated risk bands, lacks CVSS vector traceability
+- Expected behavior: Read CVSS scores, map to P0-P4, include vectors in outputs
+
+**🟢 GREEN Phase**: ✅ COMPLETE
+- Updated test priority mapping to use CVSS Environmental scores
+- Updated Phase 3 input schema documentation with CVSS structure
+- Updated test-priorities.json schema with full CVSS fields
+- Updated workflow overview with CVSS integration points
+- Updated Critical Rules for CVSS-based prioritization
+- Updated No Exceptions list
+- Created prioritization-matrix.md with complete CVSS mapping
+- All integration points verified present and linked
+
+**🔵 REFACTOR Phase**: ⏳ PENDING
+- Pressure test scenarios to be created and executed
+- Document in .local/pressure-tests-2024-12-20.md
+- Verify agents cannot rationalize away CVSS prioritization under time/authority pressure
+
+### Files Modified
+- SKILL.md: 363 → 383 lines (+20 lines; under 500 hard limit ✅)
+- references/prioritization-matrix.md: 518 lines (new file, comprehensive CVSS mapping guide)
+- .history/CHANGELOG.md: Updated (this entry)
+- Backup: .local/2025-12-20-04-57-56-security-test-planning.bak
+
+### Impact
+- Phase 4 now consumes CVSS 4.0 scores from Phase 3 (threat-modeling skill update 2024-12-19)
+- Test priorities based on industry-standard CVSS Environmental scores (business-contextualized)
+- CVSS vectors included in all test outputs for traceability (audits, compliance, tooling)
+- Priority bands (P0-P4) map directly to CVSS severity levels (Critical/High/Medium/Low)
+- Resource allocation guidance (30% P0, 40% P1, 20% P2, 10% P3)
+- Completes end-to-end CVSS integration: Phase 3 (scoring) → Phase 4 (test planning)

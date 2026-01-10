@@ -8,10 +8,10 @@ Load threat model summary and risk matrix:
 
 ```bash
 # Read Phase 3 summary
-cat .claude/.threat-model/{session}/phase-3/summary.md
+cat .claude/.output/threat-modeling/{timestamp}-{slug}/phase-3/summary.md
 
 # Read risk matrix for prioritization
-cat .claude/.threat-model/{session}/phase-3/risk-matrix.json
+cat .claude/.output/threat-modeling/{timestamp}-{slug}/phase-3/risk-matrix.json
 ```
 
 **Understanding check**: What are the top 5 Critical/High threats? What files/components do they affect?
@@ -28,7 +28,7 @@ For EACH threat in threat-model.json, identify:
 
 ```bash
 # Reference Phase 1 entry points for code locations
-cat .claude/.threat-model/{session}/phase-1/entry-points.json
+cat .claude/.output/threat-modeling/{timestamp}-{slug}/phase-1/entry-points.json
 ```
 
 ## Step 3: Generate Code Review Plan
@@ -257,7 +257,7 @@ Create `summary.md` (<2000 tokens) as execution roadmap:
 ```markdown
 # Phase 4 Summary: Security Test Plan
 
-**Session**: {session-id}
+**Session**: {timestamp}-{slug}
 **Scope**: {scope from Phase 1}
 **Date**: {ISO date}
 
@@ -291,7 +291,7 @@ Create `summary.md` (<2000 tokens) as execution roadmap:
 
 ## Artifacts Location
 
-`.claude/.threat-model/{session}/phase-4/`
+`.claude/.output/threat-modeling/{timestamp}-{slug}/phase-4/`
 ```
 
 ## Step 10: Verify Completeness

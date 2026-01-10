@@ -1,0 +1,80 @@
+# Changelog - security-controls-mapping
+
+## [Date: 2026-01-10] - Session Variable Fix in Reference File
+
+### Changed
+**references/detailed-workflow.md:**
+- **Line 23**: Replaced `cat {session}/phase-1/summary.md` with `cat {timestamp}-{slug}/phase-1/summary.md`
+- **Line 24**: Replaced `ls {session}/phase-1/components/` with `ls {timestamp}-{slug}/phase-1/components/`
+
+### Rationale
+- Standardizes session variable naming in bash command examples to match threat-modeling-orchestrator conventions
+- Uses consistent `{timestamp}-{slug}` format instead of deprecated `{session}` format
+- Aligns with established session identifier pattern across all threat modeling skills
+
+### Line Count
+- detailed-workflow.md: 261 lines (unchanged)
+
+---
+
+## [Date: 2026-01-10]
+
+### Changed
+- **Line 204**: Replaced `.claude/.threat-model/{session}/phase-4/` with `.claude/.output/threat-modeling/{timestamp}-{slug}/phase-4/`
+
+### Rationale
+- Standardizes output directory path with threat-modeling-orchestrator skill conventions
+- Uses consistent session identifier format matching persisting-agent-outputs skill
+- Aligns with established `.claude/.output/` convention for orchestrator outputs
+
+### Line Count
+- 347 lines (unchanged - well under 500 limit)
+
+---
+
+## [Date: 2025-12-20]
+
+### Changed
+- **Replaced Parallelization Strategy**: Updated from category-based parallelization (12 agents for 12 categories) to concern-based batched execution (one agent per concern from Phase 1)
+- **Added Two-Tier Output Structure**: Documented distinction between Tier 1 (investigation files per concern) and Tier 2 (consolidated category files by orchestrator)
+- **Extracted Core Workflow**: Moved 10-step detailed workflow (242 lines) to `references/detailed-workflow.md` to reduce main skill from 502→346 lines
+- **Updated Core Workflow section**: Now describes two execution modes (per-concern default, full-mapping legacy) with link to detailed workflow
+
+### Added
+- **Per-Concern Batched Execution**: Orchestrator spawns agents in severity-ordered batches (CRITICAL → HIGH → MEDIUM → LOW → INFO)
+- **Investigation File Schema**: Each agent produces `phase-2/investigations/{severity}/{concern-id}-{name}.json` instead of full category files
+- **Consolidation Algorithm**: Orchestrator consolidates investigation files into 12 category JSON files for Phase 3 consumption
+- **Cross-references**: Added links to `threat-modeling-orchestrator/references/phase-2-batched-execution.md`, `investigation-file-schema.md`, and `consolidation-algorithm.md`
+- **New reference file**: `references/detailed-workflow.md` containing legacy full-mapping mode workflow
+
+### Reason
+**RED Failure**: Skill described legacy architecture where Phase 2 spawned one agent per security category (12 agents total), with each agent producing a complete category file. This didn't match the new architecture where:
+1. Phase 2 spawns one agent per security CONCERN from Phase 1 (not category)
+2. Agents execute in severity-ordered batches (CRITICAL → INFO)
+3. Each agent produces investigation file (`phase-2/investigations/{severity}/{concern-id}-{name}.json`), not full category file
+4. The 12 category files are produced by ORCHESTRATOR via consolidation, not by individual agents
+
+**GREEN Success**: Skill now accurately describes batched execution architecture, two-tier output structure, and orchestrator's consolidation role.
+
+### Technical Details
+- **Line count**: 502 → 346 lines (156 lines saved, now well below 500-line hard limit)
+- **Files created**: `references/detailed-workflow.md` (legacy mode documentation)
+- **Sections modified**: "Core Workflow", "Parallelization Strategy"
+- **Sections added**: "Two-Tier Output Structure"
+
+### REFACTOR Assessment
+**Pressure testing evaluation**: This update changes **documentation** describing orchestrator behavior, not mandatory rules that agents might rationalize away. The skill describes Phase 2 execution architecture (how concerns are batched, what files are produced) rather than workflow steps that could be skipped under pressure.
+
+**Why pressure testing not required**:
+1. **Descriptive, not prescriptive**: Documents existing orchestrator behavior rather than imposing new rules
+2. **No rationalization surface**: No "you must/must not" rules that could be bypassed
+3. **Architecture documentation**: Explains system design, not workflow compliance
+4. **Reference material**: Agents read this to understand outputs, not follow step-by-step mandates
+
+**Validation approach**: Instead of pressure testing, validated via:
+- ✅ Architectural accuracy (matches threat-modeling-orchestrator references)
+- ✅ Schema compliance (investigation files and category files correctly described)
+- ✅ Cross-reference validation (links to orchestrator documentation verified)
+- ✅ GREEN test passed (skill accurately describes new architecture)
+
+**If future updates add mandatory workflow rules**: REFACTOR would be required for those changes.

@@ -1,0 +1,127 @@
+{
+  "threat": {
+    "id": "T-001",
+    "title": "JWT Token Reuse Across Applications (Missing Audience Validation)",
+    "category": "STRIDE-Spoofing",
+    "description": "Attacker obtains valid JWT token from a different application using the same Cognito user pool, then reuses it to authenticate to this API. Without audience (aud) claim validation, the API accepts tokens not intended for it.",
+    "discoveredIn": "Phase 4: jwt-validation-weakness investigation"
+  },
+  "affectedComponents": [
+    {
+      "componentId": "auth-handler",
+      "componentName": "Authentication Handler",
+      "path": "./modules/chariot/backend/pkg/handler/handlers/auth",
+      "entryPoint": "API Gateway - all authenticated endpoints"
+    }
+  ],
+  "attackVector": {
+    "attackerProfile": "External Attacker (Targeted)",
+    "prerequisites": [
+      "Valid JWT token from another application in same Cognito pool",
+      "Knowledge of API endpoint URLs"
+    ],
+    "steps": [
+      "Attacker authenticates to another application using same Cognito pool",
+      "Attacker extracts JWT token from that application",
+      "Attacker sends requests to this API with the stolen JWT",
+      "API validates signature and issuer, but not audience",
+      "API grants access to attacker"
+    ],
+    "skillLevel": "Medium",
+    "detectionDifficulty": "Hard (appears as legitimate traffic)"
+  },
+  "businessContext": {
+    "crownJewelsAtRisk": ["api_keys", "vulnerability_reports", "customer_configurations"],
+    "businessImpact": "Critical - Unauthorized access to customer security data",
+    "complianceViolations": ["SOC 2 CC6.1 - Logical Access Control", "PCI-DSS 8.2.1 - Authentication"]
+  },
+  "cvss40": {
+    "version": "4.0",
+    "baseScore": 8.7,
+    "baseSeverity": "HIGH",
+    "vectorString": "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:N/SC:H/SI:H/SA:N",
+    "baseMetrics": {
+      "attackVector": "Network",
+      "attackComplexity": "Low",
+      "attackRequirements": "None",
+      "privilegesRequired": "Low",
+      "userInteraction": "None",
+      "vulnerableSystem": {
+        "confidentialityImpact": "High",
+        "integrityImpact": "High",
+        "availabilityImpact": "None"
+      },
+      "subsequentSystem": {
+        "confidentialityImpact": "High",
+        "integrityImpact": "High",
+        "availabilityImpact": "None"
+      }
+    },
+    "threatMetrics": {
+      "exploitMaturity": "Proof-of-Concept"
+    },
+    "environmentalScore": 9.2,
+    "environmentalSeverity": "CRITICAL",
+    "environmentalMetrics": {
+      "confidentialityRequirement": "High",
+      "integrityRequirement": "High",
+      "availabilityRequirement": "Medium",
+      "modifiedAttackVector": "Network",
+      "modifiedAttackComplexity": "Low",
+      "modifiedAttackRequirements": "None",
+      "modifiedPrivilegesRequired": "Low",
+      "modifiedUserInteraction": "None",
+      "modifiedVulnerableSystem": {
+        "confidentialityImpact": "High",
+        "integrityImpact": "High",
+        "availabilityImpact": "None"
+      },
+      "modifiedSubsequentSystem": {
+        "confidentialityImpact": "High",
+        "integrityImpact": "High",
+        "availabilityImpact": "None"
+      }
+    }
+  },
+  "likelihood": {
+    "rating": "Medium",
+    "rationale": "Requires valid credentials for another application, but Cognito pools often shared across org",
+    "threatActorCapability": "Medium - Requires understanding of JWT structure and API endpoints"
+  },
+  "existingControls": [
+    {
+      "control": "JWT Signature Verification",
+      "effectiveness": "Effective - Prevents token tampering",
+      "location": "./modules/chariot/backend/pkg/auth/jwt.go:45-67"
+    },
+    {
+      "control": "Issuer Validation",
+      "effectiveness": "Effective - Ensures token from correct Cognito pool",
+      "location": "./modules/chariot/backend/pkg/auth/jwt.go:72-78"
+    }
+  ],
+  "mitigations": [
+    {
+      "mitigation": "Add audience (aud) claim validation",
+      "type": "Preventive",
+      "effort": "Low (1-2 hours)",
+      "effectiveness": "High - Completely prevents cross-app token reuse",
+      "residualRisk": "Low",
+      "implementation": "Update jwt.go to validate aud claim matches expected API identifier"
+    },
+    {
+      "mitigation": "Implement token binding (client certificate)",
+      "type": "Preventive",
+      "effort": "High (1-2 weeks)",
+      "effectiveness": "Very High - Prevents token theft entirely",
+      "residualRisk": "Very Low",
+      "implementation": "Bind JWT to client TLS certificate, validate on each request"
+    }
+  ],
+  "references": [
+    "OWASP Top 10 2021 - A01:2021 Broken Access Control",
+    "OWASP API Security Top 10 - API2:2023 Broken Authentication",
+    "CWE-287: Improper Authentication",
+    "RFC 7519: JSON Web Token (JWT) - Section 4.1.3 (aud claim)"
+  ]
+}

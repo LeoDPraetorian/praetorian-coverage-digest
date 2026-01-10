@@ -16,9 +16,11 @@ Guide completion of development work by presenting clear options and handling ch
 
 ## The Process
 
-### Step 1: Verify Tests
+### Step 1: Verify Tests AND Requirements
 
-**Before presenting options, verify tests pass:**
+**Before presenting options, verify BOTH:**
+
+#### 1a. Verify Tests Pass
 
 ```bash
 # Run project's test suite
@@ -37,7 +39,40 @@ Cannot proceed with merge/PR until tests pass.
 
 Stop. Don't proceed to Step 2.
 
-**If tests pass:** Continue to Step 2.
+#### 1b. Verify Requirements/Exit Criteria Met
+
+**If this work was from a plan:**
+
+1. Read the plan's exit criteria
+2. Verify each criterion is met
+3. Count actual completions against expected
+
+```
+Plan exit criteria:
+- [ ] All 12 component files migrated → Verified: 12 files (git diff --stat)
+- [ ] No TypeScript errors → Verified: npm run build exits 0
+- [ ] All routes updated → Verified: grep shows 0 old routes
+
+✅ All exit criteria met
+```
+
+**If requirements NOT met:**
+
+```
+Requirements incomplete:
+- ✅ 12 component files migrated
+- ❌ 3 routes still using old pattern (see: src/routes/legacy/)
+
+Cannot proceed with merge/PR until requirements met.
+```
+
+Stop. Don't proceed to Step 2.
+
+**If no formal plan exists:**
+
+Ask: "What were the requirements for this work? I need to verify they're met before completing."
+
+**If tests pass AND requirements met:** Continue to Step 2.
 
 ### Step 2: Determine Base Branch
 
@@ -171,6 +206,11 @@ git worktree remove <worktree-path>
 - **Problem:** Merge broken code, create failing PR
 - **Fix:** Always verify tests before offering options
 
+**Assuming tests = requirements**
+
+- **Problem:** Tests pass but exit criteria not met (e.g., 47 files updated instead of 118)
+- **Fix:** Verify requirements/exit criteria separately from test verification
+
 **Open-ended questions**
 
 - **Problem:** "What should I do next?" → ambiguous
@@ -191,6 +231,9 @@ git worktree remove <worktree-path>
 **Never:**
 
 - Proceed with failing tests
+- Assume passing tests means requirements are met
+- Skip requirements verification for 'obvious' completions
+- Proceed if ANY exit criterion is unverified
 - Merge without verifying tests on result
 - Delete work without confirmation
 - Force-push without explicit request
@@ -198,6 +241,7 @@ git worktree remove <worktree-path>
 **Always:**
 
 - Verify tests before offering options
+- Verify requirements/exit criteria separately from tests
 - Present exactly 4 options
 - Get typed confirmation for Option 4
 - Clean up worktree for Options 1 & 4 only

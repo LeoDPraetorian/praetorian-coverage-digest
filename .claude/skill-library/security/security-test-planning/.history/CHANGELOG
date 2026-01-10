@@ -1,0 +1,38 @@
+# Changelog - security-test-planning
+
+## 2026-01-10 - Fix Path and Session Variable Inconsistencies
+
+### Changed
+- **SKILL.md**: Replaced 2 occurrences of `.claude/.threat-model/{session}` with `.claude/.output/threat-modeling/{timestamp}-{slug}`
+- **references/output-schemas.md**: Replaced 1 path occurrence + 2 variable occurrences (`{session}` and `{session-id}`)
+- **references/workflow.md**: Replaced 4 path occurrences + 5 variable occurrences
+
+### Rationale
+- Standardizes output directory path with threat-modeling-orchestrator skill conventions
+- Uses consistent `{timestamp}-{slug}` session identifier format from persisting-agent-outputs skill
+- Aligns with established `.claude/.output/` convention for orchestrator outputs
+- Updates both path references and session labels in report templates
+
+### Files Affected
+- SKILL.md (379 lines - unchanged)
+- references/output-schemas.md (237 lines - unchanged)
+- references/workflow.md (310 lines - unchanged)
+
+### Total Changes
+- 7 path replacements across 3 files
+- 9 variable replacements (both `{session}` and `{session-id}`) across 3 files
+
+---
+
+## 2026-01-10 - Phase Reference Corrections
+
+**Changed**:
+- Fixed consumer description (line 20): Changed "threat-modeling-orchestrator skill in Phase 7 (future test execution)" to "threat-modeling-orchestrator and downstream CI/CD automation" - removed non-existent Phase 7 reference
+- Fixed phase failure message (line 124): Changed "Phase 4 has FAILED" to "Phase 6 has FAILED" - corrected to match that security-test-planning IS Phase 6
+
+**Rationale**:
+- Phase 7 does not exist in the threat modeling workflow (phases are 1-6)
+- security-test-planning is Phase 6, not Phase 4
+- These corrections align with the corrected phase numbering in threat-modeling-orchestrator
+
+**Line Count**: 379 lines (unchanged)

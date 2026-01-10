@@ -129,6 +129,258 @@ test("user can filter assets by status", async ({ page }) => {
 });
 ```
 
+## Test Implementation Pattern (REQUIRED)
+
+Follow this structure for every test file you create.
+
+### Test File Organization
+
+```typescript
+// [Component].test.tsx
+
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// 1. SETUP SECTION
+// Mock dependencies, create test utilities
+
+// 2. HAPPY PATH TESTS
+describe('[Component] - Happy Path', () => {
+  // Primary use cases
+});
+
+// 3. EDGE CASE TESTS
+describe('[Component] - Edge Cases', () => {
+  // Boundary conditions
+});
+
+// 4. ERROR CASE TESTS
+describe('[Component] - Error Handling', () => {
+  // Failure scenarios
+});
+
+// 5. INTEGRATION TESTS (if applicable)
+describe('[Component] - Integration', () => {
+  // Component interactions
+});
+```
+
+---
+
+### Test Case Structure
+
+Every test should follow this pattern:
+
+```typescript
+it('should [expected behavior] when [condition]', async () => {
+  // ARRANGE - Set up test conditions
+  const mockData = { ... };
+  const onAction = vi.fn();
+
+  // ACT - Perform the action
+  render(<Component data={mockData} onAction={onAction} />);
+  await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+
+  // ASSERT - Verify the outcome
+  expect(onAction).toHaveBeenCalledWith(expectedValue);
+  expect(screen.getByText('Success')).toBeInTheDocument();
+});
+```
+
+---
+
+### Example: Complete Test File
+
+```typescript
+// UserProfile.test.tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { server } from '@/test/server';
+import { UserProfile } from './UserProfile';
+
+// SETUP
+const mockUser = {
+  id: '123',
+  name: 'Test User',
+  email: 'test@example.com',
+};
+
+// HAPPY PATH
+describe('UserProfile - Happy Path', () => {
+  beforeEach(() => {
+    server.use(
+      http.get('/api/users/:id', () => {
+        return HttpResponse.json(mockUser);
+      })
+    );
+  });
+
+  it('displays user information when loaded', async () => {
+    render(<UserProfile userId="123" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Test User')).toBeInTheDocument();
+    });
+    expect(screen.getByText('test@example.com')).toBeInTheDocument();
+  });
+
+  it('shows edit button for own profile', async () => {
+    render(<UserProfile userId="123" isOwnProfile />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
+    });
+  });
+});
+
+// EDGE CASES
+describe('UserProfile - Edge Cases', () => {
+  it('handles missing email gracefully', async () => {
+    server.use(
+      http.get('/api/users/:id', () => {
+        return HttpResponse.json({ ...mockUser, email: null });
+      })
+    );
+
+    render(<UserProfile userId="123" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Test User')).toBeInTheDocument();
+    });
+    expect(screen.getByText('No email provided')).toBeInTheDocument();
+  });
+
+  it('handles very long names with truncation', async () => {
+    const longName = 'A'.repeat(100);
+    server.use(
+      http.get('/api/users/:id', () => {
+        return HttpResponse.json({ ...mockUser, name: longName });
+      })
+    );
+
+    render(<UserProfile userId="123" />);
+
+    await waitFor(() => {
+      const nameElement = screen.getByTestId('user-name');
+      expect(nameElement).toHaveClass('truncate');
+    });
+  });
+});
+
+// ERROR CASES
+describe('UserProfile - Error Handling', () => {
+  it('shows error message when user not found', async () => {
+    server.use(
+      http.get('/api/users/:id', () => {
+        return new HttpResponse(null, { status: 404 });
+      })
+    );
+
+    render(<UserProfile userId="999" />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/user not found/i)).toBeInTheDocument();
+    });
+  });
+
+  it('shows retry button on server error', async () => {
+    server.use(
+      http.get('/api/users/:id', () => {
+        return new HttpResponse(null, { status: 500 });
+      })
+    );
+
+    render(<UserProfile userId="123" />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
+    });
+  });
+
+  it('retries successfully after error', async () => {
+    let callCount = 0;
+    server.use(
+      http.get('/api/users/:id', () => {
+        callCount++;
+        if (callCount === 1) {
+          return new HttpResponse(null, { status: 500 });
+        }
+        return HttpResponse.json(mockUser);
+      })
+    );
+
+    render(<UserProfile userId="123" />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /retry/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Test User')).toBeInTheDocument();
+    });
+  });
+});
+```
+
+---
+
+### Common Testing Patterns
+
+**Async Data Loading**:
+```typescript
+it('shows loading state then data', async () => {
+  render(<Component />);
+
+  // Loading state
+  expect(screen.getByTestId('loading')).toBeInTheDocument();
+
+  // Data loaded
+  await waitFor(() => {
+    expect(screen.queryByTestId('loading')).not.toBeInTheDocument();
+  });
+  expect(screen.getByText('Data')).toBeInTheDocument();
+});
+```
+
+**Form Submission**:
+```typescript
+it('submits form with valid data', async () => {
+  const onSubmit = vi.fn();
+  render(<Form onSubmit={onSubmit} />);
+
+  await userEvent.type(screen.getByLabelText(/name/i), 'Test');
+  await userEvent.type(screen.getByLabelText(/email/i), 'test@example.com');
+  await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+
+  expect(onSubmit).toHaveBeenCalledWith({
+    name: 'Test',
+    email: 'test@example.com',
+  });
+});
+```
+
+**Conditional Rendering**:
+```typescript
+it('shows admin controls for admin users', () => {
+  render(<Dashboard user={{ role: 'admin' }} />);
+  expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
+});
+
+it('hides admin controls for regular users', () => {
+  render(<Dashboard user={{ role: 'user' }} />);
+  expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+});
+```
+
+---
+
+**CRITICAL**: Every test must have clear Arrange/Act/Assert sections. Every test must test ONE behavior. Test names must describe the expected behavior.
+
 ## Anti-Patterns to Avoid
 
 - ❌ Testing implementation details (internal state, private methods)

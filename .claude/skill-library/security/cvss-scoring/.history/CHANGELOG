@@ -1,0 +1,88 @@
+## [Date: 2024-12-19] - Initial Creation
+
+### Created
+- Skill created via creating-skills workflow
+- RED failure documented: Threat modeling Phase 3 lacks standardized CVSS scoring with business context integration
+- Category: security (skill-library)
+- Type: Process/Pattern (CVSS scoring methodology)
+- Target: Standalone open-source threat modeling tool
+- Key features:
+  - CVSS version selection (3.1 recommended, 4.0 optional)
+  - Base metric assessment for theoretical threats
+  - Temporal/Threat metrics with conservative defaults
+  - Environmental metrics auto-derived from Phase 0 business context
+  - Structured JSON output for threat-model.json
+
+## [Date: 2024-12-19] - Content Population Complete
+
+### Added
+- Reference files (5):
+  - version-comparison.md (287 lines) - CVSS 3.1 vs 4.0 detailed analysis
+  - base-metrics-guide.md (534 lines) - Complete Base metric assessment guidance
+  - temporal-threat-metrics.md (437 lines) - Temporal/Threat metrics with defaults
+  - environmental-metrics.md (725 lines) - Phase 0 integration formulas
+  - calculation-formulas.md (785 lines) - Complete CVSS 3.1 mathematics
+
+- Example files (3):
+  - sql-injection-scoring.md (531 lines) - Payment API SQLi walkthrough
+  - authentication-bypass.md (137 lines) - JWT bypass walkthrough
+  - privilege-escalation.md (140 lines) - User→Admin walkthrough
+
+### Modified
+- SKILL.md - Added TodoWrite mandate (Phase 13 fix)
+- gateway-security - Added cvss-scoring to Phase 3 section
+
+### Audit
+- Status: PASSED (0 critical, 0 warnings, 2 info)
+- All 16 phases validated
+- Progressive disclosure: SKILL.md 324 lines, references total ~2,800 lines
+
+## [Date: 2024-12-19] - TDD Complete (Phases 8-9)
+
+### Phase 8: GREEN - Skill Verification
+- Original RED scenario re-tested with skill loaded
+- Gap successfully closed: Provides standardized CVSS with Phase 0 integration
+- Analyst can now score threats consistently with business context
+- Audit status: PASSED (0 critical, 0 warnings, 2 info)
+
+### Phase 9: REFACTOR - Pressure Testing
+- Test 1 (Time + Emergency): PASSED - Agent used Environmental despite deadline
+- Test 2 (Authority + Expertise): PASSED - Agent advocated for Environmental despite senior pushback
+- Test 3 (Pragmatic + Efficiency): PASSED - Agent continued Environmental despite volume pressure
+
+**Result: Skill is bulletproof on first iteration - no hardening required**
+
+All agents:
+- Read and followed "Environmental Metrics Are Mandatory" rule
+- Explicitly rejected rationalization pressures
+- Cited skill's "Not even when" section
+- Delivered complete Environmental scoring
+
+### Status
+- TDD cycle: COMPLETE (RED → GREEN → REFACTOR)
+- Production ready: YES
+- Gateway integration: gateway-security updated
+- Next step: Use in threat modeling Phase 3 workflows
+
+## [Date: 2024-12-20] - Default to CVSS 4.0
+
+### Changed
+- **Quick Reference table**: Swapped rows to list CVSS 4.0 as "(Recommended)" (line 30), CVSS 3.1 as "Legacy compatibility" (line 31)
+- **Step 1 AskUserQuestion**: Reordered options so CVSS 4.0 is first (Recommended), 3.1 is second (lines 52-66)
+- **Default recommendation**: Changed from "CVSS 3.1 unless user has specific need for 4.0" to "CVSS 4.0 unless legacy system compatibility requires 3.1" (line 71)
+- **Typical Workflow**: Updated default from "3.1" to "4.0" (line 35)
+- **Version Selection Default**: Changed from "Always default to CVSS 3.1" to "Always default to CVSS 4.0" with updated exception list (lines 268-273)
+
+### Reason
+- RED failure: Skill recommended CVSS 3.1 as default, but CVSS 4.0 is the current industry standard (released 2023)
+- Agents following this skill would produce threat models with outdated CVSS 3.1 scoring instead of industry-standard 4.0
+- CVSS 4.0 provides better score differentiation, Supplemental metrics, and future-proof security tooling compatibility
+- 3.1 preserved as option for organizations with NVD/legacy tool requirements
+
+### Impact
+- Line count: 326 → 328 lines (+2 lines, well under 500 limit)
+- Skill now defaults to current industry standard (CVSS 4.0)
+- AskUserQuestion options reordered to prioritize 4.0
+- 3.1 remains available for legacy compatibility
+- Aligns with threat-modeling-orchestrator skill's CVSS 4.0 integration (2024-12-19/20)
+

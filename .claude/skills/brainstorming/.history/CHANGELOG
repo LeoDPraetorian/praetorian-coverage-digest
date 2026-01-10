@@ -1,0 +1,24 @@
+# Changelog - brainstorming
+
+## 2026-01-10 - Prompt Engineering Integration
+
+**Type:** Enhancement
+
+**Changes:**
+- Added Integration section with reference to orchestration-prompt-patterns library skill
+- Enhanced "Understanding the idea" section with Progressive Disclosure pattern (4 levels: Orientation, Constraints, Decisions, Details)
+- Enhanced "Exploring approaches" section with Chain-of-Thought reasoning structure (5-step systematic evaluation)
+- Added 3 new Key Principles: Progressive disclosure, Chain-of-thought for options, Self-consistency
+- Added Anti-Patterns table with 5 common mistakes and correct approaches
+
+**Rationale:**
+Integrates formal prompt engineering patterns from orchestration-prompt-patterns to provide structured questioning discipline, preventing:
+- Jumping to implementation details without establishing context
+- Overwhelming users with multiple questions in single messages
+- Presenting options without systematic trade-off analysis
+- First-impression bias in recommendations
+
+**Impact:**
+- Questions now follow explicit 4-level progression (Orientation → Constraints → Decisions → Details)
+- Options require step-by-step reasoning and self-consistency checks
+- Clear anti-patterns help agents avoid common brainstorming failures

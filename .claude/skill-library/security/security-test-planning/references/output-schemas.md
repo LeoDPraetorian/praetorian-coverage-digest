@@ -197,7 +197,7 @@ interface PrioritizedTest {
 ```markdown
 # Phase 4 Summary: Security Test Plan
 
-**Session**: {session-id}
+**Session**: {timestamp}-{slug}
 **Scope**: {scope}
 **Date**: {date}
 
@@ -231,7 +231,7 @@ interface PrioritizedTest {
 
 ## Artifacts Location
 
-`.claude/.threat-model/{session}/phase-4/`
+`.claude/.output/threat-modeling/{timestamp}-{slug}/phase-4/`
 ```
 
 **Token limit**: <2000 tokens for summary.md

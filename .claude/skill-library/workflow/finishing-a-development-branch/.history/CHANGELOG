@@ -1,0 +1,32 @@
+# Changelog
+
+All notable changes to the finishing-a-development-branch skill.
+
+## [2026-01-10] - Requirements Verification Added
+
+### Changed
+- **Step 1**: Expanded from "Verify Tests" to "Verify Tests AND Requirements"
+  - Added 1a (Verify Tests Pass) - original test verification
+  - Added 1b (Verify Requirements/Exit Criteria Met) - new requirements verification
+  - Agents must now verify BOTH tests pass AND requirements met before proceeding
+  - Added guidance for plan-based work (read exit criteria, verify each criterion, count completions)
+  - Added guidance for work without formal plans (ask user for requirements)
+
+### Added
+- **Common Mistakes**: "Assuming tests = requirements" entry
+  - Problem: Tests pass but exit criteria not met (e.g., 47 files updated instead of 118)
+  - Fix: Verify requirements/exit criteria separately from test verification
+
+- **Red Flags**: Added requirements verification mandates
+  - Never: "Assume passing tests means requirements are met"
+  - Never: "Skip requirements verification for 'obvious' completions"
+  - Never: "Proceed if ANY exit criterion is unverified"
+  - Always: "Verify requirements/exit criteria separately from tests"
+
+### Why
+Prevents false completion claims where tests pass but actual work requirements incomplete.
+Example: Agent updates 47 files instead of 118, tests pass, agent proceeds to merge/PR options.
+
+### Testing
+RED: Scenario where agent proceeds to Step 2 with passing tests but incomplete requirements
+GREEN: Agent now stops at Step 1b, reports incomplete requirements, blocks Step 2

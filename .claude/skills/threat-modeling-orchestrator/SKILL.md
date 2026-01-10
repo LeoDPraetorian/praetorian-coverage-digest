@@ -11,26 +11,30 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, Task, AskUserQues
 ## When to Use
 
 Use this skill when:
-
 - Performing comprehensive threat modeling on a codebase
 - Need systematic STRIDE + PASTA + DFD analysis
 - Require structured outputs (Markdown, JSON, SARIF)
 - Analyzing large codebases that exceed context windows
 - Need human approval between analysis phases
 
-**You MUST use TodoWrite** to track progress through all 5 phases (Phase 0-4).
+**You MUST use TodoWrite** to track progress through all 6 phases (Phase 1-6).
 
 ---
 
 ## Quick Reference
 
-| Phase                | Purpose                                                  | Execution         | Checkpoint       |
-| -------------------- | -------------------------------------------------------- | ----------------- | ---------------- |
-| 0. Business Context  | Crown jewels, threat actors, compliance, business impact | Interactive skill | ⏸️ User approval |
-| 1. Codebase Mapping  | Architecture, components, data flows                     | Parallel agents   | ⏸️ User approval |
-| 2. Security Controls | Auth, authz, validation, crypto                          | Parallel agents   | ⏸️ User approval |
-| 3. Threat Modeling   | STRIDE + PASTA + DFD threats                             | Sequential skill  | ⏸️ User approval |
-| 4. Test Planning     | Prioritized security test plan                           | Sequential skill  | ⏸️ User approval |
+| Category | Component | Purpose | Execution | Checkpoint |
+|----------|-----------|---------|-----------|------------|
+| **Setup** | Session Initialization | Create workspace and directories | Automatic | - |
+| **Config** | Scope Selection | Define analysis boundaries | Interactive | - |
+| **Config** | Methodology & CVSS Selection | Choose threat modeling approach and CVSS version | Interactive | - |
+| **Phase 1** | Business Context | Crown jewels, threat actors, compliance | Interactive skill | ⏸️ User approval |
+| **Phase 2** | Codebase Sizing | File counting, component discovery, strategy | Single agent | ⏸️ Automatic (no checkpoint) |
+| **Phase 3** | Code Mapping | Architecture, components, data flows | Dynamic parallel agents | ⏸️ User approval |
+| **Phase 4** | Security Controls | Auth, authz, validation, crypto | Batched parallel | ⏸️ After each batch |
+| **Phase 5** | Threat Modeling | STRIDE/PASTA/DFD threats | Sequential agent | ⏸️ User approval |
+| **Phase 6** | Test Planning | Prioritized security test plan | Sequential agent | ⏸️ User approval |
+| **Finalize** | Final Report Generation | Consolidate all outputs | Automatic | - |
 
 ---
 
@@ -44,12 +48,10 @@ Use this skill when:
 ## Phase {N} Complete: {Phase Name}
 
 ### Key Findings:
-
 - [Finding 1]
 - [Finding 2]
 
 ### Questions for You:
-
 - Is this understanding correct?
 - Any areas I missed?
 
@@ -58,28 +60,26 @@ Use this skill when:
 
 **Why:** Errors compound across phases. Early validation prevents wasted work.
 
-### Phase 0 Is Mandatory
+### Phase 1 Is Mandatory
 
-**Phase 0 (Business Context Discovery) MUST execute before Phase 1.** You cannot perform risk-based threat modeling without understanding:
-
+**Phase 1 (Business Context Discovery) MUST execute before Phase 2.** You cannot perform risk-based threat modeling without understanding:
 - **WHAT** you're protecting (crown jewels, sensitive data)
 - **WHY** it matters (business impact, compliance requirements)
 - **WHO** would attack (threat actor profiles)
 
 Without business context, technical threat models produce "security theater" instead of risk management.
 
-**Enforcement**: Phase 1 cannot proceed without Phase 0 approval checkpoint.
+**Enforcement**: Phase 2 (Codebase Sizing) cannot proceed without Phase 1 approval checkpoint.
 
 **No exceptions:**
-
 - **Not even when**: Manager says skip it, client says skip it, user says "we already know"
 - **Not even when**: Time pressure, deadline, emergency, audit tomorrow
-- **Not even when**: Previous Phase 0 exists (for incremental: validate changes in 30-60 min, don't skip)
-- **Not even when**: Client claims "no sensitive data" (they're often wrong - validate with Phase 0)
+- **Not even when**: Previous Phase 1 exists (for incremental: validate changes in 30-60 min, don't skip)
+- **Not even when**: Client claims "no sensitive data" (they're often wrong - validate with Phase 1)
 - **Not even when**: "Just internal tool" or "only 10 users" (insiders are threat actors too)
-- **Not even when**: Budget constraints (explain Phase 0 is 20-25% of total, not optional)
+- **Not even when**: Budget constraints (explain Phase 1 is 20-25% of total, not optional)
 
-**If anyone claims "we can skip Phase 0"**: They're wrong. Run it anyway. Document their assumptions in Phase 0 outputs to prove they were incomplete.
+**If anyone claims "we can skip Phase 1"**: They're wrong. Run it anyway. Document their assumptions in Phase 1 outputs to prove they were incomplete.
 
 ### State Must Be Persisted
 
@@ -90,7 +90,6 @@ All artifacts go to: `.claude/.output/threat-modeling/{timestamp}-{slug}/`
 ### Scope Selection Is Required
 
 **Always ask user** to select scope before any analysis:
-
 1. **Full application** - Analyze entire codebase
 2. **Specific component(s)** - Focus on particular modules
 3. **Incremental** - Changes only (git diff based)
@@ -99,7 +98,7 @@ All artifacts go to: `.claude/.output/threat-modeling/{timestamp}-{slug}/`
 
 ## Core Workflow
 
-### Step 0: Session Setup
+### Session Initialization
 
 **YOU MUST run the actual `date` command — DO NOT approximate or invent timestamps.**
 
@@ -128,6 +127,65 @@ All artifacts go to: `.claude/.output/threat-modeling/{timestamp}-{slug}/`
 
 2. **Store OUTPUT_DIR** - Pass it to every agent spawned.
 
+### Slug Generation Rules
+
+The slug portion of the session ID identifies the analysis target. Generate as follows:
+
+**Format**: kebab-case, 2-4 words, lowercase
+
+**Algorithm**:
+```
+1. Extract target name from scope selection
+2. Convert to lowercase
+3. Replace spaces and underscores with hyphens
+4. Remove special characters (keep only a-z, 0-9, hyphens)
+5. Truncate to max 30 characters
+6. Trim trailing hyphens
+```
+
+**Examples**:
+
+| Scope Target | Generated Slug |
+|--------------|----------------|
+| `modules/chariot/backend` | `chariot-backend` |
+| `Nebula Scanner v2.0` | `nebula-scanner` |
+| `modules/janus-framework` | `janus-framework` |
+| `src/auth/LoginController.ts` | `auth-login` |
+| Full application (no specific target) | `full-app` |
+| Incremental (git diff) | `incremental-{branch}` |
+
+**Special Cases**:
+
+| Scope Type | Slug Pattern |
+|------------|--------------|
+| Full application | `full-app` or `{repo-name}` |
+| Single component | `{component-name}` |
+| Multiple components | `{primary-component}-multi` |
+| Incremental analysis | `incremental-{base-branch}` |
+
+**Bash Implementation**:
+```bash
+generate_slug() {
+  local target="$1"
+  echo "$target" | \
+    tr '[:upper:]' '[:lower:]' | \
+    sed 's/[_ ]/-/g' | \
+    sed 's/[^a-z0-9-]//g' | \
+    sed 's/--*/-/g' | \
+    cut -c1-30 | \
+    sed 's/-$//'
+}
+
+# Example usage
+SLUG=$(generate_slug "modules/chariot/backend")
+# Result: chariot-backend
+```
+
+**Rationale**:
+- Provides deterministic slug generation for consistent session IDs
+- Enables session lookup and resume functionality
+- Prevents invalid characters in directory names
+
 3. **Initialize metadata.json**:
    ```json
    {
@@ -138,6 +196,7 @@ All artifacts go to: `.claude/.output/threat-modeling/{timestamp}-{slug}/`
      "current_phase": "scope_selection",
      "phases": {
        "business_context": { "status": "pending" },
+       "codebase_sizing": { "status": "pending" },
        "codebase_mapping": { "status": "pending" },
        "security_controls": { "status": "pending" },
        "threat_modeling": { "status": "pending" },
@@ -146,7 +205,53 @@ All artifacts go to: `.claude/.output/threat-modeling/{timestamp}-{slug}/`
    }
    ```
 
-### Step 1: Scope Selection
+4. **Update sessions.json** (session index for resume):
+   ```bash
+   SESSIONS_FILE="$ROOT/.claude/.output/threat-modeling/sessions.json"
+
+   # Create or update sessions index
+   if [ -f "$SESSIONS_FILE" ]; then
+     # Append new session to existing index
+     jq --arg sid "${TIMESTAMP}-${SLUG}" \
+        --arg dir "${OUTPUT_DIR}" \
+        --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        '.sessions += [{"session_id": $sid, "path": $dir, "created": $ts, "status": "in_progress"}]' \
+        "$SESSIONS_FILE" > temp.json && mv temp.json "$SESSIONS_FILE"
+   else
+     # Create new sessions index
+     echo '{"sessions": []}' | jq --arg sid "${TIMESTAMP}-${SLUG}" \
+        --arg dir "${OUTPUT_DIR}" \
+        --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        '.sessions += [{"session_id": $sid, "path": $dir, "created": $ts, "status": "in_progress"}]' \
+        > "$SESSIONS_FILE"
+   fi
+   ```
+
+   **Sessions index enables**:
+   - Resuming interrupted threat models
+   - Listing previous sessions
+   - Incremental analysis against previous models
+
+### Session Resume (Optional)
+
+If resuming an existing session, offer to user before starting new:
+
+```markdown
+## Existing Sessions Found
+
+I found {N} previous threat modeling sessions:
+
+1. `{session_id_1}` - {target} - {status} - {last_updated}
+2. `{session_id_2}` - {target} - {status} - {last_updated}
+
+Would you like to:
+- **Resume** an existing session (enter number)
+- **Start new** analysis (enter 'new')
+```
+
+To resume, load session's `metadata.json` and continue from `current_phase`.
+
+### Scope Selection
 
 Use AskUserQuestion to determine scope:
 
@@ -160,7 +265,17 @@ What would you like to threat model?
 
 Record selection in `scope.json`.
 
-### Step 1.5: Phase 0 - Business Context Discovery
+### Methodology & CVSS Selection
+
+Prompt user for methodology (Hybrid/STRIDE-only/PASTA-only/Custom) and CVSS version (4.0/3.1). Record selections in `config.json`.
+
+**See [Methodology Selection](references/methodology-selection.md)** for complete details:
+- Methodology descriptions, use cases, and time estimates
+- CVSS version comparison (4.0 vs 3.1)
+- AskUserQuestion examples for both prompts
+- Configuration schema and Phase 3 integration
+
+### Phase 1: Business Context Discovery
 
 **Goal**: Understand WHAT you're protecting and WHY before analyzing HOW it's built.
 
@@ -171,7 +286,6 @@ skill: "business-context-discovery"
 ```
 
 **The skill guides through**:
-
 1. Business Purpose Interview (20-30 min)
 2. Data Classification - Identify crown jewels (20-30 min)
 3. Threat Actor Profiling - Who would attack and why (15-20 min)
@@ -179,70 +293,106 @@ skill: "business-context-discovery"
 5. Compliance Mapping - SOC2, PCI-DSS, HIPAA, GDPR (15-20 min)
 6. Security Objectives - Protection priorities (10-15 min)
 
-**Artifacts produced** (flat files in OUTPUT_DIR):
+**Artifacts produced** (in `phase-1/`):
+- `business-objectives.json` - App purpose, users, value
+- `data-classification.json` - Crown jewels, PII/PHI/PCI
+- `threat-actors.json` - Who attacks, motivations, capabilities
+- `business-impact.json` - Financial, operational, regulatory consequences
+- `compliance-requirements.json` - Applicable regulations
+- `security-objectives.json` - Protection priorities, CIA, RTO/RPO
+- `summary.md` - <2000 token handoff
 
-- `business-context.md` - Consolidated business context including:
-  - App purpose, users, value proposition
-  - Crown jewels and data classification (PII/PHI/PCI)
-  - Threat actor profiles with motivations and capabilities
-  - Business impact assessment (financial, operational, regulatory)
-  - Compliance requirements (SOC2, PCI-DSS, HIPAA, GDPR)
-  - Security objectives and protection priorities
-
-**Checkpoint**: Present business context findings, ask for approval before Phase 1.
+**Checkpoint**: Present business context findings, ask for approval before Phase 2.
 
 **How this drives later phases**:
+- Phase 2: Weight components by business value during codebase sizing
+- Phase 3: Focus mapping on crown jewel components
+- Phase 4: Evaluate controls against compliance requirements
+- Phase 5: Apply relevant threat actor profiles, score threats using selected CVSS version (default: 4.0) with business context
+- Phase 6: Prioritize tests by CVSS Environmental scores (business-contextualized)
 
-- Phase 1: Focus mapping on crown jewel components
-- Phase 2: Evaluate controls against compliance requirements
-- Phase 3: Apply relevant threat actor profiles, use actual business impact for risk scoring
-- Phase 4: Prioritize tests by business risk scores
+### Phase 2: Codebase Sizing
 
-### Step 2: Phase 1 - Codebase Mapping
+**Goal**: Assess codebase size to dynamically configure Phase 3 parallelization strategy.
+
+**Execution**: Automatic (no checkpoint) - spawns single `codebase-sizer` agent.
+
+**Agent spawn**:
+```typescript
+Task("codebase-sizer", `Assess codebase size for ${scope.path}`, "codebase-sizer")
+```
+
+**Key benefits**:
+- Replaces hardcoded component paths with dynamic discovery
+- Optimizes Phase 3 agent count based on actual codebase structure
+- Prevents agent timeouts from oversized components
+- Weights components by security relevance (auth/crypto/handlers)
+
+**Artifacts produced** (in `phase-2/`):
+- `sizing-report.json` - File counts, strategy tier, parallelization recommendation
+- `component-analysis.json` - Per-component breakdown (optional)
+
+**No checkpoint** - automatically progresses to Phase 3 upon completion.
+
+**For complete workflow details, see [Phase 2 Workflow](references/phase-2-codebase-sizing-workflow.md)**:
+- 5-step sizing methodology
+- Size categorization (small/medium/large)
+- Dynamic Phase 3 configuration logic
+- Error handling and fallback strategies
+- Integration with business context from Phase 1
+
+### Phase 3: Code Mapping
 
 **Goal**: Build comprehensive architecture understanding.
 
-**Execution**: Spawn `codebase-mapper` agents in parallel for large codebases.
+**Execution**: Spawn `codebase-mapper` agents **dynamically configured from Phase 2 sizing-report.json**.
 
-**Each agent prompt MUST include OUTPUT_DIRECTORY:**
+**Dynamic agent spawning** (replaces hardcoded paths):
+```typescript
+// Load sizing strategy from Phase 2
+const sizingReport = JSON.parse(
+  await readFile('.claude/.output/threat-modeling/{timestamp}-{slug}/phase-2/sizing-report.json')
+);
 
+// Spawn agents based on strategy
+if (sizingReport.strategy.tier === "small") {
+  // Single agent for entire codebase
+  Task("codebase-mapper", `Analyze ${scope.path}`, "codebase-mapper");
+} else {
+  // Parallel agents per discovered component
+  for (const component of sizingReport.strategy.components_to_spawn) {
+    Task("codebase-mapper",
+         `Analyze ${component.path}: ${component.files} files`,
+         "codebase-mapper");
+  }
+}
 ```
-Task("codebase-mapper", "
-Analyze {component-path} for threat modeling.
 
-OUTPUT_DIRECTORY: {OUTPUT_DIR}
-Mode: orchestrated
-Output file: ${OUTPUT_DIR}/codebase-mapping-{component-slug}.md
+**Artifacts produced** (in `phase-3/`):
+- `manifest.json` - File inventory
+- `components/*.json` - Per-component analysis
+- `entry-points.json` - Attack surface
+- `data-flows.json` - Data movement
+- `trust-boundaries.json` - Security boundaries
+- `summary.md` - <2000 token handoff
 
-[Analysis requirements...]
+**Checkpoint**: Present findings, ask for approval before Phase 4.
 
-MANDATORY SKILLS (invoke ALL before completing):
-- persisting-agent-outputs: For file persistence to OUTPUT_DIRECTORY
+See [references/phase-3-codebase-mapping-workflow.md](references/phase-3-codebase-mapping-workflow.md) for detailed steps.
 
-COMPLIANCE: Document invoked skills in output metadata. I will verify.
-", "codebase-mapper")
-```
+### Phase 4: Security Controls Mapping (Batched Execution)
 
-**CRITICAL**: Agents detect orchestrated mode when OUTPUT_DIRECTORY is provided. They will:
+**Goal**: Identify existing security mechanisms and gaps through granular concern-focused investigation.
 
-- Save to `${OUTPUT_DIR}/{filename}.md`
-- NOT create their own timestamped directory
-- Use the orchestrator's directory structure
+**Execution**: Spawn `security-controls-mapper` agents in **batched parallel** mode, one agent per security concern, batched by severity.
 
-**Artifacts produced** (flat files in OUTPUT_DIR):
-
-- `codebase-mapping.md` - Consolidated analysis
-- `codebase-mapping-{component}.md` - Per-component analysis (if parallel)
-
-**Checkpoint**: Present findings, ask for approval.
-
-See [references/phase-1-workflow.md](references/phase-1-workflow.md) for detailed steps.
-
-### Step 3: Phase 2 - Security Controls Mapping
-
-**Goal**: Identify existing security mechanisms and gaps.
-
-**Execution**: Spawn `security-controls-mapper` agents in parallel.
+**Execution Strategy**:
+1. Derive security concerns from Phase 3 architecture artifacts (entry points, data flows, trust boundaries, components) with severity ratings. Severity ratings are assigned based on: (1) proximity to crown jewels from Phase 1, (2) exposure level from entry-points.json, (3) data sensitivity from data-flows.json
+2. Execute in severity-ordered batches: CRITICAL → HIGH → MEDIUM → LOW → INFO
+3. One dedicated agent per concern (not per control category)
+4. Batch size = number of concerns at that severity level
+5. Consolidate after each batch (cumulative updates)
+6. Checkpoint between batches for user approval
 
 **Each agent prompt MUST include OUTPUT_DIRECTORY:**
 
@@ -270,57 +420,75 @@ COMPLIANCE: Document invoked skills in output metadata. I will verify.
 
 **Checkpoint**: Present controls found and gaps, ask for approval.
 
-See [references/phase-2-workflow.md](references/phase-2-workflow.md) for detailed steps.
+See [references/phase-4-security-controls-workflow.md](references/phase-4-security-controls-workflow.md) for detailed steps.
 
-### Step 4: Phase 3 - Threat Modeling
+See [references/phase-4-batched-execution.md](references/phase-4-batched-execution.md) for complete batched execution strategy.
+
+See [references/investigation-file-schema.md](references/investigation-file-schema.md) for per-concern investigation JSON schema.
+
+See [references/consolidation-algorithm.md](references/consolidation-algorithm.md) for how investigations map to control categories.
+
+### Phase 5: Threat Modeling
 
 **Goal**: Identify threats using STRIDE + PASTA + DFD methodology.
 
-**Execution**: Sequential (needs holistic view). Read and apply `threat-modeling` skill.
+**Execution**: Sequential (needs holistic view). Spawn single `threat-modeler` agent.
 
-**Inputs**: Load Phase 0 (business context), Phase 1 (codebase mapping), and Phase 2 (security controls) from OUTPUT_DIR.
+**Agent spawn**:
+```typescript
+Task("threat-modeler", `Execute threat modeling with STRIDE + PASTA + DFD methodology`, "threat-modeler")
+```
 
-**Artifacts produced** (flat files in OUTPUT_DIR):
+**Inputs**: Load Phase 1, Phase 3, and Phase 4 summaries and key artifacts.
 
-- `threat-model.md` - Comprehensive threat analysis with STRIDE categorization
+**Artifacts produced** (in `phase-5/`):
+- `threat-model.json` - Structured threat entries with CVSS scores (version per config)
+- `abuse-cases/*.json` - Per-category abuse scenarios
+- `attack-trees/*.md` - Attack path diagrams
+- `risk-matrix.json` - CVSS severity band distribution
+- `summary.md` - <2000 token handoff with top CVSS-scored threats
 
-**Checkpoint**: Present top threats and abuse cases, ask for approval.
+**Checkpoint**: Present top threats and abuse cases, ask for approval before Phase 6.
 
-See [references/phase-3-workflow.md](references/phase-3-workflow.md) for detailed steps.
+See [references/phase-5-threat-modeling-workflow.md](references/phase-5-threat-modeling-workflow.md) for detailed steps.
 
-### Step 5: Phase 4 - Security Test Planning
+### Phase 6: Security Test Planning
 
 **Goal**: Generate prioritized, actionable test plan.
 
-**Execution**: Sequential. Read and apply `security-test-planning` skill.
+**Execution**: Sequential. Spawn single `security-test-planner` agent.
 
-**Inputs**: Load Phase 0 (business context), Phase 1 (entry points), and Phase 3 (threat model) from OUTPUT_DIR.
+**Agent spawn**:
+```typescript
+Task("security-test-planner", `Generate prioritized security test plan from Phase 5 threats`, "security-test-planner")
+```
 
-**Artifacts produced** (flat files in OUTPUT_DIR):
+**Inputs**: Load Phase 5 threat model and Phase 3 entry points.
 
-- `test-plan.md` - Comprehensive test plan with prioritized targets
+**Artifacts produced** (in `phase-6/`):
+- `code-review-plan.json` - Prioritized files
+- `sast-recommendations.json` - Static analysis focus
+- `dast-recommendations.json` - Dynamic testing targets
+- `sca-recommendations.json` - Software composition analysis
+- `manual-test-cases.json` - Threat-driven tests
+- `test-priorities.json` - Test execution priority matrix
+- `summary.md` - Execution roadmap
 
 **Checkpoint**: Present test plan, ask for final approval.
 
-See [references/phase-4-workflow.md](references/phase-4-workflow.md) for detailed steps.
+See [references/phase-6-test-planning-workflow.md](references/phase-6-test-planning-workflow.md) for detailed steps.
 
-### Step 6: Final Report Generation
+### Final Report Generation
 
 **Consolidate all phases** into final deliverable:
 
-| Format   | File           | Purpose                                               |
-| -------- | -------------- | ----------------------------------------------------- |
-| Markdown | `SYNTHESIS.md` | Comprehensive report consolidating all phase findings |
+| Format | File | Purpose |
+|--------|------|---------|
+| Markdown | `threat-model-report.md` | Human-readable report |
+| JSON | `threat-model-data.json` | Machine-readable data |
+| SARIF | `threat-model.sarif` | IDE integration |
 
-The SYNTHESIS.md file should include:
-
-- Executive summary with key findings
-- Business context (crown jewels, compliance, threat actors)
-- Architecture overview from codebase mapping
-- Security controls assessment
-- Threat model with STRIDE analysis
-- Prioritized test plan
-- Recommendations
+**Note on file naming**: `threat-model-data.json` (final report) consolidates and extends `phase-5/threat-model.json` (intermediate). The final report includes all Phase 5 threats plus executive summary, remediation priorities, and cross-phase context. Phase 5's intermediate file is retained for traceability.
 
 See [references/report-templates.md](references/report-templates.md) for output schemas.
 
@@ -333,8 +501,8 @@ Between each phase, write a handoff file (flat files in OUTPUT_DIR):
 ```json
 {
   "sessionId": "{timestamp}-{slug}",
-  "fromPhase": 0,
-  "toPhase": 1,
+  "fromPhase": 1,
+  "toPhase": 2,
   "timestamp": "2026-01-04T15:28:47Z",
   "summary": {
     "keyFindings": ["..."],
@@ -351,11 +519,11 @@ Between each phase, write a handoff file (flat files in OUTPUT_DIR):
 }
 ```
 
-**File naming**: `handoff-phase-{N}-to-{M}.json` (flat, not in subdirectory)
+**File naming**: `phase-{N}-to-{M}.json` in the handoffs/ subdirectory
 
 **Why handoffs matter**: Phases run in separate contexts. Handoffs compress findings for downstream use.
 
-**Phase 0 in handoffs**: All handoffs from Phase 1+ must include Phase 0 summary with crown jewels and compliance context to enable risk-based analysis.
+**Phase 1 in handoffs**: All handoffs from Phase 2+ must include Phase 1 summary with crown jewels and compliance context to enable risk-based analysis.
 
 See [references/handoff-schema.md](references/handoff-schema.md) for complete schema.
 
@@ -365,13 +533,11 @@ See [references/handoff-schema.md](references/handoff-schema.md) for complete sc
 
 Use these templates for human approval gates:
 
-### After Phase 0
-
+### After Phase 1
 ```markdown
-## Phase 0 Complete: Business Context Discovery
+## Phase 1 Complete: Business Context Discovery
 
 ### What I Found:
-
 - **Application**: {One-line business purpose}
 - **Crown Jewels**: {Top 3-5 most sensitive assets}
 - **Threat Actors**: {Relevant attacker profiles}
@@ -379,46 +545,40 @@ Use these templates for human approval gates:
 - **Compliance**: {Applicable regulations}
 
 ### Key Insights:
-
 - {Business-specific finding that shapes approach}
 - {Compliance requirement determining controls}
 - {Threat actor profile guiding threats}
 
 ### Questions for You:
-
 - Is this business understanding correct?
 - Any sensitive data I missed?
 - Any threat actors I should consider?
 - Any compliance requirements I overlooked?
 - Does the business impact seem reasonable?
 
-**Approve to proceed to Phase 1: Codebase Mapping?** [Yes/No/Revise]
+**Approve to proceed to Phase 2: Codebase Sizing?** [Yes/No/Revise]
 
-If approved, Phase 1 will focus on: {Components handling crown jewels}
+If approved, Phase 2 will automatically assess codebase size to configure Phase 3.
 ```
 
-### After Phase 1
-
+### After Phase 3
 ```markdown
-## Phase 1 Complete: Codebase Understanding
+## Phase 3 Complete: Code Mapping
 
 ### What I Found:
-
-- {X} components identified
+- {X} components identified (discovered via Phase 2 sizing)
 - {Y} entry points (attack surface)
 - {Z} data flows mapped
 
 ### Key Architecture Points:
-
 1. {Summary point 1}
 2. {Summary point 2}
 
 ### Questions for You:
-
 - Is this architecture understanding correct?
 - Any components I missed?
 
-**Approve to proceed to Security Controls Mapping?** [Yes/No/Revise]
+**Approve to proceed to Phase 4: Security Controls Mapping?** [Yes/No/Revise]
 ```
 
 See [references/checkpoint-prompts.md](references/checkpoint-prompts.md) for all phase templates.
@@ -429,31 +589,37 @@ See [references/checkpoint-prompts.md](references/checkpoint-prompts.md) for all
 
 ```
 .claude/.output/threat-modeling/{timestamp}-{slug}/
-├── metadata.json                  # Status, timestamps, phase tracking
-├── scope.json                     # User-selected scope
-├── business-context.md            # Phase 0 output
-├── codebase-mapping.md            # Phase 1 consolidated output
-├── codebase-mapping-frontend.md   # Phase 1: codebase-mapper agent (if parallel)
-├── codebase-mapping-backend.md    # Phase 1: codebase-mapper agent (if parallel)
-├── security-controls.md           # Phase 2 output
-├── threat-model.md                # Phase 3 output
-├── test-plan.md                   # Phase 4 output
-├── checkpoint-phase-0.json        # Human approval records (flat, not in subdirectory)
-├── checkpoint-phase-1.json
-├── checkpoint-phase-2.json
-├── checkpoint-phase-3.json
-├── checkpoint-phase-4.json
-├── handoff-phase-0-to-1.json      # Phase transitions (flat, not in subdirectory)
-├── handoff-phase-1-to-2.json
-├── handoff-phase-2-to-3.json
-├── handoff-phase-3-to-4.json
-└── SYNTHESIS.md                   # Final consolidated report
+├── config.json              # Session configuration
+├── scope.json               # User-selected scope
+├── checkpoints/             # Human approval records
+│   ├── phase-1-checkpoint.json
+│   ├── phase-3-checkpoint.json
+│   ├── phase-4-checkpoint.json
+│   ├── phase-5-checkpoint.json
+│   └── phase-6-checkpoint.json
+├── phase-1/                 # Business context outputs (MANDATORY FIRST)
+├── phase-2/                 # Codebase sizing outputs (automatic, no checkpoint)
+│   └── sizing-report.json   # Primary output with parallelization strategy
+├── phase-3/                 # Code mapping outputs (dynamic from phase-2)
+├── phase-4/                 # Security controls outputs
+├── phase-5/                 # Threat model outputs
+├── phase-6/                 # Test plan outputs
+├── handoffs/                # Phase transition records
+│   ├── phase-1-to-2.json
+│   ├── phase-2-to-3.json
+│   ├── phase-3-to-4.json
+│   ├── phase-4-to-5.json
+│   └── phase-5-to-6.json
+└── final-report/            # Consolidated outputs (includes business context)
+    ├── threat-model-report.md
+    ├── threat-model-data.json
+    └── threat-model.sarif
+
 ```
 
 ---
 
-## Parallel Execution Strategy
-
+## Templates
 For large codebases, spawn multiple agents with OUTPUT_DIRECTORY:
 
 ```
@@ -497,49 +663,57 @@ COMPLIANCE: Document invoked skills in output metadata. I will verify.
 
 ---
 
-## Error Handling
+## Parallel Execution and Error Handling
 
-| Error                   | Cause               | Solution                                 |
-| ----------------------- | ------------------- | ---------------------------------------- |
-| Agent timeout           | Component too large | Split into smaller scopes                |
-| Missing artifacts       | Phase incomplete    | Re-run phase before proceeding           |
-| User rejects checkpoint | Findings incorrect  | Go back, address feedback, re-checkpoint |
-| Skill not found         | Missing dependency  | Create required skill first              |
+**Dynamic agent spawning** based on Phase 2 sizing-report.json configures optimal parallelization:
 
----
+- **Small codebases** (<1k files): Single agent
+- **Medium codebases** (1k-10k files): 2-5 parallel agents per discovered component
+- **Large codebases** (>10k files): 5-10 parallel agents with sampling
 
-## Troubleshooting
+**Always consolidate** parallel results before checkpoints.
 
-**Problem**: Phase 3 produces generic threats
-**Solution**: Ensure Phase 1 data-flows.json and Phase 2 control-gaps.json are loaded.
-
-**Problem**: Too many findings to review
-**Solution**: Use risk scoring to prioritize. Present top 10 first.
-
-**Problem**: User wants to skip phases
-**Solution**: Explain downstream dependencies. Offer reduced scope instead.
+**For complete parallel execution strategies and comprehensive error recovery**, see [Parallel Execution and Error Handling](references/parallel-execution-and-error-handling.md):
+- Dynamic agent spawning from Phase 2
+- Strategy tiers and component discovery
+- Phase 4 batched execution (concern-focused)
+- Consolidation between parallel runs
+- Error recovery for all phases (sizing, mapping, controls, threats, testing)
+- Checkpoint rejection handling
+- Session corruption recovery
+- Performance optimization guidelines
 
 ---
 
 ## References
 
-- [references/phase-1-workflow.md](references/phase-1-workflow.md) - Codebase mapping details
-- [references/phase-2-workflow.md](references/phase-2-workflow.md) - Security controls mapping
-- [references/phase-3-workflow.md](references/phase-3-workflow.md) - Threat modeling methodology
-- [references/phase-4-workflow.md](references/phase-4-workflow.md) - Test planning workflow
-- [references/handoff-schema.md](references/handoff-schema.md) - Handoff JSON schema
+- [references/phase-2-codebase-sizing-workflow.md](references/phase-2-codebase-sizing-workflow.md) - Codebase sizing details
+- [references/phase-3-codebase-mapping-workflow.md](references/phase-3-codebase-mapping-workflow.md) - Code mapping details
+- [references/phase-4-security-controls-workflow.md](references/phase-4-security-controls-workflow.md) - Security controls mapping workflow
+- [references/phase-4-batched-execution.md](references/phase-4-batched-execution.md) - Batched parallel execution strategy
+- [references/phase-4-to-5-compatibility.md](references/phase-4-to-5-compatibility.md) - Phase 4/5 integration patterns
+- [references/investigation-file-schema.md](references/investigation-file-schema.md) - Per-concern investigation JSON schema
+- [references/consolidation-algorithm.md](references/consolidation-algorithm.md) - How investigations map to control categories
+- [references/phase-5-threat-modeling-workflow.md](references/phase-5-threat-modeling-workflow.md) - Threat modeling methodology
+- [references/phase-6-test-planning-workflow.md](references/phase-6-test-planning-workflow.md) - Test planning workflow
+- [references/handoff-protocol.md](references/handoff-protocol.md) - Handoff JSON schema and examples
+- [references/methodology-selection.md](references/methodology-selection.md) - Threat modeling methodology selection
 - [references/checkpoint-prompts.md](references/checkpoint-prompts.md) - Human checkpoint templates
 - [references/report-templates.md](references/report-templates.md) - Final report formats
 
 ## Related Skills
 
-- `business-context-discovery` - Phase 0 methodology (MANDATORY FIRST)
-- `codebase-mapping` - Phase 1 methodology (used by codebase-mapper agent)
-- `security-controls-mapping` - Phase 2 methodology
-- `threat-modeling` - Phase 3 methodology
-- `security-test-planning` - Phase 4 methodology
+- `business-context-discovery` - Phase 1 methodology (MANDATORY FIRST)
+- `codebase-sizing` - Phase 2 methodology (used by codebase-sizer agent)
+- `codebase-mapping` - Phase 3 methodology (used by codebase-mapper agent)
+- `security-controls-mapping` - Phase 4 methodology
+- `threat-modeling` - Phase 5 methodology
+- `security-test-planning` - Phase 6 methodology
 
 ## Related Agents
 
-- `codebase-mapper` - Executes Phase 1 in parallel
-- `security-controls-mapper` - Executes Phase 2 in parallel (pending creation)
+- `codebase-sizer` - Executes Phase 2 (single agent, automatic)
+- `codebase-mapper` - Executes Phase 3 in dynamic parallel (configured by Phase 2)
+- `security-controls-mapper` - Executes Phase 4 in batched parallel (one agent per concern)
+- `threat-modeler` - Executes Phase 5 (sequential threat identification and CVSS scoring)
+- `security-test-planner` - Executes Phase 6 (sequential test plan generation)

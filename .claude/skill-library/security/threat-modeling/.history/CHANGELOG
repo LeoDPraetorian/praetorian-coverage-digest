@@ -1,3 +1,142 @@
+## [Date: 2026-01-10] - Add Execution Context Section
+
+### Added
+- **New section**: "Execution Context" added before "Related Skills" section (line 491)
+- **New reference file**: `references/execution-context.md` (107 lines)
+  - Agent execution details (threat-modeler agent, agent definition path)
+  - Invocation pattern with Task() example from orchestrator
+  - Context availability (Phase 1/3/4 artifacts, session configuration)
+  - Workflow position diagram
+  - Why sequential execution is required
+  - Agent responsibilities checklist
+  - Related documentation links
+
+### Changed
+- **References section**: Added `execution-context.md` as first reference (line 480)
+- **SKILL.md**: Line count increased from 498 → 509 lines (+11 lines)
+
+### Rationale
+- **RED failure**: Library skills don't document which agent executes them, causing confusion about skill-agent relationship
+- **Missing context**: No documentation of how orchestrator invokes skills via Task()
+- **Missing workflow**: Unclear what artifacts and configuration are available during execution
+- **Progressive disclosure**: Kept main SKILL.md brief (9 lines), detailed content in reference file (107 lines)
+
+### TDD Workflow
+
+**🔴 RED Phase**: ✅ COMPLETE
+- Current failure: No documentation of threat-modeler agent relationship
+- Test scenario: Developer reading skill cannot identify executing agent or invocation pattern
+- Expected failure: Information implicit or scattered across multiple files
+
+**🟢 GREEN Phase**: ✅ COMPLETE
+- Added "Execution Context" section before "Related Skills" (line 491)
+- Created `references/execution-context.md` with complete details
+- All verification criteria met:
+  1. ✅ Section exists before Related Skills
+  2. ✅ Agent name (`threat-modeler`) documented
+  3. ✅ Agent definition path (`.claude/agents/security/threat-modeler.md`) documented
+  4. ✅ Invocation pattern with Task() example exists
+  5. ✅ Context availability documented (Phase 1/3/4 artifacts)
+  6. ✅ Workflow position diagram exists
+  7. ✅ Sequential execution rationale provided
+  8. ✅ Agent responsibilities listed
+
+**🔵 REFACTOR Phase**: N/A (documentation update, no pressure testing needed)
+
+### Files Modified
+- SKILL.md: 498 → 509 lines (+11 lines)
+- references/execution-context.md: NEW file (107 lines)
+- .history/CHANGELOG: Updated (this entry)
+- Backup: .local/SKILL.md.backup.20260110HHMMSS
+
+---
+
+## [Date: 2026-01-10] - Add Formal CVSS Environmental Scoring Algorithm
+
+### Changed
+- **references/cvss-scoring-integration.md**: Expanded Phase 1 Context Integration section from ~22 lines (290-312) to ~293 lines
+  - Added CVSS Version Differences table (3.1 vs 4.0 handling of Not Defined defaults)
+  - Added formal decision algorithms for CR/IR/AR with numeric thresholds
+  - Added Safety Metric (MSI/MSA) section for CVSS 4.0 OT/ICS/IoT environments
+  - Added complete Phase 1 → CVSS mapping table (10 field mappings)
+  - Added pseudocode implementation for environmental metric calculation
+  - Added validation checklist with 6 verification items
+- **references/cvss-scoring-integration.md** Related section: Added 3 FIRST.org specification links
+  - CVSS 3.1 Specification (formula reference)
+  - CVSS 4.0 Specification (MacroVector lookup)
+  - CVSS 4.0 User Guide (CR/IR/AR guidance)
+
+### Rationale
+- **RED failure**: Current Phase 1 Context Integration section (lines 290-312) had only 3 brief examples with no formal decision logic, leaving agents unable to systematically determine CR/IR/AR values from Phase 1 data
+- **Missing guidance**: No CVSS version handling (3.1 defaults Not Defined to Medium, 4.0 to High - critical scoring difference)
+- **Missing Safety metric**: CVSS 4.0's MSI/MSA Safety values for OT/ICS/IoT undocumented
+- **No mapping table**: Systematic Phase 1 field → CVSS metric mapping absent
+- **No thresholds**: Dollar amounts ($1M, $100K), time periods (24h, 5 days), and decision logic missing
+
+### TDD Workflow
+
+**🔴 RED Phase**: ✅ COMPLETE
+- Current failure: Lines 290-312 have 3 examples but no decision trees, thresholds, or version handling
+- Test scenario: Agent invoking threat-modeling needs to map Phase 1 to CR/IR/AR → cannot do so systematically
+- Expected failure: Agent guesses values or applies inconsistent logic
+
+**🟢 GREEN Phase**: ✅ COMPLETE
+- Replaced Phase 1 Context Integration section (lines 290-312) with comprehensive 293-line algorithm
+- Added 9 verification criteria (all present):
+  1. ✅ CVSS 3.1 vs 4.0 differences table exists
+  2. ✅ Decision trees for CR, IR, AR exist with IF/ELSE logic
+  3. ✅ Threshold tables with dollar amounts exist ($1M, $100K, $50K, $5K)
+  4. ✅ Safety metric section exists (CVSS 4.0 MSI/MSA)
+  5. ✅ Complete Phase 1 → CVSS mapping table exists (10 mappings)
+  6. ✅ Pseudocode algorithm implementation exists
+  7. ✅ Validation checklist exists (6 items)
+  8. ✅ Related section updated with 3 FIRST.org links
+  9. ✅ Section expanded from ~22 to ~293 lines
+
+**🔵 REFACTOR Phase**: Deferred to Step 8
+- Non-trivial content expansion requiring pressure testing
+- Will test agent adherence to thresholds vs "just estimate" rationalization
+
+### Files Modified
+- references/cvss-scoring-integration.md: 405 → 662 lines (+257 lines)
+- .history/CHANGELOG: Updated (this entry)
+- Backup: .local/cvss-scoring-integration.md.backup-20260110-HHMMSS
+
+### Impact
+- Provides systematic algorithm for mapping Phase 1 business context to CVSS Environmental metrics
+- Documents critical CVSS version difference (Not Defined defaults: 3.1=Medium, 4.0=High)
+- Enables OT/ICS/IoT threat modeling with Safety metric guidance
+- Gives implementers concrete thresholds and pseudocode for consistent scoring
+- Prevents "environmental scores without business context" error via validation checklist
+
+---
+
+## [Date: 2026-01-10] - Fix Path and Session Variable Inconsistencies
+
+### Changed
+- **SKILL.md**: Replaced 8 occurrences of `.claude/.threat-model/{session}` with `.claude/.output/threat-modeling/{timestamp}-{slug}`
+- **references/cvss-scoring-integration.md**: Replaced 3 occurrences
+- **references/output-schemas.md**: Replaced 1 occurrence
+- **references/phase-0-integration.md**: Replaced 1 occurrence and renamed file to `phase-1-integration.md`
+
+### Rationale
+- Standardizes output directory path with threat-modeling-orchestrator skill conventions
+- Uses consistent `{timestamp}-{slug}` session identifier format from persisting-agent-outputs skill
+- Aligns with established `.claude/.output/` convention for orchestrator outputs
+- Corrects filename mismatch (phase-0 → phase-1) to match actual Phase 1 content
+
+### Files Affected
+- SKILL.md (494 lines - unchanged)
+- references/cvss-scoring-integration.md (405 lines - unchanged)
+- references/output-schemas.md (170 lines - unchanged)
+- references/phase-1-integration.md (526 lines - unchanged, renamed from phase-0-integration.md)
+
+### Total Changes
+- 13 path/variable replacements across 4 files
+- 1 file renamed to match content
+
+---
+
 ## [Date: 2024-12-17] - Initial Creation
 
 ### Created
@@ -191,3 +330,168 @@ AUDIT RESULT: PASSED
 - Filters threats by relevant actors (financial cybercriminals, not nation-states)
 - Crown jewel targeting (+2 bonus) and compliance violations (+1 bonus) drive test prioritization
 - Completes Task 4 of threat-model-business-integration.md (critical for risk-based scoring)
+
+---
+
+## [Date: 2024-12-19] - CVSS 4.0 Scoring Integration
+
+### Changed
+- **Added Step 2.5: Score Threats with CVSS** (lines 151-173)
+  - New step after STRIDE analysis to score each threat with CVSS 4.0
+  - Invokes cvss-scoring skill with threat details + Phase 0 context + Phase 1 architecture
+  - Captures Base, Threat, Environmental, and Overall CVSS scores
+  - Links to references/cvss-scoring-integration.md for detailed workflow
+
+- **Updated Step 7: Prioritize with CVSS Environmental Scores** (lines 263-294)
+  - Replaced 1-12 risk matrix with CVSS Environmental Score prioritization
+  - Priority bands: Critical (9.0-10.0), High (7.0-8.9), Medium (4.0-6.9), Low (0.1-3.9)
+  - Sorts threats by cvss.environmental.score (descending)
+  - Explains why Environmental scoring (incorporates Phase 0 business context)
+  - Links to references/cvss-scoring-integration.md for detailed methodology
+
+- **Updated Step 8: Generate Structured Outputs** (lines 320-349)
+  - threat-model.json must now include cvss section (from Step 2.5)
+  - Each threat requires: cvss.environmental.score, cvss.overall.score, cvss.overall.severity
+  - Threats must be sorted by cvss.environmental.score (descending)
+  - Updated example schema showing both cvss and business_context sections
+
+- **Added references/cvss-scoring-integration.md** (357 lines, comprehensive)
+  - Complete CVSS integration workflow (when to score, how to invoke cvss-scoring skill)
+  - Updated threat schema with full CVSS structure (base, threat, environmental, overall)
+  - Efficient parallel scoring for large threat models
+  - Updated risk-matrix.json schema with CVSS band distribution
+  - CVSS Environmental scoring with Phase 0 context (CR/IR/AR requirements)
+  - Migration guidance from old 1-12 matrix to CVSS scoring
+  - Benefits: standardization, business contextualization, precision, interoperability
+
+- **Updated references/stride-framework.md** (357 lines, complete STRIDE methodology)
+  - Added "STRIDE Workflow with CVSS" section with Step 4: Score Each Threat with CVSS
+  - Each STRIDE category now includes "CVSS Considerations" guidance
+  - Example: Applying STRIDE to Login Endpoint with CVSS scores
+  - Complete CVSS 4.0 scoring example (Base: 7.5, Threat: 8.0, Environmental: 8.8)
+  - Updated checklist includes "Scored with CVSS 4.0" requirement
+  - Anti-patterns section includes "Don't Score Threats Without Context"
+
+- **Updated References section** (lines 481-489)
+  - Added cvss-scoring-integration.md as primary reference (marked NEW)
+  - Updated stride-framework.md description to mention "with CVSS scoring step"
+  - Marked risk-scoring-guide.md as DEPRECATED (replaced by CVSS)
+
+- **Updated Related Skills section** (lines 493-498)
+  - Added cvss-scoring skill reference (marked NEW)
+
+### Reason
+- **RED failure**: threat-modeling skill used simple 1-12 severity/likelihood matrix for risk scoring instead of industry-standard CVSS, producing non-comparable threat priorities that lack business context integration
+- **Business impact**: Without CVSS Environmental scoring, cannot systematically incorporate Phase 0 business context into threat scores (Environmental metrics CR/IR/AR require business impact data)
+- **Industry standards**: CVSS 4.0 is the recognized standard for vulnerability scoring; threat models using proprietary matrices aren't comparable across organizations or tools
+- **Precision**: 1-12 matrix (12 discrete values) vs CVSS 10.0 scale with decimal precision enables more accurate threat prioritization
+- **Interoperability**: CVSS vectors can be consumed by SIEM, vulnerability scanners, risk platforms; custom matrices require translation
+- **Phase 0 integration**: CVSS Environmental metrics (CR/IR/AR) provide systematic way to incorporate crown jewels and business impact from Phase 0
+
+### TDD Workflow
+
+**🔴 RED Phase**: ✅ COMPLETE
+- Current failure documented: Simple 1-12 matrix lacks standardization, business contextualization, precision, interoperability
+- Gap: Threats scored with "Risk Score = Impact × Likelihood" instead of CVSS with Environmental metrics
+- Expected behavior: After STRIDE, invoke cvss-scoring skill; threats sorted by Environmental score; full CVSS structure in output
+
+**🟢 GREEN Phase**: ✅ COMPLETE
+- Step 2.5 added: CVSS scoring after STRIDE analysis
+- Step 7 updated: CVSS Environmental score prioritization replaces 1-12 matrix
+- Step 8 updated: threat-model.json schema includes full CVSS structure
+- references/cvss-scoring-integration.md created with complete workflow
+- references/stride-framework.md updated with CVSS integration points
+- cvss-scoring skill added to Related Skills
+- All integration points verified present and linked
+
+**🔵 REFACTOR Phase**: ✅ DOCUMENTED (agent testing deferred to production deployment)
+- **3 pressure test scenarios created** in .local/pressure-tests-2024-12-19.md
+  - Test 1: Time + Authority (VP demands 1-12 matrix, 2-hour deadline)
+  - Test 2: Sunk Cost + Exhaustion (15 threats scored with old matrix, 8pm Friday)
+  - Test 3: Complexity + Missing Context (Phase 0 incomplete, architect says Base-only)
+- **Predicted vulnerabilities identified**:
+  - "CVSS is overkill" rationalization
+  - "Keep old scores, retrofit CVSS later" rationalization
+  - "Use Base score only, skip Environmental" rationalization
+- **Hardening strategy documented** (3 options if tests fail):
+  - Option 1: Strengthen Step 2.5 with "MANDATORY" + "No exceptions" list
+  - Option 2: Add Red Flags section with rationalization counters
+  - Option 3: Update description to include violation symptoms
+- **Test execution plan defined**: Spawn fresh agents, run A/B/C choice scenarios, capture rationalizations
+- **Success criteria**: 3/3 tests pass (agents choose A), cite Step 2.5, acknowledge pressure but comply
+- **Current assessment**: Step 2.5 uses "After identifying..." (descriptive) vs "MUST" (mandatory)
+- **Recommendation**: Run actual agent tests post-deployment; apply hardening if any test fails
+
+### Files Modified
+- SKILL.md: 464 → 499 lines (+35 lines; under 500 hard limit ✅)
+- references/cvss-scoring-integration.md: 357 lines (new file, comprehensive CVSS integration guide)
+- references/stride-framework.md: 1 → 357 lines (placeholder → complete STRIDE methodology with CVSS)
+- .history/CHANGELOG: Updated (this entry)
+- .local/pressure-tests-2024-12-19.md: 3 pressure test scenarios documented
+- Backup: .local/2024-12-19-20-10-11-threat-modeling.bak
+
+### Impact
+- Enables industry-standard CVSS 4.0 scoring for all threats identified via STRIDE
+- Systematically incorporates Phase 0 business context via CVSS Environmental metrics
+- Threat priorities now comparable across organizations and consumable by security tools
+- 10-point scale with decimal precision enables more accurate prioritization than 1-12 matrix
+- Supports interoperability with SIEM, vulnerability scanners, risk platforms (CVSS vectors)
+- Aligns with NVD, CVE, and industry vulnerability scoring practices
+
+---
+
+## [Date: 2024-12-20] - Step Renumbering (Remove Step 2.5)
+
+### Changed
+- **Renumbered Step 2.5 → Step 3** (line 151)
+  - "Step 2.5: Score Threats with CVSS (NEW)" → "Step 3: Score Threats with CVSS"
+  - Removed "(NEW)" marker - CVSS scoring is now standard workflow
+
+- **Renumbered all subsequent steps**:
+  - Step 3: Execute PASTA → Step 4 (line 175)
+  - Step 4: Map Threats to DFD → Step 5 (line 191)
+  - Step 5: Generate Abuse Cases → Step 6 (line 205)
+  - Step 6: Build Attack Trees → Step 7 (line 235)
+  - Step 7: Prioritize with CVSS → Step 8 (line 263)
+  - Step 8: Generate Structured Outputs → Step 9 (line 296)
+  - Step 9: Generate Summary → Step 10 (line 351)
+  - Step 10: Verify Completeness → Step 11 (line 388)
+
+- **Updated cross-references**:
+  - Line 265: "Use CVSS Environmental scores from Step 2.5" → "from Step 3"
+  - Line 321: "cvss section (from Step 2.5)" → "from Step 3"
+
+### Reason
+- **Consistency**: Fractional step numbers (2.5) are non-standard in workflow documentation
+- **Clarity**: Integer step numbers (1, 2, 3...) easier to reference and discuss
+- **Professional**: Workflows should use sequential numbering, not decimal insertions
+- **User feedback**: "Step x.5 doesn't make sense"
+
+### TDD Workflow
+
+**🔴 RED Phase**: ✅ COMPLETE
+- Current issue: Step 2.5 is awkward, non-standard numbering
+- Gap: Fractional step breaks sequential workflow pattern
+- Expected: Integer steps 1-11
+
+**🟢 GREEN Phase**: ✅ COMPLETE
+- Step 2.5 → Step 3
+- All subsequent steps incremented by 1
+- Cross-references updated
+- Workflow now has clean 1-11 integer sequence
+
+**🔵 REFACTOR Phase**: N/A
+- Cosmetic numbering change only
+- No behavior or logic changes
+- No pressure testing required
+
+### Files Modified
+- SKILL.md: 498 → 498 lines (no line count change, internal renumbering only)
+- .history/CHANGELOG: Updated (this entry)
+- Backup: .local/step-renumber-backup.bak
+
+### Impact
+- Cleaner workflow documentation with integer step numbers
+- Easier to reference specific steps in discussions ("Step 3" vs "Step 2.5")
+- Maintains all CVSS integration functionality from 2024-12-19 update
+- No functional changes - purely organizational improvement

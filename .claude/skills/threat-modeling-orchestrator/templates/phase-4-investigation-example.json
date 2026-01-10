@@ -1,0 +1,94 @@
+{
+  "concern": {
+    "id": "jwt-validation-weakness",
+    "title": "JWT Token Validation May Accept Invalid Signatures",
+    "severity": "CRITICAL",
+    "category": "authentication",
+    "source": "Phase 3: entry-points.json - API Gateway JWT validation"
+  },
+  "investigation": {
+    "filesAnalyzed": [
+      "./modules/chariot/backend/pkg/auth/jwt.go",
+      "./modules/chariot/backend/pkg/handler/middleware/auth.go",
+      "./modules/chariot/backend/pkg/cognito/validator.go"
+    ],
+    "timeSpent": "15 minutes",
+    "linesReviewed": 347
+  },
+  "controlsFound": [
+    {
+      "control": "JWT Signature Verification",
+      "location": "./modules/chariot/backend/pkg/auth/jwt.go:45-67",
+      "implementation": "Uses aws-jwt-go library with RS256 algorithm",
+      "effectiveness": "Strong",
+      "evidence": "Verifies signature against Cognito public keys, rejects unsigned tokens"
+    },
+    {
+      "control": "Token Expiration Check",
+      "location": "./modules/chariot/backend/pkg/auth/jwt.go:89-95",
+      "implementation": "Validates 'exp' claim against current time",
+      "effectiveness": "Adequate",
+      "evidence": "Rejects expired tokens, no grace period"
+    },
+    {
+      "control": "Issuer Validation",
+      "location": "./modules/chariot/backend/pkg/auth/jwt.go:72-78",
+      "implementation": "Validates 'iss' claim matches Cognito user pool",
+      "effectiveness": "Strong",
+      "evidence": "Hardcoded issuer URL prevents token from other sources"
+    }
+  ],
+  "gapsIdentified": [
+    {
+      "gap": "No audience (aud) claim validation",
+      "severity": "HIGH",
+      "impact": "JWT tokens intended for other services could be accepted",
+      "location": "./modules/chariot/backend/pkg/auth/jwt.go",
+      "recommendation": "Add audience validation to ensure tokens are for this API",
+      "cvssBaseScore": 7.5,
+      "cvssVector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+    },
+    {
+      "gap": "Token revocation not checked",
+      "severity": "MEDIUM",
+      "impact": "Compromised tokens valid until expiration (typically 1 hour)",
+      "location": "./modules/chariot/backend/pkg/auth/jwt.go",
+      "recommendation": "Implement token revocation list (Redis-backed) or reduce token TTL",
+      "cvssBaseScore": 5.3,
+      "cvssVector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N"
+    }
+  ],
+  "complianceMapping": [
+    {
+      "requirement": "PCI-DSS 8.2.1 - Strong Authentication",
+      "status": "Partial",
+      "notes": "JWT signature verification adequate, but no MFA enforcement found"
+    },
+    {
+      "requirement": "SOC 2 CC6.1 - Logical Access",
+      "status": "Compliant",
+      "notes": "JWT validation provides logical access control"
+    }
+  ],
+  "attackScenarios": [
+    {
+      "scenario": "Attacker reuses JWT token from different application",
+      "likelihood": "Medium",
+      "impact": "High",
+      "mitigatedBy": null,
+      "exploitable": true
+    }
+  ],
+  "recommendations": {
+    "immediate": [
+      "Add audience (aud) claim validation to JWT verification"
+    ],
+    "shortTerm": [
+      "Implement token revocation list using Redis with 1-hour TTL"
+    ],
+    "longTerm": [
+      "Reduce JWT token TTL from 1 hour to 15 minutes",
+      "Add refresh token rotation mechanism"
+    ]
+  }
+}

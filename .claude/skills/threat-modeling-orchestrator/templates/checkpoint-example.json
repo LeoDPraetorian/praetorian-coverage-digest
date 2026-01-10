@@ -1,0 +1,36 @@
+{
+  "sessionId": "tm-20241220-a1b2c3",
+  "phase": 3,
+  "phaseName": "Codebase Mapping",
+  "timestamp": "2024-12-20T15:30:00Z",
+  "status": "approved",
+  "summary": {
+    "components": 8,
+    "entryPoints": 23,
+    "dataFlows": 15,
+    "trustBoundaries": 5
+  },
+  "keyFindings": [
+    "REST API exposes 23 endpoints via API Gateway",
+    "JWT-based authentication with Cognito integration",
+    "DynamoDB for operational data, Neo4j for graph queries",
+    "Lambda functions process async jobs via SQS queues"
+  ],
+  "questionsForUser": [
+    "Is this architecture understanding correct?",
+    "Any components I missed?",
+    "Should I include the third-party integrations (GitHub API, Okta)?",
+    "Are the shared dependencies (tabularium, janus-framework) in scope?"
+  ],
+  "userResponse": {
+    "approved": true,
+    "timestamp": "2024-12-20T15:35:00Z",
+    "feedback": "Architecture looks correct. Please include GitHub API integration in scope - we authenticate users via GitHub OAuth.",
+    "revisionRequested": false,
+    "additionalScope": [
+      "./modules/chariot/backend/pkg/github"
+    ]
+  },
+  "nextPhase": 4,
+  "nextPhaseName": "Security Controls Mapping"
+}

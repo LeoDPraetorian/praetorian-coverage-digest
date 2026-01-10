@@ -44,17 +44,19 @@ This gateway implements 3-tier loading:
 
 **Match your task to a routing pattern:**
 
-| Task Intent                                | Route To                              |
-| ------------------------------------------ | ------------------------------------- |
-| "create agent" / "update agent" / "agents" | → `managing-agents` (core skill)      |
-| "create skill" / "update skill" / "skills" | → `managing-skills` (core skill)      |
-| "command" / "slash command"                | → `managing-commands` (core skill)    |
-| "MCP wrapper" / "tool wrapper"             | → `managing-mcp-wrappers` (core)      |
-| "hook" / "pre-commit" / "post-tool"        | → `claude-hook-write` (library)       |
-| "plugin" / "extension"                     | → `claude-plugin-structure` (library) |
-| "marketplace" / "publish"                  | → `claude-marketplace-management`     |
-| "research" / "investigate"                 | → `researching-skills` (core)         |
-| "brainstorm" / "design"                    | → `brainstorming` (core)              |
+| Task Intent                                         | Route To                                    |
+| --------------------------------------------------- | ------------------------------------------- |
+| "create agent" / "update agent" / "agents"          | → `managing-agents` (core skill)            |
+| "create skill" / "update skill" / "skills"          | → `managing-skills` (core skill)            |
+| "command" / "slash command"                         | → `managing-commands` (core skill)          |
+| "MCP wrapper" / "tool wrapper"                      | → `managing-mcp-wrappers` (core)            |
+| "hook" / "pre-commit" / "post-tool"                 | → `claude-hook-write` (library)             |
+| "plugin" / "extension"                              | → `claude-plugin-structure` (library)       |
+| "marketplace" / "publish"                           | → `claude-marketplace-management`           |
+| "large file" / "context limit" / "split"            | → `processing-large-artifacts` (library)    |
+| "prompt patterns" / "few-shot" / "chain-of-thought" | → `orchestration-prompt-patterns` (library) |
+| "research" / "investigate"                          | → `researching-skills` (core)               |
+| "brainstorm" / "design"                             | → `brainstorming` (core)                    |
 
 ## Routing Algorithm
 
@@ -98,18 +100,19 @@ skill: "managing-commands"
 
 ### Skill Management
 
-| Skill                          | Path                                                                                    | Triggers                  |
-| ------------------------------ | --------------------------------------------------------------------------------------- | ------------------------- |
-| Auditing Skills                | `.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md`                | audit skill               |
-| Closing Skill Loopholes        | `.claude/skill-library/claude/skill-management/closing-skill-loopholes/SKILL.md`        | loophole, rationalization |
-| Creating Skills                | `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md`                | create skill              |
-| Deleting Skills                | `.claude/skill-library/claude/skill-management/deleting-skills/SKILL.md`                | delete skill              |
-| Fixing Skills                  | `.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md`                  | fix skill                 |
-| Migrating Skills               | `.claude/skill-library/claude/skill-management/migrating-skills/SKILL.md`               | migrate skill             |
-| Pressure Testing Skill Content | `.claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md` | pressure test, verify     |
-| Renaming Skills                | `.claude/skill-library/claude/skill-management/renaming-skills/SKILL.md`                | rename skill              |
-| Syncing Gateways               | `.claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md`               | sync gateway              |
-| Updating Skills                | `.claude/skill-library/claude/skill-management/updating-skills/SKILL.md`                | update skill              |
+| Skill                          | Path                                                                                    | Triggers                        |
+| ------------------------------ | --------------------------------------------------------------------------------------- | ------------------------------- |
+| Auditing Skills                | `.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md`                | audit skill                     |
+| Closing Skill Loopholes        | `.claude/skill-library/claude/skill-management/closing-skill-loopholes/SKILL.md`        | loophole, rationalization       |
+| Creating Skills                | `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md`                | create skill                    |
+| Deleting Skills                | `.claude/skill-library/claude/skill-management/deleting-skills/SKILL.md`                | delete skill                    |
+| Fixing Skills                  | `.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md`                  | fix skill                       |
+| Migrating Skills               | `.claude/skill-library/claude/skill-management/migrating-skills/SKILL.md`               | migrate skill                   |
+| Pressure Testing Skill Content | `.claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md` | pressure test, verify           |
+| Processing Large Skills        | `.claude/skill-library/claude/skill-management/processing-large-skills/SKILL.md`        | understand skill, analyze skill |
+| Renaming Skills                | `.claude/skill-library/claude/skill-management/renaming-skills/SKILL.md`                | rename skill                    |
+| Syncing Gateways               | `.claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md`               | sync gateway                    |
+| Updating Skills                | `.claude/skill-library/claude/skill-management/updating-skills/SKILL.md`                | update skill                    |
 
 ### Hooks & Plugins
 
@@ -120,6 +123,13 @@ skill: "managing-commands"
 | Plugin Settings        | `.claude/skill-library/claude/plugins/claude-plugin-settings/SKILL.md`             | plugin settings   |
 | Plugin Security Audit  | `.claude/skill-library/claude/plugins/claude-plugin-security-auditor/SKILL.md`     | plugin security   |
 | Marketplace Management | `.claude/skill-library/claude/marketplaces/claude-marketplace-management/SKILL.md` | marketplace       |
+
+### Orchestration
+
+| Skill                         | Path                                                                     | Triggers                                    |
+| ----------------------------- | ------------------------------------------------------------------------ | ------------------------------------------- |
+| Orchestration Prompt Patterns | `.claude/skill-library/prompting/orchestration-prompt-patterns/SKILL.md` | prompt patterns, few-shot, chain-of-thought |
+| Processing Large Artifacts    | `.claude/skill-library/claude/processing-large-artifacts/SKILL.md`       | large file, context limit, split, decompose |
 
 ## Cross-Gateway Routing
 

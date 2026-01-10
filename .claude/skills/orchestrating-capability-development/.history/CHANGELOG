@@ -1,5 +1,53 @@
 # Changelog - orchestrating-capability-development
 
+## [2026-01-10] Prompt Engineering Pattern Integration
+
+### RED Phase Documentation
+
+**Gap Identified**: Capability development agent prompts lacked the advanced prompt engineering patterns that were added to feature development orchestration:
+- No few-shot TDD examples specific to capability types (VQL, Nuclei)
+- No chain-of-thought verification protocols for reviewers
+- No capability-specific decision protocols for architects
+- No structured test coverage patterns for test leads
+- Missing reference to orchestration-prompt-patterns library skill
+
+### Changes Applied
+
+**Added to developer-prompt.md**:
+- Few-shot TDD examples for VQL capabilities (S3 bucket detection)
+- Few-shot TDD examples for Nuclei templates (CVE detection)
+- Concrete RED-GREEN cycle demonstrations
+
+**Added to reviewer-prompt.md**:
+- Chain-of-thought verification (5-step protocol for each requirement)
+- Capability-specific verification points (detection logic, indicators, severity, false positives)
+- Self-consistency two-pass review (functional + adversarial security review)
+
+**Added to architect-prompt.md**:
+- Capability Architecture Decision Protocol (6-step decision chain)
+- Security criteria analysis (detection accuracy, false positive rate, evasion resistance, performance)
+- Self-consistency check for architectural decisions
+
+**Added to test-lead-prompt.md**:
+- Capability Test Coverage Pattern (5 required test categories)
+- Coverage checklist with scoring (70 minimum quality_score)
+- Test category weights (True/False positive: 40pts, Evasion: 20pts, Performance: 20pts, Integration: 20pts)
+
+**Added to SKILL.md**:
+- Library Skills reference section linking to orchestration-prompt-patterns
+
+### Files Modified
+
+- `references/prompts/developer-prompt.md` - Added TDD pattern examples after "Your Job" section
+- `references/prompts/reviewer-prompt.md` - Added chain-of-thought verification and self-consistency sections
+- `references/prompts/architect-prompt.md` - Added capability architecture decision protocol after "Your Job" section
+- `references/prompts/test-lead-prompt.md` - Added capability test coverage pattern after "Your Job" section
+- `SKILL.md` - Added Library Skills reference section after Prompt Templates
+
+### Verification
+
+All prompt templates now include capability-specific prompt engineering patterns matching the quality improvements made to orchestrating-feature-development.
+
 ## [2026-01-08] Orchestrator Refactor - 7 Improvements
 
 ### RED Phase Documentation

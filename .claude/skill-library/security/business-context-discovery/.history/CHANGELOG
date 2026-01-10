@@ -1,3 +1,20 @@
+## [Date: 2026-01-10] - Fix Path and Session Variable Inconsistencies
+
+### Changed
+- Line 50: Replaced `.claude/.threat-model/{session-id}` with `.claude/.output/threat-modeling/{timestamp}-{slug}` in mkdir command
+- Line 51: Replaced `.claude/.threat-model/{session-id}` with `.claude/.output/threat-modeling/{timestamp}-{slug}` in cd command
+
+### Rationale
+- Standardizes output directory path with threat-modeling-orchestrator skill conventions
+- Uses consistent session identifier format matching persisting-agent-outputs skill
+- Aligns with established `.claude/.output/` convention for orchestrator outputs
+- Prevents confusion between old and new path conventions
+
+### Line Count
+- 335 lines (unchanged - well under 500 limit)
+
+---
+
 ## [Date: 2025-12-18] - Initial Creation
 
 ### Created

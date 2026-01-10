@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-01-10
+
+**Added**: New Step 5 "Verify Exit Criteria" between review feedback (Step 4) and task completion (now Step 6). Prevents failure mode where subagents report completion but actual deliverables don't match plan's specified unit (files vs functions vs calls vs endpoints).
+
+**Changed**: Renumbered subsequent steps - Step 5 → Step 6, Step 6 → Step 7, Step 7 → Step 8. Updated Step 6 to require Step 5 verification before marking complete. Updated Step 7 (Final Review) to include exit criteria verification in code reviewer dispatch.
+
+**Impact**: Systematic verification prevents the 'Calls vs Files' trap (real incident: 118 function calls counted when plan specified 118 files, only 47 files actually updated).
+
 ## 2026-01-07
 
 **Changed**: Replaced hardcoded `general-purpose` subagent with dynamic `subagent_type` parameter requiring selection of appropriate specialized agent (frontend-developer, backend-developer, capability-developer, integration-developer) based on task domain.

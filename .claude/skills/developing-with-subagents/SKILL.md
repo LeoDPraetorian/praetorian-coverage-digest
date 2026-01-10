@@ -95,21 +95,67 @@ Task tool (superpowers:code-reviewer):
 "Fix issues from code review: [list issues]"
 ```
 
-### 5. Mark Complete, Next Task
+### 5. Verify Exit Criteria
 
+**Before marking task complete, verify against plan's exit criteria:**
+
+1. **Read the task's exit criteria** from the plan (exact wording)
+2. **Identify the unit** (files, functions, tests, endpoints)
+3. **Count actual completions** of that unit
+4. **Compare** against criteria number/description
+
+**Example verification:**
+
+```
+Plan exit criteria: 'All 12 component files migrated'
+Subagent reported: 'Migrated 12 components'
+
+VERIFY: Count actual files changed:
+git diff --name-only HEAD~1 | grep -c '.tsx'
+Result: 12 files
+
+✅ Exit criteria met (12 files = 12 files)
+```
+
+**If mismatch:**
+
+Do NOT mark complete. Dispatch fix subagent:
+
+```
+'Exit criteria says 12 files, but only 8 files changed.
+Complete migration for remaining 4 files: [list them]'
+```
+
+**The 'Calls vs Files' Trap:**
+
+Real failure: Subagent reported '118 navigation calls updated' when exit criteria said '118 files'. Agent counted function calls, not files. Only 47 files were actually updated.
+
+**ALWAYS verify the UNIT matches what the plan specified.**
+
+### 6. Mark Complete, Next Task
+
+- **Only after exit criteria verified** (Step 5)
 - Mark task as completed in TodoWrite
 - Move to next task
-- Repeat steps 2-5
+- Repeat steps 2-6
 
-### 6. Final Review
+### 7. Final Review
 
 After all tasks complete, dispatch final code-reviewer:
+
+```
+VERIFY ALL EXIT CRITERIA:
+For each task in the plan, confirm:
+- Exit criteria wording
+- Actual completion count
+- Unit matches (files vs functions vs calls)
+```
 
 - Reviews entire implementation
 - Checks all plan requirements met
 - Validates overall architecture
 
-### 7. Complete Development
+### 8. Complete Development
 
 After final review passes:
 

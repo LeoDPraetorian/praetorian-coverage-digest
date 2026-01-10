@@ -1,0 +1,98 @@
+{
+  "testCase": {
+    "id": "TC-001",
+    "title": "Verify JWT Audience Claim Validation Prevents Cross-App Token Reuse",
+    "threat": "T-001 - JWT Token Reuse Across Applications",
+    "type": "Manual Security Test",
+    "phase": "DAST"
+  },
+  "priority": {
+    "cvssEnvironmentalScore": 9.2,
+    "severity": "CRITICAL",
+    "businessContext": "Protects crown jewel data (api_keys, vulnerability_reports)",
+    "complianceRelevance": ["SOC 2 CC6.1", "PCI-DSS 8.2.1"],
+    "executionOrder": 1
+  },
+  "prerequisites": {
+    "environment": "Staging environment with test Cognito pool",
+    "tools": ["Burp Suite", "Postman", "JWT decoder"],
+    "access": ["Valid user account in test Cognito pool", "Access to API Gateway endpoint"],
+    "testData": ["Valid JWT from different app in same Cognito pool"]
+  },
+  "testSteps": [
+    {
+      "step": 1,
+      "action": "Obtain valid JWT token from alternate application",
+      "method": "Authenticate to test-app-2 using same Cognito pool",
+      "expected": "Receive valid JWT with iss claim matching Cognito pool",
+      "notes": "Save token for subsequent steps"
+    },
+    {
+      "step": 2,
+      "action": "Decode JWT and verify audience claim",
+      "method": "Use jwt.io to decode token, check aud claim",
+      "expected": "Token has aud claim for 'test-app-2', not this API",
+      "notes": "Confirm token is not intended for target API"
+    },
+    {
+      "step": 3,
+      "action": "Send authenticated request to target API with wrong-audience token",
+      "method": "curl -H 'Authorization: Bearer {token}' https://api.example.com/assets",
+      "expected": "401 Unauthorized with error: 'Invalid audience claim'",
+      "notes": "API should reject token with wrong aud"
+    },
+    {
+      "step": 4,
+      "action": "Attempt to access sensitive endpoint with wrong-audience token",
+      "method": "curl -H 'Authorization: Bearer {token}' https://api.example.com/api-keys",
+      "expected": "401 Unauthorized, no data returned",
+      "notes": "Verify crown jewel data protected"
+    },
+    {
+      "step": 5,
+      "action": "Verify error logged in CloudWatch",
+      "method": "Check Lambda logs for authentication failure event",
+      "expected": "Log entry: 'JWT validation failed: audience mismatch'",
+      "notes": "Ensure security event properly logged for SOC 2"
+    }
+  ],
+  "expectedResults": {
+    "passing": [
+      "API rejects all requests with wrong-audience JWT",
+      "401 Unauthorized returned with descriptive error",
+      "No access to crown jewel data (api_keys, vulnerabilities)",
+      "Security event logged in CloudWatch"
+    ],
+    "failing": [
+      "API accepts wrong-audience JWT (CRITICAL VULNERABILITY)",
+      "Access granted to sensitive endpoints",
+      "No security event logged"
+    ]
+  },
+  "validationCriteria": {
+    "functionalCorrectness": "Token validation rejects wrong aud claim",
+    "securityPosture": "No unauthorized access possible",
+    "complianceAlignment": "SOC 2 logical access control enforced",
+    "errorHandling": "Proper error messages without info disclosure"
+  },
+  "remediation": {
+    "ifTestFails": [
+      "Add audience validation to jwt.go:ValidateToken()",
+      "Configure expected audience in environment variable",
+      "Re-test with corrected code"
+    ],
+    "codeLocation": "./modules/chariot/backend/pkg/auth/jwt.go",
+    "estimatedEffort": "2 hours"
+  },
+  "regression": {
+    "frequency": "Every release",
+    "automation": "Candidate for automated security regression suite",
+    "integrationPoint": "CI/CD pipeline after deployment to staging"
+  },
+  "references": {
+    "threatId": "T-001",
+    "controlGapId": "jwt-validation-weakness",
+    "complianceControl": "SOC 2 CC6.1, PCI-DSS 8.2.1",
+    "owaspReference": "OWASP API Security - API2:2023 Broken Authentication"
+  }
+}

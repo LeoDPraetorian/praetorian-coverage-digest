@@ -1,5 +1,44 @@
 # Changelog
 
+## [2026-01-10] - Post-Completion Verification Protocol
+
+### Added
+- **Post-Completion Verification Protocol (MANDATORY)** section after "Conflict Detection" (lines 245-310)
+- **5-step verification process** orchestrators MUST follow when ANY agent returns:
+  1. Read the Output File (not just response summary)
+  2. Verify Metadata Block Exists (JSON with agent, skills_invoked, source_files_verified, status)
+  3. Compare skills_invoked Against Mandatory List (catch missing skill invocations)
+  4. Verify Exit Criteria (quote criteria, check COUNT and UNIT)
+  5. Only Then Mark Complete (5-point checklist with evidence)
+- **Real failure documentation**: "118 calls updated" vs 47 files touched incident
+- **Why This Protocol Exists** explanation linking to orchestrator-enforcement hook
+
+### Context
+Real failure: Orchestrator trusted agent's response summary ("118 calls updated") without reading output file. Output file showed only 47 files touched. The agent counted function calls, not files. Verification would have caught this after first batch, not fourth batch.
+
+Problem: Orchestrators were marking phases complete based on response summaries without verifying:
+- Output file contents
+- Metadata block presence (per persisting-agent-outputs)
+- skills_invoked array against mandatory list
+- Exit criteria with COUNT/UNIT verification
+
+Solution: Added mandatory 5-step verification protocol that orchestrators MUST follow before marking any agent complete. Protocol enforces:
+- Reading actual output files (not trusting summaries)
+- Metadata compliance checking
+- Skills invocation verification
+- Exit criteria validation with evidence
+
+Impact:
+- Prevents orchestrators from trusting misleading response summaries
+- Catches missing skill invocations (agents that skip verifying-before-completion)
+- Enforces COUNT and UNIT verification (prevents function calls vs files confusion)
+- Creates checkpoint after EVERY agent return (not just at workflow end)
+- Links to orchestrator-enforcement hook for reminder mechanism
+
+Line count impact: +67 lines (348 → 415 lines)
+
+---
+
 ## [2026-01-04] - Effort Scaling Guidance
 
 ### Added

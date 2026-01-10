@@ -1,6 +1,6 @@
 # STRIDE Mapping Reference
 
-**Mapping security controls to STRIDE threat categories for Phase 2 analysis.**
+**Mapping security controls to STRIDE threat categories for Phase 4 analysis.**
 
 ---
 

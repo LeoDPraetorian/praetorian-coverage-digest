@@ -64,6 +64,174 @@ The plan must specify:
 3. Expected outcomes
 4. Edge cases to cover
 
+## Test Coverage Pattern (REQUIRED)
+
+Every feature requires systematic test coverage across multiple categories. Use this pattern to ensure comprehensive coverage.
+
+### Coverage Categories
+
+**1. Happy Path Tests (MUST HAVE - Baseline)**
+
+The primary use cases that should always work:
+- Main user flow completes successfully
+- Expected data displays correctly
+- Success states render properly
+- Positive actions produce expected results
+
+**2. Edge Case Tests (MUST HAVE - Boundaries)**
+
+Boundary conditions and unusual but valid inputs:
+- Empty states (empty arrays, null values, zero counts)
+- Single item vs multiple items
+- Maximum allowed values
+- Minimum allowed values
+- Special characters in text inputs
+- Very long strings
+- Unicode and internationalization
+
+**3. Error Case Tests (MUST HAVE - Resilience)**
+
+Failure scenarios and error handling:
+- API failures (500 errors)
+- Network timeouts
+- Validation errors (400 errors)
+- Authentication failures (401)
+- Authorization failures (403)
+- Not found errors (404)
+- Rate limiting (429)
+
+**4. Integration Tests (CONTEXT-DEPENDENT)**
+
+Component and service interactions:
+- Parent-child component communication
+- State management integration
+- API contract verification
+- Event propagation
+- Side effect handling
+
+**5. Accessibility Tests (SHOULD HAVE)**
+
+WCAG compliance verification:
+- Keyboard navigation works
+- Screen reader compatibility
+- Focus management
+- ARIA attributes correct
+- Color contrast sufficient
+
+---
+
+### Test Plan Template
+
+For the feature being tested, create this structured plan:
+
+```markdown
+# Test Plan: [Feature Name]
+
+## Coverage Summary
+
+| Category | Test Count | Priority |
+|----------|------------|----------|
+| Happy Path | X | MUST |
+| Edge Cases | X | MUST |
+| Error Cases | X | MUST |
+| Integration | X | SHOULD |
+| Accessibility | X | SHOULD |
+
+## Happy Path Tests
+
+### HP-1: [Primary use case]
+- **Scenario**: [User does X]
+- **Expected**: [Y happens]
+- **Components**: [files to test]
+
+### HP-2: [Secondary use case]
+- **Scenario**: [User does X]
+- **Expected**: [Y happens]
+- **Components**: [files to test]
+
+## Edge Case Tests
+
+### EC-1: Empty state handling
+- **Scenario**: [Component receives empty array]
+- **Expected**: [Shows empty state message]
+- **Components**: [files to test]
+
+### EC-2: Boundary values
+- **Scenario**: [Maximum items displayed]
+- **Expected**: [Pagination or truncation works]
+- **Components**: [files to test]
+
+## Error Case Tests
+
+### ER-1: API failure
+- **Scenario**: [API returns 500]
+- **Expected**: [Error message shown, retry available]
+- **Components**: [files to test]
+
+### ER-2: Network timeout
+- **Scenario**: [Request times out]
+- **Expected**: [Timeout message, graceful degradation]
+- **Components**: [files to test]
+
+## Integration Tests
+
+### IN-1: [Component interaction]
+- **Scenario**: [Parent passes data to child]
+- **Expected**: [Child renders correctly, events bubble]
+- **Components**: [files to test]
+
+## Accessibility Tests
+
+### AC-1: Keyboard navigation
+- **Scenario**: [User tabs through component]
+- **Expected**: [Focus visible, logical order]
+- **Components**: [files to test]
+```
+
+---
+
+### Coverage Checklist
+
+Before finalizing the test plan, verify:
+
+| Check | Status |
+|-------|--------|
+| Every component has at least one test | □ |
+| All API calls have success AND failure tests | □ |
+| Empty states are tested | □ |
+| Error messages are verified | □ |
+| Loading states are tested | □ |
+| User interactions are covered | □ |
+
+---
+
+### Quality Score Calculation
+
+Use this rubric for the quality_score:
+
+| Coverage Area | Points | Criteria |
+|---------------|--------|----------|
+| Happy Path | 30 | All primary flows covered |
+| Edge Cases | 25 | 80%+ boundary conditions covered |
+| Error Cases | 25 | All API error codes handled |
+| Integration | 10 | Key component interactions tested |
+| Accessibility | 10 | Basic a11y verified |
+
+**Total: 100 points**
+
+**Minimum passing score: 70**
+
+Scoring guide:
+- 90-100: Excellent coverage, production-ready
+- 80-89: Good coverage, minor gaps acceptable
+- 70-79: Adequate coverage, meets minimum bar
+- 60-69: Insufficient, needs more tests
+- <60: Failing, major gaps
+
+---
+
+**CRITICAL**: The test plan must be specific enough that a tester can implement without asking questions. Include file paths, component names, and expected behaviors.
+
 ## Test Plan Document Structure
 
 ```markdown

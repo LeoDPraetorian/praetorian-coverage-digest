@@ -1,0 +1,101 @@
+{
+  "sessionId": "tm-20241220-a1b2c3",
+  "phase": 3,
+  "timestamp": "2024-12-20T15:30:00Z",
+  "manifest": {
+    "totalFiles": 127,
+    "filesByLanguage": {
+      "go": 89,
+      "yaml": 23,
+      "json": 15
+    },
+    "linesOfCode": 15234
+  },
+  "components": [
+    {
+      "id": "auth-handler",
+      "name": "Authentication Handler",
+      "path": "./modules/chariot/backend/pkg/handler/handlers/auth",
+      "purpose": "User authentication via Cognito JWT validation",
+      "technology": "Go, AWS Lambda, Cognito",
+      "trustLevel": "high",
+      "handlesData": ["user_credentials", "jwt_tokens"]
+    },
+    {
+      "id": "asset-handler",
+      "name": "Asset Management Handler",
+      "path": "./modules/chariot/backend/pkg/handler/handlers/asset",
+      "purpose": "CRUD operations for discovered assets",
+      "technology": "Go, AWS Lambda, DynamoDB",
+      "trustLevel": "medium",
+      "handlesData": ["asset_metadata", "dns_records", "ip_addresses"]
+    }
+  ],
+  "entryPoints": [
+    {
+      "id": "api-gateway-rest",
+      "type": "HTTP",
+      "endpoint": "https://api.example.com/*",
+      "methods": ["GET", "POST", "PUT", "DELETE"],
+      "authentication": "JWT (Cognito)",
+      "rateLimiting": true,
+      "components": ["auth-handler", "asset-handler", "risk-handler"]
+    },
+    {
+      "id": "sqs-job-queue",
+      "type": "Queue",
+      "source": "AWS SQS",
+      "triggeredBy": "Scan job creation",
+      "authentication": "IAM role",
+      "components": ["job-processor"]
+    }
+  ],
+  "dataFlows": [
+    {
+      "id": "user-login-flow",
+      "source": "Web UI",
+      "destination": "Cognito",
+      "via": ["API Gateway", "Auth Handler"],
+      "data": ["email", "password"],
+      "encryption": "TLS 1.3",
+      "validation": "Email format, password complexity"
+    },
+    {
+      "id": "asset-storage-flow",
+      "source": "Asset Handler",
+      "destination": "DynamoDB",
+      "via": ["AWS SDK"],
+      "data": ["asset_metadata", "dns_records"],
+      "encryption": "At rest (AWS managed keys)",
+      "validation": "Schema validation"
+    }
+  ],
+  "trustBoundaries": [
+    {
+      "id": "external-internal",
+      "description": "API Gateway to Lambda functions",
+      "crossingPoints": ["API Gateway endpoints"],
+      "controls": ["JWT validation", "API Gateway authorization", "Rate limiting"]
+    },
+    {
+      "id": "application-database",
+      "description": "Lambda functions to DynamoDB",
+      "crossingPoints": ["AWS SDK calls"],
+      "controls": ["IAM role permissions", "VPC security groups", "Encryption at rest"]
+    }
+  ],
+  "externalDependencies": [
+    {
+      "name": "AWS Cognito",
+      "purpose": "User authentication",
+      "trustLevel": "high",
+      "dataShared": ["user_credentials", "jwt_tokens"]
+    },
+    {
+      "name": "GitHub API",
+      "purpose": "Repository scanning",
+      "trustLevel": "medium",
+      "dataShared": ["repository_names", "commit_history"]
+    }
+  ]
+}

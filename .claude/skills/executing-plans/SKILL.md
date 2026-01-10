@@ -56,13 +56,27 @@ For each task:
 3. Run verifications as specified
 4. Mark as completed
 
-### Step 3: Report
+### Step 3: Report and WAIT
 
 When batch complete:
 
-- Show what was implemented
-- Show verification output
-- Say: "Ready for feedback."
+1. **Show what was implemented** (file list with changes)
+2. **Show verification output** (test results, build output)
+3. **Verify against exit criteria:**
+   - Quote exit criteria from plan
+   - Count actual completions (use the UNIT specified in criteria)
+   - Show evidence: file list, command output, or diff
+4. **Say:** "Ready for feedback. Waiting for confirmation before next batch."
+
+**CRITICAL: DO NOT proceed to Step 4 without human confirmation.**
+
+This is a blocking checkpoint. The human must respond before you continue. Do not:
+- Assume silence means approval
+- Proceed after a timeout
+- Batch multiple checkpoints together
+- Skip checkpoint for "simple" batches
+
+**If no response after reporting:** Wait. Do not proceed.
 
 ### Step 4: Continue
 
@@ -71,6 +85,21 @@ Based on feedback:
 - Apply changes if needed
 - Execute next batch
 - Repeat until complete
+
+### Human Checkpoint Protocol
+
+**Why checkpoints exist:**
+
+Real failure: Agent executed 4 batches without stopping, claimed 118 files updated when only 47 were done. No checkpoint allowed orchestrator to catch the miscount after batch 1.
+
+**Checkpoint rules:**
+
+1. Report MUST include verification evidence (not just "done")
+2. Wait for explicit human response
+3. If human identifies issues, fix BEFORE next batch
+4. Never rationalize skipping checkpoints ("this batch was simple")
+
+**If you're tempted to skip:** That's the exact moment the checkpoint matters most.
 
 ### Step 5: Complete Development
 
@@ -281,6 +310,16 @@ git commit -m "docs: mark phase 1 complete"
 
 Ready to continue with Phase 2?
 ```
+
+**CRITICAL: DO NOT proceed to Step 9 without human confirmation.**
+
+Phase transitions are mandatory checkpoints. The human must explicitly approve before you:
+- Start the next phase
+- Mark the current phase complete in PLAN.md
+- Update progress tracking
+
+**Acceptable confirmations:** "continue", "proceed", "next phase", "looks good", explicit approval
+**Not acceptable:** Silence, implicit approval, "I'll review later"
 
 ### Step 9: Continue to Next Phase
 

@@ -1,3 +1,5 @@
+> **NOTE:** This prompt template is now used internally by the discovering-codebases-for-planning skill. Orchestrators should invoke that skill rather than spawning Explore agents directly.
+
 # Explore Subagent Prompt Template
 
 Use this template when dispatching Explore agents in Phase 2 (Discovery).

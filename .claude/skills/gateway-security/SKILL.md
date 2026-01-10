@@ -57,7 +57,7 @@ This gateway implements 3-tier loading:
 | "codebase map" / "architecture analysis"       | → `codebase-mapping`             |
 | "security controls" / "mitigations"            | → `security-controls-mapping`    |
 | "CVSS" / "severity score"                      | → `cvss-scoring`                 |
-| "security test plan" / "pentest" / "Phase 6"   | → `planning-security-tests`      |
+| "security test plan" / "pentest" / "Phase 6"   | → `security-test-planning`       |
 | "codebase size" / "complexity"                 | → `codebase-sizing`              |
 | "security review" / "OWASP" / "Go security"    | → `reviewing-backend-security`   |
 | "frontend security" / "React security" / "XSS" | → `reviewing-frontend-security`  |
@@ -110,10 +110,10 @@ This gateway implements 3-tier loading:
 | Business Context       | `.claude/skill-library/security/business-context-discovery/SKILL.md` | business context, crown jewels       |
 | Codebase Sizing        | `.claude/skill-library/security/codebase-sizing/SKILL.md`            | codebase size, complexity            |
 | Codebase Mapping       | `.claude/skill-library/security/codebase-mapping/SKILL.md`           | codebase map, architecture           |
-| Security Controls      | `.claude/skill-library/security/mapping-security-controls/SKILL.md`  | security controls, mitigations       |
+| Security Controls      | `.claude/skill-library/security/security-controls-mapping/SKILL.md`  | security controls, mitigations       |
 | Threat Modeling        | `.claude/skill-library/security/threat-modeling/SKILL.md`            | threat model, attack surface         |
 | CVSS Scoring           | `.claude/skill-library/security/cvss-scoring/SKILL.md`               | CVSS, severity score                 |
-| Security Test Planning | `.claude/skill-library/security/planning-security-tests/SKILL.md`    | security test plan, pentest, Phase 6 |
+| Security Test Planning | `.claude/skill-library/security/security-test-planning/SKILL.md`     | security test plan, pentest, Phase 6 |
 
 ### Security Review
 

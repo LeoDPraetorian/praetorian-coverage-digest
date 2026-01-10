@@ -108,6 +108,106 @@ For EACH requirement in the plan:
 2. Does it match the spec exactly? (Yes/No/Deviation noted)
 3. Is there anything extra not in the spec? (List extras)
 
+## Chain-of-Thought Verification (REQUIRED)
+
+For EACH requirement in the plan, you MUST follow this exact 5-step chain. Do NOT batch requirements. Do NOT skip steps.
+
+### The 5-Step Verification Chain
+
+**Step 1: State the requirement exactly**
+Copy the exact text from plan.md. Do not paraphrase.
+"Requirement: [exact text from plan.md]"
+
+**Step 2: Locate the developer's claim**
+Quote what the developer said they implemented.
+"Developer claims: [quote from implementation-log.md or summary]"
+
+**Step 3: Verify independently (DO NOT TRUST THE CLAIM)**
+Read the actual code. The developer may have:
+- Claimed completion when work is incomplete
+- Misunderstood the requirement
+- Implemented something subtly different
+- Made optimistic claims about working code
+
+"Reading [file.tsx] lines [X-Y]...
+Found: [actual code snippet]
+Observation: [what the code actually does - be specific]"
+
+**Step 4: Compare against requirement**
+"Requirement says: [X]
+Implementation does: [Y]
+Match: Yes / No / Partial"
+
+If partial, specify exactly what matches and what doesn't.
+
+**Step 5: Document evidence**
+"Evidence: [file:line] - [specific code that proves compliance or non-compliance]"
+
+---
+
+### Full Verification Example
+
+**Requirement from plan.md**: "Add pagination to asset list with 25 items per page default"
+
+**Chain**:
+
+**Step 1 - Requirement stated**:
+"Requirement: Add pagination to asset list with 25 items per page default"
+
+**Step 2 - Developer claim**:
+"Developer claims: 'Added pagination component to AssetList with configurable page size'"
+
+**Step 3 - Independent verification**:
+"Reading src/components/AssetList.tsx lines 30-45...
+Found:
+```tsx
+const [pageSize, setPageSize] = useState(10);
+// ...
+<Pagination
+  pageSize={pageSize}
+  onPageSizeChange={setPageSize}
+/>
+```
+Observation: Page size state initialized to 10, not 25. Pagination component exists."
+
+**Step 4 - Comparison**:
+"Requirement says: 25 items per page DEFAULT
+Implementation does: 10 items per page default
+Match: NO - wrong default value"
+
+**Step 5 - Evidence**:
+"Evidence: src/components/AssetList.tsx:32 - useState(10) should be useState(25)"
+
+**Verdict for this requirement**: NOT_COMPLIANT
+
+---
+
+### Verification Table Format
+
+After completing all chains, summarize in this table:
+
+| # | Requirement | Dev Claim | Verified | Evidence | Compliant? |
+|---|-------------|-----------|----------|----------|------------|
+| 1 | [req text] | [claim] | [what you found] | [file:line] | ✓/✗ |
+| 2 | [req text] | [claim] | [what you found] | [file:line] | ✓/✗ |
+
+---
+
+### Red Flags That Require Extra Scrutiny
+
+When you see these in developer output, verify MORE carefully:
+
+- "Implemented as specified" (vague - verify everything)
+- "Added the feature" (no details - what exactly?)
+- "Tests passing" (which tests? do they cover the requirement?)
+- Fast completion time (may indicate shortcuts)
+- No file:line references (may not have actually done the work)
+
+---
+
+**CRITICAL**: Complete ALL 5 steps for EVERY requirement.
+One requirement at a time. No batching. No shortcuts.
+
 ## Spec Compliance Checklist
 
 | Requirement | Implemented | Matches Spec | Notes |
@@ -203,6 +303,85 @@ Is the code well-built?
 - [ ] No hardcoded secrets
 - [ ] Proper authentication/authorization
 - [ ] XSS/injection prevention
+
+## Self-Consistency: Two-Pass Review (REQUIRED)
+
+A single read-through is insufficient. You MUST perform two passes with different focuses.
+
+### Pass 1: Initial Read (Top-Down)
+
+Read the code from start to finish. Note your first impressions:
+
+- Overall structure: [clean / messy / mixed]
+- Code organization: [logical / confusing]
+- Naming quality: [clear / unclear / mixed]
+- Initial quality score (gut feeling): [1-10]
+- Issues noticed: [list what jumped out]
+
+Document: "Pass 1 complete. Initial score: X/10. Issues found: [list]"
+
+### Pass 2: Adversarial Read (Problem-Seeking)
+
+Now read again with a critical eye. Actively look for problems your first pass might have missed:
+
+**Error Handling Audit**:
+- Are all async operations wrapped in try/catch?
+- Are error messages user-friendly and debuggable?
+- Are errors logged appropriately?
+- What happens on network failure? Timeout?
+
+**Edge Case Audit**:
+- Empty arrays/objects - handled?
+- Null/undefined values - checked?
+- Maximum values - bounded?
+- Concurrent operations - safe?
+
+**Security Audit**:
+- User input validated before use?
+- No sensitive data in logs or errors?
+- Authentication checked where needed?
+- Authorization verified for operations?
+
+**Performance Audit**:
+- Unnecessary re-renders possible?
+- Large data sets handled efficiently?
+- Memoization used where beneficial?
+- N+1 query patterns present?
+
+Document: "Pass 2 complete. Additional issues found: [list]"
+
+### Consistency Check
+
+Compare your two passes:
+
+| Aspect | Pass 1 Assessment | Pass 2 Assessment | Changed? |
+|--------|-------------------|-------------------|----------|
+| Error handling | [adequate/inadequate] | [adequate/inadequate] | Y/N |
+| Edge cases | [covered/missing] | [covered/missing] | Y/N |
+| Security | [secure/concerns] | [secure/concerns] | Y/N |
+| Performance | [fine/issues] | [fine/issues] | Y/N |
+| Overall score | [X/10] | [X/10] | Y/N |
+
+**If Pass 2 found issues Pass 1 missed**:
+- These are likely real issues that superficial review misses
+- They indicate the code has hidden problems
+- Weight these findings HIGHER in your final assessment
+- Lower your final score to account for discoverability issues
+
+**Final Verdict Determination**:
+
+| Pass 1 Score | Pass 2 Findings | Final Verdict |
+|--------------|-----------------|---------------|
+| 8+ | No new issues | APPROVED |
+| 8+ | Minor issues only | APPROVED_WITH_NOTES |
+| 8+ | Significant issues found | CHANGES_REQUESTED |
+| 6-7 | No new issues | APPROVED_WITH_NOTES |
+| 6-7 | Any new issues | CHANGES_REQUESTED |
+| <6 | Any | CHANGES_REQUESTED |
+
+---
+
+**CRITICAL**: Document BOTH passes in your review output. Show your work.
 
 ## Files to Review
 

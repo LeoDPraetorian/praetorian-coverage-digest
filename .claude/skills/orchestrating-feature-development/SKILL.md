@@ -31,7 +31,7 @@ Use this skill when you need to:
 | ------------------ | ------------------------------------------ | ------------------------ | ------------------ |
 | 0: Setup           | -                                          | Create feature directory | -                  |
 | 1: Brainstorming   | brainstorming skill                        | Sequential               | 🛑 Human           |
-| 2: Discovery       | Explore (frontend + backend)               | **PARALLEL**             | -                  |
+| 2: Discovery       | discovering-codebases-for-planning         | **PARALLEL** (dynamic)   | -                  |
 | 3: Planning        | writing-plans skill                        | Sequential               | 🛑 Human           |
 | 4: Architecture    | frontend-lead + security-lead              | **PARALLEL**             | 🛑 Human           |
 | 5: Implementation  | frontend-developer (batch or per-task)     | Mode-dependent           | Per-task if 4+     |
@@ -79,7 +79,7 @@ Cross-cutting concerns and troubleshooting guides:
 | All   | `persisting-agent-outputs` (output format)              | -                                                   |
 | All   | `orchestrating-multi-agent-workflows` (blocked routing) | -                                                   |
 | 1     | `brainstorming`                                         | -                                                   |
-| 2     | -                                                       | `dispatching-parallel-agents` (if 3+ failures)      |
+| 2     | `discovering-codebases-for-planning`                    | `dispatching-parallel-agents` (if 3+ failures)      |
 | 3     | `writing-plans`                                         | -                                                   |
 | 4-9   | -                                                       | `developing-with-subagents` (if >3 tasks)           |
 | 4-9   | -                                                       | `persisting-progress-across-sessions` (if >5 tasks) |
@@ -109,10 +109,12 @@ Cross-cutting concerns and troubleshooting guides:
                   │
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 2: Discovery (PARALLEL)                                          │
-│  Agents: Explore (frontend) + Explore (backend) - very thorough mode    │
-│  **PROMPT TEMPLATE:** references/prompts/explore-prompt.md              │
-│  Output: frontend-discovery.md, backend-discovery.md                    │
+│  Phase 2: Discovery (THREE-STAGE)                                       │
+│  **REQUIRED SUB-SKILL:** discovering-codebases-for-planning             │
+│  Stage 1: Scoping (identify relevant components)                        │
+│  Stage 2: Parallel Explore (1-10 agents based on scoping)               │
+│  Stage 3: Synthesis + Verification                                      │
+│  Output: discovery.md, file-placement.md, discovery-summary.json        │
 │  No Human Checkpoint (feeds into Planning)                              │
 │                                                                         │
 │  **CONDITIONAL SUB-SKILL:** dispatching-parallel-agents                 │
@@ -143,7 +145,7 @@ Cross-cutting concerns and troubleshooting guides:
 │  Phase 4: Architecture (PARALLEL)                                       │
 │  Agents: frontend-lead + security-lead                                  │
 │  **PROMPT TEMPLATE:** references/prompts/architect-prompt.md            │
-│  Input: frontend-discovery.md + backend-discovery.md + plan.md          │
+│  Input: discovery.md + file-placement.md + discovery-summary.json + plan.md │
 │  Output: architecture.md, security-assessment.md, tech-debt.md          │
 │  Tech Debt Registry: Update .claude/tech-debt-registry.md               │
 │  X Human Checkpoint (enhanced with tech debt decisions)                 │
@@ -322,13 +324,13 @@ See [references/rationalization-table.md](references/rationalization-table.md) f
 
 ## Agent Matrix by Feature Type
 
-| Type       | Discovery (Phase 2)        | Leads (Phase 4)               | Developers (Phase 5) | Reviewers (Phase 6)                   | Planner (Phase 7) | Testers (Phase 8)  | Validator (Phase 9) |
-| ---------- | -------------------------- | ----------------------------- | -------------------- | ------------------------------------- | ----------------- | ------------------ | ------------------- |
-| Frontend   | Explore ×2 (very thorough) | frontend-lead + security-lead | frontend-developer   | frontend-reviewer + frontend-security | test-lead         | frontend-tester ×3 | test-lead           |
-| Backend    | Explore ×2 (very thorough) | backend-lead + security-lead  | backend-developer    | backend-reviewer + backend-security   | test-lead         | backend-tester ×3  | test-lead           |
-| Full-stack | Explore ×2 (very thorough) | All 4 leads                   | Both developers      | All 4 reviewers                       | test-lead         | All 6 testers      | test-lead           |
+| Type       | Discovery (Phase 2)                         | Leads (Phase 4)               | Developers (Phase 5) | Reviewers (Phase 6)                   | Planner (Phase 7) | Testers (Phase 8)  | Validator (Phase 9) |
+| ---------- | ------------------------------------------- | ----------------------------- | -------------------- | ------------------------------------- | ----------------- | ------------------ | ------------------- |
+| Frontend   | discovering-codebases-for-planning (1-10 agents) | frontend-lead + security-lead | frontend-developer   | frontend-reviewer + frontend-security | test-lead         | frontend-tester ×3 | test-lead           |
+| Backend    | discovering-codebases-for-planning (1-10 agents) | backend-lead + security-lead  | backend-developer    | backend-reviewer + backend-security   | test-lead         | backend-tester ×3  | test-lead           |
+| Full-stack | discovering-codebases-for-planning (1-10 agents) | All 4 leads                   | Both developers      | All 4 reviewers                       | test-lead         | All 6 testers      | test-lead           |
 
-**Rule**: Match agents to feature domain. Discovery always runs frontend + backend Explore agents in parallel (very thorough mode). Full-stack features spawn ALL agents in parallel for phases 4-9.
+**Rule**: Match agents to feature domain. Discovery uses `discovering-codebases-for-planning` skill which dynamically spawns 1-10 Explore agents based on feature context and codebase size. Full-stack features spawn ALL agents in parallel for phases 4-9.
 
 ## Feature Directory Structure
 
@@ -364,7 +366,7 @@ AskUserQuestion({
 
 **Solution**: Spawn ALL domain agents in parallel:
 
-- Phase 2: Explore (frontend) + Explore (backend) - always runs, very thorough mode
+- Phase 2: discovering-codebases-for-planning skill - analyzes all relevant components
 - Phase 4: frontend-lead + backend-lead + security-lead (3 agents)
 - Phase 5: frontend-developer + backend-developer (2 agents)
 - Phase 6: All 4 reviewers in parallel
@@ -381,10 +383,11 @@ See [Troubleshooting](references/troubleshooting.md) for more scenarios.
 
 ### Requires (invoke before or at start)
 
-| Skill                                 | When               | Purpose                                             |
-| ------------------------------------- | ------------------ | --------------------------------------------------- |
-| `persisting-agent-outputs`            | Phase 0            | Discover output directory, set up feature workspace |
-| `orchestrating-multi-agent-workflows` | When agent blocked | Routing table for blocked_reason handling           |
+| Skill                                 | When               | Purpose                                                         |
+| ------------------------------------- | ------------------ | --------------------------------------------------------------- |
+| `persisting-agent-outputs`            | Phase 0            | Discover output directory, set up feature workspace             |
+| `orchestrating-multi-agent-workflows` | When agent blocked | Routing table for blocked_reason handling                       |
+| `discovering-codebases-for-planning`  | Phase 2            | Feature-context-aware parallel discovery with dynamic agent count |
 
 ### Calls (skill-invocation via Skill tool)
 
@@ -398,14 +401,13 @@ See [Troubleshooting](references/troubleshooting.md) for more scenarios.
 
 | Agent                                     | Phase      | Key Mandatory Skills                             |
 | ----------------------------------------- | ---------- | ------------------------------------------------ |
-| `Explore` ×2                              | Phase 2    | discovering-reusable-code                        |
 | `frontend-lead` + `security-lead`         | Phase 4    | adhering-to-dry, adhering-to-yagni               |
 | `frontend-developer`                      | Phase 5    | developing-with-tdd, verifying-before-completion |
 | `frontend-reviewer` + `frontend-security` | Phase 6    | adhering-to-dry                                  |
 | `test-lead`                               | Phase 7, 9 | -                                                |
 | `frontend-tester` ×3                      | Phase 8    | developing-with-tdd                              |
 
-**Note**: All spawned agents receive `persisting-agent-outputs` in prompt. See prompt templates for complete skill list.
+**Note**: Phase 2 agent spawning (1-10 Explore agents) is handled internally by the `discovering-codebases-for-planning` skill. All spawned agents receive `persisting-agent-outputs` in prompt. See prompt templates for complete skill list.
 
 ### Conditional (based on complexity)
 
@@ -432,12 +434,31 @@ Located in `references/prompts/`:
 
 | Template              | Used In    | Agents                                     |
 | --------------------- | ---------- | ------------------------------------------ |
-| `explore-prompt.md`   | Phase 2    | Explore (frontend + backend)               |
+| `explore-prompt.md`   | Phase 2    | Explore agents (via discovering-codebases-for-planning) |
 | `architect-prompt.md` | Phase 4    | frontend-lead, backend-lead, security-lead |
 | `developer-prompt.md` | Phase 5    | frontend-developer, backend-developer      |
 | `reviewer-prompt.md`  | Phase 6    | _-reviewer, _-security                     |
 | `test-lead-prompt.md` | Phase 7, 9 | test-lead                                  |
 | `tester-prompt.md`    | Phase 8    | frontend-tester, backend-tester            |
+
+### Library Skills (Reference for Prompt Quality)
+
+| Skill | Path | Purpose |
+|-------|------|---------|
+| orchestration-prompt-patterns | .claude/skill-library/prompting/orchestration-prompt-patterns/SKILL.md | Prompt engineering patterns for agents |
+
+The prompt templates in references/prompts/ implement patterns from this library skill:
+- **developer-prompt.md**: Few-shot TDD examples
+- **reviewer-prompt.md**: Chain-of-thought verification, self-consistency review
+- **architect-prompt.md**: Decision chain-of-thought with self-consistency
+- **test-lead-prompt.md**: Coverage pattern with quality scoring
+- **tester-prompt.md**: Test implementation patterns with examples
+
+When updating prompt templates, reference the library skill for:
+- Few-shot example construction
+- Chain-of-thought pattern structure
+- Self-consistency verification methods
+- Confidence calibration guidelines
 
 ### Alternative Workflows
 
@@ -451,7 +472,7 @@ Located in `references/prompts/`:
 Feature development is complete when:
 
 - ✅ All 10 phases marked "complete" in metadata.json
-- ✅ Discovery reports generated for frontend and backend
+- ✅ Discovery artifacts generated (discovery.md, file-placement.md, discovery-summary.json)
 - ✅ Tech debt registry updated with findings from architecture phase
 - ✅ All reviewers returned verdict: APPROVED
 - ✅ Test plan created and all tests implemented (quality_score >= 70)

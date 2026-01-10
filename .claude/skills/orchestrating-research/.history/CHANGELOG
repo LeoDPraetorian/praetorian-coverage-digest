@@ -1,5 +1,47 @@
 # Changelog - orchestrating-research
 
+## 2026-01-10 (Prompt Engineering Patterns Integration)
+
+### Added
+- **orchestration-prompt-patterns library skill reference** to Related Skills table
+- **Self-Consistency Protocol (MANDATORY)** in Phase 4: Synthesis
+  - Three-pass aggregation: source-first, claim-first, conflict-first
+  - Consistency check table with confidence adjustment rules
+  - Integrated into synthesis workflow (steps 1-2 before grouping)
+- **Evidence-based confidence calibration** in agent prompt templates
+  - Checklist for evidence verification (direct sources, agreement count, authority, recency)
+  - Confidence ranges tied to authoritative source agreement
+  - Replaces intuition-based confidence scoring
+- **Anti-patterns**: Single-pass synthesis, unjustified confidence, ignoring contradictions
+- **Synthesis structure enhancements**:
+  - Synthesis confidence metadata (consistency check, evidence quality, source agreement)
+  - Confidence scores on interpretations and recommendations
+  - Conflict resolution approach (3-step protocol)
+  - Methodology notes section (aggregation passes, consistency result, sources analyzed)
+
+### Changed
+- **Phase 4: Synthesis** - Added self-consistency protocol before existing synthesis steps
+- **Synthesis structure template** - Enhanced with confidence metadata and methodology tracking
+- **references/agent-prompt-templates.md** - Updated confidence scoring section with evidence-based calibration
+
+### Rationale
+**Problem**: Single-pass synthesis produces first-impression bias. Agents aggregate findings linearly (first source → second source → third source), causing early findings to dominate and later contradictions to be underweighted. Confidence scores lacked calibration, making them meaningless for weighting synthesis.
+
+**Solution**: Multi-path aggregation (self-consistency) forces three independent synthesis paths:
+1. Source-first: Extract from each agent, combine by theme (bottom-up)
+2. Claim-first: Identify claims, check which agents support each (top-down)
+3. Conflict-first: Start with disagreements, build consensus (adversarial)
+
+If all three paths agree → high confidence. If they diverge → investigate why, adjust confidence.
+
+Evidence-based confidence calibration replaces gut feeling with concrete criteria (source count, authority, agreement).
+
+### Impact
+- **Synthesis quality**: Multi-path aggregation catches conflicts that single-pass synthesis misses
+- **Confidence accuracy**: Evidence-based calibration makes scores meaningful for weighting recommendations
+- **Transparency**: Methodology notes document which aggregation approach was used
+- **Line count**: Increased from 634 to 672 lines (172 lines over soft limit, requires progressive disclosure refactor)
+
 ## 2026-01-04 (Phase 6 Workflow Handoff)
 
 ### Added

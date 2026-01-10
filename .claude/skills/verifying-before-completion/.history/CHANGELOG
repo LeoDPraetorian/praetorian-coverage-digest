@@ -1,0 +1,15 @@
+# Changelog
+
+All notable changes to this skill will be documented in this file.
+
+## [2026-01-10] - Exit Criteria Interpretation
+
+### Added
+- New "Exit Criteria Interpretation (LITERAL RULE)" section after Common Failures table
+- Table mapping exit criteria statements to literal unit counts vs incorrect interpretations
+- Real-world ambiguity trap example (118 files vs 118 function calls)
+- 5-step verification protocol for exit criteria
+- Guidance for handling ambiguous exit criteria wording
+
+### Context
+Addresses documented failure where agent claimed "118 navigation calls updated" when exit criteria required "118 files updated" - only 47 files were actually modified. New section enforces literal interpretation of completion metrics to prevent favorable but incorrect counting.

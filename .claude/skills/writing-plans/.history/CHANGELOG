@@ -2,6 +2,26 @@
 
 All notable changes to the writing-plans skill will be documented in this file.
 
+## [2026-01-10] - Add Unambiguous Exit Criteria Section
+
+### Added
+- **Unambiguous Exit Criteria section**: New MANDATORY section after Plan Document Header (line 274)
+  - Requires explicit [COUNT] [UNIT] [ACTION] format with verification commands
+  - Bad vs Good examples table showing ambiguous vs specific criteria
+  - Exit criteria template with observable metrics
+  - Real failure case study: "118 navigation calls" misinterpretation
+  - Explicit unit clarification (files/functions/lines/tests)
+
+### Rationale
+- **Prevents misinterpretation**: Real incident where "update 118 navigation calls" was interpreted as function calls (not files), leading to premature completion claim (47/118 files updated)
+- **Enforces verification**: Mandates verification commands so executing agents can validate completion objectively
+- **Removes ambiguity**: Forces plan writers to specify exact units and counts, eliminating implicit assumptions
+
+### Impact
+- Plan clarity: Eliminates vague exit criteria like "tests passing", "refactor complete"
+- Agent alignment: Executing agents have unambiguous completion criteria
+- Verification: Every criterion includes a testable verification command
+
 ## [2026-01-04] - Standardize Output Directory Structure
 
 ### Changed

@@ -242,6 +242,73 @@ After parallel agents return:
 - Run full test suite
 - Integrate all changes
 
+### Post-Completion Verification Protocol (MANDATORY)
+
+When ANY agent returns, you MUST verify before marking complete:
+
+#### Step 1: Read the Output File
+
+Do NOT trust the response summary. Read the actual output file:
+
+```bash
+# Agent should have written to OUTPUT_DIRECTORY
+cat .claude/.output/[workflow]/[agent]-output.md
+```
+
+#### Step 2: Verify Metadata Block Exists
+
+Every agent output MUST end with a JSON metadata block (per persisting-agent-outputs):
+
+```json
+{
+  "agent": "frontend-developer",
+  "skills_invoked": ["skill1", "skill2"],
+  "source_files_verified": ["path:lines"],
+  "status": "complete"
+}
+```
+
+**If metadata missing:** Agent violated persisting-agent-outputs. Do NOT mark complete.
+
+#### Step 3: Compare skills_invoked Against Mandatory List
+
+You provided MANDATORY SKILLS in the task prompt. Verify:
+
+```
+Your prompt said: MANDATORY SKILLS: persisting-agent-outputs, verifying-before-completion
+Agent metadata says: skills_invoked: ["persisting-agent-outputs"]
+
+DISCREPANCY: verifying-before-completion not invoked
+```
+
+**If discrepancy:** Note it. Consider re-spawning agent with stronger prompt.
+
+#### Step 4: Verify Exit Criteria (if task had criteria)
+
+If you specified exit criteria in the task prompt:
+
+1. Quote the criteria
+2. Check agent's output against criteria
+3. Verify the COUNT and UNIT match (see verifying-before-completion skill)
+
+#### Step 5: Only Then Mark Complete
+
+```markdown
+✅ Agent: frontend-developer
+✅ Output file: .claude/.output/features/2026-01-10/frontend-developer-implementation.md
+✅ Metadata: Present with skills_invoked array
+✅ Skills verified: 3/3 mandatory skills invoked
+✅ Exit criteria: '47 files updated' - VERIFIED (see file list in output)
+
+→ Marking phase complete
+```
+
+### Why This Protocol Exists
+
+Real failure: Orchestrator trusted agent's response summary ('118 calls updated') without reading output file. Output file showed only 47 files touched. The agent counted function calls, not files. Verification would have caught this.
+
+**The orchestrator-enforcement hook reminds you of this protocol. This skill documents the full procedure.**
+
 ## Progress Tracking
 
 **Always use TodoWrite** to track multi-phase work:

@@ -2,6 +2,60 @@
 
 All notable changes to the orchestrating-feature-development skill will be documented in this file.
 
+## [Date: 2026-01-10]
+
+### Changed - Phase 2 Discovery Integration with discovering-codebases-for-planning
+
+Replaced fixed 2-agent Explore dispatch with feature-context-aware discovery skill.
+
+#### What Changed
+
+**Phase 2 Discovery now uses `discovering-codebases-for-planning` skill:**
+- Dynamic agent count (1-10) based on feature context and codebase size
+- Three-stage process: Scoping → Parallel Discovery → Synthesis
+- Structured outputs: discovery.md + file-placement.md + discovery-summary.json
+
+#### Files Modified
+
+1. **SKILL.md Updates:**
+   - Quick Reference table Phase 2 row: "discovering-codebases-for-planning | PARALLEL (dynamic)"
+   - Workflow diagram Phase 2 box: THREE-STAGE with skill invocation details
+   - Required Sub-Skills table: Added discovering-codebases-for-planning to Phase 2
+   - Integration "Requires" table: Added discovering-codebases-for-planning entry
+   - Integration "Spawns" table: Removed Phase 2 Explore ×2, added note that spawning handled by skill
+   - Agent Matrix table: Updated Discovery column to show discovering-codebases-for-planning (1-10 agents)
+   - Exit Criteria: Updated to reference new discovery artifacts
+
+2. **references/phase-2-discovery.md:**
+   - Complete rewrite with three-stage workflow
+   - Skill invocation instructions
+   - Stage breakdown (Scoping, Parallel Discovery, Synthesis)
+   - Handoff protocol to Phase 3 and Phase 4
+   - metadata.json update schema
+   - Error handling scenarios
+
+3. **references/prompts/explore-prompt.md:**
+   - Added header note: "This prompt template is now used internally by the discovering-codebases-for-planning skill"
+
+#### Why This Changed
+
+**Previous approach (fixed 2 Explore agents):**
+- No feature-context filtering (analyzed everything)
+- Fixed parallelization regardless of codebase size
+- Unstructured handoff (just markdown files)
+
+**New approach (discovering-codebases-for-planning):**
+- Only analyzes components RELEVANT to feature
+- Dynamic agent count (1-10) based on actual scope
+- Structured output (JSON + markdown) for downstream planning
+
+#### Backward Compatibility
+
+- discovery.md still produced (same file, same format)
+- frontend-discovery.md and backend-discovery.md replaced by unified discovery.md
+- New artifacts are ADDITIONS (file-placement.md, discovery-summary.json)
+- Phase 3 and Phase 4 can consume new or old format
+
 ## [Date: 2026-01-06]
 
 ### Added - Skill Composition Patterns (MAJOR ARCHITECTURE UPDATE)

@@ -63,6 +63,53 @@ Create a comprehensive test plan covering:
 2. **Integration Tests**: End-to-end detection flow
 3. **Acceptance Tests**: Real targets with known positive/negative cases
 
+## Capability Test Coverage Pattern
+
+### Required Test Categories
+
+**1. Detection Accuracy (MUST HAVE)**
+- True positive: Known vulnerable targets detected
+- True negative: Patched/non-vulnerable targets NOT detected
+- Boundary cases: Edge versions, partial patches
+
+**2. False Positive Prevention (MUST HAVE)**
+- Similar but non-vulnerable configurations
+- Common false positive triggers
+- Version edge cases
+
+**3. Evasion Resistance (MUST HAVE)**
+- Common evasion techniques
+- Encoding variations
+- Protocol edge cases
+
+**4. Performance (MUST HAVE)**
+- Single target timing
+- Batch processing efficiency
+- Resource usage
+
+**5. Integration (IF APPLICABLE)**
+- Scanner pipeline integration
+- Output format compliance
+- Error propagation
+
+---
+
+### Coverage Checklist
+
+| Category | Test Case | Covered? | File |
+|----------|-----------|----------|------|
+| True Positive | [vulnerable target] | □ | |
+| True Negative | [patched target] | □ | |
+| False Positive | [similar config] | □ | |
+| Evasion | [technique 1] | □ | |
+| Performance | [timing test] | □ | |
+
+**Minimum quality_score: 70**
+- True/False positive coverage: 40 points
+- Evasion resistance coverage: 20 points
+- Performance tests: 20 points
+- Integration tests: 20 points
+
 ## Test Plan Structure
 
 Your test-plan.md MUST include:

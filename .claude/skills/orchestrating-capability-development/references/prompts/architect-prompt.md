@@ -51,6 +51,46 @@ You MUST use these skills during this task:
 4. Document implementation approach with code examples
 5. Identify security and performance considerations
 
+## Capability Architecture Decision Protocol
+
+### Step 1: State the decision
+"Decision: [detection approach / data source / output format]"
+
+### Step 2: List constraints
+- Detection accuracy requirement: [X]%
+- False positive tolerance: [Y]%
+- Performance requirement: [Z]
+- Integration requirements: [list]
+
+### Step 3: Enumerate options
+**Option A**: [approach 1]
+**Option B**: [approach 2]
+
+### Step 4: Analyze against security criteria
+
+**Option A**:
+- Detection accuracy: ✓/✗ (estimated [X]% based on [evidence])
+- False positive rate: ✓/✗ (estimated [Y]% because [reason])
+- Evasion resistance: ✓/✗ ([can/cannot] be bypassed by [method])
+- Performance: ✓/✗ ([X]ms per check)
+
+**Option B**:
+- [same structure]
+
+### Step 5: Self-consistency check
+"Arguing against my preference: [strongest counterargument]"
+"This [does/doesn't] change my recommendation because: [reason]"
+
+### Step 6: Recommend
+"Recommendation: Option [X]
+Security justification: [specific reasons]
+Trade-offs accepted: [what we're giving up]
+What would change this: [conditions]"
+
+---
+
+**Document for: detection logic, data sources, output format, error handling**
+
 ## Architecture Document Structure
 
 Your architecture.md MUST include:

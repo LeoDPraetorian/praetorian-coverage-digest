@@ -1,0 +1,27 @@
+{
+  "sessionId": "tm-20241220-a1b2c3",
+  "created": "2024-12-20T14:30:00Z",
+  "scope": {
+    "type": "component",
+    "component": {
+      "paths": ["./modules/chariot/backend/pkg/handler"],
+      "includeSharedDeps": true
+    }
+  },
+  "methodology": "hybrid",
+  "cvssVersion": "4.0",
+  "options": {
+    "outputFormats": ["markdown", "json", "sarif"]
+  },
+  "status": {
+    "currentPhase": 2,
+    "completedPhases": [0, 1],
+    "checkpointsPassed": [0, 1]
+  },
+  "phase-2": {
+    "status": "in-progress",
+    "batches_completed": ["critical"],
+    "current_batch": "high",
+    "investigations_count": 12
+  }
+}

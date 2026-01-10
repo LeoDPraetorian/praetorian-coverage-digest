@@ -402,16 +402,46 @@ Each agent prompt MUST include:
 
 ### Phase 4: Synthesis
 
-**Goal:** Cross-reference results and detect conflicts
+**Goal:** Cross-reference results and detect conflicts using multi-path aggregation
+
+**Self-Consistency Protocol (MANDATORY):**
+
+Before finalizing synthesis, perform three aggregation passes:
+
+**Pass 1 - Source-First**:
+Start with each agent's output, extract findings, combine by theme.
+Document: "Source-first synthesis: [key points]"
+
+**Pass 2 - Claim-First**:
+Identify major claims across all sources, check which agents support each.
+Document: "Claim-first synthesis: [key points]"
+
+**Pass 3 - Conflict-First**:
+Start with disagreements between sources, resolve them, build consensus.
+Document: "Conflict-first synthesis: [key points]"
+
+**Consistency Check**:
+| Aspect | Pass 1 | Pass 2 | Pass 3 | Consistent? |
+|--------|--------|--------|--------|-------------|
+| Main conclusion | | | | |
+| Finding 1 | | | | |
+| Finding 2 | | | | |
+
+- All three agree → High confidence (0.85+)
+- Two agree → Medium confidence (0.7), investigate difference
+- All differ → Low confidence (0.5), flag for human review
 
 **After all agents return:**
 
-1. **Group by interpretation**: Organize findings by interpretation first
-2. **Merge within interpretation**: Combine all source findings for each interpretation
-3. **Cross-reference patterns**: Identify themes appearing across multiple interpretations
-4. **Detect conflicts**: Flag disagreements between sources
-5. **Generate executive summary**: 2-3 paragraphs summarizing key findings
-6. **Create recommendations**: Prioritized next steps based on findings
+1. **Perform three aggregation passes** (source-first, claim-first, conflict-first)
+2. **Check consistency** across passes
+3. **Group by interpretation**: Organize findings by interpretation first
+4. **Merge within interpretation**: Combine all source findings for each interpretation
+5. **Cross-reference patterns**: Identify themes appearing across multiple interpretations
+6. **Detect conflicts**: Flag disagreements between sources with analysis
+7. **Adjust confidence**: Based on consistency check results
+8. **Generate executive summary**: 2-3 paragraphs synthesizing key findings
+9. **Create recommendations**: Prioritized next steps based on findings
 
 **Synthesis structure:**
 
@@ -420,11 +450,16 @@ Each agent prompt MUST include:
 
 [2-3 paragraphs synthesizing all findings]
 
+**Synthesis Confidence: [0.0-1.0]**
+- Consistency check: [All agree | Two agree | Mixed]
+- Evidence quality: [Strong | Moderate | Weak]
+- Source agreement: [High | Medium | Low]
+
 # Findings by Interpretation
 
 ## Interpretation 1: {name}
 
-### Key Findings
+### Key Findings (confidence: X.X)
 
 - ...
 
@@ -444,19 +479,31 @@ Each agent prompt MUST include:
 
 [Disagreements between sources with analysis]
 
+**Resolution approach for each conflict:**
+1. State the conflicting claims
+2. Analyze WHY sources disagree (context, date, scope)
+3. Provide nuanced synthesis or flag as unresolved
+
 # Knowledge Gaps
 
 [What wasn't found or needs further research]
 
 # Recommendations
 
-1. [Priority 1 recommendation]
-2. [Priority 2 recommendation]
+1. [Priority 1 recommendation] (confidence: X.X)
+2. [Priority 2 recommendation] (confidence: X.X)
    ...
 
 # Full Citations
 
 [All URLs, arxiv IDs, file paths]
+
+# Methodology Notes
+
+- Aggregation passes performed: 3 (source-first, claim-first, conflict-first)
+- Consistency check result: [outcome]
+- Total sources analyzed: N
+- Date range of sources: [range]
 ```
 
 **See:** [references/synthesis-protocol.md](references/synthesis-protocol.md) for conflict detection patterns
@@ -581,6 +628,9 @@ Without this handoff protocol, research becomes a dead end. The agent completes 
 | Synthesizing without conflict detection     | Misses disagreements, presents false consensus | Explicitly flag conflicts between sources   |
 | Generic topic names                         | Hard to find later, unclear scope              | Use semantic kebab-case names (2-4 words)   |
 | Implementing research logic inline          | Duplicates agent code, hard to maintain        | Delegate to research agents                 |
+| Single-pass synthesis                       | Misses conflicts, first-impression bias        | Three-pass aggregation with consistency check |
+| Unjustified confidence                      | Scores meaningless for weighting               | Require evidence-based calibration          |
+| Ignoring contradictions                     | False consensus in synthesis                   | Conflict-first pass surfaces disagreements  |
 
 ## Key Principles
 
@@ -616,11 +666,12 @@ Without this handoff protocol, research becomes a dead end. The agent completes 
 
 ## Related Skills
 
-| Skill                                 | Access Method                                                        | Purpose                                  |
-| ------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------- |
-| `translating-intent`                  | `Read(".claude/skill-library/research/translating-intent/SKILL.md")` | Query expansion (invoke in analyze mode) |
-| `orchestrating-multi-agent-workflows` | `skill: "orchestrating-multi-agent-workflows"`                       | General orchestration patterns           |
-| `persisting-agent-outputs`            | `skill: "persisting-agent-outputs"`                                  | Output persistence patterns              |
+| Skill                                 | Access Method                                                                           | Purpose                                       |
+| ------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `translating-intent`                  | `Read(".claude/skill-library/research/translating-intent/SKILL.md")`                    | Query expansion (invoke in analyze mode)      |
+| `orchestrating-multi-agent-workflows` | `skill: "orchestrating-multi-agent-workflows"`                                          | General orchestration patterns                |
+| `persisting-agent-outputs`            | `skill: "persisting-agent-outputs"`                                                     | Output persistence patterns                   |
+| `orchestration-prompt-patterns`       | `Read(".claude/skill-library/prompting/orchestration-prompt-patterns/SKILL.md")`        | Prompt quality patterns for agents and synthesis |
 
 ## Progressive Disclosure
 

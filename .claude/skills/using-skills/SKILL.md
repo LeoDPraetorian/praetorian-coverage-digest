@@ -62,6 +62,8 @@ These thoughts mean STOP—you're rationalizing:
 | "I'll just do this one thing first" | Check BEFORE doing anything.                           |
 | "This feels productive"             | Undisciplined action wastes time. Skills prevent this. |
 | "I know what that means"            | Knowing the concept ≠ using the skill. Invoke it.      |
+| "I'm done, no need to verify"       | Completion claims require evidence. Invoke verifying-before-completion. |
+| "Tests pass so requirements met"    | Tests ≠ requirements. Verify exit criteria separately. |
 
 ## Skill Priority
 
@@ -72,6 +74,30 @@ When multiple skills could apply, use this order:
 
 "Let's build X" → brainstorming first, then implementation skills.
 "Fix this bug" → debugging first, then domain-specific skills.
+
+## Completion Skills
+
+**Before claiming ANY task complete, check for completion skills:**
+
+| About to... | Required Skill |
+|-------------|----------------|
+| Claim task/phase complete | `verifying-before-completion` |
+| Mark batch done | `verifying-before-completion` |
+| Say 'done', 'finished', 'complete' | `verifying-before-completion` |
+| Create commit/PR | `verifying-before-completion` |
+| Return from subagent task | `verifying-before-completion` |
+
+**The completion trap:**
+
+```
+❌ WRONG: 'I updated all 118 files. Done!'
+   (No verification - how do you KNOW it's 118?)
+
+✅ RIGHT: [Invoke verifying-before-completion]
+   'Exit criteria: 118 files. Verified: grep shows 118 files updated.'
+```
+
+**Completion is a task.** It requires skill invocation like any other task.
 
 ## Skill Types
 

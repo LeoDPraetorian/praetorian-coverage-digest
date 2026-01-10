@@ -116,6 +116,99 @@ State explicitly:
 5. Add inline documentation
 6. Create implementation log documenting decisions
 
+## TDD Pattern for Capabilities (Follow These Examples)
+
+### Example 1: VQL Capability Test
+
+**Task**: Add VQL capability to detect open S3 buckets
+
+**Step 1 - Write failing test first**:
+```yaml
+# tests/s3_bucket_exposure_test.yaml
+name: S3 Bucket Exposure Detection Test
+test_cases:
+  - name: detects_public_bucket
+    input:
+      bucket_name: "test-bucket"
+      acl: "public-read"
+    expected:
+      detected: true
+      severity: "high"
+
+  - name: ignores_private_bucket
+    input:
+      bucket_name: "private-bucket"
+      acl: "private"
+    expected:
+      detected: false
+```
+
+**Step 2 - Run test, verify failure**:
+```
+FAIL: Capability s3_bucket_exposure not found
+```
+✓ Correct - capability doesn't exist yet
+
+**Step 3 - Implement minimal capability**:
+```yaml
+# capabilities/s3_bucket_exposure.yaml
+name: S3 Bucket Exposure
+description: Detects publicly accessible S3 buckets
+queries:
+  - SELECT * FROM s3_buckets()
+    WHERE acl = 'public-read' OR acl = 'public-read-write'
+severity: high
+```
+
+**Step 4 - Verify tests pass**:
+```
+PASS: detects_public_bucket
+PASS: ignores_private_bucket
+```
+
+### Example 2: Nuclei Template Test
+
+**Task**: Add Nuclei template for CVE-2024-1234
+
+**Step 1 - Write failing test**:
+```yaml
+# tests/cve_2024_1234_test.yaml
+test_cases:
+  - name: detects_vulnerable_version
+    target: "http://test-vulnerable:8080"
+    expected_match: true
+    expected_severity: "critical"
+
+  - name: ignores_patched_version
+    target: "http://test-patched:8080"
+    expected_match: false
+```
+
+**Step 2 - Verify failure**: Template not found ✓
+
+**Step 3 - Implement template**:
+```yaml
+id: CVE-2024-1234
+info:
+  name: Example Vulnerability
+  severity: critical
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}/vulnerable-endpoint"
+    matchers:
+      - type: word
+        words:
+          - "vulnerable-version-string"
+```
+
+**Step 4 - Verify pass**: All test cases green ✓
+
+---
+
+**Apply this pattern. Test MUST fail before implementation.**
+
 ## Capability Artifacts by Type
 
 ### VQL Capabilities

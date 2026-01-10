@@ -1,0 +1,17 @@
+# Changelog - using-skills
+
+## 2026-01-10 - Add Completion Skills Section
+
+**Type**: Enhancement (structural)
+
+**Changes**:
+- Added new "Completion Skills" section after "Skill Priority" (line 76-98)
+- Added mandate to invoke `verifying-before-completion` before claiming completion
+- Added completion trap examples (wrong vs right patterns)
+- Added 2 new red flags to Red Flags table:
+  - "I'm done, no need to verify" → Completion claims require evidence
+  - "Tests pass so requirements met" → Tests ≠ requirements
+
+**Rationale**: Agents were claiming tasks complete without verification (e.g., "I updated all 118 files. Done!"). This creates a loophole where completion bypasses the verification skill that exists specifically for this purpose.
+
+**Impact**: +24 lines (86 → 110 lines, well under 500-line limit)

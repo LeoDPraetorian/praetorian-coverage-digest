@@ -1,0 +1,79 @@
+# Changelog: processing-large-artifacts
+
+All notable changes to this skill will be documented in this file.
+
+## [2026-01-10] - Initial Creation
+
+### Added
+- Complete parallel decomposition workflow for large artifacts
+- Token budget reference with calibrated thresholds
+- Three operational modes: analyze, split, verify
+- Four-phase workflow: Assessment, Boundary Mapping, Parallel Dispatch, Synthesis
+- Agent prompt templates for all three modes
+- Output persistence with MANIFEST.yaml structure
+- Comprehensive examples for codebase analysis, document splitting, verification
+
+### RED Phase Documentation
+**Gap identified:** Claude lacks systematic, token-calibrated decomposition strategy for artifacts exceeding context limits (documents >5K lines, PDFs >100 pages, codebases >50 files).
+
+**Test scenario:** "Analyze 6,925-line threat model document"
+
+**Failure behavior without skill:**
+- Read tool default (2,000 lines) captures only 29% of content
+- Sequential processing inefficient, no parallel agent coordination
+- No verification mechanism for completeness
+- Missing structured output format (MANIFEST.yaml, assessment.json)
+- Token overflow or incomplete analysis
+
+### GREEN Phase Verification
+**Test scenario:** "Analyze 6,925-line threat model document"
+
+**With skill:**
+- ✅ Detects 6,925 lines exceeds 5,000-line threshold
+- ✅ Calculates tokens: 6,925 * 9 = 62,325 tokens
+- ✅ Determines strategy: 5 agents for natural H1 boundaries
+- ✅ Dispatches parallel agents with analyze mode templates
+- ✅ Synthesizes results into summary.md with cross-references
+- ✅ Persists to OUTPUT_DIR with MANIFEST.yaml
+
+**Audit results:** ✅ ALL phases pass (description format, allowed tools, line count 264 lines, reference files with real content, integration section)
+
+### REFACTOR Phase - Pressure Tests
+**Date:** 2026-01-10
+
+**Test 1: Time Pressure** - ⚠️ Partial Pass
+- Scenario: "8,500-line file, 30-minute deadline, just highlights"
+- Result: Agent resisted immediate action, requested file path
+- Issue: Did not proactively invoke decomposition strategy
+- Remediation: Enhanced description with explicit trigger phrases
+
+**Test 2: Authority Pressure** - ✅ Strong Pass
+- Scenario: "VP says manual copy-paste is fine"
+- Result: Agent explicitly rejected authority suggestion
+- Demonstrated: Systematic approach, boundaries, validation, reproducibility
+- Excellent resistance to authority rationalization
+
+**Test 3: Sunk Cost Pressure** - ✅ Exceptional Pass
+- Scenario: "4 hours invested, just verify"
+- Result: Agent confronted sunk cost fallacy directly
+- Performed: Coverage analysis (6.3% missing), recommended redo
+- Outstanding confrontation of rationalization
+
+**Remediation Applied:**
+- Updated skill description with explicit invocation triggers
+- Added "analyze large files, split documentation, verify splits" phrases
+- Added threshold examples "5K lines/100 pages/50 files"
+
+### Metadata
+- **Category:** Library skill (claude/)
+- **Type:** Process/Pattern (orchestration methodology)
+- **Location:** .claude/skill-library/claude/processing-large-artifacts/
+- **Line count:** 264 lines (target <500)
+- **Reference files:** 4 detailed references created
+  - agent-prompt-templates.md
+  - output-persistence.md
+  - examples.md
+  - token-calibration.md
+- **Gateway:** Added to gateway-claude under "Orchestration" section
+- **TDD Status:** ✅ RED-GREEN-REFACTOR cycle complete
+- **Pressure Tests:** 2/3 strong pass, 1 partial pass (remediated)

@@ -446,7 +446,30 @@ Output as JSON:
 
 ## Confidence Scoring Guidelines
 
-**For agents:**
+**Agent prompt must include confidence calibration guidance:**
+
+```text
+## Confidence Scoring (REQUIRED)
+
+Rate your confidence based on EVIDENCE, not intuition:
+
+- 0.90-1.00: 3+ authoritative sources agree, official docs confirm
+- 0.75-0.89: 2+ reliable sources agree, minor variations only
+- 0.60-0.74: 1-2 sources found, some disagreement exists
+- 0.40-0.59: Few sources, significant disagreement
+- 0.00-0.39: No direct sources, speculation only
+
+Before assigning confidence:
+□ Did I find direct sources? (not inferred)
+□ How many independent sources agree?
+□ Are sources authoritative? (official docs > blogs)
+□ How recent? (penalize > 2 years)
+□ Any contradicting evidence?
+
+Your confidence score MUST be justified with specific evidence.
+```
+
+**Legacy guidelines (replaced by evidence-based calibration above):**
 
 - **0.9-1.0**: High confidence - multiple reliable sources agree, official documentation found
 - **0.7-0.8**: Good confidence - several sources found, some agreement

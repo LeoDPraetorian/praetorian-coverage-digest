@@ -1,0 +1,41 @@
+# Changelog - processing-large-skills
+
+## 2026-01-10 - Initial Creation
+
+**RED Phase Documentation:**
+
+- **Gap:** When encountering skills with progressive disclosure (SKILL.md + 5-15 reference files), Claude either:
+  - Reads only SKILL.md, missing detailed patterns in references
+  - Reads files sequentially, losing context between files
+  - Fails to synthesize how components relate to each other
+  - Cannot trace dependency chains (skill A calls skill B calls skill C)
+
+- **Test Scenario:** "Help me understand the managing-skills skill"
+  - managing-skills has SKILL.md + 7 reference files + delegates to 10 library skills
+  - Without systematic analysis: partial understanding, missed relationships, incomplete dependency map
+
+- **Failure Behaviors:**
+  - Reads 2-3 files, claims understanding
+  - Misses that managing-skills is a router (doesn't implement, only delegates)
+  - Cannot explain the full workflow from command to library skill execution
+  - No structured output for future reference
+
+**Skill Details:**
+
+- **Category:** claude/skill-management
+- **Type:** Process/Pattern
+- **Location:** Library (.claude/skill-library/)
+- **Purpose:** Systematic analysis of complex, multi-file skills using parallel agent coordination
+- **Modes:** understand, compare, trace
+
+**Created:** Initial SKILL.md with 250 lines (within <500 line limit)
+
+**GREEN Phase:** Skill successfully addresses gap - provides systematic parallel analysis
+
+**REFACTOR Phase:**
+- Pressure Test 1 (Time): PASS ✅
+- Pressure Test 2 (Authority): PASS ✅
+- Pressure Test 3 (Sunk Cost): FAIL ❌ → Loophole closed
+- Added counter-rationalization: "User already spent time reading manually" pitfall
+- Re-test after loophole closure: Counter-rationalization recognized
+- Final line count: 252 lines (within <500 line limit)

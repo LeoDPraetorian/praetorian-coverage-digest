@@ -447,6 +447,14 @@ Located in `references/prompts/`:
 | `test-lead-prompt.md` | Phase 6 (Step 1, 3) | test-lead            |
 | `tester-prompt.md`    | Phase 6 (Step 2)    | capability-tester    |
 
+### Library Skills (Reference for Prompt Quality)
+
+| Skill | Path | Purpose |
+|-------|------|---------|
+| orchestration-prompt-patterns | .claude/skill-library/prompting/orchestration-prompt-patterns/SKILL.md | Prompt engineering patterns for agents |
+
+Prompt templates implement patterns from this library skill.
+
 ### Alternative Workflows
 
 | Skill                                    | When to Use Instead                                                    |

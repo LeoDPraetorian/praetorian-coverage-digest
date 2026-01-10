@@ -1,3 +1,21 @@
+## [2026-01-10] - Fix Path Inconsistency
+
+### Changed
+
+- Line 336: Replaced `.claude/.threat-model/{session}/phase-3/` with `.claude/.output/threat-modeling/{timestamp}-{slug}/phase-3/`
+
+### Rationale
+
+- Standardizes output directory path with threat-modeling-orchestrator skill conventions
+- Uses consistent session identifier format matching persisting-agent-outputs skill
+- Aligns with established `.claude/.output/` convention for orchestrator outputs
+
+### Line Count
+
+- 438 lines (unchanged - well under 500 limit)
+
+---
+
 ## [2024-12-17] - Initial Creation
 
 ### Created

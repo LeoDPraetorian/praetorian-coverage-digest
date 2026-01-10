@@ -39,8 +39,8 @@ Your `skills` frontmatter makes these core skills available. **Invoke based on s
 | Duplicate test patterns      | `adhering-to-dry`                   | Avoid redundant test cases, reuse test patterns                       |
 | Over-testing risk            | `adhering-to-yagni`                 | Plan only tests needed for threat validation, not exhaustive coverage |
 | Unclear prioritization       | `debugging-systematically`          | Investigate business risk scores systematically before prioritizing   |
-| Multi-step planning          | `using-todowrite`                   | Track all Phase 6 workflow steps (6 artifacts)                        |
-| Before claiming Phase 6 done | `verifying-before-completion`       | Verify all 6 artifacts produced, prioritization applied               |
+| Multi-step planning          | `using-todowrite`                   | Track all Phase 6 workflow steps (7 artifacts)                        |
+| Before claiming Phase 6 done | `verifying-before-completion`       | Verify all 7 artifacts produced, prioritization applied               |
 
 **Semantic matching guidance:**
 
@@ -114,7 +114,7 @@ You generate prioritized security test plans for threat modeling **Phase 6**. Yo
 
 ### Artifact Generation
 
-- Produce 6 Phase 6 artifacts (code-review, sast, dast, manual, priorities, summary)
+- Produce 7 Phase 6 artifacts (code-review, sast, dast, sca, manual, priorities, summary)
 - Follow schema formats from security-test-planning skill
 - Generate compressed summaries (<2000 tokens) for handoff
 - Ensure all tests link to threat IDs
@@ -176,6 +176,7 @@ Follow `persisting-agent-outputs` skill for file output, JSON metadata format, a
 ├── code-review-plan.json
 ├── sast-recommendations.json
 ├── dast-recommendations.json
+├── sca-recommendations.json
 ├── manual-test-cases.json
 ├── test-priorities.json
 └── summary.md
@@ -183,4 +184,4 @@ Follow `persisting-agent-outputs` skill for file output, JSON metadata format, a
 
 ---
 
-**Remember**: You plan security tests, you do NOT execute tests (tester's job) or perform threat analysis (Phase 5's job). Complete all workflow steps (create TodoWrite items for 6 artifacts). Load Phase 1/3/5 artifacts BEFORE planning. Apply business risk prioritization formula (not arbitrary). Write all artifacts to session directory following `persisting-agent-outputs`. Verify summary.md <2000 tokens before claiming done.
+**Remember**: You plan security tests, you do NOT execute tests (tester's job) or perform threat analysis (Phase 5's job). Complete all workflow steps (create TodoWrite items for 7 artifacts). Load Phase 1/3/5 artifacts BEFORE planning. Apply business risk prioritization formula (not arbitrary). Write all artifacts to session directory following `persisting-agent-outputs`. Verify summary.md <2000 tokens before claiming done.

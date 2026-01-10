@@ -1,5 +1,51 @@
 # Changelog - executing-plans
 
+## 2026-01-10 - Add mandatory human checkpoint enforcement
+
+**Type:** Enhancement (Prevent runaway batch execution)
+
+**Problem:**
+Real failure: Agent executed 4 batches without stopping, claimed 118 files updated when only 47 were done. No checkpoint allowed orchestrator to catch the miscount after batch 1. Agents were proceeding through batches without waiting for human confirmation, rationalizing that silence meant approval.
+
+**Gap:**
+- Step 3 (Report) didn't explicitly mandate waiting for human response
+- No checkpoint protocol explaining why waiting is critical
+- Phase transitions (Step 8) didn't block on human approval
+- Agents could rationalize skipping checkpoints ("batch was simple")
+
+**Solution:**
+Added mandatory checkpoint enforcement at three locations:
+
+1. **Single-File Plans Step 3** (line 59-79):
+   - Renamed to "Report and WAIT"
+   - Added 4-step reporting protocol (implementation list, verification output, exit criteria check, explicit wait statement)
+   - Added CRITICAL blocking rule: "DO NOT proceed to Step 4 without human confirmation"
+   - Listed rationalization patterns to avoid (silence = approval, timeout, batching checkpoints, "simple" batches)
+   - Explicit instruction: "If no response after reporting: Wait. Do not proceed."
+
+2. **Human Checkpoint Protocol** (new section after Step 4, line 89-102):
+   - Real failure case documentation (118 vs 47 files incident)
+   - 4 checkpoint rules (evidence required, wait for response, fix before next batch, no rationalizations)
+   - Warning: "If you're tempted to skip: That's the exact moment the checkpoint matters most"
+
+3. **Phased Plans Step 8** (line 314-322):
+   - Added CRITICAL blocking rule for phase transitions
+   - Listed what requires approval (next phase start, PLAN.md updates, progress tracking)
+   - Defined acceptable confirmations (explicit approval) vs unacceptable (silence, "I'll review later")
+
+**Verification:**
+- All three locations now explicitly state DO NOT PROCEED without human confirmation
+- Checkpoint protocol provides context (real failure) and rules (no rationalizations)
+- Phase transitions have same blocking enforcement as batch checkpoints
+
+**Impact:**
+- Prevents runaway execution across multiple batches
+- Forces evidence-based reporting (not just "done")
+- Enables orchestrator to catch errors after first batch, not fourth batch
+- Makes checkpoints mandatory, not optional based on agent judgment
+
+---
+
 ## 2025-12-30 - Add phased plan execution support
 
 **Type:** Enhancement (Progressive disclosure for plan execution)
