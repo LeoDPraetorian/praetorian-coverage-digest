@@ -1,0 +1,17 @@
+# Changelog - gateway-security
+
+## 2026-01-09 - Added Windows Security Reference Skills
+
+**Added to Intent Detection Table**:
+- "Windows internals" / "kernel" / "CreateProcess" → `windows-internals`
+- "Windows authentication" / "Kerberos" / "NTLM" → `windows-security-internals`
+- "EDR" / "EDR evasion" / "function hooking" / "ETW" → `evading-edr`
+
+**Added to Skill Registry** (new section: Windows Security References):
+- `windows-internals` - Windows Internals 7th Edition Part 1 (OS architecture, kernel, processes, threads, memory, I/O, security)
+- `windows-security-internals` - Windows Security Internals (authentication, Kerberos, NTLM, access tokens, security descriptors)
+- `evading-edr` - Evading EDR (EDR architecture, function hooks, kernel callbacks, ETW, offensive security)
+
+**Location**: `.claude/skill-library/security/windows/`
+
+**Use Case**: Routes Windows security questions to authoritative technical book references.

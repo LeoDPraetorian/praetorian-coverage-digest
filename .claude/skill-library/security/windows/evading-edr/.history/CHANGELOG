@@ -1,0 +1,63 @@
+# Changelog - evading-edr
+
+## 2026-01-09 - Initial Creation
+
+**Type**: Library/Framework skill
+**Category**: security/windows
+**Location**: `.claude/skill-library/security/windows/evading-edr/`
+
+**RED Phase Documentation**:
+
+**Gap**: When users ask questions about EDR architecture, detection mechanisms, evasion techniques, function hooking, kernel callbacks, ETW internals, or offensive security tradecraft, Claude:
+- Relies on training data that may not cover latest EDR implementations
+- Cannot reference specific evasion techniques, sensor components, or detection logic from authoritative offensive security sources
+- Misses technical details about EDR internals crucial for red team operations and security tool development
+- Cannot provide citations from Matt Hand's comprehensive EDR evasion guide
+
+**Test Scenario**: User asks "How do EDRs use ETW for telemetry collection? What are the bypass techniques?"
+
+**Expected Behavior**: Claude reads `EvadingEDR/chapters/chapter-08.md`, explains ETW provider architecture, trace sessions, consumer mechanisms, discusses ETW patching and tampering techniques, and cites Evading EDR by Matt Hand.
+
+**GREEN Phase**: TBD - Will verify skill provides access to EDR architecture and evasion techniques.
+
+**Book Details**:
+- Author: Matt Hand
+- Publisher: No Starch Press (2024)
+- Focus: EDR architecture from offensive security perspective, evasion techniques
+
+**Chapters Available**: 0-2, 4-5, 7-8, 11-13 (EDR architecture, Function hooks, Object notifications, Image-load/registry notifications, Network filters, ETW, ELAM, Threat-Intelligence provider, Detection-aware attack case study)
+
+**Content Source**: OCR-transcribed markdown chapters in `EvadingEDR/chapters/` with automated error corrections applied (9 lines fixed including EDR Architecture capitalization, Mimikatz corrections).
+
+**Security Context**: This book describes offensive security techniques. Use ONLY in authorized contexts: pentesting engagements, red team exercises, security research on owned systems, CTF competitions, defensive analysis.
+
+**Related Skills**:
+- `windows-internals` - **FREQUENTLY PAIRED** - Provides OS foundation (processes, drivers, kernel) for EDR concepts
+- `windows-security-internals` - Authentication and token manipulation in evasion context
+
+## 2026-01-09 - GREEN Phase Verified
+
+**Test Scenario**: Verified access to Chapter 8 "Event Tracing for Windows" with ETW architecture, provider/consumer model, and telemetry collection details.
+
+**Result**: SUCCESS ✅
+- Skill successfully routes to `EvadingEDR/chapters/chapter-08.md`
+- Chapter contains complete ETW architecture, logging facility usage, EDR telemetry collection mechanisms, and evasion techniques
+- Offensive security perspective documented with authorization requirements
+
+**Gateway Integration**: Added to `gateway-security` with triggers "EDR", "EDR evasion", "function hooking", "ETW"
+
+## 2026-01-09 - REFACTOR Phase Complete
+
+**Pressure Test Approach**: Library/Framework reference skills (passive documentation) - sanity checks performed.
+
+**Result**: Skills provide reliable access to Matt Hand's authoritative EDR evasion techniques. Security context warnings included (authorized use only).
+
+## 2026-01-09 - Chapter Files Relocated
+
+**Change**: Copied all chapter files from repository root to `references/chapters/` within skill directory.
+
+**After**: Chapters included in `references/chapters/` (10 files: chapter-00.md, 01-02, 04-05, 07-08, 11-13)
+
+**Updated Paths**: `.claude/skill-library/security/windows/evading-edr/references/chapters/chapter-0N.md`
+
+**Rationale**: Self-contained for version control.

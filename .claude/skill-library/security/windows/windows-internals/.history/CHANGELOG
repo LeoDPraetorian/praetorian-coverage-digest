@@ -1,0 +1,70 @@
+# Changelog - windows-internals
+
+## 2026-01-09 - Initial Creation
+
+**Type**: Library/Framework skill
+**Category**: security/windows
+**Location**: `.claude/skill-library/security/windows/windows-internals/`
+
+**RED Phase Documentation**:
+
+**Gap**: When users ask deep technical questions about Windows kernel internals, process/thread management, memory management, I/O system, or low-level security mechanisms, Claude:
+- Relies on training data that may be outdated or incomplete
+- Cannot reference specific chapters, diagrams, or technical details from Windows Internals 7th Edition
+- Misses implementation-specific details crucial for security research and tool development
+- Cannot provide authoritative citations from the canonical Windows internals reference
+
+**Test Scenario**: User asks "How does Windows implement process creation at the kernel level? Walk me through the CreateProcess stages."
+
+**Expected Behavior**: Claude reads `Winternals7thPt1/chapters/chapter-03.md`, references the "Flow of CreateProcess" section with the 7-stage breakdown (validation, image opening, process object creation, thread initialization, subsystem initialization, thread startup, process initialization), and cites Windows Internals 7th Edition.
+
+**GREEN Phase**: TBD - Will verify skill provides access to chapter content and enables accurate technical responses.
+
+**Book Details**:
+- Authors: Mark E. Russinovich, David A. Solomon, Alex Ionescu, Pavel Yosifovich
+- Edition: 7th Edition, Part 1 (2017)
+- Publisher: Microsoft Press
+- Coverage: Windows 10 and Windows Server 2016
+- Chapters: 0-7 (Front matter, Concepts/tools, System architecture, Processes/jobs, Threads, Memory management, I/O system, Security)
+
+**Content Source**: OCR-transcribed markdown chapters in `Winternals7thPt1/chapters/` with automated error corrections applied (48 patterns fixed).
+
+**Related Skills**:
+- `windows-security-internals` - Complements Chapter 7 with deeper authentication/authorization coverage
+- `evading-edr` - Applies Windows Internals concepts to EDR evasion techniques
+
+## 2026-01-09 - GREEN Phase Verified
+
+**Test Scenario**: User asks "How does Windows implement process creation at the kernel level? Walk me through the CreateProcess stages."
+
+**Result**: SUCCESS ✅
+- Skill successfully routes to `Winternals7thPt1/chapters/chapter-03.md`
+- Chapter contains complete 7-stage CreateProcess flow (validation, image opening, process object creation, thread initialization, subsystem initialization, thread startup, process initialization)
+- Authoritative technical details accessible with proper citation
+
+**Gateway Integration**: Added to `gateway-security` with triggers "Windows internals", "kernel", "CreateProcess"
+
+## 2026-01-09 - REFACTOR Phase Complete
+
+**Pressure Test Approach**: Library/Framework reference skills (passive documentation) - sanity checks performed instead of active pressure testing.
+
+**Mitigation Verified**:
+- Clear "When to Use" sections guide appropriate skill invocation
+- Gateway integration ensures automatic routing for Windows questions
+- Chapter navigation and search patterns enable rapid topic lookup
+- Integration section documents skill relationships
+
+**Result**: Skills provide reliable access to authoritative Windows technical content.
+
+## 2026-01-09 - Chapter Files Relocated
+
+**Change**: Copied all chapter files from repository root to `references/chapters/` within skill directory for self-contained version control.
+
+**Before**: Chapters referenced from `{repo-root}/Winternals7thPt1/chapters/`
+**After**: Chapters included in `references/chapters/` (8 files: chapter-00.md through chapter-07.md)
+
+**Updated Paths**:
+- Read paths: `.claude/skill-library/security/windows/windows-internals/references/chapters/chapter-0N.md`
+- Grep paths: `.claude/skill-library/security/windows/windows-internals/references/chapters/*.md`
+
+**Rationale**: Makes skill self-contained and suitable for version control without depending on repo root directories.

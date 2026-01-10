@@ -63,6 +63,9 @@ This gateway implements 3-tier loading:
 | "frontend security" / "React security" / "XSS" | → `reviewing-frontend-security`  |
 | "CIS" / "benchmark" / "compliance mapping"     | → `mapping-to-cis-benchmarks`    |
 | "FDA" / "medical device" / "510(k)" / "SBOM"   | → `mapping-to-fda-cybersecurity` |
+| "Windows internals" / "kernel" / "CreateProcess" | → `windows-internals`            |
+| "Windows authentication" / "Kerberos" / "NTLM" | → `windows-security-internals`   |
+| "EDR" / "EDR evasion" / "function hooking" / "ETW" | → `evading-edr`                  |
 | "browser extension" / "hypercube" / "Chrome"   | → `hypercube-browser-extension`  |
 | "Shodan" / "host search" / "recon"             | → use `gateway-mcp-tools`        |
 | "testing" (general)                            | → also invoke `gateway-testing`  |
@@ -120,6 +123,13 @@ This gateway implements 3-tier loading:
 | Frontend Security Review | `.claude/skill-library/security/reviewing-frontend-security/SKILL.md` | frontend security, React security, XSS |
 | Hypercube Browser Extension | `.claude/skill-library/security/hypercube-browser-extension/SKILL.md` | browser extension, hypercube, Chrome |
 
+### Windows Security References
+
+| Skill                      | Path                                                                       | Triggers                                    |
+| -------------------------- | -------------------------------------------------------------------------- | ------------------------------------------- |
+| Windows Internals          | `.claude/skill-library/security/windows/windows-internals/SKILL.md`        | Windows internals, kernel, process, thread, memory, CreateProcess |
+| Windows Security Internals | `.claude/skill-library/security/windows/windows-security-internals/SKILL.md` | Windows authentication, Kerberos, NTLM, access token, security descriptor |
+| Evading EDR                | `.claude/skill-library/security/windows/evading-edr/SKILL.md`             | EDR, EDR evasion, function hooking, ETW, kernel callbacks |
 
 ### Compliance Frameworks
 

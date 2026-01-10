@@ -1,0 +1,64 @@
+# Changelog - windows-security-internals
+
+## 2026-01-09 - Initial Creation
+
+**Type**: Library/Framework skill
+**Category**: security/windows
+**Location**: `.claude/skill-library/security/windows/windows-security-internals/`
+
+**RED Phase Documentation**:
+
+**Gap**: When users ask deep technical questions about Windows authentication mechanisms, Kerberos internals, access tokens, security descriptors, or Active Directory security, Claude:
+- Relies on training data that may miss recent security research insights
+- Cannot reference specific authentication flows, token structures, or security descriptor components from authoritative sources
+- Misses implementation details crucial for security assessments and vulnerability research
+- Cannot provide citations from Google Project Zero researcher James Forshaw's comprehensive analysis
+
+**Test Scenario**: User asks "How does the Windows access check process work internally? What's the algorithm?"
+
+**Expected Behavior**: Claude reads `WSI/chapters/chapter-07.md`, explains the Security Reference Monitor (SRM) access checking algorithm, discusses ResultantAccess calculation, generic vs specific rights, and cites Windows Security Internals by James Forshaw.
+
+**GREEN Phase**: TBD - Will verify skill provides access to authentication/authorization internals.
+
+**Book Details**:
+- Author: James Forshaw (Google Project Zero, 20+ years Windows security research)
+- Publisher: No Starch Press (2024)
+- Technical Reviewer: Lee Holmes (Azure Security, PowerShell team)
+- Focus: Authentication, Authorization, Auditing internals
+
+**Chapters Available**: 0-5, 7, 9-11, 13-14 (PowerShell setup, Kernel, User-mode apps, Access tokens, Security descriptors, Access check, Auditing, Windows auth, Active Directory, Network auth, Kerberos)
+
+**Content Source**: OCR-transcribed markdown chapters in `WSI/chapters/` with automated error corrections applied (31 lines fixed including NtObjectManager module references, ISBN corrections).
+
+**PowerShell Integration**: Heavily uses NtObjectManager PowerShell module for security testing - Chapter 1 provides complete setup.
+
+**Related Skills**:
+- `windows-internals` - Provides OS architecture foundation for security mechanisms
+- `evading-edr` - Applies authentication concepts to credential access and privilege escalation
+
+## 2026-01-09 - GREEN Phase Verified
+
+**Test Scenario**: Verified access to Chapter 7 "The Access Check Process" with SeAccessCheck API details, kernel-mode access checking, and security descriptor processing.
+
+**Result**: SUCCESS ✅
+- Skill successfully routes to `WSI/chapters/chapter-07.md`
+- Chapter contains complete access check algorithm, SeAccessCheck parameters, and implementation details
+- PowerShell NtObjectManager module integration documented
+
+**Gateway Integration**: Added to `gateway-security` with triggers "Windows authentication", "Kerberos", "NTLM"
+
+## 2026-01-09 - REFACTOR Phase Complete
+
+**Pressure Test Approach**: Library/Framework reference skills (passive documentation) - sanity checks performed.
+
+**Result**: Skills provide reliable access to James Forshaw's authoritative Windows security research.
+
+## 2026-01-09 - Chapter Files Relocated
+
+**Change**: Copied all chapter files from repository root to `references/chapters/` within skill directory.
+
+**After**: Chapters included in `references/chapters/` (12 files: chapter-00.md, 01-05, 07, 09-11, 13-14)
+
+**Updated Paths**: `.claude/skill-library/security/windows/windows-security-internals/references/chapters/chapter-0N.md`
+
+**Rationale**: Self-contained for version control.
