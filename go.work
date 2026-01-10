@@ -1,17 +1,11 @@
 go 1.25.3
 
 use (
-	./modules/augustus
-	./modules/capability-sdk
 	./modules/chariot-aegis-capabilities/aegis-registry
 	./modules/chariot/acceptance
 	./modules/chariot/backend
-	./modules/diocletian
-	./modules/fingerprintx
 	./modules/janus
 	./modules/janus-framework
-	./modules/nebula
 	./modules/tabularium
-	./modules/trajan
 	modules/chariot-devops/chariot-utils/user-purge
 )
