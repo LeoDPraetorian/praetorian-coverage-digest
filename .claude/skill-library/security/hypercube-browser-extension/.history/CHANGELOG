@@ -1,0 +1,105 @@
+# Changelog - hypercube-browser-extension
+
+## 2026-01-08 - Description Enhancement (Audit Fix)
+
+### Changed
+- **Enhanced description for completeness and discoverability** (auditing-skills workflow)
+  - Added missing capabilities: "Firebase deployment", "extension customization", "website generation", "testing", "operational security"
+  - Improved searchability: Added "C2 framework" and "red team engagements" industry terms
+  - Length: 244 characters (within acceptable range, improved comprehensiveness)
+
+### Removed
+- Generic terms: "exploitation framework" → "C2 framework" (more specific)
+- Generic terms: "authorized security testing" → "authorized red team engagements" (more discoverable)
+
+### Rationale
+- **Completeness**: Original description missed 3 major phases (website, testing, opsec) representing ~40% of workflow content
+- **Discoverability**: Users searching for "red team browser extension" or "pentest C2" now find this skill more easily
+- **Accuracy maintained**: All described capabilities are present in the skill
+
+### Audit Results
+- Phase 1 (Description Format): ⚠️ WARNING → ✅ PASS
+- Semantic Review (Completeness): ⚠️ WARNING → ✅ PASS
+- Semantic Review (Discoverability): ℹ️ INFO → ✅ PASS
+
+---
+
+## 2026-01-08 - Website Generation Phase Added
+
+### Added
+- **New Phase 5: Generate Professional Website (Credibility Multiplier)**
+  - Complete 9-page website structure (homepage, portal, features, about, support, privacy, terms, download, styles)
+  - Reference documentation: `references/website-generation.md` (91 lines)
+  - Deployment options: GitHub Pages, Netlify, Vercel, Firebase Hosting
+  - Chrome Store integration fields (website URL, privacy policy URL, support URL)
+
+- **Demo Functionality Rules**:
+  - Show realistic error messages ("Invalid email or password") instead of "demo mode" alerts
+  - Simulate loading states with button text changes and delays
+  - Styled error notifications matching real authentication failures
+  - Contact forms show "service temporarily unavailable" errors
+
+- **Link Policy (Critical OpSec)**:
+  - All links must point to site itself only (no external links)
+  - No social media links in footer (creates verification surface)
+  - No Chrome Web Store direct links (use internal download page)
+  - No third-party integrations or backstops
+
+### Changed
+- Renumbered subsequent phases: old Phase 5 → Phase 6, old Phase 6 → Phase 7
+- Updated sub-section numbering throughout (5.1-5.3 → 6.1-6.3, 7.1-7.3 unchanged)
+
+### Rationale
+- Professional website increases extension credibility dramatically (appears as established company vs throwaway project)
+- Users researching extension find substantial online presence with customer portal, legal pages, support
+- Internal-only links prevent verification failures (broken social media, non-existent Chrome Store listings during testing)
+- Realistic error messages maintain illusion of real service without backend implementation
+- Website is easily rebrandable (10-15 minutes) for future engagements
+
+### Verification
+- GREEN: PASS (website generated and tested with convincing demo functionality)
+- Compliance: PENDING (line count check needed)
+- No external links present in generated website
+- Demo modes show authentication failures, not "demo mode" alerts
+
+---
+
+## 2026-01-07 - Workflow Reorganization + OpSec Improvements
+
+### Changed
+- **Reorganized workflow phases** to reflect correct order:
+  - Phase 1: Design Pretext (conceptual)
+  - Phase 2: Deploy Infrastructure (hypercube-deployer agent automation)
+  - Phase 3: Dress/Customize Extension (make it unique)
+  - Phase 4: Chrome Web Store Materials  
+  - Phase 5: Testing & Validation
+  - Phase 6: Operational Guidance
+
+- **Added hypercube-deployer agent** as primary automation path
+  - Automates Firebase setup, WASM build, credential embedding
+  - Output location documented: `.claude/.output/agents/[timestamp]-hypercube-deployment/`
+
+- **Added OpSec improvements**:
+  - Phase 3.1: WASM file renaming (main.wasm → pretext-appropriate name like api-validator.wasm, license-check.wasm)
+  - Updated background.js to load renamed WASM file
+  - Examples: DevAPI Tester Pro (api-validator.wasm), Antiphish Solutions (threat-detector.wasm)
+
+- **Added CSP compliance requirements** in Phase 3.2:
+  - NO inline JavaScript allowed in popup.html
+  - All JS must be in separate .js files
+  - No inline event handlers (onclick, etc.)
+  - Use addEventListener for all interactivity
+
+### Removed
+- **Incorrect Firebase reuse warning** - Firebase projects can be reused across engagements
+- **Redundant instrumentation phase** - hypercube-deployer handles this automatically
+
+### Added
+- DevAPI Tester Pro example reference (developer tools pretext)
+- Phase numbering now reflects actual deployment sequence
+
+### Rationale
+- Previous workflow had manual Firebase setup before pretext design, which was backwards
+- Automation via hypercube-deployer makes deployment faster and more reliable
+- OpSec improvements (WASM renaming, visual distinctness) are critical for operational security
+- CSP compliance is mandatory for Chrome Store approval

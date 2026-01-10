@@ -49,3 +49,6 @@
 [submodule "modules/venator"]
 	path = modules/venator
 	url = https://github.com/praetorian-inc/venator.git
+[submodule "modules/hypercube-ng"]
+	path = modules/hypercube-ng
+	url = https://github.com/praetorian-inc/hypercube-ng

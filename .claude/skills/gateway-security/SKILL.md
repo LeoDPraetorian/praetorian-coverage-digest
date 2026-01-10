@@ -63,6 +63,7 @@ This gateway implements 3-tier loading:
 | "frontend security" / "React security" / "XSS" | → `reviewing-frontend-security`  |
 | "CIS" / "benchmark" / "compliance mapping"     | → `mapping-to-cis-benchmarks`    |
 | "FDA" / "medical device" / "510(k)" / "SBOM"   | → `mapping-to-fda-cybersecurity` |
+| "browser extension" / "hypercube" / "Chrome"   | → `hypercube-browser-extension`  |
 | "Shodan" / "host search" / "recon"             | → use `gateway-mcp-tools`        |
 | "testing" (general)                            | → also invoke `gateway-testing`  |
 
@@ -117,6 +118,8 @@ This gateway implements 3-tier loading:
 | ------------------------ | --------------------------------------------------------------------- | -------------------------------------- |
 | Backend Security Review  | `.claude/skill-library/security/reviewing-backend-security/SKILL.md`  | security review, OWASP, Go security    |
 | Frontend Security Review | `.claude/skill-library/security/reviewing-frontend-security/SKILL.md` | frontend security, React security, XSS |
+| Hypercube Browser Extension | `.claude/skill-library/security/hypercube-browser-extension/SKILL.md` | browser extension, hypercube, Chrome |
+
 
 ### Compliance Frameworks
 

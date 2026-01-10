@@ -1,0 +1,49 @@
+# Changelog - hypercube-deployer
+
+## 2026-01-08 - Content Extraction (Audit Fix)
+
+### Changed
+- **Reduced line count from 287 to 253 lines** (-34 lines, 12% reduction toward 130-180 target)
+- Centralized Firebase manual steps in `firebase-cli-deployment` skill (avoiding duplication)
+- Extracted engagement-specific content to agent references
+
+### Added
+- **firebase-cli-deployment skill enhancement**:
+  - New section: "Realtime Database Manual Creation"
+  - Documents manual Console steps for first database instance creation
+  - Complements existing Anonymous Authentication manual setup section
+
+- **references/engagement-isolation-rules.md** (new):
+  - OpSec-friendly Firebase project naming conventions
+  - Authorization verification checklist
+  - Post-engagement cleanup procedures
+
+- **references/build-prerequisites.md** (new):
+  - Go version requirements (1.16+, recommended 1.24+)
+  - Firebase CLI authentication verification
+  - Directory write access checks
+  - Environment verification commands
+
+### Rationale
+- **Phase 8 audit finding**: Development agents should be 130-180 lines (was 287, 60% over)
+- **Centralization**: Firebase-specific knowledge belongs in firebase-cli-deployment skill (single source of truth)
+- **Progressive disclosure**: Detailed rules/prerequisites moved to references, agent remains focused on orchestration
+- **Maintainability**: Engagement rules and prerequisites can be updated in references without touching agent core
+
+### Audit Results
+- Phase 8 (Line Count): ⚠️ WARNING (287 lines) → ⚠️ WARNING (253 lines) - Progress made, still above target
+- Target: 130-180 lines for development agents
+- Current: 253 lines (73 lines over max target)
+- Next steps: Consider additional extractions or refactoring if further reduction needed
+
+### Files Modified
+- `.claude/agents/development/hypercube-deployer.md` (287 → 253 lines)
+- `.claude/skill-library/integrations/firebase-cli-deployment/SKILL.md` (added Realtime Database section)
+
+### Files Created
+- `.claude/agents/development/.history/hypercube-deployer/references/engagement-isolation-rules.md`
+- `.claude/agents/development/.history/hypercube-deployer/references/build-prerequisites.md`
+- `.claude/agents/development/.history/hypercube-deployer/CHANGELOG` (this file)
+
+### Backup
+- `.claude/agents/development/.history/hypercube-deployer/2026-01-08-17-54-20-pre-extraction.bak`

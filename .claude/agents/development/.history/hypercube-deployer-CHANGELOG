@@ -1,0 +1,42 @@
+## [2026-01-08] - Quota Project Workaround Added
+
+### Changed
+
+- Added GOOGLE_CLOUD_QUOTA_PROJECT environment variable workaround to Firebase database rules deployment step
+- Updated "Post-manual steps" section in "Firebase Infrastructure Automation" to include command with environment variable: `GOOGLE_CLOUD_QUOTA_PROJECT=<project-id> firebase deploy --only database --project <project-id>`
+- Added explanation note about 403 PERMISSION_DENIED error when quota project is not set for Application Default Credentials
+
+### Reason
+
+- Firebase database deployment was failing with `403 PERMISSION_DENIED` error: "The firebasedatabase.googleapis.com API requires a quota project, which is not set by default"
+- When using `gcloud auth` (Application Default Credentials) instead of Firebase OAuth, the Firebase CLI doesn't automatically set the quota project
+- Environment variable provides immediate workaround without requiring additional gcloud configuration commands
+- This fix was discovered during live deployment session and needs to be documented for future deployments
+
+### Verification
+
+- GREEN: PASS (tested during actual deployment, rules deployed successfully with environment variable)
+- Compliance: PENDING
+- Re-audit: PENDING
+
+---
+
+## [2026-01-08] - Authentication Workflow Updated
+
+### Changed
+
+- Updated authentication workflow to use `./scripts/firebase-ensure-auth.sh` script
+- Modified "Authentication Check (NEVER SKIP)" section in EXTREMELY-IMPORTANT block to reference script instead of raw `firebase login` command
+- Updated "Firebase Infrastructure Automation" automated steps to describe script capabilities (checks authentication status, initiates login if needed, extracts/displays URL, verifies completion)
+
+### Reason
+
+- Agent didn't handle authentication gracefully - raw `firebase login` command requires manual understanding of OAuth flow
+- The firebase-ensure-auth.sh script provides better UX: automatic authentication checking via `firebase login:list`, conditional login via `firebase login:ci --no-localhost`, URL extraction/display with visual formatting, automatic verification
+- Script reduces authentication friction: 5 seconds if already authenticated, 30 seconds if login needed
+
+### Verification
+
+- GREEN: PENDING (identified need to also update firebase-cli-deployment skill for consistency)
+- Compliance: PENDING
+- Re-audit: PENDING
