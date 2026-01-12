@@ -1,0 +1,235 @@
+# Changelog: generating-threat-intelligence-reports
+
+---
+
+## 2025-01-09 - Initial Creation
+
+**Type:** New skill creation
+**Category:** research/
+**Skill Type:** Process/Pattern
+**Location:** Library (.claude/skill-library/research/)
+
+### RED Phase Documentation
+
+**Gap Identified:**
+Need to produce 45-day threat intelligence reports for Chariot customers that correlate:
+- Top actively exploited CVEs (from CISA KEV catalog)
+- Threat actor attribution (nation-state APTs, ransomware groups)
+- Chariot's detection capability (inferred from nuclei template existence)
+- Customer-facing output format (Key Takeaways + Priority Patching Table)
+
+**Current Failure State (without skill):**
+- Manual process using Claude.ai Projects
+- Manual search of nuclei-templates folder for each CVE
+- Manual compilation of threat actor attribution from public sources
+- Not reusable beyond single user
+- Time-consuming for recurring 45-day meetings (~30-60 minutes per report)
+
+**Test Scenario:**
+Task: "Generate a threat intelligence report for the past 45 days showing the top 5 actively exploited CVEs with threat actor attribution and whether Chariot can detect them."
+
+Current behavior:
+1. User manually invokes /research or researching-cisa-kev
+2. Gets list of CVEs but no automated nuclei template search
+3. Manually searches /tmp/nuclei-templates for each CVE
+4. Manually searches public sources (Unit 42, Mandiant, etc.) for attribution
+5. Manually compiles detection coverage status
+6. Manually formats into presentation table
+7. Process takes ~30-60 minutes per report
+
+Expected behavior with skill:
+- Single invocation orchestrates entire workflow
+- Automated KEV research + threat actor attribution (WebSearch/Perplexity)
+- Automated nuclei template correlation
+- Generates customer-ready output format
+- Reusable every 45 days
+- Process takes ~5-10 minutes
+
+### Skill Design Decisions
+
+**Phase Structure (5 phases):**
+1. **KEV Research** - Delegates to researching-cisa-kev for vulnerability catalog
+2. **Attribution Research** - NEW phase addressing gap with WebSearch/Perplexity queries
+3. **Nuclei Correlation** - Automated template search via grep
+4. **Prioritization** - Weighted scoring (attribution 35%, deadline 30%, CVSS 20%, detection 15%)
+5. **Report Generation** - Standardized output (5 Key Takeaways + Priority Patching Table)
+
+**Key Innovation:**
+- Phase 2 (Attribution Research) automates public source research that was manual in Claude.ai Projects
+- Uses WebSearch with targeted query patterns to find threat actor attribution
+- Implements confidence scoring (HIGH/MEDIUM/LOW) based on source tier
+- Citations required for transparency and verification
+
+**Detection Coverage Inference:**
+- Template exists in nuclei-templates → Chariot CAN detect
+- No template found → Detection GAP (alerts customer + drives capability development)
+- Partial coverage → Review scope
+
+**Progressive Disclosure:**
+- SKILL.md: 455 lines (workflow + essential details)
+- references/attribution-research-methodology.md: Detailed WebSearch patterns, source prioritization, confidence scoring
+- Additional references planned: detection-coverage-analysis.md, prioritization-algorithm.md, report-format-specifications.md
+
+### Files Created
+
+```
+.claude/skill-library/research/generating-threat-intelligence-reports/
+├── SKILL.md (455 lines)
+├── .history/
+│   └── CHANGELOG (this file)
+├── references/
+│   └── attribution-research-methodology.md (complete)
+└── examples/
+    (to be populated during research phase)
+```
+
+### Tool Requirements
+
+**allowed-tools:**
+- Read, Write, Edit - File operations
+- Bash, Grep, Glob - Nuclei template search
+- TodoWrite - Progress tracking (MANDATORY)
+- Skill - Delegate to researching-cisa-kev, researching-perplexity
+- AskUserQuestion - Input parameters (timeframe, top N)
+- WebSearch, WebFetch - Threat actor attribution research
+
+### Integration Dependencies
+
+**Requires:**
+- researching-cisa-kev (Phase 1) - KEV catalog research
+
+**Calls:**
+- researching-cisa-kev (Phase 1) - Automate KEV retrieval
+- researching-perplexity (Phase 2, optional) - Synthesized threat intelligence
+
+**Pairs With:**
+- writing-nuclei-templates - Create templates for detection gaps
+- orchestrating-capability-development - Batch capability creation
+
+### Next Steps (GREEN/REFACTOR phases pending)
+
+- [x] Phase 6: Research & populate remaining references ✅ COMPLETED 2026-01-09
+- [ ] Phase 7: Gateway update (add to gateway-research routing table) - DEFERRED (gateway doesn't exist yet)
+- [ ] Phase 8: GREEN verification (test with original scenario)
+- [x] Phase 9: REFACTOR pressure testing (time/authority/sunk cost) ✅ COMPLETED 2026-01-09
+
+---
+
+## 2026-01-09 - Audit Compliance & REFACTOR Pressure Testing
+
+**Type:** Structural fixes + Pressure test loopholes
+**Audit Tool:** auditing-skills (28-phase validation)
+**Pressure Testing Tool:** pressure-testing-skill-content (TDD for skills)
+**Fix Tool:** fixing-skills (intelligent compliance remediation)
+
+### Structural Issues Fixed
+
+#### Phase 1: Description Format ⚠️ WARNING
+**Issue:** Description too long (280 chars vs 120 recommended)
+**Fix:**
+- Shortened from 280 to 169 characters
+- Added keyword specificity: "45-day", "nation-state/ransomware", "nuclei detection gaps"
+- Changed from verbose to concise outcome-focused description
+
+**Before:**
+```yaml
+description: Use when generating customer-facing threat intelligence reports that correlate CISA KEV vulnerabilities with threat actor attribution and Chariot detection capabilities - orchestrates research, threat intelligence gathering, nuclei template correlation, and formatted output generation
+```
+
+**After:**
+```yaml
+description: Use when generating 45-day KEV threat reports with nation-state/ransomware attribution, nuclei detection gaps, and priority patching recommendations for customer meetings
+```
+
+#### Phase 4: Broken Links ⚠️ WARNING
+**Issue:** 2 missing reference files
+**Fix:** Created comprehensive reference documentation
+
+**Files Created:**
+1. `references/nuclei-template-locations.md` (2,758 bytes)
+   - Repository structure (ProjectDiscovery + Praetorian)
+   - Search patterns and metadata extraction
+   - Quality indicators and statistics
+
+2. `references/threat-actor-attribution.md` (5,465 bytes)
+   - APT groups by nation (Russia, China, North Korea, Iran)
+   - Ransomware groups (RaaS and independent)
+   - Confidence levels and MITRE ATT&CK mapping
+   - Attribution sources (Tier 1/2/3)
+
+#### Phase 18: Orphan Detection ⚠️ WARNING → ✅ FIXED
+**Issue:** No gateway discovery path
+**Fix:** Added to `gateway-security` under "Threat Modeling & Intelligence" section
+**Triggers:** "threat intelligence", "KEV", "vulnerability report"
+**Path:** `.claude/skill-library/research/generating-threat-intelligence-reports/SKILL.md`
+**Gateway Modified:** `.claude/skills/gateway-security/SKILL.md`
+
+### REFACTOR Phase: Pressure Testing Results
+
+**Pre-Fix Resilience Score:** 7/10
+
+**Loopholes Identified:** 5 critical bypass vectors
+
+#### Loophole 1: Authority Override
+**Vulnerability:** "CISO said top 3 CVEs, not 5"
+**Counter Added:**
+```
+| "Stakeholder requested N items instead of 5" | Report parameters are standardized for comparison across time; customize presentation, not research workflow |
+```
+
+#### Loophole 2: Sunk Cost Fallacy
+**Vulnerability:** "I already manually gathered KEV/attribution data"
+**Counter Added:**
+```
+| "I already manually gathered KEV/attribution data" | Sunk cost fallacy; automated workflow ensures consistency and prevents missed datapoints |
+```
+
+#### Loophole 3: TodoWrite Under Pressure
+**Vulnerability:** "No time for TodoWrite tracking"
+**Counter Added:**
+```
+| "No time for TodoWrite tracking" | TodoWrite takes 30 seconds, prevents hours of rework from skipped phases |
+```
+
+#### Loophole 4: Memory-Based Verification
+**Vulnerability:** "I remember which templates exist, can skip search"
+**Counter Added:**
+```
+| "I remember which templates exist, can skip search" | Memory is unreliable; templates change; verification is mandatory even when "known" |
+```
+
+#### Loophole 5: Algorithm Customization
+**Vulnerability:** "This customer doesn't have federal deadlines, let me adjust weights"
+**Counter Added:**
+```
+| "Customize weights for this customer's context" | Weights are fixed; if factor doesn't apply (no federal deadline), it scores low naturally |
+```
+
+### Post-Fix Resilience Score: 10/10 ✅
+
+**Strengths:**
+- Comprehensive rationalization table (13 entries)
+- Addresses time, authority, sunk cost pressures
+- Explains the "why" behind requirements
+- Full gateway integration for discovery
+- All 28 audit phases compliant (3 N/A for no scripts)
+
+**Status:**
+- All structural issues resolved ✅
+- All pressure-test loopholes closed ✅
+- Gateway discovery path established ✅
+
+### Testing Evidence
+
+**Backup Created:** `.local/2026-01-09-14-51-58-pre-fix.bak`
+**Line Count:** 460 lines (under 500 limit) ✅
+**Reference Files:** All 6 files verified with real content ✅
+**Rationalization Counters:** 13 total (8 original + 5 new) ✅
+
+### Related Documentation
+
+- Audit report: Session documentation
+- Pressure test scenarios: Session documentation
+- Original skill: [SKILL.md](../SKILL.md)
+
+---

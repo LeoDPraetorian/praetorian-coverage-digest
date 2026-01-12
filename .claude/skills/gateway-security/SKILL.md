@@ -59,6 +59,7 @@ This gateway implements 3-tier loading:
 | "CVSS" / "severity score"                      | → `cvss-scoring`                 |
 | "security test plan" / "pentest" / "Phase 6"   | → `security-test-planning`       |
 | "codebase size" / "complexity"                 | → `codebase-sizing`              |
+| "threat intelligence" / "KEV" / "vulnerability report" | → `generating-threat-intelligence-reports` |
 | "security review" / "OWASP" / "Go security"    | → `reviewing-backend-security`   |
 | "frontend security" / "React security" / "XSS" | → `reviewing-frontend-security`  |
 | "CIS" / "benchmark" / "compliance mapping"     | → `mapping-to-cis-benchmarks`    |
@@ -103,17 +104,18 @@ This gateway implements 3-tier loading:
 | ---------------- | ---------------------------------------------------------- | -------------------------- |
 | Defense in Depth | `.claude/skill-library/security/defense-in-depth/SKILL.md` | defense, hardening, layers |
 
-### Threat Modeling
+### Threat Modeling & Intelligence
 
-| Skill                  | Path                                                                 | Triggers                             |
-| ---------------------- | -------------------------------------------------------------------- | ------------------------------------ |
-| Business Context       | `.claude/skill-library/security/business-context-discovery/SKILL.md` | business context, crown jewels       |
-| Codebase Sizing        | `.claude/skill-library/security/codebase-sizing/SKILL.md`            | codebase size, complexity            |
-| Codebase Mapping       | `.claude/skill-library/security/codebase-mapping/SKILL.md`           | codebase map, architecture           |
-| Security Controls      | `.claude/skill-library/security/security-controls-mapping/SKILL.md`  | security controls, mitigations       |
-| Threat Modeling        | `.claude/skill-library/security/threat-modeling/SKILL.md`            | threat model, attack surface         |
-| CVSS Scoring           | `.claude/skill-library/security/cvss-scoring/SKILL.md`               | CVSS, severity score                 |
-| Security Test Planning | `.claude/skill-library/security/security-test-planning/SKILL.md`     | security test plan, pentest, Phase 6 |
+| Skill                         | Path                                                                              | Triggers                                       |
+| ----------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Business Context              | `.claude/skill-library/security/business-context-discovery/SKILL.md`              | business context, crown jewels                 |
+| Codebase Sizing               | `.claude/skill-library/security/codebase-sizing/SKILL.md`                         | codebase size, complexity                      |
+| Codebase Mapping              | `.claude/skill-library/security/codebase-mapping/SKILL.md`                        | codebase map, architecture                     |
+| Security Controls             | `.claude/skill-library/security/security-controls-mapping/SKILL.md`               | security controls, mitigations                 |
+| Threat Modeling               | `.claude/skill-library/security/threat-modeling/SKILL.md`                         | threat model, attack surface                   |
+| CVSS Scoring                  | `.claude/skill-library/security/cvss-scoring/SKILL.md`                            | CVSS, severity score                           |
+| Security Test Planning        | `.claude/skill-library/security/security-test-planning/SKILL.md`                  | security test plan, pentest, Phase 6           |
+| Threat Intelligence Reporting | `.claude/skill-library/research/generating-threat-intelligence-reports/SKILL.md`  | threat intelligence, KEV, vulnerability report |
 
 ### Security Review
 
