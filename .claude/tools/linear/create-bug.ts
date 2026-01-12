@@ -63,6 +63,7 @@ import {
 } from '../config/lib/sanitize.js';
 import { estimateTokens } from '../config/lib/response-utils.js';
 import type { HTTPPort } from '../config/lib/http-client.js';
+import { resolveStateId, resolveAssigneeId } from './lib/resolve-ids.js';
 
 /**
  * GraphQL mutation for creating an issue
@@ -227,7 +228,8 @@ export const createBug = {
       mutationInput.description = validated.description;
     }
     if (validated.assignee) {
-      mutationInput.assigneeId = validated.assignee;
+      // Resolve assignee name/email/"me" to UUID
+      mutationInput.assigneeId = await resolveAssigneeId(client, validated.assignee);
     }
     if (validated.priority !== undefined) {
       mutationInput.priority = validated.priority;
@@ -235,7 +237,8 @@ export const createBug = {
       mutationInput.priority = 2; // Default to High for bugs
     }
     if (validated.state) {
-      mutationInput.stateId = validated.state;
+      // Resolve state name to UUID (uses team parameter as teamId)
+      mutationInput.stateId = await resolveStateId(client, validated.team, validated.state);
     }
 
     // Execute GraphQL mutation

@@ -18,6 +18,55 @@ This is the PRIMARY interface for all Linear operations. Describe what you want 
 
 ---
 
+## Team Selection Flow
+
+When creating issues, the command needs a team. The team selector provides an intelligent flow:
+
+### Step 1: Check for Saved Default
+
+Before prompting, check if user has a saved default team:
+
+```bash
+npx tsx -e "import { getDefaultTeam } from './.claude/tools/linear/lib/team-selector.js'; import { PreferenceManager } from './.claude/tools/config/lib/preference-manager.js'; const manager = new PreferenceManager('linear'); getDefaultTeam(manager).then(r => console.log(JSON.stringify(r)))"
+```
+
+### Step 2: Confirm or Select Team
+
+**If result.ok && result.value exists** (has default team):
+- Use AskUserQuestion with options:
+  - "Use default: {result.value.name}"
+  - "Choose different team"
+
+**If result.value === null or undefined** (no default):
+- Proceed to Step 3
+
+### Step 3: Fetch Teams with Hierarchy
+
+```bash
+npx tsx -e "import { fetchTeamsWithHierarchy } from './.claude/tools/linear/lib/team-selector.js'; import { listTeams } from './.claude/tools/linear/list-teams.js'; fetchTeamsWithHierarchy(() => listTeams.execute({})).then(r => console.log(JSON.stringify(r)))"
+```
+
+### Step 4: Organize and Present Teams
+
+```bash
+npx tsx -e "import { organizeTeamHierarchy } from './.claude/tools/linear/lib/team-selector.js'; import { fetchTeamsWithHierarchy } from './.claude/tools/linear/lib/team-selector.js'; import { listTeams } from './.claude/tools/linear/list-teams.js'; (async () => { const result = await fetchTeamsWithHierarchy(() => listTeams.execute({})); if (result.ok) { const hierarchy = organizeTeamHierarchy(result.value); console.log(JSON.stringify(hierarchy)); } })();"
+```
+
+Use AskUserQuestion to:
+- Present hierarchy.parents as parent team options
+- If user selects a parent with sub-teams, use getSiblingSubTeams() to show sub-team options
+- Continue drill-down until final team selected
+
+### Step 5: Save as Default (Optional)
+
+After team selection, ask user if they want to save as default:
+
+```bash
+npx tsx -e "import { setDefaultTeam } from './.claude/tools/linear/lib/team-selector.js'; import { PreferenceManager } from './.claude/tools/config/lib/preference-manager.js'; const manager = new PreferenceManager('linear'); setDefaultTeam(manager, { id: 'TEAM_ID', name: 'TEAM_NAME' }).then(r => console.log(JSON.stringify(r)))"
+```
+
+---
+
 ## Examples
 
 ### Creating Issues

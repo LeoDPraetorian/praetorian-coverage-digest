@@ -27,7 +27,8 @@
  * - identifier: string (optional)
  * - title: string (required)
  * - description: string | null (truncated to 200 chars)
- * - priority: object | null - {name: string, value: number}
+ * - priority: number | null - Float value (0-4)
+ * - priorityLabel: string | null - Label like "Urgent", "High", "Normal", "Low"
  * - state: object | null - {id, name, type}
  * - status: string | null
  * - assignee: string | null - assignee name (extracted from assignee object)
@@ -38,7 +39,7 @@
  *
  * Edge cases discovered:
  * - GraphQL returns { issues: { nodes: [...] } }, NOT array directly
- * - priority is an OBJECT {name, value}, NOT a number
+ * - priority is a Float (number 0-4), priorityLabel is the string label
  * - assignee is an OBJECT, we extract name as string
  * - Empty results returns [], not null
  * - descriptions are truncated to 200 chars for token efficiency
@@ -66,6 +67,7 @@ import {
 } from '../config/lib/sanitize.js';
 import { estimateTokens } from '../config/lib/response-utils.js';
 import type { HTTPPort } from '../config/lib/http-client.js';
+import { buildIssueFilterWithIdDetection } from './list-issues-helpers.js';
 
 /**
  * GraphQL query for listing issues with filters
@@ -91,10 +93,8 @@ const LIST_ISSUES_QUERY = `
         identifier
         title
         description
-        priority {
-          name: label
-          value: priority
-        }
+        priority
+        priorityLabel
         state {
           id
           name
@@ -177,11 +177,9 @@ export const listIssuesOutput = z.object({
     identifier: z.string().optional(),
     title: z.string(),
     description: z.string().optional(),
-    // Priority is an OBJECT with name and value (not a number!)
-    priority: z.object({
-      name: z.string(),
-      value: z.number()
-    }).optional(),
+    // Priority is a Float (number), priorityLabel is the string label
+    priority: z.number().nullable().optional(),
+    priorityLabel: z.string().nullable().optional(),
     state: z.object({
       id: z.string(),
       name: z.string(),
@@ -212,10 +210,8 @@ interface IssuesListResponse {
       identifier?: string | null;
       title: string;
       description?: string | null;
-      priority?: {
-        name: string;
-        value: number;
-      } | null;
+      priority?: number | null;
+      priorityLabel?: string | null;
       state?: {
         id: string;
         name: string;
@@ -238,37 +234,12 @@ interface IssuesListResponse {
 
 /**
  * Build GraphQL filter object from input parameters
+ *
+ * NOTE: This function has been replaced by buildIssueFilterWithIdDetection
+ * which automatically detects UUIDs and uses id filters instead of name filters.
+ *
+ * @deprecated Use buildIssueFilterWithIdDetection from list-issues-helpers.ts instead
  */
-function buildIssueFilter(input: ListIssuesInput): Record<string, any> | undefined {
-  const filter: Record<string, any> = {};
-
-  if (input.assignee) {
-    filter.assignee = { name: { eq: input.assignee } };
-  }
-  if (input.team) {
-    filter.team = { name: { eq: input.team } };
-  }
-  if (input.state) {
-    filter.state = { name: { eq: input.state } };
-  }
-  if (input.project) {
-    filter.project = { name: { eq: input.project } };
-  }
-  if (input.label) {
-    filter.labels = { some: { name: { eq: input.label } } };
-  }
-  if (input.query) {
-    filter.or = [
-      { title: { contains: input.query } },
-      { description: { contains: input.query } }
-    ];
-  }
-  if (input.includeArchived !== undefined && !input.includeArchived) {
-    filter.archived = { eq: false };
-  }
-
-  return Object.keys(filter).length > 0 ? filter : undefined;
-}
 
 /**
  * List issues from Linear using GraphQL API
@@ -305,8 +276,8 @@ export const listIssues = {
     // Create client (with optional test token)
     const client = await createLinearClient(testToken);
 
-    // Build filter from input
-    const filter = buildIssueFilter(validated);
+    // Build filter from input (with automatic UUID detection)
+    const filter = buildIssueFilterWithIdDetection(validated);
 
     // Build order by
     const orderBy = validated.orderBy === 'createdAt' ? 'createdAt' : 'updatedAt';
@@ -332,10 +303,8 @@ export const listIssues = {
         identifier: issue.identifier || undefined,
         title: issue.title,
         description: issue.description?.substring(0, 200) || undefined, // Truncate for token efficiency
-        priority: issue.priority ? {
-          name: issue.priority.name,
-          value: issue.priority.value
-        } : undefined,
+        priority: issue.priority ?? undefined,
+        priorityLabel: issue.priorityLabel ?? undefined,
         state: issue.state ? {
           id: issue.state.id,
           name: issue.state.name,

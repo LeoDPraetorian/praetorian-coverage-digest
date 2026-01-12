@@ -67,6 +67,20 @@ import {
 } from '../config/lib/sanitize.js';
 import { estimateTokens } from '../config/lib/response-utils.js';
 import type { HTTPPort } from '../config/lib/http-client.js';
+import { resolveStateId, resolveAssigneeId, resolveProjectId } from './lib/resolve-ids.js';
+
+/**
+ * GraphQL query to fetch issue team (needed for state resolution)
+ */
+const GET_ISSUE_TEAM_QUERY = `
+  query IssueTeam($id: String!) {
+    issue(id: $id) {
+      team {
+        id
+      }
+    }
+  }
+`;
 
 /**
  * GraphQL mutation for updating an issue
@@ -165,8 +179,16 @@ export const updateIssueOutput = z.object({
 export type UpdateIssueOutput = z.infer<typeof updateIssueOutput>;
 
 /**
- * GraphQL response type
+ * GraphQL response types
  */
+interface IssueTeamResponse {
+  issue: {
+    team: {
+      id: string;
+    };
+  };
+}
+
 interface IssueUpdateResponse {
   issueUpdate: {
     success: boolean;
@@ -218,6 +240,17 @@ export const updateIssue = {
     // Create client (with optional test token)
     const client = await createLinearClient(testToken);
 
+    // Fetch issue team if state resolution is needed
+    let teamId: string | undefined;
+    if (updateFields.state) {
+      const teamResponse = await executeGraphQL<IssueTeamResponse>(
+        client,
+        GET_ISSUE_TEAM_QUERY,
+        { id }
+      );
+      teamId = teamResponse.issue.team.id;
+    }
+
     // Build GraphQL input - map field names to Linear API format
     const mutationInput: {
       title?: string;
@@ -240,16 +273,19 @@ export const updateIssue = {
       mutationInput.description = updateFields.description;
     }
     if (updateFields.assignee) {
-      mutationInput.assigneeId = updateFields.assignee; // assignee → assigneeId
+      // Resolve assignee name/email/"me" to UUID
+      mutationInput.assigneeId = await resolveAssigneeId(client, updateFields.assignee);
     }
-    if (updateFields.state) {
-      mutationInput.stateId = updateFields.state; // state → stateId
+    if (updateFields.state && teamId) {
+      // Resolve state name to UUID (requires teamId)
+      mutationInput.stateId = await resolveStateId(client, teamId, updateFields.state);
     }
     if (updateFields.priority !== undefined) {
       mutationInput.priority = updateFields.priority;
     }
     if (updateFields.project) {
-      mutationInput.projectId = updateFields.project; // project → projectId
+      // Resolve project name to UUID
+      mutationInput.projectId = await resolveProjectId(client, updateFields.project);
     }
     if (updateFields.labels) {
       mutationInput.labelIds = updateFields.labels; // labels → labelIds
@@ -263,6 +299,12 @@ export const updateIssue = {
     if (updateFields.cycle) {
       mutationInput.cycleId = updateFields.cycle; // cycle → cycleId
     }
+
+    // DEBUG: Log mutation variables before sending
+    console.error('[DEBUG] IssueUpdate mutation variables:', JSON.stringify({
+      id,
+      input: mutationInput
+    }, null, 2));
 
     // Execute GraphQL mutation
     const response = await executeGraphQL<IssueUpdateResponse>(

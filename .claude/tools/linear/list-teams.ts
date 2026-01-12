@@ -68,6 +68,10 @@ const LIST_TEAMS_QUERY = `
         description
         createdAt
         updatedAt
+        parent {
+          id
+          name
+        }
       }
     }
   }
@@ -102,7 +106,11 @@ export const listTeamsOutput = z.object({
     key: z.string().optional(),
     description: z.string().optional(),
     createdAt: z.string().optional(),
-    updatedAt: z.string().optional()
+    updatedAt: z.string().optional(),
+    parent: z.object({
+      id: z.string(),
+      name: z.string(),
+    }).optional(),
   })),
   totalTeams: z.number(),
   estimatedTokens: z.number()
@@ -122,6 +130,10 @@ interface TeamsResponse {
       description?: string | null;
       createdAt?: string;
       updatedAt?: string;
+      parent?: {
+        id: string;
+        name: string;
+      } | null;
     }>;
   } | null;
 }
@@ -195,6 +207,10 @@ export const listTeams = {
         description: team.description?.substring(0, 200) || undefined, // Truncate for token efficiency
         createdAt: team.createdAt,
         updatedAt: team.updatedAt,
+        parent: team.parent ? {
+          id: team.parent.id,
+          name: team.parent.name,
+        } : undefined,
       })),
       totalTeams: teams.length,
     };

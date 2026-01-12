@@ -250,7 +250,19 @@ export function createHTTPClient(
           },
         };
       } catch (error) {
-        const httpError = classifyError(error);
+        // Try to extract response body for better error messages (e.g., GraphQL errors)
+        let responseBody: any = null;
+        if (error instanceof KyHTTPError) {
+          try {
+            // Clone to avoid consuming the body
+            const clone = error.response.clone();
+            responseBody = await clone.json();
+          } catch {
+            // Response might not be JSON
+          }
+        }
+
+        const httpError = classifyError(error, responseBody);
         return {
           ok: false,
           error: httpError,
@@ -269,15 +281,16 @@ export function createHTTPClient(
 /**
  * Classify errors into structured types
  */
-function classifyError(error: unknown): HTTPError {
+function classifyError(error: unknown, responseBody?: any): HTTPError {
   if (error instanceof KyHTTPError) {
     const status = error.response.status;
+    let message = error.message;
 
     if (status === 401 || status === 403) {
       return {
         type: 'auth',
         status,
-        message: error.message,
+        message,
         retryable: false,
       };
     }
@@ -290,10 +303,20 @@ function classifyError(error: unknown): HTTPError {
       };
     }
     if (status >= 400 && status < 500) {
+      // Enhance message with GraphQL errors if available
+      if (responseBody?.errors && Array.isArray(responseBody.errors)) {
+        const graphqlErrors = responseBody.errors.map((e: any) => e.message).join('; ');
+        message += ` - GraphQL errors: ${graphqlErrors}`;
+      } else if (typeof responseBody === 'string' && responseBody.length < 500) {
+        message += ` - ${responseBody}`;
+      } else if (responseBody && typeof responseBody === 'object') {
+        message += ` - ${JSON.stringify(responseBody).substring(0, 500)}`;
+      }
+
       return {
         type: 'client',
         status,
-        message: error.message,
+        message,
         retryable: false,
       };
     }
@@ -301,7 +324,7 @@ function classifyError(error: unknown): HTTPError {
       return {
         type: 'server',
         status,
-        message: error.message,
+        message,
         retryable: true,
       };
     }
