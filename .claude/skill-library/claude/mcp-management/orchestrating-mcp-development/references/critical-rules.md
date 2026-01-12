@@ -59,3 +59,23 @@ The orchestrator uses this to:
 - Pass context to next agent
 - Detect when to escalate (blocked status)
 - Trigger feedback loops (CHANGES_REQUESTED verdict)
+
+## Blocked Agent Routing
+
+When agent returns `status: "blocked"` with `blocked_reason`, route per this table:
+
+| Blocked Reason            | Route To               | Action                           |
+| ------------------------- | ---------------------- | -------------------------------- |
+| security_concern          | security-lead          | Re-assess security requirements  |
+| architecture_decision     | mcp-tool-lead          | Clarify architecture             |
+| missing_requirements      | AskUserQuestion        | Get user input                   |
+| test_failures             | mcp-tool-tester        | Debug test issues                |
+| out_of_scope              | AskUserQuestion        | Confirm scope                    |
+| schema_discovery_failed   | mcp-tool-lead          | Alternative discovery approach   |
+| unknown                   | AskUserQuestion        | Manual assessment                |
+
+**Critical Rules:**
+- Do NOT try to fix agent's work manually
+- Do NOT ask blocked agent to continue
+- Spawn NEW agent with resolution context
+- Include full context from artifacts (architecture.md, schema-discovery.md)

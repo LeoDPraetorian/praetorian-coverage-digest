@@ -96,6 +96,32 @@ Agents MUST reference shared utilities from .claude/ for testing, response handl
 
 **Complete rules and formats:** See [references/critical-rules.md](references/critical-rules.md)
 
+## Table of Contents
+
+### References
+
+#### P0 - Critical Infrastructure
+- [Progress Persistence](references/progress-persistence.md)
+- [Context Management](references/context-management.md)
+- [Troubleshooting](references/troubleshooting.md)
+
+#### P0 - Prompt Templates
+- [MCP Tool Developer Prompt](references/prompts/mcp-tool-developer-prompt.md)
+- [MCP Tool Tester Prompt](references/prompts/mcp-tool-tester-prompt.md)
+- [MCP Tool Lead Prompt](references/prompts/mcp-tool-lead-prompt.md)
+- [MCP Tool Reviewer Prompt](references/prompts/mcp-tool-reviewer-prompt.md)
+- [Security Lead Prompt](references/prompts/security-lead-prompt.md)
+
+#### P1 - Process Enhancement
+- [Rationalization Table](references/rationalization-table.md)
+- [Phase 7: Code Review](references/phase-7-code-review.md)
+- [Checkpoint Configuration](references/checkpoint-configuration.md)
+- [Phase 6: Plan Review](references/phase-6-plan-review.md)
+- [Large Service Handling](references/large-service-handling.md)
+
+#### P1 - Handoff Enhancement
+- [Agent Handoffs](references/agent-handoffs.md)
+
 ## Workflow Phases
 
 ### Phase 0: Setup
@@ -670,6 +696,53 @@ All audits passing (>=10/11 phases).
 └── ... (all tools)
 ```
 
+## Integration
+
+### Core Skills
+
+| Skill                                  | Purpose                              |
+| -------------------------------------- | ------------------------------------ |
+| setting-up-mcp-servers                 | Phase 1: MCP detection and setup     |
+| managing-mcp-wrappers                  | Phase 9-10: CLI audit and generation |
+| orchestrating-multi-agent-workflows    | Agent coordination and routing       |
+| persisting-agent-outputs               | Handoff format and metadata          |
+| developing-with-subagents              | Conditional: >10 tools               |
+| persisting-progress-across-sessions    | Conditional: >15 tools               |
+| dispatching-parallel-agents            | Conditional: 3+ failures             |
+
+### Library Skills
+
+| Skill                                 | Path                                                                                         | Purpose                           |
+| ------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------- |
+| designing-progressive-loading-wrappers | .claude/skill-library/claude/mcp-management/designing-progressive-loading-wrappers/SKILL.md  | Token optimization                |
+| optimizing-llm-api-responses          | .claude/skill-library/development/typescript/optimizing-llm-api-responses/SKILL.md           | Response filtering                |
+| implementing-result-either-pattern    | .claude/skill-library/development/typescript/implementing-result-either-pattern/SKILL.md     | Error handling                    |
+| validating-with-zod-schemas           | .claude/skill-library/development/typescript/validating-with-zod-schemas/SKILL.md            | Input validation                  |
+| implementing-retry-with-backoff       | .claude/skill-library/development/typescript/implementing-retry-with-backoff/SKILL.md        | Resilience                        |
+| sanitizing-inputs-securely            | .claude/skill-library/development/typescript/sanitizing-inputs-securely/SKILL.md             | Security                          |
+| structuring-hexagonal-typescript      | .claude/skill-library/development/typescript/structuring-hexagonal-typescript/SKILL.md       | Architecture                      |
+| testing-with-vitest-mocks             | .claude/skill-library/testing/testing-with-vitest-mocks/SKILL.md                             | Testing patterns                  |
+| avoiding-barrel-files                 | .claude/skill-library/development/typescript/avoiding-barrel-files/SKILL.md                  | Import patterns                   |
+| documenting-with-tsdoc                | .claude/skill-library/development/typescript/documenting-with-tsdoc/SKILL.md                 | Documentation                     |
+| orchestration-prompt-patterns         | .claude/skill-library/prompting/orchestration-prompt-patterns/SKILL.md                       | Prompt engineering patterns       |
+
+> Prompt templates in `references/prompts/` implement patterns from orchestration-prompt-patterns skill.
+
+### Required Sub-Skills by Phase
+
+| Phase | Required Sub-Skills                                               | Conditional Sub-Skills                               |
+| ----- | ----------------------------------------------------------------- | ---------------------------------------------------- |
+| All   | persisting-agent-outputs, orchestrating-multi-agent-workflows     | -                                                    |
+| 1     | setting-up-mcp-servers                                            | -                                                    |
+| 3-7   | -                                                                 | developing-with-subagents (if >10 tools)             |
+| 3-7   | -                                                                 | persisting-progress-across-sessions (if >15 tools)   |
+| 6,7   | -                                                                 | dispatching-parallel-agents (if 3+ failures)         |
+
+**Conditional complexity triggers:**
+- \>10 tools: Invoke `developing-with-subagents` for batch coordination
+- \>15 tools: Invoke `persisting-progress-across-sessions` for resume capability
+- 3+ independent failures in batch: Invoke `dispatching-parallel-agents` for parallel fixes
+
 ## Related Skills
 
 - **setting-up-mcp-servers** - MCP detection, installation, and configuration (Phase 1)
@@ -692,3 +765,8 @@ MCP wrapper creation is complete when:
 - ✅ All code reviews verdict: APPROVED (Phase 7)
 - ✅ Service skill generated covering all tools (Phase 10)
 - ✅ Build and tests pass (Phase 10)
+- ✅ All gate checklists passed (RED, GREEN, Audit)
+- ✅ No rationalization phrases detected during workflow
+- ✅ Progress.json status = 'complete'
+- ✅ Both review stages passed (spec compliance + quality/security)
+- ✅ All tool metadata files present with skills_invoked arrays

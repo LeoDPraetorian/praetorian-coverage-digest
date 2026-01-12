@@ -1,5 +1,19 @@
 # Agent Prompt Templates
 
+> **Note**: Full prompt templates are now available in [references/prompts/](prompts/) directory. This file provides brief reference prompts for quick agent spawning. For comprehensive prompts with STEP 0 clarification gates, few-shot examples, and self-review checklists, use the full templates.
+
+## Quick Reference Prompts
+
+The prompts below are abbreviated versions for quick reference. For production use, refer to:
+
+- [mcp-tool-developer-prompt.md](prompts/mcp-tool-developer-prompt.md) - ~680 lines with TDD examples
+- [mcp-tool-tester-prompt.md](prompts/mcp-tool-tester-prompt.md) - ~700 lines with test patterns
+- [mcp-tool-lead-prompt.md](prompts/mcp-tool-lead-prompt.md) - ~750 lines with decision chains
+- [mcp-tool-reviewer-prompt.md](prompts/mcp-tool-reviewer-prompt.md) - ~660 lines with verification chains
+- [security-lead-prompt.md](prompts/security-lead-prompt.md) - ~530 lines with threat analysis
+
+---
+
 ## mcp-tool-lead Prompt Template
 
 ```
