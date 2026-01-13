@@ -357,10 +357,10 @@ endif
 	@make submodule-init-robust
 	@make submodule-pull
 	@make install-git-hooks
+	@echo "📦 Installing npm dependencies (root + workspaces + LSP servers + gopls)..."
+	@npm install
 	@make setup-ui
-	@make setup-go-tools
-	@make mcp-tools-setup
-	@make claude-skills-setup
+	@make claude-skills-build
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
 		echo "AWS credentials not found, running aws configure..."; \
 		aws configure; \
@@ -400,17 +400,25 @@ endif
 setup-mac:
 	@echo "Installing core packages on macOS..."
 	@brew install awscli aws-sam-cli jq node python docker go gh pipx uv
+	@echo "Installing LSP dependencies..."
+	@command -v rustup >/dev/null 2>&1 && rustup component add rust-analyzer 2>/dev/null || echo "  ⚠️ rustup not found, skipping rust-analyzer"
 	@pipx ensurepath > /dev/null 2>&1 || true
 	@echo "Installing Praetorian CLI..."
 	@pipx install praetorian-cli > /dev/null 2>&1 || pipx upgrade praetorian-cli > /dev/null 2>&1 || echo "⚠️  Warning: Praetorian CLI installation/upgrade failed"
 	@echo "Installing Claude Code..."
 	@npm install -g @anthropic-ai/claude-code > /dev/null
+	@echo "Installing LSP servers globally (for Claude Code plugins)..."
+	@npm install -g typescript-language-server typescript pyright > /dev/null 2>&1 || echo "  ⚠️ Some LSP servers failed to install globally"
 	@echo "Installing Claude Agent SDK..."
 	@uv pip install --system --break-system-packages claude-agent-sdk > /dev/null 2>&1 || uv pip install --system --break-system-packages --upgrade claude-agent-sdk > /dev/null 2>&1 || echo "⚠️  Warning: Claude Agent SDK installation/upgrade failed"
 
 update-mac:
 	@echo "Upgrading core packages on macOS..."
 	@brew upgrade awscli aws-sam-cli jq node python docker go gh pipx uv
+	@echo "Updating LSP servers..."
+	@npm update -g typescript-language-server typescript pyright > /dev/null 2>&1 || true
+	@go install golang.org/x/tools/gopls@latest 2>/dev/null || true
+	@command -v rustup >/dev/null 2>&1 && rustup update 2>/dev/null || true
 	@echo "Updating Praetorian CLI..."
 	@pipx upgrade praetorian-cli > /dev/null 2>&1 || pipx install praetorian-cli > /dev/null 2>&1 || echo "⚠️  Warning: Praetorian CLI update/install failed"
 	@echo "Updating Claude Code..."
@@ -427,6 +435,9 @@ setup-ubuntu:
 	@sudo python3 -m pip install --no-cache-dir praetorian-cli --break-system-packages > /dev/null
 	@echo "Installing Claude Code..."
 	@sudo npm install -g @anthropic-ai/claude-code > /dev/null
+	@echo "Installing LSP servers globally (for Claude Code plugins)..."
+	@sudo npm install -g typescript-language-server typescript pyright > /dev/null 2>&1 || echo "  ⚠️ Some LSP servers failed to install"
+	@go install golang.org/x/tools/gopls@latest 2>/dev/null || echo "  ⚠️ gopls install failed"
 	@echo "Installing Claude Agent SDK..."
 	@sudo python3 -m pip install --no-cache-dir claude-agent-sdk --break-system-packages > /dev/null
 # devcontainer specific for go path
@@ -450,6 +461,9 @@ update-ubuntu:
 	@sudo python3 -m pip install --no-cache-dir --upgrade praetorian-cli --break-system-packages > /dev/null
 	@echo "Updating Claude Code..."
 	@sudo npm update -g @anthropic-ai/claude-code > /dev/null
+	@echo "Updating LSP servers..."
+	@sudo npm update -g typescript-language-server typescript pyright > /dev/null 2>&1 || true
+	@go install golang.org/x/tools/gopls@latest 2>/dev/null || true
 	@echo "Updating Claude Agent SDK..."
 	@sudo python3 -m pip install --no-cache-dir --upgrade claude-agent-sdk --break-system-packages > /dev/null
 
@@ -492,16 +506,18 @@ configure-cli:
 	echo "  praetorian --profile $$UUID"
 
 .PHONY: setup-go-tools
-setup-go-tools: ## Install Go development tools (gopls language server for Serena)
+setup-go-tools: ## [DEPRECATED] gopls now installed via npm postinstall - kept for manual use
 	@echo "📦 Installing Go development tools..."
 	@echo "  → gopls (Go language server)..."
 	@go install golang.org/x/tools/gopls@latest
 	@echo "✅ Go tools installed to $(shell go env GOPATH)/bin"
 	@echo "ℹ️  Ensure $(shell go env GOPATH)/bin is in your PATH"
+	@echo "ℹ️  Note: gopls is now auto-installed via 'npm install' postinstall hook"
 
 .PHONY: mcp-tools-setup
-mcp-tools-setup: ## Install dependencies for all MCP custom tools (chrome-devtools, currents, context7, linear)
+mcp-tools-setup: ## [DEPRECATED] MCP tools now installed via npm workspaces - kept for manual use
 	@echo "📦 Installing MCP tool dependencies..."
+	@echo "ℹ️  Note: These are now installed automatically via 'npm install' (workspaces)"
 	@echo "  → chrome-devtools..."
 	@cd .claude/tools/chrome-devtools && npm install > /dev/null 2>&1
 	@echo "  → currents..."
@@ -512,11 +528,9 @@ mcp-tools-setup: ## Install dependencies for all MCP custom tools (chrome-devtoo
 	@cd .claude/tools/linear && npm install > /dev/null 2>&1
 	@echo "✅ All MCP tool dependencies installed"
 
-.PHONY: claude-skills-setup
-claude-skills-setup: ## Install and build Claude skill management CLI tools (audit, fix, search, update)
-	@echo "📦 Installing Claude skill management dependencies..."
-	@cd .claude && npm install > /dev/null 2>&1
-	@echo "🔨 Building skill management packages..."
+.PHONY: claude-skills-build
+claude-skills-build: ## Build Claude skill management CLI tools (audit, fix, search, update)
+	@echo "🔨 Building Claude skill management packages..."
 	@cd .claude && npm run -w @chariot/formatting-skill-output build > /dev/null 2>&1 || true
 	@cd .claude && npm run -w @chariot/auditing-skills build > /dev/null 2>&1 || true
 	@cd .claude && npm run -w @chariot/fixing-skills build > /dev/null 2>&1 || true
