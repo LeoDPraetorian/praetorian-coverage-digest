@@ -1,3 +1,45 @@
+## [Date: 2026-01-12] - Fix Phase 6.3 Reference File Population Failure
+
+### Problem
+Phase 6.3 (Incorporate Research into Skill) allowed agents to mark "Incorporate research" complete after updating only SKILL.md, leaving references/ empty or with placeholder files <50 lines.
+
+### Root Cause
+1. Phase 6.3 was implicit ("populate references/") without enumerating which files to create
+2. No per-file TodoWrite tracking - single todo marked complete prematurely
+3. No verification gate blocking Phase 7 until all reference files exist with content
+4. No mapping from SYNTHESIS.md sections to specific reference files
+
+### Changes
+
+**SKILL.md Phase 6.3 (lines 415-435):**
+- Added 4-step workflow: Expand TodoWrite → Map content → Create files → Verify
+- Condensed skill type → reference file mapping (detailed version in research-integration.md)
+- Added bash verification gate that blocks Phase 7 until files exist with >50 lines
+- Added 3 rationalization counters for "partial incorporation" patterns
+- Line count: 538 → 490 lines (condensed Phase 1.3, 5.2, 9 to achieve <500 compliance)
+
+**references/research-integration.md (lines 68-345):**
+- Added Research-to-Reference Mapping Table (6 reference files → research sources)
+- Added Per-File Content Guidance section with specific extraction instructions for 4 skill types
+- Added complete 78-line example showing advanced-patterns.md populated from research
+- Updated verification checklist with bash check and blocking gate
+- Added 3 new anti-patterns about empty placeholder files
+- Line count: 194 → 373 lines
+
+### Acceptance Criteria Met
+1. ✅ Phase 6.3 expands TodoWrite with one item per required reference file
+2. ✅ Mapping table exists showing research output → reference file routing
+3. ✅ Verification gate blocks Phase 7 until all reference files exist with content
+4. ✅ research-integration.md updated with mapping table and complete example
+5. ✅ Rationalization counters added for 'partial incorporation' patterns
+
+### Files Modified
+- `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md` (538 → 490 lines)
+- `.claude/skill-library/claude/skill-management/creating-skills/references/research-integration.md` (194 → 373 lines)
+- Tables formatted with Prettier
+
+---
+
 ## [Date: 2026-01-06] - Add Integration Section Requirement (Phase 28 Compliance)
 
 ### Added

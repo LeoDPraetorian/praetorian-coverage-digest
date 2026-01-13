@@ -184,6 +184,168 @@ wc -l $ROOT/{skill-path}/SKILL.md
 
 ---
 
+## Phase 4c: Research Integration (When Research Was Performed)
+
+### When to Use
+
+After `orchestrating-research` returns with SYNTHESIS.md, Step 5 must expand into granular sub-steps.
+
+### Research-to-Update-Target Mapping
+
+**Understanding the mapping**: SYNTHESIS.md sections contain different types of information that feed different update targets.
+
+#### SYNTHESIS.md Sections → Update Targets
+
+| SYNTHESIS.md Section          | Update Target                                  | What to Extract                          |
+| ----------------------------- | ---------------------------------------------- | ---------------------------------------- |
+| Executive Summary             | SKILL.md overview/description                  | High-level changes, new capabilities     |
+| Findings by Interpretation    | SKILL.md workflow sections                     | Step-by-step procedures, decision points |
+| Cross-Interpretation Patterns | references/patterns.md                         | Common patterns across sources           |
+| Conflicts & Discrepancies     | references/troubleshooting.md or edge-cases.md | Trade-offs, when to use which approach   |
+| Recommendations               | SKILL.md Quick Reference table                 | Priority actions, best practices         |
+| Full Citations                | References section at bottom                   | Updated links, version numbers           |
+
+#### Research Agent Output Files → Update Targets
+
+| Research Agent Output | Update Target                       | What to Extract                   |
+| --------------------- | ----------------------------------- | --------------------------------- |
+| context7-\*.md        | references/api-reference.md         | Official API docs, current syntax |
+| github-\*.md          | references/patterns.md or examples/ | Real-world implementations        |
+| codebase-\*.md        | SKILL.md examples                   | Project-specific patterns         |
+| perplexity-\*.md      | SKILL.md best practices             | Community consensus               |
+
+### Step 4c.1: Identify Update Targets
+
+After reading SYNTHESIS.md, expand TodoWrite with per-target items:
+
+```
+TodoWrite([
+  { content: 'Step 5.1: Identify update targets', status: 'in_progress', activeForm: 'Identifying targets' },
+  { content: 'Step 5.2: Update SKILL.md Quick Reference', status: 'pending', activeForm: 'Updating Quick Reference' },
+  { content: 'Step 5.3: Update SKILL.md workflow sections', status: 'pending', activeForm: 'Updating workflow' },
+  { content: 'Step 5.4: Update references/workflow.md', status: 'pending', activeForm: 'Updating workflow.md' },
+  { content: 'Step 5.5: Update references/patterns.md', status: 'pending', activeForm: 'Updating patterns.md' },
+  { content: 'Step 5.6: Verify research incorporation', status: 'pending', activeForm: 'Verifying incorporation' },
+  { content: 'Step 6: Verify GREEN', status: 'pending', activeForm: 'Verifying fix' },
+  { content: 'Step 7: Compliance audit', status: 'pending', activeForm: 'Running compliance' },
+  { content: 'Step 8: REFACTOR', status: 'pending', activeForm: 'Pressure testing' }
+])
+```
+
+**Process**:
+
+1. Read current SKILL.md to identify sections
+2. List existing references/ files (`ls -la references/`)
+3. Read SYNTHESIS.md completely
+4. Map SYNTHESIS.md sections to update targets using table above
+5. Determine which existing reference files need updates
+6. Identify if new reference files are needed
+
+### Step 4c.2: Update SKILL.md Core Sections
+
+Apply changes to:
+
+- Quick Reference table (from Recommendations section)
+- Overview/description (from Executive Summary)
+- Workflow/procedure sections (from Findings by Interpretation)
+- Examples and patterns (from research agent outputs)
+- References/citations (from Full Citations)
+
+**Use current syntax from research, not training data.**
+
+### Step 4c.3: Update Existing Reference Files
+
+For each file in `references/`, check if SYNTHESIS.md has relevant findings.
+
+#### Procedure per Reference File
+
+1. **Check relevance**: Does this file's topic appear in SYNTHESIS.md?
+
+2. **If yes - Compare and update**:
+   - Read current reference file completely
+   - Identify sections in SYNTHESIS.md that apply to this file
+   - Update outdated syntax/APIs (use context7-\*.md outputs)
+   - Add new patterns discovered (use Cross-Interpretation Patterns section)
+   - Remove deprecated approaches (documented in Conflicts & Discrepancies)
+   - Update citations/links (from Full Citations section)
+   - Document changes made (brief comment or commit message)
+
+3. **If no - Document decision**:
+   - File may be orthogonal to research scope
+   - Add comment in TodoWrite: "references/X.md - No updates needed (topic not in research scope)"
+   - This prevents "I forgot to check" vs "I checked and it's current"
+
+4. **Track in TodoWrite**: Create one item per file that needs updating
+
+#### Common Reference File Updates
+
+| File Pattern       | Likely Updates from Research                  |
+| ------------------ | --------------------------------------------- |
+| api-reference.md   | New methods, changed signatures, deprecations |
+| patterns.md        | New patterns, evolved best practices          |
+| workflow.md        | New steps, reordered procedures               |
+| troubleshooting.md | New edge cases, resolved issues               |
+| examples.md        | Updated syntax, new use cases                 |
+
+### Step 4c.4: Create New Reference Files
+
+If research reveals patterns not covered by existing reference files:
+
+1. **Determine need**: Is there a SYNTHESIS.md section with substantial content that doesn't fit existing files?
+
+2. **Create file**: Follow progressive disclosure patterns
+
+   ```bash
+   # Example: Research revealed CI/CD integration patterns not documented
+   Write({
+     file_path: "{skill-path}/references/ci-cd-integration.md",
+     content: "# CI/CD Integration\n\n[Content from SYNTHESIS.md]"
+   })
+   ```
+
+3. **Link from SKILL.md**: Add to Related Skills or References section
+
+   ```markdown
+   **References**:
+
+   - [ci-cd-integration.md](references/ci-cd-integration.md) - CI/CD integration patterns
+   ```
+
+### Step 4c.5: Research Incorporation Verification Gate
+
+**MANDATORY checkpoint before proceeding to Phase 6 (GREEN)**
+
+#### Verification Checklist
+
+All must pass:
+
+- [ ] SYNTHESIS.md has been read completely
+- [ ] SKILL.md updated with patterns from research (not just original request)
+- [ ] All existing reference files reviewed for staleness
+- [ ] Reference files updated where research provided new information
+- [ ] New reference files created if research revealed uncovered patterns
+- [ ] Examples use current syntax from research (not training data)
+- [ ] Citations updated with research sources
+
+#### Verification Prompt
+
+**Research Incorporation Verification:**
+
+Before proceeding to GREEN, confirm:
+
+1. Which SYNTHESIS.md sections did you incorporate? [List them]
+2. Which files did you update? [List with line counts changed]
+3. Did any reference files need updates? [Yes/No, which ones]
+4. Are there new patterns from research not in existing files? [Yes/No, action taken]
+
+**If any answer is 'None' or 'No action', STOP and review SYNTHESIS.md again.**
+
+#### Cannot Proceed Until Verification Passes ✅
+
+This gate prevents superficial "I updated SKILL.md" completions that ignore research depth.
+
+---
+
 ## Phase 5: Changelog
 
 ### 5.1 Create .history directory

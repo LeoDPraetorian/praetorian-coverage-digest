@@ -99,24 +99,9 @@ Ask user to describe a specific scenario where Claude currently fails without th
 
 **CRITICAL**: Actually test the scenario and capture the failure.
 
-**Option A: Conversational Testing (Recommended for Most Skills)**
+**Option A (Recommended):** Ask Claude to perform task without skill. Document what goes wrong (wrong approach, missing context, incorrect patterns). Record verbatim.
 
-1. Ask Claude to perform the task (without using any skill)
-2. Document exactly what goes wrong:
-   - Wrong approach taken?
-   - Missing context?
-   - Incorrect patterns?
-   - Takes too long?
-
-**Record verbatim** what Claude does wrong. This proves the skill is needed.
-
-**Option B: Structured Evaluations (Advanced)**
-
-For heavily reused skills, create `evaluations/test-case-{n}.json` with query, expected_behavior, and files fields.
-
-**Use when:** Skills used across multiple projects, critical workflows, team-shared skills.
-
-**For most skills, conversational testing (Option A) is sufficient.**
+**Option B (Advanced):** Create `evaluations/test-case-{n}.json` for heavily reused skills.
 
 ### 1.4 Confirm RED State
 
@@ -234,30 +219,11 @@ mkdir -p $ROOT/.claude/skill-library/{category}/{skill-name}/examples
 
 ### 5.2 Generate SKILL.md with Progressive Disclosure
 
-**🚨 CRITICAL: Design for progressive disclosure from the start.**
+**🚨 CRITICAL: Design for progressive disclosure from the start.** Target: <500 lines (ideally 300-450).
 
-For complete progressive disclosure patterns, see [Progressive Disclosure](.claude/skills/managing-skills/references/progressive-disclosure.md).
+**See:** [template-guidance.md](references/template-guidance.md) for templates by skill type, line count management, description patterns.
 
-**Note**: Gateways use gateway-template.md (see [references/gateway-creation.md](references/gateway-creation.md)).
-
-**For detailed template guidance**, see [references/template-guidance.md](references/template-guidance.md):
-
-- Line count thresholds and management
-- Description requirements (third-person, discovery patterns)
-- Tool access control patterns
-- Content placement strategy
-- Template selection by skill type
-
-**Quick template selection**:
-
-| Skill Type        | Template             | See                                                 |
-| ----------------- | -------------------- | --------------------------------------------------- |
-| Process/Pattern   | Methodology workflow | [skill-templates.md](references/skill-templates.md) |
-| Library/Framework | npm package docs     | [skill-templates.md](references/skill-templates.md) |
-| Integration       | Service connection   | [skill-templates.md](references/skill-templates.md) |
-| Tool Wrapper      | CLI/MCP wrapper      | [skill-templates.md](references/skill-templates.md) |
-
-**Target**: SKILL.md < 500 lines (ideally 300-450). Use references/ for detailed content.
+**Gateways:** Use gateway-template.md (see [references/gateway-creation.md](references/gateway-creation.md)).
 
 #### 🚨 Integration Section (MANDATORY)
 
@@ -412,7 +378,29 @@ The orchestrating-research skill provides:
 
 Read SYNTHESIS.md from `.claude/.output/research/{timestamp}-{topic}/` (orchestrating-research creates OUTPUT_DIR with SYNTHESIS.md and source files), update SKILL.md with patterns/docs/practices, populate references/, replace placeholders with real examples.
 
-**See:** [research-integration.md](references/research-integration.md). **Cannot proceed to Phase 7 until skill reflects research findings.** ✅
+**After reading SYNTHESIS.md:**
+
+1. **Expand TodoWrite** - Create per-file items for required references (see [research-integration.md](references/research-integration.md) for skill type → reference file mapping)
+2. **Map content** - Route SYNTHESIS.md sections to reference files using mapping table
+3. **Create files** - Write each reference file with >50 lines from research sources (not placeholders)
+4. **Verify** - Run bash check confirming all files exist with content
+
+**Verification gate (blocks Phase 7):**
+
+```bash
+for file in workflow.md advanced-patterns.md; do
+  [ ! -f "references/$file" ] || [ $(wc -l < "references/$file") -lt 50 ] && echo "FAIL: $file" && exit 1
+done
+```
+
+**Rationalization counters:**
+
+- "I updated SKILL.md" → References/ holds detailed content, create ALL files
+- "Add references later" → Phase 7+ assumes they exist, complete before Phase 7
+- "Research lacked content" → That's Phase 6.2 failure, re-run or document gap
+- "50 lines of bullets is enough" → Substantive means code examples, patterns, citations
+
+**See:** [research-integration.md](references/research-integration.md) for complete integration workflow and anti-patterns.
 
 ## Phase 7: Gateway Update (Library Skills Only)
 
@@ -476,50 +464,15 @@ Audit {skill-name} to verify compliance with all 28 phase requirements.
 
 ## Phase 9: 🔵 REFACTOR Phase (Pressure Test)
 
-**Skills must resist rationalization under pressure.** For REFACTOR scope rules and creating vs updating differences, see [REFACTOR Rules Reference](.claude/skills/managing-skills/references/patterns/refactor-rules.md).
-
-### 9.1 Load Pressure Testing Methodology
-
-**Invoke the `pressure-testing-skill-content` skill:**
+**Invoke pressure-testing-skill-content:**
 
 ```
 Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")
 ```
 
-This skill provides the complete methodology for:
+Follow methodology to test: time pressure, authority pressure, sunk cost pressure. If any fail, add counter-rationalization, re-test.
 
-- Creating effective pressure scenarios (3+ combined pressures)
-- Spawning test subagents with the Task tool
-- Evaluating subagent responses (PASS/FAIL criteria)
-- Closing loopholes when subagents rationalize/bypass the skill
-
-**Claude performs pressure tests autonomously** - do NOT ask the user to evaluate scenarios.
-
-### 9.2 Run Three Pressure Tests
-
-Follow the `pressure-testing-skill-content` methodology to test:
-
-1. **Time pressure**: Emergency, deadline, deploy window closing
-2. **Authority pressure**: Senior says skip it, "I'll take responsibility"
-3. **Sunk cost pressure**: Hours of work already done, "waste to delete"
-
-**If any test FAILS:** Add explicit counter-rationalization to the skill, then re-test.
-
-### 9.3 Final Verification
-
-Run audit and confirm all phases pass:
-
-```markdown
-Audit {skill-name} to verify compliance with all 28 phase requirements.
-```
-
-**Skill is complete when:**
-
-- ✅ RED phase documented (gap proven)
-- ✅ GREEN phase passed (skill works)
-- ✅ REFACTOR phase passed (pressure-tested with subagents)
-- ✅ Audit passes (compliance verified)
-- ✅ Gateway updated (if library skill)
+**Complete when:** ✅ RED documented ✅ GREEN passed ✅ REFACTOR passed ✅ Audit passed ✅ Gateway updated (library only)
 
 ---
 

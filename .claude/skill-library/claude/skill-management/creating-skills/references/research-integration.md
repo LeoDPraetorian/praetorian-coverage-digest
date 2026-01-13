@@ -67,29 +67,192 @@ Incorporate findings into the main skill file:
 
 ### 3. Populate Reference Files
 
-Add detailed content to `references/` directory:
+Add detailed content to `references/` directory. **Each file MUST have >50 lines of substantive content (not placeholders).**
+
+#### Research-to-Reference Mapping Table
+
+Use this table to route research output content to the correct reference files:
+
+| Reference File       | Primary Source in Research Output                | Content to Extract                                       |
+| -------------------- | ------------------------------------------------ | -------------------------------------------------------- |
+| workflow.md          | SYNTHESIS.md → Findings by Interpretation        | Step-by-step procedures, phase breakdowns, checklists    |
+| api-reference.md     | context7-\*.md files + SYNTHESIS.md API sections | API methods, parameters, return types, examples          |
+| patterns.md          | SYNTHESIS.md → Cross-Interpretation Patterns     | Usage patterns, best practices, common combinations      |
+| advanced-patterns.md | github-\*.md files + SYNTHESIS.md patterns       | Complex workflows, edge cases, optimization techniques   |
+| error-handling.md    | SYNTHESIS.md → Conflicts section                 | Error types, recovery strategies, debugging approaches   |
+| configuration.md     | codebase-\*.md + web-\*.md setup guides          | Setup steps, environment variables, integration examples |
+
+#### Per-File Content Guidance
 
 **For Process/Pattern skills:**
 
-- `workflow.md` - Step-by-step procedures from research
-- `advanced-patterns.md` - Complex patterns discovered
+- `workflow.md` (>50 lines)
+  - Extract step-by-step procedures from SYNTHESIS.md "Findings by Interpretation"
+  - Include decision trees from github-\*.md examples
+  - Add checklists from web-\*.md tutorials
+  - Cite specific source files (e.g., "From github-react-patterns.md: ...")
+- `advanced-patterns.md` (>50 lines)
+  - Extract complex patterns from github-\*.md open-source implementations
+  - Include optimization techniques from SYNTHESIS.md patterns section
+  - Add edge case handling from perplexity-\*.md discussions
+  - Provide real code examples (not hypothetical)
 
 **For Library/Framework skills:**
 
-- `api-reference.md` - Complete API docs from Context7
-- `patterns.md` - Usage patterns from codebase + web
+- `api-reference.md` (>50 lines)
+  - Extract complete API from context7-\*.md official documentation
+  - Include method signatures, parameters, return types
+  - Add SYNTHESIS.md API sections for cross-method patterns
+  - Cite version numbers (e.g., "TanStack Query v5.17.0")
+- `patterns.md` (>50 lines)
+  - Extract usage patterns from codebase-\*.md local examples
+  - Include best practices from web-\*.md community resources
+  - Add SYNTHESIS.md "Cross-Interpretation Patterns" section
+  - Reference actual codebase files (e.g., `modules/chariot/ui/src/hooks/useAssets.ts`)
 
 **For Integration skills:**
 
-- `api-reference.md` - Service APIs from docs
-- `configuration.md` - Setup examples from research
+- `api-reference.md` (>50 lines)
+  - Extract API endpoints from context7-\*.md or web-\*.md documentation
+  - Include authentication methods from SYNTHESIS.md security section
+  - Add request/response examples from github-\*.md implementations
+  - Cite API version and endpoint URLs
+- `configuration.md` (>50 lines)
+  - Extract setup steps from codebase-\*.md existing integrations
+  - Include environment variables from web-\*.md setup guides
+  - Add troubleshooting from SYNTHESIS.md conflicts section
+  - Provide complete working examples
 
 **For Tool Wrapper skills:**
 
-- `commands.md` - CLI commands from docs
-- `error-handling.md` - Error patterns from issues/discussions
+- `commands.md` (>50 lines)
+  - Extract CLI commands from context7-\*.md tool documentation
+  - Include flag descriptions and examples from web-\*.md tutorials
+  - Add command chaining patterns from github-\*.md scripts
+  - Cite tool version (e.g., "praetorian-cli v2.3.0")
+- `error-handling.md` (>50 lines)
+  - Extract error types from SYNTHESIS.md conflicts section
+  - Include recovery strategies from github-\*.md issue discussions
+  - Add debugging approaches from web-\*.md troubleshooting guides
+  - Provide error message examples and fixes
 
-### 4. Replace Template Placeholders
+### 4. Example: Complete Reference File from Research
+
+**Scenario:** Creating `advanced-patterns.md` for a TanStack Query skill after research
+
+**Source files available:**
+
+- `SYNTHESIS.md` - Cross-interpretation patterns section
+- `github-tanstack-examples.md` - Open-source implementations
+- `codebase-chariot-hooks.md` - Local usage patterns
+
+**Resulting advanced-patterns.md (78 lines):**
+
+```markdown
+# Advanced TanStack Query Patterns
+
+**Source:** Research conducted 2026-01-12
+
+## Optimistic Updates with Rollback
+
+**Pattern from github-tanstack-examples.md:**
+
+\`\`\`typescript
+const mutation = useMutation({
+mutationFn: updateUser,
+onMutate: async (newUser) => {
+// Cancel outgoing refetches
+await queryClient.cancelQueries({ queryKey: ['users'] })
+
+    // Snapshot previous value
+    const previousUsers = queryClient.getQueryData(['users'])
+
+    // Optimistically update
+    queryClient.setQueryData(['users'], (old) => [...old, newUser])
+
+    return { previousUsers }
+
+},
+onError: (err, newUser, context) => {
+// Rollback on error
+queryClient.setQueryData(['users'], context.previousUsers)
+},
+})
+\`\`\`
+
+**Used in codebase:** `modules/chariot/ui/src/mutations/useUpdateAsset.ts:45-67`
+
+## Dependent Queries
+
+**Pattern from SYNTHESIS.md Cross-Interpretation Patterns:**
+
+\`\`\`typescript
+const { data: user } = useQuery({
+queryKey: ['user', userId],
+queryFn: () => fetchUser(userId),
+})
+
+const { data: projects } = useQuery({
+queryKey: ['projects', user?.id],
+queryFn: () => fetchProjects(user.id),
+enabled: !!user?.id, // Only run when user exists
+})
+\`\`\`
+
+**Best practice (from web research):** Always use `enabled` option to prevent unnecessary requests.
+
+## Infinite Queries for Pagination
+
+**Pattern from github-tanstack-examples.md:**
+
+\`\`\`typescript
+const {
+data,
+fetchNextPage,
+hasNextPage,
+isFetchingNextPage,
+} = useInfiniteQuery({
+queryKey: ['projects'],
+queryFn: ({ pageParam = 0 }) => fetchProjects(pageParam),
+getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
+})
+\`\`\`
+
+**Performance note (from SYNTHESIS.md):** Use `maxPages` option to limit memory usage for very long lists.
+
+## Prefetching Strategies
+
+**Pattern from codebase-chariot-hooks.md:**
+
+\`\`\`typescript
+// Prefetch on hover (modules/chariot/ui/src/components/AssetCard.tsx)
+<Card
+onMouseEnter={() => {
+queryClient.prefetchQuery({
+queryKey: ['asset', asset.id],
+queryFn: () => fetchAssetDetails(asset.id),
+})
+}}
+/>
+\`\`\`
+
+**When to use (from web research):** Prefetch for likely next actions, but avoid prefetching everything (wastes bandwidth).
+
+## Related Patterns
+
+- [TanStack Query Official Docs](https://tanstack.com/query/v5/docs) - Latest API
+- [Codebase hooks](../../modules/chariot/ui/src/hooks/) - Local implementations
+```
+
+**Key characteristics of this example:**
+
+- 78 lines (well over 50-line minimum)
+- Cites specific research sources ("from github-tanstack-examples.md")
+- References actual codebase files with locations
+- Includes real code examples (not placeholders)
+- Provides context for when to use each pattern
+
+### 5. Replace Template Placeholders
 
 Transform generic templates into real content:
 
@@ -119,7 +282,7 @@ Transform generic templates into real content:
 - Current (from latest docs, not training data)
 - Project-specific (uses actual file paths, conventions)
 
-### 5. Add Citations
+### 6. Add Citations
 
 Include source attribution:
 
@@ -143,27 +306,44 @@ Include source attribution:
 
 ## Verification Checklist
 
-Before proceeding to Phase 7, verify:
+**Before proceeding to Phase 7, ALL items must pass:**
 
 - [ ] SYNTHESIS.md has been read and understood
-- [ ] SKILL.md contains patterns from codebase research
-- [ ] SKILL.md includes API docs from Context7 (if library skill)
-- [ ] SKILL.md incorporates best practices from web research
-- [ ] Reference files are populated (not empty placeholders)
+- [ ] SKILL.md updated with patterns from SYNTHESIS.md
+- [ ] All required reference files for skill type exist (see mapping table)
+- [ ] Each reference file has >50 lines of content (not placeholder)
+- [ ] Reference files cite research sources (not training data)
 - [ ] All examples are real (not hypothetical)
 - [ ] Examples use current syntax (not outdated from training data)
 - [ ] File paths reference actual codebase files
 - [ ] Citations link to research sources
 
+**Bash verification:**
+
+```bash
+# Verify reference files exist and have content
+for file in workflow.md advanced-patterns.md; do
+  if [ ! -f "references/$file" ] || [ $(wc -l < "references/$file") -lt 50 ]; then
+    echo "FAIL: references/$file missing or too short"
+    exit 1
+  fi
+done
+```
+
+**Cannot proceed to Phase 7 until verification passes** ✅
+
 ## Anti-Patterns
 
-| Anti-Pattern                 | Why It's Wrong                | Fix                          |
-| ---------------------------- | ----------------------------- | ---------------------------- |
-| Skip reading SYNTHESIS.md    | Miss cross-source patterns    | Always read synthesis first  |
-| Copy research verbatim       | Creates bloated skill         | Extract key patterns only    |
-| Keep template examples       | Generic, not project-specific | Replace with real examples   |
-| Use hypothetical paths       | Not greppable, not verifiable | Use actual file paths        |
-| Mix training data + research | Can contradict (old vs new)   | Trust research over training |
+| Anti-Pattern                              | Why It's Wrong                                         | Fix                                     |
+| ----------------------------------------- | ------------------------------------------------------ | --------------------------------------- |
+| Skip reading SYNTHESIS.md                 | Miss cross-source patterns                             | Always read synthesis first             |
+| Copy research verbatim                    | Creates bloated skill                                  | Extract key patterns only               |
+| Keep template examples                    | Generic, not project-specific                          | Replace with real examples              |
+| Use hypothetical paths                    | Not greppable, not verifiable                          | Use actual file paths                   |
+| Mix training data + research              | Can contradict (old vs new)                            | Trust research over training            |
+| **Create empty placeholder files**        | **Fails Phase 7 verification, GREEN tests incomplete** | **Write >50 lines substantive content** |
+| **Update only SKILL.md, skip references** | **Detailed content belongs in references/**            | **Create ALL required reference files** |
+| **Create references "later"**             | **Phase 7+ assumes they exist**                        | **Complete all files before Phase 7**   |
 
 ## Common Rationalizations
 

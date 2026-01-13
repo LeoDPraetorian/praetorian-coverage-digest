@@ -1,496 +1,65 @@
-# Changelog
-
-## 2026-01-06 - Add Phase 28 Fix Procedure
-
-### Added
-- **Phase 28 Fix Procedure** (lines 218-285) - Complete procedure for fixing missing Integration sections
-  - Step-by-step analysis of skill content to determine relationships
-  - Called By determination via codebase search
-  - Requires/Calls/Pairs With extraction from skill content
-  - Integration section generation template
-  - Migration path from Related Skills
-
-### Changed
-- **Quick Reference Table** - Added Phase 28 to Claude-Automated category
-- **Step 4b Section** - Updated phase list to include Phase 28
-
-### Reason
-- New Phase 28 audit (Integration Section) requires corresponding fix procedure
-- Enables automated migration from "Related Skills" to structured "Integration" format
-- Based on [obra/superpowers](https://github.com/obra/superpowers) pattern analysis
-
-### Technical Details
-- Line count: ~75 lines added to Step 4b section
-- Links to Phase 28 details in auditing-skills
-
----
-
-## 2026-01-05 - Add Rationalization Prevention
-
-### Changed
-- **Rationalization Prevention Section** (lines 42-56) - Added after Quick Reference table
-- **Step 0 Statistical Evidence** (line 88) - Added ~25% wrong directory failure rate
-- **Step 2 Statistical Evidence** (line 111) - Added ~20% rollback requirement rate
-- **Step 5 Statistical Evidence** (line 347) - Added ~30% incomplete fix rate
-- **New Reference File** - Created `references/rationalization-table.md` with domain-specific rationalizations
-
-### Problem Fixed
-- Agents were rationalizing skipping workflow steps during fixes
-- No explicit prevention guidance for common shortcuts like "skip backup" or "close enough"
-- Statistical evidence was missing from gates to justify discipline
-- No domain-specific rationalization table for fixing workflow
-
-### Solution
-- Added Rationalization Prevention section with cross-reference to shared patterns
-- Created comprehensive rationalization table covering:
-  - All 6 workflow steps (Run Audit, Create Backup, Categorize, Apply Fixes, Verify, Changelog)
-  - All 4 fix categories (Deterministic, Hybrid, Claude-Automated, Human-Required)
-  - Cross-step rationalizations
-- Added statistical evidence at 3 critical gates (Step 0, Step 2, Step 5)
-- Key principle: "If you detect rationalization phrases in your thinking, STOP"
-
-### Technical Details
-- Line count: 375 → 398 lines (well under 500-line limit)
-- New file: `references/rationalization-table.md` (108 lines)
-- Links to shared prevention: `../../../../skills/using-skills/references/rationalization-prevention.md`
-- Statistical evidence format: "~N% [consequence] [mitigation]"
-
-### Impact
-- Agents must now explicitly recognize and counter rationalization attempts
-- Statistical evidence justifies mechanical discipline at each gate
-- Domain-specific table provides instant responses to common shortcuts
-- Workflow integrity improved through explicit prevention rather than implicit expectations
-
----
-
-## 2026-01-04 - Fix Phase 26 Research Workflow Continuation
-
-### Changed
-- **Phase 26 Fix Procedure** (lines 145-194) - Rewritten to use TodoWrite for continuation state
-- Replaced invisible continuation instructions with explicit TodoWrite tracking
-- Removed old DO/DO NOT box (lines 190-206 in previous version)
-
-### Problem Fixed
-- Phase 26 workflow was stopping after orchestrating-research completed
-- Continuation instructions in lines 190-203 were invisible to agent during research execution
-- Agent was reading orchestrating-research context, not fixing-skills context
-- Workflow stopped with "Research complete!" instead of continuing
-
-### Solution
-- Step 3a: Write remaining fix phases to TodoWrite BEFORE invoking research
-- Step 3c: When research returns with 'WORKFLOW_CONTINUATION_REQUIRED', check TodoWrite
-- Agent sees pending 'Populate incomplete reference files' todo and continues automatically
-- Maintains state across context switches via TodoWrite persistence
-
-### Technical Details
-- Line count reduced: 389 → 375 lines
-- TodoWrite array includes 4 tracked steps: Research, Populate, Verify, Changelog
-- Continuation instructions now in step 3c (lines 176-182)
-- Pattern matches updating-skills research integration (lines 125-146)
-
-### Impact
-- Phase 26 fixes now complete automatically without user prompting
-- Research findings properly integrated into stub files
-- Consistent workflow across fixing-skills, creating-skills, and updating-skills
-
-## 2026-01-04 - Add Research Integration for Phase 26 Fixes
-
-### Added
-- **Phase 26 Fix Procedure** - New subsection documenting how to populate incomplete reference files
-- Research integration workflow following same pattern as creating-skills and updating-skills
-- AskUserQuestion prompt for research confirmation
-- Automatic continuation rules after orchestrating-research completes
-- Critical warning: "Never use training data to populate missing content"
-
-### Changed
-- Phase 26 list item: Added link to Phase 26 Fix Procedure section
-- SKILL.md: Added 64-line Phase 26 Fix Procedure section (lines 145-208)
-- Current line count: 389 lines (well under 500-line limit)
-
-### Reason
-- **RED failure**: When fixing Phase 26 issues (incomplete reference files), Claude was using training data to generate content
-- Training data produces outdated or incorrect information (e.g., GitHub auth patterns from 2024)
-- Both creating-skills (Phase 6.2) and updating-skills (Step 4) invoke orchestrating-research for content
-- fixing-skills must follow the same pattern for consistency and accuracy
-
-### Technical Details
-
-**Integration Pattern (matches creating-skills and updating-skills):**
-
-1. Detect Phase 26 genuine stubs (incomplete reference files)
-2. Ask user via AskUserQuestion: "Research or user provides content?"
-3. If "Yes" → Invoke orchestrating-research
-4. Read SYNTHESIS.md from `.claude/.output/research/{timestamp}/`
-5. Extract verified content and populate incomplete files
-6. Continue with remaining fix steps automatically
-
-**Automatic Continuation Rules:**
-
-✅ DO:
-- Read research output immediately
-- Extract and apply verified content
-- Continue fix workflow without stopping
-
-❌ DO NOT:
-- Report "Research complete!" and stop
-- Generate content from training data
-- Create TODO/stub placeholders
-
-**Evidence of Need:**
-
-User was creating integrating-with-github skill references and initially generated content from training data, then caught the error and asked to read existing research instead (`.claude/.output/research/20260103-092920-github-api-integration/`).
-
-This proves the workflow needed explicit research integration to prevent training-data generation.
-
-### Files Changed
-- `SKILL.md` lines 140-208 - Added Phase 26 Fix Procedure subsection
-
-### Verification
-- ✅ Phase 26 Fix Procedure matches creating-skills Phase 6.2 research pattern
-- ✅ Includes orchestrating-research invocation
-- ✅ Includes automatic continuation rules (DO/DO NOT)
-- ✅ Explains why research is mandatory (training data risk)
-- ✅ References phase-26-semantic-review.md for classification criteria
-
-### Impact
-- fixing-skills now aligns with creating-skills and updating-skills research patterns
-- Prevents outdated/incorrect content generation from training data
-- Ensures Phase 26 fixes produce verified, current information
-- Maintains 3-skill consistency: create/update/fix all use orchestrating-research
-
-### Method
-- Manual edit via Edit tool
-- No backup needed (non-destructive addition)
-
----
-
-## 2026-01-02 - Update Phase Numbers and Path Format
-
-### Changed
-- **Phase number updates** - Updated all phase references from sub-phase notation to sequential numbering
-  - Sub-phases 14a-d → phases 14-17 (14a→14, 14b→15, 14c→16, 14d→17)
-  - Old phases 15-22 → phases 18-25 (shifted +4)
-  - Added Phase 26 (Reference Content Quality)
-  - Updated category lists in SKILL.md:
-    - Deterministic: `2, 5, 6, 7, 12, 14a, 16, 18` → `2, 5, 6, 7, 12, 14, 19, 21`
-    - Hybrid: `4, 10, 19` → `4, 10, 22`
-    - Claude-Automated: `1, 3, 11, 13, 15, 17, 21, 22` → `1, 3, 11, 13, 18, 20, 24, 25, 26`
-    - Validation-Only: `14b-d` → `15, 16, 17`
-    - Human-Required: `8, 9, 20` → `8, 9, 23`
-  - Updated Quick Reference table and all scenario descriptions
-  - Updated references/fix-procedures.md phase numbers
-- **Path format updates** - Converted all relative paths to repo-root format
-  - Pattern: `../../../../skills/managing-skills/...` → `.claude/skills/managing-skills/...`
-  - Updated 6 locations in SKILL.md
-  - Updated 3 locations in references/fix-procedures.md
-
-### Reason
-- **Audit system renumbering**: The auditing-skills system was refactored to use sequential phase numbering instead of sub-phases
-- **Path consistency**: Repo-root format (`.claude/`) is clearer and more maintainable than relative paths (`../../../../`)
-- All skills referencing the audit system need to be updated to match the new numbering
-
-### Verification
-- ✅ No remaining sub-phase notation (14a, 14b, 14c, 14d) in either file
-- ✅ No remaining relative paths (`../../../../`) in either file
-- ✅ All phase references updated to sequential numbering
-- ✅ All category lists updated with correct phase numbers
-
-## 2025-12-31 - Simplify Repository Root Navigation Pattern
-
-### Changed
-- **Step 0: Navigate to Repository Root** in SKILL.md - Replaced complex 3-line pattern with industry-standard single-line approach
-- **Step 1: Run Audit** in SKILL.md - Updated audit navigation to use simplified pattern
-- Old pattern (2 locations): `REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel); cd "$REPO_ROOT"`
-- New pattern (Location 1): `ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"`
-- New pattern (Location 2): `ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run audit -- {skill-name}`
-- Variable name: `REPO_ROOT` → `ROOT` for consistency with commands and MCP tools
-- Updated `references/fix-procedures.md` Phase 11 with new ROOT pattern
-- Updated `references/phase-fixes.md` Phase 11 with new ROOT pattern and explanation
-- Updated `scripts/src/fix.ts` line 163 help text to reference $ROOT instead of $REPO_ROOT
-
-### Reason
-- **RED failure**: Old pattern uses unnecessary complexity (stderr redirect, conditional test, 3 separate commands per location)
-- Can cause parsing errors in Claude Code's Bash tool when combined with other operators
-- Inconsistent with updated patterns across codebase (commands, MCP skills, CLAUDE.md)
-- More verbose and harder to maintain than necessary
-- fixing-skills is used as a reference for fixing other skills, so patterns must be exemplary
-
-### Technical Details
-- Single git command with both `--show-superproject-working-tree` and `--show-toplevel` flags
-- Pipe to `head -1` automatically selects first non-empty result (super-repo root when in submodule)
-- Simpler: 2-3 commands instead of 4-5, one line instead of three per location
-- No stderr redirect needed, no conditional test needed
-- Proper quoting prevents bash parsing errors
-- Works identically from any directory depth (tested from super-repo and deep submodule)
-
-### Files Changed
-- `SKILL.md` lines 64-66 - Replaced Step 0 navigation pattern (3 lines → 1 line)
-- `SKILL.md` lines 78-80 - Replaced Step 1 audit navigation pattern (3 lines → 1 line)
-- `references/fix-procedures.md` lines 65-74 - Updated Phase 11 cd Commands with new ROOT pattern
-- `references/phase-fixes.md` lines 324-339 - Updated Phase 11 example with new ROOT pattern and explanation
-- `scripts/src/fix.ts` line 163 - Updated help text from $REPO_ROOT to $ROOT
-- Line count: 325 → 319 lines (6 lines removed due to consolidation)
-
-### Verification
-- ✅ Tested from submodule directory (`modules/chariot/ui/src/`) → Returns super-repo root
-- ✅ Tested from super-repo root with .claude navigation → Successfully navigates to .claude directory
-- ✅ All REPO_ROOT references replaced with ROOT in markdown files
-- ✅ Help text updated in TypeScript CLI tool
-
-## 2025-12-30 - Enhance Phase Numbering Hygiene to Update Prose References
-
-### Added
-- **Step 5: Update Prose References** - New comprehensive prose reference update procedure
-- Regex patterns for finding all prose references: "Phase X (", "Phase X:", "to Phase X", "return to Phase X"
-- **Step 6: Verify Name Hints Match** - Validates prose hints against actual phase names after renumbering
-- **Step 7: Report External References** - Optional grep search for external skill references
-- Complete example showing troubleshooting.md, progress-persistence.md, agent-handoffs.md updates
-
-### Changed
-- SKILL.md Phase Numbering Hygiene section: 5-step → 7-step procedure
-- fix-procedures.md: Added Semantic Criterion 7 section with complete Step 1-7 process
-- Enhanced example transformation to show prose updates alongside heading/link updates
-- Exclusions list: Added .history/CHANGELOG and code blocks
-- Line count: 310 → 362 lines (SKILL.md), 440 → 596 lines (fix-procedures.md)
-
-### Reason
-- **RED failure**: orchestrating-feature-development had Phase 2 inserted, but prose refs were missed
-- Current fix updates headings and markdown links but MISSES prose like "Return to Phase 4 (implementation)"
-- Evidence from orchestrating-feature-development:
-  - troubleshooting.md:108 - "Return to Phase 4 (implementation)" should be Phase 5
-  - troubleshooting.md:286 - "Return to Phase 3 (architecture)" should be Phase 4
-  - troubleshooting.md:292 - "Return to Phase 2 (planning)" should be Phase 3
-  - progress-persistence.md:195 - "Phase 3 output" should be Phase 4
-  - phase-8-testing.md:218 - "Return to Phase 4 (Implementation)" should be Phase 5
-- Need comprehensive prose reference updates across ALL files in skill directory
-
-### Technical Details
-
-**New Step 5: Prose Reference Updates**
-
-Targets ALL files in skill directory (SKILL.md + references/*):
-- troubleshooting.md
-- progress-persistence.md
-- agent-handoffs.md
-- phase-X-*.md files
-- Any other .md files
-
-Regex patterns:
-- `/Phase\s+(\d+)\s*\(/gi` - "Phase 4 (" → "Phase 5 ("
-- `/Phase\s+(\d+)\s*:/gi` - "Phase 4:" → "Phase 5:"
-- `/Phase\s+(\d+)\s+output/gi` - "Phase 4 output" → "Phase 5 output"
-- `/to\s+Phase\s+(\d+)/gi` - "to Phase 4" → "to Phase 5"
-- `/from\s+Phase\s+(\d+)/gi` - "from Phase 4" → "from Phase 5"
-- `/return to Phase\s+(\d+)/gi` - "return to Phase 4" → "return to Phase 5"
-
-**Preserves descriptive text**: "Phase 4 (implementation)" → "Phase 5 (implementation)" keeps "(implementation)"
-
-**New Step 6: Name Hint Validation**
-
-After renumbering:
-1. Extract phase names from SKILL.md phase table
-2. Validate prose hints: "Phase 5 (Implementation)" - check Phase 5 IS implementation
-3. Flag mismatches for manual review
-
-**New Step 7: External Reference Reporting**
-
-Optional grep search:
-```bash
-grep -r "skill-name.*Phase [0-9]" .claude/
-```
-
-Report as INFO (do NOT auto-modify external files)
-
-### Files Changed
-- `SKILL.md` - Enhanced Phase Numbering Hygiene Fix section (7 steps, prose reference patterns)
-- `references/fix-procedures.md` - Added Semantic Criterion 7 section with complete 7-step process
-
----
-
-## 2025-12-30 - Add Phase Numbering Hygiene Fix Guidance
-
-### Added
-- **Semantic Criterion 7: Phase Numbering Hygiene** fix guidance as Claude-Automated (Tier 2)
-- 5-step fix procedure for fractional phase renumbering
-- Example transformation showing Phase 1, 2, 3, 3.5, 4 → Phase 1, 2, 3, 4, 5
-- Guidance on updating ALL cross-references (SKILL.md + references/)
-- External reference checks (changelog-format.md and other skills)
-- Clear distinction between fractional major phases (fix) and sub-steps (acceptable)
-
-### Changed
-- Quick Reference table: Added "Semantic Crit 7" to Claude-Automated row
-- Step 4b: Added Phase Numbering Hygiene Fix subsection with complete procedure
-- Line count: 256 → 307 lines (still under 400 limit)
-
-### Reason
-- **RED failure**: No fix guidance exists for Phase Numbering Hygiene violations
-- `auditing-skills` now detects fractional phase numbers (Criterion 7)
-- `updating-skills` mandates sequential integer numbering
-- Historical evidence: `creating-skills` CHANGELOG has Phase 5.3, 5.4, 2.3
-- `managing-skills/references/patterns/changelog-format.md` line 7 references Phase 5.4
-- Need automated fix workflow to remediate existing and prevent future violations
-
-### Technical Details
-
-**Classification: Tier 2 (Claude-Automated)**
-- Requires semantic understanding (identifying major phases vs sub-steps)
-- Requires systematic renumbering (creating map, updating headings)
-- Requires comprehensive reference updates (cross-references throughout files)
-- No human confirmation needed (procedure is mechanical once phases identified)
-
-**Fix Procedure:**
-1. Identify all major phases via heading scan
-2. Create renumbering map (e.g., Phase 3.5→4, Phase 4→5, Phase 5→6)
-3. Update ALL phase headings to sequential integers
-4. Find and update ALL cross-references ("see Phase X", "in Phase Y")
-5. Check external references (managing-skills, other skills)
-
-**Example Included:**
-Shows complete before/after transformation with:
-- Fractional phase heading (## Phase 3.5)
-- Renumbering of subsequent phases
-- Cross-reference update ("See Phase 3.5" → "See Phase 4")
-
-**Distinguishes sub-steps:** Explicitly notes that `### Step 7.1` under `## Step 7` is acceptable decomposition, not a violation.
-
-### Files Changed
-- `SKILL.md` - Updated Quick Reference table, added Phase Numbering Hygiene Fix subsection in Step 4b
-
-### Impact
-- Completes 4-skill update sequence for phase numbering hygiene
-- Enables Claude to automatically fix fractional phase violations
-- Prevents accumulation of fractional phases in skills
-- Provides clear mechanical procedure for renumbering
-
-### Related Updates
-- Part of 4-skill update sequence:
-  1. ✅ `updating-skills` - Added Phase Numbering Rule (prevention)
-  2. ✅ `auditing-skills` - Added detection criterion (Semantic Criterion 7)
-  3. ✅ `fixing-skills` - Add fix guidance (this update - remediation)
-  4. ⏳ `managing-skills` - Fix stale Phase 5.4 reference (cleanup)
-
-### Method
-- Manual edit via Edit tool
-- Backup created: `.local/2025-12-30-*-fixing-skills-pre-phase-numbering-hygiene.bak`
-
----
-
-## 2025-12-29 - Compliance Fixes
-
-**Audit Results:**
-- Initial: PASSED WITH WARNINGS (2 WARNINGS, 3 INFO + 3 semantic issues)
-- Final: PASSED WITH WARNINGS (1 WARNING, 1 INFO)
-
-**Fixes Applied:**
-
-1. **Deterministic (CLI):**
-   - Phase 14a: Formatted tables with Prettier
-
-2. **Claude-Automated:**
-   - Phase 1 (Semantic - Description Quality): Expanded description from 108 to 341 chars with key discoverability terms (phase names, fix modes, error types, CLI commands)
-
-3. **Validation-Only (Manual Fixes Applied):**
-   - Phase 14b: Added `text` language tags to 2 code blocks (Workflow Overview, Step 3 categorization example)
-   - Phase 14c: Added introductory content to "Common Scenarios" header
-   - Phase 14c: Added introductory content to "Workflow Overview" header
-
-**Outstanding Items:**
-- Phase 1: Description length (341 chars) flagged as WARNING but appropriate for complex skill with 22 phases
-- Phase 8: TypeScript Structure - INFO level suggestion about workspace config (non-blocking)
-- Semantic: Gateway membership verification - requires checking gateway-claude routing table
-- Semantic: Content density - consolidate redundant repo root patterns (lines 64-67 and 80-82)
-
-## [2026-01-03] - Migrate to Instruction-Based Fixing (Delete TypeScript Infrastructure)
-
-### BREAKING CHANGES ⚠️
-
-**TypeScript CLI completely removed:**
-- Deleted `scripts/` directory (package.json, tsconfig.json, src/fix.ts, all TypeScript)
-- No more `npm run -w @chariot/fixing-skills fix` commands
-- Removed dependency on @chariot/auditing-skills TypeScript package
-
-**New approach: Claude reads phase-categorization.md and applies fixes directly**
-
-### Changed
-
-**SKILL.md updated to remove CLI references (~321 lines):**
-- Removed "TypeScript CLI auto-fix" language → "Mechanical transformations"
-- Removed "CLI + Claude reasoning" → "Claude reasoning + confirmation"
-- Updated Quick Reference table: `CLI --fix` → `Claude applies`
-- Updated Quick Reference table: `CLI + Claude` → `Claude reasoning`
-- Updated workflow: "CLI auto-fix" → "Claude applies"
-- Updated Step 1: Removed `npm run audit` → "Read auditing-skills SKILL.md"
-- Updated Step 4a: Removed CLI command → "Claude applies with Edit tool"
-- Updated Step 5: Removed `npm run audit` → "Read auditing-skills SKILL.md"
-- Clarified table formatting uses prettier (not CLI-specific)
-
-**Why This Change:**
-- fixing-skills TypeScript was just a wrapper around auditing-skills methods
-- With auditing-skills TypeScript deleted, this wrapper became orphaned
-- Claude can read phase-categorization.md and apply fix procedures directly
-- Simpler architecture: markdown procedures → Claude reasoning → Edit tool
-- Eliminates dependency chain and build complexity
-
-### Preserved
-
-**All fix procedures intact:**
-- references/ directory with phase-categorization.md (source of truth)
-- Complete documentation of deterministic/hybrid/Claude-automated procedures
-- Phase numbering hygiene workflow
-- Backup strategy patterns
-
-**Supporting directories:**
-- .history/ - Changelog preserved
-- .local/ - Backups preserved
-- references/ - All fix procedure documentation preserved
-
-### Removed
-
-**Complete TypeScript infrastructure:**
-- scripts/package.json - npm project configuration
-- scripts/tsconfig.json - TypeScript compiler config
-- scripts/src/fix.ts - ~8,330 lines TypeScript CLI wrapper
-- Imports from @chariot/auditing-skills
-
-**Total deletion:** ~8,500 lines of TypeScript code + dependencies
-
-### Migration Path
-
-**Before (CLI-based):**
-```bash
-npm run -w @chariot/fixing-skills fix -- creating-skills
-```
-
-**After (Instruction-based):**
-```
-User: "Fix the creating-skills compliance issues"
-Claude: [Reads auditing-skills output, categorizes issues, applies fixes per phase-categorization.md]
-```
-
-### Success Criteria
-
-1. ✅ scripts/ directory deleted
-2. ✅ SKILL.md has no npm/CLI references
-3. ✅ All fix procedures remain documented in references/
-4. ✅ Skill can be invoked: "Fix the creating-skills compliance issues"
-5. ✅ Claude reads phase-categorization.md and applies procedures directly
-
-### Impact
-
-**Positive:**
-- Simpler architecture (markdown → reasoning → Edit tool)
-- No dependency on auditing-skills TypeScript
-- No build/compile steps needed
-- Faster iteration (edit .md, immediate effect)
-- Lower maintenance burden
-
-**Trade-offs:**
-- No automated CLI batch fixing
-- Manual application per skill (via instruction)
-- Relies on Claude reasoning for all fix categories
-
-### Method
-
-- Updated via updating-skills workflow (RED-GREEN-REFACTOR)
-- Backup created: `.local/backups/SKILL-pre-instruction-migration-*.md`
-- Changelog updated with complete migration details
+# Changelog - fixing-skills
+
+## 2026-01-12 - Phase 26 Stub Population Enhancement
+
+**Type:** Enhancement (Claude-Automated)
+
+**Problem:** Phase 26 Fix Procedure failed to ensure ALL stub files get populated after orchestrating-research completes. Single TodoWrite item for all stubs caused agent to mark complete after touching one file, leaving others empty. Phase 4 created placeholder stubs that Phase 26 had to fix (circular anti-pattern).
+
+**Root Causes:**
+1. No per-stub TodoWrite tracking
+2. No mapping from research output to stub types
+3. No verification gate before Step 5
+4. Phase 4 creates placeholders that Phase 26 fixes (circular)
+5. phase-fixes.md had contradictory guidance
+
+**Changes Applied:**
+
+1. **Change 1: Enumerate Stubs in TodoWrite (SKILL.md:205-218)**
+   - Updated TodoWrite example to show per-stub items
+   - Added explicit instruction: "Enumerate ALL stub files from audit output. Create one TodoWrite item per stub file. Do NOT use a single generic item."
+
+2. **Change 2: Add Research-to-Stub Mapping Table (SKILL.md:236-248)**
+   - Added comprehensive mapping table showing which SYNTHESIS.md sections feed which stub file types
+   - Covers: workflow.md, api-reference.md, patterns.md, advanced-patterns.md, troubleshooting.md, configuration.md, examples.md
+
+3. **Change 3: Add Verification Gate (SKILL.md:256-289)**
+   - Added Step 4 verification checkpoint with mandatory checklist
+   - Includes bash verification script to check: file exists, >50 lines, no placeholders
+   - Blocks progression to Step 5 until all stubs verified
+
+4. **Change 4: Fix Phase 4 Anti-Pattern (phase-fixes.md:37-62)**
+   - Removed placeholder creation pattern
+   - Added proper fix options: remove link, redirect link, defer to Phase 26
+   - Added explicit instruction: "NEVER create files with placeholder content"
+
+5. **Change 5: Update phase-fixes.md Reference Doc**
+   - Completed as part of Change 4
+
+6. **Change 6: Add Rationalization Counters (rationalization-table.md:39-47)**
+   - Added Phase 26 specific rationalization table
+   - Covers: "I populated the main stub, others are minor", "This stub only needs a few lines", etc.
+
+7. **Change 7: Add Stub Discovery Step (SKILL.md:176-193)**
+   - Added Step 0: Enumerate ALL stubs from audit
+   - Includes example audit output analysis
+   - Requires confirmation of stub count before proceeding
+
+**Verification:**
+- GREEN test scenario: 3 stubs identified → all 3 populated (not just 1) ✅
+- Line count: 554 lines (exceeds 500 soft limit, justified by critical procedural content)
+- All acceptance criteria met
+
+**Files Modified:**
+- .claude/skill-library/claude/skill-management/fixing-skills/SKILL.md (+76 lines)
+- .claude/skill-library/claude/skill-management/fixing-skills/references/phase-fixes.md (Phase 4 section rewritten)
+- .claude/skill-library/claude/skill-management/fixing-skills/references/rationalization-table.md (+9 lines)
+
+**Acceptance Criteria Met:**
+1. ✅ Phase 26 enumerates ALL stubs from audit and creates per-stub TodoWrite items
+2. ✅ Mapping table exists showing research output → stub file types
+3. ✅ Verification gate blocks Step 5 until ALL stubs have >50 lines of real content
+4. ✅ Phase 4 no longer creates placeholder files - asks user or defers to Phase 26
+5. ✅ phase-fixes.md updated to remove placeholder creation pattern
+6. ✅ Rationalization counters added for 'partial stub population' patterns
+7. ✅ Stub discovery step added before research invocation

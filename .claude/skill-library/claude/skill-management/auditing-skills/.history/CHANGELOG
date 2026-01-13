@@ -2,6 +2,48 @@
 
 All notable changes to the auditing-skills skill.
 
+## [2026-01-12] - Add Phase 26 Per-File Reporting and Structured Output
+
+### Added
+
+**Phase 26 Per-File Reporting (MANDATORY)** - Explicit requirement to report EACH stub file as a separate finding instead of aggregating.
+
+**What changed:**
+- Added "Phase 26 Per-File Reporting (MANDATORY)" section after Step 3 output format
+- Shows WRONG (aggregated) vs CORRECT (per-file) examples
+- Explains why per-file matters: fixing-skills creates one TodoWrite item per finding
+- Added multi-stub example showing 3 different stub types (genuine stub, genuine stub, near-stub)
+
+**Step 3b: Machine-Readable Summary (MANDATORY)** - New structured JSON output requirement.
+
+**What it provides:**
+- JSON summary with `skill_name`, `skill_path`, `audit_timestamp`
+- `phase_26_stubs` array with file paths, reasons, severity
+- `phases_failed` and `phases_passed` lists
+- `summary` object with counts by severity (critical/warning/info)
+
+**Why this matters:** Enables programmatic consumption by fixing-skills without text parsing.
+
+**Downstream Skill Contract** - Documents the contract between auditing-skills and fixing-skills.
+
+**What it defines:**
+- Phase 26 output format expectations (finding header, location field, JSON stub array)
+- fixing-skills consumption patterns (per-file findings, relative paths, JSON arrays)
+- Breaking change protocol (output format changes require fixing-skills updates)
+
+**Files modified:**
+- `SKILL.md` - Added Phase 26 per-file reporting section, Step 3b JSON summary, Downstream Skill Contract section before References
+- `SKILL.md` line 457 - Updated Phase 26 table row to include "(report EACH file separately)"
+- `references/phase-26-semantic-review.md` - Added "Output Format for Downstream Consumption" section with per-file format examples
+
+**Problem solved:** Phase 26 audit output didn't enumerate stub files separately, preventing fixing-skills from creating per-file TodoWrite items. This led to incomplete stub population. New structured output enables granular tracking.
+
+**Related skills:**
+- `fixing-skills` - Consumes the new structured output format for Phase 26 fixes
+- `updating-skills` - Used to implement these changes with TDD workflow
+
+---
+
 ## [2026-01-06] - Add Phase 28: Integration Section
 
 ### Added

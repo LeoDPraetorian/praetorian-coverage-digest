@@ -160,6 +160,64 @@ Recommendation: Run prettier on markdown tables
 [INFO] Phase 2: Allowed Tools - Using Bash tool without clear justification
 Location: Frontmatter
 Recommendation: Document why Bash is needed or remove from allowed-tools
+```
+
+**Phase 26 Per-File Reporting (MANDATORY):**
+
+For Phase 26 (Reference Content Quality), you MUST report EACH stub file as a separate finding. Do NOT aggregate multiple stubs into a single finding.
+
+```
+# ❌ WRONG - Aggregated (fixing-skills cannot enumerate)
+[CRITICAL] Phase 26: Reference Content Quality - 3 stub files detected
+Location: references/
+Recommendation: Populate stub files via research
+
+# ✅ CORRECT - Per-file (fixing-skills can create TodoWrite per file)
+[CRITICAL] Phase 26: Genuine stub - workflow.md
+Location: references/workflow.md
+Content: 12 lines, mostly headers, no substantive content
+Recommendation: Populate via orchestrating-research
+
+[CRITICAL] Phase 26: Genuine stub - api-reference.md
+Location: references/api-reference.md
+Content: Empty file (0 bytes)
+Recommendation: Populate via orchestrating-research
+
+[CRITICAL] Phase 26: Genuine stub - patterns.md
+Location: references/patterns.md
+Content: Contains '[Content to be added]' placeholder
+Recommendation: Populate via orchestrating-research
+```
+
+**Why per-file reporting matters:**
+- fixing-skills creates one TodoWrite item per finding
+- Aggregated findings result in single 'Fix Phase 26' item
+- Per-file findings enable 'Populate workflow.md', 'Populate api-reference.md', etc.
+- This ensures ALL stubs get tracked and populated
+
+**Phase 26 Example (Multiple Stubs):**
+
+When multiple stub files are detected, report each separately:
+
+```
+[CRITICAL] Phase 26: Genuine stub - workflow.md
+Location: references/workflow.md
+Content: File exists but only contains '# Workflow' header (1 line)
+Classification: Genuine stub (not template, not redirect)
+Recommendation: Populate via orchestrating-research with query 'workflow patterns for {skill-topic}'
+
+[CRITICAL] Phase 26: Genuine stub - api-reference.md
+Location: references/api-reference.md
+Content: Empty file (0 bytes)
+Classification: Genuine stub
+Recommendation: Populate via orchestrating-research with Context7 source
+
+[WARNING] Phase 26: Near-stub - patterns.md
+Location: references/patterns.md
+Content: 45 lines but 30 are code block structure, only 15 lines of prose
+Classification: Borderline - has structure but lacks examples
+Recommendation: Expand with concrete examples from research
+```
 
 ## Semantic Issues ({count})
 
@@ -179,6 +237,53 @@ Recommendation: Renumber as Phase 6, increment subsequent phases
 - **INFO** - Best practice recommendations
 
 After reporting, you MUST use AskUserQuestion to offer fix options (see Post-Audit Actions).
+
+### Step 3b: Machine-Readable Summary (MANDATORY)
+
+After prose findings, output a structured JSON summary for downstream skill consumption:
+
+```markdown
+## Machine-Readable Summary
+
+\`\`\`json
+{
+  "skill_name": "example-skill",
+  "skill_path": ".claude/skill-library/category/example-skill",
+  "audit_timestamp": "2026-01-12T15:30:00Z",
+  "summary": {
+    "critical": 2,
+    "warning": 3,
+    "info": 1
+  },
+  "phase_26_stubs": [
+    {
+      "file": "references/workflow.md",
+      "reason": "12 lines, mostly headers",
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "references/api-reference.md",
+      "reason": "Empty file (0 bytes)",
+      "severity": "CRITICAL"
+    }
+  ],
+  "phases_failed": [3, 14, 26],
+  "phases_passed": [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 24, 25, 28]
+}
+\`\`\`
+```
+
+**Required fields:**
+- `skill_name`: Skill being audited
+- `skill_path`: Full path for fixing-skills to locate files
+- `phase_26_stubs`: Array of stub files with paths and reasons (CRITICAL for fixing-skills)
+- `phases_failed`: List of failed phase numbers
+- `summary`: Count by severity
+
+**Why structured output matters:**
+- fixing-skills can programmatically extract stub file list
+- No text parsing required for TodoWrite enumeration
+- Enables future automation and reporting tools
 
 ### Step 4: Reference Fix Procedures
 
@@ -349,10 +454,33 @@ All 28 validation phases:
 | 23    | Coverage Check            | INFO     | Hybrid           | All library skills in exactly one gateway  |
 | 24    | Line Number References    | WARNING  | Claude-Automated | No hardcoded line numbers                  |
 | 25    | Context7 Staleness        | WARNING  | Claude-Automated | Context7 docs <30 days old                 |
-| 26    | Reference Content Quality | CRITICAL | Claude-Automated | No empty or placeholder files              |
+| 26    | Reference Content Quality | CRITICAL | Claude-Automated | No empty or placeholder files (report EACH file separately) |
 | 28    | Integration Section       | CRITICAL | Claude-Automated | Has Called-By, Requires, Calls, Pairs-With |
 
 **For detailed phase documentation**, see [Phase Details Reference](references/phase-details.md).
+
+---
+
+## Downstream Skill Contract
+
+auditing-skills output is consumed by fixing-skills. This contract defines the expected format:
+
+**Phase 26 Contract:**
+
+| Field | Format | Example | Consumer |
+|-------|--------|---------|----------|
+| Finding header | `[CRITICAL] Phase 26: Genuine stub - {filename}` | `[CRITICAL] Phase 26: Genuine stub - workflow.md` | fixing-skills parses filename |
+| Location | `Location: references/{filename}` | `Location: references/workflow.md` | fixing-skills uses for file operations |
+| JSON stub array | `phase_26_stubs[].file` | `"references/workflow.md"` | fixing-skills iterates for TodoWrite |
+
+**fixing-skills expectations:**
+1. Each stub file appears as separate finding (not aggregated)
+2. Location field contains relative path from skill root
+3. JSON summary includes `phase_26_stubs` array with all stub files
+4. Stub file paths are consistent between prose and JSON
+
+**Breaking changes:**
+If auditing-skills output format changes, fixing-skills Phase 26 procedure must be updated to match.
 
 ---
 

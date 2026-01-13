@@ -14,16 +14,21 @@ allowed-tools: Read, Write, Edit, Bash, Grep, TodoWrite, Skill, AskUserQuestion
 
 ## Quick Reference
 
-| Step                 | Purpose              | Time     | Reference                 |
-| -------------------- | -------------------- | -------- | ------------------------- |
-| **1. 🔴 RED**        | Document failure     | 5 min    | tdd-methodology.md        |
-| **2. Locate + Size** | Find skill, strategy | 2 min    | line-count-limits.md      |
-| **3. Backup**        | Protect file         | 1 min    | backup-strategy.md        |
-| **4. Research**      | Optional - content   | 5-10 min | orchestrating-research    |
-| **5. Edit**          | Apply changes        | 5-15 min | progressive-disclosure.md |
-| **6. 🟢 GREEN**      | Verify fix           | 5 min    | tdd-methodology.md        |
-| **7. Compliance**    | Audit + line count   | 5 min    | auditing-skills           |
-| **8. 🔵 REFACTOR**   | Pressure test        | 5-10 min | testing-skills            |
+| Step                 | Purpose                     | Time     | Reference                 |
+| -------------------- | --------------------------- | -------- | ------------------------- |
+| **1. 🔴 RED**        | Document failure            | 5 min    | tdd-methodology.md        |
+| **2. Locate + Size** | Find skill, strategy        | 2 min    | line-count-limits.md      |
+| **3. Backup**        | Protect file                | 1 min    | backup-strategy.md        |
+| **4. Research**      | Optional - content          | 5-10 min | orchestrating-research    |
+| **5. Edit**          | Apply changes (with subs)   | 5-15 min | update-workflow.md        |
+| **5.1** Targets      | Identify files to update    | 2 min    | update-workflow.md        |
+| **5.2** SKILL.md     | Update core sections        | 3-5 min  | progressive-disclosure.md |
+| **5.3** References   | Update existing refs        | 3-5 min  | update-workflow.md        |
+| **5.4** New Refs     | Create if needed            | 2-3 min  | update-workflow.md        |
+| **5.5** Verify       | Research incorporation gate | 2 min    | update-workflow.md        |
+| **6. 🟢 GREEN**      | Verify fix                  | 5 min    | tdd-methodology.md        |
+| **7. Compliance**    | Audit + line count          | 5 min    | auditing-skills           |
+| **8. 🔵 REFACTOR**   | Pressure test               | 5-10 min | testing-skills            |
 
 **Total**: 30-60 minutes
 
@@ -107,13 +112,90 @@ See [references/rationalization-table.md](references/rationalization-table.md) f
 
 **Step 5: Edit** ← POST-RESEARCH RESUME POINT
 
-Apply changes using Edit or Write tool. Use information from the original request and any research (read ${OUTPUT_DIR}/SYNTHESIS.md if research was performed) to write real content. If the request references files, read and incorporate that content.
+Apply changes using Edit or Write tool. When research was performed, Step 5 MUST expand into granular sub-steps tracked in TodoWrite.
 
 > **Phase Numbering Rule (when adding phases to skills):**
 >
 > - NEVER use fractional phase numbers (e.g., Phase 3.5, Phase 5.4)
 > - ALWAYS renumber subsequent phases to maintain sequential integers
 > - Sub-steps WITHIN a phase (Step 5.1, 5.2, 5.3) are acceptable for decomposition
+
+**Step 5.1: Identify Update Targets**
+
+If research was performed, read SYNTHESIS.md and determine which files need updates:
+
+```
+TodoWrite([
+  { content: 'Step 5.1: Identify update targets', status: 'in_progress', activeForm: 'Identifying targets' },
+  { content: 'Step 5.2: Update SKILL.md Quick Reference', status: 'pending', activeForm: 'Updating Quick Reference' },
+  { content: 'Step 5.3: Update SKILL.md workflow sections', status: 'pending', activeForm: 'Updating workflow' },
+  { content: 'Step 5.4: Update references/[file1].md', status: 'pending', activeForm: 'Updating file1' },
+  { content: 'Step 5.5: Update references/[file2].md', status: 'pending', activeForm: 'Updating file2' },
+  { content: 'Step 5.6: Verify research incorporation', status: 'pending', activeForm: 'Verifying incorporation' },
+  ...remaining steps
+])
+```
+
+1. Read current SKILL.md to identify sections
+2. List existing references/ files (ls -la references/)
+3. Determine which need updates based on SYNTHESIS.md topics
+
+**Step 5.2: Update SKILL.md Core Sections**
+
+Apply changes to:
+
+- Quick Reference table
+- Workflow/procedure sections
+- Examples and patterns
+- Use research findings for current syntax, not training data
+
+**Step 5.3: Update Existing References/ Files**
+
+For each file in references/, check if SYNTHESIS.md has relevant findings:
+
+1. **Check relevance**: Does this file's topic appear in research?
+2. **If yes**: Compare current content with research findings
+   - Update outdated syntax/APIs
+   - Add new patterns discovered
+   - Remove deprecated approaches
+   - Update citations/links
+3. **If no**: File may be orthogonal to research - document "No updates needed"
+4. **Track in TodoWrite**: One item per file that needs updating
+
+See [update-workflow.md](references/update-workflow.md#updating-existing-reference-files) for detailed guidance.
+
+**Step 5.4: Create New Reference Files (If Needed)**
+
+If research reveals patterns not covered by existing files:
+
+- Create new reference file in references/
+- Follow progressive disclosure patterns
+- Link from SKILL.md Related Skills or References section
+
+**Step 5.5: Verification Checkpoint**
+
+**Research Incorporation Verification (MANDATORY before Step 6):**
+
+Before proceeding to GREEN, confirm:
+
+1. Which SYNTHESIS.md sections did you incorporate? [List them]
+2. Which files did you update? [List with line counts changed]
+3. Did any reference files need updates? [Yes/No, which ones]
+4. Are there new patterns from research not in existing files? [Yes/No, action taken]
+
+**If any answer is 'None' or 'No action', STOP and review SYNTHESIS.md again.**
+
+Verification checklist (all must pass):
+
+- [ ] SYNTHESIS.md has been read completely
+- [ ] SKILL.md updated with patterns from research (not just original request)
+- [ ] All existing reference files reviewed for staleness
+- [ ] Reference files updated where research provided new information
+- [ ] New reference files created if research revealed uncovered patterns
+- [ ] Examples use current syntax from research (not training data)
+- [ ] Citations updated with research sources
+
+**Cannot proceed to Step 6 until verification passes** ✅
 
 **Step 6: Verify GREEN** - Re-test scenario, must pass
 
@@ -131,7 +213,19 @@ For significant content updates, consider using `orchestrating-research` before 
 
 ### When to Suggest Research
 
-Ask user via AskUserQuestion if the update involves:
+**Before asking user**, check Context7 staleness if applicable:
+
+```bash
+if [ -f "$ROOT/{skill-path}/.local/context7-source.json" ]; then
+  FETCHED=$(jq -r '.fetchedAt' "$ROOT/{skill-path}/.local/context7-source.json")
+  DAYS_OLD=$(( ($(date +%s) - $(date -d "$FETCHED" +%s)) / 86400 ))
+  if [ "$DAYS_OLD" -gt 30 ]; then
+    echo "Context7 docs are >30 days stale - research recommended"
+  fi
+fi
+```
+
+Then ask user via AskUserQuestion if the update involves:
 
 **Suggest Research:**
 
@@ -139,6 +233,7 @@ Ask user via AskUserQuestion if the update involves:
 - New API patterns or features
 - Major version refreshes (React 18→19, etc.)
 - Content expansions with new examples
+- Context7 documentation >30 days old (include in question: "Context7 documentation is >30 days old. Research recommended to refresh.")
 
 **Skip Research:**
 
@@ -190,16 +285,6 @@ If user selects 'Yes, invoke orchestrating-research':
 - If request references files (research output, examples), read and use them
 - Write real content with actual code examples, not placeholder text
 - Proceed directly to Step 5
-
----
-
-## Context7 Documentation Refresh
-
-Skills with context7 documentation can become stale (>30 days). Before updating, check staleness:
-
-1. Read `.local/context7-source.json` if it exists
-2. Check `fetchedAt` date - if >30 days old, refresh first
-3. See [references/context7-refresh.md](references/context7-refresh.md) for refresh workflow
 
 ---
 

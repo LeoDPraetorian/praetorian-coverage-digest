@@ -36,10 +36,15 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 
 ### Step 5: Edit
 
-| Rationalization                  | Why It's Wrong                                | Response                                    |
-| -------------------------------- | --------------------------------------------- | ------------------------------------------- |
-| 'Close enough to what was asked' | Edits must address the documented RED failure | DENIED. Edit must fix the specific failure. |
-| 'I'll add more content later'    | 'Later' has ~5% completion rate               | DENIED. Complete the edit now.              |
+| Rationalization                                | Why It's Wrong                                                  | Response                                                  |
+| ---------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------- |
+| 'Close enough to what was asked'               | Edits must address the documented RED failure                   | DENIED. Edit must fix the specific failure.               |
+| 'I'll add more content later'                  | 'Later' has ~5% completion rate                                 | DENIED. Complete the edit now.                            |
+| 'I updated SKILL.md, research is incorporated' | SKILL.md is often just summary; references/ have the details    | DENIED. Check and update ALL relevant files.              |
+| 'The existing references are still accurate'   | Research may reveal updates to 'accurate' content               | DENIED. Compare each file against SYNTHESIS.md.           |
+| 'I'll update references in a separate PR'      | Partial updates create inconsistency; skill + refs must be sync | DENIED. Update all files in same workflow.                |
+| 'Research didn't have new info for this file'  | Absence of evidence ≠ evidence of absence                       | DENIED. Document explicit 'No updates needed' + reasoning |
+| 'Only SKILL.md was mentioned in the request'   | Research integration applies to entire skill directory          | DENIED. Update all files where research applies.          |
 
 ### Step 6: Verify GREEN
 

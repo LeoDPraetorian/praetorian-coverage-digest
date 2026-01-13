@@ -289,3 +289,37 @@ Phase 26 requires **semantic reasoning** to distinguish:
 | Conceptual discussion | ✅    | TODOs are the subject matter          |
 
 **Remember**: TypeScript provides candidates, Claude provides classification. False positives occur when regex is used for semantic tasks.
+
+---
+
+## Output Format for Downstream Consumption
+
+When reporting Phase 26 findings, format for fixing-skills consumption:
+
+**Per-File Finding Format:**
+```
+[{SEVERITY}] Phase 26: {Classification} - {filename}
+Location: references/{filename}
+Content: {description of why it's a stub}
+Classification: {Genuine stub | Near-stub | False positive}
+Recommendation: {specific action}
+```
+
+**Classification values:**
+- `Genuine stub` - Empty or placeholder, needs full population
+- `Near-stub` - Has structure but lacks substance, needs expansion
+- `False positive` - Template/example/redirect, no action needed (still report for transparency)
+
+**DO NOT aggregate:**
+```
+# ❌ WRONG
+[CRITICAL] Phase 26: 3 stub files need population
+
+# ✅ CORRECT
+[CRITICAL] Phase 26: Genuine stub - workflow.md
+[CRITICAL] Phase 26: Genuine stub - api-reference.md
+[WARNING] Phase 26: Near-stub - patterns.md
+```
+
+**Why per-file reporting matters:**
+Each finding becomes a separate TodoWrite item in fixing-skills, enabling granular tracking and completion of stub population work.

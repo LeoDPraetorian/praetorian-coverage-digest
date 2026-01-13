@@ -36,6 +36,16 @@ Extends [shared rationalization prevention](../../../../../skills/using-skills/r
 | 'Phase 26 stub is minor'                | Stub content propagates incorrect patterns         | DENIED. Research to populate stubs.    |
 | 'I can populate stub from memory'       | Training data may be stale or incorrect            | DENIED. Use orchestrating-research.    |
 
+### Step 4: Phase 26 Specific Rationalizations
+
+| Rationalization                               | Reality                                    | Required Action                     |
+| --------------------------------------------- | ------------------------------------------ | ----------------------------------- |
+| 'I populated the main stub, others are minor' | ALL stubs identified by audit must be fixed | DENIED. Complete EVERY stub in TodoWrite list |
+| 'This stub only needs a few lines'            | Stubs need substantive content (>50 lines) | DENIED. Research and populate fully |
+| 'I can add placeholder and fix later'         | Placeholders ARE the problem Phase 26 fixes | DENIED. Never create placeholders  |
+| 'Research didn't cover this stub type'        | Re-run research with adjusted query OR ask user | DENIED. Don't skip - resolve the gap |
+| 'The audit only flagged one stub'             | Check audit output again - may have missed others | DENIED. Re-read audit, enumerate ALL stubs |
+
 ### Step 5: Verify Fixes
 
 | Rationalization                               | Why It's Wrong                                 | Response                           |

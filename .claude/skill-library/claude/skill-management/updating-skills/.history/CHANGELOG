@@ -247,3 +247,46 @@ Evidence TypeScript was unused:
 - No backup needed (no SKILL.md changes)
 - Deleted orphaned scripts/ directory
 - Changelog documents migration
+
+## [2026-01-12] - Research incorporation verification gate
+
+### Changed
+
+- Step 5 expanded into sub-steps (5.1-5.5) with TodoWrite tracking for each file
+- Added verification gate (Step 5.5) requiring explicit confirmation before Step 6 (GREEN)
+- Added research-to-update-target mapping tables in update-workflow.md Phase 4c
+- Added guidance for updating existing reference files with staleness checks
+- Added 5 rationalization counters for partial update patterns
+- Integrated Context7 staleness check into Step 4 research decision flow
+- Removed separate Context7 Documentation Refresh section (now integrated)
+
+### Reason
+
+- RED failure: Agents marked 'Edit skill with research findings' complete after superficial SKILL.md changes
+- References/ files remained stale with outdated information
+- No verification that research was actually incorporated
+- No mapping from SYNTHESIS.md sections to update targets
+- Step 5 was too vague - didn't enumerate which files to update
+
+### Impact
+
+- Forces granular per-file tracking in TodoWrite (prevents bulk completion)
+- Blocks progression to GREEN until verification checklist passes
+- Provides explicit mapping: SYNTHESIS.md sections → SKILL.md/references/ targets
+- Enables comprehensive research incorporation across entire skill directory
+- Prevents "SKILL.md only" updates that leave references stale
+- Improves research workflow continuity with clear post-research resume point
+
+### Files Modified
+
+1. SKILL.md - Quick Reference table (added Steps 5.1-5.5), Step 5 expansion with verification gate
+2. references/update-workflow.md - Added Phase 4c with mapping tables and reference update procedures
+3. references/rationalization-table.md - Added 5 research incorporation rationalization counters
+
+### Compliance
+
+- SKILL.md: 318 lines (under 500 limit ✅)
+- update-workflow.md: 498 lines
+- All reference files exist and resolve
+- All external links valid
+- Tables formatted with prettier

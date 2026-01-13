@@ -38,17 +38,28 @@ Edit {
 
 **Issue:** References to non-existent files
 
-**Fix:** Create placeholder reference files
+**NEVER create files with placeholder content like '[Content to be added]'.**
+This creates technical debt that Phase 26 must fix.
 
-```bash
-# Create missing reference
-mkdir -p {skill-path}/references
-cat > {skill-path}/references/workflow.md << 'EOF'
-# {Skill Name} - Detailed Workflow
+**Fix options (ask user via AskUserQuestion):**
 
-[Content to be added]
-EOF
-```
+1. **Remove link** - Delete the reference from SKILL.md if content not needed
+2. **Redirect link** - Point to existing file that covers the topic
+3. **Defer to Phase 26** - Flag file for research-based population (do NOT create placeholder)
+
+**Fix procedure:**
+
+1. Check if referenced file exists
+2. If missing: Ask user whether to (a) remove link, (b) provide content, or (c) invoke research
+3. If (a): Remove the broken link from SKILL.md
+4. If (b): Create file with user-provided content
+5. If (c): Flag for Phase 26 research - do NOT create placeholder
+6. NEVER create files with placeholder content
+
+If file truly needs to exist, either:
+- Get content from user immediately
+- Invoke orchestrating-research to populate it
+- Remove the link until content is available
 
 ---
 
