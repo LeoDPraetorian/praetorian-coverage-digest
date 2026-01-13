@@ -1,5 +1,77 @@
 # Changelog
 
+## [2026-01-11] - Quality Frameworks and Workflow Governance
+
+### Added
+- **Gated Verification Pattern** section with two-stage gates (Requirement Compliance → Quality Assessment)
+- **Extended Agent Status Values** - Added `needs_clarification` status to existing complete|blocked|needs_review
+- **Clarification Response Format** - Structured JSON format for agents requesting input before proceeding
+- **Handling Clarification Requests** - Protocol for orchestrators to answer questions by category (requirement, dependency, architecture, scope)
+- **Retry Limits with Escalation** section - MAX retry limits for different loop types (2 for Stage 1, 1 for Stage 2)
+- **Escalation Protocol** with AskUserQuestion template for retry exhaustion
+- **Retry Tracking** - JSON format for tracking retry_count, max_retries, last_failure
+- **Human Checkpoint Framework** - When to add checkpoints (major decisions, resource commitment, point of no return)
+- **Checkpoint Protocol** - 4-step process with AskUserQuestion template
+- **Checkpoint Metadata** - JSON format with approved, approved_at, user_selection, notes
+- **Quality Scoring Framework** - Quantitative thresholds with weighted factors
+- **Quality Score Structure** - JSON format with factors (completeness, correctness, quality, edge_cases)
+- **Score Interpretation** - 4-tier scale (90-100: Excellent, 70-89: Good, 50-69: Needs improvement, <50: Significant issues)
+- **Customizing Factors** - Workflow type examples (Implementation, Testing, Documentation)
+- **Rationalization Prevention** - Common rationalizations table with detection phrases and prevention strategies
+- **Detection Protocol** - 4-step process for handling rationalization (STOP, return to checklist, complete items, use clarification if blocked)
+- **Override Protocol** - 5-step process for documented deviations with AskUserQuestion template
+- **Conditional Sub-Skill Triggers** - Complexity-based triggers table (3+ tasks, 5+ tasks, 3+ failures, >30 min duration)
+- **Measuring Conditions** - Guidelines for task count, independence, failure count, duration estimates
+- **Integration Protocol** - 4-step process for invoking conditional skills
+- **New reference files**:
+  - references/gated-verification.md - Detailed two-stage verification examples
+  - references/quality-scoring.md - Factor customization examples by workflow type
+  - references/clarification-protocol.md - Extended clarification request handling examples
+
+### Changed
+- **References** section - Added 3 new reference links (gated-verification, quality-scoring, clarification-protocol)
+- **Progress file format** - Updated minimal format to include quality metrics and checkpoint tracking
+- **Progress file completed phases** - Added checkpoint and quality_score metadata fields
+
+### Context
+Backported battle-tested patterns from orchestrating-feature-development into this foundational protocol skill. Over time, the specific implementation (orchestrating-feature-development) developed advanced patterns that should be generalized into the foundational multi-agent coordination skill.
+
+Problems addressed:
+1. **No gated verification** - Reviews happened in single pass, wasting effort when spec compliance failed
+2. **Limited status values** - Couldn't distinguish "stuck" (blocked) from "need input" (needs_clarification)
+3. **No retry limits** - Feedback loops could run indefinitely without escalation
+4. **Unstructured checkpoints** - Escalation mentioned but not with clear protocol
+5. **Subjective quality** - "Good enough" judgments instead of quantitative scoring
+6. **No rationalization prevention** - No detection or override protocol for workflow deviations
+7. **No complexity triggers** - Related skills mentioned but no threshold rules for invocation
+
+Solutions:
+- Two-stage gated verification separates compliance (did they do what was asked?) from quality (did they do it well?)
+- Extended status values with structured clarification format (category, question, options, impact)
+- Default retry limits (Stage 1: 2, Stage 2: 1) with AskUserQuestion escalation templates
+- Human checkpoint framework with when/how guidance and metadata tracking
+- Quality scoring with weighted factors (completeness 40%, correctness 30%, quality 20%, edge_cases 10%)
+- Rationalization prevention table with detection phrases and override protocol
+- Conditional triggers with measurable conditions (task counts, independence, duration estimates)
+
+Impact:
+- Orchestrators now have quantitative thresholds instead of subjective judgments
+- Clear retry limits prevent infinite loops
+- Gated verification saves effort by checking spec before quality
+- Structured clarification format enables better agent communication
+- Rationalization detection prevents workflow shortcuts
+- Complexity triggers automate supporting skill invocation
+
+### Line Count
+- Before: 415 lines
+- After: ~750 lines (SKILL.md)
+- New reference files: 3 (gated-verification.md: 289 lines, quality-scoring.md: 280 lines, clarification-protocol.md: 386 lines)
+- Total addition: ~1200 lines across 4 files
+
+Note: Main SKILL.md is now ~750 lines. While above 500-line soft limit, this is justified as foundational protocol that other orchestration skills build upon. Consider future extraction of some sections to references if grows beyond 800 lines.
+
+---
+
 ## [2026-01-10] - Post-Completion Verification Protocol
 
 ### Added

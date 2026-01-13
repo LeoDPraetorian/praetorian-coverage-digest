@@ -38,11 +38,15 @@ Brief description of what this orchestration is accomplishing.
   - Agent: backend-architect
   - Completed: <timestamp>
   - Key decisions: [list]
+  - Checkpoint: approved
+  - Approved at: <timestamp>
 
 - [x] **Phase 2: Implementation** - <result summary>
   - Agent: backend-developer
   - Completed: <timestamp>
   - Files created: [list]
+  - Quality score: 85/70
+  - Retry count: 0/2
 
 ## Current Phase
 
@@ -176,6 +180,14 @@ For simpler orchestrations, a minimal format:
 
 ## Agent Output (latest)
 {last agent's JSON output}
+
+## Quality Metrics
+- Quality score: {score} / {threshold}
+- Retry count: {count} / {max}
+
+## Checkpoints
+- Architecture: {approved|pending|skipped}
+- Implementation: {approved|pending|skipped}
 ````
 
 ## Progress File Lifecycle

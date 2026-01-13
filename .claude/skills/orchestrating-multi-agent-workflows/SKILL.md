@@ -193,11 +193,53 @@ If testing phase reveals 3+ independent failures across different files, use the
 
 When an agent returns:
 
-1. **Check status**: `complete`, `blocked`, or `needs_review`
-2. **If blocked**: Use the routing table below to determine next agent
+1. **Check status**: `complete`, `blocked`, `needs_review`, or `needs_clarification` (see [Extended Agent Status Values](#extended-agent-status-values))
+2. **If blocked**: Use the [Agent Routing Table](#agent-routing-table) to determine next agent
 3. **If needs_review**: Evaluate and decide next step
-4. **If complete**: Mark todo complete, proceed to next phase
-5. **Capture handoff context**: Agent may recommend follow-up actions
+4. **If needs_clarification**: Answer questions and re-dispatch (see [Clarification Protocol](#handling-clarification-requests))
+5. **If complete**: Mark todo complete, proceed to next phase
+6. **Capture handoff context**: Agent may recommend follow-up actions
+
+## Gated Verification Pattern
+
+When verification matters (reviews, validation, quality checks), use two-stage gates:
+
+**Stage 1: REQUIREMENT COMPLIANCE (Blocking Gate)**
+- Does output match specification?
+- Pass required before Stage 2
+- MAX N retries (default: 2)
+
+**Stage 2: QUALITY ASSESSMENT (Parallel)**
+- Is output well-constructed?
+- Run quality + security checks in parallel
+- MAX M retries (default: 1)
+
+This pattern prevents wasted effort reviewing output that doesn't meet requirements.
+
+### When to Use Gated Verification
+
+| Scenario | Use Gated? | Why |
+|----------|------------|-----|
+| Code review after implementation | Yes | Verify spec compliance before quality review |
+| Test validation | Yes | Verify plan adherence before quality scoring |
+| Architecture review | No | Single-pass evaluation sufficient |
+| Simple task completion | No | Overhead not justified |
+
+### Gated Verification Template
+
+```
+Stage 1 Agent Prompt Addition:
+'Your ONLY focus: Does output match requirements exactly?
+Return verdict: COMPLIANT | NOT_COMPLIANT
+Do NOT evaluate quality, style, or optimization.'
+
+Stage 2 Agent Prompt Addition:
+'Prerequisite: Stage 1 passed (requirements met).
+Focus: Is output well-constructed?
+Return verdict: APPROVED | CHANGES_REQUESTED'
+```
+
+See [references/gated-verification.md](references/gated-verification.md) for detailed examples.
 
 ### Agent Routing Table
 
@@ -217,6 +259,17 @@ When an agent returns `blocked`, use this table to determine the next agent:
 
 **Pattern matching**: Replace `*` with the domain prefix (e.g., `frontend-developer` → `frontend-security`).
 
+### Extended Agent Status Values
+
+Agents can return these status values:
+
+| Status | Meaning | Orchestrator Action |
+|--------|---------|---------------------|
+| complete | Task finished successfully | Mark todo complete, proceed |
+| blocked | Cannot proceed, need different agent | Use routing table |
+| needs_review | Work done but wants human check | Present to user |
+| needs_clarification | Need answers before proceeding | Answer questions, re-dispatch |
+
 ### Structured Blocked Response Format
 
 Agents should return this structure when blocked:
@@ -232,6 +285,52 @@ Agents should return this structure when blocked:
 ```
 
 The orchestrator uses `blocked_reason` to look up the routing table and spawn the appropriate next agent. Agents should NOT include routing logic in their definitions—that responsibility belongs exclusively to the orchestrator.
+
+### Clarification Response Format
+
+When agent needs input before proceeding:
+
+```json
+{
+  "status": "needs_clarification",
+  "questions": [
+    {
+      "category": "requirement|dependency|architecture|scope",
+      "question": "Specific question text",
+      "options": ["Option A", "Option B"],
+      "impact": "Why this matters for the task"
+    }
+  ],
+  "partial_work": "What agent completed before needing clarification"
+}
+```
+
+### Handling Clarification Requests
+
+1. **Technical questions**: Research codebase, read documentation
+2. **Requirement questions**: Escalate via AskUserQuestion
+3. **Architecture questions**: Spawn appropriate lead agent
+4. **Re-dispatch**: Send original agent answers with original context
+
+```typescript
+Task(
+  subagent_type: "[same-agent]",
+  prompt: "
+    CLARIFICATION ANSWERS:
+    Q1: [question]
+    → A1: [researched answer]
+
+    Q2: [question]
+    → A2: [user's decision]
+
+    Now proceed with original task using these answers.
+
+    [Original prompt context]
+  "
+)
+```
+
+See [references/clarification-protocol.md](references/clarification-protocol.md) for extended examples.
 
 ### Conflict Detection
 
@@ -308,6 +407,240 @@ If you specified exit criteria in the task prompt:
 Real failure: Orchestrator trusted agent's response summary ('118 calls updated') without reading output file. Output file showed only 47 files touched. The agent counted function calls, not files. Verification would have caught this.
 
 **The orchestrator-enforcement hook reminds you of this protocol. This skill documents the full procedure.**
+
+## Retry Limits with Escalation
+
+**NEVER loop indefinitely.** All feedback loops have maximum retry limits.
+
+### Default Retry Limits
+
+| Loop Type | MAX Retries | Then |
+|-----------|-------------|------|
+| Requirement compliance (Stage 1) | 2 | Escalate to user |
+| Quality fixes (Stage 2) | 1 | Escalate to user |
+| Test/validation fixes | 1 | Escalate to user |
+| Any unspecified loop | 2 | Escalate to user |
+
+### Escalation Protocol
+
+After MAX retries exceeded, use AskUserQuestion:
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "[Phase/Task] still failing after [N] attempts. How to proceed?",
+    header: "[Phase]",
+    multiSelect: false,
+    options: [
+      { label: "Show issues", description: "Review failure details" },
+      { label: "Proceed anyway", description: "Accept current state, document known issues" },
+      { label: "Revise approach", description: "Change strategy or requirements" },
+      { label: "Cancel", description: "Stop workflow" }
+    ]
+  }]
+})
+```
+
+### Retry Tracking
+
+Track retry counts in progress:
+
+```json
+{
+  "phase": "review",
+  "retry_count": 1,
+  "max_retries": 2,
+  "last_failure": "Spec compliance: missing error handling"
+}
+```
+
+## Human Checkpoint Framework
+
+### When to Add Checkpoints
+
+Add mandatory human checkpoints when:
+
+- **Major design decisions**: Architecture, approach selection
+- **Resource commitment**: Before significant implementation starts
+- **Point of no return**: Before irreversible changes
+- **User preferences matter**: UX decisions, trade-offs with no clear winner
+
+### Checkpoint Protocol
+
+1. Use AskUserQuestion with clear options
+2. Record approval in progress tracking
+3. Do NOT proceed without explicit approval
+4. If user selects 'pause', document state for resume
+
+### Checkpoint Metadata
+
+```json
+{
+  "phase": "architecture",
+  "checkpoint": true,
+  "approved": true,
+  "approved_at": "2025-01-11T10:30:00Z",
+  "user_selection": "Option A",
+  "notes": "User preferred simpler approach"
+}
+```
+
+### Checkpoint Question Template
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "[Phase] complete. Review before proceeding to [next phase]?",
+    header: "[Phase]",
+    multiSelect: false,
+    options: [
+      { label: "Approve", description: "Proceed to [next phase]" },
+      { label: "Request changes", description: "Modify before proceeding" },
+      { label: "Review details", description: "Show me [artifacts]" },
+      { label: "Pause", description: "Stop here, resume later" }
+    ]
+  }]
+})
+```
+
+## Quality Scoring Framework
+
+Quantitative thresholds prevent subjective 'good enough' judgments.
+
+### Quality Score Structure
+
+Validation agents should return:
+
+```json
+{
+  "quality_score": 85,
+  "factors": {
+    "completeness": { "weight": 40, "score": 90 },
+    "correctness": { "weight": 30, "score": 85 },
+    "quality": { "weight": 20, "score": 80 },
+    "edge_cases": { "weight": 10, "score": 75 }
+  },
+  "threshold": 70,
+  "verdict": "PASS"
+}
+```
+
+### Score Interpretation
+
+| Score | Interpretation | Action |
+|-------|----------------|--------|
+| 90-100 | Excellent | Proceed immediately |
+| 70-89 | Good, acceptable | Proceed |
+| 50-69 | Needs improvement | Feedback loop |
+| <50 | Significant issues | Escalate to user |
+
+### Using Quality Scores
+
+1. Validation agents MUST return quality_score when evaluating work
+2. Orchestrator checks: `if quality_score >= threshold then proceed`
+3. Scores below threshold trigger feedback loop (respecting retry limits)
+4. User can override threshold via AskUserQuestion
+
+### Customizing Factors
+
+Adjust weights based on workflow type:
+
+| Workflow Type | Emphasize |
+|---------------|-----------|
+| Implementation | Correctness (40%), Completeness (30%) |
+| Testing | Coverage (40%), Edge cases (30%) |
+| Documentation | Completeness (50%), Clarity (30%) |
+
+See [references/quality-scoring.md](references/quality-scoring.md) for factor customization examples.
+
+## Rationalization Prevention
+
+### Common Rationalizations
+
+| Rationalization | Detection Phrases | Prevention |
+|-----------------|-------------------|------------|
+| "This is simple" | "just", "quickly", "simple", "trivial" | Check effort scaling tier first |
+| "I'll fix it later" | "later", "next time", "TODO", "tech debt" | Enforce completion before proceeding |
+| "Close enough" | "basically", "mostly", "approximately", "~" | Require explicit verification |
+| "User won't notice" | "minor", "edge case", "unlikely" | Document for user decision |
+| "Tests can wait" | "test later", "verify manually", "obvious" | Block on verification phase |
+| "Skip this step" | "unnecessary", "overkill", "overhead" | Follow checklist exactly |
+
+### Detection Protocol
+
+If you detect rationalization phrases in your thinking:
+
+1. **STOP** - Do not proceed
+2. **Return to checklist** - Review phase requirements
+3. **Complete all items** - No exceptions
+4. **If genuinely blocked** - Use clarification protocol, not skip
+
+### Override Protocol
+
+If workflow MUST deviate from standard process:
+
+1. Use AskUserQuestion to propose deviation
+2. Explain specific risk and trade-off
+3. Present alternatives considered
+4. Document user's explicit decision
+5. Proceed only with approval
+
+```typescript
+AskUserQuestion({
+  questions: [{
+    question: "Proposing to skip [step]. Risk: [specific risk]. Proceed?",
+    header: "Override",
+    options: [
+      { label: "Skip with documented risk", description: "[trade-off explanation]" },
+      { label: "Don't skip", description: "Complete step as designed" }
+    ]
+  }]
+})
+```
+
+**All overrides must be documented in progress tracking with rationale.**
+
+## Conditional Sub-Skill Triggers
+
+Invoke supporting skills when complexity thresholds are met.
+
+### Complexity-Based Triggers
+
+| Condition | Trigger Skill | Purpose |
+|-----------|---------------|---------|
+| 3+ independent tasks in plan | `developing-with-subagents` | Same-session parallel execution with review |
+| 5+ total tasks | `persisting-progress-across-sessions` | Cross-session resume capability |
+| 3+ independent failures | `dispatching-parallel-agents` | Parallel debugging |
+| Estimated duration >30 min | `persisting-progress-across-sessions` | Progress checkpoints |
+
+### Measuring Conditions
+
+- **Task count**: Count items in decomposition/plan phase
+- **Independence**: Can tasks run without shared state?
+- **Failure count**: Track in feedback loop iterations
+- **Duration estimate**: agent_count × 8 minutes average
+
+### Integration Protocol
+
+When condition met:
+
+1. Note trigger reason in TodoWrite
+2. Invoke conditional skill via Skill tool
+3. Follow that skill's protocol completely
+4. Return to main workflow when skill completes
+
+### Example
+
+```
+Plan has 6 tasks, 4 are independent.
+
+Triggers:
+- 5+ tasks → invoke persisting-progress-across-sessions
+- 3+ independent → invoke developing-with-subagents
+
+TodoWrite: 'Invoking developing-with-subagents (4 independent tasks detected)'
+Skill('developing-with-subagents')
+```
 
 ## Progress Tracking
 
@@ -413,3 +746,6 @@ Return orchestration results as:
 - [Execution Patterns](references/execution-patterns.md) - Detailed sequential/parallel/hybrid examples
 - [Delegation Templates](references/delegation-templates.md) - Agent prompt templates by type
 - [Progress File Format](references/progress-file-format.md) - Structure for persistence
+- [Gated Verification](references/gated-verification.md) - Two-stage verification patterns
+- [Quality Scoring](references/quality-scoring.md) - Factor customization examples
+- [Clarification Protocol](references/clarification-protocol.md) - Extended clarification examples
