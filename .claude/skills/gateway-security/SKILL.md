@@ -60,6 +60,8 @@ This gateway implements 3-tier loading:
 | "security test plan" / "pentest" / "Phase 6"   | → `security-test-planning`       |
 | "codebase size" / "complexity"                 | → `codebase-sizing`              |
 | "threat intelligence" / "KEV" / "vulnerability report" | → `generating-threat-intelligence-reports` |
+| "CVE impact" / "customer exposure" / "asset vulnerability" | → `analyzing-cve-customer-impact` |
+| "CVE research" / "nuclei template" / "detection gap" | → `orchestrating-cve-research-jobs` |
 | "security review" / "OWASP" / "Go security"    | → `reviewing-backend-security`   |
 | "frontend security" / "React security" / "XSS" | → `reviewing-frontend-security`  |
 | "CIS" / "benchmark" / "compliance mapping"     | → `mapping-to-cis-benchmarks`    |
@@ -116,6 +118,8 @@ This gateway implements 3-tier loading:
 | CVSS Scoring                  | `.claude/skill-library/security/cvss-scoring/SKILL.md`                            | CVSS, severity score                           |
 | Security Test Planning        | `.claude/skill-library/security/security-test-planning/SKILL.md`                  | security test plan, pentest, Phase 6           |
 | Threat Intelligence Reporting | `.claude/skill-library/research/generating-threat-intelligence-reports/SKILL.md`  | threat intelligence, KEV, vulnerability report |
+| CVE Customer Impact Analysis  | `.claude/skill-library/research/analyzing-cve-customer-impact/SKILL.md`           | CVE impact, customer exposure, asset vulnerability |
+| CVE Research Orchestration    | `.claude/skill-library/research/orchestrating-cve-research-jobs/SKILL.md`         | CVE research, nuclei template, detection gap   |
 
 ### Security Review
 

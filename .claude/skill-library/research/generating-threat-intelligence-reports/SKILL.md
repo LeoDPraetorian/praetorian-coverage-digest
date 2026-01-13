@@ -56,8 +56,8 @@ Ask user via AskUserQuestion if not provided:
 |-----------|---------|---------|
 | **Timeframe** | 45 days | KEV catalog date range |
 | **Top N CVEs** | 5 | Number of vulnerabilities to report |
+| **Industry Vertical** | All | Healthcare, Financial, Government, Manufacturing, Energy, Technology, or All |
 | **Output Format** | Markdown | Table/Presentation format |
-| **Focus Area** | All | Sector/technology filter (optional) |
 
 ### Output Artifacts
 
@@ -156,6 +156,58 @@ For each CVE, document:
 
 **See:** [references/attribution-research-methodology.md](references/attribution-research-methodology.md) for detailed query patterns, source prioritization, and citation formats.
 
+### 2.4 Industry Vertical Filtering
+
+**If industry vertical specified (not "All"):**
+
+Filter CVEs based on "Target Sectors" extracted in Phase 2.2:
+
+**Matching logic:**
+- **Healthcare:** CVEs targeting Healthcare, Medical, Hospitals, Pharmaceutical sectors
+- **Financial:** CVEs targeting Financial Services, Banking, Fintech, Insurance sectors
+- **Government:** CVEs targeting Government, Defense, Federal, State agencies
+- **Manufacturing:** CVEs targeting Manufacturing, Industrial Control Systems, Supply Chain
+- **Energy:** CVEs targeting Energy, Oil & Gas, Utilities, Power Grid
+- **Technology:** CVEs targeting Technology, Software, SaaS, Cloud providers
+
+**Examples:**
+
+```
+User requests: --vertical Healthcare
+Attribution data: "Target Sectors: Healthcare, Government"
+Result: ✅ INCLUDE (Healthcare match)
+
+User requests: --vertical Financial
+Attribution data: "Target Sectors: Healthcare, Government"
+Result: ❌ EXCLUDE (No Financial match)
+
+User requests: --vertical All
+Attribution data: Any
+Result: ✅ INCLUDE (All sectors accepted)
+```
+
+**Filtering behavior:**
+- Apply filter AFTER Phase 2 attribution research completes
+- If fewer than Top N CVEs match vertical, report all matching CVEs
+- **If ZERO CVEs match vertical:** Generate summary report with recommendation to expand search
+- Include note in report: "Filtered by {vertical} sector targeting"
+
+**Priority boost:** CVEs targeting specified vertical receive +15% priority weight in Phase 4 scoring.
+
+**Zero-match handling:**
+```markdown
+# Threat Intelligence Report
+
+**Industry Focus:** Healthcare
+**CVEs Found:** 0
+
+No CVEs targeting the Healthcare sector were identified in the {days}-day KEV window.
+
+**Recommendation:**
+- Expand search: Use --vertical All to see all threats
+- Extend timeframe: Use --days 90 for broader coverage
+```
+
 ---
 
 ## Phase 3: Nuclei Template Correlation
@@ -191,20 +243,23 @@ grep -r "CVE-YYYY-NNNNN" /tmp/nuclei-templates --include="*.yaml" --include="*.y
 
 ### 3.3 Detection Coverage Analysis
 
-Create detection status for each CVE:
+**Initial status assignment (tentative - refined in Phase 2):**
 
-| Detection Status | Meaning | Impact |
-|-----------------|---------|--------|
-| **Covered** | Template exists in nuclei | Chariot can detect |
-| **Partial** | Template exists but limited scope | Detection may miss variants |
-| **Gap** | No template found | Manual detection required |
+| Detection Status | Symbol | Meaning |
+|-----------------|--------|---------|
+| **COVERED** | ✅ | Template exists in nuclei (refined by customer exposure in Phase 2) |
+| **GAP** | ❌ | No template found (refined by remediation in Phase 3) |
+
+**Note:** This is a tentative status. The progressive detection status system refines this based on:
+- **Phase 2:** Customer asset exposure (COVERED → COVERED-EXPOSED if customer has vulnerable assets)
+- **Phase 3:** Remediation status (GAP → IN DEVELOPMENT when CVE research triggered)
 
 **For templates found:** Read first 50 lines to extract:
 - Template severity
 - Detection method (HTTP/network/file-based)
 - Verified status (metadata.verified: true/false)
 
-**See:** [references/detection-coverage-analysis.md](references/detection-coverage-analysis.md)
+**See:** [references/detection-coverage-analysis.md](references/detection-coverage-analysis.md) and [references/detection-status-system.md](references/detection-status-system.md) for complete progressive status definitions
 
 ---
 
@@ -255,45 +310,21 @@ Priority 2: CVE-YYYY-0002 (Score: 8.7)
 
 ### 5.1 Key Takeaways (5 Bullets)
 
-Format each as:
+Format: `> **Bold Title:** Single sentence explanation with supporting data.`
 
-> **Bold Title:** Single sentence explanation with supporting data.
+**Required focus:** Weaponization speed, threat actor patterns, sector targeting, patching priorities, detection coverage.
 
-**Required focus areas:**
-1. **Speed of weaponization** - 0-day to KEV addition timeline
-2. **Threat actor convergence** - Multiple groups using same CVE or targeting same sector
-3. **Sector/platform targeting patterns** - Which industries/technologies under attack
-4. **Critical patching priorities** - Top 2-3 CVEs requiring immediate action
-5. **Detection coverage status** - Summary of gaps requiring capability development
-
-**Example:**
-
-> **Rapid Weaponization:** CVE-2025-55182 was weaponized within 48 hours of disclosure by APT28, indicating pre-knowledge and coordinated campaign targeting government agencies.
+**See:** [references/report-format-specifications.md](references/report-format-specifications.md) for detailed examples and formatting guidance.
 
 ### 5.2 Priority Patching Recommendations Table
 
-```markdown
-| Priority | CVE | Product | Threat Actor Attribution | Confidence | Detection Status |
-|----------|-----|---------|-------------------------|------------|------------------|
-| CRITICAL | CVE-2025-55182 | React/Next.js | APT28 (Russia) | HIGH | **GAP** |
-| HIGH | CVE-2024-12345 | Apache Struts | LockBit 3.0 | HIGH | COVERED |
-| HIGH | CVE-2024-23456 | Cisco ASA | Opportunistic | MEDIUM | COVERED |
-| MEDIUM | CVE-2024-34567 | VMware vCenter | APT41 (China) | MEDIUM | Partial |
-| MEDIUM | CVE-2024-45678 | Microsoft Exchange | Unknown | LOW | COVERED |
-```
+**Format:** Table with Priority, CVE, Product, Threat Actor, Confidence, Detection Status
 
-**Column Definitions:**
-- **Priority:** CRITICAL/HIGH/MEDIUM based on Phase 4 scoring
-- **CVE:** Vulnerability ID (hyperlinked to NVD/CISA)
-- **Product:** Affected software/hardware
-- **Threat Actor Attribution:** Group name + country if nation-state
-- **Confidence:** Attribution confidence level (HIGH/MEDIUM/LOW)
-- **Detection Status:** Chariot capability (GAP/Partial/COVERED)
+**Columns:** Priority | CVE (hyperlinked) | Product | Threat Actor | Confidence | Detection Status (tentative)
 
-**Detection Status Color Coding (for presentation):**
-- **RED (GAP)**: Immediate attention required - Chariot cannot detect
-- **YELLOW (Partial)**: Review detection scope - may miss variants
-- **GREEN (COVERED)**: Actively monitored by Chariot
+**Note:** Detection status is tentative. Refined in Phase 2 (customer exposure) and Phase 3 (remediation).
+
+**See:** [references/report-format-specifications.md](references/report-format-specifications.md) and [references/detection-status-system.md](references/detection-status-system.md) for examples and status definitions
 
 ### 5.3 Threat Actor Attribution Details
 
