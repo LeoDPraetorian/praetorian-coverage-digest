@@ -69,10 +69,11 @@ Read("modules/chariot/ui/src/components/Login.tsx")
 
 **Input Validation & XSS Prevention:**
 
-- XSS vulnerabilities in user input handling
-- Data sanitization and validation patterns
-- React's built-in XSS protections
-- Safe handling of dynamic content and HTML rendering
+- XSS vulnerabilities **only when bypassing React's rendering** (dangerouslySetInnerHTML, eval, innerHTML)
+- React JSX provides automatic XSS protection through HTML entity escaping
+- DOMPurify required **only** when rendering raw HTML (dangerouslySetInnerHTML, CMS content, external HTML)
+- Data validation patterns for API submission and form handling
+- Verify no unsafe patterns: eval(), innerHTML, document.write(), unvalidated URL injection
 
 **Severity Classification:**
 
@@ -150,10 +151,13 @@ When reviewing auth implementations:
 
 ## Input Validation & XSS Prevention Checklist
 
+**IMPORTANT**: React JSX provides automatic XSS protection by escaping all values. XSS vulnerabilities in React occur **only** when developers bypass React's rendering with `dangerouslySetInnerHTML`, `eval()`, `innerHTML`, `document.write()`, or direct DOM manipulation of user input.
+
 When reviewing input handling:
 
-- [ ] User input sanitized before rendering
-- [ ] No `dangerouslySetInnerHTML` without DOMPurify sanitization
+- [ ] React's JSX rendering used for user input (automatic escaping)
+- [ ] If `dangerouslySetInnerHTML` is used, HTML sanitized with DOMPurify
+- [ ] No bypassing of React's rendering (eval, innerHTML, document.write)
 - [ ] Form validation applied at field level
 - [ ] Data validation before API submission
 - [ ] No inline event handlers from user input
