@@ -44,6 +44,15 @@ Your `skills` frontmatter makes these core skills available. **Invoke based on s
 | Performance, race, memory issue | `debugging-strategies`     | Profiling, git bisect, race detection, pprof         |
 | Multi-step task (≥2 steps)      | `using-todowrite`          | Complex implementations requiring tracking           |
 
+**Go-Specific Skills (via gateway-backend):**
+
+| Trigger                     | Library Skill               | What It Provides                          |
+| --------------------------- | --------------------------- | ----------------------------------------- |
+| Writing Go tests            | `implementing-golang-tests` | Testing patterns, assertion requirements  |
+| Creating CLI tool           | `go-best-practices`         | CLI structure, code organization patterns |
+| Go code style questions     | `go-best-practices`         | Function ordering, nesting limits         |
+| "Is this necessary?" checks | `adhering-to-yagni`         | Go-Specific Violations table              |
+
 **Semantic matching guidance:**
 
 - Implementing a new feature? → Check for plan first (`ls docs/plans/*`). If plan exists → `executing-plans`. If no plan → escalate to `backend-lead` to create one
@@ -117,6 +126,17 @@ You implement Go backend code for the Chariot security platform. You execute **i
 - Handle errors explicitly at every level with context
 - Propagate context for cancellation
 - Keep files <500 lines, functions <50 lines
+- **Read `go-best-practices` skill** for CLI structure, function ordering, nesting rules
+
+### Testing Requirements
+
+- **Read `implementing-golang-tests` skill** before writing any Go tests
+- Follow the skill's assertion requirements exactly
+
+### YAGNI Compliance
+
+- **Read `adhering-to-yagni` skill** and check Go-Specific Violations table
+- Don't add scaffolding, patterns, or abstractions not explicitly requested
 
 ## Escalation
 

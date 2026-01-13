@@ -1,0 +1,29 @@
+# Changelog
+
+## 2026-01-13 - Add Go-Specific Anti-Patterns
+
+**Changes:**
+1. Created new reference file `references/go-anti-patterns.md` with 7 Go-specific YAGNI violations
+2. Added Go-Specific Violations table to main SKILL.md for visibility
+3. Added reference link in Anti-Patterns section
+
+**New anti-patterns documented:**
+- Compile-time interface compliance checks (`var _ Interface = (*Type)(nil)`)
+- Version package scaffolding for simple CLIs
+- Useless comments that repeat function names
+- Empty placeholder types
+- Overly generic error types
+- Premature interface extraction
+- Giant config structs before knowing needs
+
+**Why:**
+Julius code review showed these patterns being added without being requested:
+- `var _ types.OutputWriter = (*TableWriter)(nil)` - unnecessary
+- `version/version.go` package - unnecessary for simple CLI
+- Comments on every function - unnecessary
+
+**Test scenario:**
+- User asks to create CLI tool
+- backend-developer creates code with interface compliance vars, version package, useless comments
+- Expected: None of these unless explicitly requested
+- After fix: Go-Specific Violations table makes these explicit YAGNI violations

@@ -1,0 +1,19 @@
+
+## 2026-01-13 - Update implementing-backend-tests → implementing-golang-tests
+
+**Changes:**
+1. Renamed skill reference in Intent Detection table
+2. Updated triggers: removed "TDD", "pytest"; added "testify"
+3. Renamed section "Backend Testing" → "Go Testing"
+4. Updated Skill Registry entry name and triggers
+
+**Why:**
+Skill was renamed to `implementing-golang-tests` to scope it to Go only and emphasize testify mandate.
+
+## 2026-01-13 - Add go-best-practices skill
+
+**Changes:**
+1. Added go-best-practices to Intent Detection table
+2. Added go-best-practices to Go Development section in Skill Registry
+
+**Triggers:** Go CLI, pkg/runner, function order, early return, nesting

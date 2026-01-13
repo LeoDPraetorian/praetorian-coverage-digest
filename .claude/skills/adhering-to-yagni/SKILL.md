@@ -45,6 +45,16 @@ If the user didn't explicitly ask for it → ASK before doing it
 | **Error handling**            | User asks for happy path → You add try-catch everywhere        | Ask: "What error handling do you want?"        |
 | **Optimization**              | User asks for implementation → You optimize for performance    | Ask: "Should I optimize this?"                 |
 
+### Go-Specific Violations (See [go-anti-patterns.md](references/go-anti-patterns.md))
+
+| Violation                      | Example                                           | What to Do Instead                              |
+| ------------------------------ | ------------------------------------------------- | ----------------------------------------------- |
+| **Interface compliance vars**  | `var _ Interface = (*Type)(nil)`                  | Return interface from constructor instead       |
+| **Version package**            | Creating `version/version.go` for simple CLI      | Don't add unless explicitly requested           |
+| **Useless comments**           | `// NewFoo creates a new Foo`                     | Only comment non-obvious behavior               |
+| **Premature interfaces**       | Interface with single implementation              | Just use struct until polymorphism needed       |
+| **Giant config structs**       | 20-field Config struct before knowing needs       | Start simple, add options when requested        |
+
 ## Table of Contents
 
 This skill is organized into detailed reference documents:
@@ -65,6 +75,7 @@ This skill is organized into detailed reference documents:
 
 - **[Rationalization Traps](references/rationalization-traps.md)** - Common justifications to avoid
 - **[The "While I'm Here" Fallacy](references/while-im-here.md)** - Why adjacent changes are dangerous
+- **[Go-Specific Anti-Patterns](references/go-anti-patterns.md)** - Compile-time checks, version packages, useless comments
 
 ## Core Workflow
 

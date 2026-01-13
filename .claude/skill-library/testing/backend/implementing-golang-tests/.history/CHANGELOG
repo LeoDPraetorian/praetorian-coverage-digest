@@ -1,0 +1,23 @@
+# Changelog
+
+## 2026-01-13 - Major Update: Testify Mandate + Rename to implementing-golang-tests
+
+**Changes:**
+1. Renamed from `implementing-backend-tests` to `implementing-golang-tests` for clarity
+2. Added CRITICAL testify mandate section at top (NON-NEGOTIABLE)
+3. Provided testify assertion examples (assert.* vs require.*)
+4. Added anti-pattern examples showing t.Error vs testify
+5. Scoped skill to Go only (Python tests should use separate skill)
+6. Added explicit "If you write t.Error, STOP immediately" directive
+
+**Why:**
+Julius code review showed tests using `t.Error` instead of testify despite skill line 85-86 mandate. The mandate wasn't prominent enough and lacked enforcement language.
+
+**Test scenario:**
+- User creates Julius CLI tool via feature pipeline
+- backend-developer implements tests
+- Tests should use testify assertions throughout
+- Previous: Tests used t.Error/t.Errorf
+- After fix: CRITICAL block at top makes testify non-negotiable
+
+**Line count:** 236 lines (was 198) - still under 400 line inline limit

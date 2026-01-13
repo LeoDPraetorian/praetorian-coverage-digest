@@ -40,6 +40,15 @@ Your `skills` frontmatter makes these core skills available. **Invoke based on s
 | Investigating issues       | `debugging-systematically` | Root cause analysis during review                              |
 | Multi-step task (≥2 steps) | `using-todowrite`          | Anything requiring > 1 task to perform                         |
 
+**Go-Specific Review Checks (via gateway-backend):**
+
+| Trigger                     | Library Skill               | What It Provides                        |
+| --------------------------- | --------------------------- | --------------------------------------- |
+| Reviewing Go tests          | `implementing-golang-tests` | Testing patterns to enforce             |
+| Reviewing CLI tool          | `go-best-practices`         | CLI structure, organization to enforce  |
+| Reviewing file organization | `go-best-practices`         | Function ordering, nesting rules        |
+| Checking for unnecessary    | `adhering-to-yagni`         | Go-Specific Violations to flag          |
+
 **Semantic matching guidance:**
 
 - Quick review question? → `enforcing-evidence-based-analysis` + `verifying-before-completion`
@@ -107,6 +116,16 @@ You review backend implementations, validating that `backend-developer`'s code m
 - Check for Go idiom violations
 - Verify error handling completeness
 - Validate concurrency safety (no race conditions)
+
+### Go-Specific Reviews
+
+**Before reviewing Go code, read these library skills via gateway-backend:**
+
+- `go-best-practices` - CLI structure, function ordering, nesting rules
+- `implementing-golang-tests` - Testing patterns and assertion requirements
+- `adhering-to-yagni` - Go-Specific Violations table
+
+**The skills define what to enforce.** Don't hardcode rules here - read the skills.
 
 ### Verification & Feedback
 

@@ -1,23 +1,53 @@
 ---
-name: implementing-backend-tests
-description: Use when implementing backend tests from a test-lead plan - provides 3-step process (locate plan, implement following plan, verify criteria), test mode selection (unit/integration/acceptance), and mandatory protocols (behavior testing, TDD cycle, plan adherence)
+name: implementing-golang-tests
+description: Use when implementing Go backend tests from a test-lead plan - provides 3-step process (locate plan, implement following plan, verify criteria), test mode selection (unit/integration/acceptance), and mandatory protocols (testify assertions, behavior testing, TDD cycle, plan adherence)
 allowed-tools: Read, Bash, Grep, Glob
 ---
 
-# Implementing Backend Tests
+# Implementing Go Backend Tests
 
-**3-step process for implementing Go/Python backend tests according to test-lead's plan.**
+**3-step process for implementing Go backend tests according to test-lead's plan.**
+
+<CRITICAL>
+## Testify Mandate (NON-NEGOTIABLE)
+
+ALL Go tests MUST use `github.com/stretchr/testify` assertions. NO EXCEPTIONS.
+
+```go
+// ❌ NEVER use standard Go testing assertions
+if result != expected {
+    t.Errorf("got %v, want %v", result, expected)
+}
+
+// ✅ ALWAYS use testify
+assert.Equal(t, expected, result)
+require.NoError(t, err)  // Use require for must-pass assertions
+```
+
+**Why testify is mandatory:**
+- Consistent assertion style across codebase
+- Better failure messages with clear diffs
+- Mock support for interfaces
+- Table-driven test utilities
+
+**If you write `t.Error`, `t.Errorf`, `t.Fatal`, or `t.Fatalf`:**
+- STOP immediately
+- Rewrite using testify assertions
+- Review ALL test functions for violations
+</CRITICAL>
 
 ## When to Use
 
 Use this skill when:
 
-- Implementing tests for Go or Python backend code
+- Implementing tests for Go backend code
 - A test-lead has created a test plan for you to follow
 - You need guidance on unit, integration, or acceptance test implementation
 - You need to verify your tests meet the plan's acceptance criteria
 
 **Context**: This skill is invoked by the `backend-tester` agent as part of its test implementation workflow.
+
+**For Python tests**: Use Python-specific testing skills (pytest patterns).
 
 ## Quick Reference
 
@@ -78,12 +108,37 @@ Choose the appropriate test mode based on what you're testing:
 | Third-party APIs, service communication, data flows | Integration | API clients, mock servers, contract tests |
 | Real AWS services, end-to-end backend flows         | Acceptance  | Real SQS/DynamoDB/Cognito, test fixtures  |
 
-**Unit Testing (Go testing + testify, pytest)**
+**Unit Testing (Go testing + testify)**
 
 - Test handler and service behavior in isolation
-- Use testify for assertions and mocking
+- **MANDATORY**: Use testify for ALL assertions (see Testify Mandate above)
+- Use `assert.*` for regular assertions, `require.*` for must-pass checks
 - Table-driven tests for scenario coverage
 - Follow AAA pattern: Arrange → Act → Assert
+
+**Testify assertion examples:**
+
+```go
+// Basic assertions
+assert.Equal(t, expected, actual)
+assert.NotNil(t, obj)
+assert.True(t, condition)
+
+// Error handling
+require.NoError(t, err)           // Test fails immediately if err != nil
+assert.Error(t, err)              // Expect an error
+assert.EqualError(t, err, "msg")  // Check exact error message
+
+// Collections
+assert.Len(t, slice, 5)
+assert.Contains(t, slice, item)
+assert.ElementsMatch(t, expected, actual)  // Order-independent slice comparison
+
+// Mocking (testify/mock)
+mockService := new(MockService)
+mockService.On("Method", arg).Return(result, nil)
+assert.True(t, mockService.AssertExpectations(t))
+```
 
 **Integration Testing (API validation, service communication)**
 
@@ -142,6 +197,18 @@ assert.Equal(t, 1, handler.callCount)
 // ✅ GOOD: Tests behavior
 assert.Equal(t, http.StatusOK, response.StatusCode)
 assert.Equal(t, expectedAsset, response.Body.Asset)
+```
+
+**Common mistake - Using standard Go assertions:**
+
+```go
+// ❌ WRONG: Standard Go testing
+if response.StatusCode != http.StatusOK {
+    t.Errorf("got status %d, want %d", response.StatusCode, http.StatusOK)
+}
+
+// ✅ RIGHT: testify
+assert.Equal(t, http.StatusOK, response.StatusCode)
 ```
 
 ### Verify Before Test

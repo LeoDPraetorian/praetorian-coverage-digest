@@ -47,7 +47,7 @@ This gateway implements 3-tier loading:
 | Task Intent                                           | Route To                                                             |
 | ----------------------------------------------------- | -------------------------------------------------------------------- |
 | "write tests for..."                                  | → Mandatory skills + domain-specific                                 |
-| "implement tests from plan" / "backend test"          | → `gateway-backend` (has `implementing-backend-tests`)               |
+| "implement tests from plan" / "backend test"          | → `gateway-backend` (has `implementing-golang-tests`)                |
 | "fix flaky test"                                      | → `condition-based-waiting` + `testing-anti-patterns`                |
 | "test plan" / "coverage gaps"                         | → `verifying-test-metrics-reality` + `test-infrastructure-discovery` |
 | "debug test failure"                                  | → `debugging-systematically` (via gateway) + `testing-anti-patterns` |

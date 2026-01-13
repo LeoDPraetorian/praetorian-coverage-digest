@@ -68,11 +68,12 @@ This gateway implements 3-tier loading:
 | "port equivalence" / "testing"                                                                       | → `verifying-port-equivalence`           |
 | "capability architecture" / "scanner"                                                                | → `enforcing-go-capability-architecture` |
 | "Go structure" / "project layout" / "cmd pkg internal"                                               | → `structuring-go-projects`              |
+| "Go CLI" / "pkg/runner" / "function order" / "early return" / "nesting"                              | → `go-best-practices`                    |
 | "bash" / "shell script" / "defensive"                                                                | → `bash-defensive-patterns`              |
 | "YAML" / "parse" / "template"                                                                        | → `yaml-master`                          |
 | "Makefile" / "make target" / "build automation"                                                      | → `adhering-to-makefile-best-practices`  |
 | "review" / "code quality" / "PR"                                                                     | → `reviewing-backend-implementations`    |
-| "implement tests" / "test plan" / "TDD"                                                              | → `implementing-backend-tests`           |
+| "implement tests" / "test plan" / "Go test" / "testify"                                              | → `implementing-golang-tests`            |
 | "architecture analysis" / "trace execution"                                                          | → `behavior-first-architecture-analysis` |
 | "capability assessment" / "system design"                                                            | → `behavior-first-architecture-analysis` |
 | "TypeScript" / "advanced patterns"                                                                   | → also invoke `gateway-typescript`       |
@@ -94,6 +95,7 @@ This gateway implements 3-tier loading:
 
 | Skill                   | Path                                                                                 | Triggers                                                                     |
 | ----------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| Go Best Practices       | `.claude/skill-library/development/backend/go-best-practices/SKILL.md`               | Go CLI, pkg/runner, function order, early return, nesting                    |
 | Errgroup Concurrency    | `.claude/skill-library/development/backend/go-errgroup-concurrency/SKILL.md`         | errgroup, concurrent, goroutine                                              |
 | Semaphore Pools         | `.claude/skill-library/development/backend/implementing-go-semaphore-pools/SKILL.md` | semaphore, worker pool, rate limit, bounded concurrency, too many goroutines |
 | Structuring Go Projects | `.claude/skill-library/development/backend/structuring-go-projects/SKILL.md`         | Go structure, project layout, cmd pkg internal, golang standards             |
@@ -138,11 +140,11 @@ This gateway implements 3-tier loading:
 | GraphQL Clients   | `.claude/skill-library/development/backend/implementing-graphql-clients/SKILL.md` | GraphQL, batch queries, rate limiting, cursor pagination, GitHub API, GitLab API, Azure DevOps API |
 | Integration Tests | `.claude/skill-library/testing/writing-integration-tests-first/SKILL.md`          | integration test, contract                                                                         |
 
-### Backend Testing
+### Go Testing
 
-| Skill                      | Path                                                                        | Triggers                                         |
-| -------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------ |
-| Implementing Backend Tests | `.claude/skill-library/testing/backend/implementing-backend-tests/SKILL.md` | implement tests, test plan, Go test, pytest, TDD |
+| Skill                     | Path                                                                        | Triggers                                     |
+| ------------------------- | --------------------------------------------------------------------------- | -------------------------------------------- |
+| Implementing Golang Tests | `.claude/skill-library/testing/backend/implementing-golang-tests/SKILL.md` | implement tests, test plan, Go test, testify |
 
 ### Go Porting
 

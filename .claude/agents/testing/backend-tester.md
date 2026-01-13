@@ -45,7 +45,7 @@ Your `skills` frontmatter makes these core skills available. **Invoke based on s
 
 **Semantic matching guidance:**
 
-- Implementing tests from plan? → `enforcing-evidence-based-analysis` (read source) + `developing-with-tdd` + Read `implementing-backend-tests` skill + gateway routing
+- Implementing tests from plan? → `enforcing-evidence-based-analysis` (read source) + `developing-with-tdd` + Read `implementing-golang-tests` skill + gateway routing
 - New test suite without plan? → Request `test-lead` to create plan first
 - Debugging flaky test? → `debugging-systematically` + `tracing-root-causes` + gateway routing
 - Performance/race conditions? → `debugging-strategies` + gateway routing
@@ -115,13 +115,13 @@ You write tests for Go/Python backend code in the Chariot security platform. You
 
 ## Test Implementation Workflow
 
-For the complete test implementation process (locating the test plan, implementing tests following the plan, verifying against acceptance criteria, test mode selection, and mandatory protocols), use the `implementing-backend-tests` library skill:
+For the complete test implementation process (locating the test plan, implementing tests following the plan, verifying against acceptance criteria, test mode selection, and mandatory protocols), use the `implementing-golang-tests` library skill:
 
 ```
-Read(".claude/skill-library/testing/backend/implementing-backend-tests/SKILL.md")
+Read(".claude/skill-library/testing/backend/implementing-golang-tests/SKILL.md")
 ```
 
-The `implementing-backend-tests` skill provides:
+The `implementing-golang-tests` skill provides:
 
 - **3-step process**: Locate plan → Implement following plan → Verify criteria
 - **Test mode selection**: Unit, Integration, or Acceptance guidance
