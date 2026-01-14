@@ -70,16 +70,17 @@ client = boto3.client('dynamodb', region_name='us-east-1')
 
 ## Quick Reference
 
-| Service        | Common Operations                     | Chariot Usage                          |
-| -------------- | ------------------------------------- | -------------------------------------- |
-| Lambda         | Function deployment, invocation, logs | Backend API handlers, async processing |
-| DynamoDB       | Query, Scan, PutItem, UpdateItem      | Primary data store                     |
-| S3             | PutObject, GetObject, ListObjects     | File storage, scan results             |
-| API Gateway    | REST API, WebSocket, authorization    | HTTP API entry points                  |
-| CloudFormation | Stack creation, updates, outputs      | Infrastructure as Code                 |
-| IAM            | Role management, policy attachment    | Service permissions                    |
-| CloudWatch     | Logs, metrics, alarms                 | Monitoring and debugging               |
-| Neo4j (AWS)    | Graph queries, relationship traversal | Attack surface graph database          |
+| Service              | Common Operations                          | Chariot Usage                            |
+| -------------------- | ------------------------------------------ | ---------------------------------------- |
+| Lambda               | Function deployment, invocation, logs      | Backend API handlers, async processing   |
+| DynamoDB             | Query, Scan, PutItem, UpdateItem           | Primary data store                       |
+| S3                   | PutObject, GetObject, ListObjects          | File storage, scan results               |
+| API Gateway          | REST API, WebSocket, authorization         | HTTP API entry points                    |
+| CloudFormation       | Stack creation, updates, outputs           | Infrastructure as Code                   |
+| **StackSets**        | **Org-wide deployment, delegated admin**   | **Multi-account IAM roles, baselines**   |
+| IAM                  | Role management, policy attachment         | Service permissions                      |
+| CloudWatch           | Logs, metrics, alarms                      | Monitoring and debugging                 |
+| Neo4j (AWS)          | Graph queries, relationship traversal      | Attack surface graph database            |
 
 ## Implementation
 
@@ -387,6 +388,7 @@ The Chariot backend (`modules/chariot/backend/`) uses:
 - [references/client-creation.md](references/client-creation.md) - Service client initialization patterns
 - [references/error-handling.md](references/error-handling.md) - Comprehensive error handling guide
 - [references/infrastructure-as-code.md](references/infrastructure-as-code.md) - CloudFormation/SAM patterns
+- [references/stacksets-organization-deployment.md](references/stacksets-organization-deployment.md) - Multi-account StackSets with delegated admin
 - [references/security-patterns.md](references/security-patterns.md) - AWS security best practices
 - [references/performance-optimization.md](references/performance-optimization.md) - Performance tuning guide
 - [references/cost-optimization.md](references/cost-optimization.md) - Cost reduction strategies
