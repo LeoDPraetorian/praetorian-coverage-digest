@@ -81,8 +81,8 @@ EXIT CODES:
   2   Tool error (invalid arguments, file not found)
 
 DOCUMENTATION:
-  Skill: .claude/skills/managing-mcp-wrappers/SKILL.md
-  References: .claude/skills/managing-mcp-wrappers/references/
+  Skill: .claude/skills/managing-tool-wrappers/SKILL.md
+  References: .claude/skills/managing-tool-wrappers/references/
 `);
 }
 

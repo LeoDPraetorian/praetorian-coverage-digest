@@ -46,8 +46,8 @@ Extends shared rationalization prevention patterns for MCP wrapper creation work
 | Rationalization | Why It's Wrong | Response |
 |----------------|----------------|----------|
 | 'Batch size 10 is more efficient' | Batches >5 overwhelm agents | DENIED. Use batch size 3-5. |
-| 'Architecture is obvious from schema' | Tool-specific edge cases exist | DENIED. mcp-tool-lead must design per tool. |
-| 'Tests can be generic across tools' | Each tool has unique validation requirements | DENIED. mcp-tool-tester per tool. |
+| 'Architecture is obvious from schema' | Tool-specific edge cases exist | DENIED. tool-lead must design per tool. |
+| 'Tests can be generic across tools' | Each tool has unique validation requirements | DENIED. tool-tester per tool. |
 | '10 tests per tool is enough' | 18 tests across 6 categories is requirement | DENIED. Meet test plan requirements. |
 | 'Sequential is safer than batched' | Batching prevents session timeouts | DENIED. Process in batches. |
 
@@ -73,7 +73,7 @@ Extends shared rationalization prevention patterns for MCP wrapper creation work
 
 | Rationalization | Why It's Wrong | Response |
 |----------------|----------------|----------|
-| 'Self-review is sufficient' | mcp-tool-reviewer provides objective assessment | DENIED. Agent review required. |
+| 'Self-review is sufficient' | tool-reviewer provides objective assessment | DENIED. Agent review required. |
 | 'One retry failed, skip review' | Max 1 retry, then escalate | DENIED. Escalate via AskUserQuestion. |
 | 'CHANGES_REQUESTED is blocking' | 1 retry allowed per tool | DENIED. Fix and re-review once. |
 | 'Review all 15 tools in one batch' | Review in same batches as implementation | DENIED. Batch size 3-5. |
@@ -120,7 +120,7 @@ Extends shared rationalization prevention patterns for MCP wrapper creation work
 
 ## Agent-Specific Rationalizations
 
-### mcp-tool-lead
+### tool-lead
 
 | Rationalization | Why It's Wrong | Response |
 |----------------|----------------|----------|
@@ -128,7 +128,7 @@ Extends shared rationalization prevention patterns for MCP wrapper creation work
 | 'Token optimization is obvious' | designing-progressive-loading-wrappers required | DENIED. Load and follow skill. |
 | 'Result/Either is overkill' | Consistent error handling across all tools | DENIED. Use Result/Either pattern. |
 
-### mcp-tool-tester
+### tool-tester
 
 | Rationalization | Why It's Wrong | Response |
 |----------------|----------------|----------|
@@ -136,7 +136,7 @@ Extends shared rationalization prevention patterns for MCP wrapper creation work
 | 'Security tests are optional' | 4 security tests mandatory per tool | DENIED. Test all 4 security scenarios. |
 | '@claude/testing can be manual mocks' | @claude/testing ensures consistency | DENIED. Use @claude/testing imports. |
 
-### mcp-tool-developer
+### tool-developer
 
 | Rationalization | Why It's Wrong | Response |
 |----------------|----------------|----------|
@@ -144,7 +144,7 @@ Extends shared rationalization prevention patterns for MCP wrapper creation work
 | 'Manual string truncation works' | response-utils provides tested utilities | DENIED. Use response-utils. |
 | 'Custom regex is simpler' | sanitize.ts provides validated patterns | DENIED. Use sanitize.ts validators. |
 
-### mcp-tool-reviewer
+### tool-reviewer
 
 | Rationalization | Why It's Wrong | Response |
 |----------------|----------------|----------|

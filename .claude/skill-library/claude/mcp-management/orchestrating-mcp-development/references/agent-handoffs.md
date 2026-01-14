@@ -19,7 +19,7 @@ The metadata JSON block at the end of each agent output file serves as the hando
 
 ```json
 {
-  "agent": "mcp-tool-developer",
+  "agent": "tool-developer",
   "output_type": "implementation",
   "timestamp": "2025-01-11T10:30:00Z",
   "feature_directory": ".claude/.output/mcp-wrappers/...",
@@ -75,10 +75,10 @@ The orchestrator uses `orchestrating-multi-agent-workflows` skill's agent routin
 Current phase being completed:
 
 - `schema_discovery` - From schema discovery agents
-- `architecture` - From mcp-tool-lead agents
-- `testing` - From mcp-tool-tester agents
-- `implementation` - From mcp-tool-developer agents
-- `review` - From mcp-tool-reviewer agents
+- `architecture` - From tool-lead agents
+- `testing` - From tool-tester agents
+- `implementation` - From tool-developer agents
+- `review` - From tool-reviewer agents
 
 ### summary
 
@@ -172,7 +172,7 @@ Suggested next agent (orchestrator decides final routing):
 
 ```json
 // When complete - can suggest next phase agent
-"next_agent": "mcp-tool-developer"
+"next_agent": "tool-developer"
 
 // When blocked - orchestrator decides using routing table
 "next_agent": null
@@ -266,7 +266,7 @@ This helps the orchestrator understand what debugging steps have already been ta
   },
   "handoff": {
     "next_phase": "architecture",
-    "next_agent": "mcp-tool-lead",
+    "next_agent": "tool-lead",
     "context": "Tool: get-issue. Input schema: issueId (required string, alphanumeric). Output: 850 tokens raw, 40 tokens after filtering (95% reduction). Critical fields: id, title, state, assignee.name. Optional fields: description (large), comments (array), history (large). Security concerns: validate issueId format to prevent injection.",
     "blockers": []
   }
@@ -277,7 +277,7 @@ This helps the orchestrator understand what debugging steps have already been ta
 
 ```json
 {
-  "agent": "mcp-tool-lead",
+  "agent": "tool-lead",
   "output_type": "shared-architecture",
   "timestamp": "2025-01-11T10:45:00Z",
   "feature_directory": ".claude/.output/mcp-wrappers/2025-01-11-123000-linear",
@@ -310,7 +310,7 @@ This helps the orchestrator understand what debugging steps have already been ta
   },
   "handoff": {
     "next_phase": "architecture",
-    "next_agent": "mcp-tool-lead",
+    "next_agent": "tool-lead",
     "context": "Shared patterns for all 15 Linear tools: (1) Error handling via Result<T,E> pattern from implementing-result-either-pattern skill. (2) Input validation via Zod with refinements using sanitize.ts validators. (3) Token optimization via FilteredResult interface with progressive loading - target 80-99% reduction. (4) Response processing via response-utils.truncateField() and filterFields(). (5) Security via sanitize.validateAlphanumeric(), validateUrl(), escapeHtml(). Each tool now needs tool-specific InputSchema, FilteredResult, and field selection strategy.",
     "blockers": []
   }
@@ -321,7 +321,7 @@ This helps the orchestrator understand what debugging steps have already been ta
 
 ```json
 {
-  "agent": "mcp-tool-lead",
+  "agent": "tool-lead",
   "output_type": "tool-architecture",
   "timestamp": "2025-01-11T11:30:00Z",
   "feature_directory": ".claude/.output/mcp-wrappers/2025-01-11-123000-linear",
@@ -346,7 +346,7 @@ This helps the orchestrator understand what debugging steps have already been ta
   },
   "handoff": {
     "next_phase": "implementation",
-    "next_agent": "mcp-tool-developer",
+    "next_agent": "tool-developer",
     "context": "Tool: get-issue. Follow shared patterns from architecture-shared.md. InputSchema: issueId field (z.string().refine(sanitize.validateAlphanumeric)). FilteredResult interface: {id: string, title: string, state: string, assignee: string}. Token target: 850→40 (95% reduction). Error handling: Result<FilteredResult, Error>. MCP call: callMCPTool('linear', 'get-issue', {issueId}). Use response-utils.filterFields(['id','title','state','assignee.name']).",
     "blockers": []
   }
@@ -357,7 +357,7 @@ This helps the orchestrator understand what debugging steps have already been ta
 
 ```json
 {
-  "agent": "mcp-tool-developer",
+  "agent": "tool-developer",
   "output_type": "implementation",
   "timestamp": "2025-01-11T12:15:00Z",
   "feature_directory": ".claude/.output/mcp-wrappers/2025-01-11-123000-linear",
@@ -389,7 +389,7 @@ This helps the orchestrator understand what debugging steps have already been ta
   },
   "handoff": {
     "next_phase": "review",
-    "next_agent": "mcp-tool-reviewer",
+    "next_agent": "tool-reviewer",
     "context": "Implemented get-issue.ts following architecture exactly. InputSchema uses sanitize.validateAlphanumeric() for issueId. Result<FilteredResult, Error> pattern implemented. Token reduction: 850→25 tokens (97% - exceeds 95% target). FilteredResult interface exports {id, title, state, assignee}. Used response-utils.filterFields() not manual field selection. Tests: 18 passed (6 categories covered). TSDoc documentation added. No barrel file imports. Ready for code review.",
     "blockers": []
   }
@@ -400,7 +400,7 @@ This helps the orchestrator understand what debugging steps have already been ta
 
 ```json
 {
-  "agent": "mcp-tool-reviewer",
+  "agent": "tool-reviewer",
   "output_type": "code-review",
   "timestamp": "2025-01-11T13:00:00Z",
   "feature_directory": ".claude/.output/mcp-wrappers/2025-01-11-123000-linear",
@@ -483,7 +483,7 @@ This helps the orchestrator understand what debugging steps have already been ta
 
 ```json
 {
-  "agent": "mcp-tool-lead",
+  "agent": "tool-lead",
   "output_type": "architecture-blocked",
   "timestamp": "2025-01-11T11:00:00Z",
   "feature_directory": ".claude/.output/mcp-wrappers/2025-01-11-123000-linear",
@@ -532,7 +532,7 @@ This helps the orchestrator understand what debugging steps have already been ta
 
 ```json
 {
-  "agent": "mcp-tool-developer",
+  "agent": "tool-developer",
   "output_type": "implementation-blocked",
   "timestamp": "2025-01-11T12:30:00Z",
   "feature_directory": ".claude/.output/mcp-wrappers/2025-01-11-123000-linear",
@@ -573,7 +573,7 @@ This helps the orchestrator understand what debugging steps have already been ta
       {
         "type": "validation_error_integration",
         "description": "Zod refine() error format incompatible with Result<T,E> pattern from architecture. 3 tests failing on validation error path.",
-        "resolution": "Need mcp-tool-tester to debug test expectations or mcp-tool-lead to clarify error handling pattern for Zod integration"
+        "resolution": "Need tool-tester to debug test expectations or tool-lead to clarify error handling pattern for Zod integration"
       }
     ]
   }

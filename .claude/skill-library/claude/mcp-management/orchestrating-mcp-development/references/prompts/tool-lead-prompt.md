@@ -1,12 +1,12 @@
 # MCP Tool Lead Prompt Template
 
-Use this template when dispatching mcp-tool-lead subagents in Phase 3 (Architecture).
+Use this template when dispatching tool-lead subagents in Phase 3 (Architecture).
 
 ## Usage
 
 ```typescript
 Task({
-  subagent_type: "mcp-tool-lead",
+  subagent_type: "tool-lead",
   description: "Design architecture for MCP wrapper [service]/[tool]",
   prompt: `[Use template below, filling in placeholders]`,
 });
@@ -661,7 +661,7 @@ After completing your work, include this metadata block:
 
 ```json
 {
-  "agent": "mcp-tool-lead",
+  "agent": "tool-lead",
   "output_type": "architecture",
   "feature_directory": ".claude/.output/mcp-wrappers/{YYYY-MM-DD-HHMMSS}-{SERVICE}",
   "skills_invoked": [
@@ -690,7 +690,7 @@ After completing your work, include this metadata block:
     "reduction_pct": 81
   },
   "handoff": {
-    "next_agent": "mcp-tool-tester",
+    "next_agent": "tool-tester",
     "context": "Architecture complete with 81% token reduction target, ready for test planning"
   }
 }
@@ -706,7 +706,7 @@ If you cannot complete this task, return:
 
 ```json
 {
-  "agent": "mcp-tool-lead",
+  "agent": "tool-lead",
   "status": "blocked",
   "blocked_reason": "incomplete_discovery|ambiguous_requirements|conflicting_constraints|missing_schema_info",
   "attempted": [

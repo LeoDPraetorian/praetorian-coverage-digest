@@ -62,7 +62,7 @@ Do not reinterpret these as something else.
 
 ## AGENT SELECTION (use THESE agents, not general-purpose ones)
 
-- MCP wrappers, TypeScript tooling, .claude/tools/ → mcp-tool-lead, mcp-tool-developer, mcp-tool-reviewer
+- MCP wrappers, TypeScript tooling, .claude/tools/ → tool-lead, tool-developer, tool-reviewer, tool-tester
 - Backend, backend APIs, Lambda, AWS, Go services → backend-lead, backend-developer, backend-reviewer, backend-security
 - React UI, frontend components → frontend-lead, frontend-developer, frontend-reviewer, frontend-security
 - Test strategy, test quality, test coverage → test-lead

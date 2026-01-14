@@ -16,7 +16,7 @@ Human approval required at:
 
 ### Phase 3: Shared Architecture
 
-**When:** After both agents (mcp-tool-lead + security-lead) complete
+**When:** After both agents (tool-lead + security-lead) complete
 
 **Trigger:** Always required (applies to all service sizes)
 
@@ -57,7 +57,7 @@ AskUserQuestion({
 **Handling responses:**
 
 - **Approve**: Proceed to Phase 4
-- **Request changes**: Spawn mcp-tool-lead again with feedback
+- **Request changes**: Spawn tool-lead again with feedback
 - **Show details**: Display full architecture files, then re-ask
 
 **Why critical:** Architecture misalignment affects ALL tools in the service. Catching issues here prevents rework on 15+ wrappers.
@@ -329,7 +329,7 @@ Save progress.json after:
 
 If session interrupted:
 
-1. User restarts with `/mcp-manager resume {service}`
+1. User restarts with `/tool-manager resume {service}`
 2. Orchestrator reads progress.json
 3. Identifies last completed phase
 4. Displays resume summary

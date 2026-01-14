@@ -13,7 +13,7 @@ The MCP Manager enforces TDD through a structured workflow:
 ## Quick Reference: CLI Commands
 
 ```bash
-cd .claude/skills/managing-mcp-wrappers/scripts
+cd .claude/skills/managing-tool-wrappers/scripts
 
 # STEP 1: Create test file only (RED phase setup)
 npm run create -- <service> <tool>
@@ -43,7 +43,7 @@ npm run verify-green -- <service>/<tool>
 **Purpose:** Understand the real API response format before writing any code.
 
 ```bash
-npx tsx .claude/skills/managing-mcp-wrappers/templates/discover-schema.ts \
+npx tsx .claude/skills/managing-tool-wrappers/templates/discover-schema.ts \
   --mcp <service> \
   --tool <tool> \
   --cases 3
@@ -162,7 +162,7 @@ npm run audit -- {service}/{tool}
 
 ## TDD Enforcement via CLI
 
-The mcp-manager CLI **enforces** TDD through blocked operations:
+The tool-manager CLI **enforces** TDD through blocked operations:
 
 | Command                    | Behavior                 | Enforcement                         |
 | -------------------------- | ------------------------ | ----------------------------------- |

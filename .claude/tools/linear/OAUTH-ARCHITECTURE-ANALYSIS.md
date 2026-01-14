@@ -6,7 +6,7 @@
 
 **Date:** 2026-01-06
 
-**Agent:** mcp-tool-lead (Architecture)
+**Agent:** tool-lead (Architecture)
 
 ---
 
@@ -370,7 +370,7 @@ The shared app is acceptable for internal/first-party tooling where trust is est
 
 ```json
 {
-  "agent": "mcp-tool-lead",
+  "agent": "tool-lead",
   "output_type": "architecture-plan",
   "timestamp": "2026-01-06T00:00:00Z",
   "feature_directory": ".claude/tools/linear",
@@ -391,7 +391,7 @@ The shared app is acceptable for internal/first-party tooling where trust is est
   ],
   "status": "complete",
   "handoff": {
-    "next_agent": "mcp-tool-developer",
+    "next_agent": "tool-developer",
     "context": "Implement Option D (Hybrid) - add hardcoded Praetorian clientId with user override capability"
   }
 }

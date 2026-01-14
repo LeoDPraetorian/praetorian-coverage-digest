@@ -8,11 +8,11 @@ import type { AuditResult, Issue } from '../types.js';
 
 // Known deprecated patterns
 const DEPRECATED_PATTERNS: Record<string, string> = {
-  'mcp-code-write': 'mcp-manager (npm run create/update)',
-  'mcp-code-compliance': 'mcp-manager (npm run audit)',
-  'mcp-code-audit': 'mcp-manager (npm run audit --all)',
-  'mcp-code-fix': 'mcp-manager (npm run fix)',
-  'mcp-code-test': 'mcp-manager (npm run test)',
+  'mcp-code-write': 'tool-manager (npm run create/update)',
+  'mcp-code-compliance': 'tool-manager (npm run audit)',
+  'mcp-code-audit': 'tool-manager (npm run audit --all)',
+  'mcp-code-fix': 'tool-manager (npm run fix)',
+  'mcp-code-test': 'tool-manager (npm run test)',
 };
 
 export async function auditPhase5(wrapperPath: string): Promise<AuditResult> {

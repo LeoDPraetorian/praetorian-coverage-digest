@@ -18,7 +18,7 @@
 ## [2026-01-02] - Initial Creation
 
 ### Created
-- New mcp-tool-reviewer agent for reviewing MCP wrapper implementations
+- New tool-reviewer agent for reviewing MCP wrapper implementations
 - Modeled after frontend-reviewer agent structure
 - Integrated with orchestrating-mcp-development workflow (Phase 7)
 

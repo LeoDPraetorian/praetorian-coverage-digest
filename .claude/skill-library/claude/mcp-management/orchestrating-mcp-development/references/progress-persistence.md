@@ -38,7 +38,7 @@ Enable long-running MCP wrapper workflows by:
       "status": "complete",
       "approved": true,
       "architecture_file": ".claude/.output/mcp-wrappers/linear/architecture.md",
-      "agent_used": "mcp-tool-lead",
+      "agent_used": "tool-lead",
       "shared_decisions": [
         "Use response-utils.ts sanitizeResponse() for all MCP calls",
         "Result type pattern for error handling",
@@ -51,7 +51,7 @@ Enable long-running MCP wrapper workflows by:
 
     "implementation": {
       "status": "in_progress",
-      "agents_used": ["mcp-tool-developer"],
+      "agents_used": ["tool-developer"],
       "tools_completed": ["get-issue", "list-issues", "create-issue"],
       "tools_in_progress": ["update-issue"],
       "tools_remaining": ["search-issues", "list-projects", "get-project"],

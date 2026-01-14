@@ -2,7 +2,7 @@
 
 ## Parallel Execution is MANDATORY
 
-**Phase 3 (Architecture):** Spawn mcp-tool-lead + security-lead in SINGLE message
+**Phase 3 (Architecture):** Spawn tool-lead + security-lead in SINGLE message
 **Phase 8 (Review):** Can add parallel security review if needed
 
 **DO NOT spawn sequentially when parallel is possible.**
@@ -47,7 +47,7 @@ All Task agents must return structured JSON for orchestrator parsing:
   "files_created": ["path/to/file1.ts", "path/to/file2.ts"],
   "verdict": "APPROVED" | "CHANGES_REQUESTED" | "BLOCKED",
   "handoff": {
-    "next_agent": "mcp-tool-developer" | "mcp-tool-reviewer" | "mcp-tool-tester",
+    "next_agent": "tool-developer" | "tool-reviewer" | "tool-tester",
     "context": "Key decisions, blockers, or requirements for next phase"
   }
 }
@@ -67,11 +67,11 @@ When agent returns `status: "blocked"` with `blocked_reason`, route per this tab
 | Blocked Reason            | Route To               | Action                           |
 | ------------------------- | ---------------------- | -------------------------------- |
 | security_concern          | security-lead          | Re-assess security requirements  |
-| architecture_decision     | mcp-tool-lead          | Clarify architecture             |
+| architecture_decision     | tool-lead          | Clarify architecture             |
 | missing_requirements      | AskUserQuestion        | Get user input                   |
-| test_failures             | mcp-tool-tester        | Debug test issues                |
+| test_failures             | tool-tester        | Debug test issues                |
 | out_of_scope              | AskUserQuestion        | Confirm scope                    |
-| schema_discovery_failed   | mcp-tool-lead          | Alternative discovery approach   |
+| schema_discovery_failed   | tool-lead          | Alternative discovery approach   |
 | unknown                   | AskUserQuestion        | Manual assessment                |
 
 **Critical Rules:**

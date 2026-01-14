@@ -192,7 +192,7 @@ For simple tasks that don't need orchestration:
 
 Claude Code agents are specialized sub-processes that handle complex tasks autonomously. This document defines the architectural patterns, quality standards, and governance rules for all agents in the Chariot platform.
 
-**Gold Standard**: `mcp-tool-lead` (~164 lines) - Use as template for all new agents.
+**Gold Standard**: `tool-lead` (~164 lines) - Use as template for all new agents.
 
 ---
 
@@ -512,7 +512,7 @@ Follow `persisting-agent-outputs` skill for file output, JSON metadata format, a
 
 ### Role-Specific Step 1 Integration
 
-**Important**: Role-specific skills are now integrated directly into the Step 1 table, not listed separately. This matches the `mcp-tool-lead` gold standard pattern.
+**Important**: Role-specific skills are now integrated directly into the Step 1 table, not listed separately. This matches the `tool-lead` gold standard pattern.
 
 When creating an agent, add role-specific skills to the Step 1 table with appropriate rationale:
 
@@ -527,7 +527,7 @@ When creating an agent, add role-specific skills to the Step 1 table with approp
 | Cross-domain        | Multiple gateways                     | "Domain intersection patterns"                               |
 | Orchestrator        | `orchestrating-multi-agent-workflows` | "Coordination patterns"                                      |
 
-**Multiple Gateways Pattern**: Cross-domain agents (e.g., `mcp-tool-lead` uses both `gateway-mcp-tools` + `gateway-typescript`) include multiple gateways for their intersecting domains. Each gateway provides domain-specific library skill routing.
+**Multiple Gateways Pattern**: Cross-domain agents (e.g., `tool-lead` uses both `gateway-mcp-tools` + `gateway-typescript`) include multiple gateways for their intersecting domains. Each gateway provides domain-specific library skill routing.
 
 ### Available Gateways
 
@@ -1053,7 +1053,7 @@ Once an agent is spawned, it runs to completion. Design agent prompts carefullyt
 
 - **Agent Manager**: `.claude/skills/managing-agents/SKILL.md`
 - **Agent Management Skills**: `.claude/skill-library/claude/agent-management/`
-- **Gold Standard**: `.claude/agents/architecture/mcp-tool-lead.md`
+- **Gold Standard**: `.claude/agents/architecture/tool-lead.md`
 - **Skills Architecture**: `docs/SKILLS-ARCHITECTURE.md`
 
 ### Anthropic Guidance

@@ -1166,7 +1166,7 @@ Should show workspace-specific cache files with recent modification times.
 
 ```json
 {
-  "agent": "mcp-tool-lead",
+  "agent": "tool-lead",
   "output_type": "architecture-plan",
   "timestamp": "2025-01-02T00:00:00Z",
   "feature_directory": ".claude/tools/serena",
@@ -1188,7 +1188,7 @@ Should show workspace-specific cache files with recent modification times.
   ],
   "status": "complete",
   "handoff": {
-    "next_agent": "mcp-tool-developer",
+    "next_agent": "tool-developer",
     "context": "Implement connection pool per Task 1-8 in Implementation Tasks section"
   }
 }

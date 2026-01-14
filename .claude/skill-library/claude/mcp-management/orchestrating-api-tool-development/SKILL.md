@@ -32,15 +32,15 @@ Verify infrastructure exists before starting:
 
 | Phase  | Agent              | Purpose             | Duration  |
 | ------ | ------------------ | ------------------- | --------- |
-| RED    | mcp-tool-tester    | Write failing tests | 10-15 min |
-| GREEN  | mcp-tool-developer | Implement wrapper   | 15-20 min |
-| REVIEW | mcp-tool-reviewer  | Code review         | 5-10 min  |
+| RED    | tool-tester    | Write failing tests | 10-15 min |
+| GREEN  | tool-developer | Implement wrapper   | 15-20 min |
+| REVIEW | tool-reviewer  | Code review         | 5-10 min  |
 
 ## TDD Workflow
 
 ### Phase 1: RED - Write Failing Tests First
 
-**Spawn mcp-tool-tester agent:**
+**Spawn tool-tester agent:**
 
 ```
 Create tests for [service-name] [endpoint-name] wrapper
@@ -68,7 +68,7 @@ Use createShodanClient pattern from .claude/tools/shodan/client.ts
 
 ### Phase 2: GREEN - Implement Wrapper
 
-**Spawn mcp-tool-developer agent:**
+**Spawn tool-developer agent:**
 
 ```
 Implement [service-name] [endpoint-name] wrapper following TDD
@@ -100,7 +100,7 @@ Auth configuration:
 
 ### Phase 3: REVIEW - Code Quality
 
-**Spawn mcp-tool-reviewer agent:**
+**Spawn tool-reviewer agent:**
 
 ```
 Review [service-name] wrapper implementation
@@ -223,5 +223,5 @@ Architecture documentation: `.claude/.output/api-wrappers/http-client-architectu
 ## Related Skills
 
 - `orchestrating-mcp-development` - For MCP wrapper development
-- `managing-mcp-wrappers` - Lifecycle management for wrappers
+- `managing-tool-wrappers` - Lifecycle management for wrappers
 - `gateway-mcp-tools` - Routes to wrapper-related skills

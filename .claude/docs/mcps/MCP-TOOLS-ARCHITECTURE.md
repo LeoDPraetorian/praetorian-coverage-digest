@@ -95,13 +95,13 @@ Additional savings from eliminated MCP infrastructure: **3,700 tokens**
 
 ### Layer 1: MCP Wrapper Management (Lifecycle)
 
-**Location**: `.claude/skills/managing-mcp-wrappers/` (lifecycle) + `.claude/skills/creating-mcp-wrappers/` (creation)
+**Location**: `.claude/skills/managing-tool-wrappers/` (lifecycle) + `.claude/skills/creating-mcp-wrappers/` (creation)
 
 **Purpose**: Create, test, audit, and maintain MCP wrappers with mandatory TDD enforcement.
 
 **Two-Skill Architecture**:
 
-- `managing-mcp-wrappers` - Lifecycle operations (audit, update, fix, test, generate-skill)
+- `managing-tool-wrappers` - Lifecycle operations (audit, update, fix, test, generate-skill)
 - `creating-mcp-wrappers` - Instruction-driven wrapper creation with TDD gates
 
 > **See [MCP Wrapper Management](#mcp-wrapper-management) section below for complete documentation** including TDD workflow, 11-phase audit system, directory structure, and CLI reference.
@@ -335,16 +335,16 @@ The MCP Wrapper Management system is the lifecycle management system for MCP wra
 
 | Aspect         | Details                                                                                   |
 | -------------- | ----------------------------------------------------------------------------------------- |
-| **Location**   | `.claude/skills/managing-mcp-wrappers/` + `.claude/skills/creating-mcp-wrappers/`         |
+| **Location**   | `.claude/skills/managing-tool-wrappers/` + `.claude/skills/creating-mcp-wrappers/`         |
 | **Purpose**    | Create, test, audit, and maintain MCP wrappers                                            |
 | **Philosophy** | TDD-first: tests must exist and fail before implementation                                |
 | **Coverage**   | Minimum 80% unit test coverage required                                                   |
-| **Invocation** | `skill: "creating-mcp-wrappers"` (create) or `skill: "managing-mcp-wrappers"` (lifecycle) |
+| **Invocation** | `skill: "creating-mcp-wrappers"` (create) or `skill: "managing-tool-wrappers"` (lifecycle) |
 
 ### Directory Structure
 
 ```
-.claude/skills/managing-mcp-wrappers/     # Lifecycle management
+.claude/skills/managing-tool-wrappers/     # Lifecycle management
  SKILL.md                              # Main skill documentation
  scripts/
     src/
@@ -459,7 +459,7 @@ MCP wrappers must pass compliance validation across 11 phases:
 All commands run from the scripts directory:
 
 ```bash
-cd .claude/skills/managing-mcp-wrappers/scripts
+cd .claude/skills/managing-tool-wrappers/scripts
 ```
 
 #### TDD Workflow Commands
@@ -507,14 +507,14 @@ cd $ROOT/.claude && npm run test:coverage -- tools/linear/get-issue
 #  Tests pass with 85% coverage
 
 # Phase 7-8: Structural audit + service skill
-cd $ROOT/.claude/skills/managing-mcp-wrappers/scripts && npm run generate-skill -- linear
+cd $ROOT/.claude/skills/managing-tool-wrappers/scripts && npm run generate-skill -- linear
 #  Updated .claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md
 ```
 
 **Alternative: Direct CLI** (for experienced developers):
 
 ```bash
-cd .claude/skills/managing-mcp-wrappers/scripts && npm install
+cd .claude/skills/managing-tool-wrappers/scripts && npm install
 npm run create -- linear get-issue      # Generate test scaffold
 npm run verify-red -- linear/get-issue  # Confirm tests fail
 npm run generate-wrapper -- linear/get-issue  # Generate wrapper
@@ -1007,7 +1007,7 @@ See **Phase 4.1** and **Phase 6** in Current Status & TODO for implementation ro
 ### Migration Path
 
 1. **Identify MCP** to wrap
-2. **Run TDD workflow** via `creating-mcp-wrappers` skill (or `managing-mcp-wrappers` CLI)
+2. **Run TDD workflow** via `creating-mcp-wrappers` skill (or `managing-tool-wrappers` CLI)
 3. **Generate service skill** for agent access
 4. **Remove MCP** from `.mcp.json`
 5. **Update agents** to use wrapper skill
@@ -1023,7 +1023,7 @@ See [MCP Wrapper Management](#mcp-wrapper-management) section for complete CLI r
 skill: "creating-mcp-wrappers"
 
 # Alternative: Direct CLI
-cd .claude/skills/managing-mcp-wrappers/scripts
+cd .claude/skills/managing-tool-wrappers/scripts
 
 # TDD Workflow
 npm run create -- <service> <tool>           # 1. Test file only
@@ -1060,7 +1060,7 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
 
 - **Gateway Skill**: `.claude/skills/gateway-mcp-tools/SKILL.md` (core skill - entry point)
 - **Creation Workflow**: `.claude/skills/creating-mcp-wrappers/SKILL.md` (8-phase hybrid workflow)
-- **Lifecycle Manager**: `.claude/skills/managing-mcp-wrappers/SKILL.md` (audit, fix, update, test)
+- **Lifecycle Manager**: `.claude/skills/managing-tool-wrappers/SKILL.md` (audit, fix, update, test)
 - **Testing Library**: `.claude/lib/testing/README.md` (@claude/testing documentation)
 - **Path Resolution**: `.claude/lib/find-project-root.ts` (shared project root detection)
 - **Registry Skill**: `.claude/skill-library/claude/mcp-tools/mcp-tools-registry/SKILL.md` (detailed usage)
@@ -1158,7 +1158,7 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
   - Ensures service skill documentation matches actual Zod schemas in wrappers
 
 - [x] **Hybrid Wrapper Creation Architecture** (Dec 2024)
-  - Split `mcp-manager` into `managing-mcp-wrappers` (lifecycle) + `creating-mcp-wrappers` (creation)
+  - Split `tool-manager` into `managing-tool-wrappers` (lifecycle) + `creating-mcp-wrappers` (creation)
   - Instruction-driven schema discovery and test design (Claude reasoning)
   - Mechanical TDD gates (vitest enforcement - cannot bypass)
   - 8-phase workflow documented in `creating-mcp-wrappers` skill

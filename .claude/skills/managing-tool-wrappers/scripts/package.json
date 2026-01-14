@@ -1,5 +1,5 @@
 {
-  "name": "@claude/managing-mcp-wrappers",
+  "name": "@claude/managing-tool-wrappers",
   "version": "1.0.0",
   "type": "module",
   "description": "MCP wrapper lifecycle manager with TDD enforcement",

@@ -15,4 +15,4 @@
 - Architecture documented at .claude/.output/api-wrappers/http-client-architecture.md
 
 **Rationale:**
-Parallel to orchestrating-mcp-development but for REST APIs. Guides TDD workflow (RED-GREEN-REFACTOR), agent coordination (mcp-tool-tester → mcp-tool-developer → mcp-tool-reviewer), and token optimization patterns.
+Parallel to orchestrating-mcp-development but for REST APIs. Guides TDD workflow (RED-GREEN-REFACTOR), agent coordination (tool-tester → tool-developer → tool-reviewer), and token optimization patterns.

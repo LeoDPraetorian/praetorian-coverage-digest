@@ -1,12 +1,12 @@
 # MCP Tool Reviewer Prompt Template
 
-Use this template when dispatching mcp-tool-reviewer subagents in Phase 8 (Code Review).
+Use this template when dispatching tool-reviewer subagents in Phase 8 (Code Review).
 
 ## Usage
 
 ```typescript
 Task({
-  subagent_type: "mcp-tool-reviewer",
+  subagent_type: "tool-reviewer",
   description: "Review MCP wrapper implementation for [service]/[tool]",
   prompt: `[Use template below, filling in placeholders]`,
 });
@@ -592,7 +592,7 @@ After completing your work, include this metadata block:
 
 ```json
 {
-  "agent": "mcp-tool-reviewer",
+  "agent": "tool-reviewer",
   "output_type": "code_review",
   "feature_directory": ".claude/.output/mcp-wrappers/{YYYY-MM-DD-HHMMSS}-{SERVICE}",
   "skills_invoked": [
@@ -618,7 +618,7 @@ After completing your work, include this metadata block:
     "coverage_pct": 85
   },
   "handoff": {
-    "next_agent": "orchestrator" | "mcp-tool-developer",
+    "next_agent": "orchestrator" | "tool-developer",
     "context": "Review complete, 1 change requested: add output validation before filtering"
   }
 }
@@ -634,7 +634,7 @@ If you cannot complete this task, return:
 
 ```json
 {
-  "agent": "mcp-tool-reviewer",
+  "agent": "tool-reviewer",
   "status": "blocked",
   "blocked_reason": "architecture_unclear|implementation_missing|verification_failed|conflicting_requirements",
   "attempted": [

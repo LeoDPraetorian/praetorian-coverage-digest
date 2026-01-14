@@ -13,7 +13,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch, AskUser
 Use this skill when:
 
 - Before creating MCP wrappers when the MCP is not yet configured
-- When `/mcp-manager create` is called for an unconfigured MCP
+- When `/tool-manager create` is called for an unconfigured MCP
 - When manually setting up a new MCP server integration
 - When `orchestrating-mcp-development` needs MCP setup before schema discovery
 
@@ -346,5 +346,5 @@ No separate output file is created - the config is added directly to the codebas
 ## Related Skills
 
 - `orchestrating-mcp-development` - Invokes this skill before schema discovery
-- `managing-mcp-wrappers` - References configured MCPs for wrapper operations
+- `managing-tool-wrappers` - References configured MCPs for wrapper operations
 - `gateway-mcp-tools` - Routes to MCP-specific library skills

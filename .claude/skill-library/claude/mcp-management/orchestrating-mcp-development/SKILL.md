@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion, 
 
 Use this skill when:
 
-- Creating new MCP wrappers via /mcp-manager create {service}
+- Creating new MCP wrappers via /tool-manager create {service}
 - Need to wrap ALL tools in an MCP service (100% coverage)
 - Want shared architecture patterns across all wrappers
 - Require batched parallel execution for multiple tools
@@ -29,11 +29,11 @@ Use this skill when:
 | 0     | Setup               | -                               | Sequential          | -            |
 | 1     | MCP Setup           | setting-up-mcp-servers          | Sequential          | -            |
 | 2     | Tool Discovery      | Claude                          | Sequential          | -            |
-| 3     | Shared Architecture | mcp-tool-lead + security-lead   | PARALLEL            | 🛑 Human     |
-| 4     | Per-Tool Work       | mcp-tool-lead + mcp-tool-tester | BATCHED (3-5 tools) | -            |
+| 3     | Shared Architecture | tool-lead + security-lead   | PARALLEL            | 🛑 Human     |
+| 4     | Per-Tool Work       | tool-lead + tool-tester | BATCHED (3-5 tools) | -            |
 | 5     | RED Gate            | CLI                             | Sequential          | Gate         |
-| 6     | Implementation      | mcp-tool-developer              | BATCHED (3-5 tools) | -            |
-| 7     | Code Review         | mcp-tool-reviewer               | BATCHED (3-5 tools) | 1 retry/tool |
+| 6     | Implementation      | tool-developer              | BATCHED (3-5 tools) | -            |
+| 7     | Code Review         | tool-reviewer               | BATCHED (3-5 tools) | 1 retry/tool |
 | 8     | GREEN Gate          | CLI                             | Sequential          | Gate         |
 | 9     | Audit               | CLI                             | Sequential          | Gate         |
 | 10    | Completion          | -                               | Sequential          | -            |
@@ -42,12 +42,12 @@ Use this skill when:
 
 | Phase | Agent(s)           | Mode     | Execution | Output                                         |
 | ----- | ------------------ | -------- | --------- | ---------------------------------------------- |
-| 3     | mcp-tool-lead      | shared   | PARALLEL  | architecture-shared.md                         |
+| 3     | tool-lead      | shared   | PARALLEL  | architecture-shared.md                         |
 | 3     | security-lead      | shared   | PARALLEL  | security-assessment.md                         |
-| 4     | mcp-tool-lead      | per-tool | BATCHED   | tools/{tool}/architecture.md                   |
-| 4     | mcp-tool-tester    | per-tool | BATCHED   | tools/{tool}/test-plan.md, {tool}.unit.test.ts |
-| 6     | mcp-tool-developer | per-tool | BATCHED   | {tool}.ts                                      |
-| 7     | mcp-tool-reviewer  | per-tool | BATCHED   | tools/{tool}/review.md                         |
+| 4     | tool-lead      | per-tool | BATCHED   | tools/{tool}/architecture.md                   |
+| 4     | tool-tester    | per-tool | BATCHED   | tools/{tool}/test-plan.md, {tool}.unit.test.ts |
+| 6     | tool-developer | per-tool | BATCHED   | {tool}.ts                                      |
+| 7     | tool-reviewer  | per-tool | BATCHED   | tools/{tool}/review.md                         |
 
 ## Batching Strategy
 
@@ -106,10 +106,10 @@ Agents MUST reference shared utilities from .claude/ for testing, response handl
 - [Troubleshooting](references/troubleshooting.md)
 
 #### P0 - Prompt Templates
-- [MCP Tool Developer Prompt](references/prompts/mcp-tool-developer-prompt.md)
-- [MCP Tool Tester Prompt](references/prompts/mcp-tool-tester-prompt.md)
-- [MCP Tool Lead Prompt](references/prompts/mcp-tool-lead-prompt.md)
-- [MCP Tool Reviewer Prompt](references/prompts/mcp-tool-reviewer-prompt.md)
+- [MCP Tool Developer Prompt](references/prompts/tool-developer-prompt.md)
+- [MCP Tool Tester Prompt](references/prompts/tool-tester-prompt.md)
+- [MCP Tool Lead Prompt](references/prompts/tool-lead-prompt.md)
+- [MCP Tool Reviewer Prompt](references/prompts/tool-reviewer-prompt.md)
 - [Security Lead Prompt](references/prompts/security-lead-prompt.md)
 
 #### P1 - Process Enhancement
@@ -313,7 +313,7 @@ The goal is to establish consistent patterns across all wrappers, not design eac
 **Spawn in SINGLE message:**
 
 ```typescript
-Task(subagent_type: 'mcp-tool-lead', prompt: 'Design SHARED architecture patterns for ALL {service} MCP wrappers.
+Task(subagent_type: 'tool-lead', prompt: 'Design SHARED architecture patterns for ALL {service} MCP wrappers.
 
 Tools to wrap: [list all tools from tools-manifest.json]
 
@@ -345,7 +345,7 @@ Assess:
 Output: .claude/.output/mcp-wrappers/{YYYY-MM-DD-HHMMSS}-{service}/security-assessment.md', run_in_background: true)
 ```
 
-**mcp-tool-lead MUST load these library skills via Read tool:**
+**tool-lead MUST load these library skills via Read tool:**
 
 | Skill                  | Path                                                                                        | Focus              |
 | ---------------------- | ------------------------------------------------------------------------------------------- | ------------------ |
@@ -373,7 +373,7 @@ Output: .claude/.output/mcp-wrappers/{YYYY-MM-DD-HHMMSS}-{service}/security-asse
 - `architecture-shared.md`
 - `security-assessment.md`
 
-For complete Phase 3 agent prompts, see [references/agent-prompts.md](references/agent-prompts.md#mcp-tool-lead).
+For complete Phase 3 agent prompts, see [references/agent-prompts.md](references/agent-prompts.md#tool-lead).
 
 ### Phase 4: Per-Tool Work (BATCHED)
 
@@ -387,7 +387,7 @@ This phase processes tools in batches of 3-5 to manage parallelism.
 // Example: Batch 1 = ['get-issue', 'list-issues', 'create-issue']
 
 // 4a. Per-tool architecture (parallel within batch)
-Task(subagent_type: 'mcp-tool-lead', prompt: 'Design tool-specific architecture for get-issue.
+Task(subagent_type: 'tool-lead', prompt: 'Design tool-specific architecture for get-issue.
 
 SHARED patterns (use these): [attach architecture-shared.md]
 Tool schema: [attach tools/get-issue/schema-discovery.md]
@@ -402,7 +402,7 @@ Output: .claude/.output/mcp-wrappers/{YYYY-MM-DD-HHMMSS}-{service}/tools/get-iss
 // Spawn similar for list-issues, create-issue in same message
 
 // 4b. Test planning (after architecture complete)
-Task(subagent_type: 'mcp-tool-tester', prompt: 'Create test plan for get-issue wrapper.
+Task(subagent_type: 'tool-tester', prompt: 'Create test plan for get-issue wrapper.
 
 Shared patterns: [attach architecture-shared.md]
 Tool architecture: [attach tools/get-issue/architecture.md]
@@ -412,7 +412,7 @@ Requirements: 18 tests across 6 categories per tool.
 Output: .claude/.output/mcp-wrappers/{YYYY-MM-DD-HHMMSS}-{service}/tools/get-issue/test-plan.md')
 
 // 4c. Test implementation (after test plan complete)
-Task(subagent_type: 'mcp-tool-tester', prompt: 'Implement tests for get-issue wrapper.
+Task(subagent_type: 'tool-tester', prompt: 'Implement tests for get-issue wrapper.
 
 Test plan: [attach tools/get-issue/test-plan.md]
 
@@ -438,7 +438,7 @@ Update `metadata.json` after each batch:
 }
 ```
 
-**mcp-tool-tester MUST load:**
+**tool-tester MUST load:**
 
 - .claude/skill-library/testing/testing-with-vitest-mocks/SKILL.md
 
@@ -459,7 +459,7 @@ Update `metadata.json` after each batch:
 - `tools/{tool}/test-plan.md` for each tool
 - `.claude/tools/{service}/{tool}.unit.test.ts` for each tool
 
-For complete mcp-tool-tester prompt, see [references/agent-prompts.md](references/agent-prompts.md#mcp-tool-tester).
+For complete tool-tester prompt, see [references/agent-prompts.md](references/agent-prompts.md#tool-tester).
 
 ### Phase 5: RED Gate
 
@@ -484,7 +484,7 @@ Implement ALL wrappers in batches.
 ```typescript
 // Batch 1: ['get-issue', 'list-issues', 'create-issue']
 
-Task(subagent_type: 'mcp-tool-developer', prompt: 'Implement get-issue wrapper.
+Task(subagent_type: 'tool-developer', prompt: 'Implement get-issue wrapper.
 
 Shared patterns: [attach architecture-shared.md]
 Tool architecture: [attach tools/get-issue/architecture.md]
@@ -511,7 +511,7 @@ Update `metadata.json` after each batch:
 }
 ```
 
-**mcp-tool-developer implements wrapper:**
+**tool-developer implements wrapper:**
 
 1. Create InputSchema (Zod) per architecture
 2. Create FilteredResult interface per token strategy
@@ -530,7 +530,7 @@ Review ALL wrappers in batches.
 **For each batch of tools:**
 
 ```typescript
-Task(subagent_type: 'mcp-tool-reviewer', prompt: 'Review get-issue wrapper.
+Task(subagent_type: 'tool-reviewer', prompt: 'Review get-issue wrapper.
 
 Shared patterns: [attach architecture-shared.md]
 Tool architecture: [attach tools/get-issue/architecture.md]
@@ -548,8 +548,8 @@ Verdict: APPROVED | CHANGES_REQUESTED | BLOCKED')
 
 **Retry Logic:** If CHANGES_REQUESTED for a tool:
 
-1. mcp-tool-developer fixes that specific tool
-2. mcp-tool-reviewer re-reviews ONCE
+1. tool-developer fixes that specific tool
+2. tool-reviewer re-reviews ONCE
 3. If still failing, escalate via AskUserQuestion
 
 Update `metadata.json`:
@@ -564,7 +564,7 @@ Update `metadata.json`:
 }
 ```
 
-**mcp-tool-reviewer MUST load:**
+**tool-reviewer MUST load:**
 
 - .claude/skill-library/development/typescript/avoiding-barrel-files/SKILL.md
 - .claude/skill-library/development/typescript/documenting-with-tsdoc/SKILL.md
@@ -587,7 +587,7 @@ Update `metadata.json`:
 
 **Output:** `tools/{tool}/review.md` for each tool (all must be APPROVED)
 
-For complete mcp-tool-reviewer prompt, see [references/agent-prompts.md](references/agent-prompts.md#mcp-tool-reviewer).
+For complete tool-reviewer prompt, see [references/agent-prompts.md](references/agent-prompts.md#tool-reviewer).
 
 ### Phase 8: GREEN Gate
 
@@ -608,7 +608,7 @@ This runs tests for ALL wrappers. Every test should pass.
 ALL wrappers must pass audit.
 
 ```bash
-cd $ROOT/.claude/skills/managing-mcp-wrappers/scripts && npm run audit -- {service}
+cd $ROOT/.claude/skills/managing-tool-wrappers/scripts && npm run audit -- {service}
 ```
 
 This audits ALL wrappers in the service.
@@ -624,7 +624,7 @@ Finalize all wrappers and generate service skill.
 **Step 1: Generate service skill (covers ALL tools):**
 
 ```bash
-cd $ROOT/.claude/skills/managing-mcp-wrappers/scripts && npm run generate-skill -- {service}
+cd $ROOT/.claude/skills/managing-tool-wrappers/scripts && npm run generate-skill -- {service}
 ```
 
 **Step 2: Final verification:**
@@ -703,7 +703,7 @@ All audits passing (>=10/11 phases).
 | Skill                                  | Purpose                              |
 | -------------------------------------- | ------------------------------------ |
 | setting-up-mcp-servers                 | Phase 1: MCP detection and setup     |
-| managing-mcp-wrappers                  | Phase 9-10: CLI audit and generation |
+| managing-tool-wrappers                  | Phase 9-10: CLI audit and generation |
 | orchestrating-multi-agent-workflows    | Agent coordination and routing       |
 | persisting-agent-outputs               | Handoff format and metadata          |
 | developing-with-subagents              | Conditional: >10 tools               |
@@ -746,7 +746,7 @@ All audits passing (>=10/11 phases).
 ## Related Skills
 
 - **setting-up-mcp-servers** - MCP detection, installation, and configuration (Phase 1)
-- **managing-mcp-wrappers** - CLI commands for audit, fix, generate-skill (Phase 9, 10)
+- **managing-tool-wrappers** - CLI commands for audit, fix, generate-skill (Phase 9, 10)
 - **orchestrating-feature-development** - Reference for multi-agent orchestration patterns
 - **dispatching-parallel-agents** - For handling batch failures across multiple tools
 - **gateway-typescript** - Routes to TypeScript library skills (Zod, Result/Either, TSDoc)

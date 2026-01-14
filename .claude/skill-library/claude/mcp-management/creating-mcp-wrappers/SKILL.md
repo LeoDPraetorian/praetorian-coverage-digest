@@ -334,7 +334,7 @@ grep -l "{Service}Responses" $ROOT/.claude/lib/testing/src/mocks/response-builde
 **Command**:
 
 ```bash
-cd $ROOT/.claude/skills/managing-mcp-wrappers/scripts
+cd $ROOT/.claude/skills/managing-tool-wrappers/scripts
 npm run generate-skill -- {service}
 ```
 
@@ -488,7 +488,7 @@ npm search mcp {service}
 
 ## Related Skills
 
-- `managing-mcp-wrappers` - Main MCP manager skill (delegates here)
+- `managing-tool-wrappers` - Main MCP manager skill (delegates here)
 - `developing-with-tdd` - TDD methodology
 - `verifying-before-completion` - Final validation
 - `gateway-mcp-tools` - Routes to this skill

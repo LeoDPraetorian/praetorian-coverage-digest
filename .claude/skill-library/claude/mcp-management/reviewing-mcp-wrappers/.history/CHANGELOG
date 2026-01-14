@@ -2,21 +2,21 @@
 
 **RED Phase Documentation:**
 
-**Gap**: The mcp-tool-reviewer agent contains 100+ lines of review methodology embedded in the agent definition (lines 127-231). This violates the agent architecture principle of "agents = executors, skills = knowledge".
+**Gap**: The tool-reviewer agent contains 100+ lines of review methodology embedded in the agent definition (lines 127-231). This violates the agent architecture principle of "agents = executors, skills = knowledge".
 
-**Current Failure**: mcp-tool-reviewer must parse embedded instructions from its own definition rather than loading a dedicated skill. This:
+**Current Failure**: tool-reviewer must parse embedded instructions from its own definition rather than loading a dedicated skill. This:
 - Bloats the agent definition
 - Makes methodology harder to maintain and update
 - Prevents reuse by other contexts
 - Violates skill-agent separation pattern
 
-**Expected Behavior**: mcp-tool-reviewer should load reviewing-mcp-wrappers skill for HOW-to methodology.
+**Expected Behavior**: tool-reviewer should load reviewing-mcp-wrappers skill for HOW-to methodology.
 
 **Category**: mcp-management (library)
 **Skill Type**: Process/Pattern
 **Line Count**: 196 lines (target <500)
 
-**Content Extracted From**: .claude/agents/analysis/mcp-tool-reviewer.md (lines 127-231)
+**Content Extracted From**: .claude/agents/analysis/tool-reviewer.md (lines 127-231)
 
 **Key Sections**:
 - Step 1: Locate Architecture Plan

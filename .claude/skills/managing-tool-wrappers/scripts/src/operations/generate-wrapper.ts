@@ -54,7 +54,7 @@ export async function generateWrapper(options: CLIOptions): Promise<number> {
     repoRoot,
     '.claude',
     'skills',
-    'mcp-manager',
+    'tool-manager',
     'templates',
     'tool-wrapper.ts.tmpl'
   );

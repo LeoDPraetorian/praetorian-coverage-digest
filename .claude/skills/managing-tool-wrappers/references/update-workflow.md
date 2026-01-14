@@ -57,7 +57,7 @@ cd .claude && npm run test:unit -- tools/{service}/{tool}.unit.test.ts
 **Purpose:** Discover actual API response format for new fields.
 
 ```bash
-npx tsx .claude/skills/managing-mcp-wrappers/templates/discover-schema.ts \
+npx tsx .claude/skills/managing-tool-wrappers/templates/discover-schema.ts \
   --mcp {service} \
   --tool {tool} \
   --cases 3

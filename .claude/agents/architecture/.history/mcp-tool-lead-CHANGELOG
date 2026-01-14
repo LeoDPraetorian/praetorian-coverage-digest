@@ -18,7 +18,7 @@
 ## [2026-01-02] - Initial Creation
 
 ### Created
-- New mcp-tool-lead agent for designing MCP wrapper architecture
+- New tool-lead agent for designing MCP wrapper architecture
 - Modeled after frontend-lead agent structure
 - Integrated with orchestrating-mcp-development workflow (Phase 2)
 

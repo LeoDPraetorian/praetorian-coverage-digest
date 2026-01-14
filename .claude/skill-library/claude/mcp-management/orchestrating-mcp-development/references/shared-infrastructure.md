@@ -11,7 +11,7 @@ Located at .claude/lib/testing/. Provides:
 - testSecurityScenarios() - Automated security test runner
 - Response builders: LinearResponses, Context7Responses, CurrentsResponses, SerenaResponses
 
-mcp-tool-tester MUST use these instead of manual vi.mock() patterns.
+tool-tester MUST use these instead of manual vi.mock() patterns.
 
 ## Response Utilities
 
@@ -23,7 +23,7 @@ Located at .claude/tools/config/lib/response-utils.ts. Provides:
 - estimateTokens(data) - Token count estimation for responses
 - normalizeArrayResponse(rawData) - Handle varying MCP response formats
 
-mcp-tool-developer MUST use these for response filtering instead of manual implementation.
+tool-developer MUST use these for response filtering instead of manual implementation.
 
 ## Input Sanitization
 
@@ -35,7 +35,7 @@ Located at .claude/tools/config/lib/sanitize.ts. Provides:
 - validateNoXSS(input) - Blocks script injection patterns
 - createSecureStringValidator(fieldName, options) - Zod superRefine helper
 
-mcp-tool-developer MUST use these as Zod refinements for all user inputs.
+tool-developer MUST use these as Zod refinements for all user inputs.
 
 ## MCP Client
 

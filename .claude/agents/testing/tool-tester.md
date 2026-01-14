@@ -1,6 +1,6 @@
 ---
-name: mcp-tool-tester
-description: Use when testing MCP wrappers - unit tests (Vitest), integration tests (real MCP calls), schema validation tests. Implements tests according to test-lead's plan, then returns for validation.\n\n<example>\nContext: User needs wrapper unit tests.\nuser: 'Write unit tests for the Linear get-issue wrapper'\nassistant: 'I will use mcp-tool-tester for unit testing'\n</example>\n\n<example>\nContext: User needs schema validation tests.\nuser: 'Test the Zod schemas for the context7 wrapper'\nassistant: 'I will use mcp-tool-tester for schema testing'\n</example>\n\n<example>\nContext: User needs integration tests.\nuser: 'Create integration tests with real MCP calls'\nassistant: 'I will use mcp-tool-tester for integration testing'\n</example>
+name: tool-tester
+description: Use when testing tool wrappers (MCP servers and REST APIs) - unit tests (Vitest), integration tests, schema validation tests. Implements tests according to test-lead's plan, then returns for validation.\n\n<example>\nContext: User needs wrapper unit tests.\nuser: 'Write unit tests for the Linear get-issue wrapper'\nassistant: 'I will use tool-tester for unit testing'\n</example>\n\n<example>\nContext: User needs schema validation tests.\nuser: 'Test the Zod schemas for the context7 wrapper'\nassistant: 'I will use tool-tester for schema testing'\n</example>\n\n<example>\nContext: User needs integration tests.\nuser: 'Create integration tests with real MCP calls'\nassistant: 'I will use tool-tester for integration testing'\n</example>
 type: testing
 permissionMode: default
 tools: Bash, Edit, Glob, Grep, MultiEdit, Read, Skill, TodoWrite, WebFetch, WebSearch, Write

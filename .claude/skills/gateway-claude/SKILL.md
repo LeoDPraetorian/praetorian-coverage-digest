@@ -49,7 +49,7 @@ This gateway implements 3-tier loading:
 | "create agent" / "update agent" / "agents"          | → `managing-agents` (core skill)            |
 | "create skill" / "update skill" / "skills"          | → `managing-skills` (core skill)            |
 | "command" / "slash command"                         | → `managing-commands` (core skill)          |
-| "MCP wrapper" / "tool wrapper"                      | → `managing-mcp-wrappers` (core)            |
+| "MCP wrapper" / "tool wrapper"                      | → `managing-tool-wrappers` (core)           |
 | "hook" / "pre-commit" / "post-tool"                 | → `claude-hook-write` (library)             |
 | "plugin" / "extension"                              | → `claude-plugin-structure` (library)       |
 | "marketplace" / "publish"                           | → `claude-marketplace-management`           |
@@ -75,7 +75,7 @@ This gateway implements 3-tier loading:
 | `managing-agents`       | `/agent-manager`   | agents, create, update     |
 | `managing-skills`       | `/skill-manager`   | skills, audit, fix         |
 | `managing-commands`     | `/command-manager` | commands, slash            |
-| `managing-mcp-wrappers` | `/mcp-manager`     | MCP wrappers, tool wrapper |
+| `managing-tool-wrappers` | `/tool-manager`    | MCP wrappers, tool wrapper |
 | `researching-skills`    | —                  | research, investigate      |
 | `brainstorming`         | —                  | brainstorm, design         |
 

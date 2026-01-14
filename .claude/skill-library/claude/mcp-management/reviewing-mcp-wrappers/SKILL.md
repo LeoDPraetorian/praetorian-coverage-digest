@@ -45,7 +45,7 @@ ls .claude/features/*/architecture*.md
 # Or ask user for plan location
 ```
 
-**If no plan exists**: Escalate to `mcp-tool-lead` to create one, OR review against general standards only (note this limitation in output).
+**If no plan exists**: Escalate to `tool-lead` to create one, OR review against general standards only (note this limitation in output).
 
 ---
 
@@ -175,16 +175,16 @@ For complete review document template with examples, see [references/review-docu
 
 | Situation                   | Recommend            |
 | --------------------------- | -------------------- |
-| Fixes needed                | `mcp-tool-developer` |
-| Plan unclear/missing        | `mcp-tool-lead`      |
-| Architecture changes needed | `mcp-tool-lead`      |
+| Fixes needed                | `tool-developer` |
+| Plan unclear/missing        | `tool-lead`      |
+| Architecture changes needed | `tool-lead`      |
 
 ---
 
 ## Related Skills
 
 - `persisting-agent-outputs` - File output location discovery protocol
-- `managing-mcp-wrappers` - Complete MCP wrapper lifecycle management
+- `managing-tool-wrappers` - Complete MCP wrapper lifecycle management
 
 ---
 

@@ -17,7 +17,7 @@ Unit tests accidentally spawn real child processes (MCP servers, Go backends, et
 3. No Vitest projects config to separate unit vs integration test runs
 
 **Failure Behavior:**
-Without this skill, testing agents (mcp-tool-tester, backend-tester, frontend-tester) write tests that spawn real processes, causing expensive hangs and CI failures.
+Without this skill, testing agents (tool-tester, backend-tester, frontend-tester) write tests that spawn real processes, causing expensive hangs and CI failures.
 
 **Why Skill Needed:**
 Testing agents lack guidance on:

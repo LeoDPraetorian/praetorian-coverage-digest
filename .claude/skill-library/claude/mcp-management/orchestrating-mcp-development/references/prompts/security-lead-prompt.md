@@ -1,6 +1,6 @@
 # Security Lead Prompt Template
 
-Use this template when dispatching security-lead subagents in Phase 3 (Architecture - parallel with mcp-tool-lead).
+Use this template when dispatching security-lead subagents in Phase 3 (Architecture - parallel with tool-lead).
 
 ## Usage
 
@@ -475,7 +475,7 @@ After completing your work, include this metadata block:
     "error_handling": ["Safe error messages, no stack traces"]
   },
   "handoff": {
-    "next_agent": "mcp-tool-lead",
+    "next_agent": "tool-lead",
     "context": "Security assessment complete with medium risk level, 4 controls required"
   }
 }

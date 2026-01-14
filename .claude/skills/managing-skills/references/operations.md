@@ -208,7 +208,7 @@ Display all skills using Claude's native tools (Glob, Read).
 | Skill Name        | Location | Path                   |
 | ----------------- | -------- | ---------------------- |
 | frontend-patterns | CORE     | ./.claude/skills/...   |
-| mcp-manager       | CORE     | ./.claude/skills/...   |
+| tool-manager       | CORE     | ./.claude/skills/...   |
 | tanstack-query    | LIBRARY  | ./.claude/skill-lib... |
 
 **See:** [listing-skills](.claude/skill-library/claude/skill-management/listing-skills/SKILL.md)

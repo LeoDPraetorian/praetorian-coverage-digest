@@ -123,7 +123,7 @@ Follow `persisting-agent-outputs` skill for file output, JSON metadata format, a
 | Field                | Value                                                      |
 | -------------------- | ---------------------------------------------------------- |
 | `output_type`        | `test-plan` or `test-validation`                           |
-| `handoff.next_agent` | `frontend-tester` or `backend-tester` or `mcp-tool-tester` |
+| `handoff.next_agent` | `frontend-tester` or `backend-tester` or `tool-tester` |
 
 ---
 

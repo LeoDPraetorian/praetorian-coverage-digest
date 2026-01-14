@@ -22,7 +22,7 @@ Dispatch **NEW fix agent** with specific instructions:
 
 ```
 Task(
-  subagent_type: "mcp-tool-developer",
+  subagent_type: "tool-developer",
   description: "Fix issue in get-issue wrapper",
   prompt: "
     Previous implementation had this issue: [specific issue from review]
@@ -61,7 +61,7 @@ for (const batch of batches) {
   const batchResults = await Promise.all(
     batch.tools.map((tool) =>
       Task({
-        subagent_type: "mcp-tool-developer",
+        subagent_type: "tool-developer",
         description: `Implement ${tool} wrapper`,
         prompt: buildPromptWithSharedContext(tool, sharedContext),
       })

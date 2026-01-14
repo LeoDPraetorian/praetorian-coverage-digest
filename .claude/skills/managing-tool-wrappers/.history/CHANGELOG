@@ -2,6 +2,8 @@
 
 All notable changes to this skill.
 
+- **2026-01-13**: Add support for both MCP wrapper and REST API wrapper creation workflows. The create subcommand now asks users what type of tool they're wrapping via AskUserQuestion, then routes to either `orchestrating-mcp-development` (for MCP servers like Context7, Perplexity) or `orchestrating-api-tool-development` (for REST APIs like Shodan, Linear). Updated skill description, title, and examples to reflect both wrapper types. Added AskUserQuestion to allowed-tools.
+
 - **2026-01-04**: Update Quick Reference table and section header to reference `orchestrating-mcp-development` instead of `creating-mcp-wrappers`. This aligns with the new multi-agent orchestration workflow for 100% tool coverage.
 
 - **2025-12-01**: Fix phase count maintenance issue - adding a new audit phase requires updating 12+ places manually.

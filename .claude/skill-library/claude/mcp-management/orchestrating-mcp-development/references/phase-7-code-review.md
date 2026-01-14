@@ -19,7 +19,7 @@ Validate that the wrapper implementation follows the approved shared architectur
 
 ### Agent
 
-- **mcp-tool-reviewer** (single agent)
+- **tool-reviewer** (single agent)
 - Pattern: Chain-of-thought verification
 - MAX_RETRIES: 2 per tool
 
@@ -82,14 +82,14 @@ A: [YES/NO + interface comparison]
 ### Verdict Options
 
 - **SPEC_COMPLIANT**: Implementation matches architecture - proceed to Stage 2
-- **SPEC_VIOLATION**: Implementation deviates from architecture - send back to mcp-tool-developer
+- **SPEC_VIOLATION**: Implementation deviates from architecture - send back to tool-developer
 
 ### Gate Enforcement
 
 ```typescript
 if (stage1_verdict !== 'SPEC_COMPLIANT') {
-  // Send back to mcp-tool-developer
-  Task(subagent_type: 'mcp-tool-developer', prompt: 'Fix spec violations in {tool}.
+  // Send back to tool-developer
+  Task(subagent_type: 'tool-developer', prompt: 'Fix spec violations in {tool}.
 
   Review feedback: [attach tools/{tool}/review-stage1.md]
   Architecture: [attach tools/{tool}/architecture.md]
@@ -99,7 +99,7 @@ if (stage1_verdict !== 'SPEC_COMPLIANT') {
 
   // Re-review after fix (MAX_RETRIES: 2)
   if (retry_count < 2) {
-    Task(subagent_type: 'mcp-tool-reviewer', prompt: 'Re-review {tool} spec compliance.')
+    Task(subagent_type: 'tool-reviewer', prompt: 'Re-review {tool} spec compliance.')
   } else {
     // Escalate after 2 retries
     AskUserQuestion({
@@ -133,7 +133,7 @@ Assess code quality, maintainability, and security threats in parallel.
 
 ### Agents
 
-1. **mcp-tool-reviewer** (quality assessment)
+1. **tool-reviewer** (quality assessment)
    - Pattern: Two-pass self-consistency
    - Focus: Code quality, maintainability, TypeScript best practices
 
@@ -148,7 +148,7 @@ Both agents spawn in SINGLE message (parallel execution):
 ```typescript
 // Stage 2 can only start if Stage 1 verdict = SPEC_COMPLIANT
 
-Task(subagent_type: 'mcp-tool-reviewer', prompt: 'Quality review for {tool}.
+Task(subagent_type: 'tool-reviewer', prompt: 'Quality review for {tool}.
 
 Stage 1 verdict: SPEC_COMPLIANT
 
@@ -188,7 +188,7 @@ Output: tools/{tool}/review-security.md
 Verdict: APPROVED | CHANGES_REQUESTED | BLOCKED', run_in_background: true)
 ```
 
-### Two-Pass Self-Consistency (mcp-tool-reviewer)
+### Two-Pass Self-Consistency (tool-reviewer)
 
 The reviewer performs TWO independent passes:
 
@@ -291,7 +291,7 @@ Stage 2 allows 1 retry per tool:
 if (overall_verdict === 'CHANGES_REQUESTED') {
   if (retry_count === 0) {
     // First retry: Fix and re-review
-    Task(subagent_type: 'mcp-tool-developer', prompt: 'Fix quality/security issues in {tool}.
+    Task(subagent_type: 'tool-developer', prompt: 'Fix quality/security issues in {tool}.
 
     Quality feedback: [attach tools/{tool}/review-quality.md]
     Security feedback: [attach tools/{tool}/review-security.md]

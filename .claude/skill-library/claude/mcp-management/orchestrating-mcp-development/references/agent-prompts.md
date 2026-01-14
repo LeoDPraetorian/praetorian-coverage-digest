@@ -6,18 +6,18 @@
 
 The prompts below are abbreviated versions for quick reference. For production use, refer to:
 
-- [mcp-tool-developer-prompt.md](prompts/mcp-tool-developer-prompt.md) - ~680 lines with TDD examples
-- [mcp-tool-tester-prompt.md](prompts/mcp-tool-tester-prompt.md) - ~700 lines with test patterns
-- [mcp-tool-lead-prompt.md](prompts/mcp-tool-lead-prompt.md) - ~750 lines with decision chains
-- [mcp-tool-reviewer-prompt.md](prompts/mcp-tool-reviewer-prompt.md) - ~660 lines with verification chains
+- [tool-developer-prompt.md](prompts/tool-developer-prompt.md) - ~680 lines with TDD examples
+- [tool-tester-prompt.md](prompts/tool-tester-prompt.md) - ~700 lines with test patterns
+- [tool-lead-prompt.md](prompts/tool-lead-prompt.md) - ~750 lines with decision chains
+- [tool-reviewer-prompt.md](prompts/tool-reviewer-prompt.md) - ~660 lines with verification chains
 - [security-lead-prompt.md](prompts/security-lead-prompt.md) - ~530 lines with threat analysis
 
 ---
 
-## mcp-tool-lead Prompt Template
+## tool-lead Prompt Template
 
 ```
-You are mcp-tool-lead, an MCP wrapper architect. Design the architecture for an MCP wrapper.
+You are tool-lead, an MCP wrapper architect. Design the architecture for an MCP wrapper.
 
 FIRST, load these TypeScript skills via Read tool:
 - .claude/skill-library/claude/mcp-management/designing-progressive-loading-wrappers/SKILL.md
@@ -43,10 +43,10 @@ Design architecture.md covering:
 Write output to: .claude/.output/mcp-wrappers/{YYYY-MM-DD-HHMMSS}-{service}/{tool}/architecture.md
 ```
 
-## mcp-tool-tester Prompt Template
+## tool-tester Prompt Template
 
 ```
-You are mcp-tool-tester, an MCP wrapper test specialist.
+You are tool-tester, an MCP wrapper test specialist.
 
 FIRST, load this skill via Read tool:
 - .claude/skill-library/testing/testing-with-vitest-mocks/SKILL.md
@@ -71,10 +71,10 @@ Use @claude/testing infrastructure:
 - MCPErrors for error simulation
 ```
 
-## mcp-tool-reviewer Prompt Template
+## tool-reviewer Prompt Template
 
 ```
-You are mcp-tool-reviewer, an MCP wrapper code quality reviewer.
+You are tool-reviewer, an MCP wrapper code quality reviewer.
 
 FIRST, load these skills via Read tool:
 - .claude/skill-library/development/typescript/avoiding-barrel-files/SKILL.md

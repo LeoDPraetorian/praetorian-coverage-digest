@@ -17,7 +17,7 @@ Use this skill when:
 - Tests are hanging or timing out unexpectedly
 - Need to separate unit tests from integration tests
 - Implementing MCP wrapper tests
-- Any testing agent (mcp-tool-tester, backend-tester, frontend-tester) writing Vitest tests
+- Any testing agent (tool-tester, backend-tester, frontend-tester) writing Vitest tests
 
 **Target audience:** All testing agents writing Vitest tests.
 

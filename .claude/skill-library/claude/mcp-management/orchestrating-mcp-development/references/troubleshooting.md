@@ -35,9 +35,9 @@ Common issues and solutions when orchestrating MCP wrapper development.
 | Blocked Reason            | Route To               | Action                          |
 | ------------------------- | ---------------------- | ------------------------------- |
 | `security_concern`        | security-lead          | Re-assess security requirements |
-| `architecture_decision`   | mcp-tool-lead          | Clarify architecture            |
+| `architecture_decision`   | tool-lead          | Clarify architecture            |
 | `missing_requirements`    | AskUserQuestion        | Get user input                  |
-| `test_failures`           | mcp-tool-tester        | Debug test issues               |
+| `test_failures`           | tool-tester        | Debug test issues               |
 | `out_of_scope`            | AskUserQuestion        | Confirm scope                   |
 | `schema_discovery_failed` | Retry with different approach | Check MCP auth, try manual      |
 
@@ -83,7 +83,7 @@ Agent blocked: "Schema discovery returned empty for get-issue endpoint"
    OUTPUT_DIRECTORY: .claude/.output/mcp-wrappers/{service}/
    ```
 
-4. Re-spawn mcp-tool-developer with error context
+4. Re-spawn tool-developer with error context
 
 ---
 
@@ -120,7 +120,7 @@ Agent blocked: "Schema discovery returned empty for get-issue endpoint"
    // Mock not configured correctly
    ```
 
-4. Re-spawn mcp-tool-tester with mock setup guidance if needed
+4. Re-spawn tool-tester with mock setup guidance if needed
 
 ---
 
@@ -144,7 +144,7 @@ Agent blocked: "Schema discovery returned empty for get-issue endpoint"
    - Edge case validation
    - Response sanitization paths
    - Security checks
-4. Re-spawn mcp-tool-tester:
+4. Re-spawn tool-tester:
 
    ```
    Current coverage: {percent}%

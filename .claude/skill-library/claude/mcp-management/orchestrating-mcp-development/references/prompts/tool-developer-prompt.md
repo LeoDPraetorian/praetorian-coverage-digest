@@ -1,12 +1,12 @@
 # MCP Tool Developer Prompt Template
 
-Use this template when dispatching mcp-tool-developer subagents in Phase 5 (Implementation).
+Use this template when dispatching tool-developer subagents in Phase 5 (Implementation).
 
 ## Usage
 
 ```typescript
 Task({
-  subagent_type: "mcp-tool-developer",
+  subagent_type: "tool-developer",
   description: "Implement MCP wrapper for [service]/[tool]",
   prompt: `[Use template below, filling in placeholders]`,
 });
@@ -610,7 +610,7 @@ After completing your work, include this metadata block:
 
 ```json
 {
-  "agent": "mcp-tool-developer",
+  "agent": "tool-developer",
   "output_type": "implementation",
   "feature_directory": ".claude/.output/mcp-wrappers/{YYYY-MM-DD-HHMMSS}-{SERVICE}",
   "skills_invoked": [
@@ -640,7 +640,7 @@ After completing your work, include this metadata block:
     "reduction_pct": 82
   },
   "handoff": {
-    "next_agent": "mcp-tool-reviewer",
+    "next_agent": "tool-reviewer",
     "context": "Implementation complete with 82% token reduction, ready for code review"
   }
 }
@@ -656,7 +656,7 @@ If you cannot complete this task, return:
 
 ```json
 {
-  "agent": "mcp-tool-developer",
+  "agent": "tool-developer",
   "status": "blocked",
   "blocked_reason": "missing_requirements|architecture_ambiguity|test_failures|security_concern|out_of_scope",
   "attempted": [

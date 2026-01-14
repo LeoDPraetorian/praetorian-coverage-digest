@@ -473,7 +473,7 @@ describe("getIssue", () => {
 ## Phase 3: RED Gate (CLI)
 
 ```bash
-cd .claude/skills/mcp-manager/scripts
+cd .claude/skills/tool-manager/scripts
 npm run verify-red -- linear/get-issue
 ```
 

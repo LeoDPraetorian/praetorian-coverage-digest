@@ -1,12 +1,12 @@
 # MCP Tool Tester Prompt Template
 
-Use this template when dispatching mcp-tool-tester subagents in Phase 4 (Test Planning & Implementation).
+Use this template when dispatching tool-tester subagents in Phase 4 (Test Planning & Implementation).
 
 ## Usage
 
 ```typescript
 Task({
-  subagent_type: "mcp-tool-tester",
+  subagent_type: "tool-tester",
   description: "Create test plan and implement tests for [service]/[tool]",
   prompt: `[Use template below, filling in placeholders]`,
 });
@@ -625,7 +625,7 @@ After completing your work, include this metadata block:
 
 ```json
 {
-  "agent": "mcp-tool-tester",
+  "agent": "tool-tester",
   "output_type": "test_implementation",
   "feature_directory": ".claude/.output/mcp-wrappers/{YYYY-MM-DD-HHMMSS}-{SERVICE}",
   "skills_invoked": [
@@ -656,7 +656,7 @@ After completing your work, include this metadata block:
     "function": 90
   },
   "handoff": {
-    "next_agent": "mcp-tool-developer",
+    "next_agent": "tool-developer",
     "context": "Test suite complete with ≥80% coverage, ready for implementation (TDD RED phase)"
   }
 }
@@ -672,7 +672,7 @@ If you cannot complete this task, return:
 
 ```json
 {
-  "agent": "mcp-tool-tester",
+  "agent": "tool-tester",
   "status": "blocked",
   "blocked_reason": "missing_requirements|architecture_ambiguity|coverage_gaps|unclear_security_requirements",
   "attempted": [

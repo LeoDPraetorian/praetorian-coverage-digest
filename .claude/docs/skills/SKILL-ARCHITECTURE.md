@@ -161,7 +161,7 @@ Router skills manage lifecycle operations for infrastructure components. They're
 | `managing-skills`       | Skill lifecycle       | create, update, audit, fix, delete, rename, migrate, search, list, sync |
 | `managing-agents`       | Agent lifecycle       | create, update, test, audit, fix, rename, search, list                  |
 | `managing-commands`     | Command lifecycle     | create, audit, fix, list                                                |
-| `managing-mcp-wrappers` | MCP wrapper lifecycle | create, verify-red, generate, verify-green, update, audit, fix, test    |
+| `managing-tool-wrappers` | MCP wrapper lifecycle | create, verify-red, generate, verify-green, update, audit, fix, test    |
 
 ### Router Architecture
 
@@ -662,7 +662,7 @@ Domain-specific agents with auto-loaded gateway skills:
  gateway-typescript/                     # TypeScript routing
  managing-agents/                        # Agent lifecycle router
  managing-commands/                      # Command lifecycle router
- managing-mcp-wrappers/                  # MCP lifecycle router
+ managing-tool-wrappers/                  # MCP lifecycle router
  managing-skills/                        # Skill lifecycle router
  orchestrating-feature-development/      # Feature orchestration
  orchestrating-mcp-development/          # MCP wrapper orchestration

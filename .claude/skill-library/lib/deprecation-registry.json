@@ -212,34 +212,34 @@
       "status": "removed"
     },
     "mcp-code-write": {
-      "replacedBy": "mcp-manager",
+      "replacedBy": "tool-manager",
       "deprecatedDate": "2025-11-29",
-      "reason": "Consolidated into unified mcp-manager skill with TDD enforcement",
-      "migrationNotes": "Use: npm run -w @claude/mcp-manager create -- <service> <tool>"
+      "reason": "Consolidated into unified tool-manager skill with TDD enforcement",
+      "migrationNotes": "Use: npm run -w @claude/tool-manager create -- <service> <tool>"
     },
     "mcp-code-compliance": {
-      "replacedBy": "mcp-manager",
+      "replacedBy": "tool-manager",
       "deprecatedDate": "2025-11-29",
-      "reason": "Consolidated into unified mcp-manager skill (audit operation)",
-      "migrationNotes": "Use: npm run -w @claude/mcp-manager audit -- <name> [--phase N]"
+      "reason": "Consolidated into unified tool-manager skill (audit operation)",
+      "migrationNotes": "Use: npm run -w @claude/tool-manager audit -- <name> [--phase N]"
     },
     "mcp-code-audit": {
-      "replacedBy": "mcp-manager",
+      "replacedBy": "tool-manager",
       "deprecatedDate": "2025-11-29",
-      "reason": "Consolidated into unified mcp-manager skill (audit operation)",
-      "migrationNotes": "Use: npm run -w @claude/mcp-manager audit -- <name>"
+      "reason": "Consolidated into unified tool-manager skill (audit operation)",
+      "migrationNotes": "Use: npm run -w @claude/tool-manager audit -- <name>"
     },
     "mcp-code-fix": {
-      "replacedBy": "mcp-manager",
+      "replacedBy": "tool-manager",
       "deprecatedDate": "2025-11-29",
-      "reason": "Consolidated into unified mcp-manager skill (fix operation)",
-      "migrationNotes": "Use: npm run -w @claude/mcp-manager fix -- <name> [--dry-run]"
+      "reason": "Consolidated into unified tool-manager skill (fix operation)",
+      "migrationNotes": "Use: npm run -w @claude/tool-manager fix -- <name> [--dry-run]"
     },
     "mcp-code-test": {
-      "replacedBy": "mcp-manager",
+      "replacedBy": "tool-manager",
       "deprecatedDate": "2025-11-29",
-      "reason": "Consolidated into unified mcp-manager skill (test operation)",
-      "migrationNotes": "Use: npm run -w @claude/mcp-manager test -- <name> [--unit] [--coverage]"
+      "reason": "Consolidated into unified tool-manager skill (test operation)",
+      "migrationNotes": "Use: npm run -w @claude/tool-manager test -- <name> [--unit] [--coverage]"
     },
     "claude-agent-write": {
       "replacedBy": "agent-manager",
@@ -307,11 +307,11 @@
       "reason": "Renamed to avoid namespace collision with /command-manager command (same name caused skill resolution instead of command)",
       "migrationNotes": "Use: skill: \"managing-commands\" - command /command-manager remains unchanged"
     },
-    "mcp-manager": {
-      "replacedBy": "managing-mcp-wrappers",
+    "tool-manager": {
+      "replacedBy": "managing-tool-wrappers",
       "deprecatedDate": "2025-12-19",
-      "reason": "Renamed to avoid namespace collision with /mcp-manager command (same name caused skill resolution instead of command)",
-      "migrationNotes": "Use: skill: \"managing-mcp-wrappers\" - command /mcp-manager remains unchanged"
+      "reason": "Renamed to avoid namespace collision with /tool-manager command (same name caused skill resolution instead of command)",
+      "migrationNotes": "Use: skill: \"managing-tool-wrappers\" - command /tool-manager remains unchanged"
     },
     "frontend-zustand-state-management": {
       "replacedBy": "using-zustand-state-management",
@@ -397,7 +397,7 @@
     "consumers": [
       "claude-skill-compliance",
       "agent-manager",
-      "mcp-manager"
+      "tool-manager"
     ],
     "updateProtocol": "When renaming via /skill-manager rename or /agent-manager rename, the skill should automatically add an entry here (NOT YET IMPLEMENTED - manual for now)",
     "legacyConsumers": [

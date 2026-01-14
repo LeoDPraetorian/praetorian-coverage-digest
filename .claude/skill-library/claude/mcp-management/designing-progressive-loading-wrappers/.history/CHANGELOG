@@ -63,7 +63,7 @@ All notable changes to designing-progressive-loading-wrappers will be documented
 ### Related Skills
 
 - `creating-mcp-wrappers` (CORE) - TDD implementation workflow
-- `managing-mcp-wrappers` (LIBRARY) - Wrapper lifecycle management
+- `managing-tool-wrappers` (LIBRARY) - Wrapper lifecycle management
 - `gateway-mcp-tools` (CORE) - MCP tool discovery router
 - `developing-with-tdd` (CORE) - TDD methodology
 

@@ -278,12 +278,12 @@ Based on historical data, average time per tool per phase:
 | Phase | Time per Tool | Notes |
 |-------|--------------|-------|
 | 2. Schema Discovery | 2-3 min | Manual testing + documentation |
-| 4. Architecture | 1-2 min | mcp-tool-lead per tool |
-| 4. Test Planning | 2-3 min | mcp-tool-tester per tool |
-| 4. Test Implementation | 3-5 min | mcp-tool-tester writes 18 tests |
+| 4. Architecture | 1-2 min | tool-lead per tool |
+| 4. Test Planning | 2-3 min | tool-tester per tool |
+| 4. Test Implementation | 3-5 min | tool-tester writes 18 tests |
 | 5. RED Gate | <1 min | CLI execution |
-| 6. Implementation | 4-6 min | mcp-tool-developer per tool |
-| 7. Code Review | 2-3 min | mcp-tool-reviewer per tool |
+| 6. Implementation | 4-6 min | tool-developer per tool |
+| 7. Code Review | 2-3 min | tool-reviewer per tool |
 | 8. GREEN Gate | 1-2 min | CLI execution with coverage |
 | 9. Audit | <1 min | CLI execution per tool |
 
@@ -323,7 +323,7 @@ Phase 2: Tool Discovery
 - Save progress.json
 
 Phase 3: Shared Architecture
-- Spawn mcp-tool-lead + security-lead (parallel)
+- Spawn tool-lead + security-lead (parallel)
 - Human checkpoint ✅
 - Save progress.json
 
@@ -513,9 +513,9 @@ Within each batch, spawn agents in parallel:
 const batch = ['get-issue', 'list-issues', 'create-issue']
 
 // Architecture (parallel)
-Task(subagent_type: 'mcp-tool-lead', prompt: 'Design get-issue', run_in_background: true)
-Task(subagent_type: 'mcp-tool-lead', prompt: 'Design list-issues', run_in_background: true)
-Task(subagent_type: 'mcp-tool-lead', prompt: 'Design create-issue', run_in_background: true)
+Task(subagent_type: 'tool-lead', prompt: 'Design get-issue', run_in_background: true)
+Task(subagent_type: 'tool-lead', prompt: 'Design list-issues', run_in_background: true)
+Task(subagent_type: 'tool-lead', prompt: 'Design create-issue', run_in_background: true)
 
 // Wait for all to complete before proceeding to test planning
 ```

@@ -14,10 +14,10 @@
 - **troubleshooting.md**: Comprehensive troubleshooting guide covering 10 common scenarios (lost context, blocked agents, build failures, test failures, coverage issues, audit failures, schema discovery issues, rate limiting, batch recovery, architecture compliance)
 
 **P0 - Prompt Templates (references/prompts/)**
-- **mcp-tool-developer-prompt.md** (680 lines): Few-shot TDD examples + Progressive disclosure clarification gate with 7 mandatory skills, 3 comprehensive examples (simple wrapper, Zod validation, token optimization), MCP-specific context, 14-item self-review checklist
-- **mcp-tool-tester-prompt.md** (701 lines): Few-shot test structure + Chain-of-thought edge cases with 4 mandatory skills, 6 test category requirements (≥18 tests total), mock setup patterns, 17-item self-review checklist
-- **mcp-tool-lead-prompt.md** (747 lines): Chain-of-thought architecture decisions + Self-consistency alternative perspective check with 7 TypeScript library skills, 3 decision chain templates, two-pass verification, 19-item self-review checklist
-- **mcp-tool-reviewer-prompt.md** (664 lines): Chain-of-thought spec compliance + Self-consistency two-pass review with 3 mandatory skills, 5-step verification chain, review checklist, verdict criteria (APPROVED/CHANGES_REQUESTED/BLOCKED)
+- **tool-developer-prompt.md** (680 lines): Few-shot TDD examples + Progressive disclosure clarification gate with 7 mandatory skills, 3 comprehensive examples (simple wrapper, Zod validation, token optimization), MCP-specific context, 14-item self-review checklist
+- **tool-tester-prompt.md** (701 lines): Few-shot test structure + Chain-of-thought edge cases with 4 mandatory skills, 6 test category requirements (≥18 tests total), mock setup patterns, 17-item self-review checklist
+- **tool-lead-prompt.md** (747 lines): Chain-of-thought architecture decisions + Self-consistency alternative perspective check with 7 TypeScript library skills, 3 decision chain templates, two-pass verification, 19-item self-review checklist
+- **tool-reviewer-prompt.md** (664 lines): Chain-of-thought spec compliance + Self-consistency two-pass review with 3 mandatory skills, 5-step verification chain, review checklist, verdict criteria (APPROVED/CHANGES_REQUESTED/BLOCKED)
 - **security-lead-prompt.md** (532 lines): Chain-of-thought threat analysis with 1 mandatory skill, security assessment chains (input validation, output sanitization, MCP concerns), threat model template, 24-item security checklist
 
 **P1 - Process Enhancement**
@@ -33,7 +33,7 @@
 #### Changed
 
 **Updated Files**
-- **critical-rules.md**: Added "Blocked Agent Routing" section with 7-row routing table mapping blocked_reason values to appropriate agents (security-lead, mcp-tool-lead, AskUserQuestion, mcp-tool-tester) with 4 critical rules for handling blocked agents
+- **critical-rules.md**: Added "Blocked Agent Routing" section with 7-row routing table mapping blocked_reason values to appropriate agents (security-lead, tool-lead, AskUserQuestion, tool-tester) with 4 critical rules for handling blocked agents
 - **agent-prompts.md**: Added note at top directing to full prompt templates in references/prompts/ directory with links to 5 comprehensive templates and line counts, preserved existing quick reference prompts
 - **SKILL.md** (694 → 772 lines):
   - Added Integration section with Core Skills table (7 skills), Library Skills table (11 skills including orchestration-prompt-patterns), Required Sub-Skills by Phase table with conditional triggers (>10 tools, >15 tools, 3+ failures)
