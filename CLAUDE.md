@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Chariot Development Platform** is a comprehensive super-repository that unifies all Chariot security tools and frameworks under a single development environment with integrated AI assistance through Claude-Flow orchestration.
+**Chariot Development Platform** is a comprehensive super-repository that unifies all Chariot security tools and frameworks under a single development environment with integrated AI assistance through Claude-Flow orchestration. 
+
+CRITICAL: You must evaluate all user requests for matching skills regardless if you have knowledge of a subject.
 
 ## Repository Architecture
 
