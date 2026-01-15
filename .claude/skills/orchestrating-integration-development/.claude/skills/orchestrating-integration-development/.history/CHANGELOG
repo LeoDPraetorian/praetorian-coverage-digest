@@ -1,0 +1,22 @@
+
+## 2026-01-14 - Error Recovery Documentation
+
+**Change**: Added comprehensive error recovery documentation
+
+**Files Changed**:
+- Created references/error-recovery.md
+- Updated SKILL.md Phase 4 section (line 321)
+- Updated SKILL.md Phase 5 section (line 385)
+- Updated SKILL.md Phase 6 section (line 424)
+- Updated SKILL.md Troubleshooting section (line 719)
+
+**New Content**:
+- Detection commands for partial completion (Phases 4, 5, 6)
+- Three recovery strategies (Resume, Rollback, Restart Earlier Phase)
+- Phase-specific recovery table with common failures
+- Metadata tracking format for recovery operations
+- Decision flowchart for choosing recovery approach
+
+**Impact**: Users can now detect partial phase completion and systematically recover from mid-phase failures without wasted work or confusion.
+
+**Line Count**: 836 → 844 lines (+8)

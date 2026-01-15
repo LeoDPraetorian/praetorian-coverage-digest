@@ -59,6 +59,7 @@ This gateway implements 3-tier loading:
 | "performance" / "load test"                           | → `performance-testing`                                              |
 | "test hanging" / "process spawning" / "vitest config" | → `configuring-vitest-test-isolation`                                |
 | "MCP wrapper test" / "tool wrapper"                   | → `configuring-vitest-test-isolation` + `gateway-typescript`         |
+| "Go integration test" / "httptest" / "mock.Collector" | → `testing-integrations`                                             |
 
 ## Skill Registry
 
@@ -82,12 +83,13 @@ This gateway implements 3-tier loading:
 
 ### By Test Type
 
-| Skill                 | Path                                                                   | Triggers                |
-| --------------------- | ---------------------------------------------------------------------- | ----------------------- |
-| API Testing Patterns  | `.claude/skill-library/testing/api-testing-patterns/SKILL.md`          | REST, API, endpoint     |
-| CLI Testing Patterns  | `.claude/skill-library/testing/cli-testing-patterns/SKILL.md`          | CLI, command-line       |
-| Performance Testing   | `.claude/skill-library/testing/performance-testing/SKILL.md`           | load, stress, benchmark |
-| Acceptance Test Suite | `.claude/skill-library/testing/backend/acceptance-test-suite/SKILL.md` | acceptance, e2e backend |
+| Skill                  | Path                                                                    | Triggers                                             |
+| ---------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
+| API Testing Patterns   | `.claude/skill-library/testing/api-testing-patterns/SKILL.md`           | REST, API, endpoint                                  |
+| CLI Testing Patterns   | `.claude/skill-library/testing/cli-testing-patterns/SKILL.md`           | CLI, command-line                                    |
+| Performance Testing    | `.claude/skill-library/testing/performance-testing/SKILL.md`            | load, stress, benchmark                              |
+| Acceptance Test Suite  | `.claude/skill-library/testing/backend/acceptance-test-suite/SKILL.md`  | acceptance, e2e backend                              |
+| Testing Integrations   | `.claude/skill-library/testing/testing-integrations/SKILL.md`           | Go integration test, httptest, mock.Collector, P0    |
 
 ### Mocking
 

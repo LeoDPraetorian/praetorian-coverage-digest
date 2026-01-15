@@ -1,0 +1,54 @@
+# Changelog
+
+## 2026-01-14 - Initial Creation
+
+### RED Phase Documentation
+
+**Gap identified**: No skill exists for same-agent iteration loops with safety guards. Current state:
+- Orchestration skills manually implement retry logic
+- No scratchpad for cross-iteration context
+- No loop detection (infinite loops possible)
+- No standardized safety guards
+- No completion promise pattern
+
+**Test scenario**: Orchestration skill needs to run tests in a loop until passing. Without this skill, orchestrator must manually track iterations, errors, and detect loops.
+
+### Skill Details
+
+- **Location**: Core (.claude/skills/)
+- **Type**: Process/Pattern
+- **Category**: Agentic workflow control
+
+### Source
+
+Based on:
+- [Ralph Wiggum technique](https://awesomeclaude.ai/ralph-wiggum) by Geoffrey Huntley
+- [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) by Mike O'Brien
+
+Key patterns adapted:
+- Completion promise (explicit string signals task complete)
+- Agent scratchpad (cross-iteration context)
+- Safety guards (max_iterations, max_runtime, consecutive_errors)
+- Loop detection (signature extraction, 3-consecutive threshold)
+- Error history injection
+
+### Files Created
+
+- `SKILL.md` - Main skill file (318 lines)
+- `references/scratchpad-template.md` - Copy-paste template
+- `references/safety-guards.md` - Guard configuration details
+- `references/loop-detection.md` - Detection algorithm
+- `references/escalation-options.md` - AskUserQuestion templates
+- `.history/CHANGELOG` - This file
+
+### Integration Points
+
+Called by:
+- `orchestrating-capability-development` (Phase 6: Testing)
+- `orchestrating-fingerprintx-development` (Phase 2: Research, Phase 5: Validation)
+- `orchestrating-feature-development` (Phase 5: Implementation - complex batches)
+
+Pairs with:
+- `persisting-agent-outputs` - Get feature_directory for scratchpad
+- `debugging-systematically` - When loop is stuck
+- `verifying-before-completion` - Before claiming completion promise valid

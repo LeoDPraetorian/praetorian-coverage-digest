@@ -68,16 +68,16 @@ Library skills have **zero discovery cost**they load on-demand via the Read tool
 
 ```
 .claude/skill-library/
- claude/              # Agent, skill, command, MCP management
- development/         # Frontend, backend, TypeScript, shell
- testing/             # API, E2E, mocking, performance
- security/            # Auth, secrets, cryptography, threat modeling
- infrastructure/      # Cloud patterns, cost optimization
- architecture/        # Frontend, backend architecture decisions
- documents/           # PDF, DOCX, PPTX, XLSX processing
- workflow/            # Code review, git workflows
- quality/             # UI/UX laws
- ai/                  # LLM evaluation
+├── claude/              # Agent, skill, command, MCP management
+├── development/         # Frontend, backend, TypeScript, shell
+├── testing/             # API, E2E, mocking, performance
+├── security/            # Auth, secrets, cryptography, threat modeling
+├── infrastructure/      # Cloud patterns, cost optimization
+├── architecture/        # Frontend, backend architecture decisions
+├── documents/           # PDF, DOCX, PPTX, XLSX processing
+├── workflow/            # Code review, git workflows
+├── quality/             # UI/UX laws
+└── ai/                  # LLM evaluation
 ```
 
 **Invocation**: Use the Read tool with the full path
@@ -237,23 +237,23 @@ Every skill follows a consistent structure:
 
 ```
 skill-name/
- SKILL.md              # Main skill file (< 500 lines)
- references/           # Detailed documentation
-    workflow.md
-    patterns.md
-    prompts/          # Subagent prompt templates (orchestration skills)
-        architect-prompt.md
-        developer-prompt.md
-        tester-prompt.md
- examples/             # Code examples
- scripts/              # CLI implementation (optional)
-    src/
-    package.json
-    tsconfig.json
- .history/             # Change tracking
-    CHANGELOG
- .output/              # CLI outputs (gitignored)
- .local/               # Temp data (gitignored)
+├── SKILL.md              # Main skill file (< 500 lines)
+├── references/           # Detailed documentation
+│   ├── workflow.md
+│   ├── patterns.md
+│   └── prompts/          # Subagent prompt templates (orchestration skills)
+│       ├── architect-prompt.md
+│       ├── developer-prompt.md
+│       └── tester-prompt.md
+├── examples/             # Code examples
+├── scripts/              # CLI implementation (optional)
+│   ├── src/
+│   ├── package.json
+│   └── tsconfig.json
+├── .history/             # Change tracking
+│   └── CHANGELOG
+├── .output/              # CLI outputs (gitignored)
+└── .local/               # Temp data (gitignored)
 ```
 
 ### Required Sections in SKILL.md
@@ -637,97 +637,97 @@ Domain-specific agents with auto-loaded gateway skills:
 
 ```
 .claude/skills/
- adhering-to-dry/                        # DRY principle enforcement
- adhering-to-yagni/                      # Scope discipline
- agent-manager/                          # Agent management utilities
- brainstorming/                          # Collaborative design
- calibrating-time-estimates/             # Time estimation
- debugging-strategies/                   # Debugging techniques
- debugging-systematically/               # 4-phase debugging
- developing-with-subagents/              # Subagent orchestration
- developing-with-tdd/                    # TDD enforcement
- discovering-reusable-code/              # Code reuse analysis
- dispatching-parallel-agents/            # Parallel execution
- enforcing-evidence-based-analysis/      # Evidence-based reasoning
- engineering-prompts/                    # Prompt optimization
- executing-plans/                        # Plan execution
- gateway-backend/                        # Backend routing
- gateway-capabilities/                   # Capabilities routing
- gateway-claude/                         # Claude infra routing
- gateway-frontend/                       # Frontend routing
- gateway-integrations/                   # Integration routing
- gateway-mcp-tools/                      # MCP tools routing
- gateway-security/                       # Security routing
- gateway-testing/                        # Testing routing
- gateway-typescript/                     # TypeScript routing
- managing-agents/                        # Agent lifecycle router
- managing-commands/                      # Command lifecycle router
- managing-tool-wrappers/                  # MCP lifecycle router
- managing-skills/                        # Skill lifecycle router
- orchestrating-feature-development/      # Feature orchestration
- orchestrating-mcp-development/          # MCP wrapper orchestration
- orchestrating-multi-agent-workflows/    # Workflow coordination
- orchestrating-research/                 # Research orchestration
- persisting-agent-outputs/               # Agent output persistence
- persisting-progress-across-sessions/    # Cross-session state
- semantic-code-operations/               # Serena MCP code ops
- pressure-testing-skill-content/          # Skill pressure testing
- threat-modeling-orchestrator/           # Security modeling
- tracing-root-causes/                    # Root cause analysis
- translating-intent/                     # Intent expansion
- using-skills/                           # Skill navigator
- using-todowrite/                        # TodoWrite guidance
- verifying-before-completion/            # Verification checklist
- writing-plans/                          # Implementation planning
+├── adhering-to-dry/                        # DRY principle enforcement
+├── adhering-to-yagni/                      # Scope discipline
+├── agent-manager/                          # Agent management utilities
+├── brainstorming/                          # Collaborative design
+├── calibrating-time-estimates/             # Time estimation
+├── debugging-strategies/                   # Debugging techniques
+├── debugging-systematically/               # 4-phase debugging
+├── developing-with-subagents/              # Subagent orchestration
+├── developing-with-tdd/                    # TDD enforcement
+├── discovering-reusable-code/              # Code reuse analysis
+├── dispatching-parallel-agents/            # Parallel execution
+├── enforcing-evidence-based-analysis/      # Evidence-based reasoning
+├── engineering-prompts/                    # Prompt optimization
+├── executing-plans/                        # Plan execution
+├── gateway-backend/                        # Backend routing
+├── gateway-capabilities/                   # Capabilities routing
+├── gateway-claude/                         # Claude infra routing
+├── gateway-frontend/                       # Frontend routing
+├── gateway-integrations/                   # Integration routing
+├── gateway-mcp-tools/                      # MCP tools routing
+├── gateway-security/                       # Security routing
+├── gateway-testing/                        # Testing routing
+├── gateway-typescript/                     # TypeScript routing
+├── managing-agents/                        # Agent lifecycle router
+├── managing-commands/                      # Command lifecycle router
+├── managing-tool-wrappers/                 # MCP lifecycle router
+├── managing-skills/                        # Skill lifecycle router
+├── orchestrating-feature-development/      # Feature orchestration
+├── orchestrating-mcp-development/          # MCP wrapper orchestration
+├── orchestrating-multi-agent-workflows/    # Workflow coordination
+├── orchestrating-research/                 # Research orchestration
+├── persisting-agent-outputs/               # Agent output persistence
+├── persisting-progress-across-sessions/    # Cross-session state
+├── semantic-code-operations/               # Serena MCP code ops
+├── pressure-testing-skill-content/         # Skill pressure testing
+├── threat-modeling-orchestrator/           # Security modeling
+├── tracing-root-causes/                    # Root cause analysis
+├── translating-intent/                     # Intent expansion
+├── using-skills/                           # Skill navigator
+├── using-todowrite/                        # TodoWrite guidance
+├── verifying-before-completion/            # Verification checklist
+└── writing-plans/                          # Implementation planning
 ```
 
 ### Library Skills (`.claude/skill-library/`)
 
 ```
 .claude/skill-library/
- ai/                                      # 1 LLM evaluation skill
- architecture/
-    frontend/                            # 3 frontend architecture skills
- claude/
-    agent-management/                    # 8 agent lifecycle skills
-    skill-management/                    # 12 skill lifecycle skills
-    mcp-tools/                           # 12 MCP wrapper skills
-    mcp-management/                      # MCP server management
-    plugins/                             # 3 plugin management skills
-    hooks/                               # 1 git hook skill
-    marketplaces/                        # 1 distribution skill
-    writing-linear-epics-stories/        # 1 project management skill
- development/
-    frontend/                            # 20 React/TypeScript skills
-    backend/                             # 9 Go/AWS skills
-    capabilities/                        # 12 VQL/scanner skills
-    integrations/                        # 5 third-party API skills
-    typescript/                          # 15 TypeScript skills
-    shell/                               # 2 Bash/YAML skills
-    analyzing-cyclomatic-complexity/     # 1 code quality skill
-    error-handling-patterns/             # 1 error handling skill
-    querying-neo4j-with-cypher/          # 1 database skill
- documents/                               # 4 document processing skills
- infrastructure/                          # 3 cloud/infra skills
- lib/                                     # Shared libraries
- mcp-management/                          # 3 MCP management skills
-    creating-mcp-wrappers/
-    designing-progressive-loading-wrappers/
-    setting-up-mcp-servers/
- quality/                                 # 1 UI/UX skill
- research/                                # 6 research skills
-    researching-arxiv/
-    researching-codebase/
-    researching-context7/
-    researching-github/
-    researching-perplexity/
-    researching-web/
- security/                                # 11 security skills
- testing/
-    frontend/                            # 11 React testing skills
-    backend/                             # 4 Go testing skills
-    (root)                               # 12 general testing skills
- workflow/                                # 7 git/review skills
+├── ai/                                      # 1 LLM evaluation skill
+├── architecture/
+│   └── frontend/                            # 3 frontend architecture skills
+├── claude/
+│   ├── agent-management/                    # 8 agent lifecycle skills
+│   ├── skill-management/                    # 12 skill lifecycle skills
+│   ├── mcp-tools/                           # 12 MCP wrapper skills
+│   ├── mcp-management/                      # MCP server management
+│   ├── plugins/                             # 3 plugin management skills
+│   ├── hooks/                               # 1 git hook skill
+│   ├── marketplaces/                        # 1 distribution skill
+│   └── writing-linear-epics-stories/        # 1 project management skill
+├── development/
+│   ├── frontend/                            # 20 React/TypeScript skills
+│   ├── backend/                             # 9 Go/AWS skills
+│   ├── capabilities/                        # 12 VQL/scanner skills
+│   ├── integrations/                        # 5 third-party API skills
+│   ├── typescript/                          # 15 TypeScript skills
+│   ├── shell/                               # 2 Bash/YAML skills
+│   ├── analyzing-cyclomatic-complexity/     # 1 code quality skill
+│   ├── error-handling-patterns/             # 1 error handling skill
+│   └── querying-neo4j-with-cypher/          # 1 database skill
+├── documents/                               # 4 document processing skills
+├── infrastructure/                          # 3 cloud/infra skills
+├── lib/                                     # Shared libraries
+├── mcp-management/                          # 3 MCP management skills
+│   ├── creating-mcp-wrappers/
+│   ├── designing-progressive-loading-wrappers/
+│   └── setting-up-mcp-servers/
+├── quality/                                 # 1 UI/UX skill
+├── research/                                # 6 research skills
+│   ├── researching-arxiv/
+│   ├── researching-codebase/
+│   ├── researching-context7/
+│   ├── researching-github/
+│   ├── researching-perplexity/
+│   └── researching-web/
+├── security/                                # 11 security skills
+├── testing/
+│   ├── frontend/                            # 11 React testing skills
+│   ├── backend/                             # 4 Go testing skills
+│   └── (root)                               # 12 general testing skills
+└── workflow/                                # 7 git/review skills
 ```
 
 ## FAQ

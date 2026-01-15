@@ -47,26 +47,50 @@ This constraint has critical implications for orchestration design.
 ### What Works
 
 ```
-Main conversation
-
-     Skill("orchestrating-feature-development")   Skill runs IN main
-
-               [Main conversation follows skill instructions]
-
-             Task(frontend-lead)       Main spawns: first-level subagent
-             Task(frontend-developer)  Main spawns: first-level subagent
-             Task(frontend-tester)     Main spawns: first-level subagent
+┌───────────────────────────────────────────────────────────────┐
+│                     Main conversation                         │
+└───────────────────────────┬───────────────────────────────────┘
+                            │
+                            ▼
+     ┌───────────────────────────────────────────────────┐
+     │ Skill("orchestrating-feature-development")        │
+     │ ✓ Skill runs IN main conversation context         │
+     └───────────────────────────────────────────────────┘
+                            │
+                            │ [Main follows skill instructions]
+                            │
+          ┌─────────────────┼─────────────────┐
+          ▼                 ▼                 ▼
+    ┌───────────┐     ┌───────────┐     ┌───────────┐
+    │ frontend  │     │ frontend  │     │ frontend  │
+    │   -lead   │     │-developer │     │  -tester  │
+    │ ✓ 1st lvl │     │ ✓ 1st lvl │     │ ✓ 1st lvl │
+    └───────────┘     └───────────┘     └───────────┘
 ```
 
 ### What Doesn't Work
 
 ```
-Main conversation
-
-     Task(frontend-orchestrator)      Spawned as subagent
-
-             Task(frontend-lead)       BLOCKED: nested spawning
-             Task(frontend-developer)  BLOCKED: nested spawning
+┌───────────────────────────────────────────────────────────────┐
+│                     Main conversation                         │
+└───────────────────────────┬───────────────────────────────────┘
+                            │
+                            ▼
+     ┌───────────────────────────────────────────────────┐
+     │ Task(frontend-orchestrator)                       │
+     │ Spawned as subagent                               │
+     └───────────────────────────────────────────────────┘
+                            │
+          ┌─────────────────┼─────────────────┐
+          ▼                 ▼                 ▼
+    ┌───────────┐     ┌───────────┐     ┌───────────┐
+    │ frontend  │     │ frontend  │     │ frontend  │
+    │   -lead   │     │-developer │     │  -tester  │
+    │ ✗ BLOCKED │     │ ✗ BLOCKED │     │ ✗ BLOCKED │
+    └───────────┘     └───────────┘     └───────────┘
+         ↑                 ↑                 ↑
+         └─────────────────┴─────────────────┘
+              Nested spawning not allowed
 ```
 
 **Source**: [Claude Code Sub-agents Documentation](https://code.claude.com/docs/en/sub-agents) confirms "No nested spawning: Subagents cannot spawn other subagents."
@@ -118,35 +142,35 @@ We implemented a **thin agent architecture** that keeps agent prompts lean while
 ### Architecture Overview
 
 ```
-
-                      User Request
-         "Add dark mode with filtering and tests"
-
-                       1. Multi-agent task?  Use orchestration skill
-
-
-           Orchestration Skill (runs IN main)
-   Skill("orchestrating-feature-development")
-   Guides main through phases
-   Main conversation does all agent spawning
-
-                       2. Main spawns worker agents (first-level subagents)
-
-
-              Worker Agents (.claude/agents/)
-   Lean prompt: Role + Critical rules + Output format
-   Skills auto-loaded via frontmatter (gateway-frontend)
-   Execute focused tasks, return results
-   CANNOT spawn other agents (subagent limitation)
-
-                       3. Agents read skills just-in-time
-
-
-              Skill Library (On-Demand)
-   Gateway skills route to library skills
-   Full patterns loaded via Read tool
-   No token cost until actually needed
-
+┌─────────────────────────────────────────────────────────────┐
+│                      User Request                           │
+│         "Add dark mode with filtering and tests"            │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ 1. Multi-agent task? → Use orchestration skill
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│           Orchestration Skill (runs IN main)                │
+│  • Skill("orchestrating-feature-development")               │
+│  • Guides main through phases                               │
+│  • Main conversation does all agent spawning                │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ 2. Main spawns worker agents (first-level subagents)
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Worker Agents (.claude/agents/)                │
+│  • Lean prompt: Role + Critical rules + Output format       │
+│  • Skills auto-loaded via frontmatter (gateway-frontend)    │
+│  • Execute focused tasks, return results                    │
+│  • CANNOT spawn other agents (subagent limitation)          │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ 3. Agents read skills just-in-time
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Skill Library (On-Demand)                      │
+│  • Gateway skills route to library skills                   │
+│  • Full patterns loaded via Read tool                       │
+│  • No token cost until actually needed                      │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### Single-Agent Tasks
@@ -154,26 +178,26 @@ We implemented a **thin agent architecture** that keeps agent prompts lean while
 For simple tasks that don't need orchestration:
 
 ```
-
-                      User Request
-              "Fix the search in assets page"
-
-                       1. Claude sees agent descriptions via Task tool
-
-
-                Agent Selection (Task Tool)
-   Core agents (.claude/agents/) - discoverable
-   ~500-1000 chars per agent in system prompt
-   "Use when" trigger pattern enables accurate selection
-
-                       2. Single agent spawned with lean prompt
-
-
-           Agent Execution (.claude/agents/)
-   Lean prompt: Role + Critical rules + Output format
-   Skills auto-loaded via frontmatter (gateway-frontend)
-   Executes task, returns results
-
+┌─────────────────────────────────────────────────────────────┐
+│                      User Request                           │
+│              "Fix the search in assets page"                │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ 1. Claude sees agent descriptions via Task tool
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│                Agent Selection (Task Tool)                  │
+│  • Core agents (.claude/agents/) - discoverable             │
+│  • ~500-1000 chars per agent in system prompt               │
+│  • "Use when" trigger pattern enables accurate selection    │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ 2. Single agent spawned with lean prompt
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│           Agent Execution (.claude/agents/)                 │
+│  • Lean prompt: Role + Critical rules + Output format       │
+│  • Skills auto-loaded via frontmatter (gateway-frontend)    │
+│  • Executes task, returns results                           │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### Token Savings
@@ -225,29 +249,29 @@ Claude is already expert-level. Only add context it doesn't have.
 Information loads in tiers, not all at once:
 
 ```
-
- Agent Spawned (~3,000-5,000 tokens)
-  Role statement
-  Skill Loading Protocol
-  Anti-Bypass (brief)
-  Output format + Escalation
-
-                   Step 1: Invoke gateway
-
-
- Gateway Loaded (~500-1,000 tokens)
-  Mandatory skills by role (paths)
-  Task routing tables
-  Quick Decision Guide
-
-                   Step 3: Read library skills
-
-
- Library Skills On-Demand
-  Only loaded when Read() called
-  ~500-2,000 tokens per skill
-  Zero cost until needed
-
+┌─────────────────────────────────────────┐
+│ Agent Spawned (~3,000-5,000 tokens)     │
+│  • Role statement                       │
+│  • Skill Loading Protocol               │
+│  • Anti-Bypass (brief)                  │
+│  • Output format + Escalation           │
+└─────────────────┬───────────────────────┘
+                  │ Step 1: Invoke gateway
+                  ▼
+┌─────────────────────────────────────────┐
+│ Gateway Loaded (~500-1,000 tokens)      │
+│  • Mandatory skills by role (paths)     │
+│  • Task routing tables                  │
+│  • Quick Decision Guide                 │
+└─────────────────┬───────────────────────┘
+                  │ Step 2: Read library skills
+                  ▼
+┌─────────────────────────────────────────┐
+│ Library Skills On-Demand                │
+│  • Only loaded when Read() called       │
+│  • ~500-2,000 tokens per skill          │
+│  • Zero cost until needed               │
+└─────────────────────────────────────────┘
 ```
 
 ### Principle 4: Sub-Agent Isolation
@@ -558,25 +582,25 @@ Agents exceeding maximums fail audit. Extract content to skills.
 
 ```
 .claude/agents/                    # Core agents (discoverable via Task tool)
- analysis/                      # Security review, assessment
- architecture/                  # System design, patterns, decisions
- development/                   # Implementation, coding, features
- mcp-tools/                     # Specialized MCP tool access
- orchestrator/                  # RESERVED (orchestration via skills)
- quality/                       # Code review, auditing, standards
- research/                      # Pattern analysis, exploration
- testing/                       # Unit, integration, e2e, quality
+├── analysis/                      # Security review, assessment
+├── architecture/                  # System design, patterns, decisions
+├── development/                   # Implementation, coding, features
+├── mcp-tools/                     # Specialized MCP tool access
+├── orchestrator/                  # RESERVED (orchestration via skills)
+├── quality/                       # Code review, auditing, standards
+├── research/                      # Pattern analysis, exploration
+└── testing/                       # Unit, integration, e2e, quality
 
 .claude/agent-library/             # Library agents (spawned by orchestration skills)
- integration/                   # Integration workflow agents
-    integration-researcher.md  # Spawned via orchestrating-research skill
- research/                      # Research workflow agents
-     codebase-researcher.md     # Spawned via orchestrating-research skill
-     context7-researcher.md     # Spawned via orchestrating-research skill
-     github-researcher.md       # Spawned via orchestrating-research skill
-     arxiv-researcher.md        # Spawned via orchestrating-research skill
-     perplexity-researcher.md   # Spawned via orchestrating-research skill
-     web-researcher.md          # Spawned via orchestrating-research skill
+├── integration/                   # Integration workflow agents
+│   └── integration-researcher.md  # Spawned via orchestrating-research skill
+└── research/                      # Research workflow agents
+    ├── codebase-researcher.md     # Spawned via orchestrating-research skill
+    ├── context7-researcher.md     # Spawned via orchestrating-research skill
+    ├── github-researcher.md       # Spawned via orchestrating-research skill
+    ├── arxiv-researcher.md        # Spawned via orchestrating-research skill
+    ├── perplexity-researcher.md   # Spawned via orchestrating-research skill
+    └── web-researcher.md          # Spawned via orchestrating-research skill
 ```
 
 ### Agent Categories
@@ -837,28 +861,28 @@ The Agent Manager handles lifecycle management for agents using a Partial Hybrid
 Agent creation and updates follow Red-Green-Refactor:
 
 ```
-
- RED Phase
- 1. Document gap: Why is agent needed?
- 2. Test scenario without agent  FAIL
- 3. Capture exact failure behavior
-
-                   Cannot proceed without failing test
-
-
- GREEN Phase
- 4. Create/update agent for specific gap
- 5. Re-test scenario  PASS
- 6. Verify no regression
-
-
-
-
- REFACTOR Phase
- 7. Test discovery (new session)
- 8. Verify line count <150/250
- 9. Verify skill delegation
-
+┌─────────────────────────────────────────┐
+│ RED Phase                               │
+│ 1. Document gap: Why is agent needed?   │
+│ 2. Test scenario without agent → FAIL   │
+│ 3. Capture exact failure behavior       │
+└─────────────────┬───────────────────────┘
+                  │ Cannot proceed without failing test
+                  ▼
+┌─────────────────────────────────────────┐
+│ GREEN Phase                             │
+│ 4. Create/update agent for specific gap │
+│ 5. Re-test scenario → PASS              │
+│ 6. Verify no regression                 │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│ REFACTOR Phase                          │
+│ 7. Test discovery (new session)         │
+│ 8. Verify line count <150/250           │
+│ 9. Verify skill delegation              │
+└─────────────────────────────────────────┘
 ```
 
 ### Block Scalar Detection
@@ -902,34 +926,34 @@ Do not test changes in the same sessionresults will be invalid.
 ### Agent Selection
 
 ```
-
- User Request
- "Fix the search in assets page"
-
-                   Claude sees descriptions via Task tool
-
-
- Agent Selection
-  Descriptions from frontmatter
-  Examples help match intent
-  "Use when" pattern enables selection
-
-                   Agent spawned with lean prompt
-
-
- Agent Execution
-  Lean prompt: Role + Protocol + Output
-  Skills loaded via gateway
-  Detailed patterns from skill library
-
-                   Agent reads skills just-in-time
-
-
- Skill Library
-  Gateway routes to library skills
-  Full patterns via Read tool
-  Zero cost until needed
-
+┌─────────────────────────────────────────┐
+│ User Request                            │
+│ "Fix the search in assets page"         │
+└─────────────────┬───────────────────────┘
+                  │ Claude sees descriptions via Task tool
+                  ▼
+┌─────────────────────────────────────────┐
+│ Agent Selection                         │
+│  • Descriptions from frontmatter        │
+│  • Examples help match intent           │
+│  • "Use when" pattern enables selection │
+└─────────────────┬───────────────────────┘
+                  │ Agent spawned with lean prompt
+                  ▼
+┌─────────────────────────────────────────┐
+│ Agent Execution                         │
+│  • Lean prompt: Role + Protocol + Output│
+│  • Skills loaded via gateway            │
+│  • Detailed patterns from skill library │
+└─────────────────┬───────────────────────┘
+                  │ Agent reads skills just-in-time
+                  ▼
+┌─────────────────────────────────────────┐
+│ Skill Library                           │
+│  • Gateway routes to library skills     │
+│  • Full patterns via Read tool          │
+│  • Zero cost until needed               │
+└─────────────────────────────────────────┘
 ```
 
 ### Multi-Agent Coordination
@@ -937,16 +961,25 @@ Do not test changes in the same sessionresults will be invalid.
 For complex tasks requiring multiple agents, use **orchestration skills** (not orchestrator agents):
 
 ```
-Main conversation
-
-     Skill("orchestrating-feature-development")   Skill runs IN main
-
-               [Main follows skill through phases]
-
-             Task(frontend-lead)       Phase 4: Architecture
-             Task(frontend-developer)  Phase 5: Implementation
-             Task(frontend-reviewer)   Phase 6: Review
-             Task(frontend-tester)     Phase 8: Testing
+┌─────────────────────────────────────────────────────────────┐
+│                    Main conversation                        │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+                      ▼
+     ┌────────────────────────────────────────────────────────┐
+     │ Skill("orchestrating-feature-development")             │
+     │ Skill runs IN main conversation                        │
+     └────────────────────────────────────────────────────────┘
+                      │
+                      │ [Main follows skill through phases]
+                      │
+          ┌──────────┬┴──────────┬────────────┐
+          ▼          ▼           ▼            ▼
+     ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐
+     │frontend │ │frontend │ │frontend │ │frontend │
+     │ -lead   │ │-developer│ │-reviewer│ │-tester  │
+     │Phase 4  │ │Phase 5  │ │Phase 6  │ │Phase 8  │
+     └─────────┘ └─────────┘ └─────────┘ └─────────┘
 ```
 
 **Key principles:**
@@ -1058,9 +1091,9 @@ Once an agent is spawned, it runs to completion. Design agent prompts carefullyt
 
 ### Anthropic Guidance
 
-- [Claude Code Sub-agents](https://code.claude.com/docs/en/sub-agents) - **Critical**: Documents "no nested spawning" constraint
-- [Agent Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) - Three-level progressive disclosure architecture
-- [Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system) - Token economics, eight principles, when multi-agent is poor fit
+- [Claude Code Sub-agents](https://code.claude.com/docs/en/sub-agents)
+- [Agent Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
+- [Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system)
 - [Effective Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents)
 - [Claude 4 Best Practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices)
@@ -1068,5 +1101,5 @@ Once an agent is spawned, it runs to completion. Design agent prompts carefullyt
 
 ### Community Resources
 
-- [Multi-Agent Orchestration: 10 Claude Instances in Parallel](https://dev.to/bredmond1019/multi-agent-orchestration-running-10-claude-instances-in-parallel-part-3-29da) - Real-world parallel execution patterns
-- [Multi-Agents vs Tool Groups: A Layered Approach](https://offnote.substack.com/p/multi-agents-vs-tool-groups-a-layered) - Architectural trade-offs analysis
+- [Multi-Agent Orchestration: 10 Claude Instances in Parallel](https://dev.to/bredmond1019/multi-agent-orchestration-running-10-claude-instances-in-parallel-part-3-29da)
+- [Multi-Agents vs Tool Groups: A Layered Approach](https://offnote.substack.com/p/multi-agents-vs-tool-groups-a-layered)

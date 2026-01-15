@@ -1,4 +1,4 @@
-# Phase 4: Per-Task Implementation Mode
+# Phase 5: Per-Task Implementation Mode
 
 **Use when plan has 4+ independent tasks** to catch issues immediately via per-task review cycles instead of accumulating issues until phase-level review.
 
@@ -16,7 +16,7 @@
 
 ## Review Mode Selection
 
-At Phase 4 entry, count tasks in architecture.md:
+At Phase 5 entry, count tasks in architecture.md:
 
 ```python
 task_count = count_tasks(architecture.md)
@@ -161,8 +161,8 @@ Task(
 **IF verdict is `CHANGES_REQUESTED`:**
 
 1. Dispatch developer to fix issues
-2. Re-review code quality (max **1 retry**)
-3. After 1 failure, escalate to user
+2. Re-review code quality (max **3 retries**)
+3. After 3 failures, escalate to user
 
 ### Step 5: Mark Task Complete
 
@@ -281,7 +281,7 @@ Track per-task progress in metadata.json:
 Per-task mode integrates with checkpoint configuration:
 
 - **Every 3 tasks**: Generate progress report (see SKILL.md Checkpoint Configuration)
-- **Any task >2 retries**: Mandatory human review
+- **Any task >3 retries**: Mandatory human review
 - **Cumulative issues >5**: Mandatory human review
 
 ## Benefits vs Batch Mode
@@ -311,8 +311,8 @@ Per-task mode integrates with checkpoint configuration:
 
 ## Related References
 
-- [Phase 4: Implementation](phase-4-implementation.md) - Batch mode workflow
-- [Phase 5: Review](phase-5-review.md) - Phase-level review patterns
+- [Phase 5: Implementation](phase-5-implementation.md) - Batch mode workflow
+- [Phase 7: Review](phase-7-review.md) - Phase-level review patterns
 - [Checkpoint Configuration](../SKILL.md#checkpoint-configuration) - Human review triggers
 - [Prompts: Developer](prompts/developer-prompt.md) - Clarification protocol
 - [Prompts: Reviewer](prompts/reviewer-prompt.md) - Spec compliance + code quality templates

@@ -488,3 +488,46 @@ Also condensed Exit Criteria section to fit within 500-line limit after adding S
 
 **Related:** ORCHESTRATOR-REFACTOR.md analysis of obra/superpowers patterns
 
+
+## 2026-01-14 - Enhanced Reviewer Adversarial Mindset
+
+**Changed**: Added "DO NOT TRUST THE REPORT" language to reviewer-prompt.md spec compliance section
+
+**Impact**: 
+- Reviewers will adopt more adversarial mindset when verifying implementation claims
+- Reduces risk of optimistic developer reports slipping through review
+- Aligns with Superpowers best practice for spec compliance verification
+
+**Files Modified**:
+- references/prompts/reviewer-prompt.md: Added explicit "suspiciously quickly" warning
+
+**Rationale**: Analysis of obra/superpowers repository revealed stronger adversarial language that prevents reviewer complacency. Our neutral "verify independently" was insufficient to trigger deep code inspection.
+
+## 2026-01-14 - Enable Mid-Task Clarification Questions
+
+**Changed**: Added "While you work" guidance to developer-prompt.md
+
+**Impact**: 
+- Developers explicitly encouraged to ask questions during implementation, not just upfront
+- Reduces risk of proceeding with wrong assumptions when encountering unexpected blockers
+- Complements STEP 0 upfront clarification with ongoing clarification permission
+
+**Files Modified**:
+- references/prompts/developer-prompt.md: Added "While you work" clause after STEP 0
+
+**Rationale**: Analysis of obra/superpowers repository showed explicit mid-task questioning guidance. Our STEP 0 only covered upfront clarification, creating implicit pressure to "not bother" the orchestrator once work begins.
+
+## 2026-01-14 - Add Integration Section to Test-Lead Prompt
+
+**Changed**: Added Integration section to test-lead-prompt.md that invokes developing-with-tdd
+
+**Impact**: 
+- Test-lead now knows where to find anti-pattern definitions
+- "No anti-patterns detected" quality check has clear guidance
+- Links quality score calculation to specific anti-patterns from TDD skill
+- Lists key anti-patterns inline (Cardinal Sin, mocking, over-engineering, etc.)
+
+**Files Modified**:
+- references/prompts/test-lead-prompt.md: Added Integration section before Output Format
+
+**Rationale**: Quality score includes 10% weight for "No anti-patterns detected" but test-lead had no guidance on what constitutes an anti-pattern. Integration section provides explicit link to developing-with-tdd skill which defines these patterns.

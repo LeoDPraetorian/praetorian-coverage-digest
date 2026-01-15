@@ -1,10 +1,10 @@
-# Phase 2: Discovery
+# Phase 3: Discovery
 
 Search existing capabilities for reusable patterns before creating new code.
 
 ## Overview
 
-The Discovery phase executes AFTER Brainstorming (Phase 1) and BEFORE Architecture (Phase 3). It spawns the native `Explore` agent (very thorough mode) to search the codebase for existing capability patterns, preventing the #1 implementation failure: creating new capability code when reusable patterns exist.
+The Discovery phase executes AFTER Brainstorming (Phase 1) and BEFORE Architecture (Phase 4). It spawns the native `Explore` agent (very thorough mode) to search the codebase for existing capability patterns, preventing the #1 implementation failure: creating new capability code when reusable patterns exist.
 
 **Why this phase exists:**
 
@@ -150,7 +150,7 @@ The Explore agent supports three thoroughness levels: `quick`, `medium`, `very t
 - **Patterns to Extend:** M
 ```
 
-## Handoff to Phase 3 (Architecture)
+## Handoff to Phase 4 (Architecture)
 
 Discovery output feeds into Architecture:
 
@@ -169,7 +169,7 @@ Discovery output feeds into Architecture:
 }
 ```
 
-The `capability-lead` agent in Phase 3 consumes this report to create implementation plans that prioritize pattern reuse over new code.
+The `capability-lead` agent in Phase 4 consumes this report to create implementation plans that prioritize pattern reuse over new code.
 
 ## metadata.json Updates
 
@@ -206,7 +206,7 @@ If exhaustive search finds no similar capabilities:
 If discovery finds multiple conflicting approaches:
 
 1. Flag all approaches in discovery.md
-2. Leads resolve during Phase 3 (Architecture)
+2. Leads resolve during Phase 4 (Architecture)
 3. Document resolution rationale in architecture.md
 
 ## Exit Criteria
@@ -223,5 +223,5 @@ Discovery phase is complete when:
 
 - **discovering-reusable-code skill** - Reuse methodology (prompts now baked into Explore)
 - **Native Explore agent** - Executes the analysis (very thorough mode)
-- **Phase 3: Architecture** - Consumes discovery report
+- **Phase 4: Architecture** - Consumes discovery report
 - **Capability Types** - Type-specific search patterns

@@ -316,7 +316,7 @@ Each capability type has different quality standards based on its security purpo
 
 ## Quality Gate Enforcement
 
-### Phase 3 (Architecture)
+### Phase 4 (Architecture)
 
 Quality standards must be **specified** in architecture.md:
 
@@ -324,14 +324,14 @@ Quality standards must be **specified** in architecture.md:
 - Measurement methodology
 - Validation approach
 
-### Phase 5 (Review)
+### Phase 7 (Review)
 
 Quality standards must be **evaluated** in review.md:
 
 - Architecture specifies appropriate metrics
 - Implementation design supports quality targets
 
-### Phase 6 (Testing)
+### Phase 8 (Testing)
 
 Quality standards must be **validated** in test-validation.md:
 
@@ -342,6 +342,6 @@ Quality standards must be **validated** in test-validation.md:
 ## Related
 
 - [Capability Types](capability-types.md) - Type-specific implementation guidance
-- [Phase 3: Architecture](phase-3-architecture.md) - Specifying quality standards
-- [Phase 5: Review](phase-5-review.md) - Evaluating quality design
-- [Phase 6: Testing](phase-6-testing.md) - Validating quality metrics
+- [Phase 4: Architecture](phase-4-architecture.md) - Specifying quality standards
+- [Phase 7: Review](phase-7-review.md) - Evaluating quality design
+- [Phase 8: Testing](phase-8-testing.md) - Validating quality metrics

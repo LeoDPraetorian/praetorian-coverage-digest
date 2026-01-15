@@ -51,3 +51,15 @@ Don't fill templates with placeholder text. Use `researching-skills` to find rea
 ### ❌ Don't Include Time-Sensitive Information
 
 Avoid info that becomes outdated. Document current method prominently, collapse deprecated patterns in `<details>` tags.
+
+### ❌ Don't Use Fractional Major Phase Numbers
+
+Skills must use sequential integer phase numbers (Phase 1, 2, 3, 4...) not fractional (Phase 1.5, 3.5, 4.5).
+
+**Rule**: [Phase Numbering](.claude/skills/managing-skills/references/patterns/changelog-format.md)
+
+**Acceptable**: Sub-steps within phases (Step 5.1, 5.2, 5.3) for decomposition
+
+**When adding phases**: Renumber subsequent phases to maintain sequential integers
+
+**Caught by**: auditing-skills Phase 7 (Phase Numbering Hygiene)

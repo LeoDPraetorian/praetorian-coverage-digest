@@ -31,43 +31,43 @@ We implemented progressive loading for MCPs through TypeScript wrappers that ach
 ## Architecture Overview
 
 ```
-
-                     Claude Code Session
-                    (0 MCP tokens at start)
-
-                       1. Agent has gateway-mcp-tools in frontmatter
-
-
-           Gateway Skill (.claude/skills/gateway-mcp-tools/)
-   Single slot in 15K skill budget
-   Routes to service skills in .claude/skill-library/
-   Lists paths: mcp-tools-linear, mcp-tools-praetorian-cli
-
-                       2. Agent reads service skill (just-in-time)
-
-
-    Service Skill (.claude/skill-library/.../mcp-tools-*)
-   Tool catalog with import paths
-   Service-specific examples
-   0 token cost (library, not auto-discovered)
-
-                       3. Agent imports wrapper (~50 tokens)
-
-
-              TypeScript Wrapper (.claude/tools/)
-   Zod validation for inputs
-   On-demand MCP connection
-   Response filtering & summarization
-   Token-optimized output
-
-                       4. Wrapper spawns MCP (only when called)
-
-
-                      MCP Server Process
-   Runs independently (not in Claude's context)
-   Returns full data to wrapper
-   Connection closed after call
-
+┌─────────────────────────────────────────────────────────────┐
+│                     Claude Code Session                     │
+│                    (0 MCP tokens at start)                  │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ 1. Agent has gateway-mcp-tools in frontmatter
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│           Gateway Skill (.claude/skills/gateway-mcp-tools/) │
+│  • Single slot in 15K skill budget                          │
+│  • Routes to service skills in .claude/skill-library/       │
+│  • Lists paths: mcp-tools-linear, mcp-tools-praetorian-cli  │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ 2. Agent reads service skill (just-in-time)
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│    Service Skill (.claude/skill-library/.../mcp-tools-*)    │
+│  • Tool catalog with import paths                           │
+│  • Service-specific examples                                │
+│  • 0 token cost (library, not auto-discovered)              │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ 3. Agent imports wrapper (~50 tokens)
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│              TypeScript Wrapper (.claude/tools/)            │
+│  • Zod validation for inputs                                │
+│  • On-demand MCP connection                                 │
+│  • Response filtering & summarization                       │
+│  • Token-optimized output                                   │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ 4. Wrapper spawns MCP (only when called)
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      MCP Server Process                     │
+│  • Runs independently (not in Claude's context)             │
+│  • Returns full data to wrapper                             │
+│  • Connection closed after call                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### Token Savings
@@ -265,13 +265,13 @@ User: "Get Linear issue ENG-1234"
 
 ```
 .claude/tools/{service}/
- {tool-name}.ts              # Wrapper implementation
- {tool-name}.unit.test.ts    # Unit tests (mocked MCP)
- {tool-name}.integration.test.ts  # Integration tests (real MCP)
- tsconfig.json               # TypeScript config (REQUIRED - auto-generated by create)
- index.ts                    # Re-exports all tools
- package.json                # Dependencies
- README.md                   # Service documentation
+├── {tool-name}.ts              # Wrapper implementation
+├── {tool-name}.unit.test.ts    # Unit tests (mocked MCP)
+├── {tool-name}.integration.test.ts  # Integration tests (real MCP)
+├── tsconfig.json               # TypeScript config (REQUIRED - auto-generated by create)
+├── index.ts                    # Re-exports all tools
+├── package.json                # Dependencies
+└── README.md                   # Service documentation
 ```
 
 ### Wrapper Template
@@ -345,53 +345,52 @@ The MCP Wrapper Management system is the lifecycle management system for MCP wra
 
 ```
 .claude/skills/managing-tool-wrappers/     # Lifecycle management
- SKILL.md                              # Main skill documentation
- scripts/
-    src/
-       cli.ts                        # CLI entry point
-       tdd-enforcer.ts               # RED/GREEN phase enforcement
-       types.ts                      # Shared TypeScript types
-       utils.ts                      # Shared utilities
-       operations/                   # CLI command implementations
-          create.ts                 # Create wrapper scaffold
-          update.ts                 # Update existing wrapper
-          verify-red.ts             # RED phase verification
-          verify-green.ts           # GREEN phase verification
-          generate-skill.ts         # Generate service skill
-          test.ts                   # Test runner
-       phases/                       # 11 audit phase implementations
-          phase1-schema-discovery.ts
-          phase2-optional-fields.ts
-          phase3-type-unions.ts
-          phase4-nested-access.ts
-          phase5-reference-validation.ts
-          phase6-unit-coverage.ts
-          phase7-integration-tests.ts
-          phase8-test-quality.ts
-          phase9-security-validation.ts
-          phase10-typescript-validation.ts
-          phase11-skill-schema-sync.ts  # NEW: Skill-schema synchronization
-       fixers/                       # Auto-fix implementations
-           phase2-fixer.ts
-           phase3-fixer.ts
-           phase4-fixer.ts
-    package.json
-    node_modules/
- templates/
-    discover-schema.ts                # Schema discovery script template
-    tool-wrapper.ts.tmpl              # Wrapper implementation template
-    tsconfig.json.tmpl                # TypeScript config template
- references/                           # Workflow documentation
+├── SKILL.md                              # Main skill documentation
+├── scripts/
+│   ├── src/
+│   │   ├── cli.ts                        # CLI entry point
+│   │   ├── tdd-enforcer.ts               # RED/GREEN phase enforcement
+│   │   ├── types.ts                      # Shared TypeScript types
+│   │   ├── utils.ts                      # Shared utilities
+│   │   ├── operations/                   # CLI command implementations
+│   │   │   ├── create.ts                 # Create wrapper scaffold
+│   │   │   ├── update.ts                 # Update existing wrapper
+│   │   │   ├── verify-red.ts             # RED phase verification
+│   │   │   ├── verify-green.ts           # GREEN phase verification
+│   │   │   ├── generate-skill.ts         # Generate service skill
+│   │   │   └── test.ts                   # Test runner
+│   │   ├── phases/                       # 11 audit phase implementations
+│   │   │   ├── phase1-schema-discovery.ts
+│   │   │   ├── phase2-optional-fields.ts
+│   │   │   ├── phase3-type-unions.ts
+│   │   │   ├── phase4-nested-access.ts
+│   │   │   ├── phase5-reference-validation.ts
+│   │   │   ├── phase6-unit-coverage.ts
+│   │   │   ├── phase7-integration-tests.ts
+│   │   │   ├── phase8-test-quality.ts
+│   │   │   ├── phase9-security-validation.ts
+│   │   │   ├── phase10-typescript-validation.ts
+│   │   │   └── phase11-skill-schema-sync.ts  # NEW: Skill-schema synchronization
+│   │   └── fixers/                       # Auto-fix implementations
+│   │       ├── phase2-fixer.ts
+│   │       ├── phase3-fixer.ts
+│   │       └── phase4-fixer.ts
+│   └── package.json
+├── templates/
+│   ├── discover-schema.ts                # Schema discovery script template
+│   ├── tool-wrapper.ts.tmpl              # Wrapper implementation template
+│   └── tsconfig.json.tmpl                # TypeScript config template
+└── references/                           # Workflow documentation
 
 .claude/skills/creating-mcp-wrappers/     # Creation workflow (instruction-driven)
- SKILL.md                              # 8-phase hybrid workflow
- references/
-    schema-discovery-guide.md         # Interactive MCP exploration
-    test-design-patterns.md           # 6 test categories, 18+ tests
-    implementation-guide.md           # Zod schemas, filtering, errors
-    batch-mode-guide.md               # Multi-tool workflow
- examples/
-     linear-get-issue.md               # End-to-end walkthrough
+├── SKILL.md                              # 8-phase hybrid workflow
+├── references/
+│   ├── schema-discovery-guide.md         # Interactive MCP exploration
+│   ├── test-design-patterns.md           # 6 test categories, 18+ tests
+│   ├── implementation-guide.md           # Zod schemas, filtering, errors
+│   └── batch-mode-guide.md               # Multi-tool workflow
+└── examples/
+    └── linear-get-issue.md               # End-to-end walkthrough
 ```
 
 ### TDD Workflow (Enforced)
@@ -399,30 +398,30 @@ The MCP Wrapper Management system is the lifecycle management system for MCP wra
 The MCP Manager enforces a strict Red-Green-Refactor cycle. You cannot generate a wrapper until tests exist and fail.
 
 ```
-
-                     RED Phase
-  1. npm run create -- <service> <tool>
-      Generates test file ONLY (no wrapper)
-  2. npm run verify-red -- <service>/<tool>
-      Confirms tests FAIL (proves tests work)
-
-                       Blocked until RED passes
-
-
-                     GREEN Phase
-  3. npm run generate-wrapper -- <service>/<tool>
-      Creates wrapper from template
-  4. npm run verify-green -- <service>/<tool>
-      Confirms tests PASS with 80% coverage
-
-
-
-
-                     REFACTOR Phase
-  5. Add integration tests (optional, recommended)
-  6. Optimize implementation (token reduction, security)
-  7. Re-run verify-green (must stay green)
-
+┌─────────────────────────────────────────────────────────────┐
+│                       🔴 RED Phase                          │
+│  1. npm run create -- <service> <tool>                      │
+│     → Generates test file ONLY (no wrapper)                 │
+│  2. npm run verify-red -- <service>/<tool>                  │
+│     → Confirms tests FAIL (proves tests work)               │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ Blocked until RED passes
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│                       🟢 GREEN Phase                        │
+│  3. npm run generate-wrapper -- <service>/<tool>            │
+│     → Creates wrapper from template                         │
+│  4. npm run verify-green -- <service>/<tool>                │
+│     → Confirms tests PASS with ≥80% coverage                │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│                       🔵 REFACTOR Phase                     │
+│  5. Add integration tests (optional, recommended)           │
+│  6. Optimize implementation (token reduction, security)     │
+│  7. Re-run verify-green (must stay green)                   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 **Key Enforcement**:

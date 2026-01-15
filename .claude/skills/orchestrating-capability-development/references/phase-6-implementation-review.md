@@ -1,10 +1,10 @@
-# Phase 4.5: Implementation Completion Review
+# Phase 6: Implementation Completion Review
 
 **Verify all architecture requirements were implemented BEFORE code review.**
 
 ## Purpose
 
-Catch missing requirements before Phase 5 (Code Review), where they're harder to identify among quality issues.
+Catch missing requirements before Phase 7 (Code Review), where they're harder to identify among quality issues.
 
 **Problem**: Code reviewers focus on "how well is it built?" Missing requirements ("was everything built?") get lost in the noise.
 
@@ -12,14 +12,14 @@ Catch missing requirements before Phase 5 (Code Review), where they're harder to
 
 ## When to Run
 
-**Mandatory checkpoint** between Phase 4 (Implementation) and Phase 5 (Review):
+**Mandatory checkpoint** between Phase 5 (Implementation) and Phase 7 (Review):
 
 ```
-Phase 4: Implementation
+Phase 5: Implementation
         ↓
-Phase 4.5: Implementation Completion Review ← YOU ARE HERE
+Phase 6: Implementation Completion Review ← YOU ARE HERE
         ↓
-Phase 5: Code Review
+Phase 7: Code Review
 ```
 
 ## Workflow
@@ -88,7 +88,7 @@ For ANY requirement marked ✗:
 
 **When to use**: Critical requirement, must be implemented.
 
-1. Return to Phase 4 (Implementation)
+1. Return to Phase 5 (Implementation)
 2. Dispatch developer with SPECIFIC missing requirement:
 
 ```
@@ -100,7 +100,7 @@ Task(
 
     REQUIREMENT: {specific requirement text from architecture.md}
 
-    This was supposed to be implemented in Phase 4 but was missed.
+    This was supposed to be implemented in Phase 5 but was missed.
 
     Your job:
     1. Implement this specific requirement
@@ -113,7 +113,7 @@ Task(
 )
 ```
 
-3. After implementation, re-run Phase 4.5 (this step)
+3. After implementation, re-run Phase 6 (this step)
 
 #### Option B: Defer to Later
 
@@ -149,7 +149,7 @@ AskUserQuestion({
       },
       {
         label: "No, implement it now",
-        description: "Return to Phase 4 to implement"
+        description: "Return to Phase 5 to implement"
       }
     ]
   }]
@@ -204,7 +204,7 @@ AskUserQuestion({
 
 ### Step 4: Verify Completion
 
-Only proceed to Phase 5 when ALL requirements have:
+Only proceed to Phase 7 when ALL requirements have:
 
 - ✓ Implementation evidence (file:line), OR
 - ✓ User-approved deferral, OR
@@ -296,18 +296,18 @@ Save metadata:
 ### Update TodoWrite
 
 ```
-TodoWrite: Mark "Phase 4.5: Implementation Completion Review" as completed
-TodoWrite: Mark "Phase 5: Code Review" as in_progress
+TodoWrite: Mark "Phase 6: Implementation Completion Review" as completed
+TodoWrite: Mark "Phase 7: Code Review" as in_progress
 ```
 
 ## Why This Matters
 
-**Without Phase 4.5:**
-- Missing requirements discovered in Phase 5 (code review) mixed with quality issues
+**Without Phase 6:**
+- Missing requirements discovered in Phase 7 (code review) mixed with quality issues
 - Reviewer focusing on "is this well-built?" misses "is everything built?"
-- Missing requirements found in Phase 6 (testing) - very expensive
+- Missing requirements found in Phase 8 (testing) - very expensive
 
-**With Phase 4.5:**
+**With Phase 6:**
 - Dedicated "completeness check" separate from "quality check"
 - Missing requirements caught early, before cascading into testing
 - Clear audit trail of what was deferred/removed with user approval
@@ -316,7 +316,7 @@ TodoWrite: Mark "Phase 5: Code Review" as in_progress
 
 ### "This feels like extra bureaucracy"
 
-**Reality**: Finding missing requirements in Phase 5 is MORE expensive (mixed with quality issues) or Phase 6 (after testing). This saves time.
+**Reality**: Finding missing requirements in Phase 7 is MORE expensive (mixed with quality issues) or Phase 8 (after testing). This saves time.
 
 **Statistical evidence**: Projects without completeness check have ~18% missing requirement rate at launch.
 
@@ -333,7 +333,7 @@ TodoWrite: Mark "Phase 5: Code Review" as in_progress
 
 ## Related References
 
-- [Phase 4: Implementation](phase-4-implementation.md) - Previous phase
-- [Phase 5: Review](phase-5-review.md) - Next phase (quality focus)
+- [Phase 5: Implementation](phase-5-implementation.md) - Previous phase
+- [Phase 7: Review](phase-7-review.md) - Next phase (quality focus)
 - [Tech Debt Registry](../../tech-debt-registry.md) - Where deferred items go
 - [Agent Handoffs](agent-handoffs.md) - Handoff format

@@ -1,6 +1,6 @@
 # Architect Subagent Prompt Template
 
-Use this template when dispatching capability-lead subagent in Phase 3.
+Use this template when dispatching capability-lead subagent in Phase 4.
 
 ## Usage
 

@@ -1,0 +1,35 @@
+# integration-lead Changelog
+
+## [1.0.0] - 2026-01-12
+
+### Created
+- Initial creation of integration-lead agent
+- Follows frontend-lead pattern adapted for integration architecture
+- Specializes in Chariot integration P0 requirements:
+  - VMFilter initialization and usage
+  - CheckAffiliation design (real API query vs stub)
+  - ValidateCredentials implementation
+  - errgroup concurrency patterns
+  - Pagination safety (maxPages)
+  - Tabularium model mapping
+
+### Architecture Decisions
+- Auth flow design (OAuth2, API key, JWT, HMAC, Basic)
+- Pagination strategy selection (token, page, cursor, SDK-based)
+- errgroup pattern selection (standard, shared state, continue-on-error)
+- Rate limiting strategy design
+- File structure for large integrations (>400 lines split)
+
+### Workflow
+- integration-lead (architecture) → integration-developer (implementation) → backend-reviewer (validation)
+- Updated integration-developer to reference integration-lead instead of backend-lead
+
+### Skills
+- Uses gateway-integrations + gateway-backend for routing
+- Mandates developing-integrations skill for P0 compliance
+- Inherits architect patterns from frontend-lead
+
+### Output Format
+- output_type: "integration-architecture" or "integration-refactor-plan"
+- handoff.next_agent: "integration-developer"
+- Plan includes P0 Compliance Checklist (pre-filled)

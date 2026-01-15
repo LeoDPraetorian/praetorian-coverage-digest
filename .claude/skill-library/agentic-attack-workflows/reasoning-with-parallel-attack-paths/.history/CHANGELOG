@@ -1,0 +1,31 @@
+# Changelog
+
+## 2026-01-14 - Initial Creation
+
+**RED Phase Documentation:**
+
+**Problem**: Orchestrators performing security threat modeling need diverse attack perspectives, but a single LLM has inherent blind spots in reasoning patterns. Current approach uses sequential or single-model analysis, which suffers from:
+- Tunnel vision (ParaThinker research - early mistakes propagate)
+- Model-specific blind spots (Claude misses CVE patterns that GPT-4 catches)
+- Lack of confidence calibration (no cross-reference validation)
+
+**Without this skill**: An orchestrator running threat modeling would either:
+1. Use only Claude → misses GPT-4's CVE database knowledge, Gemini's architecture analysis, DeepSeek's code-level bugs
+2. Run models sequentially with different prompts → loses emergent diversity from model differences
+3. Have no synthesis protocol → doesn't know if 1/4 or 4/4 models agree (confidence signal)
+
+**Expected failure behavior**: Ask an orchestrator to "perform comprehensive threat analysis on JWT auth flow" without this skill, and it will:
+- Use only its own perspective (Claude)
+- Miss vulnerabilities that other models would catch
+- Provide no confidence calibration
+- Not cross-reference findings across models
+
+**Skill Type**: Process/Pattern (methodology for parallel LLM analysis)
+**Category**: agentic-attack-workflows
+**Location**: Library (specialized, on-demand loading)
+**Gateway**: gateway-claude (Agentic Attack Workflows section)
+
+**Initial Structure:**
+- Created SKILL.md (262 lines - well under 500 line limit)
+- Established directory structure with references/ and examples/
+- Defined workflow: Setup → Define Target → Execute Parallel → Synthesize → Report

@@ -1,6 +1,6 @@
 # Reviewer Subagent Prompt Template
 
-Use this template when dispatching reviewer subagents in Phase 5.
+Use this template when dispatching reviewer subagents in Phase 6.
 
 ## Two-Stage Review Process
 
@@ -58,16 +58,55 @@ For EACH architecture requirement, follow this chain:
 ### Step 2: Locate implementation
 "Developer claims: [from implementation-log.md]"
 
-### Step 3: Verify independently
-"Examining [file]...
-Found: [actual implementation]
-Observation: [what it actually does]"
+### Step 3: Verify independently (DO NOT TRUST THE CLAIM)
+Read the actual code. The developer may have:
+- Claimed completion when work is incomplete
+- Misunderstood the requirement
+- Implemented something subtly different
+- Made optimistic claims about working code
+
+"Reading [file] lines [X-Y]...
+Found: [actual code snippet]
+Observation: [what the code actually does - be specific]"
 
 ### Step 4: Compare
 "Required: [X], Implemented: [Y], Match: Yes/No"
 
 ### Step 5: Evidence
 "File:line - [specific evidence]"
+
+---
+
+### Full Verification Example (VQL Capability)
+
+**Requirement from architecture.md**: "VQL query must check for both AWS access keys (AKIA prefix) AND secret access keys (40-character base64) in environment files"
+
+**Chain**:
+
+**Step 1 - Requirement stated**:
+"Requirement: VQL query must check for both AWS access keys (AKIA prefix) AND secret access keys (40-character base64) in environment files"
+
+**Step 2 - Developer claim**:
+"Developer claims: 'Implemented AWS credential detection in VQL with pattern matching for access keys'"
+
+**Step 3 - Independent verification**:
+"Reading modules/chariot-aegis-capabilities/vql/aws-credentials.vql lines 15-25...
+Found:
+```vql
+LET credentials = SELECT * FROM glob(globs='/etc/environment,~/.env')
+WHERE Data =~ 'AKIA[0-9A-Z]{16}'
+```
+Observation: Query only checks for access key prefix (AKIA), does NOT check for secret access keys. Only searches 2 hardcoded paths, not 'environment files' broadly."
+
+**Step 4 - Comparison**:
+"Requirement says: Check for BOTH access keys AND secret keys
+Implementation does: Only checks access key prefix
+Match: NO - missing secret key detection entirely"
+
+**Step 5 - Evidence**:
+"Evidence: modules/chariot-aegis-capabilities/vql/aws-credentials.vql:15-18 - missing secret key pattern, incomplete path coverage"
+
+**Verdict for this requirement**: NOT_COMPLIANT
 
 ---
 
@@ -91,7 +130,11 @@ For scanner integrations:
 
 ## CRITICAL VERIFICATION RULE
 
-**The implementer may have finished quickly. Their report may be:**
+**DO NOT TRUST THE REPORT.**
+
+**CRITICAL: The implementer finished suspiciously quickly.**
+
+Their report may be:
 
 - **Incomplete** - Missing requirements they didn't mention
 - **Inaccurate** - Claiming things work that don't
@@ -115,12 +158,16 @@ For EACH requirement in the architecture:
 
 ### Red Flags to Watch For
 
-- "Implemented as specified" without details
-- Vague summaries ("added the capability")
-- No test file references
-- Suspiciously fast completion
-- Claims that can't be verified from code
+When you see these in developer output, verify MORE carefully:
+
+- "Implemented as specified" (vague - verify everything)
+- "Added the capability" (no details - what exactly?)
+- "Tests passing" (which tests? do they cover the requirement?)
+- "Detection working" (working how? on what test cases?)
+- Fast completion time (may indicate shortcuts)
+- No file:line references (may not have actually done the work)
 - Missing TDD evidence (no RED phase documented)
+- Vague summaries without code specifics
 
 ---
 

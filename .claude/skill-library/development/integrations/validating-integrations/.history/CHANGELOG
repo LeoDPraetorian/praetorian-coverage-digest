@@ -1,0 +1,23 @@
+# Changelog - validating-integrations
+
+## [2026-01-14] - Align verification commands with developing-integrations patterns
+
+### Changed
+- **Quick Reference table**: Updated VMFilter verification to check for initialization in struct AND usage before Job.Send()
+- **Quick Reference table**: Updated Pagination Safety to check for EITHER maxPages OR API-provided termination signals
+- **checkaffiliation-verification.md**: Added systematic 5-step verification for all three acceptable patterns (A/B/C)
+- **pagination-verification.md**: Updated requirements to accept EITHER Approach A (maxPages) OR Approach B (API signals)
+- **Compliance report format**: Updated to reflect pattern-based CheckAffiliation and dual-approach Pagination evidence
+
+### Added
+- Cross-reference note at top of SKILL.md linking to developing-integrations as source of truth
+- Pattern detection logic for CheckAffiliation (Pattern A: Direct API query, Pattern B: CheckAffiliationSimple, Pattern C: Seed-based)
+- Dual-verification for Pagination Safety (maxPages constant OR API termination signals)
+
+### Fixed
+- Verification commands now correctly identify all three acceptable CheckAffiliation patterns instead of just checking for function existence
+- Pagination verification no longer requires maxPages constant, accepts API-provided signals as valid termination guarantee
+- VMFilter verification now checks for both initialization AND usage, not just presence of functions
+
+### Context
+This update ensures validating-integrations skill matches the authoritative patterns documented in developing-integrations references. Previous verification commands were too strict (requiring maxPages when API signals acceptable) or too lenient (missing Pattern B/C for CheckAffiliation).

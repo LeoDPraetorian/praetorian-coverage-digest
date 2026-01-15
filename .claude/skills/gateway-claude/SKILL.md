@@ -54,9 +54,10 @@ This gateway implements 3-tier loading:
 | "plugin" / "extension"                              | → `claude-plugin-structure` (library)       |
 | "marketplace" / "publish"                           | → `claude-marketplace-management`           |
 | "large file" / "context limit" / "split"            | → `processing-large-artifacts` (library)    |
-| "prompt patterns" / "few-shot" / "chain-of-thought" | → `orchestration-prompt-patterns` (library) |
-| "research" / "investigate"                          | → `researching-skills` (core)               |
-| "brainstorm" / "design"                             | → `brainstorming` (core)                    |
+| "prompt patterns" / "few-shot" / "chain-of-thought" | → `orchestration-prompt-patterns` (library)        |
+| "parallel LLM" / "multi-model" / "attack diversity" | → `reasoning-with-parallel-attack-paths` (library) |
+| "research" / "investigate"                          | → `researching-skills` (core)                      |
+| "brainstorm" / "design"                             | → `brainstorming` (core)                           |
 
 ## Routing Algorithm
 
@@ -130,6 +131,12 @@ skill: "managing-commands"
 | ----------------------------- | ------------------------------------------------------------------------ | ------------------------------------------- |
 | Orchestration Prompt Patterns | `.claude/skill-library/prompting/orchestration-prompt-patterns/SKILL.md` | prompt patterns, few-shot, chain-of-thought |
 | Processing Large Artifacts    | `.claude/skill-library/claude/processing-large-artifacts/SKILL.md`       | large file, context limit, split, decompose |
+
+### Agentic Attack Workflows
+
+| Skill                                | Path                                                                                           | Triggers                                         |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Reasoning with Parallel Attack Paths | `.claude/skill-library/agentic-attack-workflows/reasoning-with-parallel-attack-paths/SKILL.md` | parallel LLM, multi-model analysis, attack paths |
 
 ## Cross-Gateway Routing
 

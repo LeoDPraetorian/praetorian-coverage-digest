@@ -52,7 +52,11 @@ Does the implementation match the specification in plan.md?
 
 ## CRITICAL VERIFICATION RULE
 
-**The implementer may have finished quickly. Their report may be:**
+**DO NOT TRUST THE REPORT.**
+
+**CRITICAL: The implementer finished suspiciously quickly.**
+
+Their report may be:
 
 - **Incomplete** - Missing requirements they didn't mention
 - **Inaccurate** - Claiming things work that don't

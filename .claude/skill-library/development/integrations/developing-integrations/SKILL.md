@@ -21,16 +21,16 @@ Use this skill when:
 
 ## Quick Reference
 
-| Requirement          | Status | Description                           |
-| -------------------- | ------ | ------------------------------------- |
-| VMFilter             | P0     | REQUIRED for all Asset/Risk emissions |
-| CheckAffiliation     | P0     | REQUIRED - query external API         |
-| ValidateCredentials  | P0     | REQUIRED - verify before processing   |
-| errgroup Safety      | P0     | SetLimit + loop variable capture      |
-| Error Handling       | P0     | Never ignore errors                   |
-| Pagination Safety    | P0     | maxPages constant required            |
-| File Size Limit      | P1     | <400 lines (split at 500+)            |
-| Frontend Integration | P1     | UI card + enum + logos                |
+| Requirement          | Status | Description                                 |
+| -------------------- | ------ | ------------------------------------------- |
+| VMFilter             | P0     | REQUIRED for all Asset/Risk emissions       |
+| CheckAffiliation     | P0     | REQUIRED - use Pattern A/B/C                |
+| ValidateCredentials  | P0     | REQUIRED - verify before processing         |
+| errgroup Safety      | P0     | SetLimit + loop variable capture            |
+| Error Handling       | P0     | Never ignore errors                         |
+| Pagination Safety    | P0     | Termination guarantee (maxPages OR API signal) |
+| File Size Limit      | P1     | <400 lines (split at 500+)                  |
+| Frontend Integration | P1     | UI card + enum + logos                      |
 
 **For detailed patterns and code examples**, see [integration-chariot-patterns](.claude/skill-library/development/integrations/integration-chariot-patterns/SKILL.md).
 
@@ -43,7 +43,7 @@ Use this skill when:
 Before writing any code, review the [Mandatory Requirements](references/mandatory-requirements.md) reference:
 
 1. **VMFilter** - Asset/Risk filtering by username
-2. **CheckAffiliation** - Real API query for ownership verification
+2. **CheckAffiliation** - Use approved pattern (A/B/C) for ownership verification
 3. **ValidateCredentials** - Credential verification before processing
 4. **errgroup Safety** - Concurrency limits and variable capture
 5. **Error Handling** - No ignored errors
@@ -72,7 +72,7 @@ Use [Pre-PR Checklist](references/pre-pr-checklist.md) to verify compliance:
 
 - [ ] VMFilter initialized in struct: `Filter: filter.NewVMFilter(job.Username)`
 - [ ] Filter called before emission: `task.Filter.Asset(&asset)` → `task.Job.Send(&asset)`
-- [ ] CheckAffiliation queries external API (not stub returning true)
+- [ ] CheckAffiliation uses approved pattern (A/B/C) - not stub returning true
 - [ ] ValidateCredentials implemented and called in `Invoke()`
 - [ ] All errgroup usage has `g.SetLimit(10)` and `item := item` before `g.Go()`
 - [ ] No ignored errors (no `_, _ = json.Marshal()`)
@@ -170,26 +170,66 @@ task.Filter.Asset(&asset)
 task.Job.Send(&asset)
 ```
 
-### ❌ Stub CheckAffiliation (41 of 42 integrations)
+### ❌ Stub CheckAffiliation - Use Approved Patterns Instead
 
 ```go
-// WRONG - doesn't query external API
+// WRONG - stub implementation without verification
 func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
-    return true, nil // VIOLATION
+    return true, nil // VIOLATION - doesn't use any approved pattern
 }
 ```
 
+**RIGHT - Choose the appropriate pattern based on API capability:**
+
+**Decision Flowchart:**
+```
+Does the vendor API have a single-asset lookup endpoint?
+├── YES → Implement Pattern A (direct query)
+└── NO → Is this a cloud provider integration (AWS/Azure/GCP)?
+    ├── YES → Use Pattern B (CheckAffiliationSimple)
+    └── NO → Is integration seed-scoped (only discovers from user seeds)?
+        ├── YES → Implement Pattern C (seed-based)
+        └── NO → Consult with integration-lead for custom approach
+```
+
+**Pattern A Example (PREFERRED):**
 ```go
-// RIGHT - query external API (see Wiz integration for real implementation)
 func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
-    // Query external API to verify asset ownership
-    resp, err := t.client.GetAsset(asset.DNS)
+    resp, err := t.client.GetAsset(asset.CloudId)
     if err != nil {
-        return false, fmt.Errorf("querying API: %w", err)
+        if isNotFoundError(err) {
+            return false, nil
+        }
+        return false, fmt.Errorf("querying asset: %w", err)
     }
-    return resp.IsOwned, nil
+    return resp.ID != "" && resp.DeletedAt == "", nil
 }
 ```
+
+**Pattern B Example (cloud providers):**
+```go
+func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
+    return t.BaseCapability.CheckAffiliationSimple(asset)
+}
+```
+
+**Pattern C Example (seed-scoped):**
+```go
+func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
+    // Check all relevant asset fields against user-provided seeds
+    for _, seed := range t.Job.Seeds {
+        if strings.Contains(asset.Key, seed.Value) {
+            return true, nil
+        }
+        if asset.DNS != "" && strings.Contains(asset.DNS, seed.Value) {
+            return true, nil
+        }
+    }
+    return false, nil
+}
+```
+
+See [checkaffiliation-patterns.md](references/checkaffiliation-patterns.md) for complete implementation guidance.
 
 ### ❌ Missing errgroup Limits (wiz.go, github.go, tenable-vm.go)
 

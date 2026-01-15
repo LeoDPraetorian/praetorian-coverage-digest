@@ -1,6 +1,6 @@
 # Tester Subagent Prompt Template
 
-Use this template when dispatching capability-tester subagent in Phase 6 (Step 2).
+Use this template when dispatching capability-tester subagent in Phase 8 (Step 2).
 
 ## Usage
 

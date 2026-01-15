@@ -115,6 +115,8 @@ Proceeding with implementation."
 
 Once requirements are clear and you've completed Step 0:
 
+**While you work:** If you encounter something unexpected or unclear, **ask questions**. It's always OK to pause and clarify. Don't guess or make assumptions.
+
 1. **Write the failing test first** (TDD)
    - Test the behavior, not the implementation
    - Run test to verify it fails for the right reason

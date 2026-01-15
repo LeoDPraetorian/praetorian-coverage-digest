@@ -11,14 +11,14 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 | 'Capability type is obvious'                  | Type affects entire workflow (VQL vs Nuclei vs Janus)   | DENIED. Confirm type explicitly. |
 | 'Similar to existing capability, skip design' | Similar != identical. Differences matter for detection. | DENIED. Complete brainstorming.  |
 
-### Phase 2: Discovery
+### Phase 3: Discovery
 
 | Rationalization                         | Why It's Wrong                                     | Response                                        |
 | --------------------------------------- | -------------------------------------------------- | ----------------------------------------------- |
 | 'No existing capabilities to reference' | Discovery finds patterns even in different domains | DENIED. Run Explore agent (very thorough mode). |
 | 'I know the capability patterns'        | Discovery surfaces patterns you forgot             | DENIED. Run Explore agent (very thorough mode). |
 
-### Phase 3: Architecture
+### Phase 4: Architecture
 
 | Rationalization                          | Why It's Wrong                                         | Response                              |
 | ---------------------------------------- | ------------------------------------------------------ | ------------------------------------- |
@@ -26,7 +26,7 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 | 'VQL/Nuclei syntax is simple'            | Syntax simplicity != logic correctness                 | DENIED. capability-lead must review.  |
 | 'Skip architecture for template updates' | Even updates need architecture review for side effects | DENIED. Architecture review required. |
 
-### Phase 4: Implementation
+### Phase 5: Implementation
 
 | Rationalization                         | Why It's Wrong                               | Response                                    |
 | --------------------------------------- | -------------------------------------------- | ------------------------------------------- |
@@ -35,7 +35,7 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 | 'Version detection can be added later'  | Version detection has ~10% follow-through    | DENIED. Implement version detection now.    |
 | 'CPE format looks right'                | Must validate against CPE 2.3 spec           | NOT ACCEPTED. Validate CPE format.          |
 
-### Phase 5: Review
+### Phase 7: Review
 
 | Rationalization                           | Why It's Wrong                                          | Response                                   |
 | ----------------------------------------- | ------------------------------------------------------- | ------------------------------------------ |
@@ -43,7 +43,7 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 | 'One retry failed, detection still works' | Repeated failures indicate design issues                | DENIED. Escalate via AskUserQuestion.      |
 | 'Quality standards are suggestions'       | Quality standards prevent production failures           | DENIED. Meet all quality standards.        |
 
-### Phase 6: Testing
+### Phase 8: Testing
 
 | Rationalization                         | Why It's Wrong                             | Response                               |
 | --------------------------------------- | ------------------------------------------ | -------------------------------------- |

@@ -407,6 +407,23 @@ Calculate based on:
 **NEEDS_WORK** - quality_score < 70 or missing critical tests
 ````
 
+## Integration
+
+### Calls (during execution)
+
+| Skill                 | When              | Purpose                              |
+| --------------------- | ----------------- | ------------------------------------ |
+| `developing-with-tdd` | Quality validation | Anti-pattern definitions (Cardinal Sin: simulating production logic, mocking anti-patterns, over-engineering) |
+
+**When checking "No anti-patterns detected"**, refer to `developing-with-tdd` skill for specific anti-patterns:
+- Testing mocks instead of real code
+- Simulating production logic in tests (the Cardinal Sin)
+- Over-engineering (YAGNI violations)
+- Vague test names
+- Tests that pass when production code is deleted
+
+---
+
 ## Output Format
 
 ```json

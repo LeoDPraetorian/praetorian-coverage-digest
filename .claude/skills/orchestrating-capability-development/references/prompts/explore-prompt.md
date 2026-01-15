@@ -1,6 +1,6 @@
 # Explore Subagent Prompt Template
 
-Use this template when dispatching Explore subagent in Phase 2.
+Use this template when dispatching Explore subagent in Phase 3.
 
 ## Usage
 

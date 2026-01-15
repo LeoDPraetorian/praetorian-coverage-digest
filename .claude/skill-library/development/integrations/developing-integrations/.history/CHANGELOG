@@ -1,5 +1,101 @@
 # Changelog
 
+## [2026-01-14] - Update Pagination Safety to Reflect Real-World Patterns
+
+### Changed
+
+**Problem Fixed**: The previous P0 requirement mandated "maxPages constant required," but 0 of 44 production integrations implement it. All use API-provided pagination signals (LastPage, HasMore, TotalCount, empty NextToken). This documentation-practice gap confused developers.
+
+**Solution**: Updated requirement to accept TWO approaches with decision criteria, aligning documentation with production patterns while maintaining safety guarantees.
+
+#### references/pagination-patterns.md
+
+- **Added**: New "Pagination Safety Guarantee" section documenting three approaches:
+  - **Approach A - Hardcoded maxPages (Defensive)**: When API doesn't provide reliable termination signals
+  - **Approach B - API-Provided Limits (Standard)**: When API provides authoritative pagination signals
+  - **Approach C - Combined (Recommended)**: Both approaches for maximum safety
+- **Added**: Decision criteria table mapping scenarios to recommended approaches
+- **Added**: Complete code examples for all three approaches
+- **Added**: Documentation guidance for architecture.md
+
+#### references/mandatory-requirements.md
+
+- **Changed**: Section 6 Pagination Safety requirement from:
+  - OLD: "MUST define maxPages constant (typically 1000)"
+  - NEW: "MUST have pagination termination guarantee via ONE of: 1) Hardcoded maxPages constant with break condition, OR 2) API-provided pagination signal (LastPage, HasMore, empty NextToken)"
+- **Added**: Three approach patterns (A/B/C) with complete code examples
+- **Added**: "Document Your Choice" guidance requiring justification in architecture.md
+- **Updated**: Verification checklist to "Pagination has termination guarantee (maxPages OR API signal), documented in architecture.md"
+
+#### SKILL.md
+
+- **Updated**: Quick Reference table - Pagination Safety changed from "maxPages constant required" to "Termination guarantee (maxPages OR API signal)"
+
+### Impact
+
+- **Compliance Rate**: Validates existing 44/44 production integrations using Approach B (API signals)
+- **Backwards Compatible**: Approach A (maxPages) still accepted for defensive implementations
+- **Recommended Pattern**: Approach C (combined) provides both safety net and complete data retrieval
+- **Developer Experience**: Clear decision criteria remove confusion about which approach to use
+- **Documentation**: Requires justification in architecture.md for traceability
+
+### Metadata
+
+- **Line Count**: SKILL.md still under 400 lines (341 lines, inline edit appropriate)
+- **Files Modified**: 3 files (SKILL.md, pagination-patterns.md, mandatory-requirements.md)
+- **Breaking Change**: No - Approach B validates existing implementations, Approach A/C are alternatives
+
+---
+
+## [2026-01-14] - Update CheckAffiliation Patterns to Support Real-World APIs
+
+### Changed
+
+**Problem Fixed**: The previous requirement mandated that CheckAffiliation "MUST query external API," but 98% of integrations (41/42) failed this because most vendor APIs don't provide single-asset ownership verification endpoints. This made the requirement impossible to satisfy for most real-world integrations.
+
+**Solution**: Replaced rigid "must query API" requirement with flexible pattern-based approach that matches real-world API capabilities.
+
+#### references/checkaffiliation-patterns.md
+
+- **Added**: New "Acceptable Patterns by API Capability" section with three approved patterns:
+  - **Pattern A - Direct Ownership Query (PREFERRED)**: For APIs with single-asset lookup endpoints (Wiz, SaaS platforms)
+  - **Pattern B - CheckAffiliationSimple (ACCEPTABLE)**: For cloud providers requiring full enumeration (AWS, Azure, GCP)
+  - **Pattern C - Seed-Based Affiliation (ACCEPTABLE)**: For seed-scoped integrations (Shodan, DNS tools)
+- **Added**: Decision flowchart to guide developers to the right pattern based on API capability
+- **Added**: Complete code examples for each pattern
+- **Changed**: Replaced "Stub Pattern (Acceptable for Cloud Providers Only)" section with "Pattern Selection Guide"
+
+#### references/mandatory-requirements.md
+
+- **Changed**: CheckAffiliation requirement from:
+  - OLD: "MUST query external API to verify organization owns the asset"
+  - NEW: "MUST verify asset affiliation using one of the approved patterns (Pattern A/B/C). Stub implementations returning true without verification are NOT acceptable."
+- **Added**: All three patterns with code examples and decision flowchart
+- **Updated**: Verification checklist to reference approved patterns
+
+#### SKILL.md
+
+- **Updated**: Quick Reference table - CheckAffiliation changed from "REQUIRED - query external API" to "REQUIRED - use Pattern A/B/C"
+- **Updated**: Step 1 Mandatory Requirements Checklist description
+- **Changed**: Violation example section - replaced single "WRONG/RIGHT" example with:
+  - Decision flowchart
+  - Pattern A/B/C examples
+  - Link to checkaffiliation-patterns.md for complete guidance
+- **Updated**: Step 3 Implementation Checklist - changed "queries external API" to "uses approved pattern (A/B/C)"
+
+### Impact
+
+- **Compliance Rate**: Eliminates the 98% failure rate by providing achievable patterns for all API types
+- **Backwards Compatible**: Pattern B (CheckAffiliationSimple) validates existing AWS/Azure/GCP implementations
+- **Security Maintained**: Pattern C (seed-based) maintains security for seed-scoped integrations where user explicitly provides discovery scope
+- **Developer Experience**: Clear decision tree removes guesswork about which pattern to use
+
+### Metadata
+
+- **Line Count**: SKILL.md still under 400 lines (inline edit appropriate)
+- **Files Modified**: 3 files (SKILL.md, checkaffiliation-patterns.md, mandatory-requirements.md)
+- **Breaking Change**: No - Pattern B validates existing implementations, new patterns are additive
+
 ## [2026-01-04-2] - Augmentation with Validated Code Examples
 
 ### Added

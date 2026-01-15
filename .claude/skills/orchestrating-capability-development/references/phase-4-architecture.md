@@ -1,4 +1,4 @@
-# Phase 3: Architecture
+# Phase 4: Architecture
 
 Design implementation plan for the security capability with detection logic, data flow, and error handling.
 
@@ -208,7 +208,7 @@ Options:
 
 1. Update metadata.json with human_approved: true
 2. Mark architecture phase as complete
-3. Proceed to Phase 4 (Implementation)
+3. Proceed to Phase 5 (Implementation)
 
 ## metadata.json Updates
 
@@ -261,8 +261,8 @@ Architecture phase is complete when:
 
 ## Related
 
-- [Phase 2: Discovery](phase-2-discovery.md) - Previous phase (provides patterns)
-- [Phase 4: Implementation](phase-4-implementation.md) - Next phase (executes plan)
+- [Phase 3: Discovery](phase-3-discovery.md) - Previous phase (provides patterns)
+- [Phase 5: Implementation](phase-5-implementation.md) - Next phase (executes plan)
 - [Capability Types](capability-types.md) - Type-specific architecture guidance
 - [Quality Standards](quality-standards.md) - Quality metrics to specify
 - [Agent Handoffs](agent-handoffs.md) - Handoff format details

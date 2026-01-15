@@ -1,4 +1,4 @@
-# Phase 4: Implementation
+# Phase 5: Implementation
 
 Execute the architecture plan to create capability artifacts.
 
@@ -16,9 +16,9 @@ Implement the security capability following the architecture plan with:
 | Aspect         | Details                                    |
 | -------------- | ------------------------------------------ |
 | **Agent**      | capability-developer                       |
-| **Input**      | architecture.md from Phase 3               |
+| **Input**      | architecture.md from Phase 4               |
 | **Output**     | Capability code + implementation-log.md    |
-| **Checkpoint** | NONE - automatic to Phase 4.5 (Completion) |
+| **Checkpoint** | NONE - automatic to Phase 6 (Completion) |
 | **Mode**       | Batch (1-3 tasks) or Per-Task (4+ tasks)   |
 
 ## Step 1: Count Tasks in Architecture
@@ -35,19 +35,19 @@ Based on task count, select the appropriate mode:
 
 | Task Count | Mode      | Workflow                                           |
 | ---------- | --------- | -------------------------------------------------- |
-| 1-3 tasks  | **Batch** | Implement all → Phase 4.5 → Phase 5 review         |
+| 1-3 tasks  | **Batch** | Implement all → Phase 6 → Phase 7 review         |
 | 4+ tasks   | **Per-Task** | Implement each → Review each → Next task        |
 
 ```python
 if task_count >= 4:
     mode = "per-task"
-    # See phase-4-per-task-mode.md for workflow
+    # See phase-5-per-task-mode.md for workflow
 else:
     mode = "batch"
     # Continue with standard workflow below
 ```
 
-**For Per-Task mode (4+ tasks):** See [Phase 4: Per-Task Mode](phase-4-per-task-mode.md) for complete workflow.
+**For Per-Task mode (4+ tasks):** See [Phase 5: Per-Task Mode](phase-5-per-task-mode.md) for complete workflow.
 
 **For Batch mode (1-3 tasks):** Continue with Agent Spawning below.
 
@@ -300,7 +300,7 @@ None / [Deviation description and justification]
 
 ## NEXT STEPS
 
-Ready for Phase 5 (Review) with capability-reviewer.
+Ready for Phase 7 (Review) with capability-reviewer.
 ```
 
 ## Handoff Format
@@ -375,7 +375,7 @@ Implementation phase is complete when:
 
 ### "Implementation doesn't match architecture plan"
 
-**Solution**: This will be caught in Phase 5 (Review). Reviewer will flag deviations and request changes.
+**Solution**: This will be caught in Phase 7 (Review). Reviewer will flag deviations and request changes.
 
 ### "Agent created files in wrong location"
 
@@ -383,14 +383,14 @@ Implementation phase is complete when:
 
 ### "Missing error handling for edge cases"
 
-**Solution**: This will be caught in Phase 5 (Review). Reviewer will flag missing error handling per architecture plan.
+**Solution**: This will be caught in Phase 7 (Review). Reviewer will flag missing error handling per architecture plan.
 
 ## Related
 
-- [Phase 3: Architecture](phase-3-architecture.md) - Previous phase (provides plan)
-- [Phase 4: Per-Task Mode](phase-4-per-task-mode.md) - Per-task review cycle (4+ tasks)
-- [Phase 4.5: Implementation Completion](phase-4.5-implementation-review.md) - Verify all requirements implemented
-- [Phase 5: Review](phase-5-review.md) - Next phase (validates implementation)
+- [Phase 4: Architecture](phase-4-architecture.md) - Previous phase (provides plan)
+- [Phase 5: Per-Task Mode](phase-5-per-task-mode.md) - Per-task review cycle (4+ tasks)
+- [Phase 6: Implementation Completion](phase-6-implementation-review.md) - Verify all requirements implemented
+- [Phase 7: Review](phase-7-review.md) - Next phase (validates implementation)
 - [Capability Types](capability-types.md) - Type-specific implementation guidance
 - [Agent Handoffs](agent-handoffs.md) - Handoff format and blocked status
 - [Prompts: Developer](prompts/developer-prompt.md) - Developer prompt with clarification protocol

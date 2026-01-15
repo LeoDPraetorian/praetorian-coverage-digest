@@ -41,84 +41,84 @@ Multi-agent systems using Claude can achieve **90%+ performance improvements** o
 ### Three-Tier Agent System
 
 ```
-
-                         TIER 1: ORCHESTRATORS
-  Analyze  Decompose  Delegate  Synthesize  Track Progress
-
-
-   frontend-orchestrator     backend-orchestrator
-   Tools: Task, Todo,        Tools: Task, Todo,
-   Read, Ask, Glob, Grep     Read, Ask, Glob, Grep
-
-
-
-
-
-                         TIER 2: SPECIALISTS
-  Focused expertise with implementation tools
-
-
-    Architects     Developers      Testers       Reviewers
-   (Design)       (Implement)    (Validate)     (Quality)
-
-
-  Tools: Bash, Edit, Write, Read, Glob, Grep, MultiEdit, TodoWrite
-
-
-
-
-                         TIER 3: SKILLS
-  Reusable behavioral modules loaded on-demand
-
-  Core Skills (~25)             Library Skills (~120)
-  .claude/skills/               .claude/skill-library/
-   developing-with-tdd        frontend/
-   debugging-systematically   backend/
-   brainstorming              testing/
-   ...                        security/
-
+┌───────────────────────────────────────────────────────────────────------──────┐
+│                         TIER 1: ORCHESTRATORS                                 │
+│      Analyze → Decompose → Delegate → Synthesize → Track Progress             │
+│                                                                               │
+│        ┌────────────────────--─┐    ┌───────────────────-──┐                  │
+│        │ frontend-orchestrator │    │ backend-orchestrator │                  │
+│        │ Tools: Task, Todo,    │    │ Tools: Task, Todo,   │                  │
+│        │ Read, Ask, Glob, Grep │    │ Read, Ask, Glob, Grep│                  │
+│        └──────────┬──────────--┘    └──────────┬────────-──┘                  │
+└────────------─────┼──────────────────────--────┼──────────────────────────────┘
+                    │                            │
+                    ▼                            ▼
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │                         TIER 2: SPECIALISTS                            │
+ │  Focused expertise with implementation tools                           │
+ │                                                                        │
+ │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐   │
+ │  │  Architects  │ │  Developers  │ │   Testers    │ │  Reviewers   │   │
+ │  │ (Design)     │ │ (Implement)  │ │ (Validate)   │ │ (Quality)    │   │
+ │  └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘   │
+ │                                                                        │
+ │  Tools: Bash, Edit, Write, Read, Glob, Grep, MultiEdit, TodoWrite      │
+ └────────────────────────────────────────────────────────────────────────┘
+              │
+              ▼
+ ┌─────────────────────────────────────────────────────────────────────────┐
+ │                         TIER 3: SKILLS                                  │
+ │  Reusable behavioral modules loaded on-demand                           │
+ │                                                                         │
+ │  Core Skills (~25)           │  Library Skills (~120)                   │
+ │  .claude/skills/             │  .claude/skill-library/                  │
+ │  ├── developing-with-tdd     │  ├── frontend/                           │
+ │  ├── debugging-systematically│  ├── backend/                            │
+ │  ├── brainstorming           │  ├── testing/                            │
+ │  └── ...                     │  └── security/                           │
+ └─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Execution Flow
 
 ```
 User Request
-
-
-
-  PHASE 1: ANALYSIS
-  Orchestrator determines: Architecture? Implementation? Testing?
-  Creates TodoWrite items for all phases
-
-
-
-
-  PHASE 2: DECOMPOSITION
-  Map dependencies: Sequential vs Parallel vs Hybrid
-  Architecture  Implementation (sequential)
-  Unit  E2E  Integration tests (parallel)
-
-
-
-
-  PHASE 3: DELEGATION
-  Spawn agents with: Objective + Context + Scope + Expected Output
-  Parallel agents in SINGLE message for concurrency
-
-
-
-
-  PHASE 4: SYNTHESIS
-  Collect agent outputs (structured JSON)
-  Check for conflicts, run validators, integrate changes
-
-
-
-
-  PHASE 5: VERIFICATION
-  All tests passing? Build successful? User approves?
-  Update progress file, mark TodoWrite complete
-
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  PHASE 1: ANALYSIS                                                      │
+│  Orchestrator determines: Architecture? Implementation? Testing?        │
+│  Creates TodoWrite items for all phases                                 │
+└─────────────────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  PHASE 2: DECOMPOSITION                                                 │
+│  Map dependencies: Sequential vs Parallel vs Hybrid                     │
+│  Architecture → Implementation (sequential)                             │
+│  Unit ↔ E2E ↔ Integration tests (parallel)                              │
+└─────────────────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  PHASE 3: DELEGATION                                                    │
+│  Spawn agents with: Objective + Context + Scope + Expected Output       │
+│  Parallel agents in SINGLE message for concurrency                      │
+└─────────────────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  PHASE 4: SYNTHESIS                                                     │
+│  Collect agent outputs (structured JSON)                                │
+│  Check for conflicts, run validators, integrate changes                 │
+└─────────────────────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  PHASE 5: VERIFICATION                                                  │
+│  All tests passing? Build successful? User approves?                    │
+│  Update progress file, mark TodoWrite complete                          │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -399,17 +399,17 @@ Task("frontend-e2e-test-engineer", "...");
 
 ```
 .claude/progress/
- frontend-asset-filtering.md    # Active orchestrations
- backend-job-processing.md
- archived/                       # Completed (kept for reference)
-     frontend-dashboard-2024-01.md
+├── frontend-asset-filtering.md    # Active orchestrations
+├── backend-job-processing.md
+└── archived/                       # Completed (kept for reference)
+    └── frontend-dashboard-2024-01.md
 
 .claude/features/{feature-id}/
- progress.json                   # Machine-readable state
- context/                        # Requirements
- architecture/                   # Design decisions
- implementation/                 # Agent outputs
- testing/                        # Test results
+├── progress.json                   # Machine-readable state
+├── context/                        # Requirements
+├── architecture/                   # Design decisions
+├── implementation/                 # Agent outputs
+└── testing/                        # Test results
 ```
 
 **Resume Protocol:**
@@ -834,19 +834,19 @@ This section analyzes how skills are connected to the `/feature` workflow and id
 ### The Fundamental Problem
 
 ```
-
-  /feature orchestration
-
-  Phase 1  skill: "brainstorming"   ENFORCED
-  Phase 2  skill: "writing-plans"   ENFORCED
-  Phase 3  Task(frontend-architect)  HOPE agent uses skills
-  Phase 4  Task(frontend-developer)  HOPE agent uses skills
-  Phase 5  Task(test-engineers)      HOPE agent uses skills
-
-   No Phase 6: Code Review
-   No Phase 7: Security Review (for sensitive features)
-   No Phase 8: PR/Branch Completion
-
+┌───────────────────────────────────────────────────────────────────┐
+│  /feature orchestration                                           │
+│                                                                   │
+│  Phase 1 ─→ skill: "brainstorming"  ENFORCED                      │
+│  Phase 2 ─→ skill: "writing-plans"  ENFORCED                      │
+│  Phase 3 ─→ Task(frontend-architect) HOPE agent uses skills       │
+│  Phase 4 ─→ Task(frontend-developer) HOPE agent uses skills       │
+│  Phase 5 ─→ Task(test-engineers)     HOPE agent uses skills       │
+│                                                                   │
+│  No Phase 6: Code Review                                          │
+│  No Phase 7: Security Review (for sensitive features)             │
+│  No Phase 8: PR/Branch Completion                                 │
+└───────────────────────────────────────────────────────────────────┘
 
 Agent skills: field makes skills DISCOVERABLE (0 token cost)
 But agents must CHOOSE to invoke them - nothing enforces it
@@ -1301,28 +1301,3 @@ If ANY checked Spawn security reviewer before proceeding
   - Validate conflict handling
 
 ---
-
-## Changelog
-
-| Date       | Change                                                                                                                                                                                                                                                                      | Author |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| 2026-01-06 | Added Skill Composition Patterns section based on obra/superpowers analysis: REQUIRED SUB-SKILL declarations, Integration sections, Prompt Templates in skills, Commands as thin wrappers, Workflow chains. Added Priority 0 implementation tasks. Updated reference links. | Claude |
-| 2026-01-04 | Centralized escalation architecture: routing table in orchestrating-multi-agent-workflows, blocked format (blocked_reason, attempted) in persisting-agent-outputs, effort scaling guidance, removed recommended_agent pattern from agents                                   | Claude |
-| 2025-12-25 | Added Skill Connectivity Analysis section with orphaned skills inventory                                                                                                                                                                                                    | Claude |
-| 2025-12-25 | Added Priority 0 quick wins for skill connectivity fixes                                                                                                                                                                                                                    | Claude |
-| 2025-12-25 | Expanded todo list with skill enforcement and workflow integration items                                                                                                                                                                                                    | Claude |
-| 2025-12-25 | Initial document creation with best practices from 32 web resources                                                                                                                                                                                                         | Claude |
-
----
-
-## Contributing
-
-To update this document:
-
-1. Review latest Anthropic documentation and research
-2. Analyze recent orchestration outcomes in `.claude/progress/`
-3. Update relevant sections with new learnings
-4. Add new reference links with key insights
-5. Update changelog
-
-For questions or suggestions, discuss with the team before making significant changes to architectural patterns.

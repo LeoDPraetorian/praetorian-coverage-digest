@@ -1,3 +1,66 @@
+## [Date: 2026-01-14] - Remove redirect stub file
+
+### Problem (Audit Finding)
+Audit detected `references/refactor-rules.md` as a redirect stub (9 lines) pointing to the shared patterns directory, violating Phase 26 (Reference Content Quality).
+
+### Root Cause
+File was kept as a redirect after content was migrated to shared location (`.claude/skills/managing-skills/references/patterns/refactor-rules.md`). No active links in SKILL.md or reference files pointed to this redirect.
+
+### Changes
+
+**Removed:**
+- `references/refactor-rules.md` - Redirect stub no longer needed
+
+### Verification
+- ✅ No broken links introduced (no files referenced the redirect)
+- ✅ 9 substantive reference files remain
+- ✅ CHANGELOG entries preserved (historical records not modified)
+
+### Category
+Phase 26 fix - Claude-Automated
+
+---
+
+## [Date: 2026-01-14] - Add Phase Numbering Hygiene Guidance
+
+### Problem (RED)
+creating-skills can produce skills with fractional major phase numbers (Phase 4.5, Phase 1.5) which violate the established phase numbering convention, causing audit warnings and maintenance debt.
+
+**Test scenario**: Created `orchestrating-integration-development` skill with "Phase 4.5: P0 Compliance Verification" which violates the sequential integer rule.
+
+### Root Cause
+1. Phase 5.2 (Generate SKILL.md) has no phase numbering guidance
+2. validation-and-anti-patterns.md doesn't list fractional phases as anti-pattern
+3. Canonical rule exists in managing-skills/references/patterns/changelog-format.md but not referenced during skill generation
+4. Phase 8.3 audit would catch it but can be skipped
+
+### Changes
+
+**SKILL.md Phase 5.2 (after line 271):**
+- Added "Phase Numbering Pattern (MANDATORY)" subsection (~10 lines)
+- References canonical source: managing-skills/references/patterns/changelog-format.md
+- Clarifies: sequential integers required, fractional major phases forbidden, sub-steps acceptable
+- Notes: caught by auditing-skills Phase 7
+- Line count: 491 → ~505 lines (added 14 lines)
+
+**references/validation-and-anti-patterns.md (after line 53):**
+- Added "Don't Use Fractional Major Phase Numbers" anti-pattern (~8 lines)
+- References same canonical source
+- Lists what's caught by (auditing-skills Phase 7)
+- Line count: 53 → ~61 lines (added 8 lines)
+
+### Acceptance Criteria Met
+1. ✅ Phase numbering rule now visible during Phase 5.2 (preventative)
+2. ✅ Both additions reference canonical source (no duplication)
+3. ✅ Anti-pattern documented for validation phase
+4. ✅ Skill maintains <500 line compliance
+
+### Files Modified
+- `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md` (491 → ~505 lines)
+- `.claude/skill-library/claude/skill-management/creating-skills/references/validation-and-anti-patterns.md` (53 → ~61 lines)
+
+---
+
 ## [Date: 2026-01-12] - Fix Phase 6.3 Reference File Population Failure
 
 ### Problem

@@ -393,3 +393,62 @@ Following superpowers principle: when multiple skills must be called in order, c
 - Decision point follows fingerprintx open-source pattern
 
 **Status**: Update complete
+
+## 2026-01-14 - Increased Retry Limits
+
+**Changed**: Increased max retry limits for all review and testing phases from 2/1/1 to 3/3/3
+
+- Phase 6, Stage 1 (Spec Compliance): 2 → 3 retries
+- Phase 6, Stage 2 (Code Quality): 1 → 3 retries
+- Phase 7 (Test Validation): 1 → 3 retries
+
+**Rationale**: Provides more opportunities to fix issues before escalating to user, improving workflow resilience without compromising quality gates.
+
+**Files Updated**:
+- SKILL.md (Quick Reference, workflow boxes, Key Principles)
+- references/phase-6-review.md (retry loops, exit criteria)
+- references/phase-7-testing.md (retry logic)
+- references/phase-4-per-task-mode.md (checkpoint thresholds)
+- references/troubleshooting.md (escalation thresholds)
+
+## 2026-01-14 - Enhanced Reviewer Skepticism Language
+
+**Changed**: Strengthened reviewer-prompt.md skepticism language to match orchestrating-feature-development
+
+Added:
+- "DO NOT TRUST THE REPORT." standalone header
+- "CRITICAL: The implementer finished suspiciously quickly." explicit warning
+- Explicit warnings in Step 3: "The developer may have: Claimed completion when work is incomplete, Misunderstood the requirement, Implemented something subtly different, Made optimistic claims about working code"
+- Full worked example showing VQL capability verification catching missing secret key detection
+- Enhanced Red Flags section with parenthetical explanations (8 flags vs 6)
+
+**Rationale**: Stronger skepticism language helps reviewers catch incomplete or inaccurate implementation claims, especially when developers finish quickly.
+
+**Files Updated**:
+- references/prompts/reviewer-prompt.md
+
+## 2026-01-14 - Renumber Phase 1.5 to Sequential Integers
+
+**Changed**: Eliminated fractional Phase 1.5, renumbered all subsequent phases sequentially
+
+Phase renumbering:
+- Phase 1.5 → Phase 2 (Work Type Decision Point)
+- Phase 2 → Phase 3 (Discovery)
+- Phase 3 → Phase 4 (Architecture)
+- Phase 4 → Phase 5 (Implementation)
+- Phase 5 → Phase 6 (Implementation Completion)
+- Phase 6 → Phase 7 (Review)
+- Phase 7 → Phase 8 (Testing)
+
+File renames:
+- phase-2-discovery.md → phase-3-discovery.md
+- phase-3-architecture.md → phase-4-architecture.md
+- phase-4-implementation.md → phase-5-implementation.md
+- phase-4-per-task-mode.md → phase-5-per-task-mode.md
+- phase-5-implementation-review.md → phase-6-implementation-review.md
+- phase-6-review.md → phase-7-review.md
+- phase-7-testing.md → phase-8-testing.md
+
+**Rationale**: Per phase numbering hygiene rule: "NEVER use fractional phase numbers (e.g., Phase 3.5, Phase 5.4), ALWAYS renumber subsequent phases to maintain sequential integers."
+
+**Files Updated**: All reference files, SKILL.md, and cross-references updated.

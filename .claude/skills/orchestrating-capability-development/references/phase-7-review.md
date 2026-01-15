@@ -1,4 +1,4 @@
-# Phase 5: Code Review
+# Phase 7: Code Review
 
 **Two-stage gated review**: Spec compliance FIRST (blocking gate), then code quality (sequential).
 
@@ -18,12 +18,12 @@ Validate implementation through sequential gates:
 | **Agent**      | capability-reviewer                                      |
 | **Input**      | architecture.md, implementation-log.md, code files       |
 | **Output**     | spec-compliance-review.md, code-quality-review.md        |
-| **Checkpoint** | Stage 1: MAX 2 RETRIES, Stage 2: MAX 1 RETRY             |
+| **Checkpoint** | Stage 1: MAX 3 RETRIES, Stage 2: MAX 3 RETRIES           |
 
 ## Two-Stage Review Pattern
 
 ```
-Phase 4.5: Implementation Completion Review
+Phase 6: Implementation Completion Review
         ↓
 ┌───────────────────────────────────────┐
 │  STAGE 1: Spec Compliance (BLOCKING)  │
@@ -32,7 +32,7 @@ Phase 4.5: Implementation Completion Review
 │  Verdict: SPEC_COMPLIANT | NOT_       │
 └─────────────┬─────────────────────────┘
               │
-         NOT_COMPLIANT? ──→ Fix loop (max 2 attempts) ──→ Escalate
+         NOT_COMPLIANT? ──→ Fix loop (max 3 attempts) ──→ Escalate
               │
         SPEC_COMPLIANT
               ↓
@@ -43,11 +43,11 @@ Phase 4.5: Implementation Completion Review
 │  Verdict: APPROVED | CHANGES_         │
 └─────────────┬─────────────────────────┘
               │
-    CHANGES_REQUESTED? ──→ Fix loop (max 1 attempt) ──→ Escalate
+    CHANGES_REQUESTED? ──→ Fix loop (max 3 attempts) ──→ Escalate
               │
            APPROVED
               ↓
-        Phase 6: Testing
+        Phase 8: Testing
 ```
 
 ## Stage 1: Spec Compliance Review (BLOCKING GATE)
@@ -100,7 +100,7 @@ elif stage1_verdict == "NOT_COMPLIANT":
     enter_stage1_fix_loop()
 ```
 
-### Step 3: Stage 1 Fix Loop (MAX 2 ATTEMPTS)
+### Step 3: Stage 1 Fix Loop (MAX 3 ATTEMPTS)
 
 If `verdict: "NOT_COMPLIANT"`:
 
@@ -116,14 +116,21 @@ If `verdict: "NOT_COMPLIANT"`:
 1. Dispatch developer with remaining issues
 2. Re-run Stage 1 spec compliance review
 3. If SPEC_COMPLIANT → proceed to Stage 2
+4. If still NOT_COMPLIANT → Attempt 3
+
+#### Attempt 3: Developer Fixes Third Time
+
+1. Dispatch developer with remaining issues
+2. Re-run Stage 1 spec compliance review
+3. If SPEC_COMPLIANT → proceed to Stage 2
 4. If still NOT_COMPLIANT → Escalate
 
-#### Escalation After 2 Failures
+#### Escalation After 3 Failures
 
 ```typescript
 AskUserQuestion({
   questions: [{
-    question: "Spec compliance failing after 2 attempts. How should we proceed?",
+    question: "Spec compliance failing after 3 attempts. How should we proceed?",
     header: "Spec Review",
     multiSelect: false,
     options: [
@@ -198,7 +205,7 @@ else:
     enter_stage2_fix_loop()
 ```
 
-### Step 6: Stage 2 Fix Loop (MAX 1 ATTEMPT)
+### Step 6: Stage 2 Fix Loop (MAX 3 ATTEMPTS)
 
 If reviewer returns `CHANGES_REQUESTED`:
 
@@ -207,15 +214,31 @@ If reviewer returns `CHANGES_REQUESTED`:
 1. Compile feedback from reviewer
 2. Dispatch developer to fix quality issues
 3. Re-run Stage 2 (code quality review)
-4. If APPROVED → proceed to Phase 6
+4. If APPROVED → proceed to Phase 7
+5. If still issues → Attempt 2
+
+#### Attempt 2: Developer Fixes Again
+
+1. Compile feedback from reviewer
+2. Dispatch developer to fix quality issues
+3. Re-run Stage 2 (code quality review)
+4. If APPROVED → proceed to Phase 7
+5. If still issues → Attempt 3
+
+#### Attempt 3: Developer Fixes Third Time
+
+1. Compile feedback from reviewer
+2. Dispatch developer to fix quality issues
+3. Re-run Stage 2 (code quality review)
+4. If APPROVED → proceed to Phase 7
 5. If still issues → Escalate
 
-#### Escalation After 1 Failure
+#### Escalation After 3 Failures
 
 ```typescript
 AskUserQuestion({
   questions: [{
-    question: "Code quality review failing after 1 retry. How should we proceed?",
+    question: "Code quality review failing after 3 retries. How should we proceed?",
     header: "Review",
     multiSelect: false,
     options: [
@@ -273,13 +296,13 @@ AskUserQuestion({
 ### Step 8: Mark TodoWrite Complete
 
 ```
-TodoWrite: Mark "Phase 5: Code Review" as completed
-TodoWrite: Mark "Phase 6: Testing" as in_progress
+TodoWrite: Mark "Phase 7: Code Review" as completed
+TodoWrite: Mark "Phase 8: Testing" as in_progress
 ```
 
 ## Exit Criteria
 
-✅ Proceed to Phase 6 (Testing) when:
+✅ Proceed to Phase 8 (Testing) when:
 
 - Stage 1: `verdict: "SPEC_COMPLIANT"` achieved
 - Stage 2: Reviewer returned `verdict: "APPROVED"` (or `"APPROVED_WITH_NOTES"`)
@@ -292,8 +315,8 @@ TodoWrite: Mark "Phase 6: Testing" as in_progress
 
 ❌ Do NOT proceed if:
 
-- Stage 1 NOT_COMPLIANT after 2 attempts without user approval
-- Stage 2 CHANGES_REQUESTED after 1 attempt without user approval
+- Stage 1 NOT_COMPLIANT after 3 attempts without user approval
+- Stage 2 CHANGES_REQUESTED after 3 attempts without user approval
 
 ## Review Checklist by Type
 
@@ -359,9 +382,9 @@ TodoWrite: Mark "Phase 6: Testing" as in_progress
 
 ## Related References
 
-- [Phase 4: Implementation](phase-4-implementation.md) - Previous phase
-- [Phase 4.5: Implementation Completion](phase-4.5-implementation-review.md) - Completeness check before review
-- [Phase 6: Testing](phase-6-testing.md) - Next phase
+- [Phase 5: Implementation](phase-5-implementation.md) - Previous phase
+- [Phase 6: Implementation Completion](phase-6-implementation-review.md) - Completeness check before review
+- [Phase 8: Testing](phase-8-testing.md) - Next phase
 - [Prompts: Reviewer](prompts/reviewer-prompt.md) - Stage 1 + Stage 2 templates
 - [Quality Standards](quality-standards.md) - Quality criteria by capability type
 - [Agent Handoffs](agent-handoffs.md) - Handoff format and retry logic

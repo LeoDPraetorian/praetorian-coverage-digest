@@ -325,6 +325,6 @@ Examples: third-party API clients, result normalization, platform bridging
 ## Related
 
 - [Phase 1: Brainstorming](phase-1-brainstorming.md) - Determining capability type
-- [Phase 2: Discovery](phase-2-discovery.md) - Type-specific search patterns
-- [Phase 3: Architecture](phase-3-architecture.md) - Type-specific architecture patterns
+- [Phase 3: Discovery](phase-3-discovery.md) - Type-specific search patterns
+- [Phase 4: Architecture](phase-4-architecture.md) - Type-specific architecture patterns
 - [Quality Standards](quality-standards.md) - Type-specific quality metrics

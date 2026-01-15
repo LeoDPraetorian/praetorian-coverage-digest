@@ -183,12 +183,12 @@ Update `${OUTPUT_DIR}/metadata.json`:
 
 ```
 TodoWrite: Mark "Phase 1: Brainstorming" as completed
-TodoWrite: Mark "Phase 2: Discovery" as in_progress
+TodoWrite: Mark "Phase 3: Discovery" as in_progress
 ```
 
 ## Exit Criteria
 
-✅ Proceed to Phase 2 when:
+✅ Proceed to Phase 3 when:
 
 - Capability type determined
 - Design documented in `design.md`
@@ -219,6 +219,6 @@ TodoWrite: Mark "Phase 2: Discovery" as in_progress
 
 ## Related References
 
-- [Phase 2: Discovery](phase-2-discovery.md) - Next phase
+- [Phase 3: Discovery](phase-3-discovery.md) - Next phase
 - [Capability Types](capability-types.md) - Detailed comparison of capability types
 - [Agent Handoffs](agent-handoffs.md) - Handoff format to discovery phase

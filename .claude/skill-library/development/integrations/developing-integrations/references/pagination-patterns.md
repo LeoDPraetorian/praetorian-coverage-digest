@@ -260,6 +260,178 @@ err := task.paginate(func(opt *godo.ListOptions) (*godo.Response, error) {
 
 ---
 
+## Pagination Safety Guarantee
+
+All pagination implementations MUST provide a termination guarantee to prevent infinite loops. Two approaches are acceptable, depending on API reliability.
+
+### Approach A: Hardcoded maxPages Constant (Defensive)
+
+**When to Use:**
+- API doesn't provide reliable termination signals
+- API has known pagination bugs or infinite loop history
+- Documentation unclear about pagination termination
+- Safety-critical integrations where truncation is acceptable
+
+**Implementation:**
+
+```go
+const maxPages = 1000 // Safety net
+
+func (task *Integration) enumerate() error {
+    var nextToken string
+    for page := 0; page < maxPages; page++ {
+        resp, err := task.client.List(nextToken)
+        if err != nil {
+            return fmt.Errorf("listing page %d: %w", page, err)
+        }
+
+        task.processItems(resp.Items)
+
+        // Check if we're done
+        if resp.NextToken == "" {
+            break
+        }
+        nextToken = resp.NextToken
+    }
+
+    // Warn if we hit the safety limit
+    if page >= maxPages {
+        slog.Warn("reached maxPages safety limit", "maxPages", maxPages)
+    }
+    return nil
+}
+```
+
+**Pros:**
+- Guaranteed termination regardless of API bugs
+- Explicit safety contract in code
+- Easy to audit and understand
+
+**Cons:**
+- May truncate legitimate large datasets
+- Arbitrary limit requires justification
+
+---
+
+### Approach B: API-Provided Limits (Standard)
+
+**When to Use:**
+- API is well-documented with reliable pagination
+- API provides authoritative termination signals
+- All data must be retrieved (no truncation acceptable)
+- Vendor SDK handles pagination internally
+
+**Termination Signals:**
+- `resp.LastPage` - Total pages known upfront
+- `resp.HasMore` - Boolean continuation flag
+- `resp.TotalCount` - Item count for verification
+- `resp.NextToken == ""` - Empty token indicates end
+- `resp.Links.IsLastPage()` - HATEOAS-style navigation
+
+**Implementation Examples:**
+
+Token-based (see Pattern 1):
+```go
+if !resp.HasNextPage() {
+    break
+}
+```
+
+Page-based (see Pattern 2):
+```go
+for i := 2; i <= resp.LastPage; i++ {
+    // Process pages
+}
+```
+
+Cursor-based (see Pattern 3):
+```go
+if nextToken == "" {
+    break
+}
+```
+
+**Pros:**
+- Gets all data, no arbitrary truncation
+- Respects API's pagination design
+- Most common pattern in production (44/44 Chariot integrations)
+
+**Cons:**
+- Relies on API correctness
+- Vulnerable to API bugs (infinite loops)
+
+---
+
+### Approach C: Combined (Recommended for Critical Paths)
+
+**When to Use:**
+- Uncertain about API reliability
+- First-time integration with new API
+- Production incidents related to pagination
+
+**Implementation:**
+
+```go
+const maxPages = 1000 // Safety net
+
+func (task *Integration) enumerate() error {
+    var nextToken string
+    for page := 0; page < maxPages; page++ {
+        resp, err := task.client.List(nextToken)
+        if err != nil {
+            return fmt.Errorf("listing page %d: %w", page, err)
+        }
+
+        task.processItems(resp.Items)
+
+        // Primary termination: API signal
+        if resp.NextToken == "" {
+            break
+        }
+        nextToken = resp.NextToken
+    }
+
+    // Log if we hit safety limit (indicates potential issue)
+    if page >= maxPages {
+        slog.Warn("reached maxPages safety limit", "maxPages", maxPages)
+    }
+    return nil
+}
+```
+
+**Benefits:**
+- API signal as primary termination (gets all data)
+- maxPages as safety net (prevents infinite loops)
+- Logging alerts to potential API issues
+- Best of both approaches
+
+---
+
+### Decision Criteria
+
+| Scenario | Recommended Approach |
+|----------|---------------------|
+| API has known pagination bugs | **Approach A** (Defensive) |
+| API well-documented, stable | **Approach B** (Standard) |
+| First integration, uncertain | **Approach C** (Combined) |
+| Large datasets (>1000 pages) | **Approach B** with monitoring |
+| Safety-critical path | **Approach C** (Combined) |
+
+**Document your choice** in `architecture.md` with justification:
+
+```markdown
+## Pagination Safety
+
+**Approach**: API-Provided Limits (Approach B)
+
+**Justification**: GitHub API provides reliable `LastPage` field in all list responses.
+No known pagination bugs. API has been stable for 10+ years.
+
+**Termination Signal**: `resp.LastPage` comparison in for loop
+```
+
+---
+
 ## Anti-Patterns to Avoid
 
 ### ❌ No Maximum Page Limit

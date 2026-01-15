@@ -61,49 +61,53 @@ task.Job.Send(&risk)
 
 ## 2. CheckAffiliation (REQUIRED)
 
-**Purpose**: Verify asset ownership by querying the external API. Prevents false positives and validates integration credentials still have access to assets.
+**Purpose**: Verify asset ownership using one of the approved patterns. Prevents false positives and validates integration credentials still have access to assets.
 
 **Requirements**:
 
+You **MUST** verify asset affiliation using one of the approved patterns (Pattern A/B/C). Stub implementations returning `true` without verification are **NOT acceptable**.
+
+See [checkaffiliation-patterns.md](checkaffiliation-patterns.md) for the complete decision tree, but here's a quick summary:
+
+### Pattern A - Direct Ownership Query (PREFERRED)
+
+For SaaS integrations with single-asset lookup endpoints:
+
 ```go
 func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
-    // MUST query external API to verify asset ownership
-    // Return (true, nil) if affiliated
-    // Return (false, nil) if not affiliated
-    // Return (false, err) on error
-
-    resp, err := t.client.GetAsset(asset.DNS) // Query external API
+    resp, err := t.client.GetAsset(asset.CloudId)
     if err != nil {
         if isNotFoundError(err) {
-            return false, nil // Asset no longer exists
+            return false, nil // Asset doesn't exist
         }
-        return false, fmt.Errorf("querying API: %w", err)
+        return false, fmt.Errorf("querying asset: %w", err)
     }
-
-    return resp.IsOwned, nil
+    return resp.ID != "" && resp.DeletedAt == "", nil
 }
 ```
 
-**ANTI-PATTERN: Stub Implementation**
+### Pattern B - CheckAffiliationSimple (ACCEPTABLE for cloud providers)
 
-❌ **WRONG - only 1 of 42 integrations (Wiz) has real implementation**:
+For AWS/Azure/GCP where full enumeration is required:
 
 ```go
 func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
-    return true, nil // VIOLATION - doesn't query external API
+    return t.BaseCapability.CheckAffiliationSimple(asset)
 }
 ```
 
-**ANTI-PATTERN: Full Re-enumeration**
+### Pattern C - Seed-Based Affiliation (ACCEPTABLE for seed-scoped integrations)
 
-❌ **WRONG - Amazon/Azure/GCP use expensive full re-enumeration**:
+For integrations that only discover from user-provided seeds (Shodan, DNS tools):
 
 ```go
 func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
-    // Re-enumerates ALL assets just to find one
-    allAssets, err := t.ListAllAssets() // Expensive
-    for _, a := range allAssets {
-        if a.ID == asset.Key {
+    // Check all relevant asset fields against user-provided seeds
+    for _, seed := range t.Job.Seeds {
+        if strings.Contains(asset.Key, seed.Value) {
+            return true, nil
+        }
+        if asset.DNS != "" && strings.Contains(asset.DNS, seed.Value) {
             return true, nil
         }
     }
@@ -111,25 +115,29 @@ func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
 }
 ```
 
-**RIGHT: Query Specific Asset**
+### Decision Flowchart
 
-✅ See `wiz.go` for the only correct implementation:
+```
+Does the vendor API have a single-asset lookup endpoint?
+├── YES → Implement Pattern A (direct query)
+└── NO → Is this a cloud provider integration (AWS/Azure/GCP)?
+    ├── YES → Use Pattern B (CheckAffiliationSimple)
+    └── NO → Is integration seed-scoped (only discovers from user seeds)?
+        ├── YES → Implement Pattern C (seed-based)
+        └── NO → Consult with integration-lead for custom approach
+```
+
+**ANTI-PATTERN: Stub Implementation**
+
+❌ **WRONG - This is a compliance violation**:
 
 ```go
-func (t *WizTask) CheckAffiliation(asset model.Asset) (bool, error) {
-    // Query specific asset by ID
-    resp, err := t.client.GetAssetByID(asset.Key)
-    if err != nil {
-        if isNotFoundError(err) {
-            return false, nil
-        }
-        return false, err
-    }
-    return true, nil
+func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
+    return true, nil // VIOLATION - doesn't use any approved pattern
 }
 ```
 
-**Why This Matters**: Stub implementations always return `true`, causing false positives when assets are deleted or credentials are revoked. Full re-enumeration is prohibitively expensive for cloud providers with thousands of assets.
+**Why This Matters**: Stub implementations always return `true`, causing false positives when assets are deleted or credentials are revoked. Use Pattern A/B/C based on your API's capabilities.
 
 ---
 
@@ -255,8 +263,14 @@ return fmt.Errorf("fetching assets from page %d: %w", page, err)
 
 **Requirements**:
 
+You **MUST** provide a pagination termination guarantee using **ONE** of the following approaches:
+
+### Approach A: Hardcoded maxPages Constant
+
+Use when API doesn't provide reliable termination signals:
+
 ```go
-const maxPages = 1000 // REQUIRED - safety limit
+const maxPages = 1000 // Safety net
 
 page := 0
 pageToken := ""
@@ -283,16 +297,85 @@ for {
 }
 ```
 
-**Infinite Loop Risk Found**:
+### Approach B: API-Provided Pagination Signal
 
-- MS Defender integration - no maxPages limit
-- EntraID integration - no maxPages limit
-- CrowdStrike Spotlight integration - no maxPages limit
-- Xpanse integration - no maxPages limit
-- InsightVM integration - no maxPages limit
-- GitLab integration - no maxPages limit
+Use when API provides reliable termination signals:
 
-**Why This Matters**: Buggy APIs can return `nextToken` infinitely. Without `maxPages`, integration runs forever, exhausting memory and causing Lambda timeouts.
+```go
+pageToken := ""
+
+for {
+    resp, err := api.ListAssets(pageToken)
+    if err != nil {
+        return fmt.Errorf("listing assets: %w", err)
+    }
+
+    // Process resp.Assets...
+
+    // API-provided termination signals (use appropriate one for your API):
+    if resp.NextToken == "" {        // Empty token
+        break
+    }
+    if !resp.HasMore {                // Boolean flag
+        break
+    }
+    if page >= resp.LastPage {        // Total page count
+        break
+    }
+    if resp.Links.IsLastPage() {      // HATEOAS navigation
+        break
+    }
+
+    pageToken = resp.NextToken
+}
+```
+
+### Approach C: Combined (Recommended)
+
+Use both approaches for maximum safety:
+
+```go
+const maxPages = 1000 // Safety net
+
+page := 0
+pageToken := ""
+
+for page < maxPages {
+    resp, err := api.ListAssets(pageToken)
+    if err != nil {
+        return fmt.Errorf("listing assets at page %d: %w", page, err)
+    }
+
+    // Process resp.Assets...
+
+    // Primary termination: API signal
+    if resp.NextToken == "" {
+        break
+    }
+
+    pageToken = resp.NextToken
+    page++
+}
+
+// Warn if we hit safety limit
+if page >= maxPages {
+    log.Warn("reached maxPages safety limit", "maxPages", maxPages)
+}
+```
+
+**Document Your Choice**: Add to `architecture.md`:
+
+```markdown
+## Pagination Safety
+
+**Approach**: API-Provided Limits (Approach B)
+
+**Justification**: GitHub API provides reliable `LastPage` field.
+
+**Termination Signal**: `resp.LastPage` comparison
+```
+
+**Why This Matters**: Production analysis shows 44/44 integrations use API-provided signals (Approach B), but APIs can have bugs. Choose the approach that matches your API's reliability, and document the decision in architecture.md.
 
 ---
 
@@ -303,10 +386,10 @@ Before submitting PR, verify:
 - [ ] VMFilter initialized in struct with `filter.NewVMFilter(job.Username)`
 - [ ] `Filter.Asset(&asset)` called before every `Job.Send(&asset)`
 - [ ] `Filter.Risk(&risk)` called before every `Job.Send(&risk)`
-- [ ] CheckAffiliation queries external API (not stub returning `true`)
+- [ ] CheckAffiliation uses one of the approved patterns (Pattern A/B/C) - not stub returning `true`
 - [ ] ValidateCredentials implemented and called in `Invoke()`
 - [ ] All errgroup usage has `g.SetLimit()` and loop variable capture
 - [ ] No ignored errors (no `_, _ = ...`)
-- [ ] All pagination loops have `maxPages` constant with break condition
+- [ ] Pagination has termination guarantee (maxPages OR API signal), documented in architecture.md
 
 **ALL items must be checked before PR approval.**

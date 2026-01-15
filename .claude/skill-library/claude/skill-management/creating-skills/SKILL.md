@@ -270,6 +270,12 @@ Every skill MUST include an Integration section documenting dependencies. This i
 
 **See:** [code-reference-patterns.md](.claude/skills/managing-skills/references/patterns/code-reference-patterns.md)
 
+#### 🚨 Phase Numbering Pattern (MANDATORY)
+
+Use sequential integers (Phase 1, 2, 3...) not fractional (Phase 1.5, 4.5). Sub-steps (5.1, 5.2) acceptable.
+
+**See:** [Phase Numbering](.claude/skills/managing-skills/references/patterns/changelog-format.md) | Caught by: auditing-skills Phase 7
+
 ### 5.3 Verify Line Count (MANDATORY)
 
 See [Line Count Limits](.claude/skills/managing-skills/references/patterns/line-count-limits.md) for complete thresholds and extraction strategy.

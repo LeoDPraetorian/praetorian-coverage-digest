@@ -44,11 +44,14 @@ This gateway implements 3-tier loading:
 
 **Match your task to a routing pattern:**
 
-| Task Intent                               | Route To                            |
-| ----------------------------------------- | ----------------------------------- |
-| "create integration" / "new integration"  | → `developing-integrations`         |
-| "integration test" / "API test"           | → `writing-integration-tests-first` |
-| "AWS" / "Lambda" / "DynamoDB" / "S3"      | → `integrating-with-aws`            |
+| Task Intent                                        | Route To                            |
+| -------------------------------------------------- | ----------------------------------- |
+| "create integration" / "new integration"           | → `developing-integrations`         |
+| "validate integration" / "P0 compliance"           | → `validating-integrations`         |
+| "test integration" / "integration tests"           | → `testing-integrations`            |
+| "mock collector" / "mock HTTP server"              | → `testing-integrations`            |
+| "integration test" / "API test"                    | → `writing-integration-tests-first` |
+| "AWS" / "Lambda" / "DynamoDB" / "S3"               | → `integrating-with-aws`            |
 | "Azure" / "Microsoft Azure" / "Key Vault" | → `integrating-with-azure`          |
 | "GCP" / "Google Cloud" / "Cloud Storage"  | → `integrating-with-gcp`            |
 | "Bugcrowd" / "bug bounty"                 | → `integrating-with-bugcrowd`       |
@@ -76,10 +79,19 @@ This gateway implements 3-tier loading:
 
 ### Patterns & Testing
 
-| Skill                   | Path                                                                              | Triggers                            |
-| ----------------------- | --------------------------------------------------------------------------------- | ----------------------------------- |
-| Developing Integrations | `.claude/skill-library/development/integrations/developing-integrations/SKILL.md` | create integration, new integration |
-| Integration Tests       | `.claude/skill-library/testing/writing-integration-tests-first/SKILL.md`          | integration test, API test          |
+| Skill                    | Path                                                                               | Triggers                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Developing Integrations  | `.claude/skill-library/development/integrations/developing-integrations/SKILL.md`  | create integration, new integration                         |
+| Validating Integrations  | `.claude/skill-library/development/integrations/validating-integrations/SKILL.md`  | validate integration, P0 compliance, verify integration     |
+| Integration Tests        | `.claude/skill-library/testing/writing-integration-tests-first/SKILL.md`           | integration test, API test                                  |
+
+### Testing (Cross-Domain)
+
+<!-- Cross-domain reference: canonical location is gateway-testing -->
+
+| Skill                | Path                                                                  | Triggers                                                                            |
+| -------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Testing Integrations | `.claude/skill-library/testing/testing-integrations/SKILL.md`         | test integration, integration tests, mock collector, mock HTTP server, P0 test coverage |
 
 ### Third-Party Integrations
 
@@ -104,6 +116,8 @@ This gateway implements 3-tier loading:
 | Go implementation | `gateway-backend`   |
 | Testing patterns  | `gateway-testing`   |
 | MCP services      | `gateway-mcp-tools` |
+
+**Note**: For integration-specific testing patterns (mock collectors, P0 compliance tests), `testing-integrations` is included directly in this gateway as a cross-domain reference. For general testing patterns, also invoke `gateway-testing`.
 
 ## Loading Skills
 

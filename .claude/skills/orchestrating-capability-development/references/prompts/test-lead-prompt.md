@@ -1,6 +1,6 @@
 # Test Lead Subagent Prompt Template
 
-Use this template when dispatching test-lead subagent in Phase 6 (Steps 1 and 3).
+Use this template when dispatching test-lead subagent in Phase 8 (Steps 1 and 3).
 
 ## Usage
 

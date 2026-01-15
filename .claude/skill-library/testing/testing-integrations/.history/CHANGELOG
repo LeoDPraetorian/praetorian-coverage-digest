@@ -1,0 +1,31 @@
+# Changelog - testing-integrations
+
+## [2026-01-12] Initial Creation
+
+**RED Phase Documentation:**
+
+**Problem**: Developers writing tests for Chariot backend integrations lack guidance on:
+- Mock HTTP server patterns (httptest)
+- Mock Chariot collector usage (mock.Collector)
+- Required test cases for P0 compliance (VMFilter, CheckAffiliation, ValidateCredentials, errgroup, pagination)
+- Table-driven test patterns for Go integration tests
+- Rate limit and retry logic testing
+- Concurrency testing patterns
+
+**Failure without skill**: Integration tests miss critical P0 requirement coverage, use incorrect mocking patterns, fail to test error conditions (429, 5xx, timeouts), have race conditions in concurrent tests, and lack proper pagination testing.
+
+**Category**: Library skill (testing)
+**Skill Type**: Process/Pattern (testing methodology)
+**Location**: .claude/skill-library/testing/testing-integrations/
+
+**Structure Created**:
+- SKILL.md (328 lines - progressive disclosure)
+- references/ directory (to be populated with research)
+- examples/ directory
+- .history/CHANGELOG (this file)
+
+**Next Steps**:
+- Phase 6: Research and populate reference files
+- Phase 7: Update gateway-testing and/or gateway-backend routing tables
+- Phase 8: GREEN phase verification
+- Phase 9: REFACTOR phase pressure testing

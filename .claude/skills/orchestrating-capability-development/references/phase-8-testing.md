@@ -1,4 +1,4 @@
-# Phase 6: Testing
+# Phase 8: Testing
 
 Create and execute comprehensive tests for the security capability.
 
@@ -17,7 +17,7 @@ Validate capability behavior through:
 | ---- | ----------------- | ------------------ | ------------------------------ |
 | 1    | test-lead         | test-plan.md       | -                              |
 | 2    | capability-tester | Test files         | -                              |
-| 3    | test-lead         | test-validation.md | 🔄 MAX 1 RETRY - then escalate |
+| 3    | test-lead         | test-validation.md | 🔄 MAX 3 RETRIES - then escalate |
 | 4    | Run tests         | Test results       | -                              |
 
 ## Step 1: Test Planning
@@ -258,12 +258,14 @@ Tests approved. Ready for final verification.
 Tests require changes. Return to capability-tester.
 ```
 
-## Retry Logic (MAX 1 RETRY)
+## Retry Logic (MAX 3 RETRIES)
 
-Same pattern as Phase 5 (Review):
+Same pattern as Phase 7 (Review):
 
 1. **First validation: CHANGES_REQUESTED** → Re-invoke capability-tester with fixes → Re-validate
-2. **Second validation: CHANGES_REQUESTED** → Escalate to user via AskUserQuestion
+2. **Second validation: CHANGES_REQUESTED** → Re-invoke capability-tester with fixes → Re-validate
+3. **Third validation: CHANGES_REQUESTED** → Re-invoke capability-tester with fixes → Re-validate
+4. **Fourth validation: CHANGES_REQUESTED** → Escalate to user via AskUserQuestion
 
 ## Step 4: Run Full Test Suite
 
@@ -360,11 +362,11 @@ Testing phase is complete when:
 
 ### "Quality metrics not met"
 
-**Solution**: This may indicate implementation issues. Consider returning to Phase 4 (Implementation) or Phase 3 (Architecture) if detection logic is flawed.
+**Solution**: This may indicate implementation issues. Consider returning to Phase 5 (Implementation) or Phase 4 (Architecture) if detection logic is flawed.
 
 ## Related
 
-- [Phase 5: Review](phase-5-review.md) - Previous phase (validates code)
+- [Phase 7: Review](phase-7-review.md) - Previous phase (validates code)
 - [Quality Standards](quality-standards.md) - Quality metrics by capability type
 - [Agent Handoffs](agent-handoffs.md) - Handoff format and retry logic
 - [Troubleshooting](troubleshooting.md) - Test failure patterns

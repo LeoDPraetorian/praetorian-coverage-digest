@@ -1,10 +1,118 @@
 # CheckAffiliation Reference Implementation
 
+## Acceptable Patterns by API Capability
+
+Choose the right pattern based on your integration's API capabilities:
+
+### Pattern A - Direct Ownership Query (PREFERRED)
+
+**When to use:**
+- API has endpoint to verify asset existence/ownership (e.g., GET /asset/{id}, query by identifier)
+- Single-asset lookup is supported without full enumeration
+
+**Example integrations:**
+- Wiz (GraphQL query for `graphEntityByProviderUniqueId`)
+- Any SaaS platform with asset-specific API endpoints
+
+**Implementation approach:**
+- Query specific asset by ID/key
+- Return `true` if exists and not deleted
+- Return `false` if not found or deleted
+- Return error only on API failures (not for "not found")
+
+**Code example:**
+```go
+func (task *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
+    resp, err := task.client.GetAsset(asset.CloudId)
+    if err != nil {
+        if isNotFoundError(err) {
+            return false, nil // Asset doesn't exist - not affiliated
+        }
+        return false, fmt.Errorf("querying asset: %w", err)
+    }
+    return resp.ID != "" && resp.DeletedAt == "", nil
+}
+```
+
+### Pattern B - CheckAffiliationSimple (ACCEPTABLE for cloud providers)
+
+**When to use:**
+- API requires full enumeration to verify ownership (no single-asset lookup endpoint)
+- Cloud provider where assets are scoped to authenticated account (AWS, Azure, GCP)
+- Full re-enumeration is the only reliable way to verify ownership
+
+**Example integrations:**
+- Amazon AWS (no single-asset query across all services)
+- Microsoft Azure (subscription-scoped resources)
+- Google Cloud Platform (project-scoped resources)
+
+**Implementation approach:**
+- Use `BaseCapability.CheckAffiliationSimple()` which re-runs `Invoke()`
+- Less efficient but acceptable when Pattern A is impossible
+
+**Code example:**
+```go
+func (task *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
+    return task.BaseCapability.CheckAffiliationSimple(asset)
+}
+```
+
+**Note:** This pattern re-enumerates ALL assets to find one specific asset. Only use when the API provides no alternative.
+
+### Pattern C - Seed-Based Affiliation (ACCEPTABLE for seed-scoped integrations)
+
+**When to use:**
+- Integration only discovers assets from user-provided seeds (domains, IPs, CIDR ranges)
+- Discovery is inherently scoped to what the user explicitly provided
+- No external account or organization concept
+
+**Example integrations:**
+- Shodan (queries user-provided IPs)
+- DNS enumeration tools (user-provided domains)
+- Network scanners (user-provided CIDR blocks)
+
+**Implementation approach:**
+- Check if asset key/DNS matches any seed in `Job.Seeds`
+- Return `true` if asset was discovered from a user-provided seed
+- Rationale: User explicitly provided the seed, so affiliation is implied
+
+**Code example:**
+```go
+func (task *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
+    // Check all relevant asset fields against user-provided seeds
+    for _, seed := range task.Job.Seeds {
+        if strings.Contains(asset.Key, seed.Value) {
+            return true, nil
+        }
+        // For DNS assets, also check the DNS field
+        if asset.DNS != "" && strings.Contains(asset.DNS, seed.Value) {
+            return true, nil
+        }
+        // Add other field checks as needed (asset.Name, asset.Value, etc.)
+    }
+    return false, nil
+}
+```
+
+### Decision Flowchart
+
+```
+Does the vendor API have a single-asset lookup endpoint?
+├── YES → Implement Pattern A (direct query)
+└── NO → Is this a cloud provider integration (AWS/Azure/GCP)?
+    ├── YES → Use Pattern B (CheckAffiliationSimple)
+    └── NO → Is integration seed-scoped (only discovers from user seeds)?
+        ├── YES → Implement Pattern C (seed-based)
+        └── NO → Consult with integration-lead for custom approach
+```
+
+---
+
 ## The Gold Standard: Wiz Integration
 
-The **ONLY** real CheckAffiliation implementation is in **Wiz** (`wiz/wiz.go:717-783`). All other integrations use stub patterns.
+The **Wiz** integration (`wiz/wiz.go:717-783`) demonstrates Pattern A - the preferred implementation.
 
-### Wiz Real Implementation
+### Wiz Real Implementation (Pattern A)
 
 ```go
 // From wiz/wiz.go:717-783 - THE ONLY REAL IMPLEMENTATION
@@ -82,33 +190,14 @@ return affiliated, nil
 
 Return `true` only if the asset exists and is not deleted.
 
-## Stub Pattern (Acceptable for Cloud Providers Only)
+## Pattern Selection Guide
 
-Amazon/Azure/GCP use `CheckAffiliationSimple` which re-runs full `Invoke()` - expensive but acceptable for cloud providers where full enumeration is the only reliable affiliation check.
+When implementing a new integration, use the decision flowchart above to select the appropriate pattern:
 
-### When to Use Stub Pattern
-
-**ONLY** for cloud providers where:
-
-- Full asset enumeration is required anyway
-- No efficient single-asset query API exists
-- Re-running Invoke() is acceptable overhead
-
-### When NOT to Use Stub Pattern
-
-For SaaS integrations (Wiz, CrowdStrike, Qualys, GitHub, etc.):
-
-- These APIs support single-asset queries
-- Full enumeration is expensive and unnecessary
-- Implement real CheckAffiliation like Wiz
-
-## Migration Path
-
-If you're implementing a new integration:
-
-1. **Check if the API supports single-asset lookup** (GET /asset/:id, query by identifier, etc.)
-2. **YES**: Implement real CheckAffiliation (use Wiz as template)
-3. **NO**: Only then use CheckAffiliationSimple stub
+1. **First choice**: Pattern A (direct query) - Most efficient and secure
+2. **Second choice**: Pattern B (CheckAffiliationSimple) - Only for cloud providers
+3. **Third choice**: Pattern C (seed-based) - Only for seed-scoped integrations
+4. **Last resort**: Consult integration-lead if none of the above apply
 
 ## Common Mistakes
 

@@ -35,7 +35,7 @@ Common issues and solutions for capability development orchestration.
 3. Document assumptions explicitly in design.md
 4. Get user confirmation before proceeding
 
-## Phase 2: Discovery
+## Phase 3: Discovery
 
 ### Issue: No similar capabilities found
 
@@ -65,7 +65,7 @@ Common issues and solutions for capability development orchestration.
 3. Proceed with greenfield implementation
 4. Consider filing tech debt issue for cleanup
 
-## Phase 3: Architecture
+## Phase 4: Architecture
 
 ### Issue: Architecture doesn't get human approval
 
@@ -105,7 +105,7 @@ Common issues and solutions for capability development orchestration.
    - Step-by-step implementation sequence
    ```
 
-## Phase 4: Implementation
+## Phase 5: Implementation
 
 ### Issue: Agent returns blocked (architecture_decision)
 
@@ -170,21 +170,21 @@ Common issues and solutions for capability development orchestration.
    ```
 4. Update implementation-log.md with correct paths
 
-## Phase 5: Review
+## Phase 7: Review
 
-### Issue: Review fails repeatedly (>1 retry)
+### Issue: Review fails repeatedly (>3 retries)
 
 **Symptoms**:
 
-- capability-reviewer returns CHANGES_REQUESTED twice
+- capability-reviewer returns CHANGES_REQUESTED four times
 - Issues persist after fixes
 
 **Solution**:
 
-1. **DO NOT retry a third time** - escalate to user via AskUserQuestion:
+1. **DO NOT retry a fourth time** - escalate to user via AskUserQuestion:
 
    ```
-   Review failed twice. Issues:
+   Review failed 3 times. Issues:
 
    Round 1: ${issues}
    Round 2: ${issues}
@@ -209,12 +209,12 @@ Common issues and solutions for capability development orchestration.
 
 1. Escalate to user: "Architecture plan needs revision"
 2. If user approves revision:
-   - Return to Phase 3 (Architecture)
+   - Return to Phase 4 (Architecture)
    - Re-invoke capability-lead with feedback
-   - After new architecture approved, return to Phase 4 (Implementation)
+   - After new architecture approved, return to Phase 5 (Implementation)
 3. Update metadata.json to track phase regression
 
-## Phase 6: Testing
+## Phase 8: Testing
 
 ### Issue: Tests failing (not implementation)
 
@@ -240,26 +240,26 @@ Common issues and solutions for capability development orchestration.
 
 **Solution**:
 
-1. **Detection accuracy issue**: Return to Phase 4 (Implementation)
+1. **Detection accuracy issue**: Return to Phase 5 (Implementation)
    - Detection logic needs improvement
    - Re-invoke capability-developer with quality targets
-2. **False positive issue**: Return to Phase 4 (Implementation)
+2. **False positive issue**: Return to Phase 5 (Implementation)
    - Matchers/filters too broad
    - Refine detection criteria
 3. **Coverage issue**: Extend tests
    - Re-invoke capability-tester to add tests
    - Do NOT lower coverage target
 
-### Issue: Test validation fails repeatedly (>1 retry)
+### Issue: Test validation fails repeatedly (>3 retries)
 
 **Symptoms**:
 
-- test-lead returns CHANGES_REQUESTED twice
+- test-lead returns CHANGES_REQUESTED four times
 - Tests still don't meet plan
 
 **Solution**:
 
-1. **DO NOT retry a third time** - escalate to user
+1. **DO NOT retry a fourth time** - escalate to user
 2. User options:
    - Approve tests as-is (accept lower quality)
    - Manual test writing (user intervenes)
@@ -351,9 +351,9 @@ If orchestration is completely broken:
 1. Review metadata.json to identify last successful phase
 2. Resume from that phase:
    ```bash
-   # Example: Resume from Phase 4 (Implementation)
+   # Example: Resume from Phase 5 (Implementation)
    # All prior phases (1-3) completed successfully
-   # Restart at Phase 4 with existing architecture.md
+   # Restart at Phase 5 with existing architecture.md
    ```
 3. Do NOT restart from Phase 1 unless architecture is fundamentally wrong
 

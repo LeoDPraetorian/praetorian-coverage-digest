@@ -70,7 +70,7 @@ The orchestrator uses `orchestrating-multi-agent-workflows` skill's agent routin
 
 ## Example Handoffs
 
-### Phase 1 (Brainstorming) → Phase 2 (Discovery)
+### Phase 1 (Brainstorming) → Phase 3 (Discovery)
 
 ```json
 {
@@ -87,7 +87,7 @@ The orchestrator uses `orchestrating-multi-agent-workflows` skill's agent routin
 }
 ```
 
-### Phase 2 (Discovery) → Phase 3 (Architecture)
+### Phase 3 (Discovery) → Phase 4 (Architecture)
 
 ```json
 {
@@ -104,7 +104,7 @@ The orchestrator uses `orchestrating-multi-agent-workflows` skill's agent routin
 }
 ```
 
-### Phase 3 (Architecture) → Phase 4 (Implementation)
+### Phase 4 (Architecture) → Phase 5 (Implementation)
 
 ```json
 {
@@ -127,7 +127,7 @@ The orchestrator uses `orchestrating-multi-agent-workflows` skill's agent routin
 }
 ```
 
-### Phase 4 (Implementation) → Phase 5 (Review)
+### Phase 5 (Implementation) → Phase 7 (Review)
 
 ```json
 {
@@ -145,7 +145,7 @@ The orchestrator uses `orchestrating-multi-agent-workflows` skill's agent routin
 }
 ```
 
-### Phase 5 (Review) → Phase 6 (Testing)
+### Phase 7 (Review) → Phase 8 (Testing)
 
 ```json
 {
@@ -247,8 +247,8 @@ function validateHandoff(handoff: AgentHandoff): boolean {
 
 - [persisting-agent-outputs](../../persisting-agent-outputs/SKILL.md) - Complete metadata format
 - [orchestrating-multi-agent-workflows](../../orchestrating-multi-agent-workflows/SKILL.md) - Agent routing table for blocked status
-- [Phase 3: Architecture](phase-3-architecture.md) - Architect handoffs
-- [Phase 4: Implementation](phase-4-implementation.md) - Developer handoffs
-- [Phase 5: Review](phase-5-review.md) - Reviewer handoffs
-- [Phase 6: Testing](phase-6-testing.md) - Test engineer handoffs
+- [Phase 4: Architecture](phase-4-architecture.md) - Architect handoffs
+- [Phase 5: Implementation](phase-5-implementation.md) - Developer handoffs
+- [Phase 7: Review](phase-7-review.md) - Reviewer handoffs
+- [Phase 8: Testing](phase-8-testing.md) - Test engineer handoffs
 - [Troubleshooting](troubleshooting.md) - Handling blocked handoffs
