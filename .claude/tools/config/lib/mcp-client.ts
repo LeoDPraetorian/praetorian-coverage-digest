@@ -222,6 +222,11 @@ function getMCPServerConfig(mcpName: string, semanticContext?: string): MCPServe
       // Args generated dynamically via getSerenaArgs() with semantic routing
       args: getSerenaArgs(semanticContext),
       envVars: {} // No authentication required (local tool)
+    },
+    'ghydra': {
+      command: 'npx',
+      args: ['-y', 'ghydra-mcp'],
+      envVars: {} // No authentication required (connects to local Ghidra instances)
     }
   };
 
