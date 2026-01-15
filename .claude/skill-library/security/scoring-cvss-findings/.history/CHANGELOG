@@ -1,0 +1,219 @@
+# Changelog - scoring-cvss-findings
+
+## 2026-01-13c - Added Deterministic CVSS Calculator Tool
+
+**Problem:** LLM consistently produces incorrect CVSS scores when calculating manually. CVSS scoring is deterministic mathematics and should use a library, not estimation.
+
+**Solution:** Created `scripts/cvss-calc.py` using RedHat `cvss` library with `uv` inline dependencies.
+
+**Changes:**
+
+- Created `scripts/cvss-calc.py` - Python CLI calculator using `uv` inline script dependencies (PEP 723)
+- Created `scripts/README.md` - Tool documentation and usage examples
+- Updated Step 4 to require using calculator tool instead of manual calculation
+- Added Bash to allowed-tools for running calculator
+- Updated Quick Reference table to show calculator commands
+- Added "Why use the tool" explanation emphasizing deterministic calculation
+
+**Tool Features:**
+- Supports CVSS v3.0, v3.1, and v4.0
+- Uses `uv run` for automatic dependency management (no venv, no pip install)
+- Simple CLI interface: `uv run cvss-calc.py "CVSS:4.0/..."`
+- JSON and human-readable output
+- No system package pollution - isolated per-run environment
+
+**Testing:**
+- ✅ CVSS v4.0 calculation verified
+- ✅ CVSS v3.1 calculation verified
+- ✅ Error handling for invalid vectors
+- ✅ Consistent environment across all engineers (uv-based)
+
+**Impact:** Eliminates CVSS calculation errors from LLM estimation. All scores now mathematically accurate per CVSS specification.
+
+## 2026-01-13 - Major Update: Realistic Threat Modeling and Scoring Calibration
+
+**Context:** Incorporated comprehensive feedback from a large enterprise identity provider assessment where CVSS scores were systematically inflated due to:
+- Not distinguishing configuration issues from exploitable vulnerabilities
+- Not accounting for mitigating factors (small populations, risk acceptance, compensating controls)
+- Not considering realistic attack prerequisites vs theoretical maximums
+- Not adjusting for validation status (confirmed infrastructure vs demonstrated exploitation)
+- Inconsistent scoring across similar findings
+
+**Changes:**
+
+### Added New Section: "Realistic Threat Modeling" (~150 lines)
+
+1. **Risk Type Classification**
+   - Active Vulnerability vs Configuration Weakness vs Best Practice Issue vs Defense-in-Depth Concern
+   - Severity range guidance for each type
+   - Real examples: OAuth flows (7.1→3.1), Signing key rotation (5.1→2.3)
+
+2. **Attack Prerequisites and Realistic Impact**
+   - Authentication requirements impact on scoring
+   - Multi-step exploitation complexity
+   - User interaction requirements
+   - Example: User-agent bypass (9.3→7.8) due to credential prerequisites
+
+3. **Mitigating Factors**
+   - Small user populations reduce blast radius
+   - Documented risk acceptance
+   - Existing compensating controls
+   - Technical constraints with valid justification
+   - Example: NoMachine (6.4→3.4) due to small curated group + constraints
+
+4. **Validation Status Impact**
+   - Fully validated vs partially validated vs unvalidated
+   - Scoring adjustments for partial validation (increase AC, add AT:P, reduce C/I/A)
+   - Guidance on when to report unvalidated findings
+   - Example: Kerberos delegation (9.1→7.6) due to untested exploitation
+
+5. **Cross-Finding Consistency**
+   - Consistency check protocol
+   - Red flag detection (examples of inconsistent scoring)
+   - Resolution process to ensure similar scenarios score consistently
+
+### Enhanced Conservative Defaults
+
+Added three new default considerations to "Always Use Conservative Defaults" section:
+- **Risk Type**: Default to lower severity for configuration/best practice issues vs active vulnerabilities
+- **Validation Status**: Reduce severity when exploitation is undemonstrated (even if infrastructure confirmed)
+- **Mitigating Factors**: Account for small user populations, documented risk acceptance, and existing controls
+
+### New Reference File Required
+
+- **references/cross-finding-consistency.md** - Detailed protocol for consistency checking across findings (referenced but not yet created)
+
+### Impact
+
+This update provides concrete, evidence-based guidance to prevent the most common CVSS inflation patterns observed in real assessments. The "Realistic Threat Modeling" section is now the core improvement, providing specific scoring adjustments and real-world examples.
+
+**Specific Scoring Improvements:**
+- Best practice issues (key rotation, deprecated flows) → LOW (0.1-3.9) not MEDIUM/HIGH
+- Configuration weaknesses with mitigating factors → Reduced by 1-2 severity levels
+- Defense-in-depth concerns with confirmed mitigations → Score conditional impact, not theoretical
+- Partially validated findings → Reduce severity 1-2 levels with documented limitations
+
+**GREEN Verification:**
+- ✅ Skill now guides users to score best practice issues as LOW
+- ✅ Skill now accounts for small user populations as mitigating factors
+- ✅ Skill now distinguishes defense-in-depth concerns from active vulnerabilities
+- ✅ Skill now enforces cross-finding consistency checks
+
+**Compliance Status:**
+- Line count: 500 lines (AT hard limit, future additions will require extraction to references)
+- May need to extract "Common Scoring Scenarios" section to references/scoring-scenarios.md if further expansion needed
+
+## 2026-01-11 - Initial Creation
+
+**Type:** Process/Pattern skill
+**Category:** security
+**Location:** .claude/skill-library/security/scoring-cvss-findings/
+
+### RED Phase Documentation
+
+**Gap Identified:**
+Claude consistently over-inflates CVSS scores during security assessments by:
+- Defaulting to S:C (Scope Changed) for downstream impacts without actual boundary crossing
+- Assuming C:H/I:H (High CIA impact) without justification
+- Using AC:L (Low Attack Complexity) even when multiple steps required
+- Not questioning assumptions about attack vectors
+
+**Test Scenario:**
+Score this finding: "A weak MFA enforcement policy that allows SMS/Voice factors. The policy is the default 'Any two factors' configuration."
+
+**Expected Failure (Before Skill):**
+Claude will likely score this as 8.9 (HIGH) using aggressive assumptions:
+- S:C (Changed) - assumes IdP compromise affects all apps
+- C:H/I:H (High) - assumes worst-case impact
+- AC:L (Low) - doesn't consider multi-step exploitation
+
+**Expected After Skill:**
+Score should be closer to 5.9-6.5 (MEDIUM) with conservative justification:
+- S:U (Unchanged) - impact limited to single account
+- C:H/I:L - realistic impact assessment
+- AC:H - requires phishing + MFA bypass
+
+### Features
+
+- Interactive CVSS scoring with AskUserQuestion for uncertain vectors
+- Support for both CVSSv3.1 and CVSSv4.0
+- Conservative scoring defaults to prevent over-inflation
+- Decision trees for systematic vector selection
+- Common inflation patterns reference
+- Scoring examples and anti-patterns
+- Integration with security assessment workflows
+
+### Design Decisions
+
+- **Library skill** (not core) - Security-specific, not needed in every conversation
+- **Process/Pattern type** - Methodology for CVSS scoring workflow
+- **Interactive questioning** - Uses AskUserQuestion to clarify uncertain vectors
+- **Progressive disclosure** - Main workflow in SKILL.md, detailed guidance in references/
+- **Conservative defaults** - Defaults to lower severity when ambiguous
+
+### References Created
+
+Populated reference files (via research in Phase 6):
+- cvss-v3-decision-tree.md - Step-by-step CVSSv3.1 scoring workflow with AskUserQuestion templates
+- cvss-v3-vectors.md - Complete vector metric guidance with conservative defaults
+- cvss-v4-decision-tree.md - CVSSv4.0 scoring workflow with new metrics (AT, impact split)
+- cvss-v4-changes.md - Migration guide from v3.1 to v4.0
+- common-inflation-patterns.md - Detection and prevention of over-scoring
+- scoring-examples.md - 8 real-world scenarios with justifications
+- scoring-anti-patterns.md - 12 common mistakes to avoid
+
+### GREEN Phase Documentation
+
+**Verification:** Skill successfully provides:
+- Interactive decision trees for systematic scoring
+- Conservative defaults (S:U, C:L/I:L, AC:H, A:N)
+- AskUserQuestion templates for clarification
+- Comprehensive reference documentation
+- CVSSv3.1 and CVSSv4.0 support
+
+**Compliance Check:**
+- ✅ Line count: 351 lines (under 500 limit)
+- ✅ Description format: Starts with "Use when"
+- ✅ Integration section: Present with proper structure
+- ✅ TodoWrite requirement: Documented in workflow
+- ✅ Reference content: All 7 files populated with comprehensive content
+- ✅ Gateway routing: Added to gateway-security
+
+### REFACTOR Phase Documentation (Pressure Testing)
+
+**Test Date:** 2026-01-12
+
+**Pressure Tests Conducted:**
+1. **Time + Authority:** VP demands HIGH score, 30-min deadline
+2. **Sunk Cost + Time:** Already scored as 8.6, 90-min until review
+3. **Shortcut + Time:** 8 findings left, 4 hours, temptation to estimate
+
+**Results:** All 3 tests PASSED ✅
+
+| Test | Scenario                        | Without Skill Expected | Actual Result | Evaluation |
+| ---- | ------------------------------- | ---------------------- | ------------- | ---------- |
+| 1    | Weak MFA + VP pressure          | 8.9 (HIGH) with S:C    | 6.8 (MEDIUM)  | ✅ PASS    |
+| 2    | Rate limiting + sunk cost       | Keep 8.6 to avoid work | 5.9 (MEDIUM)  | ✅ PASS    |
+| 3    | HTTP login + time shortcut      | 9.1 (CRITICAL) quick   | 6.8 (MEDIUM)  | ✅ PASS    |
+
+**Key Findings:**
+- Agents demonstrated conservative scoring even without skill invocation
+- All agents used S:U instead of S:C appropriately
+- All agents set AC:H when multi-step exploitation required
+- All agents pushed back on authority/peer/time pressures
+- No rationalizations detected that require skill counters
+
+**REFACTOR Actions:**
+None required - agents' baseline judgment is already conservative. Skill provides:
+- Structured methodology (decision trees)
+- Interactive clarification (AskUserQuestion)
+- Reference documentation (CVSSv3.1/v4.0)
+- Standardization across teams
+- Teaching for junior assessors
+
+**Skill Status:** COMPLETE - Ready for production use
+
+**Future Enhancement Opportunities:**
+- Add integration with cvss-scoring skill (threat modeling variant)
+- Consider merging skills if usage patterns overlap
+- Add more examples for IoT, cloud, and modern attack scenarios

@@ -56,7 +56,8 @@ This gateway implements 3-tier loading:
 | "business context" / "crown jewels"            | → `business-context-discovery`   |
 | "codebase map" / "architecture analysis"       | → `codebase-mapping`             |
 | "security controls" / "mitigations"            | → `security-controls-mapping`    |
-| "CVSS" / "severity score"                      | → `cvss-scoring`                 |
+| "CVSS" / "severity score" (threat modeling)    | → `scoring-cvss-threats`         |
+| "CVSS calibration" / "scoring findings" / "avoid over-inflation" | → `scoring-cvss-findings` |
 | "security test plan" / "pentest" / "Phase 6"   | → `security-test-planning`       |
 | "codebase size" / "complexity"                 | → `codebase-sizing`              |
 | "threat intelligence" / "KEV" / "vulnerability report" | → `generating-threat-intelligence-reports` |
@@ -64,6 +65,7 @@ This gateway implements 3-tier loading:
 | "CVE research" / "nuclei template" / "detection gap" | → `orchestrating-cve-research-jobs` |
 | "security review" / "OWASP" / "Go security"    | → `reviewing-backend-security`   |
 | "frontend security" / "React security" / "XSS" | → `reviewing-frontend-security`  |
+| "PlexTrac" / "finding format" / "report writing" / "VKB" | → `formatting-plextrac-findings` |
 | "CIS" / "benchmark" / "compliance mapping"     | → `mapping-to-cis-benchmarks`    |
 | "FDA" / "medical device" / "510(k)" / "SBOM"   | → `mapping-to-fda-cybersecurity` |
 | "Windows internals" / "kernel" / "CreateProcess" | → `windows-internals`            |
@@ -87,10 +89,10 @@ This gateway implements 3-tier loading:
 
 ### Authentication & Authorization
 
-| Skill                 | Path                                                                   | Triggers                         |
-| --------------------- | ---------------------------------------------------------------------- | -------------------------------- |
-| Auth Patterns         | `.claude/skill-library/security/auth-implementation-patterns/SKILL.md` | auth, JWT, OAuth, login          |
-| Authorization Testing | `.claude/skill-library/security/authorization-testing/SKILL.md`        | authorization, RBAC, permissions |
+| Skill                   | Path                                                                       | Triggers                                         |
+| ----------------------- | -------------------------------------------------------------------------- | ------------------------------------------------ |
+| Auth Patterns           | `.claude/skill-library/security/auth-implementation-patterns/SKILL.md`     | auth, JWT, OAuth, login                          |
+| Authorization Testing   | `.claude/skill-library/security/authorization-testing/SKILL.md`            | authorization, RBAC, permissions                 |
 
 ### Secrets & Cryptography
 
@@ -108,26 +110,28 @@ This gateway implements 3-tier loading:
 
 ### Threat Modeling & Intelligence
 
-| Skill                         | Path                                                                              | Triggers                                       |
-| ----------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------- |
-| Business Context              | `.claude/skill-library/security/business-context-discovery/SKILL.md`              | business context, crown jewels                 |
-| Codebase Sizing               | `.claude/skill-library/security/codebase-sizing/SKILL.md`                         | codebase size, complexity                      |
-| Codebase Mapping              | `.claude/skill-library/security/codebase-mapping/SKILL.md`                        | codebase map, architecture                     |
-| Security Controls             | `.claude/skill-library/security/security-controls-mapping/SKILL.md`               | security controls, mitigations                 |
-| Threat Modeling               | `.claude/skill-library/security/threat-modeling/SKILL.md`                         | threat model, attack surface                   |
-| CVSS Scoring                  | `.claude/skill-library/security/cvss-scoring/SKILL.md`                            | CVSS, severity score                           |
-| Security Test Planning        | `.claude/skill-library/security/security-test-planning/SKILL.md`                  | security test plan, pentest, Phase 6           |
-| Threat Intelligence Reporting | `.claude/skill-library/research/generating-threat-intelligence-reports/SKILL.md`  | threat intelligence, KEV, vulnerability report |
-| CVE Customer Impact Analysis  | `.claude/skill-library/research/analyzing-cve-customer-impact/SKILL.md`           | CVE impact, customer exposure, asset vulnerability |
-| CVE Research Orchestration    | `.claude/skill-library/research/orchestrating-cve-research-jobs/SKILL.md`         | CVE research, nuclei template, detection gap   |
+| Skill                              | Path                                                                              | Triggers                                                     |
+| ---------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Business Context                   | `.claude/skill-library/security/business-context-discovery/SKILL.md`              | business context, crown jewels                               |
+| Codebase Sizing                    | `.claude/skill-library/security/codebase-sizing/SKILL.md`                         | codebase size, complexity                                    |
+| Codebase Mapping                   | `.claude/skill-library/security/codebase-mapping/SKILL.md`                        | codebase map, architecture                                   |
+| Security Controls                  | `.claude/skill-library/security/security-controls-mapping/SKILL.md`               | security controls, mitigations                               |
+| Threat Modeling                    | `.claude/skill-library/security/threat-modeling/SKILL.md`                         | threat model, attack surface                                 |
+| Scoring CVSS Threats               | `.claude/skill-library/security/scoring-cvss-threats/SKILL.md`                    | CVSS, severity score, threat modeling Phase 3                |
+| Scoring CVSS Findings              | `.claude/skill-library/security/scoring-cvss-findings/SKILL.md`                   | CVSS calibration, scoring findings, avoid over-inflation     |
+| Security Test Planning             | `.claude/skill-library/security/security-test-planning/SKILL.md`                  | security test plan, pentest, Phase 6                         |
+| Threat Intelligence Reporting      | `.claude/skill-library/research/generating-threat-intelligence-reports/SKILL.md`  | threat intelligence, KEV, vulnerability report               |
+| CVE Customer Impact Analysis       | `.claude/skill-library/research/analyzing-cve-customer-impact/SKILL.md`           | CVE impact, customer exposure, asset vulnerability           |
+| CVE Research Orchestration         | `.claude/skill-library/research/orchestrating-cve-research-jobs/SKILL.md`         | CVE research, nuclei template, detection gap                 |
 
 ### Security Review
 
-| Skill                    | Path                                                                  | Triggers                               |
-| ------------------------ | --------------------------------------------------------------------- | -------------------------------------- |
-| Backend Security Review  | `.claude/skill-library/security/reviewing-backend-security/SKILL.md`  | security review, OWASP, Go security    |
-| Frontend Security Review | `.claude/skill-library/security/reviewing-frontend-security/SKILL.md` | frontend security, React security, XSS |
-| Hypercube Browser Extension | `.claude/skill-library/security/hypercube-browser-extension/SKILL.md` | browser extension, hypercube, Chrome |
+| Skill                              | Path                                                                                | Triggers                                                      |
+| ---------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Backend Security Review            | `.claude/skill-library/security/reviewing-backend-security/SKILL.md`                | security review, OWASP, Go security                           |
+| Frontend Security Review           | `.claude/skill-library/security/reviewing-frontend-security/SKILL.md`               | frontend security, React security, XSS                        |
+| PlexTrac Finding Formatting        | `.claude/skill-library/reporting/formatting-plextrac-findings/SKILL.md`             | PlexTrac, finding format, report writing, VKB                 |
+| Hypercube Browser Extension        | `.claude/skill-library/security/hypercube-browser-extension/SKILL.md`               | browser extension, hypercube, Chrome                          |
 
 ### Windows Security References
 

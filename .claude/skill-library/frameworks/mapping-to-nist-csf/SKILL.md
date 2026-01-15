@@ -274,7 +274,7 @@ None - documentation-only skill, no workflow dependencies.
 | `mapping-to-mitre-attack` | Threat context needed        | Correlate CSF with adversary techniques |
 | `mapping-to-cwe`          | Vulnerability classification | Map CSF to technical weakness types     |
 | `mapping-to-sans-top-25`  | Prioritization needed        | Align CSF with industry-critical risks  |
-| `cvss-scoring`            | Severity assessment          | Risk severity + CSF category            |
+| `scoring-cvss-threats`            | Severity assessment          | Risk severity + CSF category            |
 
 ---
 

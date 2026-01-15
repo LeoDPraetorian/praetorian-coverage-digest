@@ -109,12 +109,12 @@ For each component from Phase 3:
 
 ## CVSS 4.0 Scoring (Step 3)
 
-**After STRIDE threat identification**, invoke `cvss-scoring` skill for each threat:
+**After STRIDE threat identification**, invoke `scoring-cvss-threats` skill for each threat:
 
 ```
 For each threat:
   1. Prepare Phase 1 business context + Phase 3 architecture
-  2. Invoke cvss-scoring skill with threat details
+  2. Invoke scoring-cvss-threats skill with threat details
   3. Capture CVSS scores (base, threat, environmental, overall)
   4. Add CVSS structure to threat entry
 
@@ -146,7 +146,7 @@ For error recovery procedures, see [parallel-execution-and-error-handling.md](pa
 | Error                  | Symptom                          | Recovery                                       |
 | ---------------------- | -------------------------------- | ---------------------------------------------- |
 | Generic threats        | Threats lack specific locations  | Verify Phase 3/4 artifacts loaded              |
-| Missing CVSS scores    | Threats have no cvss field       | Re-run with cvss-scoring skill                 |
+| Missing CVSS scores    | Threats have no cvss field       | Re-run with scoring-cvss-threats skill                 |
 | STRIDE incomplete      | Categories missing               | Verify all components analyzed                 |
 
 ### Escalation

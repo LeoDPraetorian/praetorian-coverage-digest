@@ -125,7 +125,7 @@ After reading this document, you should understand:
 │       ├── threat-modeling/                 # Phase 5 methodology (CVSS 4.0)
 │       │   ├── SKILL.md
 │       │   └── references/
-│       │       ├── cvss-scoring-integration.md
+│       │       ├── scoring-cvss-threats-integration.md
 │       │       ├── output-schemas.md
 │       │       └── phase-1-integration.md
 │       └── security-test-planning/          # Phase 6 methodology

@@ -32,7 +32,7 @@ Use this skill when:
 
 ### Risk Scoring (CVSS)
 
-**Use CVSS scoring via the `cvss-scoring` skill** (4.0 recommended, 3.1 optional).
+**Use CVSS scoring via the `scoring-cvss-threats` skill** (4.0 recommended, 3.1 optional).
 
 ```
 CVSS Severity Bands:
@@ -46,7 +46,7 @@ Prioritization: Use Environmental Score (business-contextualized from Phase 1),
                 not Base Score (generic severity).
 ```
 
-**See Step 3 below** for CVSS workflow and [references/cvss-scoring-integration.md](references/cvss-scoring-integration.md) for details.
+**See Step 3 below** for CVSS workflow and [references/scoring-cvss-threats-integration.md](references/scoring-cvss-threats-integration.md) for details.
 
 ## Required Inputs
 
@@ -149,21 +149,21 @@ For EACH component identified in Phase 3, apply STRIDE **filtered by relevant th
 
 For each threat identified:
 1. Prepare Phase 1 business context and Phase 3 architecture context
-2. Invoke `cvss-scoring` skill with threat details and context
+2. Invoke `scoring-cvss-threats` skill with threat details and context
 3. Capture CVSS scores (base, threat, environmental, overall)
 4. Add CVSS structure to threat entry
 
 **Brief workflow**:
 ```
 For each threat:
-  → Skill: "cvss-scoring" with threat + Phase 1 context
+  → Skill: "scoring-cvss-threats" with threat + Phase 1 context
   → Capture: Base score, Environmental score, Overall score, Severity
   → Store: Full CVSS structure in threat entry
 ```
 
-**For detailed CVSS integration workflow, see [CVSS Scoring Integration](references/cvss-scoring-integration.md)**:
+**For detailed CVSS integration workflow, see [CVSS Scoring Integration](references/scoring-cvss-threats-integration.md)**:
 - When to score (after STRIDE, before prioritization)
-- How to invoke cvss-scoring skill with context
+- How to invoke scoring-cvss-threats skill with context
 - Updated threat schema with CVSS structure
 - Efficient parallel scoring for large threat models
 
@@ -283,7 +283,7 @@ jq '.threats | sort_by(-.cvss.environmental.score)' threat-model.json > sorted-t
 - More precise than 1-12 matrix (10-point scale with decimals)
 - Business-contextualized risk (not generic CVSS Base scores)
 
-**For detailed CVSS-based prioritization, see [CVSS Scoring Integration](references/cvss-scoring-integration.md)**:
+**For detailed CVSS-based prioritization, see [CVSS Scoring Integration](references/scoring-cvss-threats-integration.md)**:
 - How Environmental scores incorporate Phase 1 data
 - Updated risk-matrix.json schema with CVSS bands
 - Migration from old 1-12 matrix to CVSS scoring
@@ -341,7 +341,7 @@ mkdir -p .claude/.output/threat-modeling/{timestamp}-{slug}/phase-5/attack-trees
 
 **Threats must be sorted by cvss.environmental.score (descending)**.
 
-See [references/output-schemas.md](references/output-schemas.md) for exact JSON schemas, [Phase 1 Integration Guide](references/phase-1-integration.md#section-5-updated-output-schema) for business_context details, and [CVSS Scoring Integration](references/cvss-scoring-integration.md) for full CVSS structure.
+See [references/output-schemas.md](references/output-schemas.md) for exact JSON schemas, [Phase 1 Integration Guide](references/phase-1-integration.md#section-5-updated-output-schema) for business_context details, and [CVSS Scoring Integration](references/scoring-cvss-threats-integration.md) for full CVSS structure.
 
 ### Step 10: Generate Summary for Phase 6
 
@@ -478,7 +478,7 @@ Phase 6 orchestrator loads summary.md into context. If >2000 tokens, agent conte
 ## References
 
 - **[references/execution-context.md](references/execution-context.md) - Agent execution, invocation pattern, and workflow position**
-- **[references/cvss-scoring-integration.md](references/cvss-scoring-integration.md) - CVSS 4.0 integration workflow (NEW)**
+- **[references/scoring-cvss-threats-integration.md](references/scoring-cvss-threats-integration.md) - CVSS 4.0 integration workflow (NEW)**
 - **[references/phase-1-integration.md](references/phase-1-integration.md) - Phase 1 business context integration**
 - [references/stride-framework.md](references/stride-framework.md) - Detailed STRIDE methodology with CVSS scoring step
 - [references/pasta-methodology.md](references/pasta-methodology.md) - 7-stage PASTA process
@@ -500,7 +500,7 @@ This skill is executed by the `threat-modeler` agent when spawned by the threat-
 
 ## Related Skills
 
-- `cvss-scoring` - CVSS 4.0 scoring with business context integration **NEW**
+- `scoring-cvss-threats` - CVSS 4.0 scoring with business context integration **NEW**
 - `business-context-discovery` - Phase 1 methodology (produces business context inputs)
 - `codebase-sizing` - Phase 2 methodology (produces sizing analysis)
 - `codebase-mapping` - Phase 3 methodology (produces architecture inputs)

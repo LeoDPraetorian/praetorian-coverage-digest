@@ -1,5 +1,5 @@
 ---
-name: cvss-scoring
+name: scoring-cvss-threats
 description: Use when scoring threats with CVSS during threat modeling Phase 3 - guides version selection (3.1 recommended, 4.0 optional), Base metric assessment for theoretical threats, Temporal/Threat scoring, and Environmental metrics derived from Phase 1 business context (crown jewels → CR/IR/AR). Produces CVSS vectors and scores for prioritization in standalone open-source threat modeling tool.
 allowed-tools: Read, Write, AskUserQuestion, TodoWrite
 ---

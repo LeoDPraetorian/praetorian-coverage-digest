@@ -1,0 +1,266 @@
+# Changelog: formatting-plextrac-findings
+
+## 2026-01-13b - Impact Section Format Correction
+
+**Context:** Corrected Impact section format after reviewing actual VKB templates. Original format was incorrect - used subsections ("Security Impact:", "Business Impact:") which don't exist in real templates.
+
+**Changes:**
+
+### Fixed Impact Section Format
+
+**Original (WRONG - made up format):**
+```markdown
+### Impact
+
+**Security Impact:** {Specific compromise scenarios}
+**Business Impact:** {Data breach, service disruption}
+**Operational Impact:** {User workflow disruption}
+**Compliance Impact:** {Regulatory requirements}
+```
+
+**Corrected (matches VKB templates):**
+```markdown
+### Impact
+
+{1-3 narrative paragraphs describing attacker capabilities and consequences}
+
+Optional bullet points for multiple specific consequences.
+```
+
+**Based on review of:**
+- ~/owl/vkb-templates/mobile (hardcoded API keys, sensitive data masking)
+- ~/owl/vkb-templates/web (missing patches, OAuth issues)
+- ~/owl/vkb-templates/iot (debugging utilities)
+- ~/owl/vkb-templates/cloud-security (GitHub runners)
+
+**Real VKB Format:**
+- Simple paragraph(s), NO subsections
+- Narrative style describing attacker actions and consequences
+- Attack-centric focus
+- Bullet points only when listing multiple specific consequences
+- 1-3 paragraphs typical length
+
+### Updated Field Specification
+
+- Removed incorrect 4-subsection structure
+- Added real examples from VKB templates
+- Clarified "attack-centric narrative" style
+- Added "Why This Format" explanation
+
+**Result:** Impact section now matches actual VKB template format used across all assessment types.
+
+## 2026-01-13 - Major Update: Report Quality Standards and Impact Section
+
+**Context:** Incorporated comprehensive feedback from a large enterprise identity provider assessment where findings had multiple quality issues:
+- Verbatim client quotes creating defensive tone
+- Internal file paths (`.claude/.output/...`) in evidence
+- P0/P1/P2/P3 priority notation in remediation
+- Cross-finding references using internal notation instead of descriptive titles
+- Missing Impact sections
+- "Evidence" sections (PlexTrac uses "Verification and Attack Information")
+- Inconsistent title capitalization
+
+**Changes:**
+
+### Added Mandatory Impact Section
+
+- Added Impact field to required fields table
+- Updated template to include Impact section between Description and Verification
+- Added Impact field specification with structure guidance
+- **Why:** Real assessment feedback showed findings without Impact sections failed to communicate business risk to non-technical stakeholders
+- **NOTE:** Original format used subsections (Security Impact, Business Impact, etc.) - This was corrected in 2026-01-13b after reviewing actual VKB templates
+
+### Clarified Evidence vs Verification Distinction
+
+- Changed "Evidence" to "Verification and Attack Information" in required fields table
+- Updated template to embed evidence within Verification section, not separate
+- Added explicit note: "Evidence should be embedded in this section, NOT separated"
+- Updated field specification to emphasize PlexTrac VKB layout field name
+- **Why:** "Evidence" field doesn't exist in PlexTrac; all evidence goes in "Verification and Attack Information"
+
+### Added Report Quality Standards Section
+
+Created comprehensive quality standards (extracted to references/report-quality-standards.md):
+
+1. **Client Quote Handling** - Paraphrase all client statements, never verbatim quotes
+   - Examples: "this seems really bad" → "acknowledged as significant security concern"
+   - Professional third-person voice, preserve technical accuracy
+
+2. **Internal Reference Removal** - Remove `.claude/`, `/Users/`, file paths
+   - Keep: independently verifiable evidence (JSON, API responses)
+   - Remove: internal tracking references, source file citations
+
+3. **Priority Label Handling** - Distinguish policy priority (OK) from project priority (not OK)
+   - ✅ `"priority": 5` from policy JSON (technical data)
+   - ❌ `P0/P1/P2/P3` in remediation (use descriptive timelines)
+   - Replacement: "Immediate (14-30 Days)", "Short-Term (60-90 Days)", etc.
+
+4. **Cross-Finding References** - Use descriptive titles, never internal notation
+   - Example: Internal notation → "Remote Access Tool Users Permitted Weak Authentication"
+   - Test: would reference make sense in isolation?
+
+5. **Title Formatting Convention** - Always use Title Case
+   - Examples with corrections for common mistakes
+   - Rules: capitalize major words, lowercase articles/conjunctions/short prepositions
+
+6. **Section Header Preferences** - Client terminology guidance
+   - Use "Recommendations" not "Remediation" (consultative tone)
+   - Follow PlexTrac VKB layout field names exactly
+
+7. **Walkthrough Content Integration** - Paraphrase call content, remove timestamps
+   - Transform raw notes to professional third-person narrative
+   - Remove speaker names, use roles ("Administrators explained...")
+
+### Updated Template Structure
+
+- Changed title placeholder to include "in Title Case" reminder
+- Added structured Impact section with four subsections
+- Embedded evidence in Verification section with explicit note
+- Changed "Remediation" to "Recommendations" throughout
+- Updated timeline structure: Immediate/Short-Term/Long-Term with day ranges
+- Added note: "Use descriptive timeline labels, NOT P0/P1/P2/P3 priority notation"
+
+### Updated Field Specifications
+
+- **Name Field**: Changed from "Sentence case" to "Title Case" with corrected examples
+- **Impact Field**: New specification (NOTE: format corrected in 2026-01-13b to match VKB templates)
+- **Verification Field**: Renamed from "Evidence", emphasized embedding, added structure guidance
+- **Recommendations Field**: Renamed from "Remediation", updated timeline structure, added "Avoid" section
+
+### Progressive Disclosure Improvements
+
+- Extracted detailed Report Quality Standards to references/report-quality-standards.md (~350 lines)
+- Condensed ASVS Integration section to brief summary with reference link
+- Removed Examples section (moved to references if needed)
+- **Result**: 493 lines (under 500-line limit with significantly expanded guidance)
+
+### New Reference File
+
+- **references/report-quality-standards.md** - Complete quality standards with examples, transformations, and quality checklist
+
+**GREEN Verification:**
+- ✅ Template now includes mandatory Impact section
+- ✅ Evidence properly embedded in Verification section
+- ✅ Client quote handling guidance prevents verbatim quotes
+- ✅ Internal reference removal guidance prevents file path leakage
+- ✅ Priority label handling distinguishes technical data from project notation
+- ✅ Cross-finding reference guidance prevents broken internal notation
+- ✅ Title formatting enforces Title Case
+- ✅ Section headers use client preferences ("Recommendations" vs "Remediation")
+
+**Compliance Status:**
+- Line count: 493 lines (under 500-line limit)
+- All quality issues from assessment addressed
+- Progressive disclosure maintained with new reference file
+
+## 2026-01-12 - Initial Creation
+
+**Type**: Process/Pattern skill
+**Location**: Library (reporting category)
+**Created by**: creating-skills workflow (TDD methodology)
+
+### RED Phase Documentation
+
+**Gap identified**: No structured guidance for formatting security findings for PlexTrac reporting platform.
+
+**Current failure behavior** (without skill):
+1. Creates generic markdown finding format
+2. Misses required `phase_` tags that control report section placement
+3. Doesn't use CVSS 4.0 by default (PlexTrac standard)
+4. Omits custom VKB layout fields ("Verification and Attack Information", "Systems Impacted")
+5. Doesn't structure for VKB layout requirement
+6. Doesn't prepare fields for future API integration
+
+**Why this skill is needed**:
+- Praetorian uses PlexTrac for all security assessment reporting
+- Findings require specific field structure, tagging system, and CVSS 4.0 scoring
+- VKB layout has custom fields that must be populated
+- Manual copy/paste workflow needs structured validation
+- Future API integration requires consistent field structure
+
+### Features Implemented
+
+**Core functionality**:
+- Required field structure (Name, Severity, CVSS 4.0, Description, Evidence, Remediation)
+- Tagging system validation (phase_, owasp_, effective_control)
+- VKB layout compliance with custom fields
+- CVSS 4.0 integration via `scoring-cvss-findings` skill
+- API-ready output structure for future integration
+
+**References created** (detailed content):
+- field-specifications.md - Complete field requirements
+- tagging-system.md - Tagging rules and catalog
+- finding-template.md - Copy/paste template
+- api-preparation.md - API integration mapping
+- cvss-guidance.md - CVSS 4.0 for PlexTrac
+- vkb-layout.md - VKB custom field details
+- image-formatting.md - Image preparation guidelines
+
+**Examples prepared** (various severity levels):
+- SQL injection (Critical)
+- Weak authentication (High)
+- Missing security headers (Medium)
+- Information disclosure (Low)
+
+### Integration
+
+**Requires**: `scoring-cvss-findings` (CVSS 4.0 scoring)
+**Pairs with**: `reviewing-okta-configurations`, `threat-modeling`
+**Gateway**: `gateway-security` (Security Review section)
+**Triggers**: PlexTrac, finding format, report writing, VKB
+
+### Research Decision
+
+**Research skipped** (user choice): Populated directly from provided PlexTrac documentation in Cerebrum Knowledge Base.
+
+**Reference files created with content:**
+- tagging-system.md - Complete PlexTrac tagging system (phase_, owasp_, effective_control, es, threat_model, etc.)
+- finding-template.md - Copy/paste template for manual finding creation
+- vkb-layout.md - VKB layout requirements and custom field details
+- api-preparation.md - Future API integration field mapping and workflow
+
+**Content source**: User-provided PlexTrac documentation from Cerebrum Knowledge Base
+
+### Phase 7: Gateway Integration
+
+**Gateway**: Added to `gateway-security` (Security Review section)
+**Triggers**: PlexTrac, finding format, report writing, VKB
+**Intent Detection**: Updated with routing keywords
+
+### Phase 8: GREEN Verification
+
+**Verification method**: Gap closure analysis (RED failures → GREEN solutions)
+
+All RED phase failures addressed:
+- ✅ Structured PlexTrac field template (not generic markdown)
+- ✅ Complete tagging system documentation (phase_, owasp_, effective_control)
+- ✅ CVSS 4.0 integration via `scoring-cvss-findings` skill
+- ✅ VKB layout compliance and custom fields
+- ✅ API-ready field structure for future integration
+
+### Phase 9: REFACTOR (Pressure Testing)
+
+**Decision**: Pressure testing NOT REQUIRED
+
+**Rationale**: This is a reference/pattern skill (API docs, templates, formatting guidance) with no discipline rules to enforce or bypass. No pressure scenarios apply because:
+- No multi-phase workflow to shortcut
+- No time/effort tradeoffs (formatting IS the task)
+- No rationalization incentives (agents need the structure)
+
+Reference skills without enforcement rules don't require pressure testing per `pressure-testing-skill-content` guidance.
+
+### Skill Complete
+
+**Status**: Ready for use
+
+**Deliverables**:
+- SKILL.md (440 lines - within 500 limit)
+- 4 reference files with actual content
+- Gateway integration (gateway-security)
+- Changelog documentation
+- TDD methodology applied (RED-GREEN phases)
+
+**Next actions**:
+- Load via `Read(".claude/skill-library/reporting/formatting-plextrac-findings/SKILL.md")`
+- Or route via gateway-security with trigger keywords (PlexTrac, finding format, report writing, VKB)
+

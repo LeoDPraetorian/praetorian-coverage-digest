@@ -165,7 +165,7 @@ For each component from Phase 3:
 
 ### Step 4: CVSS Scoring with Business Context
 
-Use `cvss-scoring` skill to score each threat:
+Use `scoring-cvss-threats` skill to score each threat:
 
 ```typescript
 // Base metrics (technical)

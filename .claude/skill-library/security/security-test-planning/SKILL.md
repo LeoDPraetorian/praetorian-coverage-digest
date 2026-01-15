@@ -375,5 +375,5 @@ If summary.md exceeds 2000 tokens:
 - `codebase-mapping` - Phase 3 methodology (produces architecture context)
 - `security-controls-mapping` - Phase 4 methodology (produces control gap context)
 - `threat-modeling` - Phase 5 methodology (produces threat model with CVSS 4.0 scores) **UPDATED**
-- `cvss-scoring` - CVSS 4.0 scoring with Phase 1 integration (used by Phase 5)
+- `scoring-cvss-threats` - CVSS 4.0 scoring with Phase 1 integration (used by Phase 5)
 - `gateway-security` - Routes to all security skills

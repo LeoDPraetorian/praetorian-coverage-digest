@@ -4,7 +4,7 @@
 
 ## Overview
 
-After completing STRIDE threat identification, each threat must be scored using CVSS 4.0 via the `cvss-scoring` skill. This replaces the simple 1-12 severity/likelihood matrix with industry-standard CVSS scoring that incorporates:
+After completing STRIDE threat identification, each threat must be scored using CVSS 4.0 via the `scoring-cvss-threats` skill. This replaces the simple 1-12 severity/likelihood matrix with industry-standard CVSS scoring that incorporates:
 
 - **Base metrics**: Inherent exploitability and impact
 - **Threat metrics**: Likelihood of exploitation
@@ -19,7 +19,7 @@ After completing STRIDE threat identification, each threat must be scored using 
 ```
 Step 2: Apply STRIDE → Identify threats
   ↓
-NEW: Step 2.5: Score with CVSS → Invoke cvss-scoring for each threat
+NEW: Step 2.5: Score with CVSS → Invoke scoring-cvss-threats for each threat
   ↓
 Step 7: Score Risks → Use CVSS Environmental scores for prioritization
 ```
@@ -38,9 +38,9 @@ For **each threat identified in STRIDE analysis**:
    cat .claude/.output/threat-modeling/{timestamp}-{slug}/phase-1/summary.md
    ```
 
-2. **Invoke cvss-scoring skill**:
+2. **Invoke scoring-cvss-threats skill**:
    ```
-   Skill: "cvss-scoring"
+   Skill: "scoring-cvss-threats"
 
    Context:
    - Threat description: [STRIDE threat details]
@@ -147,7 +147,7 @@ EOF
 # Score each threat (can be parallelized)
 for threat in $(cat /tmp/threats-to-score.txt); do
   echo "Scoring $threat..."
-  # Invoke cvss-scoring skill with threat context
+  # Invoke scoring-cvss-threats skill with threat context
 done
 ```
 
@@ -289,7 +289,7 @@ Replace simple risk matrix with CVSS band distribution:
 
 ## Phase 1 Context Integration
 
-The cvss-scoring skill uses Phase 1 business context to determine Environmental metrics. This section provides the **formal algorithm** for mapping Phase 1 outputs to CVSS CR/IR/AR values.
+The scoring-cvss-threats skill uses Phase 1 business context to determine Environmental metrics. This section provides the **formal algorithm** for mapping Phase 1 outputs to CVSS CR/IR/AR values.
 
 ### CVSS Version Differences
 
@@ -579,7 +579,7 @@ Before applying Environmental metrics, verify:
 - [ ] Crown jewels list available for CR decisions
 - [ ] Financial thresholds converted to numeric values
 
-**CRITICAL**: Do not invoke cvss-scoring without Phase 1 context. Environmental scores without business context produce generic results that don't reflect actual organizational risk.
+**CRITICAL**: Do not invoke scoring-cvss-threats without Phase 1 context. Environmental scores without business context produce generic results that don't reflect actual organizational risk.
 
 ## Updated Step 7 Workflow
 
@@ -620,7 +620,7 @@ jq '.threats | sort_by(-.cvss.environmental.score)' threat-model.json
 **For organizations without Phase 1**: Use CVSS Base Score only (no Environmental scoring). This provides industry-standard scoring without business context.
 
 **Fallback workflow**:
-1. Score threats with cvss-scoring (Base metrics only)
+1. Score threats with scoring-cvss-threats (Base metrics only)
 2. Sort by CVSS Base Score
 3. Manually adjust priority based on known business context
 
@@ -656,7 +656,7 @@ jq '.threats | sort_by(-.cvss.environmental.score)' threat-model.json
 - [CVSS 4.0 Specification](https://www.first.org/cvss/specification-document) - MacroVector lookup
 - [CVSS 4.0 User Guide](https://www.first.org/cvss/v4-0/user-guide) - CR/IR/AR guidance
 - [Risk Scoring Guide](risk-scoring-guide.md) - DEPRECATED (replaced by CVSS)
-- `cvss-scoring` skill - CVSS scoring with Phase 1 integration
+- `scoring-cvss-threats` skill - CVSS scoring with Phase 1 integration
 - `gateway-security` - Security skills gateway
 
 ## Migration Notes
@@ -666,7 +666,7 @@ jq '.threats | sort_by(-.cvss.environmental.score)' threat-model.json
 If updating a threat model created with the old 1-12 matrix:
 
 1. Keep existing `risk_score` field for reference
-2. Add `cvss` structure via cvss-scoring skill
+2. Add `cvss` structure via scoring-cvss-threats skill
 3. Re-sort by `cvss.environmental.score`
 4. Update priority bands from matrix to CVSS ranges
 5. Archive old `risk-matrix.json`, create new CVSS-based version

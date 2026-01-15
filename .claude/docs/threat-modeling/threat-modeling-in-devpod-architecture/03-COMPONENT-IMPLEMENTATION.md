@@ -2006,7 +2006,7 @@ The image includes the following pre-loaded from
 
 - `threat-modeling-orchestrator` - Multi-phase threat analysis coordination
 - `security-controls-mapping` - Security control identification
-- `cvss-scoring` - Vulnerability severity scoring
+- `scoring-cvss-threats` - Vulnerability severity scoring
 - `security-test-planning` - Test plan generation
 
 **Agents:**
@@ -2071,7 +2071,7 @@ When provisioned, the DevPod workspace looks like:
 │   ├── skill-library/           # Extended skill library
 │   │   └── security/
 │   │       ├── threat-modeling/
-│   │       ├── cvss-scoring/
+│   │       ├── scoring-cvss-threats/
 │   │       └── ...
 │   └── agents/                  # Specialized agents
 │       ├── security-architect/

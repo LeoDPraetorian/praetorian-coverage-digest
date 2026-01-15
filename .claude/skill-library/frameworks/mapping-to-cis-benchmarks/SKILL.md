@@ -281,7 +281,7 @@ None - terminal skill providing framework documentation
 | `mapping-to-cwe`          | When mapping to multiple frameworks    | Map finding to CWE weakness      |
 | `mapping-to-mitre-attack` | When threat context needed             | Map to ATT&CK tactics/techniques |
 | `mapping-to-nist-csf`     | When NIST CSF compliance also required | Map to NIST CSF categories       |
-| `cvss-scoring`            | When quantitative risk scoring needed  | Calculate CVSS score             |
+| `scoring-cvss-threats`            | When quantitative risk scoring needed  | Calculate CVSS score             |
 | `mapping-to-sans-top-25`  | When prioritizing by exploitability    | Map to SANS Top 25 weaknesses    |
 
 ## References

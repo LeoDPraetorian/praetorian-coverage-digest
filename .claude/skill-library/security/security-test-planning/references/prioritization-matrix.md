@@ -360,5 +360,5 @@ Priority:
 
 - Main skill: `security-test-planning` - Phase 6 test planning methodology
 - Phase 5 skill: `threat-modeling` - Produces CVSS-scored threats
-- Phase 5 skill: `cvss-scoring` - CVSS 4.0 scoring with Phase 1 integration
+- Phase 5 skill: `scoring-cvss-threats` - CVSS 4.0 scoring with Phase 1 integration
 - Phase 1 skill: `business-context-discovery` - Provides business context for Environmental scoring

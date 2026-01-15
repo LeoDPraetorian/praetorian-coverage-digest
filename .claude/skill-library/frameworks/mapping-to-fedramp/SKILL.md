@@ -347,7 +347,7 @@ None - this skill provides reference data and mapping logic
 | `mapping-to-iso-27001`         | When dual FedRAMP + ISO 27001 compliance   | Cross-map NIST 800-53 ↔ ISO Annex A    |
 | `mapping-to-mitre-attack`      | When threat intelligence context needed    | ATT&CK technique → control mapping     |
 | `mapping-to-cwe`               | When vulnerability classification needed   | CWE → control mapping                  |
-| `cvss-scoring`                 | When severity scoring needed               | CVSS score influences POA&M priority   |
+| `scoring-cvss-threats`                 | When severity scoring needed               | CVSS score influences POA&M priority   |
 | `security-controls-mapping`    | When general control mapping needed        | Broader security control framework     |
 | `threat-modeling-orchestrator` | When architecting security controls        | Threat model → control recommendations |
 
@@ -394,6 +394,6 @@ Detailed documentation in `references/`:
 | `mapping-to-mitre-d3fend`      | Map defensive techniques to D3FEND framework   |
 | `mapping-to-cwe`               | Map vulnerabilities to CWE categories          |
 | `mapping-to-sans-top-25`       | Map findings to SANS Top 25 vulnerabilities    |
-| `cvss-scoring`                 | Calculate CVSS scores for findings             |
+| `scoring-cvss-threats`                 | Calculate CVSS scores for findings             |
 | `security-controls-mapping`    | General security control framework mapping     |
 | `threat-modeling-orchestrator` | Architect security controls from threat models |

@@ -182,10 +182,10 @@ For each threat identified:
 
 ### Step 4: Score Each Threat with CVSS (NEW)
 
-**Immediately after documenting a threat**, invoke `cvss-scoring` skill:
+**Immediately after documenting a threat**, invoke `scoring-cvss-threats` skill:
 
 ```
-Skill: "cvss-scoring"
+Skill: "scoring-cvss-threats"
 
 Input:
 - Threat: THR-001 details
@@ -214,7 +214,7 @@ Output:
 }
 ```
 
-**See [CVSS Scoring Integration](cvss-scoring-integration.md) for complete workflow.**
+**See [CVSS Scoring Integration](scoring-cvss-threats-integration.md) for complete workflow.**
 
 ### Step 5: Prioritize by CVSS Environmental Score
 
@@ -314,7 +314,7 @@ For each threat identified:
 - [ ] Documented with threat ID, name, description
 - [ ] Mapped to STRIDE category
 - [ ] Traced to control gap from Phase 2
-- [ ] Scored with CVSS 4.0 (via `cvss-scoring` skill)
+- [ ] Scored with CVSS 4.0 (via `scoring-cvss-threats` skill)
 - [ ] Added to threat-model.json with full CVSS structure
 
 ## Anti-Patterns
@@ -349,8 +349,8 @@ For each threat identified:
 
 ## Related
 
-- [CVSS Scoring Integration](cvss-scoring-integration.md) - How to score STRIDE threats with CVSS
+- [CVSS Scoring Integration](scoring-cvss-threats-integration.md) - How to score STRIDE threats with CVSS
 - [Phase 1 Integration Guide](phase-1-integration.md) - Business context for threat filtering
 - [Output Schemas](output-schemas.md) - threat-model.json schema with CVSS structure
 - Main skill: `threat-modeling` - Complete threat modeling workflow
-- Related skill: `cvss-scoring` - CVSS 4.0 scoring with business context
+- Related skill: `scoring-cvss-threats` - CVSS 4.0 scoring with business context

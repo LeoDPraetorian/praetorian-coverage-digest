@@ -33,7 +33,7 @@ Task("threat-modeler", `
 
   MANDATORY SKILLS:
   - threat-modeling: Core methodology
-  - cvss-scoring: Score each threat
+  - scoring-cvss-threats: Score each threat
   - persisting-agent-outputs: Write to OUTPUT_DIRECTORY
 `, "threat-modeler")
 ```
@@ -76,7 +76,7 @@ The `threat-modeler` agent must:
 
 1. **Load Phase Artifacts**: Read all phase-1, phase-3, and phase-4 outputs
 2. **Apply Methodology**: Execute STRIDE + PASTA + DFD threat identification
-3. **Score Threats**: Use `cvss-scoring` skill with business context
+3. **Score Threats**: Use `scoring-cvss-threats` skill with business context
 4. **Generate Artifacts**: Write threat-model.json, risk-matrix.json, summary.md
 5. **Persist Outputs**: Use `persisting-agent-outputs` to write to OUTPUT_DIRECTORY
 
