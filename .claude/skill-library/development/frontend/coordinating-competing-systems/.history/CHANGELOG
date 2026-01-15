@@ -1,0 +1,34 @@
+# Changelog
+
+All notable changes to this skill will be documented in this file.
+
+## [Initial Creation] - 2026-01-14
+
+### Added
+- Initial skill creation following TDD workflow
+- Four core coordination patterns:
+  - Pattern 1: State-Based Guards
+  - Pattern 2: Event-Based Sequencing
+  - Pattern 3: Priority Queuing
+  - Pattern 4: Mutex/Lock Pattern
+- Common interference patterns table
+- Debugging workflow (4-step process)
+- Real-world example from Graph Explorer (useViewportCulling interference)
+- Quick decision tree for pattern selection
+- Integration section with skill dependencies
+
+### Context
+- **Category**: frontend (library skill)
+- **Skill Type**: Process/Pattern
+- **Location**: .claude/skill-library/frontend/coordinating-competing-systems/
+
+### RED Phase Documentation
+- **Problem**: Complex UIs have multiple async systems that interfere (layout vs culling, animation vs interaction, loading vs display, async state races)
+- **Failure Mode**: Features work in isolation but break when combined, leading to developers disabling entire systems
+- **Specific Example**: useViewportCulling.ts disabled in Graph Explorer with comment "interfering with layout" because FA2Layout needs all nodes visible
+- **Current Workaround**: Developers disable features entirely or add TODO comments without understanding root cause
+- **Gap**: No systematic patterns for coordinating competing systems, no guard conditions, no sequencing strategies
+
+### Line Count
+- SKILL.md: 295 lines (safe, well under 500-line limit)
+- Progressive disclosure: Core patterns in main file, detailed implementations in references/

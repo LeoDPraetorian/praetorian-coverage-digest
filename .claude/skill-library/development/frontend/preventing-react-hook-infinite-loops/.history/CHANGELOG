@@ -1,0 +1,35 @@
+# Changelog
+
+All notable changes to this skill will be documented in this file.
+
+## [Initial Creation] - 2026-01-14
+
+### Added
+
+- Initial skill creation: preventing-react-hook-infinite-loops
+- Category: development/frontend (library skill)
+- Type: Process/Pattern
+- Core patterns:
+  - Pattern 1: Serialized dependency keys
+  - Pattern 2: Ref for mutable values
+  - Pattern 3: Object comparison with JSON
+  - Pattern 4: Stable callbacks from props
+- Anti-pattern detection table
+- Debugging workflow (5-step process)
+- Chariot codebase examples (useClusterManagement, useViewportCulling)
+- Integration section (Called By, Requires, Calls, Pairs With)
+- Library integration patterns (React Query, Zustand, React Hook Form)
+
+### RED Phase Documentation
+
+**Gap**: React hooks compare dependencies by reference, not value. Without systematic patterns, developers create infinite loops when using objects/arrays in dependency arrays, causing browser freezes and "Maximum update depth exceeded" errors.
+
+**Test Scenario**: Developer writes useEffect with array dependency that's recreated every render.
+
+**Failure Without Skill**: Claude doesn't recognize reference instability, suggests object/array literals in deps, misses serialization/ref patterns.
+
+### Metrics
+
+- SKILL.md: 283 lines (within 500 line limit, safe zone <350)
+- References created: 0 (will be populated in Phase 6 research)
+- Examples created: 0 (will be populated in Phase 6 research)

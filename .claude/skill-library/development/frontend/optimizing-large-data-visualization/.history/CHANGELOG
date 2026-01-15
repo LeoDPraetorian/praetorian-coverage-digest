@@ -1,0 +1,31 @@
+# Changelog - optimizing-large-data-visualization
+
+All notable changes to this skill will be documented in this file.
+
+## [1.0.0] - 2026-01-14
+
+### Added - Initial Creation
+
+**RED Phase Documentation:**
+- Problem: Rendering large datasets (1000+ items) causes render blocking (5-30s), scroll lag (<15 FPS), memory pressure
+- Current state: Developers lack concrete optimization patterns, decision matrices, and performance targets
+- Gap: No centralized guidance on when/how to apply LOD, viewport culling, spatial indexing, virtualization
+
+**Skill Metadata:**
+- Category: library-skill (frontend)
+- Type: Process/Pattern
+- Location: .claude/skill-library/frontend/optimizing-large-data-visualization/
+
+**Content:**
+- 4 core strategies: LOD, viewport culling, progressive loading, virtualization
+- Strategy selection matrix by data size and interaction type
+- Performance targets with measurement methods
+- Anti-patterns with solutions
+- Integration workflow for incremental adoption
+- Library comparison table
+- References to existing research: .claude/.output/discovery/20250114-graph-explorer/research-synthesis.md
+
+**Research Sources:**
+- User-provided content with concrete TypeScript examples
+- Existing graph visualization research synthesis
+- d3-quadtree, @tanstack/react-virtual, sigma.js patterns
