@@ -1,3 +1,156 @@
+## [Date: 2026-01-15] - Fix Workflow Continuation After Research (Phase 6.2)
+
+### Problem
+After Phase 6.2 invoked orchestrating-research, the agent would print `WORKFLOW_CONTINUATION_REQUIRED` and describe the next action ("Read SYNTHESIS.md and proceed to Phase 6.3") but then stop and wait for user input instead of automatically continuing.
+
+Observed in validation session (session.txt lines 410-420):
+- Line 410: Agent prints `WORKFLOW_CONTINUATION_REQUIRED`
+- Line 416: Agent says "NEXT ACTION: Read SYNTHESIS.md and proceed with Phase 6.3"
+- Line 418: "Crunched for 24m 16s"
+- Line 420: **User had to type `continue with Phase 6.3`** ← FAILURE
+
+### Root Cause
+Phase 6.2 step #3 (lines 370-373) described what should happen "When orchestrating-research returns..." but:
+1. Instructions were buried as item #3 in a numbered list
+2. Phrased as descriptive ("When X returns...") not imperative ("DO this NOW")
+3. No emphasis on immediacy - agent interpreted as "describe next action" not "execute next action"
+4. Missing explicit "Do NOT" pattern for the exact failure mode observed
+
+### Changes
+
+**SKILL.md Phase 6.2 (lines 370-387):**
+- Replaced passive description with imperative action header: "**IMMEDIATELY after orchestrating-research returns:**"
+- Added "YOU MUST execute these steps in sequence WITHOUT stopping:"
+- Changed step 4 from "Continue immediately to Phase 6.3 (next pending todo)" to "**Proceed directly to Phase 6.3** (do NOT report completion, do NOT wait for user)"
+- Added explicit signal interpretation: "`WORKFLOW_CONTINUATION_REQUIRED` means: 'Resume workflow at next TodoWrite item NOW.'"
+- Added specific "Do NOT" pattern matching observed failure: "Say 'NEXT ACTION: Read SYNTHESIS.md and proceed to Phase 6.3' without actually doing it"
+
+### Impact
+Agents will now automatically continue from Phase 6.2 → 6.3 → 7 → 8 → 9 without stopping to report research completion. The imperative framing and explicit failure pattern prevent rationalization.
+
+### Acceptance Criteria Met
+1. ✅ Imperative header replaces passive description
+2. ✅ Step 4 emphasizes "do NOT wait for user"
+3. ✅ Signal interpretation made explicit
+4. ✅ Observed failure pattern added to "Do NOT" list
+5. ✅ Line count: 509 lines (within 550 hard limit)
+
+### Files Modified
+- `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md` (Phase 6.2, lines 370-387)
+
+### Validation
+Run validation session with same skill creation task to verify agent proceeds from Phase 6.2 → 6.3 without user intervention.
+
+---
+
+## [Date: 2026-01-15] - Mandate Agent Spawning for TDD Verification (Phase 1.3, Phase 8.1)
+
+### Problem
+TDD phases (RED and GREEN) allowed document review instead of actual behavioral testing. Skill creators could bypass agent spawning by:
+- Writing hypothetical failure descriptions ("The agent would likely...")
+- Verifying skill content matches requirements ("The skill provides guidance for...")
+- Skipping actual agent execution entirely
+
+This resulted in skills that passed "testing" but never actually demonstrated behavioral change.
+
+### Root Cause
+1. Phase 1.3 said "Actually test the scenario" but made spawning "Option A (Recommended)" not mandatory
+2. Phase 8.1 said "Start a fresh context (or ask Claude to forget)" - too vague, no enforcement
+3. No explicit "NOT ACCEPTABLE" patterns to reject document review masquerading as testing
+4. No required output format (verbatim quotes, comparison tables)
+
+### Changes
+
+**SKILL.md Phase 1.3 (lines 109-122):**
+- Added "(AGENT SPAWNING MANDATORY)" to section header
+- Added explicit Task tool invocation example with correct subagent_type and prompt
+- Added "Capture verbatim" requirement with 4 specific items
+- Added "NOT ACCEPTABLE" patterns: hypothetical, speculation, assumption
+- Added "REQUIRED" patterns: actual Task invocation, verbatim output, specific quotes
+- Added reference to new `references/tdd-verification.md`
+
+**SKILL.md Phase 8.1 (lines 441-454):**
+- Added "(AGENT SPAWNING MANDATORY)" to section header
+- Added explicit Task tool invocation with MANDATORY SKILL instruction
+- Added "Compare RED vs GREEN" requirement
+- Added "NOT ACCEPTABLE" patterns: document review, hypothetical
+- Added "REQUIRED" patterns: actual Task invocation, side-by-side comparison
+- Added reference to `references/tdd-verification.md`
+
+**references/tdd-verification.md (NEW FILE):**
+- Detailed templates for RED capture format
+- Detailed templates for GREEN verification format
+- AskUserQuestion template for Phase 8.2
+- Anti-patterns section explaining document review failure modes
+- Success criteria checklists for both phases
+
+### Impact
+- TDD verification now requires actual agent spawning - cannot be faked with document review
+- Behavioral change must be demonstrated with verbatim output comparison
+- Reference file provides copy-paste templates for consistent verification
+- Explicit "NOT ACCEPTABLE" patterns prevent rationalization
+
+### Acceptance Criteria Met
+1. ✅ Phase 1.3 requires Task tool invocation (not optional)
+2. ✅ Phase 8.1 requires Task tool invocation with skill loaded
+3. ✅ Both phases have explicit "NOT ACCEPTABLE" and "REQUIRED" patterns
+4. ✅ Reference file provides detailed templates for consistent verification
+5. ✅ Line count: 502 lines (within tolerance of 500 limit)
+
+### Files Modified
+- `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md` (Phase 1.3, Phase 8.1)
+- `.claude/skill-library/claude/skill-management/creating-skills/references/tdd-verification.md` (NEW)
+
+### REFACTOR Assessment
+**Change type:** Logic change (mandatory spawning, rejection patterns)
+**Rules changed:** Yes - verification method changed from optional to mandatory
+**Validation changed:** Yes - explicit rejection of document review
+**Rationalization risk:** Low - explicit patterns make bypass obvious
+
+**Classification:** Non-trivial (methodology change)
+
+---
+
+## [Date: 2026-01-14] - Fix Workflow Continuation After Research Completes
+
+### Problem
+After Phase 6.2 invokes orchestrating-research, the workflow stops and reports "Research complete!" to the user instead of automatically continuing to Phase 6.3 (Incorporate research). The agent waits for user input instead of checking TodoWrite for pending phases.
+
+### Root Cause
+1. Workflow Continuation Rules section (lines 53-58) was too brief - only 4 lines
+2. No explicit "check TodoWrite" instruction after research returns
+3. No "continue immediately to Phase 6.3" mandate
+4. Missing WRONG vs RIGHT behavior comparison to illustrate the issue
+
+### Changes
+
+**SKILL.md Workflow Continuation Rules (lines 53-69):**
+- Expanded from 4 lines to 17 lines with explicit 7-step continuation instructions
+- Added mandatory continuation protocol:
+  1. Phase 6.2 writes remaining phases (6.3, 7, 8, 9) to TodoWrite BEFORE invoking research
+  2. orchestrating-research completes and signals `WORKFLOW_CONTINUATION_REQUIRED`
+  3. Agent MUST check TodoWrite for next pending phase
+  4. Agent continues immediately to Phase 6.3 (Incorporate research)
+  5. Do NOT report "Research complete!" and stop
+  6. Do NOT wait for user to say "continue"
+  7. Continue Phase 6.3 → 7 → 8 → 9 automatically
+- Added WRONG vs RIGHT behavior comparison showing exact failure mode
+- Pattern matches orchestrating-research Phase 6 handoff protocol
+
+### Impact
+Agents will now automatically continue from Phase 6.2 → 6.3 → 7 → 8 → 9 without stopping to report research findings or waiting for user input. This prevents workflow interruption and ensures skill creation completes in a single continuous flow.
+
+### Acceptance Criteria Met
+1. ✅ Workflow continuation rules explicitly state "check TodoWrite" after research
+2. ✅ WRONG vs RIGHT comparison shows exact failure pattern
+3. ✅ 7 explicit continuation steps documented
+4. ✅ Pattern matches orchestrating-research Phase 6 handoff protocol
+
+### Files Modified
+- `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md` (lines 53-69 expanded)
+
+---
+
 ## [Date: 2026-01-14] - Remove redirect stub file
 
 ### Problem (Audit Finding)

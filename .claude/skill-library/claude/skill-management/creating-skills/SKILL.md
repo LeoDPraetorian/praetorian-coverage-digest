@@ -54,7 +54,18 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 **9 phases run automatically Phase 1 → 9. ONLY stop for:** AskUserQuestion prompts, Phase 8 GREEN approval, Phase 9 pressure test spawning.
 
-**Research continuation:** Phase 6.2 writes remaining phases to TodoWrite → orchestrating-research returns → Check TodoWrite → Continue Phase 6.3-9 automatically. Don't stop to report research findings.
+**Research continuation (MANDATORY):**
+
+1. Phase 6.2 writes remaining phases (6.3, 7, 8, 9) to TodoWrite BEFORE invoking orchestrating-research
+2. orchestrating-research completes and signals `WORKFLOW_CONTINUATION_REQUIRED`
+3. Agent MUST check TodoWrite for next pending phase
+4. Agent continues immediately to Phase 6.3 (Incorporate research)
+5. Do NOT report "Research complete!" and stop
+6. Do NOT wait for user to say "continue"
+7. Continue Phase 6.3 → 7 → 8 → 9 automatically
+
+**WRONG:** Phase 6.2 → Research completes → "Research complete! Key findings..." → STOPS ❌
+**RIGHT:** Phase 6.2 → Research completes → Check TodoWrite → Phase 6.3 → ... → Phase 9 → "Skill creation complete" ✅
 
 ---
 
@@ -95,13 +106,20 @@ Record the answer - this becomes the skill's "Why" documentation.
 
 Ask user to describe a specific scenario where Claude currently fails without this skill.
 
-### 1.3 Capture Failure Behavior
+### 1.3 Capture Failure Behavior (AGENT SPAWNING MANDATORY)
 
-**CRITICAL**: Actually test the scenario and capture the failure.
+**CRITICAL**: You MUST spawn an agent to observe actual failure. Document review is NOT sufficient.
 
-**Option A (Recommended):** Ask Claude to perform task without skill. Document what goes wrong (wrong approach, missing context, incorrect patterns). Record verbatim.
+```
+Task(subagent_type: "general-purpose", prompt: "Scenario: {from 1.2}. Perform this task. Do NOT load any skills. Document your approach step by step.")
+```
 
-**Option B (Advanced):** Create `evaluations/test-case-{n}.json` for heavily reused skills.
+**Capture verbatim:** (1) Approach taken, (2) Rationalizations quoted, (3) Violations observed, (4) Patterns missed.
+
+**❌ NOT ACCEPTABLE:** "The agent would likely..." / "Without the skill, Claude might..." (hypothetical)
+**✅ REQUIRED:** Actual Task invocation + verbatim output + specific quotes from agent response
+
+**See:** [references/tdd-verification.md](references/tdd-verification.md) for detailed capture format.
 
 ### 1.4 Confirm RED State
 
@@ -355,16 +373,23 @@ Options: "Yes, research sources (Recommended)" or "No, skip research"
    skill: "orchestrating-research"
    ```
 
-3. When orchestrating-research returns with 'WORKFLOW_CONTINUATION_REQUIRED':
-   - Mark Phase 6.2 as complete in TodoWrite
-   - Read the SYNTHESIS.md from the output directory
-   - Continue immediately to Phase 6.3 (next pending todo)
+**IMMEDIATELY after orchestrating-research returns:**
+
+YOU MUST execute these steps in sequence WITHOUT stopping:
+
+1. Mark Phase 6.2 complete in TodoWrite
+2. Check TodoWrite for next pending phase (should be 6.3)
+3. Read SYNTHESIS.md from output directory
+4. **Proceed directly to Phase 6.3** (do NOT report completion, do NOT wait for user)
+
+The signal `WORKFLOW_CONTINUATION_REQUIRED` means: "Resume workflow at next TodoWrite item NOW."
 
 **Do NOT:**
 
-- Report 'Research complete!' to user
-- Summarize research findings and stop
-- Wait for user to say 'continue'
+- Report 'Research complete!' to user and stop
+- Summarize research findings and wait for acknowledgment
+- Say "NEXT ACTION: Read SYNTHESIS.md and proceed to Phase 6.3" without actually doing it
+- Wait for user to type 'continue'
 - Mark all phases complete when only 6.2 is done
 
 The orchestrating-research skill provides:
@@ -426,31 +451,24 @@ If creating a library skill, add it to the appropriate gateway(s).
 
 **The skill is only done when it passes the original test.**
 
-### 8.1 Re-Test the Original Scenario
+### 8.1 Re-Test the Original Scenario (AGENT SPAWNING MANDATORY)
 
-Go back to the scenario from Phase 1 (RED phase) and test again:
+**CRITICAL**: You MUST spawn an agent WITH the skill loaded to verify behavioral change. Document review is NOT sufficient.
 
-1. Start a fresh context (or ask Claude to "forget" the skill content)
-2. Load the new skill
-3. Ask Claude to perform the same task that failed before
+```
+Task(subagent_type: "general-purpose", prompt: "MANDATORY SKILL: Read('{skill-path}/SKILL.md') BEFORE starting. Scenario: {from Phase 1.2}. 1) Load the skill, 2) Perform task following skill guidance, 3) Document approach step by step.")
+```
+
+**Compare RED vs GREEN:** Approach taken, commands used, rationalizations (or lack thereof).
+
+**❌ NOT ACCEPTABLE:** "The skill provides guidance..." / "With this skill, the agent would..." (hypothetical)
+**✅ REQUIRED:** Actual Task invocation + verbatim output + side-by-side comparison with RED output
+
+**See:** [references/tdd-verification.md](references/tdd-verification.md) for comparison template.
 
 ### 8.2 Verify the Gap is Closed
 
-Ask via AskUserQuestion:
-
-```
-I've tested the skill with the original scenario.
-
-Before (RED): {what went wrong}
-After (GREEN): {what happened with the skill}
-
-Does the skill successfully address the gap?
-
-Options:
-- Yes, the skill works - proceed to refactor phase
-- Partially - need to improve the skill content
-- No - the skill doesn't help, need to rethink approach
-```
+Ask via AskUserQuestion with **verbatim quotes** from both RED (Phase 1.3) and GREEN (Phase 8.1) agent outputs, plus observed behavioral differences. Options: Yes (proceed), Partially (improve), No (rethink).
 
 **If "Partially" or "No"**: Go back to Phase 6 (Research) and improve content.
 
