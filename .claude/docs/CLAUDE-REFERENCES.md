@@ -6,6 +6,7 @@ https://code.claude.com/docs/en/sub-agents
 https://www.infoq.com/news/2025/08/claude-code-subagents/
 https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
 https://www.anthropic.com/engineering/multi-agent-research-system
+https://www.anthropic.com/research/building-effective-agents
 https://dev.to/bredmond1019/multi-agent-orchestration-running-10-claude-instances-in-parallel-part-3-29da
 https://offnote.substack.com/p/multi-agents-vs-tool-groups-a-layered
 
@@ -18,6 +19,7 @@ https://claudelog.com/faqs/what-is-todo-list-in-claude-code/
 https://platform.claude.com/docs/en/agent-sdk/todo-tracking
 https://www.philschmid.de/context-engineering-part-2
 https://www.theaiautomators.com/context-engineering-strategies-to-build-better-ai-agents/
+https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
 https://www.cometapi.com/managing-claude-codes-context/
 https://www.agalanov.com/notes/efficient-claude-code-context-parallelism-sub-agents/
 
@@ -73,7 +75,7 @@ This category covers security concerns specific to agent ecosystems:
 https://www.xenonstack.com/blog/vulnerabilities-in-ai-agents
 https://securityboulevard.com/2025/07/emerging-agentic-ai-security-vulnerabilities-expose-enterprise-systems-to-widespread-identity-based-attacks/
 
-8 Claude 4.5 Model Updates & Migration
+8 Claude 4.5 Model Updates & Migration (THIS IS PROVEN TO BE INCORRECT)
 
 Official guidance on Claude 4.5 (Opus/Sonnet) behavioral changes, tool triggering, and prompt migration:
 
@@ -82,11 +84,3 @@ https://www.anthropic.com/news/claude-sonnet-4-5
 https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-5
 https://github.com/anthropics/claude-code/blob/main/plugins/claude-opus-4-5-migration/skills/claude-opus-4-5-migration/references/prompt-snippets.md
 
-Key findings from these sources:
-
-- Claude 4.5 is more responsive to system prompts than previous models
-- Prompts designed to reduce undertriggering may now cause OVERTRIGGERING
-- Solution: Dial back aggressive language (CRITICAL, MUST, ALWAYS, REQUIRED, NEVER)
-- Replace "CRITICAL: You MUST use this tool when..." with "Use this tool when..."
-- Claude 4.5 is "the most steerable model to date"
-- Trained for "precise instruction following" - less verbose prompts work better

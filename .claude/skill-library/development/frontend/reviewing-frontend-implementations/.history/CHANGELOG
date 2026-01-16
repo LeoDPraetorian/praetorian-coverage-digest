@@ -1,5 +1,22 @@
 # Changelog: reviewing-frontend-implementations
 
+## [2026-01-15] Updated ESLint Verification
+
+**Changed:**
+- Replaced inline ESLint bash commands with reference to `using-eslint` skill in Step 4
+- Added `using-eslint` to Related Skills section
+
+**Rationale:**
+- Inline bash was less robust (didn't check staged files, no --fix, no deduplication)
+- `using-eslint` provides comprehensive ESLint execution with better git integration
+- Eliminates duplication between review skill and standalone ESLint skill
+- Ensures reviewers use same ESLint approach as developers
+
+**Impact:**
+- Line count: 142 lines → 155 lines (added explanation of skill benefits)
+- Reviewers now invoke `using-eslint` skill instead of inline bash
+- More consistent ESLint execution across workflows
+
 ## [2026-01-04] Initial Creation
 
 **RED Phase Documentation:**

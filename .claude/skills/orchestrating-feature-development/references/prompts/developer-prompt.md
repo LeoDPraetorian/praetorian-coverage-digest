@@ -1,6 +1,6 @@
 # Developer Subagent Prompt Template
 
-Use this template when dispatching developer subagents in Phase 5.
+Use this template when dispatching developer subagents in Phase 6.
 
 ## Usage
 

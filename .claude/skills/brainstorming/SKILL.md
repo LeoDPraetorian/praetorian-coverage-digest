@@ -100,8 +100,8 @@ When presenting 2-3 approaches, use this structure for EACH:
 **Implementation (if continuing):**
 
 - Ask: "Ready to set up for implementation?"
-- Use superpowers:using-git-worktrees to create isolated workspace
-- Use superpowers:writing-plans to create detailed implementation plan
+- Use using-git-worktrees to create isolated workspace
+- Use writing-plans to create detailed implementation plan
 
 ## Key Principles
 

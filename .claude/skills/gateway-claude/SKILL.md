@@ -104,7 +104,7 @@ skill: "managing-commands"
 | Skill                          | Path                                                                                    | Triggers                        |
 | ------------------------------ | --------------------------------------------------------------------------------------- | ------------------------------- |
 | Auditing Skills                | `.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md`                | audit skill                     |
-| Closing Skill Loopholes        | `.claude/skill-library/claude/skill-management/closing-skill-loopholes/SKILL.md`        | loophole, rationalization       |
+| Closing Rationalization Loopholes | `.claude/skill-library/claude/skill-management/closing-rationalization-loopholes/SKILL.md` | loophole, rationalization       |
 | Creating Skills                | `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md`                | create skill                    |
 | Deleting Skills                | `.claude/skill-library/claude/skill-management/deleting-skills/SKILL.md`                | delete skill                    |
 | Fixing Skills                  | `.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md`                  | fix skill                       |

@@ -1,5 +1,60 @@
 # Changelog
 
+## [2026-01-16] - Agent Output Validation Protocol
+
+### Added
+- **Agent Output Validation** section - Enforce mandatory skill invocation by validating subagent outputs
+- **New reference file**: references/agent-output-validation.md (386 lines) with:
+  - **Mandatory Skills by Agent Type table** - Defines required skills per agent pattern (*-lead, *-developer, *-tester, *-reviewer, *-security, test-lead, Explore)
+  - **Validation Protocol** - 6-step process to check skills_invoked array against mandatory skills
+  - **Validation Pseudo-Code** - JavaScript function showing algorithm (parseMetadataFromFile, getMandatorySkills, filter missing)
+  - **Re-spawn Template** - Compliance failure template to append when validation fails
+  - **Max Retry Policy** - 3-attempt limit (1: normal, 2: compliance template, 3: escalate to user)
+  - **Integration with Orchestration Skills** - How orchestrating-feature-development, orchestrating-capability-development, orchestrating-integration-development should invoke validation
+  - **Complete Validation Example** - End-to-end scenario with frontend-developer missing TDD skills
+  - **Limitations section** - Acknowledges validation checks IF skills invoked, not HOW WELL followed
+
+### Changed
+- **Agent Routing Table** section - Added callout link to agent-output-validation.md for mandatory skill compliance
+- **References** section - Added agent-output-validation.md as first reference link
+
+### Context
+Architecture document (.claude/docs/orchestration/MULTI-AGENT-ORCHESTRATION-ARCHITECTURE.md) identified gap: orchestrating skills embed mandatory skills in agent prompts but never validate that agents actually invoked them. The document recommended adding validation logic to orchestrating-multi-agent-workflows since it already owns the agent routing table.
+
+Problem: Agents receive mandatory skills lists in task prompts (e.g., "MANDATORY SKILLS: developing-with-tdd, verifying-before-completion, persisting-agent-outputs") but may skip them during execution. Orchestrators had no mechanism to detect non-compliance, causing quality degradation.
+
+Solution: Added validation protocol that orchestrators MUST run after EVERY Task agent returns:
+1. Read agent's output file (not just response summary)
+2. Parse metadata JSON block at end
+3. Check skills_invoked array exists and is non-empty
+4. Compare against mandatory skills table for that agent type
+5. If ANY mandatory skill missing → re-spawn with compliance failure template
+6. If validation passes → proceed to next phase
+
+Max retry policy prevents infinite loops:
+- Attempt 1: Normal prompt with mandatory skills listed
+- Attempt 2: Re-spawn with COMPLIANCE FAILURE template explicitly requiring missing skills
+- Attempt 3: Escalate to user via AskUserQuestion with full context
+
+Impact:
+- Non-compliance detected immediately after agent returns (not at workflow end)
+- Agents get explicit retry with clear requirements when they skip mandatory skills
+- Persistent non-compliance escalates to user for manual intervention
+- Orchestrating-feature-development, orchestrating-capability-development, orchestrating-integration-development can reference this protocol
+
+Limitations:
+- Validation checks IF skills invoked (metadata array presence), not HOW WELL followed (can't verify quality of skill adherence)
+- Mitigation: Use human checkpoints, code review agents, quality scoring framework, explicit exit criteria
+
+### Line Count
+- SKILL.md before: 751 lines
+- SKILL.md after: 754 lines (+3 lines for two reference links)
+- New reference file: references/agent-output-validation.md (386 lines)
+- Total addition: 389 lines
+- SKILL.md stays lean via progressive disclosure pattern ✅
+
+---
+
 ## [2026-01-11] - Quality Frameworks and Workflow Governance
 
 ### Added

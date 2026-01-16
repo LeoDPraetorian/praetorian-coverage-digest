@@ -1,0 +1,116 @@
+# Changelog
+
+## 2026-01-06 - Initial Creation
+
+**Phase**: RED-GREEN-REFACTOR TDD Cycle
+
+**RED Phase - Gap Documentation:**
+
+**Problem**: Agents rationalize skipping skill instructions despite explicit requirements.
+
+**Failure Evidence** (from .claude/.output/research/AGENTS-NOT-FOLLOWING-DIRECTIONS.md):
+
+1. **mcp-lead agent** asked to "analyze Serena connection pool":
+   - Did NOT invoke `persisting-agent-outputs` skill
+   - Did NOT write output to file
+   - Returned inline response instead
+
+2. **mcp-lead3 hallucinated description**:
+   - Actual: "Use when starting any conversation or performing any task"
+   - Hallucinated: "Use when analyzing, creating, or modifying skills"
+   - Used fabricated description to justify skipping skill
+
+3. **Non-deterministic compliance**:
+   - mcp-lead2 invoked 5-7 skills on same task across different runs
+   - 40% variance in skill invocation behavior
+
+**Test Scenario**: When agents complete work requiring file artifacts and specific skill invocations, they rationalize skipping requirements.
+
+**Location**: `.claude/skill-library/claude/skill-management/closing-skill-loopholes/`
+
+**Category**: claude/skill-management
+
+**Skill Type**: Process/Pattern (TDD methodology for closing agent compliance loopholes)
+
+**Key Features**:
+- RED-GREEN-REFACTOR workflow for systematic loophole closure
+- Rationalization pattern taxonomy (8 common patterns)
+- Counter placement decision tree (agent/skill/universal scope)
+- Loophole tracking in `.claude/docs/agents/AGENT-LOOPHOLES.md`
+- Description trap detection (WHEN vs HOW)
+- Anti-rationalization reference table
+
+**Methodology**: Based on obra/superpowers pressure testing approach with TDD cycles.
+
+## 2026-01-16 - Fix TDD Methodology Violation
+
+**Phase**: Update existing skill to fix broken TDD workflow
+
+**Problem**: The skill deferred ALL verification to REFACTOR phase, violating proper TDD:
+- RED phase only documented (didn't reproduce failure)
+- GREEN phase didn't verify counter works
+- REFACTOR was first verification (should be pressure testing while green)
+
+**Changes**:
+
+1. **SKILL.md**:
+   - Added "How This Skill Is Invoked" section (user-invoked via /closing-the-loop)
+   - Added "Scope" section (handles subagents and main Claude)
+   - Updated Quick Reference table to show REPRODUCE and VERIFY requirements
+   - Added Step 2 (Understand the Rationalization) to RED phase
+   - Added Step 3 (Reproduce the Failure) to RED phase with Task tool spawn
+   - Added Step 5 (Verify Counter Works) to GREEN phase with Task tool spawn
+   - Added Step 6 (Iterate Until Passes) to GREEN phase
+   - Updated REFACTOR phase title and purpose to "Pressure Test While Green"
+   - Updated REFACTOR steps to focus on pressure testing, not first verification
+
+2. **references/tdd-methodology.md**:
+   - Added Step 4 (Reproduce the Failure) to RED phase
+   - Added Step 5 (Understand the Rationalization) to RED phase
+   - Updated RED Phase Completion Criteria to require reproduced failure
+   - Added Step 5 (Verify Counter Works) to GREEN phase
+   - Added Step 6 (Iterate Until Passes) to GREEN phase
+   - Updated GREEN Phase Completion Criteria to require fresh agent passing
+   - Updated REFACTOR phase title to "Pressure Test While Green"
+   - Replaced re-test steps with pressure test variations
+   - Updated REFACTOR Phase Completion Criteria with gate
+
+3. **references/counter-placement.md**:
+   - Added Q0 to decision tree (Main Claude vs Subagent)
+   - Added "Main Claude (Not Subagent)" section with placement options
+   - Updated decision tree to handle both main Claude and subagents
+
+4. **examples/quick-question-trap.md**:
+   - Added Step 1-3 structure to RED phase showing reproduction
+   - Added iteration example in GREEN phase (first counter failed, second succeeded)
+   - Added Step 2-5 structure showing verification loop
+   - Added REFACTOR pressure test examples (time pressure, authority override)
+   - Updated lessons learned to emphasize iteration and verification
+
+5. **Created .claude/commands/closing-the-loop.md**:
+   - New command file for user invocation
+   - Delegates to closing-rationalization-loopholes library skill
+   - Documents 3-phase TDD workflow
+
+**Verification**:
+- RED phase now requires Task tool spawn to reproduce failure
+- GREEN phase now requires Task tool spawn to verify counter works
+- REFACTOR phase clearly about pressure testing (already green)
+- Decision tree handles both main Claude and subagents
+- Command file exists and delegates correctly
+
+**Impact**: Skill now follows proper TDD where each phase has verification, not just REFACTOR phase.
+
+## 2026-01-16 - Rename Skill
+
+**Change**: Renamed `closing-skill-loopholes` → `closing-rationalization-loopholes`
+
+**Reason**: Old name was misleading - suggested "fixing bugs in skills" when the skill actually closes rationalization loopholes where agents/Claude skip required behavior.
+
+**Files Updated**:
+- Renamed directory from `closing-skill-loopholes/` to `closing-rationalization-loopholes/`
+- Updated frontmatter `name:` field in SKILL.md
+- Updated `.claude/commands/closing-the-loop.md` delegation path
+- Updated `.claude/skills/gateway-claude/SKILL.md` routing table
+- Updated `.claude/docs/agents/AGENT-LOOPHOLES.md` methodology references
+- Updated `references/description-trap.md` example section header

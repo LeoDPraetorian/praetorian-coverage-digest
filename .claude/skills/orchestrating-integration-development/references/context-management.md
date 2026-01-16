@@ -75,18 +75,18 @@ Each agent reads context from files, not from previous agent's memory.
 
 ```
 Phase 4 agent implements auth with bug
-Phase 5 agent spawned with context "remember that auth bug from earlier"
-Phase 5 agent inherits misconceptions about the bug
-Phase 5 tests fail mysteriously because agent "remembers" wrong things
+Phase 6 agent spawned with context "remember that auth bug from earlier"
+Phase 6 agent inherits misconceptions about the bug
+Phase 6 tests fail mysteriously because agent "remembers" wrong things
 ```
 
 **Clean context example:**
 
 ```
 Phase 4 agent implements auth with bug
-Phase 5 agent spawned fresh, reads architecture.md
-Phase 5 agent sees only the spec, not implementation details
-Phase 5 tests correctly against specification
+Phase 6 agent spawned fresh, reads architecture.md
+Phase 6 agent sees only the spec, not implementation details
+Phase 6 tests correctly against specification
 ```
 
 ## Memory vs. Files

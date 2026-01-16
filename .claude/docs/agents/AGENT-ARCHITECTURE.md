@@ -1083,23 +1083,35 @@ Once an agent is spawned, it runs to completion. Design agent prompts carefullyt
 ## References
 
 ### Internal
-
 - **Agent Manager**: `.claude/skills/managing-agents/SKILL.md`
 - **Agent Management Skills**: `.claude/skill-library/claude/agent-management/`
 - **Gold Standard**: `.claude/agents/architecture/tool-lead.md`
-- **Skills Architecture**: `docs/SKILLS-ARCHITECTURE.md`
 
-### Anthropic Guidance
+### Anthropic Official Guidance
+Agent Skills Overview
+https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
 
-- [Claude Code Sub-agents](https://code.claude.com/docs/en/sub-agents)
-- [Agent Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
-- [Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system)
-- [Effective Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
-- [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents)
-- [Claude 4 Best Practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices)
-- [Agent Skills Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
+Claude Code Sub-agents
+https://code.claude.com/docs/en/sub-agents
+
+Agent Skills Best Practices
+https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+
+Multi-Agent Research System
+https://www.anthropic.com/engineering/multi-agent-research-system
+
+Effective Context Engineering
+https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
+
+Building Effective Agents
+https://www.anthropic.com/engineering/building-effective-agents
+
+Claude 4 Best Practices (IGNORE. PROVEN INCORRECT)
+https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices
 
 ### Community Resources
+Multi-Agent Orchestration: 10 Claude Instances in Parallel
+https://dev.to/bredmond1019/multi-agent-orchestration-running-10-claude-instances-in-parallel-part-3-29da
 
-- [Multi-Agent Orchestration: 10 Claude Instances in Parallel](https://dev.to/bredmond1019/multi-agent-orchestration-running-10-claude-instances-in-parallel-part-3-29da)
-- [Multi-Agents vs Tool Groups: A Layered Approach](https://offnote.substack.com/p/multi-agents-vs-tool-groups-a-layered)
+Multi-Agents vs Tool Groups: A Layered Approach
+https://offnote.substack.com/p/multi-agents-vs-tool-groups-a-layered

@@ -76,15 +76,27 @@ Independent of plan, check standard quality:
 
 **Execute all verification commands and capture output:**
 
+**Type checking (required):**
 ```bash
-# Type checking (required)
 cd modules/chariot/ui && npx tsc --noEmit
+```
 
-# Linting (modified files only)
-MODIFIED_FILES=$(git diff --name-only HEAD | grep -E '\.(ts|tsx)$')
-[ -n "$MODIFIED_FILES" ] && npx eslint $MODIFIED_FILES
+**Linting (required):**
 
-# Tests
+Use the `using-eslint` skill instead of inline commands. It provides:
+- Checks both modified and staged files
+- Auto-fix with `--fix` flag
+- Deduplicates file lists
+- Filters deleted files correctly
+
+```
+Read(".claude/skill-library/development/frontend/using-eslint/SKILL.md")
+```
+
+Then follow the skill's instructions to run ESLint on modified files.
+
+**Tests:**
+```bash
 npm test -- --passWithNoTests
 ```
 
@@ -134,6 +146,7 @@ Follow `persisting-agent-outputs` skill for file output location. Write review f
 ## Related Skills
 
 - `persisting-agent-outputs` - File output location discovery protocol
+- `using-eslint` - Robust ESLint execution for modified files (used in Step 4)
 - `frontend-lead` - Architecture planning for frontend features
 - `frontend-developer` - Implementation that gets reviewed by this process
 

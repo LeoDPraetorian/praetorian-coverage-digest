@@ -32,7 +32,7 @@ Use this skill when:
 
 **Related skills:**
 
-- `creating-mcp-wrappers` - TDD workflow for implementing wrappers (use AFTER architectural design)
+- `orchestrating-mcp-development` - Multi-agent workflow for implementing MCP wrappers (use AFTER architectural design)
 - `managing-tool-wrappers` - Lifecycle management for existing wrappers
 
 **You MUST use TodoWrite** before starting to track all architectural decisions and implementation steps when applying these patterns to a new wrapper.
@@ -463,7 +463,7 @@ Research from production wrapper deployments:
 
 | Skill                     | Access Method                                                                                  | Purpose                                    |
 | ------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| **creating-mcp-wrappers** | `Read(".claude/skill-library/claude/mcp-management/creating-mcp-wrappers/SKILL.md")` (LIBRARY) | TDD workflow for implementing MCP wrappers |
+| **orchestrating-mcp-development** | `Read(".claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md")` (LIBRARY) | Multi-agent workflow for MCP wrappers |
 | **managing-tool-wrappers** | `Read(".claude/skill-library/.../managing-tool-wrappers/SKILL.md")` (LIBRARY)                   | Lifecycle management for existing wrappers |
 | **gateway-mcp-tools**     | `skill: "gateway-mcp-tools"` (CORE)                                                            | Router for MCP tool discovery              |
 | **developing-with-tdd**   | `skill: "developing-with-tdd"` (CORE)                                                          | TDD methodology for implementation         |

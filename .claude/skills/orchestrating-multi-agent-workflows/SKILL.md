@@ -243,7 +243,9 @@ See [references/gated-verification.md](references/gated-verification.md) for det
 
 ### Agent Routing Table
 
-When an agent returns `blocked`, use this table to determine the next agent:
+When an agent returns `blocked`, use this table to determine the next agent.
+
+**For agent output validation (mandatory skill compliance), see [references/agent-output-validation.md](references/agent-output-validation.md).**
 
 | Agent Type   | Blocked Reason                | Next Agent                        |
 | ------------ | ----------------------------- | --------------------------------- |
@@ -743,6 +745,7 @@ Return orchestration results as:
 
 ## References
 
+- [Agent Output Validation](references/agent-output-validation.md) - Enforce mandatory skill invocation by subagents
 - [Execution Patterns](references/execution-patterns.md) - Detailed sequential/parallel/hybrid examples
 - [Delegation Templates](references/delegation-templates.md) - Agent prompt templates by type
 - [Progress File Format](references/progress-file-format.md) - Structure for persistence

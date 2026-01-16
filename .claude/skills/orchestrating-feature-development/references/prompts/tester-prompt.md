@@ -1,6 +1,6 @@
 # Tester Subagent Prompt Template
 
-Use this template when dispatching tester subagents in Phase 8.
+Use this template when dispatching tester subagents in Phase 10.
 
 ## Usage
 

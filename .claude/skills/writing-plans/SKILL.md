@@ -260,7 +260,7 @@ mkdir -p "$OUTPUT_DIR"
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+> **For Claude:** REQUIRED SUB-SKILL: Use executing-plans to implement this plan task-by-task.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -419,14 +419,14 @@ Contains:
 **Which approach?"**
 
 **If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:developing-with-subagents
+- **REQUIRED SUB-SKILL:** Use developing-with-subagents
 - For phased plans: Execute one phase at a time, verify exit criteria before next phase
 - Stay in this session
 - Fresh subagent per task + code review
 
 **If Parallel Session chosen:**
 - Guide them to open new session in worktree
-- **REQUIRED SUB-SKILL:** New session uses superpowers:executing-plans
+- **REQUIRED SUB-SKILL:** New session uses executing-plans
 - For phased plans: executing-plans loads PLAN.md, then executes phases sequentially
 
 ### Detection Logic

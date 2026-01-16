@@ -48,9 +48,11 @@ This gateway implements 3-tier loading:
 | ----------------------------------------------------- | -------------------------------------------------------------------- |
 | "write tests for..."                                  | → Mandatory skills + domain-specific                                 |
 | "implement tests from plan" / "backend test"          | → `gateway-backend` (has `implementing-golang-tests`)                |
+| "fix bug" / "bug fix" / "why is X broken"             | → `orchestrating-bugfix`                                             |
 | "fix flaky test"                                      | → `condition-based-waiting` + `testing-anti-patterns`                |
 | "test plan" / "coverage gaps"                         | → `verifying-test-metrics-reality` + `test-infrastructure-discovery` |
 | "debug test failure"                                  | → `debugging-systematically` (via gateway) + `testing-anti-patterns` |
+| "find bug location" / "bug discovery"                 | → `discovering-bugs-for-fixing`                                      |
 | "mock" / "stub" / "spy"                               | → `testing-with-vitest-mocks` + `creating-mocks`                     |
 | "async" / "waitFor" / "timeout"                       | → `condition-based-waiting`                                          |
 | "E2E" / "Playwright"                                  | → `gateway-frontend` (has E2E skills)                                |
@@ -80,16 +82,23 @@ This gateway implements 3-tier loading:
 | Test File Existence           | `.claude/skill-library/testing/verifying-test-file-existence/SKILL.md`     | before writing tests                                           |
 | Test Infrastructure Discovery | `.claude/skill-library/testing/test-infrastructure-discovery/SKILL.md`     | what exists, fixtures                                          |
 | Vitest Test Isolation         | `.claude/skill-library/testing/configuring-vitest-test-isolation/SKILL.md` | vitest config, test isolation, process spawning, hanging tests |
+| Discovering Bugs for Fixing   | `.claude/skill-library/testing/discovering-bugs-for-fixing/SKILL.md`   | bug discovery, find bug location, scope bug investigation      |
+
+### Bug Fixing
+
+| Skill                 | Path                                                              | Triggers                                        |
+| --------------------- | ----------------------------------------------------------------- | ----------------------------------------------- |
+| Orchestrating Bug Fix | `.claude/skill-library/testing/orchestrating-bugfix/SKILL.md` | fix bug, bug fix, why is X broken, reported bug |
 
 ### By Test Type
 
-| Skill                  | Path                                                                    | Triggers                                             |
-| ---------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
-| API Testing Patterns   | `.claude/skill-library/testing/api-testing-patterns/SKILL.md`           | REST, API, endpoint                                  |
-| CLI Testing Patterns   | `.claude/skill-library/testing/cli-testing-patterns/SKILL.md`           | CLI, command-line                                    |
-| Performance Testing    | `.claude/skill-library/testing/performance-testing/SKILL.md`            | load, stress, benchmark                              |
-| Acceptance Test Suite  | `.claude/skill-library/testing/backend/acceptance-test-suite/SKILL.md`  | acceptance, e2e backend                              |
-| Testing Integrations   | `.claude/skill-library/testing/testing-integrations/SKILL.md`           | Go integration test, httptest, mock.Collector, P0    |
+| Skill                 | Path                                                                   | Triggers                                          |
+| --------------------- | ---------------------------------------------------------------------- | ------------------------------------------------- |
+| API Testing Patterns  | `.claude/skill-library/testing/api-testing-patterns/SKILL.md`          | REST, API, endpoint                               |
+| CLI Testing Patterns  | `.claude/skill-library/testing/cli-testing-patterns/SKILL.md`          | CLI, command-line                                 |
+| Performance Testing   | `.claude/skill-library/testing/performance-testing/SKILL.md`           | load, stress, benchmark                           |
+| Acceptance Test Suite | `.claude/skill-library/testing/backend/acceptance-test-suite/SKILL.md` | acceptance, e2e backend                           |
+| Testing Integrations  | `.claude/skill-library/testing/testing-integrations/SKILL.md`          | Go integration test, httptest, mock.Collector, P0 |
 
 ### Mocking
 

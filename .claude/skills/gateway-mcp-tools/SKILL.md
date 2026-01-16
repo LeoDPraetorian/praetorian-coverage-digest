@@ -59,10 +59,10 @@ This gateway implements 3-tier loading:
 | "semantic code" / "Serena" / "LSP"            | → `mcp-tools-serena`                       |
 | "Shodan" / "host search" / "recon"            | → `mcp-tools-shodan-api`                   |
 | "tool discovery" / "MCP registry"             | → `mcp-tools-registry`                     |
-| "create wrapper" / "new MCP tool"             | → `creating-mcp-wrappers`                  |
 | "wrapper architecture" / "token optimization" | → `designing-progressive-loading-wrappers` |
 | "review wrapper" / "validate implementation"  | → `reviewing-mcp-wrappers`                 |
 | "MCP setup" / "server config"                 | → `setting-up-mcp-servers`                 |
+| "create wrapper" / "new MCP tool"             | → `orchestrating-mcp-development`          |
 | "orchestrate MCP" / "complete wrapper flow"   | → `orchestrating-mcp-development`          |
 | "orchestrate API" / "REST API wrapper"        | → `orchestrating-api-tool-development`     |
 
@@ -145,8 +145,7 @@ This gateway implements 3-tier loading:
 
 | Skill                | Path                                                                                          | Triggers                      |
 | -------------------- | --------------------------------------------------------------------------------------------- | ----------------------------- |
-| Creating Wrappers    | `.claude/skill-library/mcp-management/creating-mcp-wrappers/SKILL.md`                         | new wrapper, TDD              |
-| Orchestrating MCP    | `.claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md`          | orchestration, complete flow  |
+| Orchestrating MCP    | `.claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md`          | new wrapper, TDD, orchestration |
 | Orchestrating API    | `.claude/skill-library/claude/mcp-management/orchestrating-api-tool-development/SKILL.md`     | REST API, HTTP wrappers       |
 | Wrapper Architecture | `.claude/skill-library/claude/mcp-management/designing-progressive-loading-wrappers/SKILL.md` | token optimization            |
 | Reviewing Wrappers   | `.claude/skill-library/claude/mcp-management/reviewing-mcp-wrappers/SKILL.md`                 | review, validate, code review |

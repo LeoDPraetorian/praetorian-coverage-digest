@@ -95,14 +95,15 @@ Additional savings from eliminated MCP infrastructure: **3,700 tokens**
 
 ### Layer 1: MCP Wrapper Management (Lifecycle)
 
-**Location**: `.claude/skills/managing-tool-wrappers/` (lifecycle) + `.claude/skills/creating-mcp-wrappers/` (creation)
+**Location**: `.claude/skills/managing-tool-wrappers/` (lifecycle) + `.claude/skill-library/claude/mcp-management/orchestrating-mcp-development/` (creation)
 
 **Purpose**: Create, test, audit, and maintain MCP wrappers with mandatory TDD enforcement.
 
-**Two-Skill Architecture**:
+**Skill Architecture**:
 
-- `managing-tool-wrappers` - Lifecycle operations (audit, update, fix, test, generate-skill)
-- `creating-mcp-wrappers` - Instruction-driven wrapper creation with TDD gates
+- `managing-tool-wrappers` - Main entry point and lifecycle operations (audit, update, fix, test, generate-skill)
+- `orchestrating-mcp-development` - Multi-agent workflow for MCP wrapper creation
+- `orchestrating-api-tool-development` - Simpler workflow for REST API wrappers
 
 > **See [MCP Wrapper Management](#mcp-wrapper-management) section below for complete documentation** including TDD workflow, 11-phase audit system, directory structure, and CLI reference.
 
@@ -218,26 +219,27 @@ skills:
 
 ### Creating a New MCP Wrapper
 
-The `creating-mcp-wrappers` skill provides an instruction-driven workflow with mechanical TDD gates:
+The `orchestrating-mcp-development` skill provides a multi-agent workflow for comprehensive MCP service coverage:
 
 ```
-User: "Create wrapper for linear get-issue"
+User: "Create wrappers for linear service"
 
-1. Agent loads `creating-mcp-wrappers` skill
-2. Skill guides 8-phase hybrid workflow:
-   Phase 0: Prerequisites (get $ROOT, verify workspace)
-   Phase 1: Schema Discovery (interactive MCP exploration, 3 test cases)
-   Phase 2: Test Design (generate tests using @claude/testing)
-   Phase 3: RED Verification (npm run test:run -- must FAIL)
-   Phase 4: Wrapper Generation (create scaffold)
-   Phase 5: Implementation (code from discovery docs)
-   Phase 6: GREEN Verification (npm run test:coverage -- 80%)
-   Phase 7: Structural Audit (verify all artifacts exist)
-   Phase 8: Service Skill Update (npm run generate-skill)
-3. Agents can now discover and use the new wrapper
+1. Agent loads `orchestrating-mcp-development` via gateway-mcp-tools
+2. Skill orchestrates 11-phase multi-agent workflow:
+   Phase 0-1: Setup workspace and configure MCP server
+   Phase 2: Tool discovery - find ALL tools in the MCP service
+   Phase 3: Shared architecture design (tool-lead + security-lead in PARALLEL)
+   Phase 4: Per-tool architecture + test planning (BATCHED, 3-5 tools)
+   Phase 5: RED Gate - all tests must fail
+   Phase 6: Implementation (tool-developer, BATCHED)
+   Phase 7: Code review (tool-reviewer, max 1 retry per tool)
+   Phase 8: GREEN Gate - all tests pass with ≥80% coverage
+   Phase 9: Audit - all wrappers pass ≥10/11 phases
+   Phase 10: Completion - generate service skill
+3. Agents can now discover and use ALL wrappers for the service
 ```
 
-**Key Insight**: Claude handles discovery and test design (instruction-driven), while vitest enforces TDD gates (mechanical verification). Tests must actually fail in RED and pass in GREENno skipping.
+**Key Insight**: Multi-agent orchestration enables comprehensive service coverage with batched parallel execution, quality gates, and code review.
 
 ### Using an MCP Wrapper
 
@@ -335,11 +337,11 @@ The MCP Wrapper Management system is the lifecycle management system for MCP wra
 
 | Aspect         | Details                                                                                   |
 | -------------- | ----------------------------------------------------------------------------------------- |
-| **Location**   | `.claude/skills/managing-tool-wrappers/` + `.claude/skills/creating-mcp-wrappers/`         |
+| **Location**   | `.claude/skills/managing-tool-wrappers/` (lifecycle) + `skill-library/.../orchestrating-mcp-development/` (creation) |
 | **Purpose**    | Create, test, audit, and maintain MCP wrappers                                            |
 | **Philosophy** | TDD-first: tests must exist and fail before implementation                                |
 | **Coverage**   | Minimum 80% unit test coverage required                                                   |
-| **Invocation** | `skill: "creating-mcp-wrappers"` (create) or `skill: "managing-tool-wrappers"` (lifecycle) |
+| **Invocation** | `skill: "managing-tool-wrappers"` (routes to orchestration skills for create)             |
 
 ### Directory Structure
 
@@ -382,15 +384,11 @@ The MCP Wrapper Management system is the lifecycle management system for MCP wra
 │   └── tsconfig.json.tmpl                # TypeScript config template
 └── references/                           # Workflow documentation
 
-.claude/skills/creating-mcp-wrappers/     # Creation workflow (instruction-driven)
-├── SKILL.md                              # 8-phase hybrid workflow
-├── references/
-│   ├── schema-discovery-guide.md         # Interactive MCP exploration
-│   ├── test-design-patterns.md           # 6 test categories, 18+ tests
-│   ├── implementation-guide.md           # Zod schemas, filtering, errors
-│   └── batch-mode-guide.md               # Multi-tool workflow
-└── examples/
-    └── linear-get-issue.md               # End-to-end walkthrough
+.claude/skill-library/claude/mcp-management/
+├── orchestrating-mcp-development/        # Multi-agent creation workflow
+│   └── SKILL.md                          # 11-phase orchestration workflow
+└── orchestrating-api-tool-development/   # REST API wrapper workflow
+    └── SKILL.md                          # Simpler TDD workflow for APIs
 ```
 
 ### TDD Workflow (Enforced)
@@ -450,7 +448,7 @@ MCP wrappers must pass compliance validation across 11 phases:
 
 > **STEPS vs PHASES Clarification:**
 >
-> - **Workflow STEPS** (0-8): The 9-phase creation workflow in `creating-mcp-wrappers`
+> - **Workflow PHASES** (0-10): The 11-phase creation workflow in `orchestrating-mcp-development`
 > - **Audit PHASES** (1-11): Compliance categories checked by `npm run audit`
 
 ### CLI Reference
@@ -483,31 +481,26 @@ cd .claude/skills/managing-tool-wrappers/scripts
 | `npm run test -- <service>/<tool>`          | Run test suite for wrapper             |
 | `npm run generate-skill -- <service>`       | Generate/update service skill          |
 
-#### Example: Creating a New Wrapper
+#### Example: Creating New Wrappers
 
-**Recommended: Use `creating-mcp-wrappers` skill** (instruction-driven with TDD gates):
+**Recommended: Use `managing-tool-wrappers` skill** (routes to orchestration workflows):
 
 ```bash
-# Invoke skill - Claude guides you through 8 phases
-skill: "creating-mcp-wrappers"
+# Via /tool-manager command or managing-tool-wrappers skill
+# Routes to orchestrating-mcp-development for MCP servers
+# Routes to orchestrating-api-tool-development for REST APIs
 
-# Phase 0: Prerequisites
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
-cd $ROOT/.claude && npm install
-
-# Phase 1-2: Schema discovery + test design (Claude-guided)
-# Phase 3: RED verification
-cd $ROOT/.claude && npm run test:run -- tools/linear/get-issue
-#  Tests fail (expected - no implementation yet)
-
-# Phase 4-5: Wrapper generation + implementation (Claude-guided)
-# Phase 6: GREEN verification
-cd $ROOT/.claude && npm run test:coverage -- tools/linear/get-issue
-#  Tests pass with 85% coverage
-
-# Phase 7-8: Structural audit + service skill
-cd $ROOT/.claude/skills/managing-tool-wrappers/scripts && npm run generate-skill -- linear
-#  Updated .claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md
+# The orchestration skill guides you through 11 phases:
+# Phase 0-1: Setup workspace and configure MCP server
+# Phase 2: Tool discovery - find ALL tools in the MCP service
+# Phase 3: Shared architecture design (parallel: tool-lead + security-lead)
+# Phase 4: Per-tool architecture + test planning (batched)
+# Phase 5: RED Gate - all tests must fail
+# Phase 6: Implementation (batched)
+# Phase 7: Code review
+# Phase 8: GREEN Gate - all tests pass with ≥80% coverage
+# Phase 9: Audit - all wrappers pass ≥10/11 phases
+# Phase 10: Completion - generate service skill
 ```
 
 **Alternative: Direct CLI** (for experienced developers):
@@ -1006,7 +999,7 @@ See **Phase 4.1** and **Phase 6** in Current Status & TODO for implementation ro
 ### Migration Path
 
 1. **Identify MCP** to wrap
-2. **Run TDD workflow** via `creating-mcp-wrappers` skill (or `managing-tool-wrappers` CLI)
+2. **Run TDD workflow** via `managing-tool-wrappers` skill (routes to orchestration workflows)
 3. **Generate service skill** for agent access
 4. **Remove MCP** from `.mcp.json`
 5. **Update agents** to use wrapper skill
@@ -1018,8 +1011,10 @@ See **Phase 4.1** and **Phase 6** in Current Status & TODO for implementation ro
 See [MCP Wrapper Management](#mcp-wrapper-management) section for complete CLI reference.
 
 ```bash
-# Recommended: Use creating-mcp-wrappers skill for new wrappers
-skill: "creating-mcp-wrappers"
+# Recommended: Use managing-tool-wrappers skill (routes to orchestration)
+skill: "managing-tool-wrappers"
+# Routes to orchestrating-mcp-development for MCP servers
+# Routes to orchestrating-api-tool-development for REST APIs
 
 # Alternative: Direct CLI
 cd .claude/skills/managing-tool-wrappers/scripts
@@ -1058,7 +1053,7 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
 ### Internal Documentation
 
 - **Gateway Skill**: `.claude/skills/gateway-mcp-tools/SKILL.md` (core skill - entry point)
-- **Creation Workflow**: `.claude/skills/creating-mcp-wrappers/SKILL.md` (8-phase hybrid workflow)
+- **Creation Workflow**: `.claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md` (11-phase multi-agent workflow)
 - **Lifecycle Manager**: `.claude/skills/managing-tool-wrappers/SKILL.md` (audit, fix, update, test)
 - **Testing Library**: `.claude/lib/testing/README.md` (@claude/testing documentation)
 - **Path Resolution**: `.claude/lib/find-project-root.ts` (shared project root detection)
@@ -1156,11 +1151,15 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
   - Auto-fixable: `npm run generate-skill` regenerates service skill from wrapper schemas
   - Ensures service skill documentation matches actual Zod schemas in wrappers
 
-- [x] **Hybrid Wrapper Creation Architecture** (Dec 2024)
-  - Split `tool-manager` into `managing-tool-wrappers` (lifecycle) + `creating-mcp-wrappers` (creation)
-  - Instruction-driven schema discovery and test design (Claude reasoning)
-  - Mechanical TDD gates (vitest enforcement - cannot bypass)
-  - 8-phase workflow documented in `creating-mcp-wrappers` skill
+- [x] **Multi-Agent Wrapper Creation Architecture** (Jan 2025)
+  - Replaced `creating-mcp-wrappers` with `orchestrating-mcp-development` (11-phase multi-agent workflow)
+  - Added `orchestrating-api-tool-development` for REST API wrappers
+  - Batched parallel execution for comprehensive service coverage
+  - Quality gates: code review, coverage enforcement, audit validation
+
+- [x] **Hybrid Wrapper Creation Architecture** (Dec 2024) - DEPRECATED
+  - Originally split `tool-manager` into `managing-tool-wrappers` (lifecycle) + `creating-mcp-wrappers` (creation)
+  - Superseded by orchestration-based approach in Jan 2025
 
 - [x] **@claude/testing Library** (Dec 2024)
   - Shared testing infrastructure at `.claude/lib/testing/`

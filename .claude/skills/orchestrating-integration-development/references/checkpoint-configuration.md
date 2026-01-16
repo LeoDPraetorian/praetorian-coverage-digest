@@ -232,11 +232,11 @@ How would you like to proceed?
 | Phase 1 Design | No | No | N/A |
 | Phase 2 Skill Creation | N/A (conditional) | Yes (skip skill) | N/A |
 | Phase 3 Architecture | No | No | N/A |
-| Phase 4.5 P0 Violations | No | Yes (with docs) | N/A |
-| Phase 5 Stage 1 | No | Yes (with docs) | 2 |
-| Phase 5 Stage 2 | No | Yes (with docs) | 1 |
-| Phase 6 Testing | No | Yes (with docs) | 1 |
-| Phase 8 Final | No | No | N/A |
+| Phase 5 P0 Violations | No | Yes (with docs) | N/A |
+| Phase 6 Stage 1 | No | Yes (with docs) | 2 |
+| Phase 6 Stage 2 | No | Yes (with docs) | 1 |
+| Phase 7 Testing | No | Yes (with docs) | 1 |
+| Phase 9 Final | No | No | N/A |
 
 ## Implementing Checkpoints
 

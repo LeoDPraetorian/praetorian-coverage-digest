@@ -2,6 +2,133 @@
 
 All notable changes to the orchestrating-feature-development skill will be documented in this file.
 
+## [Date: 2026-01-16] - Phase Numbering Fix
+
+### Fixed - Test Lead Prompt Phase Numbers
+
+Fixed incorrect phase numbering in test-lead-prompt.md where both test planning and test validation were incorrectly listed as Phase 11.
+
+#### What Changed
+
+**File Updated:** `references/prompts/test-lead-prompt.md`
+
+**Changes:**
+- Line 3: Changed "Phase 11 (planning) and Phase 11 (validation)" to "Phase 9 (planning) and Phase 11 (validation)"
+- Line 7: Changed "### Phase 11: Test Planning" to "### Phase 9: Test Planning"
+- Line 29: Changed "## Phase 11: Test Planning Template" to "## Phase 9: Test Planning Template"
+
+**Rationale:**
+According to SKILL.md Quick Reference table (lines 30-43):
+- Test Planning is Phase 9
+- Testing is Phase 10
+- Test Validation is Phase 11
+
+The prompt template now correctly reflects these phase numbers.
+
+## [Date: 2026-01-16]
+
+### Added - Context Compaction Integration
+
+Integrated context compaction from persisting-progress-across-sessions as required for all orchestrations, not conditional on task count.
+
+#### What Changed
+
+**Sub-Skills Table Updated:**
+- Moved `persisting-progress-across-sessions` from CONDITIONAL (if >5 tasks) to REQUIRED (All phases)
+- Renamed purpose from "session resume" to "context compaction"
+- Removed task count condition
+
+**Critical Rules Added:**
+- New rule: "Context Compaction at Phase Transitions"
+- Compaction checkpoints after phases 3, 6, and 9
+- Compaction protocol: summarize, archive, keep only current phase context
+- Warning signs for context rot requiring immediate compaction
+
+**Workflow Diagram Updated:**
+- Added compaction checkpoint annotations after Phase 3, 6, and 9 boxes
+- Visual reminder to orchestrator at key transition points
+
+**Context Management Reference Enhanced:**
+- New section: "Context Compaction" with rationale
+- Compaction checkpoints table (what to compact vs. what to keep)
+- Compaction protocol checklist
+- Example: Post-Phase-6 compaction showing before/after context sizes
+- Guidance to invoke persisting-progress-across-sessions skill at checkpoints
+
+#### Files Modified
+
+1. **SKILL.md:**
+   - Line 82: Sub-skills table - moved persisting-progress-across-sessions to required row
+   - Lines 294-311: Added "Context Compaction at Phase Transitions" rule
+   - Line 124: Added compaction checkpoint after Phase 3
+   - Line 177: Added compaction checkpoint after Phase 6
+   - Line 215: Added compaction checkpoint after Phase 9
+
+2. **references/context-management.md:**
+   - Lines 36-95: Added complete Context Compaction section
+   - Includes why compaction matters, checkpoint table, protocol, example
+
+#### Why This Changed
+
+**Problem:**
+- Context compaction was conditional (only >5 tasks)
+- Small task plans with heavy discovery/architecture phases still accumulate significant context
+- By Phase 8-9, context rot degrades performance even with 3-4 tasks
+
+**Solution:**
+- Make compaction REQUIRED for ALL orchestrations
+- Trigger at phase boundaries regardless of task count
+- Archive full details to files, keep only summaries in context
+- Maintain performance across full 12-phase workflow
+
+## [Date: 2026-01-16]
+
+### Added - Comprehensive Metrics Tracking
+
+Added comprehensive metrics tracking to progress.json including token usage estimation and cost calculation.
+
+#### What Changed
+
+**Progress File Schema Enhanced:**
+- New `metrics` object with orchestration stats, validation loops, escalations, conflicts, token estimates, and cost breakdown
+- Token estimation formulas by phase (brainstorming: 8k, discovery: 25k, planning: 12k, etc.)
+- Cost calculation based on Anthropic pricing ($3/1M input, $15/1M output for Sonnet)
+- Per-phase token tracking in `tokens.by_phase`
+
+**Critical Rules Updated:**
+- New mandatory rule: "Metrics Tracking is MANDATORY"
+- Requires updating progress.json metrics after each agent spawn, validation retry, escalation, and phase completion
+- Metrics summary required in Phase 12 completion report
+
+**Exit Criteria Updated:**
+- Added: "Metrics tracked in progress.json (tokens, cost, iterations)"
+
+#### Files Modified
+
+1. **references/progress-persistence.md:**
+   - Added `metrics` object to Progress File Schema (lines 99-147)
+   - Added "Metrics Tracking" section with token estimation guidelines (lines 305-370)
+   - Includes estimation formulas, pricing tables, and completion summary requirements
+
+2. **SKILL.md:**
+   - Added "Metrics Tracking is MANDATORY" rule to Critical Rules section (lines 310-318)
+   - Added metrics verification to Exit Criteria (line 491)
+
+#### Why This Changed
+
+**Need for visibility:**
+- Orchestrators spawn multiple agents but had no visibility into cost
+- No way to identify expensive phases for optimization
+- No data to support effort estimates or resource planning
+
+**Token estimates enable:**
+- Cost estimation before feature development
+- Phase-by-phase breakdown to identify expensive operations
+- Tracking validation retries and escalations
+- Data-driven optimization decisions
+
+**Implementation note:** Token counts are ESTIMATES since actual API token usage is not available during orchestration. Estimates use conservative multipliers based on typical agent behavior.
+
 ## [Date: 2026-01-10]
 
 ### Changed - Phase 2 Discovery Integration with discovering-codebases-for-planning
@@ -531,3 +658,25 @@ Also condensed Exit Criteria section to fit within 500-line limit after adding S
 - references/prompts/test-lead-prompt.md: Added Integration section before Output Format
 
 **Rationale**: Quality score includes 10% weight for "No anti-patterns detected" but test-lead had no guidance on what constitutes an anti-pattern. Integration section provides explicit link to developing-with-tdd skill which defines these patterns.
+
+## [2026-01-16] - Integrate git worktree isolation
+
+### Added
+- `using-git-worktrees` as REQUIRED skill in Phase 1
+- Worktree Isolation critical rule (first rule before Parallel Execution)
+- Worktree cleanup to Exit Criteria
+- `using-git-worktrees` to Integration/Requires table
+
+### Changed
+- Phase 1 workflow diagram now shows 2-step process (worktree + output dir)
+- phase-1-setup.md completely rewritten with worktree as Step 1
+- REQUIRED SUB-SKILLS table now lists Phase 1 separately with both skills
+- Progress.json now includes worktree_path field
+
+### Rationale
+- Anthropic research (agalanov) recommends worktrees for multi-agent orchestration
+- Prevents parallel agent conflicts (separate working directories)
+- Keeps main workspace clean during multi-hour development
+- Easy rollback if feature approach fails
+- 12-phase orchestration = non-trivial feature, worktree overhead negligible (~1-2 min)
+

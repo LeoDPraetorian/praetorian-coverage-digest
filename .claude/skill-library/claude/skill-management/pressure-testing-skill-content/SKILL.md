@@ -23,7 +23,7 @@ You run scenarios without the skill (RED - watch agent fail), write skill addres
 1. **Integration Tests** - Realistic tasks WITHOUT skill mentions (tests if agent invokes skills at all)
 2. **Pressure Tests** - Realistic tasks + realistic pressure WITHOUT skill mentions (tests if agent resists bypass under pressure)
 
-**REQUIRED BACKGROUND:** You MUST understand superpowers:developing-with-tdd before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill provides skill-specific test formats (integration tests, pressure scenarios, output compliance verification).
+**REQUIRED BACKGROUND:** You MUST understand developing-with-tdd before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill provides skill-specific test formats (integration tests, pressure scenarios, output compliance verification).
 
 **Complete worked example:** See examples/CLAUDE_MD_TESTING.md for a full test campaign testing CLAUDE.md documentation variants.
 

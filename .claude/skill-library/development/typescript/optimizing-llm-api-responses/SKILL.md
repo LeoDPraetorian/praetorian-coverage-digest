@@ -294,7 +294,7 @@ Before deploying an LLM-consumed API:
 
 | Skill                                    | Purpose                                      |
 | ---------------------------------------- | -------------------------------------------- |
-| `creating-mcp-wrappers` (CORE)           | Complete MCP wrapper creation workflow       |
+| `orchestrating-mcp-development` (LIBRARY) | Complete MCP wrapper creation workflow       |
 | `designing-progressive-loading-wrappers` | Two-tier loading for context efficiency      |
 | `implementing-graphql-clients`           | GraphQL client patterns with field selection |
 | `implementing-result-either-pattern`     | Error handling without verbose messages      |

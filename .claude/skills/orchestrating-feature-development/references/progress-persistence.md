@@ -94,6 +94,55 @@ Enable long-running feature development by:
     "total_duration_minutes": 90,
     "agents_spawned": 2,
     "human_checkpoints": 2
+  },
+
+  "metrics": {
+    "orchestration": {
+      "total_agents_spawned": 7,
+      "parallel_executions": 3,
+      "sequential_executions": 4
+    },
+    "validation_loops": {
+      "spec_compliance_iterations": 2,
+      "code_quality_iterations": 1,
+      "test_validation_iterations": 1
+    },
+    "escalations": {
+      "to_user": 1,
+      "reasons": ["code_review_failed_after_retry"]
+    },
+    "conflicts": {
+      "detected": 0,
+      "resolved": 0,
+      "unresolved": 0
+    },
+    "tokens": {
+      "estimated_input_tokens": 125000,
+      "estimated_output_tokens": 45000,
+      "estimated_total_tokens": 170000,
+      "by_phase": {
+        "brainstorming": 8000,
+        "discovery": 25000,
+        "planning": 12000,
+        "architecture": 35000,
+        "implementation": 50000,
+        "code_review": 20000,
+        "test_planning": 8000,
+        "testing": 25000,
+        "test_validation": 7000
+      }
+    },
+    "cost": {
+      "estimated_cost_usd": 2.85,
+      "model_breakdown": {
+        "claude-sonnet-4": {
+          "input_tokens": 125000,
+          "output_tokens": 45000,
+          "cost_usd": 2.85
+        }
+      },
+      "note": "Estimates based on $3/1M input, $15/1M output for Sonnet"
+    }
   }
 }
 ```
@@ -190,11 +239,11 @@ FEATURE_ID="${FEATURE_SLUG}_${TIMESTAMP}"
 ```
 .claude/.output/features/{feature-id}/
 ├── progress.json           # Progress state (this document)
-├── design.md               # Phase 1 output
-├── frontend-discovery.md   # Phase 2 output
-├── backend-discovery.md    # Phase 2 output
-├── plan.md                 # Phase 3 output
-├── architecture.md         # Phase 4 output (or architecture-*.md for full-stack)
+├── design.md               # Phase 10 output
+├── frontend-discovery.md   # Phase 10 output
+├── backend-discovery.md    # Phase 10 output
+├── plan.md                 # Phase 10 output
+├── architecture.md         # Phase 10 output (or architecture-*.md for full-stack)
 └── logs/
     ├── architecture.log    # Agent spawn logs
     ├── implementation.log  # Developer agent logs
@@ -252,6 +301,69 @@ function calculateDuration(phase: PhaseProgress): number {
   return (end.getTime() - start.getTime()) / 60000; // minutes
 }
 ```
+
+## Metrics Tracking
+
+### Token Estimation
+
+Since exact token counts are not available during orchestration, use these estimates:
+
+| Content Type | Estimated Tokens |
+|--------------|------------------|
+| Agent prompt (with context) | 2,000-4,000 |
+| Agent response (typical) | 1,500-3,000 |
+| Skill invocation overhead | 500-1,500 |
+| File read (per 100 lines) | ~400 |
+
+### Estimating Phase Tokens
+
+```typescript
+function estimatePhaseTokens(phase: string, agentCount: number): number {
+  const baseTokens = {
+    brainstorming: 8000,
+    discovery: 5000,
+    planning: 12000,
+    architecture: 8000,
+    implementation: 10000,
+    code_review: 5000,
+    test_planning: 8000,
+    testing: 6000,
+    test_validation: 7000
+  };
+  return baseTokens[phase] * agentCount;
+}
+```
+
+### Cost Calculation
+
+Use current Anthropic pricing (update as needed):
+
+| Model | Input (per 1M) | Output (per 1M) |
+|-------|----------------|-----------------|
+| Claude Sonnet 4 | $3.00 | $15.00 |
+| Claude Opus 4 | $15.00 | $75.00 |
+| Claude Haiku 4 | $0.25 | $1.25 |
+
+### Updating Metrics During Orchestration
+
+After each phase completion, update the metrics in progress.json:
+- Increment agents_spawned after spawning agents
+- Increment parallel_executions or sequential_executions based on execution type
+- Update validation_loops when retries occur
+- Add to escalations when user intervention required
+- Update tokens.by_phase with estimates after each phase
+
+### Metrics Summary at Completion
+
+At Phase 12, generate a metrics summary showing:
+- Total Duration
+- Agents Spawned
+- Parallel vs Sequential Executions
+- Validation Retries
+- User Escalations
+- Estimated Tokens
+- Estimated Cost
+- Token Distribution by Phase
 
 ## Related References
 

@@ -5,9 +5,9 @@ Human approval is required at strategic points to ensure alignment and catch iss
 ## Phase-Level Checkpoints (Default)
 
 Human approval required at:
-- **Phase 1 (Brainstorming)**: Design approval via AskUserQuestion
-- **Phase 3 (Planning)**: Plan approval via AskUserQuestion
-- **Phase 4 (Architecture)**: Architecture + security + tech debt approval via AskUserQuestion
+- **Phase 2 (Brainstorming)**: Design approval via AskUserQuestion
+- **Phase 4 (Planning)**: Plan approval via AskUserQuestion
+- **Phase 5 (Architecture)**: Architecture + security + tech debt approval via AskUserQuestion
 
 ## Task-Level Checkpoints (For Large Plans)
 
@@ -44,5 +44,5 @@ Tasks 4-6: Add filter persistence, tests, and E2E validation
 
 ## Related References
 
-- [Phase 5: Implementation](phase-5-implementation.md)
-- [Phase 5: Per-Task Mode](phase-5-per-task-mode.md)
+- [Phase 5: Implementation](phase-6-implementation.md)
+- [Phase 5: Per-Task Mode](phase-6-per-task-mode.md)

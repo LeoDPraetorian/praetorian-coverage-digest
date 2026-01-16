@@ -17,14 +17,14 @@ cd modules/chariot/backend && go build ./pkg/tasks/integrations/{vendor}/...
 cat .claude/.output/integrations/{timestamp}-{vendor}/implementation-log.md
 ```
 
-### Phase 5 (Review) Partial Completion
+### Phase 6 (Review) Partial Completion
 
 ```bash
 # Check which review files exist
 ls .claude/.output/integrations/{timestamp}-{vendor}/*-review.md
 ```
 
-### Phase 6 (Testing) Partial Completion
+### Phase 7 (Testing) Partial Completion
 
 ```bash
 # Check for test files
@@ -75,9 +75,9 @@ cat .claude/.output/integrations/{timestamp}-{vendor}/test-plan.md
 | Phase 2 (Discovery) | Skill creation timeout     | Retry skill creation OR proceed without vendor skill |
 | Phase 3 (Architecture) | Missing API info        | Return to Phase 1 for more research                 |
 | Phase 4 (Implementation) | Compile errors        | Strategy A (fix errors) or B (restart)              |
-| Phase 4.5 (P0 Validation) | P0 violations        | Fix violations, re-run validation                   |
-| Phase 5 (Review)    | Max retries exceeded       | User decision required                              |
-| Phase 6 (Testing)   | Coverage below 80%         | Add more tests, re-validate                         |
+| Phase 5 (P0 Validation) | P0 violations        | Fix violations, re-run validation                   |
+| Phase 6 (Review)    | Max retries exceeded       | User decision required                              |
+| Phase 7 (Testing)   | Coverage below 80%         | Add more tests, re-validate                         |
 
 ## Metadata Tracking for Recovery
 

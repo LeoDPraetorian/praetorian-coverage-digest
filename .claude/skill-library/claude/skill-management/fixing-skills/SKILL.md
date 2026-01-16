@@ -1,6 +1,6 @@
 ---
 name: fixing-skills
-description: Use when audit failed - fixes compliance errors (TypeScript, broken links, phantom refs, line count, tables)
+description: Use when audit failed - three-tier fix orchestration (deterministic/hybrid/Claude-automated) for compliance errors, Phase 26 research-based stub population, Phase 28 Integration section generation, line count extraction
 allowed-tools: Read, Edit, Write, Bash, AskUserQuestion, TodoWrite, Skill
 ---
 
@@ -15,10 +15,10 @@ allowed-tools: Read, Edit, Write, Bash, AskUserQuestion, TodoWrite, Skill
 - **Deterministic**: Mechanical transformations (phases 2, 5, 6, 7, 12, 14, 19, 21)
 - **Hybrid**: Claude reasoning + confirmation (phases 4, 10, 22)
 - **Claude-Automated**: Claude reasoning only (phases 1, 3, 11, 13, 18, 20, 24, 25, 26)
-- **Validation-Only**: No auto-fix available (phases 15, 16, 17)
+- **Validation-Only**: No auto-fix available (phases 15, 16, 17, 29)
 - **Human-Required**: Interactive guidance (phases 8, 9, 23)
 
-**Note:** Phase 14 (table formatting) applies prettier formatting. Phases 15-17 are validation-only (code block quality, header hierarchy, prose phase references).
+**Note:** Phase 14 (table formatting) applies prettier formatting. Phases 15-17 and 29 are validation-only (code block quality, header hierarchy, prose phase references, logical coherence).
 
 See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for complete breakdown.
 
@@ -31,7 +31,7 @@ See [Phase Categorization](.claude/skills/managing-skills/references/patterns/ph
 | Deterministic    | 2, 5, 6, 7, 12, 14, 19, 21                   | Claude applies   | None (auto-apply)       |
 | Hybrid           | 4, 10, 22                                    | Claude reasoning | Confirm ambiguous cases |
 | Claude-Automated | 1, 3, 11, 13, 18, 20, 24, 25, 26, 28, Crit 7 | Claude reasoning | None (Claude applies)   |
-| Validation-Only  | 15, 16, 17                                   | Manual only      | Report issues, no fix   |
+| Validation-Only  | 15, 16, 17, 29                               | Manual only      | Report issues, no fix   |
 | Human-Required   | 8, 9, 23                                     | Interactive      | Full user guidance      |
 
 **Compliance Target:**
@@ -169,206 +169,34 @@ Claude applies these fixes directly using Edit tool. No human confirmation neede
 
 **When detected:** Genuine stubs (empty/incomplete reference files) found during semantic review
 
-**🚨 CRITICAL: Never use training data to populate missing content. Always invoke orchestrating-research.**
+**Complete procedure:** See [references/phase-26-procedure.md](references/phase-26-procedure.md)
 
-**Fix procedure:**
+**Summary:**
 
-**Step 0: Enumerate ALL stubs from audit**
+1. Enumerate ALL stubs from audit output
+2. Ask user about research approach
+3. If yes: Set up TodoWrite with per-stub items, invoke `orchestrating-research`
+4. Populate each stub from SYNTHESIS.md (not training data)
+5. Verify all stubs have >50 lines, no placeholders
 
-Before invoking research, list ALL stub files identified:
-
-1. Read audit output for Phase 26 findings
-2. Extract each file path flagged as stub/incomplete
-3. Create TodoWrite item for EACH file (see Step 3a below for example)
-4. Confirm stub count with user via output message: 'Audit found N stub files: [list]. Proceeding with research to populate all N.'
-
-Example audit output analysis:
-```
-Audit Phase 26 findings:
-- references/workflow.md: Empty file (stub)
-- references/api-reference.md: Only 12 lines (incomplete)
-- references/patterns.md: Contains '[TODO]' markers
-
-Stub count: 3 files
-```
-
-**Step 1: Identify genuine stubs** - Phase 26 flags files that are truly incomplete (not templates, not anti-pattern examples, not redirects)
-
-**Step 2: Ask user about research** - Use AskUserQuestion to confirm research approach:
-   - Option A: 'Yes, invoke orchestrating-research (Recommended)'
-   - Option B: 'No, user will provide content directly'
-
-**Step 3: If user selects 'Yes' - Set up continuation state BEFORE invoking research:**
-
-   a. Write remaining fix phases to TodoWrite with per-stub items:
-
-   **Enumerate ALL stub files from audit output. Create one TodoWrite item per stub file. Do NOT use a single generic item.**
-
-   ```
-   TodoWrite([
-     { content: 'Phase 26: Research for stub content', status: 'in_progress', activeForm: 'Researching stub content' },
-     { content: 'Populate references/workflow.md from synthesis', status: 'pending', activeForm: 'Populating workflow.md' },
-     { content: 'Populate references/api-reference.md from synthesis', status: 'pending', activeForm: 'Populating api-reference.md' },
-     { content: 'Populate references/patterns.md from synthesis', status: 'pending', activeForm: 'Populating patterns.md' },
-     // ... one todo item per stub file identified by audit in Step 0
-     { content: 'Verify ALL stubs have >50 lines content', status: 'pending', activeForm: 'Verifying stub content' },
-     { content: 'Step 5: Verify fixes', status: 'pending', activeForm: 'Verifying fixes' },
-     { content: 'Step 6: Update changelog', status: 'pending', activeForm: 'Updating changelog' }
-   ])
-   ```
-
-   b. Invoke orchestrating-research:
-
-   ```
-   skill: 'orchestrating-research'
-   ```
-
-   c. When orchestrating-research returns with 'WORKFLOW_CONTINUATION_REQUIRED':
-   - Mark research todo as complete
-   - Read ${OUTPUT_DIR}/SYNTHESIS.md
-   - Extract patterns, code examples, and citations based on stub file type mapping (see table below)
-   - Continue immediately with per-stub population todos (workflow.md, api-reference.md, etc.)
-   - Populate EACH stub file with verified content from appropriate SYNTHESIS.md sections (NOT placeholder text)
-   - Mark each stub todo complete as you finish it
-   - Complete verification todo (check >50 lines, no placeholders)
-   - Continue through Step 5 (Verify) and Step 6 (Changelog)
-
-   **Research-to-Stub Mapping Table:**
-
-   For each stub file, identify its type from the filename, then extract content from the corresponding SYNTHESIS.md section:
-
-   | Stub File Type         | Primary Source in SYNTHESIS.md     | What to Extract                           |
-   | ---------------------- | ---------------------------------- | ----------------------------------------- |
-   | workflow.md            | Findings by Interpretation         | Step-by-step procedures, decision points  |
-   | api-reference.md       | context7-\*.md + Executive Summary | Official API docs, method signatures      |
-   | patterns.md            | Cross-Interpretation Patterns      | Common patterns, best practices           |
-   | advanced-patterns.md   | github-\*.md findings              | Complex implementations, edge cases       |
-   | troubleshooting.md     | Conflicts & Discrepancies          | Trade-offs, common issues, resolutions    |
-   | configuration.md       | codebase-\*.md + web-\*.md         | Setup guides, environment config          |
-   | examples.md            | All sources - code blocks          | Real-world usage examples                 |
-
-   **Do NOT:**
-   - Report 'Research complete!' and stop
-   - Summarize findings and wait for user to say 'continue'
-   - Generate content from training data
-   - Create TODO comments or stub content
-
-**Step 4: Verification Checkpoint (MANDATORY before Step 5)**
-
-After populating all stub files, verify ALL criteria pass:
-
-**Verification Checklist:**
-- [ ] SYNTHESIS.md has been read completely
-- [ ] ALL stub files identified by audit in Step 0 have been populated
-- [ ] Each populated file has >50 lines of substantive content
-- [ ] No files contain placeholder text like '[Content to be added]' or 'TODO'
-- [ ] Content is sourced from research (not training data)
-
-**Bash verification script:**
-```bash
-# Verify all stubs populated with real content
-STUBS_FROM_AUDIT=('references/workflow.md' 'references/patterns.md')  # from audit Step 0
-for stub in "${STUBS_FROM_AUDIT[@]}"; do
-  if [ ! -f "$stub" ]; then
-    echo "FAIL: $stub still missing"
-    exit 1
-  fi
-  LINES=$(wc -l < "$stub")
-  if [ "$LINES" -lt 50 ]; then
-    echo "FAIL: $stub has only $LINES lines (need >50)"
-    exit 1
-  fi
-  if grep -q '\[Content to be added\]\|TODO\|PLACEHOLDER' "$stub"; then
-    echo "FAIL: $stub still contains placeholder text"
-    exit 1
-  fi
-done
-echo "All stubs verified"
-```
-
-**Cannot proceed to Step 5 (Verify fixes) until verification passes** ✅
-
-**Step 5: If user selects 'No' (skipped research)** - Wait for user to provide content, then apply it to the incomplete files, run verification checkpoint (Step 4 above), and continue with Step 5 (Verify fixes).
-
-**Why research is mandatory for stubs:** Using training data produces outdated or incorrect content. Research ensures skills contain verified, current information from authoritative sources.
-
-**See:** [Phase 26 Semantic Review](.claude/skill-library/claude/skill-management/auditing-skills/references/phase-26-semantic-review.md)
+**🚨 CRITICAL: Never use training data. Always invoke orchestrating-research for verified content.**
 
 ### Phase 28 Fix Procedure
 
 **When detected:** Missing or incomplete Integration section
 
-**Fix procedure:**
+**Complete procedure:** See [references/phase-28-procedure.md](references/phase-28-procedure.md)
 
-1. **Analyze skill content** - Find all skill references:
-   - `skill: "X"` invocations
-   - `Read(".../X/SKILL.md")` invocations
-   - Prose references to skills
+**Summary:**
 
-2. **Determine Called By** - Search for what invokes this skill:
+1. Analyze skill content for skill references
+2. Search for what calls this skill (Called By)
+3. Identify prerequisites (Requires)
+4. Find invoked skills (Calls)
+5. Identify conditional relationships (Pairs With)
+6. Generate and insert Integration section
 
-   ```bash
-   # Search for skills that reference this skill
-   grep -r "skill-name" .claude/skills/ .claude/skill-library/ .claude/commands/ --include="*.md"
-   ```
-
-3. **Determine Requires** - Find prerequisites:
-   - Look for "MUST invoke X first" patterns
-   - Look for "REQUIRED SUB-SKILL" directives
-   - Identify skills invoked at start (Phase 0, Step 0)
-
-4. **Determine Calls** - Find invoked skills:
-   - `skill: "X"` → Calls section
-   - `Read(".../X/SKILL.md")` → Calls section
-   - Note which phase/step invokes each
-
-5. **Determine Pairs With** - Find conditional relationships:
-   - "If X then invoke Y" patterns
-   - Optional complementary skills
-
-6. **Generate Integration section**:
-
-   ```markdown
-   ## Integration
-
-   ### Called By
-
-   - [Results from step 2]
-
-   ### Requires (invoke before starting)
-
-   | Skill                 | When | Purpose |
-   | --------------------- | ---- | ------- |
-   | [Results from step 3] |
-
-   ### Calls (during execution)
-
-   | Skill                 | Phase/Step | Purpose |
-   | --------------------- | ---------- | ------- |
-   | [Results from step 4] |
-
-   ### Pairs With (conditional)
-
-   | Skill                 | Trigger | Purpose |
-   | --------------------- | ------- | ------- |
-   | [Results from step 5] |
-   ```
-
-7. **Insert Integration section**:
-   - If "Related Skills" exists: Insert Integration BEFORE it
-   - If no "Related Skills": Insert before "References" or at end
-   - Optionally consolidate/remove "Related Skills" if redundant
-
-**Migration from Related Skills:**
-
-If skill has "## Related Skills" but no "## Integration":
-
-1. Generate Integration section from analysis
-2. Insert Integration section
-3. If Related Skills is now redundant (all info in Integration), remove it
-4. If Related Skills has additional info, keep it below Integration
-
-**See:** [Phase 28 details](.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md#phase-28-integration-section)
+**Migration:** If skill has "Related Skills" but no Integration, generate Integration and optionally consolidate.
 
 ### Phase Numbering Hygiene Fix (Semantic Criterion 7)
 
@@ -477,7 +305,7 @@ See [Phase Categorization](.claude/skills/managing-skills/references/patterns/ph
 
 ## Step 4e: Validation-Only Phases (No Auto-Fix)
 
-**Phases: 15, 16, 17**
+**Phases: 15, 16, 17, 29**
 
 These phases detect issues but cannot auto-fix due to requiring semantic understanding and manual review.
 
@@ -486,6 +314,37 @@ These phases detect issues but cannot auto-fix due to requiring semantic underst
 - Phase 15: Code block quality (missing/mismatched language tags, long lines)
 - Phase 16: Header hierarchy (empty headers, incorrect nesting)
 - Phase 17: Prose phase references (stale phase numbers after renumbering)
+- Phase 29: Logical coherence (workflow logic, contradictions, missing steps, purpose alignment)
+
+### Phase 29: Logical Coherence (Manual Resolution)
+
+**When detected:** Audit identifies logical issues such as:
+- Steps in impossible order (Step N needs output from Step M that comes later)
+- Contradictions between sections
+- Missing critical steps in workflow
+- Purpose misalignment (description doesn't match implementation)
+- Broken delegation (skill invokes non-existent sub-skills)
+
+**Why no auto-fix:** Logical coherence issues require understanding the skill's intent and making architectural decisions:
+- Reordering steps may break other dependencies
+- Resolving contradictions requires understanding which section is "correct"
+- Adding missing steps requires domain knowledge
+- Fixing purpose misalignment may require rewriting description OR workflow
+
+**Manual resolution guidance:**
+
+1. **Review the audit finding** - Understand the specific logical issue detected
+2. **Determine intent** - What was the skill trying to accomplish?
+3. **Choose resolution strategy:**
+   - Workflow logic issues → Reorder steps or add missing prerequisites
+   - Contradictions → Determine which section reflects intended behavior, update the other
+   - Missing steps → Add the step with appropriate content
+   - Purpose misalignment → Update description to match workflow OR update workflow to match description
+   - Broken delegation → Fix skill reference or remove the delegation
+4. **Apply fix manually** - Use Edit tool with careful consideration
+5. **Re-run audit** - Verify Phase 29 passes after fix
+
+**See:** [Phase 29 details](.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md#phase-29-logical-coherence--internal-consistency)
 
 See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for manual remediation steps.
 
@@ -520,30 +379,51 @@ Document fixes applied with method (Deterministic, Claude-Automated, Hybrid, Man
 
 ## Common Scenarios
 
-### Scenario 1: New Skill Cleanup
+For detailed fix scenarios and recommended fix orders, see [references/common-scenarios.md](references/common-scenarios.md).
 
-**Typical issues:** Phase 1 (description), Phase 5 (directories), Phase 4 (broken links)
-**Fix order:** Deterministic (5) → Claude-Auto (1) → Hybrid (4)
+**Quick reference:**
 
-### Scenario 2: Over-Long Skill
+| Scenario               | Typical Issues              | Fix Order              |
+| ---------------------- | --------------------------- | ---------------------- |
+| New Skill Cleanup      | Phase 1, 4, 5               | Deterministic → Hybrid |
+| Over-Long Skill        | Phase 3 (>500 lines)        | Claude-Auto (extract)  |
+| Legacy Migration       | Phase 9, 11, 13             | Claude-Auto → Human    |
+| Visual/Style Cleanup   | Phase 14, 15, 16            | Deterministic → Manual |
+| Orphan Library Skill   | Phase 18                    | Claude-Auto (gateway)  |
+| Missing Integration    | Phase 28                    | Claude-Auto (generate) |
+| Stub Reference Files   | Phase 26                    | Claude-Auto (research) |
+| Broken References      | Phase 10                    | Hybrid (registry/fuzz) |
 
-**Typical issues:** Phase 3 (>500 lines)
-**Fix:** Claude-Auto (3) - Extract sections to references/
+---
 
-### Scenario 3: Legacy Skill Migration
+## Integration
 
-**Typical issues:** Phase 9 (bash), Phase 11 (cd paths), Phase 13 (no TodoWrite)
-**Fix order:** Claude-Auto (11, 13) → Human (9)
+### Called By
 
-### Scenario 4: Visual/Style Cleanup
+- `managing-skills` (audit → fix workflow delegation)
+- `/skill-manager` command (fix operation)
+- `creating-skills` (Phase 6 - final compliance cleanup)
+- `updating-skills` (Phase 8 - post-update compliance)
 
-**Typical issues:** Phase 14 (tables), Phase 15 (code blocks), Phase 16 (headers)
-**Fix order:** Deterministic (14) → Manual review (15-16) → Semantic review (readability)
+### Requires (invoke before starting)
 
-### Scenario 5: Orphan Library Skill
+| Skill             | When   | Purpose                     |
+| ----------------- | ------ | --------------------------- |
+| `auditing-skills` | Step 1 | Identify compliance issues to fix |
 
-**Typical issues:** Phase 18 (no gateway or agent reference)
-**Fix:** Claude-Auto (18) - Add to appropriate gateway or agent
+### Calls (during execution)
+
+| Skill                    | Phase/Step | Purpose                          |
+| ------------------------ | ---------- | -------------------------------- |
+| `auditing-skills`        | Step 1     | Get initial issues list          |
+| `auditing-skills`        | Step 5     | Verify fixes resolved issues     |
+| `orchestrating-research` | Phase 26   | Populate stub reference files    |
+
+### Pairs With (conditional)
+
+| Skill               | Trigger                 | Purpose                    |
+| ------------------- | ----------------------- | -------------------------- |
+| `syncing-gateways`  | Phase 23 (coverage gaps) | Gateway consistency fixes |
 
 ---
 

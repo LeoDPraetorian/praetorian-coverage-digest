@@ -2,7 +2,7 @@
 
 # Explore Subagent Prompt Template
 
-Use this template when dispatching Explore agents in Phase 2 (Discovery).
+Use this template when dispatching Explore agents in Phase 3 (Discovery).
 
 ## Usage
 
@@ -31,12 +31,12 @@ You are exploring [DOMAIN] patterns for: [FEATURE_NAME]
 
 **THOROUGHNESS:** very thorough
 
-This is Phase 2 Discovery. Your findings will inform architecture and implementation.
+This is Phase 3 Discovery. Your findings will inform architecture and implementation.
 Be exhaustive in finding relevant patterns.
 
 ## Feature Context
 
-[PASTE design.md from Phase 1 - what we're building]
+[PASTE design.md from Phase 2 - what we're building]
 
 ## Output Directory
 

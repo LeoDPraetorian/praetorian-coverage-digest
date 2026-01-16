@@ -1,6 +1,6 @@
 # Architect Subagent Prompt Template
 
-Use this template when dispatching architect subagents in Phase 4.
+Use this template when dispatching architect subagents in Phase 5.
 
 ## Usage
 
@@ -19,7 +19,7 @@ You are designing the architecture for: [FEATURE_NAME]
 
 ## Feature Context
 
-[PASTE design.md summary from Phase 1]
+[PASTE design.md summary from Phase 2]
 
 ## Discovery Findings
 
@@ -33,7 +33,7 @@ You are designing the architecture for: [FEATURE_NAME]
 
 ## Implementation Plan Summary
 
-[PASTE plan.md task list from Phase 3]
+[PASTE plan.md task list from Phase 4]
 
 ## Output Directory
 

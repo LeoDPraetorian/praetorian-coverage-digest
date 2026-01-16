@@ -142,9 +142,20 @@ This gateway implements 3-tier loading:
 
 ### Go Testing
 
-| Skill                     | Path                                                                        | Triggers                                     |
-| ------------------------- | --------------------------------------------------------------------------- | -------------------------------------------- |
+| Skill                     | Path                                                                       | Triggers                                     |
+| ------------------------- | -------------------------------------------------------------------------- | -------------------------------------------- |
 | Implementing Golang Tests | `.claude/skill-library/testing/backend/implementing-golang-tests/SKILL.md` | implement tests, test plan, Go test, testify |
+
+### Testing Quality (Mandatory)
+
+**Load these skills for ANY testing task** - they prevent low-value tests that inflate coverage without catching bugs.
+
+| Skill                      | Path                                                                        | Triggers              |
+| -------------------------- | --------------------------------------------------------------------------- | --------------------- |
+| Avoiding Low-Value Tests   | `.claude/skill-library/testing/avoiding-low-value-tests/SKILL.md`           | any test task         |
+| Testing Anti-Patterns      | `.claude/skill-library/testing/testing-anti-patterns/SKILL.md`              | any test task         |
+| Behavior vs Implementation | `.claude/skill-library/testing/behavior-vs-implementation-testing/SKILL.md` | any test task         |
+| Condition-Based Waiting    | `.claude/skill-library/testing/condition-based-waiting/SKILL.md`            | async, flaky, timeout |
 
 ### Go Porting
 

@@ -68,6 +68,7 @@ This gateway implements 3-tier loading:
 | "migrate" / "query builder" / "old format"              | → `migrating-saved-queries`              |
 | "architecture" / "state design"                         | → `architecting-state-management`        |
 | "review" / "code review" / "PR review"                  | → `reviewing-frontend-implementations`   |
+| "lint" / "eslint" / "code quality" / "before commit"    | → `using-eslint`                         |
 | "testing" (general)                                     | → also invoke `gateway-testing`          |
 | "TypeScript" / "types" / "Zod"                          | → also invoke `gateway-typescript`       |
 
@@ -129,13 +130,30 @@ This gateway implements 3-tier loading:
 | React Query Debugging    | `.claude/skill-library/testing/frontend/react-query-cache-debugging/SKILL.md`       | cache debug, query debug |
 | Chrome Console Debugging | `.claude/skill-library/testing/frontend/debugging-chrome-console/SKILL.md`          | console, DevTools, debug |
 
+### Testing Quality (Mandatory)
+
+**Load these skills for ANY testing task** - they prevent low-value tests that inflate coverage without catching bugs.
+
+| Skill                      | Path                                                                        | Triggers              |
+| -------------------------- | --------------------------------------------------------------------------- | --------------------- |
+| Avoiding Low-Value Tests   | `.claude/skill-library/testing/avoiding-low-value-tests/SKILL.md`           | any test task         |
+| Testing Anti-Patterns      | `.claude/skill-library/testing/testing-anti-patterns/SKILL.md`              | any test task         |
+| Behavior vs Implementation | `.claude/skill-library/testing/behavior-vs-implementation-testing/SKILL.md` | any test task         |
+| Condition-Based Waiting    | `.claude/skill-library/testing/condition-based-waiting/SKILL.md`            | async, flaky, timeout |
+
 ### Security & Data
 
 | Skill                   | Path                                                                                 | Triggers                           |
 | ----------------------- | ------------------------------------------------------------------------------------ | ---------------------------------- |
 | Securing React          | `.claude/skill-library/development/frontend/securing-react-implementations/SKILL.md` | security, XSS, CSRF                |
 | Graph Queries           | `.claude/skill-library/development/frontend/constructing-graph-queries/SKILL.md`     | graph, Neo4j, query                |
-| Migrating Saved Queries | `.claude/skill-library/frontend/data-migration/migrating-saved-queries/SKILL.md`     | migrate, query builder, old format |
+| Migrating Saved Queries | `.claude/skill-library/development/frontend/migrating-saved-queries/SKILL.md`        | migrate, query builder, old format |
+
+### Code Quality
+
+| Skill        | Path                                                                      | Triggers                                 |
+| ------------ | ------------------------------------------------------------------------- | ---------------------------------------- |
+| Using ESLint | `.claude/skill-library/development/frontend/using-eslint/SKILL.md`        | lint, eslint, code quality, before commit |
 
 ### Code Review
 

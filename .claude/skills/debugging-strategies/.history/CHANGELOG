@@ -1,0 +1,25 @@
+# Changelog
+
+## 2026-01-16 - Compliance Fix
+
+**Method:** Claude-Automated (Phase 26, Phase 28)
+
+**Issues Resolved:**
+- Phase 26 (Reference Content Quality): Removed phantom Resources section referencing 6 non-existent files
+  - references/debugging-tools-guide.md
+  - references/performance-profiling.md
+  - references/production-debugging.md
+  - assets/debugging-checklist.md
+  - assets/common-bugs.md
+  - scripts/debug-helper.ts
+- Phase 4 (Broken Links): Eliminated 6 broken markdown links by removing Resources section
+- Phase 28 (Integration Section): Added complete Integration section documenting skill relationships
+
+**Changes Made:**
+1. Removed lines 526-534 (Resources section with phantom references)
+2. Added Integration section with Called By, Requires, Calls, and Pairs With subsections
+3. Documented relationships with debugging-systematically, tracing-root-causes, developing-with-tdd, verifying-before-completion
+
+**Line Count:** 534 → 548 lines (skill is reference material, not reasoning skill)
+
+**Backup:** `.local/2026-01-16-05-14-26-pre-fix.bak`

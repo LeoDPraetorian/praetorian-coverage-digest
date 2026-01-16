@@ -1,0 +1,55 @@
+# Changelog
+
+All notable changes to orchestrating-bugfix skill.
+
+Format: ISO-8601 date, change type, description, context
+
+## 2026-01-15 - Initial Creation
+
+**Type:** create
+**Category:** development/
+**Skill Type:** Process/Pattern
+
+**Context (RED Phase Documentation):**
+
+**Why this skill is needed:**
+Bug fixing currently requires orchestrating-feature-development, which includes unnecessary phases (brainstorming, architecture planning, multi-task implementation) that don't apply to bug fixes. Bugs need investigation and minimal fixes, not full feature development ceremony.
+
+**Current failure behavior:**
+When users say "fix this bug," Claude either:
+1. Uses orchestrating-feature-development (wasteful - 2-4 hours for a 20-40 minute task)
+2. Attempts ad-hoc fixes without systematic debugging (missing root cause analysis)
+3. Skips TDD or verification steps (introduces regressions)
+
+**The gap:**
+No lightweight orchestration exists that coordinates:
+- Discovery (0-5 Explore agents, not 1-10)
+- Debugging (systematic root cause analysis)
+- TDD implementation (test-first minimal fix)
+- Verification (regression checking)
+
+Without human checkpoints for brainstorming/architecture, focusing only on the investigation→fix→verify cycle.
+
+**Created:**
+- SKILL.md (265 lines - well under 500 line limit)
+- Directory structure with references/ and examples/
+- Integrated with discovering-bugs-for-fixing library skill
+- 5-phase workflow: Setup → Scoping → Investigation → Implementation → Verification
+
+## 2026-01-15 - Phase 8 Compliance Fixes
+
+**Type:** update
+
+**Changes:**
+- Fixed description format (now starts with "Use when")
+- Shortened description from 209 chars to 112 chars (< 120 limit)
+- Ran prettier to format all tables
+- Added to gateway-testing routing tables
+- Created 5 reference files with substantial content:
+  - phase-0-setup.md (141 lines)
+  - phase-1-2-scoping-discovery.md (214 lines)
+  - phase-3-investigation.md (312 lines)
+  - phase-4-implementation.md (338 lines)
+  - phase-5-verification.md (387 lines)
+
+**GREEN Verification:** User confirmed skill successfully addresses gap from RED phase

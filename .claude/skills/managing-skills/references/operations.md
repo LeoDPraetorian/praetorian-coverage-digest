@@ -94,7 +94,7 @@ Safely removes skills with comprehensive reference cleanup using Claude's native
 Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")
 ```
 
-Validates skills against the Skill Compliance Contract. Follows instruction-based workflow with 28 compliance phases.
+Validates skills against the Skill Compliance Contract. Follows instruction-based workflow with 29 compliance phases.
 
 For phase details, see [auditing-skills](.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md).
 

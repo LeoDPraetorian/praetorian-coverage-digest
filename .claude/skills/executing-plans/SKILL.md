@@ -106,7 +106,7 @@ Real failure: Agent executed 4 batches without stopping, claimed 118 files updat
 After all tasks complete and verified:
 
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
-- **REQUIRED SUB-SKILL:** Use superpowers:finishing-a-development-branch
+- **REQUIRED SUB-SKILL:** Use finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
 
 ## When to Stop and Ask for Help
@@ -338,7 +338,7 @@ Phase transitions are mandatory checkpoints. The human must explicitly approve b
 - Verify all phases marked complete in PLAN.md
 - Run full test suite
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
-- **REQUIRED SUB-SKILL:** Use superpowers:finishing-a-development-branch
+- **REQUIRED SUB-SKILL:** Use finishing-a-development-branch
 
 ---
 

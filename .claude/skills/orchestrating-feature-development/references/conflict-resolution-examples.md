@@ -33,5 +33,5 @@ Document: "Decision: 2 components following YAGNI. Extract more if reuse emerges
 
 ## Related
 
-- [Phase 4: Architecture](phase-4-architecture.md) - Main workflow
+- [Phase 4: Architecture](phase-5-architecture.md) - Main workflow
 - [Agent Handoffs](agent-handoffs.md) - JSON handoff format

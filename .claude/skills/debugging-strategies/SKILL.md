@@ -523,11 +523,26 @@ afterEach(() => {
 - [ ] Stale data (refresh database)
 ```
 
-## Resources
+## Integration
 
-- **references/debugging-tools-guide.md**: Comprehensive tool documentation
-- **references/performance-profiling.md**: Performance debugging guide
-- **references/production-debugging.md**: Debugging live systems
-- **assets/debugging-checklist.md**: Quick reference checklist
-- **assets/common-bugs.md**: Common bug patterns
-- **scripts/debug-helper.ts**: Debugging utility functions
+### Called By
+
+None - This is a reference skill invoked directly when debugging is needed, not programmatically called by other skills or agents.
+
+### Requires (invoke before starting)
+
+None - Standalone reference skill providing debugging techniques and tools.
+
+### Calls (during execution)
+
+None - This skill provides reference material and does not invoke other skills.
+
+### Pairs With (conditional)
+
+| Skill                         | Trigger                          | Purpose                                                       |
+| ----------------------------- | -------------------------------- | ------------------------------------------------------------- |
+| `debugging-systematically`    | When systematic process needed   | Provides four-phase debugging framework for methodical fixing |
+| `tracing-root-causes`         | When error deep in call stack    | Traces bugs backward through execution to find origin         |
+| `developing-with-tdd`         | After finding bug                | Creates failing test case before fixing                       |
+| `verifying-before-completion` | After implementing debug fix     | Verifies fix actually resolves issue                          |
+

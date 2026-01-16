@@ -241,6 +241,108 @@ ls .claude/progress/*.md 2>/dev/null
    - Delete if no future value
 4. **Clean up TodoWrite** - Mark all complete
 
+## Context Compaction Protocol
+
+### Why Compaction Matters
+
+From Anthropic research: "Token usage accounts for 80% of performance variance." Context rot degrades model performance even within technical token limits. The effective context window where models maintain high quality is ~256k tokens - far below advertised maximums.
+
+### Compaction vs Persistence
+
+| Concern     | Purpose                                      | When           |
+| ----------- | -------------------------------------------- | -------------- |
+| Persistence | Save state to FILES for session resume      | Between sessions |
+| Compaction  | Reduce CONTEXT WINDOW to prevent degradation | During session |
+
+Both are needed. Persistence without compaction leads to context rot. Compaction without persistence loses state on interruption.
+
+### Compaction Triggers
+
+Initiate context compaction when ANY of these occur:
+
+| Trigger           | Threshold        | Action                               |
+| ----------------- | ---------------- | ------------------------------------ |
+| Message count     | > 40 messages    | Summarize completed phases           |
+| Phase completion  | Every 3 phases   | Archive phase details to file        |
+| Agent output size | > 1000 tokens    | Summarize, store full in progress file |
+| Approaching limit | ~80% context used | Aggressive compaction                |
+
+### Compaction Protocol
+
+**Step 1: Identify Compactable Content**
+
+Content that CAN be compacted:
+- Completed phase outputs (keep 2-3 line summary)
+- Old agent handoff details (keep key decisions only)
+- Discovery findings (reference file path instead)
+- Architecture rationale (keep decision, not reasoning)
+
+Content that MUST stay in context:
+- Current phase details
+- Immediate prior phase decisions
+- Active blockers
+- Key file paths being modified
+- User preferences/constraints
+
+**Step 2: Summarize Completed Phases**
+
+Before compaction:
+```
+Phase 3 (Architecture) completed:
+- Agent: frontend-lead
+- Output: 2500 token architecture.md with component hierarchy,
+  data flow diagrams, integration points, 3 approach comparisons,
+  security considerations, tech debt analysis...
+[full content]
+```
+
+After compaction:
+```
+Phase 3 (Architecture): Complete
+- Decision: Compound component pattern with Zustand
+- File: .claude/.output/features/{id}/architecture.md
+- Key: Dashboard uses <Dashboard.Widget> children pattern
+```
+
+**Step 3: Use File References**
+
+Replace inline content with file references:
+
+Before: [500 lines of discovery findings in context]
+After: "See .claude/.output/features/{id}/discovery.md for full findings. Key patterns: TanStack Query for data fetching, MSW for testing."
+
+**Step 4: Update Progress File**
+
+When compacting, ALWAYS update progress file first:
+1. Write full content to progress file
+2. Verify write succeeded
+3. Then summarize in context
+4. Add note: "Full details in progress file"
+
+### Pre-Rot Threshold Monitoring
+
+Monitor for these warning signs:
+
+| Warning Sign          | Indicator                                  | Action                              |
+| --------------------- | ------------------------------------------ | ----------------------------------- |
+| Response quality drop | Vague or repetitive responses              | Immediate compaction                |
+| Missed context        | Agent asks about already-discussed topics  | Compaction + re-inject key facts    |
+| Instruction drift     | Not following established patterns         | Re-inject critical instructions     |
+| Slow responses        | Noticeably longer response times           | Compaction                          |
+
+### Compaction Checklist
+
+Before major phase transitions, verify:
+
+- [ ] Completed phases summarized (not full content)
+- [ ] Agent outputs archived to progress file
+- [ ] Only current phase has full details in context
+- [ ] Key decisions preserved (not just file references)
+- [ ] Critical constraints still in context
+- [ ] Progress file updated with full details
+
+**For detailed compaction examples, see:** [references/compaction-protocol.md](references/compaction-protocol.md)
+
 ## Integration with TodoWrite
 
 Progress files complement TodoWrite:
@@ -350,6 +452,8 @@ Update progress file:
 
 ## Related Skills
 
+- **orchestrating-feature-development** - Uses this skill for progress tracking AND context compaction during 12-phase workflow
+- **orchestrating-integration-development** - Uses this skill for progress tracking AND context compaction during 9-phase workflow
 - **orchestrating-multi-agent-workflows** - Multi-agent coordination patterns
 - **dispatching-parallel-agents** - Parallel agent execution
 - **developing-with-subagents** - Same-session subagent patterns
@@ -360,3 +464,4 @@ Update progress file:
 - [File Templates](references/file-templates.md) - Minimal and full progress file templates
 - [Resume Checklist](references/resume-checklist.md) - Step-by-step resume protocol
 - [Lifecycle Flowchart](references/lifecycle-flowchart.md) - Visual lifecycle diagram
+- [Compaction Protocol](references/compaction-protocol.md) - Detailed context compaction examples and workflows

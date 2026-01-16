@@ -313,7 +313,7 @@ description: Use when creating skills - TDD workflow (RED-GREEN-REFACTOR) with v
 
 **Process:**
 
-1. TypeScript flags CANDIDATES:
+1. Automated detection flags CANDIDATES:
    - Missing language tags → INFO
    - Potential language mismatches → INFO
    - Unknown language tags → INFO
@@ -377,7 +377,7 @@ async function fetchData() {
 
 **Process:**
 
-1. TypeScript flags CANDIDATES:
+1. Automated detection flags CANDIDATES:
    - Empty files (size === 0) → CRITICAL
    - Small files (size < 100 bytes) → INFO
 2. Claude reasons about each candidate's nature:

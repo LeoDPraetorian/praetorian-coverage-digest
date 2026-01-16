@@ -4,14 +4,14 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 
 ## Phase-Specific Rationalizations
 
-### Phase 1: Brainstorming
+### Phase 2: Brainstorming
 
 | Rationalization                              | Why It's Wrong                                                             | Response                                      |
 | -------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------- |
 | 'Requirements are clear, skip brainstorming' | Brainstorming reveals hidden complexity and edge cases                     | DENIED. Complete brainstorming phase.         |
 | 'User knows what they want'                  | Users describe solutions, not problems. Brainstorming surfaces real needs. | DENIED. Brainstorming clarifies requirements. |
 
-### Phase 2: Discovery
+### Phase 3: Discovery
 
 | Rationalization                            | Why It's Wrong                                     | Response                                     |
 | ------------------------------------------ | -------------------------------------------------- | -------------------------------------------- |
@@ -19,14 +19,14 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 | 'This is a new feature, nothing to reuse'  | Even new features can extend existing patterns     | DENIED. Discovery prevents special-casing.   |
 | 'Discovery is slow, I can search manually' | Manual search misses cross-domain patterns         | DENIED. Parallel discovery is comprehensive. |
 
-### Phase 3: Planning
+### Phase 4: Planning
 
 | Rationalization                       | Why It's Wrong                                | Response                            |
 | ------------------------------------- | --------------------------------------------- | ----------------------------------- |
 | 'Simple feature, minimal plan needed' | 40% of 'simple' features are actually complex | DENIED. Complete planning phase.    |
 | 'I can plan as I implement'           | Ad-hoc planning leads to rework               | DENIED. Plan before implementation. |
 
-### Phase 4: Architecture
+### Phase 5: Architecture
 
 | Rationalization                                 | Why It's Wrong                                  | Response                               |
 | ----------------------------------------------- | ----------------------------------------------- | -------------------------------------- |
@@ -34,7 +34,7 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 | 'Security review optional for internal feature' | Internal features often become external         | DENIED. Security lead review required. |
 | 'Tech debt analysis is overhead'                | Untracked tech debt accumulates silently        | DENIED. Update tech debt registry.     |
 
-### Phase 5: Implementation
+### Phase 6: Implementation
 
 | Rationalization                  | Why It's Wrong                                 | Response                              |
 | -------------------------------- | ---------------------------------------------- | ------------------------------------- |
@@ -42,7 +42,7 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 | 'I can add error handling later' | Error handling has ~10% follow-through         | DENIED. Implement error handling now. |
 | 'Types can be any for now'       | TypeScript any spreads and defeats type safety | DENIED. Proper types required.        |
 
-### Phase 6: Code Review
+### Phase 8: Code Review
 
 | Rationalization                                  | Why It's Wrong                                       | Response                              |
 | ------------------------------------------------ | ---------------------------------------------------- | ------------------------------------- |
@@ -50,7 +50,7 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 | 'One retry failed, just ship it'                 | Two failures indicate systemic issues                | DENIED. Escalate via AskUserQuestion. |
 | 'Reviewer is being too strict'                   | Strict review prevents production bugs               | DENIED. Address all feedback.         |
 
-### Phase 7-9: Testing
+### Phase 9-11: Testing
 
 | Rationalization                      | Why It's Wrong                            | Response                               |
 | ------------------------------------ | ----------------------------------------- | -------------------------------------- |
@@ -59,7 +59,7 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 | 'Tests pass, validation unnecessary' | Tests may not cover plan requirements     | DENIED. test-lead validation required. |
 | '70% coverage is acceptable'         | Coverage targets exist for a reason       | DENIED. Meet coverage requirements.    |
 
-### Phase 10: Completion
+### Phase 12: Completion
 
 | Rationalization                       | Why It's Wrong                         | Response                      |
 | ------------------------------------- | -------------------------------------- | ----------------------------- |

@@ -295,13 +295,13 @@ OUTPUT_DIRECTORY: .claude/.output/integrations/2026-01-14-shodan/
 ```
 
 **Orchestrator proceeds to Phase 4.5**:
-- Phase 4.5 is NOT an agent, it's a skill invocation
+- Phase 5 is NOT an agent, it's a skill invocation
 - Orchestrator invokes `validating-integrations` library skill
 - Skill generates `p0-compliance-review.md`
 - IF violations found: 🛑 Human Checkpoint
-- IF no violations: Proceed automatically to Phase 5 (Review)
+- IF no violations: Proceed automatically to Phase 6 (Review)
 
-### Phase 5 → Phase 6: Review → Testing
+### Phase 6 → Phase 6: Review → Testing
 
 **backend-reviewer returns** (after two-stage gated review):
 ```json

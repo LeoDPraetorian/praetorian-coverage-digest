@@ -4,7 +4,7 @@ description: Use when implementing tool wrappers (MCP servers and REST APIs) - t
 type: development
 permissionMode: default
 tools: Bash, Edit, Glob, Grep, MultiEdit, Read, Skill, TodoWrite, WebFetch, WebSearch, Write
-skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, creating-mcp-wrappers, debugging-strategies, debugging-systematically, developing-with-tdd, enforcing-evidence-based-analysis, executing-plans, gateway-mcp-tools, gateway-typescript, persisting-agent-outputs, semantic-code-operations, tracing-root-causes, using-skills, using-todowrite, verifying-before-completion
+skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, debugging-strategies, debugging-systematically, developing-with-tdd, enforcing-evidence-based-analysis, executing-plans, gateway-mcp-tools, gateway-typescript, persisting-agent-outputs, semantic-code-operations, tracing-root-causes, using-skills, using-todowrite, verifying-before-completion
 model: sonnet
 color: green
 ---
@@ -37,7 +37,7 @@ Your `skills` frontmatter makes these core skills available. **Invoke based on s
 | Trigger                         | Skill                      | When to Invoke                                       |
 | ------------------------------- | -------------------------- | ---------------------------------------------------- |
 | Implementing architect's plan   | `executing-plans`          | Execute plan in batches with review checkpoints      |
-| Creating new wrapper            | `creating-mcp-wrappers`    | Full TDD workflow for new MCP wrappers               |
+| Creating new wrapper            | `gateway-mcp-tools`        | Routes to orchestrating-mcp-development workflow     |
 | Code duplication concerns       | `adhering-to-dry`          | Check existing patterns first; eliminate duplication |
 | Scope creep risk                | `adhering-to-yagni`        | When tempted to add "nice to have" features          |
 | Bug, error, unexpected behavior | `debugging-systematically` | Investigating issues before fixing                   |
@@ -47,7 +47,7 @@ Your `skills` frontmatter makes these core skills available. **Invoke based on s
 
 **Semantic matching guidance:**
 
-- Implementing a new wrapper? → Check for plan first (`ls .claude/mcp-wrappers/*/architecture.md`). If plan exists → `executing-plans`. If no plan → `creating-mcp-wrappers` for full TDD workflow
+- Implementing a new wrapper? → Check for plan first (`ls .claude/mcp-wrappers/*/architecture.md`). If plan exists → `executing-plans`. If no plan → `gateway-mcp-tools` routes to `orchestrating-mcp-development`
 - Implementing architect's plan? → `executing-plans` + `enforcing-evidence-based-analysis` + `developing-with-tdd` + `using-todowrite` + `verifying-before-completion`
 - Bug fix in wrapper? → No plan needed. Use `debugging-systematically` + `developing-with-tdd` + gateway routing
 - Fixing reviewer feedback? → Plan already exists, just fix issues. Use `enforcing-evidence-based-analysis` + `developing-with-tdd` + `verifying-before-completion`

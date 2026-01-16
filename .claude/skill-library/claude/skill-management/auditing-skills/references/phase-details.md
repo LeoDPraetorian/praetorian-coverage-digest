@@ -4,14 +4,7 @@ Detailed explanations of all 28 audit phases.
 
 ## Architecture Note
 
-Phase files use **semantic names** (e.g., `table-formatting.ts`) and classes use **semantic names** (e.g., `TableFormattingPhase`). Phase numbers are assigned only in `phase-registry.ts`.
-
-**To renumber phases:** Update ONLY `phase-registry.ts`. No file renames or class renames needed.
-
-**Key files:**
-
-- `phase-registry.ts` - Single source of truth for phase numbers and metadata
-- `getPhaseName()` - Generates display names (e.g., "Phase 14: Table Formatting")
+Phases are numbered sequentially and described in this document. Phase validation is performed instruction-based by Claude reading this file and applying the documented rules.
 
 ## General Detection Principles
 
@@ -213,13 +206,13 @@ See [Line Count Limits](.claude/skills/managing-skills/references/patterns/line-
 
 **Why Different Thresholds:**
 
-**Code vs. Context Trade-off**: When logic moves from prompt (Claude's context) to TypeScript (CLI scripts), word count requirements change dramatically.
+**Code vs. Context Trade-off**: When logic moves from prompt (Claude's context) to external scripts, word count requirements change dramatically.
 
 **Detection Heuristics:**
 
 | Indicator            | Pattern                                   | Suggests Type |
 | -------------------- | ----------------------------------------- | ------------- |
-| CLI execution        | `npm run audit`, `scripts/*.ts`           | tool-wrapper  |
+| CLI execution        | `npm run audit`, scripts in `scripts/`    | tool-wrapper  |
 | Process headers      | `## Phase 1`, `RED-GREEN-REFACTOR`        | reasoning     |
 | Sequential language  | "first", "then", "next", "step 1"         | reasoning     |
 | Both patterns        | CLI commands + process workflow           | hybrid        |
@@ -384,36 +377,19 @@ references/
 
 Phase 8 intelligently scopes test execution based on audit mode:
 
-**Single-Skill Audit** (`npm run audit -- skill-name`):
+**Single-Skill Audit:**
 
 - **Runs only tests for the specific skill being audited**
 - Command: `npx vitest run skills/skill-name/scripts`
-- Fast execution (~23 tests for skill-manager)
+- Fast execution
 - Prevents false negatives from unrelated test failures
 
-**All-Skills Audit** (`npm run audit`):
+**All-Skills Audit:**
 
 - **Runs all tests across the entire workspace**
-- Command: `npm run test:unit` (102+ test files)
+- Command: `npm run test:unit`
 - Comprehensive validation
 - Detects issues affecting multiple skills
-
-**Why:** Before v1.1.0, Phase 8 ran ALL workspace tests (102+ files) even when auditing a single skill, causing false negatives from unrelated test failures. Now tests are scoped to the skill being audited.
-
-**Example Impact:**
-
-```bash
-# Before v1.0.0
-npm run audit -- skill-manager
-# Ran 102 test files (all MCP tools, all skills)
-# Failed due to 3 unrelated currents tool test failures
-# ❌ False negative: skill-manager tests were actually passing
-
-# After v1.1.0
-npm run audit -- skill-manager
-# Runs only 23 skill-manager tests
-# ✅ Accurate result: only tests relevant to skill-manager
-```
 
 **Why It Matters:** Broken TypeScript = broken skill functionality
 
@@ -700,7 +676,7 @@ echo "Exit: $?"  # Should be 1
 
 **Architecture:**
 
-- **Layer 1 (TypeScript):** Flags CANDIDATES (missing tags, potential mismatches)
+- **Layer 1 (Automated Detection):** Flags CANDIDATES (missing tags, potential mismatches)
 - **Layer 2 (Claude):** Semantic classification using [phase-15-semantic-review.md](phase-15-semantic-review.md)
 
 **Rationale:**
@@ -714,7 +690,7 @@ Context matters. The same missing language tag can be:
 - Pseudo-code (algorithm steps, not executable)
 - Meta-discussion (discussing code blocks themselves)
 
-TypeScript detects patterns but cannot understand context. Claude classifies each candidate based on surrounding text, file name, and purpose.
+Automated detection flags patterns but cannot understand context. Claude classifies each candidate based on surrounding text, file name, and purpose.
 
 **Common failures:**
 
@@ -999,7 +975,7 @@ Similar paths:
 
 **Checks:** No hardcoded line numbers in file references (semantic classification required)
 
-**Severity:** INFO (candidates) - TypeScript flags patterns, Claude classifies
+**Severity:** INFO (candidates) - Automated detection flags patterns, Claude classifies
 
 **Auto-fix:** No - Claude reasoning determines genuine issues vs teaching content
 
@@ -1007,7 +983,7 @@ Similar paths:
 
 **Two-Layer Architecture:**
 
-- **Layer 1 (TypeScript)**: Flag CANDIDATES with line number patterns
+- **Layer 1 (Automated Detection)**: Flag CANDIDATES with line number patterns
   - Detects `file.go:123` or `file.go:123-456` patterns
   - Provides context: surrounding lines, file name, WRONG markers
   - Severity: INFO (not WARNING)
@@ -1022,7 +998,7 @@ Similar paths:
 **What it detects:**
 
 - `file.go:123` patterns
-- `file.ts:456-789` patterns
+- `file.ext:456-789` patterns (any file extension)
 - Line number ranges in references
 
 **False positives avoided:**
@@ -1235,7 +1211,7 @@ npm run fix -- <skill> --phase 27 --apply
 
 **Fix category:** Hybrid
 
-- TypeScript deterministically calculates repo-root path
+- Automated logic deterministically calculates repo-root path
 - Claude verifies the suggested path is correct
 
 ## Phase 28: Integration Section
@@ -1396,6 +1372,294 @@ Claude will:
 
 - **Template files** (`*-template.md`) - Integration section is a placeholder
 - **Gateway skills** - Have routing tables instead of Integration (different structure)
+
+## Phase 29: Logical Coherence & Internal Consistency
+
+**Category:** Claude-Automated (requires semantic reasoning)
+
+**Checks:** Skill content forms a logically coherent whole with no contradictions, missing steps, or misalignment
+
+**Severity:** WARNING (can be CRITICAL for severe contradictions)
+
+**Auto-fix:** No - requires human judgment to resolve
+
+**Rationale:** Skills can pass all 28 structural phases while being logically incoherent. A skill might have perfect formatting, valid links, correct line counts, and still have workflows that contradict themselves or don't accomplish their stated purpose. This phase catches semantic/logical issues that structural validation cannot detect.
+
+### What It Checks
+
+1. **Workflow Logic** - Do steps follow logically from one to the next?
+2. **Internal Consistency** - Are there contradictions between sections?
+3. **Completeness** - Are critical steps missing from the workflow?
+4. **Redundancy** - Is content duplicated or out of place?
+5. **Purpose Alignment** - Does what the skill claims to do match what it instructs?
+6. **Flow Coherence** - Does the overall structure make sense?
+
+### What It Detects
+
+**Workflow Logic Issues:**
+
+- Step N references output from Step M, but Step M comes AFTER Step N
+- Workflow instructs "First do A, then B, then C" but Step C requires information from Step D
+- Success criteria reference steps that don't exist in the workflow
+- Prerequisites listed after the steps that need them
+
+**Internal Consistency Issues:**
+
+- Section A says "always do X" but Section B says "never do X"
+- Example shows pattern A, but workflow mandates pattern B
+- Quick Reference table contradicts detailed workflow steps
+- Tool usage rules conflict with actual tool invocations in examples
+
+**Completeness Issues:**
+
+- Workflow has Phase 1, 2, 3, 5 (missing Phase 4)
+- Success criteria mention deliverables not produced in workflow
+- References files that workflow never creates
+- Omits error handling for known failure modes
+
+**Redundancy Issues:**
+
+- Same instruction repeated verbatim in multiple places
+- Multiple sections explaining the same concept
+- Duplicate examples showing identical patterns
+- References containing content already in SKILL.md
+
+**Purpose Alignment Issues:**
+
+- Description says "validates API responses" but skill only discusses UI components
+- Skill claims to be "TDD-enforced" but has no test phases
+- Title says "Creating X" but workflow is about updating X
+- States "Quick (5 min)" but workflow has 15 steps requiring tools/research
+
+**Flow Coherence Issues:**
+
+- Success criteria don't match the workflow steps
+- TodoWrite tracking mandated but never used in examples
+- Skill delegates to sub-skill that doesn't exist
+- Examples assume context not established in prerequisites
+
+### Example Failures
+
+````markdown
+# ❌ FAIL: Workflow Logic - Forward Reference
+
+## Step 1: Parse Results
+
+Extract the test results from output.json.
+
+## Step 5: Run Tests
+
+Execute the test suite and save results to output.json.
+
+→ Step 1 needs output.json, but it's not created until Step 5
+
+# ❌ FAIL: Internal Consistency - Contradiction
+
+## Quick Reference
+
+| Step | Tool  |
+| ---- | ----- |
+| 1    | Read  |
+| 2    | Write |
+
+## Detailed Workflow
+
+Step 1: Use the Edit tool to modify...
+
+→ Quick Reference says "Write" but workflow says "Edit"
+
+# ❌ FAIL: Completeness - Missing Critical Step
+
+## Workflow
+
+1. Read the config file
+2. Parse the JSON
+3. Validate the schema
+4. Apply the changes
+
+## Success Criteria
+
+✅ Backup created
+✅ Config validated
+✅ Changes applied
+
+→ Success criteria mentions "Backup created" but workflow never creates backup
+
+# ❌ FAIL: Redundancy - Duplicate Content
+
+## How to Use
+
+Step 1: Navigate to repo root
+Step 2: Run the command
+Step 3: Verify output
+
+## Detailed Workflow
+
+### Step 1: Repository Navigation
+
+Navigate to the repository root...
+
+### Step 2: Command Execution
+
+Run the command...
+
+### Step 3: Output Verification
+
+Verify the output...
+
+→ Detailed Workflow repeats Quick Reference content verbatim
+
+# ❌ FAIL: Purpose Alignment - Mismatch
+
+---
+description: Use when creating React components with TDD
+---
+
+# Creating React Components
+
+## Workflow
+
+1. Design component interface
+2. Write component code
+3. Deploy to production
+
+→ Description claims "TDD" but workflow has no test phases
+
+# ❌ FAIL: Flow Coherence - Broken Delegation
+
+## Step 3: Research Patterns
+
+Invoke the `researching-best-practices` skill to gather...
+
+→ Skill `researching-best-practices` doesn't exist (should be `orchestrating-research`)
+````
+
+### Why This Phase Exists
+
+**The validation gap**: Structural phases validate FORM (formatting, links, line counts) but not SUBSTANCE (logical coherence, internal consistency).
+
+**Real-world impact**: Skills that pass structural validation but fail logical coherence:
+
+- Confuse users who follow contradictory instructions
+- Waste time on workflows with missing critical steps
+- Produce outputs that don't match stated purpose
+- Create maintenance debt from redundant content
+- Break when delegating to non-existent skills
+
+**Example from practice**: A skill passed all 28 phases with "SKILL.md: COMPLIANT" but instructed users to "run tests in Step 3" while the test script wasn't created until Step 6. Users got errors, filed issues, and the skill required a complete workflow rewrite.
+
+### Severity Guidelines
+
+**CRITICAL** (blocks PASSED status):
+
+- Workflow steps in impossible order (Step N needs output from Step N+5)
+- Direct contradictions (Section A: "always X", Section B: "never X")
+- Purpose completely misaligned (claims to create, actually updates)
+- Delegates to non-existent skills/commands
+
+**WARNING** (allows PASSED WITH WARNINGS):
+
+- Minor redundancy (similar explanations in Quick Reference and Detailed Workflow)
+- Success criteria slightly misaligned with workflow steps
+- Examples use patterns not explicitly documented in workflow
+- Missing error handling for edge cases
+
+**INFO** (suggestion only):
+
+- Content could be reorganized for better flow
+- Examples could be more diverse
+- Some steps could be consolidated
+
+### Detection Strategy
+
+**This is a semantic phase requiring Claude reasoning, not regex patterns.**
+
+**Reading strategy:**
+
+1. Read SKILL.md completely (description → workflow → success criteria → examples)
+2. Read ALL files in references/ directory
+3. Build mental model of workflow: what's promised vs what's delivered
+4. Check for contradictions, forward references, missing steps
+5. Verify examples align with workflow instructions
+
+**Validation questions to ask:**
+
+- If I follow this workflow exactly, do the steps work in this order?
+- Do any sections contradict each other?
+- Are there steps referenced that don't exist?
+- Does the output match what's claimed in description/success criteria?
+- Is critical information missing (backups, error handling, verification)?
+- Is the same content repeated unnecessarily?
+
+**False positives to avoid:**
+
+- Redundancy for emphasis (skill repeats "MUST use TodoWrite" in multiple places) → Not a violation if intentional
+- Flexible ordering (skill says "Step 3 or 4") → Not a violation if workflow allows flexibility
+- Conditional steps (workflow: "If X, do Y") → Not a missing step if conditional
+- Teaching redundancy (Quick Reference + Detailed Workflow) → Not a violation if serving different purposes
+
+### Example Semantic Analysis
+
+**Skill: `updating-skills`**
+
+**Check 1: Workflow Logic**
+
+- Step 1: Document RED → Step 2: Locate → Step 3: Backup → Step 4: Edit
+- ✅ PASS - Steps follow logically, each builds on previous
+
+**Check 2: Internal Consistency**
+
+- Description: "TDD-driven skill updates with compliance validation"
+- Workflow: Has RED phase (Step 1), GREEN phase (Step 6), REFACTOR phase (Step 8)
+- ✅ PASS - TDD claim matches workflow structure
+
+**Check 3: Completeness**
+
+- Workflow mentions "Backup created" in success criteria
+- Step 3 explicitly creates backup in .local/
+- ✅ PASS - Backup step present
+
+**Check 4: Redundancy**
+
+- Quick Reference table shows 8 steps
+- Detailed workflow explains same 8 steps with examples
+- ✅ ACCEPTABLE - Different levels of detail for different audiences
+
+**Check 5: Purpose Alignment**
+
+- Skill name: `updating-skills`
+- Workflow: Modifies existing skill files
+- ✅ PASS - Purpose matches implementation
+
+**Check 6: Flow Coherence**
+
+- Step 4 invokes `orchestrating-research` (core skill)
+- Step 5 resumes with "POST-RESEARCH RESUME POINT"
+- ✅ PASS - Delegation and continuation clearly documented
+
+**Result:** No Phase 29 violations detected
+
+### Fix Behavior
+
+**Phase 29 violations require human reasoning to fix.** Unlike deterministic phases, these issues involve understanding intent and making architectural decisions.
+
+**Typical fix workflow:**
+
+1. Audit identifies specific logical issue (e.g., "Step 3 needs output from Step 7")
+2. fixing-skills creates TodoWrite item: "Resolve Phase 29: Reorder steps so Step 3 comes after Step 7"
+3. Human (or Claude with architectural reasoning) analyzes:
+   - Can steps be reordered without breaking other logic?
+   - Should Step 3 be split into two steps?
+   - Is there a missing intermediate step?
+4. Human applies fix based on analysis
+5. Re-run audit to verify fix
+
+**Auto-fix not possible because:**
+
+- Reordering steps may break other dependencies
+- Resolving contradictions requires understanding intent
+- Filling missing steps requires domain knowledge
+- Removing redundancy requires judging what's intentional emphasis vs bloat
 
 ## Related
 

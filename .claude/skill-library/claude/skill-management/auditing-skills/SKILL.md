@@ -1,7 +1,7 @@
 ---
 name: auditing-skills
-description: Use when validating skill compliance - reads skills, applies 28-phase rules from phase-details.md, reports violations
-allowed-tools: Read, Grep, TodoWrite
+description: Use when validating skill compliance - reads skills, applies 29-phase rules from phase-details.md, reports violations
+allowed-tools: Read, Grep, Bash, TodoWrite
 ---
 
 # Auditing Skills
@@ -14,7 +14,7 @@ allowed-tools: Read, Grep, TodoWrite
 
 ## What This Skill Does
 
-Audits skills across **28 validation phases** by reading skill files and applying rules from phase-details.md.
+Audits skills across **29 validation phases** by reading skill files and applying rules from phase-details.md.
 
 **Phase categories:**
 
@@ -22,7 +22,7 @@ Audits skills across **28 validation phases** by reading skill files and applyin
 | ---------------- | ----- | ---------------------- | --------------------------------- |
 | Deterministic    | 9     | One correct answer     | Description format, Line count    |
 | Hybrid           | 4     | Deterministic + Claude | Broken links, Path resolution     |
-| Claude-Automated | 10    | Claude decides         | Orphan detection, Integration     |
+| Claude-Automated | 11    | Claude decides         | Orphan detection, Integration     |
 | Human-Required   | 3     | Human judgment         | TypeScript errors, Bash migration |
 | Validation-Only  | 2     | Detect, no fix         | Header hierarchy                  |
 | Gateway-only     | 4     | Gateway skills only    | Structure, Routing, Coverage      |
@@ -105,7 +105,7 @@ Then evaluate: Does this file contain ACTUAL content or just structure/placehold
 Read(.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md)
 ```
 
-For each of the 28 phases documented there:
+For each of the 29 phases documented there:
 
 1. Check if skill complies with that phase's requirements
 2. Note violations with severity (CRITICAL, WARNING, INFO)
@@ -322,7 +322,7 @@ This applies even if structural validation passed with zero issues.
 
 ### Semantic Checklist
 
-Evaluate against these 7 criteria:
+Evaluate against these 8 criteria:
 
 1. **Description Quality** - MANDATORY detailed assessment (see below)
 2. **Skill Categorization** - Is category correct (frontend/backend/testing/security/tooling/claude)?
@@ -331,6 +331,7 @@ Evaluate against these 7 criteria:
 5. **Content Density** - If >500 lines, is length justified?
 6. **External Documentation** - Do library skills link to official docs?
 7. **Phase Numbering Hygiene** - Are phases numbered sequentially (no fractional)?
+8. **Logical Coherence** - Does the skill make sense as a coherent whole?
 
 ### Description Quality Assessment (MANDATORY)
 
@@ -385,9 +386,9 @@ See [Phase Numbering Hygiene](references/phase-numbering-hygiene.md) for example
 
 Audit complete when:
 
-1. ✅ All 28 structural phases checked
+1. ✅ All 29 structural phases checked
 2. ✅ Findings reported with severity levels
-3. ✅ Semantic review performed (7 criteria)
+3. ✅ Semantic review performed (8 criteria)
 4. ✅ Description quality assessed (5 dimensions)
 5. ✅ Fix procedures referenced
 6. ✅ TodoWrite tracking used
@@ -425,7 +426,7 @@ Options:
 
 ## Complete Phase Reference
 
-All 28 validation phases:
+All 29 validation phases:
 
 | Phase | Name                      | Severity | Category         | What It Checks                             |
 | ----- | ------------------------- | -------- | ---------------- | ------------------------------------------ |
@@ -456,6 +457,7 @@ All 28 validation phases:
 | 25    | Context7 Staleness        | WARNING  | Claude-Automated | Context7 docs <30 days old                 |
 | 26    | Reference Content Quality | CRITICAL | Claude-Automated | No empty or placeholder files (report EACH file separately) |
 | 28    | Integration Section       | CRITICAL | Claude-Automated | Has Called-By, Requires, Calls, Pairs-With |
+| 29    | Logical Coherence         | WARNING  | Claude-Automated | Workflow logic, contradictions, missing steps, alignment |
 
 **For detailed phase documentation**, see [Phase Details Reference](references/phase-details.md).
 

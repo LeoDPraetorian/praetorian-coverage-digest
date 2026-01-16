@@ -1,10 +1,10 @@
 # Test Lead Subagent Prompt Template
 
-Use this template when dispatching test-lead in Phase 7 (planning) and Phase 9 (validation).
+Use this template when dispatching test-lead in Phase 9 (planning) and Phase 11 (validation).
 
 ## Usage
 
-### Phase 7: Test Planning
+### Phase 9: Test Planning
 
 ```typescript
 Task({
@@ -14,7 +14,7 @@ Task({
 });
 ```
 
-### Phase 9: Test Validation
+### Phase 11: Test Validation
 
 ```typescript
 Task({
@@ -26,7 +26,7 @@ Task({
 
 ---
 
-## Phase 7: Test Planning Template
+## Phase 9: Test Planning Template
 
 ````markdown
 You are creating a test plan for: [FEATURE_NAME]
@@ -298,7 +298,7 @@ Focus: Full user workflows in browser
   "e2e_tests_planned": 3,
   "handoff": {
     "next_agent": "frontend-tester",
-    "context": "Test plan ready, proceed to Phase 8 testing"
+    "context": "Test plan ready, proceed to Phase 12 testing"
   }
 }
 ```
@@ -307,7 +307,7 @@ Focus: Full user workflows in browser
 
 ---
 
-## Phase 9: Test Validation Template
+## Phase 11: Test Validation Template
 
 ```markdown
 You are validating tests against the plan for: [FEATURE_NAME]
@@ -439,7 +439,7 @@ Calculate based on:
   "incorrect_tests": [],
   "handoff": {
     "next_agent": null,
-    "context": "Validation complete, proceed to Phase 10"
+    "context": "Validation complete, proceed to Phase 12"
   }
 }
 ```

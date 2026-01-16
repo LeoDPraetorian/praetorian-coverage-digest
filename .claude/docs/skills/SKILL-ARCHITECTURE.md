@@ -710,10 +710,13 @@ Domain-specific agents with auto-loaded gateway skills:
 ├── documents/                               # 4 document processing skills
 ├── infrastructure/                          # 3 cloud/infra skills
 ├── lib/                                     # Shared libraries
-├── mcp-management/                          # 3 MCP management skills
-│   ├── creating-mcp-wrappers/
+├── mcp-management/                          # 6 MCP management skills
 │   ├── designing-progressive-loading-wrappers/
-│   └── setting-up-mcp-servers/
+│   ├── orchestrating-api-tool-development/
+│   ├── orchestrating-mcp-development/
+│   ├── reviewing-mcp-wrappers/
+│   ├── setting-up-mcp-servers/
+│   └── testing-mcp-wrappers/
 ├── quality/                                 # 1 UI/UX skill
 ├── research/                                # 6 research skills
 │   ├── researching-arxiv/
@@ -758,8 +761,20 @@ The library isn't auto-discovered, so structure doesn't affect tokens. Nested or
 
 ## References
 
-- [Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
-- [Agent Skills Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
-- [Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
-- [Subagents Documentation](https://code.claude.com/docs/en/sub-agents)
-- [obra/superpowers](https://github.com/obra/superpowers) - REQUIRED SUB-SKILL pattern, Integration sections, prompt templates, workflow chains
+
+### Anthropic Official Guidance
+Skills Overview
+https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
+
+Skill Authoring Best Practices - <500 lines, concise, feedback loops
+https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+
+Effective Context Engineering for AI Agents
+https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
+
+Agent Skills Best Practices
+https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+
+### Community Resources
+ORBA Superpower. REQUIRED SUB-SKILL pattern, Integration sections, prompt templates, workflow chains
+https://github.com/obra/superpowers 

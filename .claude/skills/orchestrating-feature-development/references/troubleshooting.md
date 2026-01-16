@@ -105,7 +105,7 @@ Agent blocked: "Backend API endpoint not available"
    Tests failing due to implementation issue:
    {test output}
 
-   Return to Phase 5 (implementation) to fix.
+   Return to Phase 6 (implementation) to fix.
    ```
 
 4. If test bug:
@@ -283,13 +283,13 @@ Can frontend work with mocked backend?
 
    ```
    Is architecture still valid?
-   ├─ No → Return to Phase 4 (architecture)
+   ├─ No → Return to Phase 6 (architecture)
    │  Save progress as user-dashboard_20241213_103000-v1
    │  Create new branch for amended feature
    │
    └─ Yes → Can we amend current plan?
       ├─ Yes → Update plan.md, continue
-      └─ No → Return to Phase 3 (planning)
+      └─ No → Return to Phase 6 (planning)
    ```
 
 3. Save current state:
@@ -362,5 +362,5 @@ Can frontend work with mocked backend?
 
 - [Progress Persistence](progress-persistence.md) - Resume workflow
 - [Agent Handoffs](agent-handoffs.md) - Handling blocked status
-- [Phase 5: Implementation](phase-5-implementation.md) - Build failures
-- [Phase 8: Testing](phase-8-testing.md) - Test failures
+- [Phase 5: Implementation](phase-6-implementation.md) - Build failures
+- [Phase 10: Testing](phase-10-testing.md) - Test failures

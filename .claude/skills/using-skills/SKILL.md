@@ -48,29 +48,29 @@ digraph skill_flow {
 
 These thoughts mean STOP—you're rationalizing:
 
-| Thought                             | Reality                                                |
-| ----------------------------------- | ------------------------------------------------------ |
-| "This is just a simple question"    | Questions are tasks. Check for skills.                 |
-| "I need more context first"         | Skill check comes BEFORE clarifying questions.         |
-| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first.           |
-| "I can check git/files quickly"     | Files lack conversation context. Check for skills.     |
-| "Let me gather information first"   | Skills tell you HOW to gather information.             |
-| "This doesn't need a formal skill"  | If a skill exists, use it.                             |
-| "I remember this skill"             | Skills evolve. Read current version.                   |
-| "This doesn't count as a task"      | Action = task. Check for skills.                       |
-| "The skill is overkill"             | Simple things become complex. Use it.                  |
-| "I'll just do this one thing first" | Check BEFORE doing anything.                           |
-| "This feels productive"             | Undisciplined action wastes time. Skills prevent this. |
-| "I know what that means"            | Knowing the concept ≠ using the skill. Invoke it.      |
+| Thought                             | Reality                                                                 |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| "This is just a simple question"    | Questions are tasks. Check for skills.                                  |
+| "I need more context first"         | Skill check comes BEFORE clarifying questions.                          |
+| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first.                            |
+| "I can check git/files quickly"     | Files lack conversation context. Check for skills.                      |
+| "Let me gather information first"   | Skills tell you HOW to gather information.                              |
+| "This doesn't need a formal skill"  | If a skill exists, use it.                                              |
+| "I remember this skill"             | Skills evolve. Read current version.                                    |
+| "This doesn't count as a task"      | Action = task. Check for skills.                                        |
+| "The skill is overkill"             | Simple things become complex. Use it.                                   |
+| "I'll just do this one thing first" | Check BEFORE doing anything.                                            |
+| "This feels productive"             | Undisciplined action wastes time. Skills prevent this.                  |
+| "I know what that means"            | Knowing the concept ≠ using the skill. Invoke it.                       |
 | "I'm done, no need to verify"       | Completion claims require evidence. Invoke verifying-before-completion. |
-| "Tests pass so requirements met"    | Tests ≠ requirements. Verify exit criteria separately. |
+| "Tests pass so requirements met"    | Tests ≠ requirements. Verify exit criteria separately.                  |
 
 ## Skill Priority
 
 When multiple skills could apply, use this order:
 
 1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task
-2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution
+2. **Implementation skills second** (orchestrating-mcp-development, implementing-go-semaphore-pools) - these guide execution
 
 "Let's build X" → brainstorming first, then implementation skills.
 "Fix this bug" → debugging first, then domain-specific skills.
@@ -79,13 +79,13 @@ When multiple skills could apply, use this order:
 
 **Before claiming ANY task complete, check for completion skills:**
 
-| About to... | Required Skill |
-|-------------|----------------|
-| Claim task/phase complete | `verifying-before-completion` |
-| Mark batch done | `verifying-before-completion` |
+| About to...                        | Required Skill                |
+| ---------------------------------- | ----------------------------- |
+| Claim task/phase complete          | `verifying-before-completion` |
+| Mark batch done                    | `verifying-before-completion` |
 | Say 'done', 'finished', 'complete' | `verifying-before-completion` |
-| Create commit/PR | `verifying-before-completion` |
-| Return from subagent task | `verifying-before-completion` |
+| Create commit/PR                   | `verifying-before-completion` |
+| Return from subagent task          | `verifying-before-completion` |
 
 **The completion trap:**
 

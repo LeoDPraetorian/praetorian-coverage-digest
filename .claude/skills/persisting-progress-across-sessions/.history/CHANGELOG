@@ -1,0 +1,33 @@
+# Changelog - persisting-progress-across-sessions
+
+## 2026-01-16 - Context Compaction Protocol
+
+**Added:**
+- New section "Context Compaction Protocol" in SKILL.md
+  - Explains difference between persistence (cross-session) and compaction (in-session)
+  - Provides compaction triggers (message count, phase completion, agent output size, context usage)
+  - Details 4-step compaction protocol (identify content, summarize phases, use file references, update progress file)
+  - Includes pre-rot threshold monitoring table
+  - Provides compaction checklist for phase transitions
+- New reference file: references/compaction-protocol.md
+  - Example 1: Summarizing Architecture Phase (before/after)
+  - Example 2: Summarizing Discovery Phase (800+ tokens to 150 tokens)
+  - Example 3: Multi-Phase Summary
+  - Anti-patterns (compacting too aggressively, never compacting, compacting without persisting)
+  - Step-by-step compaction workflow
+  - Pre-rot threshold examples
+  - Integration with orchestrations (feature-development, integration-development)
+  - Compaction metrics table
+
+**Updated:**
+- Related Skills section: Added orchestrating-feature-development and orchestrating-integration-development with context compaction note
+- References section: Added link to compaction-protocol.md
+
+**Why:**
+Addresses gap identified from Anthropic's context engineering research:
+- Context rot occurs even within token limits
+- Effective context window is ~256k tokens (not advertised 1M)
+- Token usage accounts for 80% of performance variance
+- Summarization at ~128k tokens prevents degradation
+
+The skill previously only handled cross-session persistence (saving to files) but not in-session context compaction (reducing context window usage during long-running workflows).

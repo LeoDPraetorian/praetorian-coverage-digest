@@ -1,0 +1,35 @@
+# Changelog
+
+## 2026-01-15 - Initial Creation
+
+**RED Phase Documentation:**
+- Gap: orchestrating-bugfix workflow needs Phase 1-2 capability for bug scoping and discovery
+- Without skill: Orchestrations must manually implement bug location discovery each time
+- Failure: No standardized process for determining agent count or spawning Explore agents for bug investigation
+- Need: Reusable two-stage workflow (scoping → discovery) for unknown bug locations
+
+**Skill Details:**
+- Category: development/
+- Type: Process/Pattern
+- Location: Skill Library
+
+**GREEN Phase:**
+- Skill structure validated: 226 lines (under 500 limit)
+- Frontmatter compliance verified
+- 5 reference files created with substantive content (50+ lines each)
+- Integration section present with Called By, Requires, Spawns, Hands Off To
+- Gateway routing added to gateway-testing
+- Ready for orchestrating-bugfix integration testing
+
+**Implementation:**
+- Two-stage process: Bug Scoping (Stage 1) and Discovery (Stage 2)
+- Agent count logic: 0 (known location), 1 (single candidate), 2-5 (parallel), 0 (>5 or ask user)
+- Outputs: bug-scoping-report.json, discovery-{component}.md, candidate-locations.md
+- Integration with persisting-agent-outputs for OUTPUT_DIR
+- Handoff to debugger agent after discovery
+
+**REFACTOR Phase:**
+- Added Anti-Rationalization Guards section with common bypass attempts
+- Counters for: "obvious location", "skip Stage 1", "spawn all candidates", "skip OUTPUT_DIR", "grep is enough", "no time"
+- "Not even when" guards for urgency, simplicity, grep findings, user-provided paths
+- Final line count: 245 (under 500 limit)

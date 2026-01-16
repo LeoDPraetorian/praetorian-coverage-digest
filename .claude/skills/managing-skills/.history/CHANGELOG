@@ -1,3 +1,19 @@
+## [Date: 2026-01-15] - Update Audit Terminology to Match Instruction-Based Implementation
+
+### Changed
+- **references/patterns/phase-categorization.md** - Updated two-layer architecture terminology (2 occurrences)
+  - Line 316: "TypeScript flags CANDIDATES" → "Automated detection flags CANDIDATES"
+  - Line 380: "TypeScript flags CANDIDATES" → "Automated detection flags CANDIDATES"
+
+### Reason
+Matches terminology update in `auditing-skills/references/phase-details.md` where "Layer 1 (TypeScript)" was changed to "Layer 1 (Automated Detection)" to reflect the instruction-based audit methodology. Claude now performs pattern detection, not TypeScript code.
+
+### Related Changes
+- `auditing-skills` - Updated phase-details.md to remove defunct TypeScript audit tool architecture references
+- `auditing-skills` - Added Bash to allowed-tools for Phase 8/9/12 TypeScript validation (validating skills, not audit tool itself)
+
+---
+
 ## [Date: 2026-01-06] - Add Integration Section to SKILL Template
 
 ### Changed

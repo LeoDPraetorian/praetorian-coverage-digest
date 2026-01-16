@@ -71,9 +71,9 @@ const promptTemplate = {
 };
 ```
 
-## Integration with creating-mcp-wrappers
+## Integration with MCP Wrapper Orchestration
 
-When using the `creating-mcp-wrappers` core skill, apply these patterns in the tool implementation phase.
+When using the `orchestrating-mcp-development` workflow (via `gateway-mcp-tools`), apply these patterns in the tool implementation phase.
 
 ## Checklist
 
@@ -86,4 +86,4 @@ When using the `creating-mcp-wrappers` core skill, apply these patterns in the t
 ## Related
 
 - Parent: [optimizing-llm-api-responses](../SKILL.md)
-- See also: `creating-mcp-wrappers` (core skill)
+- See also: `orchestrating-mcp-development` (via gateway-mcp-tools)

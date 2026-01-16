@@ -1,6 +1,6 @@
 # Reviewer Subagent Prompt Template
 
-Use this template when dispatching reviewer subagents in Phase 6.
+Use this template when dispatching reviewer subagents in Phase 8.
 
 ## Two-Stage Review Process
 

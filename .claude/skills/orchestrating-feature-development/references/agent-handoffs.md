@@ -360,7 +360,7 @@ function validateHandoff(handoff: AgentHandoff): boolean {
 
 ## Related References
 
-- [Phase 4: Architecture](phase-4-architecture.md) - Architect handoffs
-- [Phase 5: Implementation](phase-5-implementation.md) - Developer handoffs
-- [Phase 8: Testing](phase-8-testing.md) - Test engineer handoffs
+- [Phase 4: Architecture](phase-5-architecture.md) - Architect handoffs
+- [Phase 5: Implementation](phase-6-implementation.md) - Developer handoffs
+- [Phase 10: Testing](phase-10-testing.md) - Test engineer handoffs
 - [Troubleshooting](troubleshooting.md) - Handling blocked handoffs
