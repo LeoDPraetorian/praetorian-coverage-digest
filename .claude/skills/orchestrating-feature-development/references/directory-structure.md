@@ -12,6 +12,7 @@
 ├── tech-debt-assessment.md    # Phase 10: tech debt analysis by leads
 ├── backend-architecture.md    # Phase 10: backend-lead output (if applicable)
 ├── implementation-log.md      # Phase 10: developer output
+├── feedback-scratchpad.md     # Tight feedback loop iteration history (Phases 6-8-10)
 ├── review.md                  # Phase 10: frontend-reviewer output
 ├── security-review.md         # Phase 10: security-reviewer output
 ├── test-plan.md               # Phase 11: test-lead test plan

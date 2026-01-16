@@ -545,7 +545,7 @@ Phase 5: Testing        → CHECKPOINT (User approves final result)
 
 - **7.1**: references/error-recovery.md or troubleshooting.md — _internal convention_
 - **7.2**: AskUserQuestion when retry limits exceeded — [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
-- **7.3**: When to abort (3+ failures, user request, critical issue), rollback procedure — [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
+- **7.3**: When to abort (3+ failures, user request, critical issue), rollback procedure — **Chariot Implementation:** [emergency-abort.md](.claude/skills/orchestrating-feature-development/references/emergency-abort.md)
 
 ### Category 8: Security & Compliance (4 patterns)
 
@@ -589,7 +589,7 @@ Phase 5: Testing        → CHECKPOINT (User approves final result)
 - **10.2**: When/why to invoke optional skills — [Agent Skills Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
 - **10.3**: Embedded skill requirements in prompt templates — [obra/superpowers](https://github.com/obra/superpowers)
 - **10.4**: Check TodoWrite for parent workflow, continue if pending — [TodoWrite Tracking](https://platform.claude.com/docs/en/agent-sdk/todo-tracking)
-- **10.5**: finishing-a-development-branch, requesting-code-review at completion — _internal skills_
+- **10.5**: finishing-a-development-branch at completion — [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow) + internal convention
 
 ### Category 11: Iteration Patterns (6 patterns)
 
@@ -615,7 +615,11 @@ Phase 5: Testing        → CHECKPOINT (User approves final result)
 
 **Existing Skill:** `iterating-to-completion` (Phase 1 complete) implements 11.1-11.4 for **intra-task** iteration.
 
-**Phase 2 Needed:** Tight Feedback Loop (11.5) for **inter-phase** iteration (Implementation→Review→Test cycle).
+**Chariot Implementation (Phase 2 COMPLETE):** Tight Feedback Loop (11.5) for **inter-phase** iteration implemented in:
+- [tight-feedback-loop.md](.claude/skills/orchestrating-feature-development/references/tight-feedback-loop.md) - Canonical implementation
+- [feedback-scratchpad-template.md](.claude/skills/orchestrating-feature-development/references/feedback-scratchpad-template.md) - Scratchpad template
+
+**Key distinction:** `iterating-to-completion` = INTRA-task (same agent); Tight Feedback Loop = INTER-phase (Implementation→Review→Test cycle across agents).
 
 ---
 
@@ -1005,6 +1009,30 @@ Patterns: 1.3, 5.4, 6.1, 6.2
 **Internal convention**
 Patterns: 2.2, 2.4, 3.2, 3.7, 4.4, 4.5, 4.7, 5.3, 7.1, 8.4, 10.5
 
+### Chariot Implementations (Canonical)
+
+**Use these as the source of truth for implementing patterns in other orchestration skills.**
+
+**[orchestrating-feature-development/references/tight-feedback-loop.md](.claude/skills/orchestrating-feature-development/references/tight-feedback-loop.md)**
+Patterns: 11.1 (Completion Promise), 11.2 (Agent Scratchpad), 11.3 (Safety Guards), 11.5 (Tight Feedback Loop), 11.6 (Error History Injection)
+- INTER-phase iteration (Implementation→Review→Test cycle)
+- Completion promise: `IMPLEMENTATION_VERIFIED`
+- Scratchpad: `{feature-dir}/feedback-scratchpad.md`
+- Guards: max_feedback_iterations (5), max_consecutive_*_failures (3)
+
+**[orchestrating-feature-development/references/emergency-abort.md](.claude/skills/orchestrating-feature-development/references/emergency-abort.md)**
+Pattern: 7.3 (Emergency Abort Protocol)
+- 5 abort triggers (user request, repeated escalations, critical security, unrecoverable error, cost/time exceeded)
+- 4 cleanup options via AskUserQuestion (keep everything, keep artifacts, rollback, full cleanup)
+- Progress.json abort_info schema
+- Resume after abort via `/feature resume {id}`
+
+**[iterating-to-completion/SKILL.md](.claude/skills/iterating-to-completion/SKILL.md)**
+Patterns: 11.1-11.4 (INTRA-task iteration)
+- Same-agent loops with completion promise
+- Guards: max_iterations (10), max_runtime (15min), consecutive_error_limit (3)
+- Different from Tight Feedback Loop (INTER-phase)
+
 ### Usage Example
 
 When an orchestrator detects a missing pattern, it can output:
@@ -1029,14 +1057,14 @@ When an orchestrator detects a missing pattern, it can output:
 
 We define **34 foundational patterns** across **11 categories** that distinguish high-quality orchestrations from ad-hoc multi-agent workflows. Implementation scores:
 
-| Orchestration                          | Score | Rank |
-| -------------------------------------- | ----- | ---- |
-| orchestrating-integration-development  | 93%   | 1    |
-| orchestrating-fingerprintx-development | 89%   | 2    |
-| orchestrating-capability-development   | 86%   | 3    |
-| orchestrating-feature-development      | 79%   | 4    |
-| orchestrating-research                 | 71%   | 5    |
-| threat-modeling-orchestrator           | 62%   | 6    |
+| Orchestration                          | Score | Rank | Notes |
+| -------------------------------------- | ----- | ---- | ----- |
+| orchestrating-integration-development  | 93%   | 1    |       |
+| **orchestrating-feature-development**  | 90    | 2    |       |
+| orchestrating-fingerprintx-development | 89%   | 3    |       |
+| orchestrating-capability-development   | 86%   | 4    |       |
+| orchestrating-research                 | 71%   | 5    |       |
+| threat-modeling-orchestrator           | 62%   | 6    | Write/Edit in allowed-tools (VIOLATION) |
 
 **Score calculation:** `(Implemented + 0.5×Partial) / Total applicable patterns`
 
@@ -1065,9 +1093,9 @@ We define **34 foundational patterns** across **11 categories** that distinguish
 | Orchestration                              | Score | Strengths                                                         | Critical Gaps                               |
 | ------------------------------------------ | ----- | ----------------------------------------------------------------- | ------------------------------------------- |
 | **orchestrating-integration-development**  | 93%   | P0 compliance, skill check+creation, conditional frontend phase   | File locking (P4)                           |
+| **orchestrating-feature-development**      | ~90%  | Most phases (12), tight feedback loop, emergency abort, complete documentation | File scope boundaries, secret scanner |
 | **orchestrating-fingerprintx-development** | 89%   | Strongest blocking gates, prerequisite checks, live validation    | foundational ref missing                    |
 | **orchestrating-capability-development**   | 86%   | Capability type matrix, work type decision point                  | Context compaction                          |
-| **orchestrating-feature-development**      | 79%   | Most phases (12), complete documentation                          | Effort scaling missing                      |
 | **orchestrating-research**                 | 71%   | Sequential agent spawning, intent expansion, three-pass synthesis | Two-stage review                            |
 | **threat-modeling-orchestrator**           | 62%   | Dynamic parallelization, session resume, multi-format output      | **Write/Edit in allowed-tools (VIOLATION)** |
 
@@ -1121,7 +1149,7 @@ These skills provide **coordination patterns** used BY orchestrations, but are n
           ▼               ▼           ▼           ▼               ▼
     ┌───────────┐  ┌──-─────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐
     │integration│  │fingerprintx│ │capability │ │  feature  │ │  research │
-    │   93%     │  │    89%     │ │    86%    │ │    79%    │ │    71%    │
+    │   93%     │  │    89%     │ │    86%    │ │   ~90%    │ │    71%    │
     └───────────┘  └─-──────────┘ └───────────┘ └───────────┘ └───────────┘
          │               │             │             │              │
          └───────────────┴─────────────┴─────────────┴──────────────┘
@@ -1140,23 +1168,23 @@ These skills provide **coordination patterns** used BY orchestrations, but are n
 
 ### P0 - Critical (Missing from all implementations)
 
-| Gap                           | Pattern   | Impact                                           | Fix                       |
-| ----------------------------- | --------- | ------------------------------------------------ | ------------------------- |
-| **Iteration Patterns**        | 11.1-11.6 | No loop-until-done pattern - key to one-shotting | Add to foundational skill |
-| **Context Compaction**        | 2.5, 5.2  | Context overflow crashes long workflows          | Add compaction protocol   |
-| **Security Patterns**         | 8.1-8.4   | Zero security guidance in toolkit                | Add security gate section |
-| **Requirements Verification** | 4.4       | Code review without requirements check           | Add pre-review phase      |
+| Gap                           | Pattern   | Impact                                           | Fix                       | Status |
+| ----------------------------- | --------- | ------------------------------------------------ | ------------------------- | ------ |
+| **Iteration Patterns**        | 11.1-11.6 | No loop-until-done pattern - key to one-shotting | Add to foundational skill | ✅ DONE (feature-dev) |
+| **Context Compaction**        | 2.5, 5.2  | Context overflow crashes long workflows          | Add compaction protocol   | ✅ DONE (feature-dev, 2026-01-16) |
+| **Security Patterns**         | 8.1-8.4   | Zero security guidance in toolkit                | Add security gate section | ❌ Still missing |
+| **Requirements Verification** | 4.4       | Code review without requirements check           | Add pre-review phase      | ✅ DONE (feature-dev Phase 7) |
 
 ### P1 - High Impact
 
-| Gap                           | Pattern | Impact                           | Fix                        |
-| ----------------------------- | ------- | -------------------------------- | -------------------------- |
-| File Scope Boundaries         | 3.5     | Parallel agents may conflict     | Add scope in prompts       |
-| Proactive Conflict Prevention | 3.6     | Only reactive detection exists   | Check overlap before spawn |
-| Git Worktrees                 | 5.1     | No isolation pattern             | Document worktree usage    |
-| Metrics Tracking              | 6.3     | No cost/token visibility         | Add to progress.json       |
-| Emergency Abort               | 7.3     | No rollback guidance             | Document abort protocol    |
-| Workflow Handoff              | 10.4    | Research orphans parent workflow | Check TodoWrite for parent |
+| Gap                           | Pattern | Impact                           | Fix                        | Status |
+| ----------------------------- | ------- | -------------------------------- | -------------------------- | ------ |
+| File Scope Boundaries         | 3.5     | Parallel agents may conflict     | Add scope in prompts       | ❌ Still missing |
+| Proactive Conflict Prevention | 3.6     | Only reactive detection exists   | Check overlap before spawn | ❌ Still missing |
+| Git Worktrees                 | 5.1     | No isolation pattern             | Document worktree usage    | ✅ DONE (feature-dev Phase 1) |
+| Metrics Tracking              | 6.3     | No cost/token visibility         | Add to progress.json       | ✅ DONE (feature-dev) |
+| Emergency Abort               | 7.3     | No rollback guidance             | Document abort protocol    | ✅ DONE (feature-dev) |
+| Workflow Handoff              | 10.4    | Research orphans parent workflow | Check TodoWrite for parent | ❌ Still missing |
 
 ### P2 - Should Have
 
@@ -1176,17 +1204,24 @@ These skills provide **coordination patterns** used BY orchestrations, but are n
 
 ```
 ┌───────────────────────────────────────────────────────────────────┐
-│  /feature orchestration                                           │
+│  /feature orchestration (12 phases as of 2026-01-16)              │
 │                                                                   │
-│  Phase 1 ─→ skill: "brainstorming"  ✓ ENFORCED                    │
-│  Phase 2 ─→ skill: "writing-plans"  ✓ ENFORCED                    │
-│  Phase 3 ─→ Task(frontend-architect) ⚠ HOPE agent uses skills     │
-│  Phase 4 ─→ Task(frontend-developer) ⚠ HOPE agent uses skills    │
-│  Phase 5 ─→ Task(test-engineers)     ⚠ HOPE agent uses skills    │
+│  Phase 1  ─→ Setup (worktree + output dir)      ✓ ENFORCED        │
+│  Phase 2  ─→ skill: "brainstorming"             ✓ ENFORCED        │
+│  Phase 3  ─→ skill: "discovering-codebases..."  ✓ ENFORCED        │
+│  Phase 4  ─→ skill: "writing-plans"             ✓ ENFORCED        │
+│  Phase 5  ─→ Task(lead + security-lead)         ✓ Skills in prompt│
+│  Phase 6  ─→ Task(frontend-developer)           ✓ Skills in prompt│
+│  Phase 7  ─→ Plan Completion Review             ✓ BUILT-IN        │
+│  Phase 8  ─→ Code Review (two-stage)            ✓ BUILT-IN        │
+│  Phase 9  ─→ Task(test-lead)                    ✓ Skills in prompt│
+│  Phase 10 ─→ Task(testers, parallel)            ✓ Skills in prompt│
+│  Phase 11 ─→ Test Validation                    ✓ BUILT-IN        │
+│  Phase 12 ─→ skill: "finishing-a-dev-branch"    ✓ ENFORCED        │
 │                                                                   │
-│  ❌ No Phase 6: Code Review                                       │
-│  ❌ No Phase 7: Security Review (for sensitive features)          │
-│  ❌ No Phase 8: PR/Branch Completion                              │
+│  ✓ Code Review: Phase 8 (two-stage gated)                         │
+│  ✓ Security Review: Phase 5 (security-lead in parallel)           │
+│  ✓ PR/Branch Completion: Phase 12 (finishing-a-development-branch)│
 └───────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1204,14 +1239,14 @@ These skills provide **coordination patterns** used BY orchestrations, but are n
 
 ### Orphaned Skills by Category
 
-#### Workflow Skills (Completely Disconnected)
+#### Workflow Skills (Status as of 2026-01-16)
 
-| Skill                            | Purpose                        | Should Be Used In           |
-| -------------------------------- | ------------------------------ | --------------------------- |
-| `code-review-checklist`          | Comprehensive review checklist | After Phase 5 (new Phase 6) |
-| `finishing-a-development-branch` | Branch cleanup, PR prep        | After all phases complete   |
-| `requesting-code-review`         | PR creation best practices     | Feature completion          |
-| `github-workflow-automation`     | PR/issue automation            | Feature completion          |
+| Skill                            | Purpose                        | Status                                         |
+| -------------------------------- | ------------------------------ | ---------------------------------------------- |
+| `finishing-a-development-branch` | Branch cleanup, PR prep        | ✅ CONNECTED - Phase 12 of feature-dev         |
+| `code-review-checklist`          | Comprehensive review checklist | ❌ Orphaned - could enhance Phase 8            |
+| `requesting-code-review`         | PR creation best practices     | ❌ Orphaned - could enhance Phase 12           |
+| `github-workflow-automation`     | PR/issue automation            | ❌ Orphaned - could enhance Phase 12           |
 
 #### Security Skills (Never Mandated)
 
@@ -1246,27 +1281,30 @@ These skills provide **coordination patterns** used BY orchestrations, but are n
 
 **Target:** Bring `orchestrating-multi-agent-workflows` from 38% to 80%+
 
-| Action                                | Patterns Addressed | Effort    |
-| ------------------------------------- | ------------------ | --------- |
-| Add Iteration Patterns section        | 11.1-11.6          | 2-3 hours |
-| Add Context Compaction section        | 2.5, 5.2           | 1-2 hours |
-| Add Security Patterns section         | 8.1-8.4            | 2 hours   |
-| Add Requirements Verification pattern | 4.4                | 1 hour    |
-| Add File Scope Boundaries pattern     | 3.5, 3.6           | 1 hour    |
-| Add Git Worktrees pattern             | 5.1                | 30 min    |
-| Add Metrics Tracking pattern          | 6.3                | 1 hour    |
-| Add Emergency Abort pattern           | 7.3                | 1 hour    |
-| Add standard documentation formats    | 2.2, 3.2, 9.1, 9.3 | 2 hours   |
+| Action                                | Patterns Addressed | Effort    | Status                    |
+| ------------------------------------- | ------------------ | --------- | ------------------------- |
+| Add Iteration Patterns section        | 11.1-11.6          | 2-3 hours | ✅ DONE (feature-dev)     |
+| Add Context Compaction section        | 2.5, 5.2           | 1-2 hours | ✅ DONE (feature-dev 2026-01-16) |
+| Add Security Patterns section         | 8.1-8.4            | 2 hours   | ❌ Pending                |
+| Add Requirements Verification pattern | 4.4                | 1 hour    | ✅ DONE (feature-dev Phase 7) |
+| Add File Scope Boundaries pattern     | 3.5, 3.6           | 1 hour    | ❌ Pending                |
+| Add Git Worktrees pattern             | 5.1                | 30 min    | ✅ DONE (feature-dev Phase 1) |
+| Add Metrics Tracking pattern          | 6.3                | 1 hour    | ✅ DONE (feature-dev)     |
+| Add Emergency Abort pattern           | 7.3                | 1 hour    | ✅ DONE (feature-dev)     |
+| Add standard documentation formats    | 2.2, 3.2, 9.1, 9.3 | 2 hours   | ✅ DONE (feature-dev Integration) |
 
 ### Phase 2: Update Implementations (P1)
 
 After foundational skill is updated:
 
 1. **threat-modeling-orchestrator**: Remove Write/Edit from allowed-tools (CRITICAL)
-2. **orchestrating-feature-development**: Add Phase 0 effort scaling
-3. **All skills**: Add orchestrating-multi-agent-workflows reference if missing
-4. **All skills**: Add context compaction checkpoints
-5. **Add Tight Feedback Loop**: Wrap implementation phases in feedback loop
+2. ~~**orchestrating-feature-development**: Add tight feedback loop~~ ✅ **DONE** (2026-01-16)
+3. ~~**orchestrating-feature-development**: Add emergency abort protocol~~ ✅ **DONE** (2026-01-16)
+4. ~~**orchestrating-feature-development**: Fix allowed-tools violation~~ ✅ **DONE** (2026-01-16)
+5. ~~**orchestrating-feature-development**: Add compaction enforcement~~ ✅ **DONE** (2026-01-16)
+6. **All skills**: Add orchestrating-multi-agent-workflows reference if missing
+7. **Apply context compaction enforcement to other orchestrations** (capability, fingerprintx, integration, research)
+8. **Apply tight feedback loop to other orchestrations** (capability, fingerprintx, integration)
 
 ### Phase 3: Maintain Compliance (P2)
 
@@ -1293,6 +1331,9 @@ After foundational skill is updated:
 - [ ] Add `secret-scanner` to completion workflow
 - [ ] Add `finishing-a-development-branch` at workflow end
 - [x] Add `skills_invoked` to agent handoff schema ✓ DONE
+- [x] Add Tight Feedback Loop to orchestrating-feature-development ✓ DONE (2026-01-16)
+- [x] Add Emergency Abort Protocol to orchestrating-feature-development ✓ DONE (2026-01-16)
+- [x] Fix allowed-tools violation in orchestrating-feature-development ✓ DONE (2026-01-16)
 
 #### Priority 2: High Impact
 

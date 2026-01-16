@@ -250,6 +250,7 @@ git worktree remove <worktree-path>
 
 **Called by:**
 
+- **orchestrating-feature-development** (Phase 12) - After all phases complete
 - **developing-with-subagents** (Step 7) - After all tasks complete
 - **executing-plans** (Step 5) - After all batches complete
 

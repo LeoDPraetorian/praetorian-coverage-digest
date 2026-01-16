@@ -358,8 +358,100 @@ Can frontend work with mocked backend?
 
 ---
 
+## Abort Scenarios
+
+### User Wants to Stop Mid-Feature
+
+**Symptom**: User says 'stop', 'cancel', 'abort', or 'abandon'
+
+**Solution**:
+
+1. Acknowledge the abort request immediately
+2. Follow Emergency Abort Protocol (see [emergency-abort.md](emergency-abort.md))
+3. Present cleanup options via AskUserQuestion
+4. Execute chosen cleanup (keep everything, keep artifacts only, rollback, full cleanup)
+5. Report final state with resume instructions (if applicable)
+
+**Example**:
+
+```
+User: "Let's abort this, I want to rethink the approach"
+
+1. Stop all work immediately
+2. Update progress.json with abort_info
+3. Present cleanup options to user
+4. User selects "Keep everything"
+5. Report: "Feature aborted. Resume with /feature resume {id}"
+```
+
+---
+
+### Feature Seems Stuck in a Loop
+
+**Symptom**: Same errors repeating across iterations, 3+ escalations without progress, agent returning same blocked reason
+
+**Solution**:
+
+1. Trigger abort protocol automatically (after 3+ escalations)
+2. Recommend 'Rollback changes' cleanup option
+3. Suggest reviewing design/plan before resuming
+4. Present abort option to user
+
+**Signs of stuck loop**:
+- Same test failures repeating (check feedback-scratchpad.md)
+- Agent blocked on same issue multiple iterations
+- No forward progress in 3+ attempts
+- User receiving same escalation message
+
+**Example**:
+
+```
+Escalation #3: Code review failing on same issue
+
+→ Trigger: "This is the 3rd escalation in implementation. The feature may be stuck."
+→ Options: Continue trying | Skip phase | Abort feature
+→ Recommend: Abort, review architecture before resuming
+```
+
+---
+
+### Accidentally Aborted, Want to Continue
+
+**Symptom**: User aborted feature but wants to resume
+
+**Solution**:
+
+**If 'Keep everything' was chosen:**
+
+```bash
+/feature resume {feature-id}
+
+→ Reads progress.json (status: 'aborted')
+→ Shows: 'Feature was aborted at Phase {N}. Phases 1-{N-1} complete.'
+→ Asks: 'Resume from Phase {N}?'
+→ If yes: Changes status to 'in_progress', continues
+```
+
+**If 'Keep artifacts' was chosen:**
+- Can restart from Phase 5 (Architecture) using preserved artifacts
+- Design and plan still available in feature directory
+- Code changes lost (worktree deleted)
+
+**If 'Rollback' was chosen:**
+- Worktree reset to pre-feature commit (clean state)
+- Feature directory preserved
+- Can resume with fresh start
+
+**If 'Full cleanup' was chosen:**
+- Cannot recover
+- All data deleted (worktree + feature directory)
+- Must start fresh with `/feature`
+
+---
+
 ## Related References
 
+- [Emergency Abort Protocol](emergency-abort.md) - Abort workflow and cleanup options
 - [Progress Persistence](progress-persistence.md) - Resume workflow
 - [Agent Handoffs](agent-handoffs.md) - Handling blocked status
 - [Phase 5: Implementation](phase-6-implementation.md) - Build failures

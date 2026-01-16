@@ -94,6 +94,15 @@ At compaction checkpoints, the orchestrator should:
 2. Follow the Context Compaction Protocol section
 3. Use the compaction checklist before proceeding
 
+### Enforcement
+
+Compaction is enforced via blocking gates in the main skill. You cannot proceed past phases 3, 6, or 9 without:
+1. Completing the compaction protocol
+2. Verifying all checklist items
+3. OR getting explicit user approval to skip (with risk disclosure)
+
+This prevents the common failure mode where compaction is 'documented but not done.'
+
 ## Related References
 
 - [Phase 5: Implementation](phase-6-implementation.md)

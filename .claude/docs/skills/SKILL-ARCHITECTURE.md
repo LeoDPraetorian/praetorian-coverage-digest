@@ -541,15 +541,18 @@ Skills form explicit chains with clear handoff points:
      orchestrating-feature-development (skill)
              REQUIRED: persisting-agent-outputs
 
-             Phase 1: brainstorming
-             Phase 2: Discovery (Explore agents)
-             Phase 3: writing-plans
-             Phase 4: Architecture (lead agents)
-             Phase 5: Implementation (developer agents)
-             Phase 6: Review (reviewer agents)
-             Phase 7-9: Testing (test-lead + testers)
-
-             Phase 10: finishing-a-development-branch
+             Phase 1:  Setup
+             Phase 2:  Brainstorming
+             Phase 3:  Discovery (Explore agents)
+             Phase 4:  Planning (writing-plans)
+             Phase 5:  Architecture (lead agents)
+             Phase 6:  Implementation (developer agents)
+             Phase 7:  Plan Completion Review
+             Phase 8:  Code Review (reviewer agents)
+             Phase 9:  Test Planning (test-lead)
+             Phase 10: Testing (testers)
+             Phase 11: Test Validation (test-lead)
+             Phase 12: Completion (finishing-a-development-branch)
 ```
 
 ## Token Budget

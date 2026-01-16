@@ -30,3 +30,26 @@ Example: Agent updates 47 files instead of 118, tests pass, agent proceeds to me
 ### Testing
 RED: Scenario where agent proceeds to Step 2 with passing tests but incomplete requirements
 GREEN: Agent now stops at Step 1b, reports incomplete requirements, blocks Step 2
+
+## [Date: 2026-01-16] - Bidirectional Reference Update
+
+### Changed - Integration Section
+
+Updated "Called by" section to include orchestrating-feature-development as a caller.
+
+#### What Changed
+
+**SKILL.md Updates:**
+- Integration section "Called by" (lines 251-255) now lists three callers:
+  - orchestrating-feature-development (Phase 12) - After all phases complete [NEW]
+  - developing-with-subagents (Step 7) - After all tasks complete
+  - executing-plans (Step 5) - After all batches complete
+
+### Why
+- Maintains bidirectional references between skills
+- Documents all workflows that invoke this skill
+- Helps with skill dependency mapping and maintenance
+
+### Impact
+- No behavior change, documentation only
+- Improves skill discoverability and relationship mapping

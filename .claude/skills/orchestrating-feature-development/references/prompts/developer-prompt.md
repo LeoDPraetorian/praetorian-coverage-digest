@@ -35,15 +35,70 @@ OUTPUT_DIRECTORY: [FEATURE_DIR]
 
 Write your implementation log to: [FEATURE_DIR]/implementation-log.md
 
+## Prior Iteration Context (if in feedback loop)
+
+**READ FIRST if exists:** [FEATURE_DIR]/feedback-scratchpad.md
+
+If this file exists, you are in a feedback loop iteration. The file contains:
+- What was implemented in prior iterations
+- Review issues that must be addressed
+- Test failures that must be fixed
+
+### Issues to Address This Iteration:
+[INJECT_REVIEW_ISSUES_PLACEHOLDER]
+
+### Test Failures to Fix:
+[INJECT_TEST_FAILURES_PLACEHOLDER]
+
+**CRITICAL:** You MUST address the specific issues listed above. Do not ignore them or make the same mistakes.
+
 ## MANDATORY SKILLS (invoke ALL before completing)
 
-You MUST use these skills during this task:
+You MUST invoke these skills during this task. These come from your agent definition Step 1 + Step 2:
 
-1. **developing-with-tdd** - Write test first, verify it fails, then implement
-2. **verifying-before-completion** - Run tests and verify before claiming done
-3. **persisting-agent-outputs** - Use for output file format and metadata
-4. **adhering-to-dry** - Don't duplicate existing code
-5. **adhering-to-yagni** - Only implement what's specified, nothing extra
+### Step 1: Always Invoke First (Non-Negotiable)
+
+1. **using-skills** - Compliance rules, 1% threshold, skill discovery protocol
+2. **discovering-reusable-code** - Exhaustively search for reusable patterns before writing new code
+3. **semantic-code-operations** - Core code tool (Serena MCP) for semantic search and editing
+4. **calibrating-time-estimates** - Prevents "no time to read skills" rationalization
+5. **enforcing-evidence-based-analysis** - **CRITICAL: Prevents hallucinations** - read source files before making claims
+6. **gateway-frontend** or **gateway-backend** - Routes to mandatory + task-specific library skills for your domain
+7. **persisting-agent-outputs** - Defines output directory, file naming, MANIFEST.yaml format
+8. **developing-with-tdd** - Write test first, watch it fail, then implement
+9. **verifying-before-completion** - Ensures verification before claiming work is done
+
+### Step 2: Task-Specific Skills (Conditional - Invoke Based on Context)
+
+10. **executing-plans** - When implementing an architect's plan with multiple tasks
+11. **adhering-to-dry** - When there are code duplication concerns or checking existing patterns
+12. **adhering-to-yagni** - When there's scope creep risk or temptation to add extra features
+13. **debugging-systematically** - When investigating bugs, errors, or unexpected behavior
+14. **tracing-root-causes** - When bug is deep in call stack and need to trace backward
+15. **debugging-strategies** - When dealing with performance, race conditions, flaky tests, memory issues
+16. **using-todowrite** - When task requires multiple steps (≥2 steps) to complete
+
+**COMPLIANCE**: Document all invoked skills in the output metadata `skills_invoked` array. The orchestrator will verify this list matches the mandatory skills above.
+
+### Step 3: Load Library Skills from Gateway
+
+After invoking the gateway in Step 1, follow its instructions:
+
+**The gateway provides:**
+1. **Mandatory library skills for your role** - Read ALL skills the gateway lists as mandatory for Developers
+2. **Task-specific routing** - Use routing tables to find relevant library skills for this specific task
+3. **Implementation patterns and best practices** - Domain-specific guidance (React patterns, Go idioms, etc.)
+
+**How to load library skills:**
+```
+Read(".claude/skill-library/path/from/gateway/SKILL.md")
+```
+
+**CRITICAL:**
+- Library skill paths come FROM the gateway—do NOT hardcode them
+- You MUST read the mandatory library skills the gateway specifies for your role
+- After invoking persisting-agent-outputs, follow its discovery protocol to find/create the feature directory
+- YOU MUST WRITE YOUR OUTPUT TO A FILE (not just respond with text)
 
 ## STEP 0: Clarification (MANDATORY)
 
@@ -360,11 +415,22 @@ After completing your work, include this metadata block:
   "output_type": "implementation",
   "feature_directory": "[FEATURE_DIR]",
   "skills_invoked": [
+    "using-skills",
+    "discovering-reusable-code",
+    "semantic-code-operations",
+    "calibrating-time-estimates",
+    "enforcing-evidence-based-analysis",
+    "gateway-frontend",
+    "persisting-agent-outputs",
     "developing-with-tdd",
     "verifying-before-completion",
-    "persisting-agent-outputs",
+    "executing-plans",
     "adhering-to-dry",
-    "adhering-to-yagni"
+    "adhering-to-yagni",
+    "debugging-systematically",
+    "tracing-root-causes",
+    "debugging-strategies",
+    "using-todowrite"
   ],
   "status": "complete",
   "files_created": ["list of new files"],

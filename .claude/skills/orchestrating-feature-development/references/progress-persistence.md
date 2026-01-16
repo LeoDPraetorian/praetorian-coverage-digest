@@ -90,10 +90,52 @@ Enable long-running feature development by:
     "progress": ".claude/.output/features/user-dashboard_20241213_103000/progress.json"
   },
 
+  "worktree": {
+    "path": ".worktrees/user-dashboard",
+    "pre_feature_commit": "a1b2c3d4e5f6",
+    "created_at": "2024-12-13T10:30:00Z"
+  },
+
   "metadata": {
     "total_duration_minutes": 90,
     "agents_spawned": 2,
     "human_checkpoints": 2
+  },
+
+  "abort_info": {
+    "aborted": false,
+    "abort_reason": null,
+    "abort_phase": null,
+    "abort_timestamp": null,
+    "cleanup_choice": null,
+    "cleanup_performed": false,
+    "can_resume": false,
+    "pre_abort_commit": null
+  },
+
+  "feedback_loop": {
+    "enabled": true,
+    "current_iteration": 2,
+    "max_iterations": 5,
+    "status": "in_progress | IMPLEMENTATION_VERIFIED | escalated",
+    "consecutive_review_failures": 0,
+    "consecutive_test_failures": 1,
+    "iterations": [
+      {
+        "number": 1,
+        "implementation": "Created FilterDropdown component",
+        "review_result": "PASS",
+        "test_result": "FAIL",
+        "test_failures": ["FilterDropdown.test.tsx:45 - missing mock"]
+      },
+      {
+        "number": 2,
+        "implementation": "Fixed test mock issue",
+        "review_result": "PASS",
+        "test_result": "PASS",
+        "status": "IMPLEMENTATION_VERIFIED"
+      }
+    ]
   },
 
   "metrics": {
@@ -146,6 +188,41 @@ Enable long-running feature development by:
   }
 }
 ```
+
+### Abort Info Fields
+
+When feature development is aborted, the `abort_info` object captures the abort context:
+
+| Field | Type | Description | Values |
+|-------|------|-------------|--------|
+| `aborted` | boolean | Whether feature was aborted | `true` / `false` |
+| `abort_reason` | string \| null | Why abort was triggered | `user_request`, `repeated_escalations`, `critical_security`, `unrecoverable_error`, `cost_exceeded` |
+| `abort_phase` | string \| null | Which phase was in progress | Phase name (e.g., `"implementation"`) |
+| `abort_timestamp` | string \| null | When abort occurred | ISO 8601 timestamp |
+| `cleanup_choice` | string \| null | User's cleanup decision | `keep_everything`, `keep_artifacts`, `rollback`, `full_cleanup` |
+| `cleanup_performed` | boolean | Whether cleanup executed | `true` / `false` |
+| `can_resume` | boolean | Whether feature can be resumed | `true` / `false` |
+| `pre_abort_commit` | string \| null | Git commit before abort (for rollback) | Git SHA hash |
+
+**Example (aborted feature):**
+
+```json
+{
+  "status": "aborted",
+  "abort_info": {
+    "aborted": true,
+    "abort_reason": "repeated_escalations",
+    "abort_phase": "implementation",
+    "abort_timestamp": "2026-01-16T15:30:00Z",
+    "cleanup_choice": "keep_everything",
+    "cleanup_performed": true,
+    "can_resume": true,
+    "pre_abort_commit": "a1b2c3d4e5f6"
+  }
+}
+```
+
+See [Emergency Abort Protocol](emergency-abort.md) for complete abort workflow details.
 
 ## Writing Progress
 
@@ -259,6 +336,7 @@ FEATURE_ID="${FEATURE_SLUG}_${TIMESTAMP}"
 | `complete`    | Successfully finished                        |
 | `blocked`     | Waiting for user input or blocker resolution |
 | `failed`      | Encountered unrecoverable error              |
+| `aborted`     | User or system triggered abort protocol      |
 
 ## Resume Workflow
 

@@ -1,5 +1,10 @@
 # Phase 10: Testing
 
+> **Note:** Phase 10 is the final gate in the Tight Feedback Loop. If tests
+> fail, loop returns to Phase 6 with test failures in scratchpad. Only when
+> ALL_TESTS_PASSING does the loop exit with IMPLEMENTATION_VERIFIED.
+> See [Tight Feedback Loop (Phases 6-8-10)](tight-feedback-loop.md).
+
 Create comprehensive tests by spawning test agents in parallel for all test modes (unit, integration, E2E). Testers follow the test plan created in Phase 11.
 
 ## Purpose

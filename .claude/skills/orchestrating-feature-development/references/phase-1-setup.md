@@ -58,7 +58,18 @@ All phase outputs go here:
 - architecture.md (Phase 5)
 - etc.
 
-## Step 3: Initialize Progress File
+## Step 3: Record Starting Point (for potential rollback)
+
+Before any changes, record the current commit in the worktree for potential rollback during abort:
+
+```bash
+cd .worktrees/{feature-name}
+PRE_FEATURE_COMMIT=$(git rev-parse HEAD)
+```
+
+This commit SHA will be stored in progress.json to enable the "Rollback changes" cleanup option if the feature is aborted. See [Emergency Abort Protocol](emergency-abort.md) for details.
+
+## Step 4: Initialize Progress File
 
 Create progress.json for cross-session persistence:
 
@@ -66,10 +77,14 @@ Create progress.json for cross-session persistence:
 {
   "feature_id": "{feature-id}",
   "feature_name": "{Feature Name}",
-  "worktree_path": ".worktrees/{feature-name}",
   "created": "{timestamp}",
   "current_phase": "setup",
   "status": "in_progress",
+  "worktree": {
+    "path": ".worktrees/{feature-name}",
+    "pre_feature_commit": "{commit-sha}",
+    "created_at": "{timestamp}"
+  },
   "phases": {
     "setup": { "status": "complete" },
     "brainstorming": { "status": "pending" },

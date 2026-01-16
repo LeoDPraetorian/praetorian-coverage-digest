@@ -1,5 +1,9 @@
 # Phase 6: Implementation
 
+> **Note:** Phase 6 operates within the Tight Feedback Loop. If implementation
+> fails review (Phase 8) or tests (Phase 10), the loop returns here with
+> scratchpad context. See [Tight Feedback Loop (Phases 6-8-10)](tight-feedback-loop.md) in main SKILL.md.
+
 Execute the implementation plan by spawning developer agents with architecture context.
 
 ## Purpose

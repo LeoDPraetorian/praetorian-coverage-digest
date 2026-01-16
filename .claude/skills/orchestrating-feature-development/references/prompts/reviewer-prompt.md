@@ -104,6 +104,50 @@ For EACH requirement in the plan:
 
 OUTPUT_DIRECTORY: [FEATURE_DIR]
 
+## MANDATORY SKILLS (invoke ALL before completing)
+
+You MUST invoke these skills during this task. These come from your agent definition Step 1 + Step 2:
+
+### Step 1: Always Invoke First (Non-Negotiable)
+
+1. **using-skills** - Compliance rules, 1% threshold, skill discovery protocol
+2. **discovering-reusable-code** - When reviewing new code, search for reusable patterns that should have been used
+3. **semantic-code-operations** - Core code tool (Serena MCP) for semantic search and editing
+4. **calibrating-time-estimates** - Prevents "no time to read skills" rationalization
+5. **enforcing-evidence-based-analysis** - **CRITICAL: Prevents hallucinations** - read actual code, don't trust summaries
+6. **gateway-frontend** or **gateway-backend** - Routes to mandatory + task-specific library skills for your domain
+7. **persisting-agent-outputs** - Defines output directory, file naming, MANIFEST.yaml format
+8. **verifying-before-completion** - Ensures verification before claiming work is done
+
+### Step 2: Task-Specific Skills (Conditional - Invoke Based on Context)
+
+9. **adhering-to-dry** - When reviewing for code duplication concerns or flagging duplication
+10. **adhering-to-yagni** - When identifying unrequested features and scope creep during review
+11. **debugging-systematically** - When investigating issues or performing root cause analysis during review
+12. **using-todowrite** - When review requires multiple steps (≥2 steps) to complete
+
+**COMPLIANCE**: Document all invoked skills in the output metadata `skills_invoked` array. The orchestrator will verify this list matches the mandatory skills above.
+
+### Step 3: Load Library Skills from Gateway
+
+After invoking the gateway in Step 1, follow its instructions:
+
+**The gateway provides:**
+1. **Mandatory library skills for your role** - Read ALL skills the gateway lists as mandatory for Reviewers
+2. **Task-specific routing** - Use routing tables to find relevant library skills for this specific review
+3. **Review patterns and checklists** - Quality gates and review methodology
+
+**How to load library skills:**
+```
+Read(".claude/skill-library/path/from/gateway/SKILL.md")
+```
+
+**CRITICAL:**
+- Library skill paths come FROM the gateway—do NOT hardcode them
+- You MUST read the mandatory library skills the gateway specifies for your role
+- After invoking persisting-agent-outputs, follow its discovery protocol to find/create the feature directory
+- YOU MUST WRITE YOUR OUTPUT TO A FILE (not just respond with text)
+
 ## MANDATORY CHECK
 
 For EACH requirement in the plan:
@@ -246,7 +290,20 @@ One requirement at a time. No batching. No shortcuts.
   "agent": "frontend-reviewer",
   "output_type": "spec-compliance-review",
   "feature_directory": "[FEATURE_DIR]",
-  "skills_invoked": ["persisting-agent-outputs"],
+  "skills_invoked": [
+    "using-skills",
+    "discovering-reusable-code",
+    "semantic-code-operations",
+    "calibrating-time-estimates",
+    "enforcing-evidence-based-analysis",
+    "gateway-frontend",
+    "persisting-agent-outputs",
+    "verifying-before-completion",
+    "adhering-to-dry",
+    "adhering-to-yagni",
+    "debugging-systematically",
+    "using-todowrite"
+  ],
   "status": "complete",
   "verdict": "SPEC_COMPLIANT|NOT_COMPLIANT",
   "issues_found": [],
@@ -397,6 +454,50 @@ OUTPUT_DIRECTORY: [FEATURE_DIR]
 
 Write your review to: [FEATURE_DIR]/review.md
 
+## MANDATORY SKILLS (invoke ALL before completing)
+
+You MUST invoke these skills during this task. These come from your agent definition Step 1 + Step 2:
+
+### Step 1: Always Invoke First (Non-Negotiable)
+
+1. **using-skills** - Compliance rules, 1% threshold, skill discovery protocol
+2. **discovering-reusable-code** - When reviewing new code, search for reusable patterns that should have been used
+3. **semantic-code-operations** - Core code tool (Serena MCP) for semantic search and editing
+4. **calibrating-time-estimates** - Prevents "no time to read skills" rationalization
+5. **enforcing-evidence-based-analysis** - **CRITICAL: Prevents hallucinations** - read actual code, don't trust summaries
+6. **gateway-frontend** or **gateway-backend** - Routes to mandatory + task-specific library skills for your domain
+7. **persisting-agent-outputs** - Defines output directory, file naming, MANIFEST.yaml format
+8. **verifying-before-completion** - Ensures verification before claiming work is done
+
+### Step 2: Task-Specific Skills (Conditional - Invoke Based on Context)
+
+9. **adhering-to-dry** - When reviewing for code duplication concerns or flagging duplication
+10. **adhering-to-yagni** - When identifying unrequested features and scope creep during review
+11. **debugging-systematically** - When investigating issues or performing root cause analysis during review
+12. **using-todowrite** - When review requires multiple steps (≥2 steps) to complete
+
+**COMPLIANCE**: Document all invoked skills in the output metadata `skills_invoked` array. The orchestrator will verify this list matches the mandatory skills above.
+
+### Step 3: Load Library Skills from Gateway
+
+After invoking the gateway in Step 1, follow its instructions:
+
+**The gateway provides:**
+1. **Mandatory library skills for your role** - Read ALL skills the gateway lists as mandatory for Reviewers
+2. **Task-specific routing** - Use routing tables to find relevant library skills for this specific review
+3. **Review patterns and checklists** - Quality gates and review methodology
+
+**How to load library skills:**
+```
+Read(".claude/skill-library/path/from/gateway/SKILL.md")
+```
+
+**CRITICAL:**
+- Library skill paths come FROM the gateway—do NOT hardcode them
+- You MUST read the mandatory library skills the gateway specifies for your role
+- After invoking persisting-agent-outputs, follow its discovery protocol to find/create the feature directory
+- YOU MUST WRITE YOUR OUTPUT TO A FILE (not just respond with text)
+
 ## Issue Categories
 
 When reporting issues, categorize as:
@@ -443,7 +544,20 @@ When reporting issues, categorize as:
   "agent": "frontend-reviewer",
   "output_type": "code-quality-review",
   "feature_directory": "[FEATURE_DIR]",
-  "skills_invoked": ["persisting-agent-outputs"],
+  "skills_invoked": [
+    "using-skills",
+    "discovering-reusable-code",
+    "semantic-code-operations",
+    "calibrating-time-estimates",
+    "enforcing-evidence-based-analysis",
+    "gateway-frontend",
+    "persisting-agent-outputs",
+    "verifying-before-completion",
+    "adhering-to-dry",
+    "adhering-to-yagni",
+    "debugging-systematically",
+    "using-todowrite"
+  ],
   "status": "complete",
   "verdict": "APPROVED|APPROVED_WITH_NOTES|CHANGES_REQUESTED",
   "critical_issues": 0,

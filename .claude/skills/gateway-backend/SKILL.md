@@ -52,7 +52,6 @@ This gateway implements 3-tier loading:
 | "Burp" / "DAST" / "GraphQL scan"                                                                     | → `burp-integration`                     |
 | "Cognito" / "user pool" / "identity"                                                                 | → `aws-cognito`                          |
 | "error" / "wrapping" / "context"                                                                     | → `error-handling-patterns`              |
-| "complexity" / "cyclomatic" / "refactor"                                                             | → `analyzing-cyclomatic-complexity`      |
 | "Neo4j" / "Cypher" / "graph"                                                                         | → `querying-neo4j-with-cypher`           |
 | "cloud" / "multi-region" / "HA"                                                                      | → `cloud-advanced-patterns`              |
 | "cost" / "optimization" / "budget"                                                                   | → `cloud-cost-optimization`              |
@@ -104,10 +103,9 @@ This gateway implements 3-tier loading:
 
 ### Error Handling & Quality
 
-| Skill                   | Path                                                                         | Triggers                         |
-| ----------------------- | ---------------------------------------------------------------------------- | -------------------------------- |
-| Error Handling Patterns | `.claude/skill-library/development/error-handling-patterns/SKILL.md`         | error, wrapping, context         |
-| Cyclomatic Complexity   | `.claude/skill-library/development/analyzing-cyclomatic-complexity/SKILL.md` | complexity, cyclomatic, refactor |
+| Skill                   | Path                                                                 | Triggers                 |
+| ----------------------- | -------------------------------------------------------------------- | ------------------------ |
+| Error Handling Patterns | `.claude/skill-library/development/error-handling-patterns/SKILL.md` | error, wrapping, context |
 
 ### Database & Persistence
 

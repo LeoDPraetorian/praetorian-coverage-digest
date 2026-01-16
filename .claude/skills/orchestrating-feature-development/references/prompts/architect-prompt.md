@@ -43,11 +43,49 @@ Write your output to: [FEATURE_DIR]/architecture.md
 
 ## MANDATORY SKILLS (invoke ALL before completing)
 
-You MUST use these skills during this task:
+You MUST invoke these skills during this task. These come from your agent definition Step 1 + Step 2:
 
-1. **persisting-agent-outputs** - Use for output file format and metadata
-2. **adhering-to-dry** - Ensure architecture prevents duplication
-3. **adhering-to-yagni** - Design only what's needed, no speculative features
+### Step 1: Always Invoke First (Non-Negotiable)
+
+1. **using-skills** - Compliance rules, 1% threshold, skill discovery protocol
+2. **discovering-reusable-code** - Exhaustively search for reusable patterns before proposing new code
+3. **semantic-code-operations** - Core code tool (Serena MCP) for semantic search and editing
+4. **calibrating-time-estimates** - Prevents "no time to read skills" rationalization
+5. **enforcing-evidence-based-analysis** - **CRITICAL: Prevents hallucinations** - read source files before making claims
+6. **gateway-frontend** - Routes to mandatory + task-specific library skills for your role
+7. **persisting-agent-outputs** - Defines output directory, file naming, MANIFEST.yaml format
+8. **brainstorming** - Explores alternatives rather than jumping to first solution
+9. **writing-plans** - Documents architectural decisions and rationale
+10. **verifying-before-completion** - Ensures verification before claiming work is done
+
+### Step 2: Task-Specific Skills (Conditional - Invoke Based on Context)
+
+11. **adhering-to-dry** - When reviewing for code duplication concerns
+12. **adhering-to-yagni** - When there's scope creep risk or adding unrequested features
+13. **debugging-systematically** - When investigating architectural issues or analyzing existing code problems
+14. **using-todowrite** - When task requires multiple steps (≥2 steps) to complete
+
+**COMPLIANCE**: Document all invoked skills in the output metadata `skills_invoked` array. The orchestrator will verify this list matches the mandatory skills above.
+
+### Step 3: Load Library Skills from Gateway
+
+After invoking the gateway in Step 1, follow its instructions:
+
+**The gateway provides:**
+1. **Mandatory library skills for your role** - Read ALL skills the gateway lists as mandatory for Architects
+2. **Task-specific routing** - Use routing tables to find relevant library skills for this specific task
+3. **Architecture and decision patterns** - Design guidance and trade-off frameworks
+
+**How to load library skills:**
+```
+Read(".claude/skill-library/path/from/gateway/SKILL.md")
+```
+
+**CRITICAL:**
+- Library skill paths come FROM the gateway—do NOT hardcode them
+- You MUST read the mandatory library skills the gateway specifies for your role
+- After invoking persisting-agent-outputs, follow its discovery protocol to find/create the feature directory
+- YOU MUST WRITE YOUR OUTPUT TO A FILE (not just respond with text)
 
 ## Your Job
 
@@ -225,7 +263,22 @@ After completing your work, include this metadata block:
   "agent": "frontend-lead",
   "output_type": "architecture",
   "feature_directory": "[FEATURE_DIR]",
-  "skills_invoked": ["persisting-agent-outputs", "adhering-to-dry", "adhering-to-yagni"],
+  "skills_invoked": [
+    "using-skills",
+    "discovering-reusable-code",
+    "semantic-code-operations",
+    "calibrating-time-estimates",
+    "enforcing-evidence-based-analysis",
+    "gateway-frontend",
+    "persisting-agent-outputs",
+    "brainstorming",
+    "writing-plans",
+    "verifying-before-completion",
+    "adhering-to-dry",
+    "adhering-to-yagni",
+    "debugging-systematically",
+    "using-todowrite"
+  ],
   "status": "complete",
   "files_created": ["architecture.md"],
   "handoff": {

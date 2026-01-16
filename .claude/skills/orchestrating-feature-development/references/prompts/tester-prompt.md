@@ -54,11 +54,54 @@ Write your test summary to: [FEATURE_DIR]/test-summary-[TEST_MODE].md
 
 ## MANDATORY SKILLS (invoke ALL before completing)
 
-You MUST use these skills during this task:
+You MUST invoke these skills during this task. These come from your agent definition Step 1 + Step 2:
 
-1. **developing-with-tdd** - Write test, verify it tests the right behavior
-2. **verifying-before-completion** - Run tests and verify they pass
-3. **persisting-agent-outputs** - Use for output file format and metadata
+### Step 1: Always Invoke First (Non-Negotiable)
+
+1. **using-skills** - Compliance rules, 1% threshold, skill discovery protocol
+2. **semantic-code-operations** - Core code tool (Serena MCP) for semantic search and editing
+3. **calibrating-time-estimates** - Prevents "no time to read skills" rationalization
+4. **enforcing-evidence-based-analysis** - **CRITICAL: Prevents hallucinations** - read source code before writing tests
+5. **gateway-testing** - Routes to testing patterns (behavior testing, anti-patterns, mocking)
+6. **gateway-frontend** or **gateway-backend** - Routes to domain-specific testing patterns (React/Playwright vs Go/testify)
+7. **persisting-agent-outputs** - Defines output directory, file naming, MANIFEST.yaml format
+8. **developing-with-tdd** - Write test first, verify it tests the right behavior
+9. **verifying-before-completion** - Ensures tests pass before claiming work is done
+
+### Step 2: Task-Specific Skills (Conditional - Invoke Based on Context)
+
+10. **adhering-to-dry** - When there are test duplication concerns or checking existing test patterns
+11. **adhering-to-yagni** - When tempted to add "nice to have" test cases beyond the plan
+12. **debugging-systematically** - When investigating test failures or flaky tests
+13. **tracing-root-causes** - When test failure is deep in call stack and need to trace backward
+14. **debugging-strategies** - When dealing with performance issues, intermittent failures, memory leaks in tests
+15. **using-todowrite** - When test implementation requires multiple steps (≥2 steps) to complete
+
+**COMPLIANCE**: Document all invoked skills in the output metadata `skills_invoked` array. The orchestrator will verify this list matches the mandatory skills above.
+
+### Step 3: Load Library Skills from Gateways
+
+After invoking the gateways in Step 1, follow their instructions:
+
+**NOTE:** Testers use TWO gateways:
+- `gateway-testing` - General testing patterns (behavior testing, anti-patterns, mocking, async handling)
+- `gateway-frontend` or `gateway-backend` - Domain-specific testing patterns (React/Playwright vs Go/testify)
+
+**Each gateway provides:**
+1. **Mandatory library skills for your role** - Read ALL skills each gateway lists as mandatory for Testers
+2. **Task-specific routing** - Use routing tables to find relevant library skills for this test type
+3. **Testing patterns and anti-patterns** - Quality guidance for test implementation
+
+**How to load library skills:**
+```
+Read(".claude/skill-library/path/from/gateway/SKILL.md")
+```
+
+**CRITICAL:**
+- Library skill paths come FROM the gateways—do NOT hardcode them
+- You MUST read the mandatory library skills BOTH gateways specify for your role
+- After invoking persisting-agent-outputs, follow its discovery protocol to find/create the feature directory
+- YOU MUST WRITE YOUR OUTPUT TO A FILE (not just respond with text)
 
 ## Test Requirements from Plan
 
@@ -430,9 +473,21 @@ it('hides admin controls for regular users', () => {
   "test_mode": "[unit|integration|e2e]",
   "feature_directory": "[FEATURE_DIR]",
   "skills_invoked": [
+    "using-skills",
+    "semantic-code-operations",
+    "calibrating-time-estimates",
+    "enforcing-evidence-based-analysis",
+    "gateway-testing",
+    "gateway-frontend",
+    "persisting-agent-outputs",
     "developing-with-tdd",
     "verifying-before-completion",
-    "persisting-agent-outputs"
+    "adhering-to-dry",
+    "adhering-to-yagni",
+    "debugging-systematically",
+    "tracing-root-causes",
+    "debugging-strategies",
+    "using-todowrite"
   ],
   "status": "complete",
   "tests_written": 8,

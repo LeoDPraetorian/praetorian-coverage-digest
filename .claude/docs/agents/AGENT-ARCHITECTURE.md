@@ -978,7 +978,7 @@ For complex tasks requiring multiple agents, use **orchestration skills** (not o
      ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐
      │frontend │ │frontend │ │frontend │ │frontend │
      │ -lead   │ │-developer│ │-reviewer│ │-tester  │
-     │Phase 4  │ │Phase 5  │ │Phase 6  │ │Phase 8  │
+     │Phase 5  │ │Phase 6  │ │Phase 8  │ │Phase 10 │
      └─────────┘ └─────────┘ └─────────┘ └─────────┘
 ```
 

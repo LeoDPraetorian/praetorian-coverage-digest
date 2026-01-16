@@ -49,9 +49,51 @@ OUTPUT_DIRECTORY: [FEATURE_DIR]
 
 Write your test plan to: [FEATURE_DIR]/test-plan.md
 
-## MANDATORY SKILLS
+## MANDATORY SKILLS (invoke ALL before completing)
 
-1. **persisting-agent-outputs** - Use for output file format
+You MUST invoke these skills during this task. These come from your agent definition Step 1 + Step 2:
+
+### Step 1: Always Invoke First (Non-Negotiable)
+
+1. **using-skills** - Compliance rules, 1% threshold, skill discovery protocol
+2. **semantic-code-operations** - Core code tool (Serena MCP) for semantic search and editing
+3. **calibrating-time-estimates** - Prevents "no time to read skills" rationalization
+4. **enforcing-evidence-based-analysis** - **CRITICAL: Prevents hallucinations** - read actual code before planning tests
+5. **gateway-testing** - Routes to mandatory + task-specific testing library skills
+6. **persisting-agent-outputs** - Defines output directory, file naming, MANIFEST.yaml format
+7. **writing-plans** - Test plans follow the same rigor as architecture plans
+8. **verifying-before-completion** - Ensures plan is complete and verified before handoff
+
+### Step 2: Task-Specific Skills (Conditional - Invoke Based on Context)
+
+9. **discovering-reusable-code** - When adding new tests, search for reusable test patterns
+10. **developing-with-tdd** - For understanding proper test patterns and anti-patterns for the plan
+11. **debugging-systematically** - When analyzing existing test issues or investigating coverage gaps
+12. **adhering-to-dry** - When reviewing test patterns and eliminating test duplication
+13. **adhering-to-yagni** - When tempted to over-test or add unnecessary coverage beyond requirements
+14. **using-todowrite** - When planning requires multiple steps (≥2 steps) to complete
+
+**COMPLIANCE**: Document all invoked skills in the output metadata `skills_invoked` array. The orchestrator will verify this list matches the mandatory skills above.
+
+### Step 3: Load Library Skills from Gateway
+
+After invoking the gateway in Step 1, follow its instructions:
+
+**The gateway provides:**
+1. **Mandatory library skills for your role** - Read ALL skills the gateway lists as mandatory for Test Leads/Planners
+2. **Task-specific routing** - Use routing tables to find relevant library skills for this test planning task
+3. **Testing strategy patterns** - Coverage frameworks, test type selection, anti-pattern identification
+
+**How to load library skills:**
+```
+Read(".claude/skill-library/path/from/gateway/SKILL.md")
+```
+
+**CRITICAL:**
+- Library skill paths come FROM the gateway—do NOT hardcode them
+- You MUST read the mandatory library skills the gateway specifies for your role
+- After invoking persisting-agent-outputs, follow its discovery protocol to find/create the feature directory
+- YOU MUST WRITE YOUR OUTPUT TO A FILE (not just respond with text)
 
 ## Your Job
 
@@ -291,7 +333,22 @@ Focus: Full user workflows in browser
   "agent": "test-lead",
   "output_type": "test-plan",
   "feature_directory": "[FEATURE_DIR]",
-  "skills_invoked": ["persisting-agent-outputs"],
+  "skills_invoked": [
+    "using-skills",
+    "semantic-code-operations",
+    "calibrating-time-estimates",
+    "enforcing-evidence-based-analysis",
+    "gateway-testing",
+    "persisting-agent-outputs",
+    "writing-plans",
+    "verifying-before-completion",
+    "discovering-reusable-code",
+    "developing-with-tdd",
+    "debugging-systematically",
+    "adhering-to-dry",
+    "adhering-to-yagni",
+    "using-todowrite"
+  ],
   "status": "complete",
   "unit_tests_planned": 10,
   "integration_tests_planned": 5,
@@ -332,6 +389,52 @@ You are validating tests against the plan for: [FEATURE_NAME]
 OUTPUT_DIRECTORY: [FEATURE_DIR]
 
 Write your validation to: [FEATURE_DIR]/test-validation.md
+
+## MANDATORY SKILLS (invoke ALL before completing)
+
+You MUST invoke these skills during this task. These come from your agent definition Step 1 + Step 2:
+
+### Step 1: Always Invoke First (Non-Negotiable)
+
+1. **using-skills** - Compliance rules, 1% threshold, skill discovery protocol
+2. **semantic-code-operations** - Core code tool (Serena MCP) for semantic search and editing
+3. **calibrating-time-estimates** - Prevents "no time to read skills" rationalization
+4. **enforcing-evidence-based-analysis** - **CRITICAL: Prevents hallucinations** - read actual test code before validating
+5. **gateway-testing** - Routes to mandatory + task-specific testing library skills
+6. **persisting-agent-outputs** - Defines output directory, file naming, MANIFEST.yaml format
+7. **writing-plans** - Validation follows the same rigor as planning
+8. **verifying-before-completion** - Ensures validation is complete before handoff
+
+### Step 2: Task-Specific Skills (Conditional - Invoke Based on Context)
+
+9. **discovering-reusable-code** - When validating test patterns against existing patterns
+10. **developing-with-tdd** - For checking anti-patterns and TDD compliance in implemented tests
+11. **debugging-systematically** - When analyzing test failures or investigating quality issues
+12. **adhering-to-dry** - When reviewing test patterns for duplication
+13. **adhering-to-yagni** - When identifying over-testing or unnecessary coverage
+14. **using-todowrite** - When validation requires multiple steps (≥2 steps) to complete
+
+**COMPLIANCE**: Document all invoked skills in the output metadata `skills_invoked` array. The orchestrator will verify this list matches the mandatory skills above.
+
+### Step 3: Load Library Skills from Gateway
+
+After invoking the gateway in Step 1, follow its instructions:
+
+**The gateway provides:**
+1. **Mandatory library skills for your role** - Read ALL skills the gateway lists as mandatory for Test Leads/Planners
+2. **Task-specific routing** - Use routing tables to find relevant library skills for this validation task
+3. **Testing quality patterns** - Anti-pattern identification, test quality assessment
+
+**How to load library skills:**
+```
+Read(".claude/skill-library/path/from/gateway/SKILL.md")
+```
+
+**CRITICAL:**
+- Library skill paths come FROM the gateway—do NOT hardcode them
+- You MUST read the mandatory library skills the gateway specifies for your role
+- After invoking persisting-agent-outputs, follow its discovery protocol to find/create the feature directory
+- YOU MUST WRITE YOUR OUTPUT TO A FILE (not just respond with text)
 
 ## Your Job
 
@@ -431,7 +534,22 @@ Calculate based on:
   "agent": "test-lead",
   "output_type": "test-validation",
   "feature_directory": "[FEATURE_DIR]",
-  "skills_invoked": ["persisting-agent-outputs"],
+  "skills_invoked": [
+    "using-skills",
+    "semantic-code-operations",
+    "calibrating-time-estimates",
+    "enforcing-evidence-based-analysis",
+    "gateway-testing",
+    "persisting-agent-outputs",
+    "writing-plans",
+    "verifying-before-completion",
+    "discovering-reusable-code",
+    "developing-with-tdd",
+    "debugging-systematically",
+    "adhering-to-dry",
+    "adhering-to-yagni",
+    "using-todowrite"
+  ],
   "status": "complete",
   "quality_score": 85,
   "verdict": "PASSED|NEEDS_WORK",

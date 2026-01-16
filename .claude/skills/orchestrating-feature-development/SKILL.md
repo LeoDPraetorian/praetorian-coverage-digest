@@ -1,7 +1,7 @@
 ---
 name: orchestrating-feature-development
 description: Use when implementing complete features - coordinates brainstorming, planning, architecture, implementation, review, and testing phases with parallel agent execution and feedback loops
-allowed-tools: Skill, Task, TodoWrite, Read, Write, Bash, AskUserQuestion
+allowed-tools: Skill, Task, TodoWrite, Read, Glob, Grep, AskUserQuestion
 ---
 
 # Feature Development Orchestration
@@ -123,7 +123,34 @@ Cross-cutting concerns and troubleshooting guides:
 │                                                                         │
 │  **CONDITIONAL SUB-SKILL:** dispatching-parallel-agents                 │
 │    (when investigating 3+ independent failures)                         │
-│  ** COMPACTION CHECKPOINT: Summarize discovery, archive to files **     │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 3 → Phase 4 Transition: Compaction Gate                         │
+│                                                                         │
+│  **BLOCKING GATE: Context Compaction Required**                         │
+│                                                                         │
+│  Before proceeding to Phase 4, you MUST:                                │
+│                                                                         │
+│  1. **Invoke skill**: Read and follow `persisting-progress-across-      │
+│     sessions` Context Compaction Protocol (lines 244-343)               │
+│  2. **Execute compaction**:                                             │
+│     - Write full Phase 3 details to progress file                       │
+│     - Verify write succeeded                                            │
+│     - Replace inline content with summary (< 200 tokens)                │
+│     - Use file references, not inline content                           │
+│  3. **Verify compaction** (all must be true):                           │
+│     - [ ] Progress file updated with full Phase 3 output                │
+│     - [ ] Context contains only summary, not full discovery findings    │
+│     - [ ] File references used instead of inline content                │
+│                                                                         │
+│  **Cannot proceed to Phase 4 until all verification items checked.**    │
+│                                                                         │
+│  **If skipping compaction**: Use AskUserQuestion with explicit risk     │
+│  disclosure: 'Skipping compaction checkpoint. Risk: Context rot may     │
+│  degrade performance in later phases. Proceed anyway?'                  │
+│  Document skip decision in progress.json.                               │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
@@ -173,7 +200,34 @@ Cross-cutting concerns and troubleshooting guides:
 │  **REQUIRED (in prompt):** developing-with-tdd                          │
 │  **REQUIRED (in prompt):** verifying-before-completion                  │
 │  **NEW:** STEP 0 Clarification gate (mandatory)                         │
-│  ** COMPACTION CHECKPOINT: Summarize implementation, archive to files ** │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 6 → Phase 7 Transition: Compaction Gate                         │
+│                                                                         │
+│  **BLOCKING GATE: Context Compaction Required**                         │
+│                                                                         │
+│  Before proceeding to Phase 7, you MUST:                                │
+│                                                                         │
+│  1. **Invoke skill**: Read and follow `persisting-progress-across-      │
+│     sessions` Context Compaction Protocol (lines 244-343)               │
+│  2. **Execute compaction**:                                             │
+│     - Write full Phase 6 implementation details to progress file        │
+│     - Verify write succeeded                                            │
+│     - Replace inline content with summary (< 200 tokens)                │
+│     - Use file references, not inline content                           │
+│  3. **Verify compaction** (all must be true):                           │
+│     - [ ] Progress file updated with full Phase 6 output                │
+│     - [ ] Context contains only summary, not full implementation log    │
+│     - [ ] File references used instead of inline content                │
+│                                                                         │
+│  **Cannot proceed to Phase 7 until all verification items checked.**    │
+│                                                                         │
+│  **If skipping compaction**: Use AskUserQuestion with explicit risk     │
+│  disclosure: 'Skipping compaction checkpoint. Risk: Context rot may     │
+│  degrade performance in later phases. Proceed anyway?'                  │
+│  Document skip decision in progress.json.                               │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
@@ -210,7 +264,34 @@ Cross-cutting concerns and troubleshooting guides:
 │  Agent: test-lead (creates test plan)                                   │
 │  **PROMPT TEMPLATE:** references/prompts/test-lead-prompt.md            │
 │  Output: test-plan.md                                                   │
-│  ** COMPACTION CHECKPOINT: Summarize test plan, archive to file **      │
+└─────────────────┬───────────────────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 9 → Phase 10 Transition: Compaction Gate                        │
+│                                                                         │
+│  **BLOCKING GATE: Context Compaction Required**                         │
+│                                                                         │
+│  Before proceeding to Phase 10, you MUST:                               │
+│                                                                         │
+│  1. **Invoke skill**: Read and follow `persisting-progress-across-      │
+│     sessions` Context Compaction Protocol (lines 244-343)               │
+│  2. **Execute compaction**:                                             │
+│     - Write full Phase 9 test plan details to progress file             │
+│     - Verify write succeeded                                            │
+│     - Replace inline content with summary (< 200 tokens)                │
+│     - Use file references, not inline content                           │
+│  3. **Verify compaction** (all must be true):                           │
+│     - [ ] Progress file updated with full Phase 9 output                │
+│     - [ ] Context contains only summary, not full test plan             │
+│     - [ ] File references used instead of inline content                │
+│                                                                         │
+│  **Cannot proceed to Phase 10 until all verification items checked.**   │
+│                                                                         │
+│  **If skipping compaction**: Use AskUserQuestion with explicit risk     │
+│  disclosure: 'Skipping compaction checkpoint. Risk: Context rot may     │
+│  degrade performance in later phases. Proceed anyway?'                  │
+│  Document skip decision in progress.json.                               │
 └─────────────────┬───────────────────────────────────────────────────────┘
                   │
                   ▼
@@ -242,12 +323,17 @@ Cross-cutting concerns and troubleshooting guides:
                   ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Phase 12: Completion                                                   │
-│  **REQUIRED SUB-SKILL:** finishing-a-development-branch                 │
-│  Final verification: npm run build, npx tsc --noEmit, npm test          │
+│  **REQUIRED SUB-SKILL:** Invoke finishing-a-development-branch which:   │
+│  - Verifies tests AND requirements/exit criteria                        │
+│  - Presents 4 options (merge, PR, keep, discard)                        │
+│  - Handles worktree cleanup                                             │
 │  Update metadata.json status: "complete"                                │
-│  Present options: merge, PR, keep branch, discard                       │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
+
+## Tight Feedback Loop (Phases 6-8-10)
+
+**Based on Ralph Wiggum technique** - Implementation→Review→Test cycle with automatic iteration when review or tests fail. Max 5 iterations before escalation. Tracks iteration history in {OUTPUT_DIR}/feedback-scratchpad.md. **Details:** [references/tight-feedback-loop.md](references/tight-feedback-loop.md)
 
 ## Checkpoint Configuration
 
@@ -257,86 +343,26 @@ Human approval required at phases 2, 4, and 5. For large plans (>5 tasks), add i
 
 Each Task dispatch creates a fresh agent instance. Do not manually fix agent work or reuse agents across tasks. See [Context Management](references/context-management.md) for details.
 
+## Emergency Abort Protocol
+
+When things go wrong, abort cleanly with user choice on cleanup. Triggers: user request, 3+ escalations in same phase, critical security finding, unrecoverable error, cost/time exceeded. Five-step flow: stop work → capture state → present cleanup options → execute cleanup → report final state. See [Emergency Abort Protocol](references/emergency-abort.md) for complete details.
+
 ## Phase 1: Setup
 
 Create feature workspace with semantic naming and initialize metadata. See [Phase 1: Setup](references/phase-1-setup.md) for complete details.
 
 ## Critical Rules
 
-### Worktree Isolation is MANDATORY
+**Six mandatory rules for successful orchestration:**
 
-Feature development happens in isolated git worktree (.worktrees/{feature-name}/):
-- Phase 1 creates via `using-git-worktrees` skill
-- All phases work within worktree
-- Phase 12 cleans up after merge/PR/discard
+1. **Worktree Isolation** - Phase 1 creates isolated workspace (.worktrees/{feature-name}/)
+2. **Parallel Execution** - Spawn independent agents in SINGLE message
+3. **Human Checkpoints** - After phases 2, 4, 5: AskUserQuestion for approval
+4. **Feedback Loops** - MAX 1 retry, then escalate via AskUserQuestion
+5. **Context Compaction** - After phases 3, 6, 9: compact via persisting-progress-across-sessions
+6. **Metrics Tracking** - Update progress.json after agent spawn, retry, escalation, phase completion
 
-**Why:** Prevents parallel agent conflicts, keeps main workspace clean, easy rollback.
-
-**User opt-out:** Document in progress file, note increased conflict risk.
-
-### Parallel Execution is MANDATORY
-
-**Spawn independent agents in a SINGLE message:**
-
-```typescript
-// Good - all in one message
-Task("frontend-lead", ...)
-Task("security-lead", ...)
-```
-
-**Do NOT spawn sequentially when parallel is possible:**
-
-```typescript
-// Bad - wastes time
-await Task("frontend-lead", ...)
-await Task("security-lead", ...)
-```
-
-### Human Checkpoints are MANDATORY
-
-After phases 2, 4, and 5, you MUST:
-
-1. Use AskUserQuestion to confirm approval
-2. Do NOT proceed without approval
-3. Record approval in metadata.json
-
-**Note**: Phase 3 (Discovery) has NO checkpoint - it feeds directly into Planning and Architecture.
-
-### Feedback Loops: MAX 1 Retry
-
-After ONE retry cycle, escalate to user via AskUserQuestion. Do NOT loop indefinitely.
-
-### Context Compaction at Phase Transitions
-
-After phases 3, 6, and 9: invoke `persisting-progress-across-sessions` to compact context. Summarize completed phases, archive to files, keep only current phase details.
-
-See [Context Management](references/context-management.md#context-compaction) for protocol and examples.
-
-### Agent Handoffs Must Be Structured
-
-All Task agents must follow `persisting-agent-outputs` skill for output format.
-
-Key handoff fields:
-
-- `status`: complete, blocked, or needs_review
-- `blocked_reason`: Required when blocked (for routing table lookup)
-- `attempted`: Required when blocked (what agent tried)
-- `handoff.next_agent`: null when blocked (orchestrator decides), suggested agent when complete
-- `handoff.context`: Key info for next phase
-
-When agents return `status: blocked`, use `orchestrating-multi-agent-workflows` skill's agent routing table to determine next agent based on `blocked_reason`.
-
-See [Agent Handoffs](references/agent-handoffs.md) for examples.
-
-### Metrics Tracking is MANDATORY
-
-Update progress.json metrics after:
-- Each agent spawn (increment agents_spawned, parallel/sequential counts)
-- Each validation retry (increment validation_loops)
-- Each escalation to user (increment escalations.to_user, add reason)
-- Each phase completion (update tokens.by_phase estimate)
-
-At Phase 12, include metrics summary in completion report.
+**Complete details:** [references/critical-rules.md](references/critical-rules.md)
 
 ## Rationalization Prevention
 
@@ -461,6 +487,31 @@ When updating prompt templates, reference the library skill for:
 | --------------------------- | ---------------------------------------------------------------- |
 | `executing-plans`           | Batch execution in separate session (not same-session subagents) |
 | `developing-with-subagents` | When you have a plan and want same-session execution with review |
+
+### Related Skills
+
+| Skill | Relationship |
+|-------|--------------|
+| `iterating-to-completion` | INTRA-task loops (this skill uses INTER-phase loops in Tight Feedback Loop) |
+| `orchestrating-multi-agent-workflows` | Provides delegation patterns and effort scaling guidance |
+| `persisting-progress-across-sessions` | Cross-session persistence patterns for long-running features |
+
+### External Sources
+
+| Pattern Implemented | Source |
+|---------------------|--------|
+| GitHub Flow (branch completion) | https://docs.github.com/en/get-started/using-github/github-flow |
+| Tight Feedback Loop | https://awesomeclaude.ai/ralph-wiggum |
+| Context Compaction | https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents |
+| Effort Scaling | https://www.anthropic.com/engineering/multi-agent-research-system |
+| REQUIRED SUB-SKILL pattern | https://github.com/obra/superpowers |
+
+### Research References
+
+Ralph Wiggum integration (Tight Feedback Loop pattern):
+- [.claude/.output/research/LOOPING-TO-COMPLETION.md](../../../.output/research/LOOPING-TO-COMPLETION.md) - Project overview
+- [.claude/.output/research/ralph-wiggum-analysis.md](../../../.output/research/ralph-wiggum-analysis.md) - Pattern analysis
+- [.claude/.output/research/ralph-integration-guide.md](../../../.output/research/ralph-integration-guide.md) - Integration guide
 
 ## Exit Criteria
 

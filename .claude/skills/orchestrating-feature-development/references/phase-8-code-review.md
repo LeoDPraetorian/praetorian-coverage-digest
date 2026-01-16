@@ -1,5 +1,10 @@
 # Phase 8: Code Review
 
+> **Note:** Phase 8 Stage 1 (Spec Compliance) is the review gate in the Tight
+> Feedback Loop. If NOT_COMPLIANT, loop returns to Phase 6 with review issues
+> in scratchpad. This is different from the Stage 1 Fix Loop (retries within
+> a single iteration). See [Tight Feedback Loop (Phases 6-8-10)](tight-feedback-loop.md).
+
 **Two-stage gated review**: Spec compliance FIRST (blocking gate), then code quality + security (parallel).
 
 ## Purpose
