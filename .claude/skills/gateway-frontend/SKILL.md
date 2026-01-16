@@ -92,9 +92,9 @@ This gateway implements 3-tier loading:
 | Modern React Patterns          | `.claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md`          | hooks, composition, patterns                                                |
 | React Hook Infinite Loops      | `.claude/skill-library/development/frontend/preventing-react-hook-infinite-loops/SKILL.md` | infinite loop, useEffect, dependency                                        |
 | React Performance              | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`         | performance, optimize, slow                                                 |
-| Large Data Visualization       | `.claude/skill-library/development/frontend/optimizing-large-data-visualization/SKILL.md`  | large data, 1000+, virtualization, LOD                                      |
-| Coordinating Competing Systems | `.claude/skill-library/development/frontend/coordinating-competing-systems/SKILL.md`       | interference, competing systems, async conflict, guard patterns, sequencing |
-| Sigma.js Graph Visualization   | `.claude/skill-library/development/frontend/working-with-sigma-js/SKILL.md`                | Sigma.js, graph, WebGL, camera, layout                                      |
+| Large Data Visualization       | `.claude/skill-library/development/frontend/graphing/optimizing-large-data-visualization/SKILL.md` | large data, 1000+, virtualization, LOD                                      |
+| Coordinating Competing Systems | `.claude/skill-library/development/frontend/graphing/coordinating-competing-systems/SKILL.md` | interference, competing systems, async conflict, guard patterns, sequencing |
+| Sigma.js Graph Visualization   | `.claude/skill-library/development/frontend/graphing/working-with-sigma-js/SKILL.md`       | Sigma.js, graph, WebGL, camera, layout                                      |
 
 ### State Management
 

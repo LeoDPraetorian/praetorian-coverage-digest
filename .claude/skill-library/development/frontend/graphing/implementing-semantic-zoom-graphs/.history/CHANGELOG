@@ -1,0 +1,29 @@
+# Changelog
+
+## 2026-01-15 - Compliance Fixes
+
+**Audit Results:** 2 critical issues fixed
+
+### Phase 24: Line Number References (CRITICAL) - Claude-Automated
+**Issue:** Hardcoded line number references in chariot-implementation.md
+**Fix Applied:**
+- Replaced "Line ~35-60" with "in createAssetToRiskQuery function"
+- Replaced "~line 70-109" with "in createAssetToTechnologyQuery function"
+- Replaced "~line 112-150" with "in createRiskToAssetQuery function"
+- Replaced "(~line 130)" with "in action types union"
+- Replaced "(~line 307)" with "in initial state object"
+- Replaced "(~line 199)" with "in reducer switch statement"
+**Method:** Claude-Automated (semantic understanding to replace line numbers with structural descriptions)
+
+### Phase 28: Integration Section (CRITICAL) - Claude-Automated
+**Issue:** Missing structured Integration section documenting skill dependencies
+**Fix Applied:**
+- Added complete Integration section with all required subsections:
+  - Called By: frontend-developer agent, frontend-lead agent
+  - Requires: preventing-react-hook-infinite-loops, working-with-sigma-js
+  - Calls: None (provides patterns, doesn't invoke other skills)
+  - Pairs With: optimizing-large-data-visualization, coordinating-competing-systems, constructing-graph-queries
+**Method:** Claude-Automated (analyzed skill content and agent references to generate structured Integration section)
+
+**Verification:** Re-audit passed all 28 phases
+**Backup:** Created at .local/2026-01-15-16-52-19-pre-fix.bak
