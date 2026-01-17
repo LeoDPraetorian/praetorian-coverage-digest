@@ -1,0 +1,177 @@
+# Changelog
+
+## 2026-01-14 - Enhancement: Query Parameter & Header Randomization
+
+**Updated by**: Claude Code (updating-skills workflow based on real-world usage feedback)
+
+**Trigger**: User correctly identified that query parameters (rpcids, meeting IDs, version numbers) in URIs were static indicators not being randomized, causing fingerprinting across engagements.
+
+### Changes Applied
+
+**1. SKILL.md Updates** (+19 lines, total: 402):
+- Updated Critical Rule #4 to explicitly emphasize: "Static indicators include... identifiers in URIs (query parameters like rpcids=, meeting=, v=, file IDs, sync tokens)"
+- Added WARNING callout in Phase 3.1 with before/after examples showing query parameter randomization
+- Explicitly highlighted that URI identifiers are "Often Overlooked" static indicators
+
+**2. customizable-fields.md Updates** (+139 lines, total: 787):
+- Added comprehensive "URI-Embedded Identifiers (OFTEN OVERLOOKED - CRITICAL)" section
+- Documented common URI identifier types (query params, path-embedded IDs)
+- Provided generation commands for each identifier format:
+  - Google Meet RPC IDs (6-char alphanumeric)
+  - Google Drive File IDs (33-char alphanumeric)
+  - Meeting/Conference IDs (8-char alphanumeric)
+  - Version numbers (semantic variation)
+  - Sync tokens (base64url)
+- Added validation commands to check for reused query parameters
+- Created service-specific identifier format table
+
+**3. opsec-checklist.md Updates** (+152 lines, total: 601):
+- Added Check 1.5: Query Parameter & URI Identifier Detection
+- Added Check 1.6: Header Value Randomization
+- Updated automated validation script to detect static query params
+- Enhanced pre-deployment checklist to include query param randomization
+- Added comparison examples (failure vs. pass scenarios)
+
+### Real-World Validation
+
+**Tested with actual profile** (zoom-cs-tuned.json):
+- ✅ Successfully identified static RPC IDs (`rpcids=F6EZ5c`, `rpcids=VKU5be`)
+- ✅ Successfully identified static meeting parameters (`meeting=conf`, `v=5.17`)
+- ✅ Generated randomized replacements matching Google Meet format
+- ✅ Verified zero matches after customization
+
+**Created two domain fronting profiles**:
+1. Google Meet profile (meet.google.com) - with randomized RPC IDs, meeting IDs, versions
+2. Google Drive profile (drive.google.com / googleapis.com) - with randomized file IDs, sync tokens
+
+### Impact
+
+**Before Update**:
+- Operators might overlook query parameters as static indicators
+- Only top-level fields (encryption keys, assembly names) emphasized
+- Query params like `rpcids=F6EZ5c` could be reused across engagements → fingerprinting
+
+**After Update**:
+- Query parameters explicitly called out in 3 places (SKILL.md, customizable-fields.md, opsec-checklist.md)
+- Comprehensive generation commands for each identifier type
+- Automated detection in OPSEC validation script
+- Real-world examples from Google Meet and Drive profiles
+
+### Lessons Learned
+
+**Key Insight**: Static indicators exist at MULTIPLE levels:
+1. **Top-level fields**: Encryption keys, listener names, assembly names (well-documented)
+2. **Query parameter VALUES**: rpcids, meeting IDs, file IDs, sync tokens (NOW well-documented)
+3. **Header VALUES**: X-Request-ID, X-Client-Version (NOW well-documented)
+4. **Path-embedded IDs**: File IDs in `/drive/v3/files/{fileId}` patterns (NOW well-documented)
+
+**Principle**: ANY identifier that appears in a profile and doesn't change per-beacon (static across beacons) should change per-engagement (static across engagements creates fingerprints).
+
+### Files Modified
+
+- `.claude/skill-library/redteam/customizing-nighthawk-profiles/SKILL.md` (+19 lines)
+- `.claude/skill-library/redteam/customizing-nighthawk-profiles/references/customizable-fields.md` (+139 lines)
+- `.claude/skill-library/redteam/customizing-nighthawk-profiles/references/opsec-checklist.md` (+152 lines)
+
+**Total enhancement**: +310 lines of guidance on URI and header randomization
+
+---
+
+## 2026-01-13 - Initial Creation
+
+**Created by**: Claude Code (customizing-nighthawk-profiles skill creation workflow)
+
+**Type**: Process/Pattern skill
+**Location**: Library skill - `.claude/skill-library/redteam/`
+**Category**: redteam (new category for red team service line)
+
+### RED Phase Documentation
+
+**Gap Identified**:
+- Red team operators need to customize Nighthawk C2 profiles per-engagement to remove static indicators
+- Current failure: Claude doesn't understand Nighthawk profile structure properly and may break profiles during modification
+- Operators lack confidence that modifications are safe and won't break operational functionality
+
+**Test Scenario Failure**:
+Without this skill, when asked to "customize this Nighthawk profile for the ACME Corp engagement", Claude would:
+1. Not understand which profile fields are safe to modify vs. critical to operation
+2. Make changes that break JSON syntax (missing commas, incorrect nesting)
+3. Generate obviously fake/test data (e.g., User-Agent: "Mozilla/5.0 Test")
+4. Miss critical fields that create fingerprints (assembly stomp names, URI paths, etc.)
+5. Potentially break the profile by modifying operational settings (intervals, encryption settings)
+6. No validation step to check if modifications maintain profile integrity
+
+**Concrete Example**:
+- Asked: "Change the User-Agent to look like ACME Corp traffic"
+- Claude produces: `"User-Agent": "ACME-Corp-Agent/1.0"` ❌ (obviously malicious)
+- Instead of: `"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36..."` ✅ (realistic)
+
+### Initial Structure
+
+**SKILL.md**: 382 lines (well within 450-line target)
+
+**Core workflow phases**:
+1. Baseline Load and Validation
+2. Gather Engagement Context
+3. Profile Customization (safe vs. operational fields)
+4. OPSEC Validation
+5. Profile Validation (JSON integrity, functional checks)
+6. Output and Documentation
+
+**Key features**:
+- Distinguishes safe-to-modify fields (indicators) from operational fields (never modify without approval)
+- Provides industry-specific data generation patterns (User-Agents, URIs, headers)
+- OPSEC validation checklist to prevent static indicators
+- JSON validation workflow to prevent broken profiles
+- Deployment documentation template
+
+### References Planned
+
+The following reference files will be created during Phase 6 (Research):
+
+1. `profile-structure.md` - Complete Nighthawk profile anatomy
+2. `customizable-fields.md` - Catalog of safe-to-modify fields with examples
+3. `operational-fields.md` - Never-modify fields catalog with explanations
+4. `data-generation.md` - Generating legitimate, engagement-specific data
+5. `opsec-checklist.md` - Operational security validation checklist
+6. `validation-patterns.md` - Advanced validation techniques
+7. `deployment-workflow.md` - Deployment best practices
+8. `anti-patterns.md` - Common mistakes and avoidance strategies
+9. `engagement-questionnaire.md` - Context gathering template
+
+### Workflow Completion
+
+**Phase 6: Research & Content Population** ✅ COMPLETE
+- Executed orchestrating-research skill (5 sources: Codebase, GitHub, Web, arXiv, Official Nighthawk Docs)
+- Created SYNTHESIS.md with three-pass aggregation (source-first, claim-first, conflict-first)
+- Synthesis confidence: 0.88 (strong authoritative sources)
+- Created all 9 reference files with substantive content (4,436 total lines):
+  1. profile-structure.md (693 lines) - Complete JSON schema documentation
+  2. customizable-fields.md (648 lines) - Safe-to-modify field catalog with industry examples
+  3. operational-fields.md (784 lines) - Never-modify field catalog with OPSEC settings
+  4. data-generation.md (761 lines) - User-Agent, URI, header, assembly generation patterns
+  5. opsec-checklist.md (449 lines) - Pre/post-deployment validation checklist
+  6. validation-patterns.md (102 lines) - Advanced validation techniques
+  7. deployment-workflow.md (272 lines) - 5-phase deployment process
+  8. anti-patterns.md (372 lines) - 14 common mistakes with examples
+  9. engagement-questionnaire.md (355 lines) - Context gathering template
+
+**Phase 7: Gateway Update** ✅ COMPLETE
+- Created new gateway-redteam (117 lines)
+- Established routing for red team service line workflows
+- Added customizing-nighthawk-profiles to C2 Frameworks category
+- Planned future skills: Cobalt Strike, Sliver, payload generation, OPSEC validation
+
+**Phase 8: GREEN Verification** ✅ COMPLETE
+- Tested with real Nighthawk profile (/Users/engineer/zoom-cs-tuned.json)
+- Profile demonstrates skill principles: Google Meet domain fronting, realistic headers, legitimate paths
+- Skill successfully guides understanding of customizable vs. operational fields
+- Gap from RED phase fully addressed
+
+**Phase 9: REFACTOR Pressure Testing** ✅ COMPLETE
+- Verified counter-measures for pressure scenarios:
+  - Time pressure: Quick Reference table, anti-patterns for "good enough" data
+  - Authority pressure: Approval workflow in operational-fields.md
+  - Sunk cost pressure: Mid-workflow validation (Phase 4), automated checks
+  - Complexity avoidance: Assembly catalog with examples, uniqueness automation
+- Skill sufficiently robust for operational use

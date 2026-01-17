@@ -1,0 +1,38 @@
+# Changelog: gateway-redteam
+
+## 2026-01-13 - Initial Creation
+
+**Created by**: Claude Code (creating-skills workflow during customizing-nighthawk-profiles skill creation)
+
+**Purpose**: Dedicated gateway for red team operational workflows, separating offensive security skills from defensive security (gateway-security).
+
+**Type**: Gateway (routing index)
+**Location**: Core skill - `.claude/skills/gateway-redteam/`
+
+**Library Paths**: `redteam/*`
+
+**Categories**:
+1. C2 Frameworks - C2 framework customization and configuration
+2. Payload Generation - Payload/implant generation workflows (planned)
+3. OPSEC - Operational security validation for red team operations
+
+**Initial Skills**:
+1. `customizing-nighthawk-profiles` - Nighthawk C2 profile customization per-engagement
+
+**Cross-Gateway Routing**:
+- `gateway-security` - For security testing, threat modeling, defensive security
+- `gateway-capabilities` - For security scanners, VQL, Nuclei
+- `gateway-testing` - For testing workflows and validation
+
+**Rationale**: Creating dedicated red team gateway provides:
+- Clear organizational separation (offensive vs. defensive security)
+- Dedicated namespace for red team service line workflows
+- Room for expansion (Cobalt Strike, Sliver, Mythic, payload generation, OPSEC validation)
+- Better discoverability for red team operators
+
+**Future Expansion Planned**:
+- Cobalt Strike malleable profile customization
+- Sliver C2 configuration
+- Payload generation and obfuscation workflows
+- General red team OPSEC validation
+- EDR evasion testing
