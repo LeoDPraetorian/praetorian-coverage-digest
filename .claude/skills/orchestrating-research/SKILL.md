@@ -1,52 +1,59 @@
 ---
 name: orchestrating-research
-description: Use when coordinating complex research across multiple sources and semantic interpretations (max 3) - spawns sequential research agents after expanding vague queries via translating-intent, synthesizes cross-referenced results, persists to .claude/.output/research/
+description: Use when coordinating complex research across multiple sources - supports deep mode (with intent expansion via translating-intent) and lite mode (direct research) - spawns sequential research agents, synthesizes cross-referenced results, persists to .claude/.output/research/
 allowed-tools: Task, TodoWrite, Read, Write, AskUserQuestion, Glob, Grep, Bash
 ---
 
 # Orchestrating Research
 
-**Sequential research orchestration with intent expansion (max 3 interpretations) and cross-source synthesis.**
+**Sequential research orchestration with two modes: deep research (with intent expansion) and lite research (direct queries).**
 
 ## When to Use
 
 Use this skill when:
 
-- Research topic is vague/multi-faceted (e.g., "research authentication patterns")
-- Need comprehensive coverage across multiple interpretations
-- Want parallel execution across multiple sources (6+ research agents)
-- Require synthesis with conflict detection and cross-referencing
-- Previous research attempts were too narrow or sequential
+- Research topic requires coordination across multiple sources
+- Need synthesis with conflict detection and cross-referencing
+- Want sequential execution across multiple research agents
+- Previous research attempts were too narrow or incomplete
+
+**Choose mode based on query clarity:**
+
+- **Deep mode** (with intent expansion): Vague/multi-faceted queries (e.g., "research authentication patterns")
+- **Lite mode** (direct research): Focused queries with clear scope (e.g., "research React Hook Form validation patterns")
 
 **Do NOT use when:**
 
-- Simple, focused research question with clear scope → Use specific research agents directly
 - Single source is sufficient → Use specific research agent directly
-- User has already provided specific interpretations → Skip intent expansion
+- No synthesis needed → Use specific research agent directly
 
 ## Key Features
 
+- **Two Research Modes**: Deep (with intent expansion) or Lite (direct queries)
 - **Sequential Execution**: Spawns research agents one at a time to avoid API rate limits
-- **Intent Expansion**: Uses `translating-intent` to derive semantic interpretations (max 3) from vague queries
+- **Intent Expansion** (Deep mode): Uses `translating-intent` to derive semantic interpretations (max 3) from vague queries
 - **Cross-Source Synthesis**: Aggregates results from multiple research sources with conflict detection
-- **Autonomous Operation**: Minimal user interaction after initial query review
+- **User Control**: Select research mode and sources upfront
 
 Uses library skills in `.claude/skill-library/research/` as knowledge base.
 
 ## Quick Reference
 
-| Phase              | Purpose                                                 | Tools                | Duration |
-| ------------------ | ------------------------------------------------------- | -------------------- | -------- |
-| 1. Intent Expand   | Derive semantic interpretations (max 3)                 | `translating-intent` | 2-3 min  |
-| 2. User Review     | Review queries + select research methods                | `AskUserQuestion`    | 2-3 min  |
-| 3. Sequential Exec | Spawn agents SEQUENTIALLY (1 at a time)                 | `Task` (sequential)  | 5-15 min |
-| 4. Synthesize      | Cross-reference, detect conflicts                       | Manual synthesis     | 5-10 min |
-| 5. Persist         | Save to `.claude/.output/research/{timestamp}-{topic}/` | `Write`, `Bash`      | 2 min    |
-| 6. Handoff         | Return to parent workflow or complete                   | TodoWrite check      | 1 min    |
+| Phase              | Purpose                                                 | Tools                | Duration | Applies To   |
+| ------------------ | ------------------------------------------------------- | -------------------- | -------- | ------------ |
+| 0. Mode Selection  | Choose deep or lite research mode                       | `AskUserQuestion`    | 1 min    | Both modes   |
+| 1. Intent Expand   | Derive semantic interpretations (max 3)                 | `translating-intent` | 2-3 min  | Deep only    |
+| 2. User Review     | Review queries + select research methods                | `AskUserQuestion`    | 2-3 min  | Both modes   |
+| 3. Sequential Exec | Spawn agents SEQUENTIALLY (1 at a time)                 | `Task` (sequential)  | 5-15 min | Both modes   |
+| 4. Synthesize      | Cross-reference, detect conflicts                       | Manual synthesis     | 5-10 min | Both modes   |
+| 5. Persist         | Save to `.claude/.output/research/{timestamp}-{topic}/` | `Write`, `Bash`      | 2 min    | Both modes   |
+| 6. Handoff         | Return to parent workflow or complete                   | TodoWrite check      | 1 min    | Both modes   |
 
-**Total time:** 15-30 minutes for comprehensive research
+**Total time:**
+- Deep mode: 15-30 minutes (with intent expansion)
+- Lite mode: 10-25 minutes (direct research)
 
-**YOU MUST use TodoWrite** to track all 6 phases.
+**YOU MUST use TodoWrite** to track all phases (7 for deep mode, 6 for lite mode).
 
 ## Integration Points
 
@@ -139,9 +146,67 @@ Do NOT research: {out_of_scope_boundaries}
 
 ## Workflow Phases
 
-### Phase 1: Intent Expansion
+### Phase 0: Mode Selection
+
+**Goal:** Let user choose between deep and lite research modes
+
+Use AskUserQuestion at the very beginning to determine research approach:
+
+```javascript
+AskUserQuestion({
+  questions: [
+    {
+      header: "Mode",
+      question: "Which research mode do you want to use? (You can respond with 1 or 2)",
+      multiSelect: false,
+      options: [
+        {
+          label: "Deep Research (Recommended)",
+          description: "Expands vague queries into multiple interpretations via intent analysis - best for broad topics"
+        },
+        {
+          label: "Lite Research",
+          description: "Direct research without intent expansion - best for focused, specific queries"
+        }
+      ]
+    }
+  ]
+});
+```
+
+**Numeric Response Handling:**
+
+After receiving the user's answer, normalize the response to handle numeric inputs:
+
+```javascript
+// Normalize response to handle numeric values
+let selectedMode = userAnswer; // e.g., "Deep Research (Recommended)" or "1"
+if (selectedMode === "1") {
+  selectedMode = "Deep Research (Recommended)";
+} else if (selectedMode === "2") {
+  selectedMode = "Lite Research";
+}
+
+// Then check selectedMode to determine which mode was selected
+```
+
+**Mode behaviors:**
+
+| Mode | Intent Expansion | Best For | Example Query |
+|------|------------------|----------|---------------|
+| **Deep** | ✅ Yes (Phase 1) | Vague, multi-faceted topics | "research authentication patterns" |
+| **Lite** | ❌ No (skip Phase 1) | Focused, specific questions | "research React Hook Form validation patterns" |
+
+**After user selects mode:**
+
+- **Deep mode**: Continue to Phase 1 (Intent Expansion)
+- **Lite mode**: Skip Phase 1, go directly to Phase 2 with user's original query as the single interpretation
+
+### Phase 1: Intent Expansion (Deep Mode Only)
 
 **Goal:** Transform vague query into multiple semantic interpretations
+
+**SKIP THIS PHASE IN LITE MODE** - use user's original query as-is.
 
 1. Extract research topic from user request
 2. Derive semantic topic name (kebab-case, 2-4 words)
@@ -151,11 +216,26 @@ Do NOT research: {out_of_scope_boundaries}
 
 **Output:** `{topic: string, interpretations: [{interpretation, scope, keywords}]}`
 
+**Lite mode behavior:** Skip all of the above. Create a single interpretation from user's original query:
+
+```javascript
+{
+  topic: "derived-from-user-query",
+  interpretations: [
+    {
+      interpretation: "{user's original query}",
+      scope: "{inferred from query}",
+      keywords: ["{extracted from query}"]
+    }
+  ]
+}
+```
+
 **See:** [references/intent-integration.md](references/intent-integration.md) for complete invocation patterns
 
 ### Phase 2: User Review (Query Selection + Research Methods)
 
-**Goal:** Let user review/modify queries from Phase 1, then select research methods
+**Goal:** Let user review/modify queries (from Phase 1 in deep mode, or original query in lite mode), then select research methods
 
 **RATE LIMIT PROTECTION:** Maximum 3 interpretations per session to avoid API 429 errors.
 
@@ -163,7 +243,10 @@ Do NOT research: {out_of_scope_boundaries}
 
 #### Step 1: Query Selection (Dynamic based on query count)
 
-The queries come from Phase 1 (translating-intent output). Present them to user for selection/modification.
+**Deep mode:** Queries come from Phase 1 (translating-intent output).
+**Lite mode:** Single query is the user's original request.
+
+Present queries to user for selection/modification.
 
 **If query count > 3:** Ask user to SELECT TOP 3 PRIORITIES with note: "Select up to 3 priorities (limited to avoid rate limits and token usage)". If user selects more than 3, take first 3 selected.
 
@@ -620,9 +703,10 @@ Without this handoff protocol, research becomes a dead end. The agent completes 
 
 | Anti-Pattern                                | Why It's Wrong                                 | Correct Approach                            |
 | ------------------------------------------- | ---------------------------------------------- | ------------------------------------------- |
+| Skipping mode selection                     | Forces deep mode on focused queries, wastes time | Always ask user for mode preference (Phase 0) |
 | Spawning more than 1 agent at a time        | Triggers API rate limits, causes 429 errors    | Spawn agents SEQUENTIALLY (1 at a time)     |
 | Researching more than 3 interpretations     | Excessive token usage, rate limit failures     | Max 3 interpretations per session           |
-| Skipping intent expansion for vague queries | Misses interpretations, narrow coverage        | Always run translating-intent for ambiguity |
+| Running intent expansion in lite mode       | Wastes time on focused queries                 | Skip Phase 1 when lite mode selected        |
 | Spawning agents without user query review   | User can't modify/deselect queries, wastes CPU | Phase 2 query selection before spawning     |
 | Spawning agents without interpretation      | Generic results, no targeted focus             | Include specific interpretation + keywords  |
 | Synthesizing without conflict detection     | Misses disagreements, presents false consensus | Explicitly flag conflicts between sources   |
@@ -634,18 +718,24 @@ Without this handoff protocol, research becomes a dead end. The agent completes 
 
 ## Key Principles
 
-1. **WORKFLOW CONTINUITY**: Always check for and return to parent workflows via Phase 6 handoff
-2. **INTERPRETATION EXPANSION**: Use translating-intent to maximize coverage for vague queries (limit to 3)
-3. **STRUCTURED DELEGATION**: Each agent gets specific interpretation + keywords
-4. **COMPREHENSIVE SYNTHESIS**: Cross-reference across all dimensions (interpretations × sources)
-5. **PERSISTENT OUTPUT**: Always save to .claude/.output/research/ with full metadata
-6. **PARENT WORKFLOW DETECTION**: Check TodoWrite for pending phases before reporting completion
+1. **USER CONTROL**: Always ask user to choose research mode (Phase 0) - deep or lite
+2. **WORKFLOW CONTINUITY**: Always check for and return to parent workflows via Phase 6 handoff
+3. **MODE ADHERENCE**: Skip Phase 1 in lite mode, include it in deep mode
+4. **INTERPRETATION EXPANSION** (deep mode): Use translating-intent to maximize coverage for vague queries (limit to 3)
+5. **STRUCTURED DELEGATION**: Each agent gets specific interpretation + keywords
+6. **COMPREHENSIVE SYNTHESIS**: Cross-reference across all dimensions (interpretations × sources)
+7. **PERSISTENT OUTPUT**: Always save to .claude/.output/research/ with full metadata
+8. **PARENT WORKFLOW DETECTION**: Check TodoWrite for pending phases before reporting completion
 
 ## Common Rationalizations
 
+**"This query is clear/vague enough, I'll pick the mode for them"**
+
+→ WRONG. Always ask user to choose mode in Phase 0. They understand their research needs better than you do.
+
 **"This query is clear enough, skip intent expansion"**
 
-→ WRONG. Vague queries like "authentication patterns" have 5+ valid interpretations. Always expand unless confidence > 0.9 on single interpretation.
+→ DEPENDS. If user selected lite mode, correct. If user selected deep mode, wrong - honor their choice even if query seems focused.
 
 **"Let me spawn all agents in parallel for speed"**
 

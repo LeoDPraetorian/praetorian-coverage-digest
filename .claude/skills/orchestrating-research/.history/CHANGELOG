@@ -1,5 +1,64 @@
 # Changelog - orchestrating-research
 
+## 2026-01-16 (Numeric Response Support for Mode Selection)
+
+### Changed
+- **Phase 0 AskUserQuestion prompt**: Updated question text to indicate numeric responses are supported: "Which research mode do you want to use? (You can respond with 1 or 2)"
+- **Added numeric response normalization logic**: Documented pattern for handling "1" (maps to "Deep Research") and "2" (maps to "Lite Research") alongside text responses
+
+### Rationale
+**Problem**: Users had to type out "Deep Research (Recommended)" or "Lite Research" when selecting research mode, which is tedious compared to common CLI patterns that support numeric shortcuts.
+
+**Solution**: Add clear indication in the question prompt that numeric responses are accepted (1 or 2), and document the normalization pattern to map numeric inputs to the corresponding mode labels.
+
+### Impact
+- **User experience**: Faster mode selection via numeric shortcut (type "1" instead of selecting full text)
+- **CLI consistency**: Matches standard CLI conventions for numeric option selection
+- **Backward compatible**: Both numeric and text responses work
+
+## 2026-01-16 (Two Research Modes: Deep and Lite)
+
+### Added
+- **Phase 0: Mode Selection** - New phase to ask user for research mode preference
+  - Deep mode: Current behavior with intent expansion via translating-intent
+  - Lite mode: Direct research without intent analysis for focused queries
+  - Uses AskUserQuestion at the beginning to let user choose mode
+- **Mode selection guidance** in "When to Use" section
+  - Deep mode recommended for vague/multi-faceted queries
+  - Lite mode recommended for focused queries with clear scope
+- **Mode-specific workflow paths** throughout documentation
+  - Phase 1 marked as "Deep Mode Only" with skip instruction for lite mode
+  - Quick Reference table shows which phases apply to each mode
+  - Total time estimates for both modes (deep: 15-30 min, lite: 10-25 min)
+
+### Changed
+- **Frontmatter description**: Updated to mention "supports deep mode (with intent expansion) and lite mode (direct research)"
+- **Main heading**: Changed from "Sequential research orchestration with intent expansion" to "Sequential research orchestration with two modes: deep research (with intent expansion) and lite research (direct queries)"
+- **Key Features**: Added "Two Research Modes" as first feature, updated other features to clarify mode-specific behavior
+- **Quick Reference table**: Added Phase 0 (Mode Selection) and "Applies To" column showing which phases run in each mode
+- **Phase 1**: Added "Deep Mode Only" to heading, added skip instruction for lite mode with guidance on creating single interpretation from user query
+- **Phase 2**: Updated description to clarify queries come from Phase 1 in deep mode or original query in lite mode
+- **Anti-Patterns**: Added "Skipping mode selection" and "Running intent expansion in lite mode" anti-patterns
+- **Common Rationalizations**: Added rationalization about picking mode for user, updated existing rationalization about skipping intent expansion
+- **Key Principles**: Reordered to make "USER CONTROL" (mode selection) principle #1, added "MODE ADHERENCE" as principle #3
+- **TodoWrite tracking**: Updated from "6 phases" to "7 for deep mode, 6 for lite mode"
+
+### Rationale
+**Problem**: The orchestrating-research skill always ran intent analysis via translating-intent, even for focused queries where the user already knew exactly what they wanted to research (e.g., "research React Hook Form validation patterns"). This added unnecessary time and complexity for straightforward research needs.
+
+**Solution**: Introduce two modes:
+1. **Deep mode** (current behavior): For vague queries that benefit from intent expansion (e.g., "research authentication patterns" → OAuth, JWT, sessions)
+2. **Lite mode** (new): Skip intent analysis, use user's query directly for focused research
+
+Users choose their preferred mode at the beginning via AskUserQuestion. This gives them control over the research depth and time investment.
+
+### Impact
+- **User control**: Users can now choose research depth based on query clarity
+- **Efficiency**: Lite mode saves 2-3 minutes by skipping intent expansion for focused queries
+- **Flexibility**: Both modes available for different research needs
+- **Backward compatible**: Deep mode preserves existing behavior for users who need comprehensive coverage
+- **Line count**: Increased from 685 to 750 lines (250 lines over soft limit, requires progressive disclosure refactor for mode selection details)
+
 ## 2026-01-10 (Prompt Engineering Patterns Integration)
 
 ### Added
