@@ -1,0 +1,72 @@
+# Changelog
+
+## [Conciseness Guidelines Added] - 2026-01-13
+
+### Added
+
+- **SKILL.md Critical Rules**: Three new rules about avoiding hyperbole, unnecessary bullet points, and repetition
+- **writing-rules.md**: New "Conciseness and Clarity" section at top with four subsections:
+  - Avoid Hyperbole (factual vs exaggerated language examples)
+  - Avoid Unnecessary Bullet Points (when to use prose vs bullets)
+  - Avoid Repetition Across Sections (progressive detail principle)
+  - Be Succinct (remove filler phrases, direct statements)
+
+### Changed
+
+- **SKILL.md**: Added 4 lines to Critical Rules (hyperbole, bullets, repetition, succinctness)
+- **writing-rules.md**: Added 104 lines of detailed guidance with examples
+
+### Metadata
+
+- **Source**: User clarification "do not add hyperbole and unnecessary bullet points. do not consistently repeat across multiple sections and bullet points when a succinct point conveying the idea can be made instead"
+- **Line Count**: 301 lines (was 297) - still under 500 limit
+- **Backup**: 2026-01-13-09-50-02-pre-hyperbole-update.bak
+
+### RED Phase Documentation
+
+**Gap**: Skill didn't explicitly warn against hyperbole, unnecessary bullet points, or repetitive content across sections.
+
+**Failure without fix**:
+1. Claude might write findings with exaggerated language ("catastrophic", "devastating", "massive breach")
+2. Create bullet points where prose would be more concise
+3. Repeat same information in multiple sections instead of progressive detail
+4. Use verbose phrasing with filler words
+
+**Evidence**: User requested explicit guidance to avoid hyperbole and repetition, ensure succinct communication.
+
+## [Initial Creation] - 2026-01-13
+
+### Added
+
+- Core skill for Praetorian cloud security finding format
+- Six-section structure: Vulnerability Description, Impact, Resources Impacted, Verification and Attack Information, Recommendations, References
+- CVSS 4.0 base metrics calculation guidance
+- Comprehensive writing rules (voice, tone, formatting, client references)
+- Progressive disclosure with three reference files
+- Example S3 bucket finding demonstrating complete format
+
+### Skill Details
+
+- **Category**: Core skill
+- **Type**: Process/Pattern (writing methodology)
+- **Line Count**: 297 lines (SKILL.md) - under 500 limit
+- **References Created**: writing-rules.md, finding-structure.md, cvss-calculation.md
+
+### RED Phase Documentation
+
+**Gap**: Claude doesn't know Praetorian's cloud security finding writing format and standards.
+
+**Failure without skill:**
+
+1. Claude uses generic security writing style instead of Praetorian-specific voice
+2. Doesn't follow 6-section H4 structure (Vulnerability Description, Impact, Resources Impacted, Verification and Attack Information, Recommendations, References)
+3. Doesn't apply writing rules (avoid "Praetorian" repetition, use `%%CLIENT_SHORT%%`, backticks for resources, past tense, active voice)
+4. Doesn't generate CVSS 4.0 base metrics correctly
+5. Doesn't follow structured Verification format (Part 1: discovery, Part 2: demonstration steps, Part 3: quantifiable results)
+6. Recommendations too prescriptive with implementation details instead of strategic guidance
+
+**Test Scenario**: Ask Claude to "Write a cloud security finding about an S3 bucket with overly permissive policies" without this skill.
+
+**Expected Failure**: Generic format, missing sections, wrong heading levels, improper voice, no CVSS rating or incorrect format, missing image caption format, resource inline code formatting not applied.
+
+**Evidence**: User provided complete Praetorian finding format specifications including writing rules, section structure, section intentions, target audiences, and detailed example. Without this skill, Claude would not apply these Praetorian-specific standards.
