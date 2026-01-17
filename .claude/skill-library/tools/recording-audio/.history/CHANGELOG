@@ -1,0 +1,63 @@
+# Changelog - recording-audio
+
+## [Initial Creation] - 2026-01-15
+
+### Phase 1: RED - Gap Documentation
+
+**Problem**: No systematic way to guide CLI audio recording workflows using FFmpeg on macOS with:
+- Proper AVFoundation integration
+- Quality settings for different use cases (voice/general/high quality)
+- Claude output directory integration (`.claude/.output/audio/`)
+- Recording loop support with transcription integration
+- Microphone permission guidance
+
+**Test Scenario**: "Record 30 seconds of audio from my microphone and save it to the Claude output folder"
+
+**Expected Failure (without skill)**:
+- Claude may not know FFmpeg's AVFoundation syntax for macOS
+- Won't use proper command format (`-f avfoundation -i ":0"`)
+- Won't save to Claude output directory structure
+- Won't apply appropriate quality settings
+- Won't handle permission requirements
+- Won't integrate with existing transcribing-audio skill
+
+**Evidence**: Research document shows correct approach requires specific FFmpeg commands with AVFoundation, but no skill exists to guide this workflow systematically.
+
+### Metadata
+
+- **Category**: tools/
+- **Skill Type**: Tool Wrapper (wraps FFmpeg CLI with workflow guidance)
+- **Location**: `.claude/skill-library/tools/recording-audio/`
+- **Line Count**: 350 lines (within safe threshold)
+- **Research**: Based on comprehensive FFmpeg research in `.claude/.output/research/2026-01-15-120747-macos-cli-audio-recording/SYNTHESIS.md`
+
+### Structure
+
+- SKILL.md created with progressive disclosure pattern
+- References directory prepared for detailed workflows
+- Examples directory prepared for sample recordings
+- Integration section documents relationship with transcribing-audio skill
+
+### Next Steps
+
+- Phase 6: Populate references/ with detailed workflow documentation
+- Phase 7: Add to gateway-tools routing table
+- Phase 8: GREEN verification (test scenario passes)
+- Phase 9: REFACTOR pressure testing
+
+## 2026-01-15 - Device Selection Enforcement
+
+**Problem**: Agent skipped config checking and device listing, hardcoded `:0`, resulting in recordings from wrong device (silence instead of user's voice).
+
+**Root Cause**: Skill mentioned device listing as step but didn't make it MANDATORY with blocking language.
+
+**Changes**:
+1. Added Phase -1 to Prerequisites: MANDATORY config file check before all other phases
+2. Updated Workflow 1 Step 2: Made device selection a BLOCKING STEP with explicit DO NOT PROCEED language
+3. Added Rationalization Prevention section: Common excuses for skipping device selection with counters
+4. Updated Critical Rules: Strengthened Device Index Discovery to be MANDATORY - NO EXCEPTIONS
+5. Updated Quick Reference: Changed `:0` to `:N` placeholder with warning
+6. Updated Command Reference: Added complete workflow showing config check and device selection
+
+**Verification**: These changes prevent hardcoding device index without checking config or asking user.
+

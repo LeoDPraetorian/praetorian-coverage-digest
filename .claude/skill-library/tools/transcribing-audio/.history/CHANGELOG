@@ -1,0 +1,97 @@
+# Changelog - transcribing-audio
+
+## 2026-01-15 - Initial Creation
+
+**Type:** Tool Wrapper
+**Category:** Library skill - tools
+**Location:** `.claude/skill-library/tools/transcribing-audio/`
+
+### RED Phase Documentation
+
+**Gap:** No way to transcribe audio files (WAV, M4A, etc.) to text directly within Claude Code.
+
+**Test scenario:** User asks "transcribe this audio file" → Claude has no built-in capability.
+
+**Failure behavior (without skill):**
+- Claude responds with "I don't have direct audio transcription capabilities"
+- Suggests external tools or services
+- Unable to provide streamlined workflow within Claude Code
+
+**Why needed:** User has proven Docker-based Whisper implementation from Obsidian plugin (`~/work/dev/transcribe/obsidian-transcription/`) that provides local transcription without cloud dependencies. Skill integrates this capability into Claude Code.
+
+### Implementation
+
+**Based on:**
+- Obsidian transcription plugin architecture
+- Docker image: `ghcr.io/praetorian-inc/whisper-transcribe:latest`
+- OpenAI Whisper CLI for speech-to-text
+- Model caching strategy with volume mounts
+
+**Core features:**
+- Local transcription (no cloud dependencies)
+- Multiple model support (tiny.en, base.en, small.en, medium.en)
+- Multiple output formats (txt, json, vtt, srt, tsv)
+- Timestamp support (word-level and segment-level)
+- Language detection and translation
+- Batch processing
+- Model cache optimization
+
+**File structure:**
+- SKILL.md (420 lines) - Main documentation with Quick Start, workflow, integration examples
+- references/docker-image.md - Complete Dockerfile, build instructions, model caching, image variants
+- references/audio-recording.md - System audio recording patterns, slash command integration proposals
+- references/post-processing.md - LLM-based transcript enhancement, formatting, action item extraction
+- references/error-handling.md - Complete error catalog and troubleshooting
+
+### Future Enhancements Documented
+
+1. **Audio Recording Integration:**
+   - System-level recording wrappers (ffmpeg, arecord, parecord)
+   - Slash commands: `/record-audio`, `/transcribe`, `/record-and-transcribe`
+   - Browser-based recording via Web Audio API
+
+2. **Model Management:**
+   - Multi-model Docker image variants
+   - On-demand caching with user notifications
+   - Automatic model selection
+
+3. **Post-processing:**
+   - Claude-based formatting (punctuation, paragraphs)
+   - Meeting notes extraction (action items, decisions)
+   - Integration with brainstorming and writing-plans skills
+
+4. **Real-time Transcription:**
+   - Microphone streaming architecture
+   - Hybrid cloud + local approach
+   - WebSocket-based streaming
+
+### Research Sources
+
+- User's existing implementation: `~/work/dev/transcribe/obsidian-transcription/`
+  - README.md - Usage patterns, workflow, Docker setup
+  - Dockerfile - Model caching strategy, SHA256 verification
+  - src/transcribe.ts - Docker execution, volume mounting, error handling
+- OpenAI Whisper documentation - Model selection, parameters
+- Docker best practices - Volume mounts, caching strategies
+
+### Integration Points
+
+**Pairs with:**
+- `brainstorming` - Process brainstorming session transcripts
+- `writing-plans` - Convert planning session transcripts to plans
+- Future recording skill - Transcribe recorded audio
+
+### Key Improvements Over Raw Whisper
+
+1. **Model cache optimization:** Volume mount prevents re-downloading models
+2. **Error handling:** Complete catalog of Docker, file, format, performance errors
+3. **Cross-platform support:** Docker path detection for macOS, Linux, Windows
+4. **Integration workflow:** Clear steps for Claude Code usage patterns
+5. **Enhancement roadmap:** Documented paths for recording, post-processing, real-time
+
+### Validation
+
+- Line count: 420 lines (under 500 limit) ✅
+- Progressive disclosure: 4 reference files with detailed content ✅
+- Integration section: Documents Called By, Requires, Calls, Pairs With ✅
+- Code references: Uses descriptive patterns (no line numbers) ✅

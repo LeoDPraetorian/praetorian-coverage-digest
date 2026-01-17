@@ -1,0 +1,61 @@
+# Changelog - gateway-tools
+
+## 2026-01-15 - Initial Creation
+
+**Type:** Gateway (routing index)
+**Location:** `.claude/skills/gateway-tools/`
+
+### Created
+
+- Gateway skill created for tools domain
+- Routes to library paths: `.claude/skill-library/tools/*`
+- Categories: Audio/Video Tools, Docker Tools, CLI Utilities, System Tools
+- Initial skills: 1 skill (transcribing-audio)
+
+### Purpose
+
+Provides intent-based routing to tool wrapper skills in the library. Enables discovery of:
+- Audio/video processing tools (transcription, recording, conversion)
+- Docker-based utilities (containerized tools)
+- CLI wrappers (command-line tool integration)
+- System-level utilities (file processing, system tools)
+
+### Initial Routing Table
+
+**Audio/Video Tools:**
+- transcribing-audio - Docker/Whisper transcription wrapper
+
+**Docker Tools:**
+- transcribing-audio - Whisper CLI via Docker
+
+**CLI Utilities:**
+- transcribing-audio - Whisper command-line interface
+
+**System Tools:**
+- (Future expansion: audio recording, video processing, file conversion)
+
+### Progressive Disclosure
+
+- Level 1: Routing tables (~200 tokens) - loaded immediately
+- Level 2: Skill SKILL.md - loaded on-demand when routed
+- Level 3: Skill resources - loaded as-needed during execution
+
+### Cross-Gateway Integration
+
+Routes to other gateways when tasks involve:
+- Testing (gateway-testing)
+- Integrations (gateway-integrations)
+- Backend (gateway-backend)
+- MCP Tools (gateway-mcp-tools)
+- Security (gateway-security)
+
+### Future Expansion
+
+Designed to accommodate future tool skills:
+- Audio recording capabilities
+- Video processing utilities
+- File conversion tools
+- Image processing
+- Document processing
+- Database CLI wrappers
+- Network diagnostic tools
