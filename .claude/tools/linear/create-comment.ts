@@ -9,10 +9,10 @@
  * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
- * - issueId: string (required) - Issue ID or identifier (e.g., CHARIOT-1234 or UUID)
+ * - issueId: string (required) - Issue ID or identifier (e.g., ENG-1234 or UUID)
  * - body: string (required) - Comment content in Markdown format
  * - parentId: string (optional) - Parent comment ID for threaded replies
  *
@@ -26,7 +26,7 @@
  * Edge cases discovered:
  * - GraphQL returns {commentCreate: {success: true, comment: {...}}} on success
  * - On error, GraphQL returns errors array or throws
- * - Issue ID can be identifier (CHARIOT-1234) or UUID
+ * - Issue ID can be identifier (ENG-1234) or UUID
  * - Parent ID enables threaded/nested comments
  * - Body supports full Markdown including code blocks
  *
@@ -34,13 +34,13 @@
  * ```typescript
  * // Create simple comment
  * await createComment.execute({
- *   issueId: 'CHARIOT-1234',
+ *   issueId: 'ENG-1234',
  *   body: 'This is my comment'
  * });
  *
  * // Create reply to another comment
  * await createComment.execute({
- *   issueId: 'CHARIOT-1234',
+ *   issueId: 'ENG-1234',
  *   body: 'Replying to your point...',
  *   parentId: 'parent-comment-uuid'
  * });

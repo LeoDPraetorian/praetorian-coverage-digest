@@ -12,7 +12,7 @@ When attempting to run Linear MCP wrappers from within a submodule (e.g., `modul
 
 ```bash
 cd modules/chariot
-npx tsx .claude/tools/linear/get-issue.ts CHARIOT-1516
+npx tsx .claude/tools/linear/get-issue.ts ENG-1516
 
 Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/.../modules/chariot/.claude/tools/linear/get-issue.ts'
 ```
@@ -320,10 +320,10 @@ const toolPath = resolveSuperRepoPath("modules", "chariot", "backend", "...");
 ```bash
 # Both now work identically ✓
 cd /Users/.../chariot-development-platform
-npx tsx .claude/tools/linear/get-issue.ts CHARIOT-1516
+npx tsx .claude/tools/linear/get-issue.ts ENG-1516
 
 cd /Users/.../chariot-development-platform/modules/chariot
-npx tsx ../../.claude/tools/linear/get-issue.ts CHARIOT-1516
+npx tsx ../../.claude/tools/linear/get-issue.ts ENG-1516
 ```
 
 ---

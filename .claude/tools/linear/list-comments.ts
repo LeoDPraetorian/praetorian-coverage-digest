@@ -9,10 +9,10 @@
  * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
- * - issueId: string (required) - Issue ID or identifier (e.g., CHARIOT-1234 or UUID)
+ * - issueId: string (required) - Issue ID or identifier (e.g., ENG-1234 or UUID)
  *
  * OUTPUT (after filtering):
  * - comments: array of comment objects
@@ -29,14 +29,14 @@
  * Edge cases discovered:
  * - Body is truncated to 300 chars to reduce token usage
  * - User object may be undefined if author information unavailable
- * - Issue ID can be identifier (CHARIOT-1234) or UUID
+ * - Issue ID can be identifier (ENG-1234) or UUID
  * - Empty comments returns empty array, not null
  *
  * @example
  * ```typescript
  * // List all comments for an issue
  * const result = await listComments.execute({
- *   issueId: 'CHARIOT-1234'
+ *   issueId: 'ENG-1234'
  * });
  * console.log(`Found ${result.totalComments} comments`);
  * ```
@@ -144,7 +144,7 @@ interface IssueCommentsResponse {
  * import { listComments } from './.claude/tools/linear';
  *
  * // List comments for an issue
- * const comments = await listComments.execute({ issueId: 'CHARIOT-1234' });
+ * const comments = await listComments.execute({ issueId: 'ENG-1234' });
  *
  * // With test token
  * const comments2 = await listComments.execute({ issueId: 'abc123...' }, 'test-token');

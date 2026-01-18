@@ -9,7 +9,7 @@
  * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
  * - name: string (required) - Project name
@@ -22,6 +22,7 @@
  * - targetDate: string (optional) - Target date (ISO format)
  * - priority: number (optional) - 0=No priority, 1=Urgent, 2=High, 3=Medium, 4=Low
  * - labels: array (optional) - Label names or IDs
+ * - templateId: string (auto-set) - Organization default template (enforced)
  *
  * OUTPUT (after filtering):
  * - success: boolean - Whether creation succeeded
@@ -222,9 +223,12 @@ export const createProject = {
       targetDate?: string;
       priority?: number;
       labelIds?: string[];
+      templateId: string;
     } = {
       name: validated.name,
       teamId: validated.team,
+      // Praetorian workspace default project template - required for all projects
+      templateId: '11156350-e6e1-4712-b992-9e5b6e176ee3',
     };
 
     if (validated.description) {

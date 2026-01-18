@@ -9,7 +9,7 @@
  * - vs Direct MCP: 46,000 tokens at start
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
  * - id: string (required) - Cycle UUID to update

@@ -1,7 +1,7 @@
 /**
  * Validation script for Linear get-issue wrapper
  *
- * Tests the fixed schema with CHARIOT-1516
+ * Tests the fixed schema with ENG-1516
  *
  * Usage:
  *   npx tsx .claude/tools/linear/get-issue-validate.ts
@@ -14,7 +14,7 @@ async function validateWrapper() {
   console.log('='.repeat(60));
 
   const testCases = [
-    { id: 'CHARIOT-1516', description: 'Normal case - typical issue with priority' },
+    { id: 'ENG-1516', description: 'Normal case - typical issue with priority' },
   ];
 
   let passed = 0;
@@ -34,14 +34,15 @@ async function validateWrapper() {
       console.log(`   - Identifier: ${result.identifier}`);
       console.log(`   - Title: ${result.title}`);
 
-      if (result.priority) {
-        console.log(`   - Priority: ${result.priority.name} (value: ${result.priority.value})`);
+      if (result.priority !== undefined && result.priority !== null) {
+        const priorityLabels = ['No priority', 'Urgent', 'High', 'Normal', 'Low'];
+        console.log(`   - Priority: ${priorityLabels[result.priority] || 'Unknown'} (value: ${result.priority})`);
       } else {
         console.log(`   - Priority: not set`);
       }
 
-      if (result.estimate) {
-        console.log(`   - Estimate: ${result.estimate.name} (value: ${result.estimate.value})`);
+      if (result.estimate !== undefined && result.estimate !== null) {
+        console.log(`   - Estimate: ${result.estimate} story points`);
       }
 
       if (result.assignee) {

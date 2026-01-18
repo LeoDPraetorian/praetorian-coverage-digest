@@ -4,7 +4,7 @@ description: Use when designing tool wrapper architecture (MCP servers and REST 
 type: architecture
 permissionMode: plan
 tools: Glob, Grep, Read, Write, Skill, TodoWrite, WebFetch, WebSearch
-skills: adhering-to-dry, adhering-to-yagni, brainstorming, calibrating-time-estimates, debugging-systematically, discovering-reusable-code, enforcing-evidence-based-analysis, gateway-mcp-tools, gateway-typescript, persisting-agent-outputs, semantic-code-operations, using-skills, using-todowrite, verifying-before-completion, writing-plans
+skills: adhering-to-dry, adhering-to-yagni, brainstorming, calibrating-time-estimates, debugging-systematically, discovering-reusable-code, enforcing-evidence-based-analysis, gateway-integrations, gateway-mcp-tools, gateway-typescript, persisting-agent-outputs, semantic-code-operations, using-skills, using-todowrite, verifying-before-completion, writing-plans
 model: opus
 color: blue
 ---

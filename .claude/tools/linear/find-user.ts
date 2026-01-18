@@ -9,7 +9,7 @@
  * - vs MCP: 46,000 tokens at start
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
  * - query: string (required) - User ID, email, or name to search

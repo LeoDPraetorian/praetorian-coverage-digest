@@ -698,8 +698,7 @@ Domain-specific agents with auto-loaded gateway skills:
 │   ├── mcp-management/                      # MCP server management
 │   ├── plugins/                             # 3 plugin management skills
 │   ├── hooks/                               # 1 git hook skill
-│   ├── marketplaces/                        # 1 distribution skill
-│   └── writing-linear-epics-stories/        # 1 project management skill
+│   └── marketplaces/                        # 1 distribution skill
 ├── development/
 │   ├── frontend/                            # 20 React/TypeScript skills
 │   ├── backend/                             # 9 Go/AWS skills

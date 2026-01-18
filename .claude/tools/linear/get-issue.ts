@@ -9,7 +9,7 @@
  * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT-1516):
+ * Schema Discovery Results (tested with ENG-1516):
  *
  * REQUIRED fields (100% presence):
  * - id: string
@@ -18,9 +18,9 @@
  *
  * OPTIONAL fields (<100% presence):
  * - description: string | null
- * - priority: object | null ⚠️ TYPE VARIANCE - object with {name: string, value: number}
- * - priorityLabel: string | null (deprecated - use priority.name)
- * - estimate: object | null - object with {name: string, value: number}
+ * - priority: number | null - 0=No priority, 1=Urgent, 2=High, 3=Normal, 4=Low
+ * - priorityLabel: string | null - String label ("Urgent", "High", "Normal", "Low")
+ * - estimate: number | null - Story points estimate
  * - state: object | null
  * - assignee: string | null - appears as string (assignee name)
  * - assigneeId: string | null
@@ -31,7 +31,7 @@
  * - attachments: array
  *
  * Edge cases discovered:
- * - priority is an OBJECT {name, value}, NOT a number
+ * - priority is a NUMBER (0-4), priorityLabel is the string version
  * - assignee can be null (unassigned issues)
  * - state can be undefined (some workflow states)
  * - Empty attachments returns empty array, not null
@@ -98,14 +98,14 @@ export const getIssueParams = z.object({
     .refine(validateNoControlChars, 'Control characters not allowed')
     .refine(validateNoPathTraversal, 'Path traversal not allowed')
     .refine(validateNoCommandInjection, 'Invalid characters detected')
-    .describe('Issue ID or identifier (e.g., CHARIOT-1366 or UUID)')
+    .describe('Issue ID or identifier (e.g., ENG-1366 or UUID)')
 });
 
 export type GetIssueInput = z.infer<typeof getIssueParams>;
 
 /**
  * Output schema - minimal essential fields
- * Fixed based on schema discovery from CHARIOT-1516
+ * Fixed based on schema discovery from ENG-1516
  */
 export const getIssueOutput = z.object({
   // Required fields
@@ -116,12 +116,13 @@ export const getIssueOutput = z.object({
   // Optional fields with correct types
   description: z.string().optional(),
 
-  // Priority is a Float (number), not an object
+  // Priority is a number (0-4): 0=No priority, 1=Urgent, 2=High, 3=Normal, 4=Low
   priority: z.number().nullable().optional(),
 
+  // priorityLabel is the string version ("Urgent", "High", etc.)
   priorityLabel: z.string().optional(),
 
-  // Estimate is a Float (number), not an object
+  // Estimate is a number (story points)
   estimate: z.number().nullable().optional(),
 
   state: z.object({
@@ -162,22 +163,18 @@ interface IssueResponse {
     identifier: string;
     title: string;
     description?: string | null;
-    priority?: {
-      name: string;
-      value: number;
-    } | null;
+    priority?: number | null;
     priorityLabel?: string | null;
-    estimate?: {
-      name: string;
-      value: number;
-    } | null;
+    estimate?: number | null;
     state?: {
       id: string;
       name: string;
       type: string;
     } | null;
     assignee?: {
+      id: string;
       name: string;
+      email: string;
     } | null;
     assigneeId?: string | null;
     url?: string;
@@ -202,7 +199,7 @@ interface IssueResponse {
  * import { getIssue } from './.claude/tools/linear';
  *
  * // Get by identifier
- * const issue = await getIssue.execute({ id: 'CHARIOT-1366' });
+ * const issue = await getIssue.execute({ id: 'ENG-1366' });
  *
  * // Get by UUID
  * const issue2 = await getIssue.execute({ id: 'eee0788c-9b67-4b3c-8a08-c9cd4224403e' });

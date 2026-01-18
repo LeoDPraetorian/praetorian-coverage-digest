@@ -9,7 +9,7 @@
  * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
  * - query: string (optional) - Filter by name or email

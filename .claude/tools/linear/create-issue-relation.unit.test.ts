@@ -51,7 +51,7 @@ describe('createIssueRelation (GraphQL)', () => {
   describe('input validation', () => {
     it('validates required fields', async () => {
       await expect(
-        createIssueRelation.execute({} as CreateIssueRelationInput, { apiKey: 'test-key' })
+        createIssueRelation.execute({} as CreateIssueRelationInput, 'test-key')
       ).rejects.toThrow();
     });
 
@@ -61,7 +61,7 @@ describe('createIssueRelation (GraphQL)', () => {
           issueId: 'ISSUE\x00123',
           relatedIssueId: 'ISSUE-456',
           type: 'blocks'
-        }, { apiKey: 'test-key' })
+        }, 'test-key')
       ).rejects.toThrow('Control characters not allowed');
     });
 
@@ -71,7 +71,7 @@ describe('createIssueRelation (GraphQL)', () => {
           issueId: 'ISSUE-123',
           relatedIssueId: '../../../etc/passwd',
           type: 'blocks'
-        }, { apiKey: 'test-key' })
+        }, 'test-key')
       ).rejects.toThrow('Path traversal not allowed');
     });
 
@@ -81,7 +81,7 @@ describe('createIssueRelation (GraphQL)', () => {
           issueId: 'ISSUE-123',
           relatedIssueId: 'ISSUE-456',
           type: 'invalid' as any
-        }, { apiKey: 'test-key' })
+        }, 'test-key')
       ).rejects.toThrow();
     });
   });
@@ -114,7 +114,7 @@ describe('createIssueRelation (GraphQL)', () => {
         issueId: 'ISSUE-123',
         relatedIssueId: 'ISSUE-456',
         type: 'blocks'
-      }, { apiKey: 'test-key' });
+      }, 'test-key');
 
       expect(result.success).toBe(true);
       expect(result.relation.id).toBe('rel-123');
@@ -146,7 +146,7 @@ describe('createIssueRelation (GraphQL)', () => {
         issueId: 'ISSUE-123',
         relatedIssueId: 'ISSUE-456',
         type: 'blocked_by'
-      }, { apiKey: 'test-key' });
+      }, 'test-key');
 
       expect(result.relation.type).toBe('blocked_by');
     });
@@ -174,7 +174,7 @@ describe('createIssueRelation (GraphQL)', () => {
         issueId: 'ISSUE-123',
         relatedIssueId: 'ISSUE-456',
         type: 'duplicate'
-      }, { apiKey: 'test-key' });
+      }, 'test-key');
 
       expect(result.relation.type).toBe('duplicate');
     });
@@ -202,7 +202,7 @@ describe('createIssueRelation (GraphQL)', () => {
         issueId: 'ISSUE-123',
         relatedIssueId: 'ISSUE-456',
         type: 'related'
-      }, { apiKey: 'test-key' });
+      }, 'test-key');
 
       expect(result.relation.type).toBe('related');
     });
@@ -231,7 +231,7 @@ describe('createIssueRelation (GraphQL)', () => {
           issueId: 'ISSUE-123',
           relatedIssueId: 'ISSUE-456',
           type: 'blocks'
-        }, { apiKey: 'test-key' })
+        }, 'test-key')
       ).rejects.toThrow('Failed to create issue relation');
     });
 
@@ -254,7 +254,7 @@ describe('createIssueRelation (GraphQL)', () => {
           issueId: 'ISSUE-123',
           relatedIssueId: 'ISSUE-456',
           type: 'blocks'
-        }, { apiKey: 'test-key' })
+        }, 'test-key')
       ).rejects.toThrow(/GraphQL errors/);
     });
 
@@ -277,7 +277,7 @@ describe('createIssueRelation (GraphQL)', () => {
           issueId: 'ISSUE-123',
           relatedIssueId: 'ISSUE-456',
           type: 'blocks'
-        }, { apiKey: 'test-key' })
+        }, 'test-key')
       ).rejects.toThrow();
     });
   });
@@ -292,7 +292,7 @@ describe('createIssueRelation (GraphQL)', () => {
         issueId: 'ISSUE-123',
         relatedIssueId: 'ISSUE-456',
         type: 'blocks'
-      }, { apiKey: 'test-key' });
+      }, 'test-key');
 
       expect(result.estimatedTokens).toBeGreaterThan(0);
     });
@@ -329,7 +329,7 @@ describe('createIssueRelation (GraphQL)', () => {
         issueId: 'ISSUE-123',
         relatedIssueId: 'ISSUE-456',
         type: 'blocks'
-      }, { apiKey: 'test-key' });
+      }, 'test-key');
 
       expect(capturedVariables).toEqual({
         input: {

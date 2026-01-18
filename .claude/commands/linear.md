@@ -102,29 +102,14 @@ npx tsx -e "import { setDefaultTeam } from './.claude/tools/linear/lib/team-sele
 /linear set CHARIOT-1234 assignee to @user
 ```
 
-### Creating Epics (Comprehensive)
-
-```
-/linear create epic for real-time notifications with research
-/linear create epic for asset discovery automation with proper breakdown
-```
-
-Epic creation triggers a comprehensive workflow: codebase research, breakdown design, detailed documentation, then ticket creation.
 
 ---
 
-## Quick Operations vs Epic Creation
+## Quick Operations
 
 **Quick operations** (this command handles directly):
 - Create/get/list/update issues
 - Add comments, change status, assign users
-
-**Epic creation** (triggers `writing-linear-epics-stories` skill):
-- Detects keywords: "epic", "comprehensive", "with research", "with breakdown"
-- Performs codebase research, designs breakdown, writes detailed docs
-- Creates parent epic + child issues with full context
-
-The command automatically detects which workflow you need.
 
 ---
 
@@ -153,10 +138,9 @@ This ensures the user knows what happened and can guide next steps.
 ## How It Works
 
 1. **You describe** your intent naturally
-2. **Command detects** workflow type (quick operation vs epic)
-3. **Command routes** to appropriate skill (`mcp-tools-linear` or `writing-linear-epics-stories`)
-4. **Command parses** your input and executes the operation
-5. **Command displays** results with ticket URLs
+2. **Command routes** to appropriate skill (`mcp-tools-linear`)
+3. **Command parses** your input and executes the operation
+4. **Command displays** results with ticket URLs
 
 ---
 

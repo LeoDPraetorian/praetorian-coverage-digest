@@ -1,6 +1,6 @@
 ---
 name: mcp-tools-linear
-description: Use when accessing Linear services - provides 40+ GraphQL HTTP wrappers with OAuth 2.0 support. Direct API access, no MCP server dependency. Supports initiatives, issue relations, cycles, roadmaps, and more.
+description: Use when accessing Linear API - 57 exported GraphQL wrappers covering issues, projects, initiatives, cycles, teams, users, comments, labels, attachments, workflow states, reactions, archive operations, subscribers, favorites, documents, and issue relations via OAuth 2.0. Note 7 additional wrappers exist but not exported (roadmaps, special utilities).
 allowed-tools: Read, Bash
 skills: []
 ---
@@ -83,36 +83,88 @@ rm ~/.claude-oauth/linear.json
 3. **More Control:** Direct token management
 4. **Backward Compatible:** API key fallback preserved
 
-## Available Wrappers (40+ GraphQL Tools)
+## Available Operations (Exported in index.ts)
+
+These operations are exported and ready to use via the Linear wrapper index.
 
 ### Issues
 
-| Wrapper            | Purpose                 | Key Parameters                                            |
-| ------------------ | ----------------------- | --------------------------------------------------------- |
-| `create-issue`     | Create new issue        | `title`, `team`, `description`, `assignee`, `priority`    |
-| `get-issue`        | Get issue by ID         | `id` (e.g., "CHARIOT-1234")                               |
-| `find-issue`       | Search issues           | `query`, `limit`                                          |
-| `list-issues`      | List recent issues      | `limit` (default: 20)                                     |
-| `update-issue`     | Update issue fields     | `id`, `title`, `state`, `priority`, `assignee`, `project` |
-| `check-full-issue` | Get complete issue data | `id`                                                      |
-
-### Issue Relations
-
-| Wrapper                 | Purpose                  | Key Parameters                      |
-| ----------------------- | ------------------------ | ----------------------------------- |
-| `create-issue-relation` | Link two issues          | `issueId`, `relatedIssueId`, `type` |
-| `list-issue-relations`  | List issue relationships | `issueId`                           |
-| `delete-issue-relation` | Remove issue link        | `relationId`                        |
+| Wrapper        | Purpose                 | Key Parameters                                            |
+| -------------- | ----------------------- | --------------------------------------------------------- |
+| `create-issue` | Create new issue        | `title`, `team`, `description`, `assignee`, `priority`    |
+| `get-issue`    | Get issue by ID         | `id` (e.g., "ENG-1234")                               |
+| `find-issue`   | Search issues           | `query`, `limit`                                          |
+| `list-issues`  | List recent issues      | `limit` (default: 20)                                     |
+| `update-issue` | Update issue fields     | `id`, `title`, `state`, `priority`, `assignee`, `project` |
 
 ### Projects
 
-| Wrapper          | Purpose            | Key Parameters                                     |
-| ---------------- | ------------------ | -------------------------------------------------- |
-| `create-project` | Create new project | `name`, `description`, `teamId`, `leadId`          |
-| `get-project`    | Get project by ID  | `id`                                               |
-| `list-projects`  | List all projects  | None                                               |
-| `update-project` | Update project     | `id`, `name`, `description`, `state`, `targetDate` |
-| `delete-project` | Delete project     | `id`                                               |
+| Wrapper                        | Purpose                      | Key Parameters                                                                  |
+| ------------------------------ | ---------------------------- | ------------------------------------------------------------------------------- |
+| `create-project`               | Create new project           | `name`, `description`, `teamId`, `leadId`                                       |
+| `get-project`                  | Get project by ID            | `id`, `fullContent` (optional, default: false)                                  |
+| `list-projects`                | List all projects            | `fullContent` (optional, default: false)                                        |
+| `update-project`               | Update project               | `id`, `name`, `description`, `state`, `targetDate`                              |
+| `list-project-templates`       | List project templates       | `limit`, `includeArchived`, `fullDescription`                                   |
+| `create-project-from-template` | Create project from template | `templateId`, `name`, `team`, `description`, `lead`, `startDate`, `targetDate` |
+
+#### Understanding Project Description vs Content
+
+Linear Projects have TWO distinct text fields:
+
+| Field | Purpose | Where It Appears | Example |
+|-------|---------|------------------|---------|
+| `description` | Short summary/tagline (NON_NULL) | Project cards, lists, hover tooltips | 'Maintain >=90% customer retention through proactive engagement' |
+| `content` | Full markdown content (String) | Project Overview tab | Full markdown with ### headers, bullet lists, tables |
+
+**API Field Types (from GraphQL introspection):**
+
+```graphql
+# Project type
+description: String!  # Short summary (NON_NULL)
+content: String       # Full markdown content (nullable)
+
+# ProjectCreateInput / ProjectUpdateInput
+description: String   # Short summary
+content: String       # Full markdown content
+```
+
+**When to Use Each Field:**
+
+- **`description`** → Short summary for project cards and lists
+- **`content`** → Full markdown for Overview/Strategy/Metrics sections with headers, lists, tables
+
+**Anti-Pattern to Avoid:**
+
+```typescript
+// ❌ WRONG: Putting full markdown in description
+create-project {
+  description: "### Overview\n\nThis is a long markdown document..."
+}
+
+// ✅ RIGHT: Short summary in description, full markdown in content
+create-project {
+  description: "Improve NRR by 2% through Professional Services expansion",
+  content: "### Overview\n\nIncrease Professional Services revenue..."
+}
+```
+
+**Content Truncation:**
+
+- `get-project`: Returns both fields, `content` truncated to 1000 chars by default
+- `list-projects`: Returns both fields, `content` truncated to 500 chars by default
+- Use `fullContent: true` parameter to get untruncated content
+
+**Project Template Usage:**
+
+When creating project templates, the `templateData` JSON should include BOTH keys:
+
+```json
+{
+  "description": "Short summary for project card",
+  "content": "### Overview\n\nFull markdown content with headers..."
+}
+```
 
 ### Initiatives
 
@@ -125,40 +177,6 @@ rm ~/.claude-oauth/linear.json
 | `delete-initiative`          | Delete initiative           | `id`                        |
 | `link-project-to-initiative` | Link project to initiative  | `projectId`, `initiativeId` |
 
-### Cycles
-
-| Wrapper        | Purpose             | Key Parameters                         |
-| -------------- | ------------------- | -------------------------------------- |
-| `create-cycle` | Create sprint/cycle | `teamId`, `name`, `startsAt`, `endsAt` |
-| `get-cycle`    | Get cycle by ID     | `id`                                   |
-| `list-cycles`  | List team cycles    | `teamId`                               |
-| `update-cycle` | Update cycle        | `id`, `name`, `startsAt`, `endsAt`     |
-
-### Roadmaps
-
-| Wrapper          | Purpose                | Key Parameters              |
-| ---------------- | ---------------------- | --------------------------- |
-| `create-roadmap` | Create product roadmap | `name`, `description`       |
-| `get-roadmap`    | Get roadmap by ID      | `id`                        |
-| `list-roadmaps`  | List all roadmaps      | None                        |
-| `update-roadmap` | Update roadmap         | `id`, `name`, `description` |
-
-### Documents
-
-| Wrapper           | Purpose            | Key Parameters           |
-| ----------------- | ------------------ | ------------------------ |
-| `create-document` | Create doc page    | `title`, `content`       |
-| `get-document`    | Get document by ID | `id`                     |
-| `list-documents`  | List documents     | None                     |
-| `update-document` | Update document    | `id`, `title`, `content` |
-
-### Comments
-
-| Wrapper          | Purpose             | Key Parameters    |
-| ---------------- | ------------------- | ----------------- |
-| `create-comment` | Add issue comment   | `issueId`, `body` |
-| `list-comments`  | List issue comments | `issueId`         |
-
 ### Teams & Users
 
 | Wrapper      | Purpose              | Key Parameters    |
@@ -168,12 +186,132 @@ rm ~/.claude-oauth/linear.json
 | `find-user`  | Search for user      | `email` or `name` |
 | `list-users` | List workspace users | None              |
 
-### Special Tools
+### Comments
 
-| Wrapper           | Purpose                      | Key Parameters                 |
-| ----------------- | ---------------------------- | ------------------------------ |
-| `create-bug`      | Create bug (preset priority) | `title`, `team`, `description` |
-| `create-jira-bug` | Create bug with Jira import  | `title`, `team`, `jiraUrl`     |
+| Wrapper          | Purpose             | Key Parameters    |
+| ---------------- | ------------------- | ----------------- |
+| `create-comment` | Add issue comment   | `issueId`, `body` |
+| `list-comments`  | List issue comments | `issueId`         |
+
+### Labels
+
+| Wrapper        | Purpose            | Key Parameters                    |
+| -------------- | ------------------ | --------------------------------- |
+| `create-label` | Create issue label | `name`, `color`, `description`    |
+| `get-label`    | Get label by ID    | `id`                              |
+| `list-labels`  | List all labels    | None                              |
+| `update-label` | Update label       | `id`, `name`, `color`, `description` |
+| `delete-label` | Delete label       | `id`                              |
+
+### Archive Operations
+
+| Wrapper           | Purpose         | Key Parameters |
+| ----------------- | --------------- | -------------- |
+| `archive-issue`   | Archive issue   | `id`           |
+| `unarchive-issue` | Unarchive issue | `id`           |
+| `archive-project` | Archive project | `id`           |
+
+### Workflow States
+
+| Wrapper                  | Purpose                  | Key Parameters                           |
+| ------------------------ | ------------------------ | ---------------------------------------- |
+| `create-workflow-state`  | Create custom state      | `teamId`, `name`, `color`, `type`        |
+| `get-workflow-state`     | Get workflow state by ID | `id`                                     |
+| `list-workflow-states`   | List team workflow states | `teamId`                                |
+| `update-workflow-state`  | Update workflow state    | `id`, `name`, `color`, `position`        |
+
+### Attachments
+
+| Wrapper              | Purpose              | Key Parameters                  |
+| -------------------- | -------------------- | ------------------------------- |
+| `create-attachment`  | Attach file to issue | `issueId`, `url`, `title`       |
+| `list-attachments`   | List issue attachments | `issueId`                     |
+| `update-attachment`  | Update attachment    | `id`, `title`, `subtitle`       |
+| `delete-attachment`  | Delete attachment    | `id`                            |
+
+### Reactions
+
+| Wrapper           | Purpose              | Key Parameters        |
+| ----------------- | -------------------- | --------------------- |
+| `create-reaction` | Add emoji reaction   | `commentId`, `emoji`  |
+| `delete-reaction` | Remove emoji reaction | `id`                 |
+
+### Subscribers
+
+| Wrapper                  | Purpose                 | Key Parameters |
+| ------------------------ | ----------------------- | -------------- |
+| `subscribe-to-issue`     | Watch issue for updates | `issueId`      |
+| `unsubscribe-from-issue` | Stop watching issue     | `issueId`      |
+
+### Favorites
+
+| Wrapper           | Purpose                | Key Parameters                |
+| ----------------- | ---------------------- | ----------------------------- |
+| `create-favorite` | Star item (issue, project, etc.) | `issueId` or `projectId` |
+| `delete-favorite` | Unstar item            | `id`                          |
+
+### Cycles
+
+| Wrapper        | Purpose             | Key Parameters                           |
+| -------------- | ------------------- | ---------------------------------------- |
+| `create-cycle` | Create sprint/cycle | `teamId`, `name`, `startsAt`, `endsAt`   |
+| `get-cycle`    | Get cycle by ID     | `id`                                     |
+| `list-cycles`  | List team cycles    | `teamId` (optional)                      |
+| `update-cycle` | Update cycle        | `id`, `name`, `startsAt`, `endsAt`       |
+
+### Documents
+
+| Wrapper           | Purpose            | Key Parameters                    |
+| ----------------- | ------------------ | --------------------------------- |
+| `create-document` | Create doc page    | `title`, `content`                |
+| `get-document`    | Get document by ID | `id`                              |
+| `list-documents`  | List documents     | None                              |
+| `update-document` | Update document    | `id`, `title`, `content`          |
+
+### Issue Relations
+
+| Wrapper                 | Purpose                  | Key Parameters                           |
+| ----------------------- | ------------------------ | ---------------------------------------- |
+| `create-issue-relation` | Link two issues          | `issueId`, `relatedIssueId`, `type`      |
+| `list-issue-relations`  | List issue relationships | `issueId`                                |
+| `delete-issue-relation` | Remove issue link        | `id`                                     |
+
+## Wrappers Exist But Not Exported
+
+These wrappers exist in `.claude/tools/linear/` but are not yet exported in `index.ts`. To use them, you must import directly from the file (not from the index).
+
+### Roadmaps (4 wrappers)
+
+| Wrapper          | File                 | Purpose                |
+| ---------------- | -------------------- | ---------------------- |
+| `create-roadmap` | `create-roadmap.ts`  | Create product roadmap |
+| `get-roadmap`    | `get-roadmap.ts`     | Get roadmap by ID      |
+| `list-roadmaps`  | `list-roadmaps.ts`   | List all roadmaps      |
+| `update-roadmap` | `update-roadmap.ts`  | Update roadmap         |
+
+### Special (3 wrappers)
+
+| Wrapper            | File                    | Purpose                      |
+| ------------------ | ----------------------- | ---------------------------- |
+| `create-bug`       | `create-bug.ts`         | Create bug (preset priority) |
+| `create-jira-bug`  | `create-jira-bug.ts`    | Create bug with Jira import  |
+| `check-full-issue` | `check-full-issue.ts`   | Get complete issue data      |
+
+**Total: 7 wrappers available but not exported**
+
+## Linear APIs We Don't Wrap Yet
+
+Based on the [Linear GraphQL API](https://linear.app/developers/graphql) and [Apollo Studio Schema](https://studio.apollographql.com/public/Linear-API/schema/reference), these APIs are not yet wrapped:
+
+| Feature            | Operations Needed                                     | Business Value                |
+| ------------------ | ----------------------------------------------------- | ----------------------------- |
+| **Custom Views**   | customViewCreate, customViewUpdate, customViewDelete  | Saved filters/views           |
+| **Notifications**  | list, markRead                                        | Notification management       |
+| **Webhooks**       | webhookCreate, webhookUpdate, webhookDelete           | Integration hooks             |
+| **Time Tracking**  | timeScheduleCreate, etc.                              | Time management               |
+| **Roadmaps**       | roadmapCreate, roadmapUpdate, roadmapDelete           | Product roadmap management    |
+
+**For API discovery and schema verification:** See `.claude/skill-library/integrations/integrating-with-linear/SKILL.md`
 
 ## Usage Examples
 
@@ -203,7 +341,7 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
   const result = await createIssue.execute({
     title: 'Add OAuth support to Linear client',
     description: 'Implement OAuth 2.0 PKCE flow with token refresh',
-    team: 'Chariot',  // Team name OR team UUID
+    team: 'Engineering',  // Team name OR team UUID
     priority: 2,      // 0=None, 1=Urgent, 2=High, 3=Normal, 4=Low
     assignee: 'me'    // 'me', email, name, or user ID
   });
@@ -217,7 +355,7 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
   const { updateIssue } = await import('$ROOT/.claude/tools/linear/update-issue.ts');
   const result = await updateIssue.execute({
-    id: 'CHARIOT-1234',
+    id: 'ENG-1234',
     state: 'In Progress',
     project: 'Agentic Development'  // Project name or ID
   });
@@ -251,30 +389,53 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 })();" 2>/dev/null
 ```
 
-**Create Issue Relations:**
+**List Projects:**
 
 ```bash
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
-  const { createIssueRelation } = await import('$ROOT/.claude/tools/linear/create-issue-relation.ts');
-  const result = await createIssueRelation.execute({
-    issueId: 'issue-uuid-1',
-    relatedIssueId: 'issue-uuid-2',
-    type: 'blocks'  // blocks, blocked, related, duplicate
+  const { listProjects } = await import('$ROOT/.claude/tools/linear/index.ts');
+  const result = await listProjects.execute({});
+  console.log(JSON.stringify(result, null, 2));
+})();" 2>/dev/null
+```
+
+**Get Project with Full Content:**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { getProject } = await import('$ROOT/.claude/tools/linear/index.ts');
+  const result = await getProject.execute({
+    query: 'My Project',
+    fullContent: true  // Returns full markdown without truncation
+  });
+  console.log('Description:', result.description); // Short summary
+  console.log('Content:', result.content);         // Full markdown
+})();" 2>/dev/null
+```
+
+**Create Project with Description and Content:**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
+  const { createProject } = await import('$ROOT/.claude/tools/linear/index.ts');
+  const result = await createProject.execute({
+    name: 'Q1 Revenue Growth',
+    description: 'Improve NRR by 2% through Professional Services expansion',
+    content: '### Overview\n\nIncrease Professional Services revenue by 2% NRR improvement.\n\n### Strategy\n\n- Expand PS team capacity\n- Launch new service offerings\n\n### Metrics\n\n- Target: 92% NRR by end of Q1\n- Current: 90% NRR',
+    teamId: 'team-uuid-here'
   });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
 ```
 
-**Create Cycle:**
+**Create Comment:**
 
 ```bash
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
-  const { createCycle } = await import('$ROOT/.claude/tools/linear/create-cycle.ts');
-  const result = await createCycle.execute({
-    teamId: 'team-uuid-here',
-    name: 'Sprint 24',
-    startsAt: '2026-01-06',
-    endsAt: '2026-01-20'
+  const { createComment } = await import('$ROOT/.claude/tools/linear/index.ts');
+  const result = await createComment.execute({
+    issueId: 'issue-uuid-here',
+    body: 'This is a comment on the issue'
   });
   console.log(JSON.stringify(result, null, 2));
 })();" 2>/dev/null
@@ -336,10 +497,35 @@ rm ~/.claude-oauth/linear.json
 
 **Note:** API keys have higher limits but OAuth is more secure.
 
+## Integration
+
+### Called By
+
+- `gateway-mcp-tools` - Routes Linear operations from core to this library skill
+- Users via natural language - Direct invocation for Linear workflows
+
+### Requires (invoke before starting)
+
+None - This is an entry point skill for Linear operations.
+
+### Calls (during execution)
+
+None - Terminal skill that provides GraphQL HTTP tool execution patterns.
+
+### Pairs With (conditional)
+
+None - Standalone skill for Linear API operations.
+
 ## Related Skills
 
+- **integrating-with-linear** - API discovery and schema verification (`.claude/skill-library/integrations/integrating-with-linear/SKILL.md`)
 - **mcp-tools-registry** - Execution patterns for other MCP tools
 - **gateway-mcp-tools** - MCP tools gateway routing
+
+## External Documentation
+
+- [Linear GraphQL API](https://developers.linear.app/docs/graphql/working-with-the-graphql-api) - Official Linear API documentation
+- [Linear OAuth Setup](https://linear.app/settings/api/applications) - Create OAuth applications
 
 ## Implementation Details
 

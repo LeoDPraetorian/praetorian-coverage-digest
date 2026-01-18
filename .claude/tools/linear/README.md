@@ -65,7 +65,7 @@ import { listIssues, getIssue, createIssue } from "./.claude/tools/linear";
 const myIssues = await listIssues.execute({ assignee: "me" });
 
 // Get specific issue
-const issue = await getIssue.execute({ id: "CHARIOT-1366" });
+const issue = await getIssue.execute({ id: "ENG-1366" });
 
 // Create new issue
 const result = await createIssue.execute({
@@ -143,7 +143,7 @@ const result = await executeLinearQuery(
 // Located in .claude/tools/linear/
 import { getIssue } from "./.claude/tools/linear";
 
-const issue = await getIssue.execute({ id: "CHARIOT-1366" });
+const issue = await getIssue.execute({ id: "ENG-1366" });
 ```
 
 ## Shared MCP Client
@@ -188,7 +188,7 @@ npx mcp-remote https://mcp.linear.app/sse
 
 The Linear MCP accepts both:
 
-- Human-readable identifiers: `CHARIOT-1366`
+- Human-readable identifiers: `ENG-1366`
 - UUIDs: `eee0788c-9b67-4b3c-8a08-c9cd4224403e`
 
 ## Architecture Details
@@ -227,7 +227,7 @@ assignee: issue.assignee
 
 ```typescript
 try {
-  const issue = await getIssue.execute({ id: "CHARIOT-1366" });
+  const issue = await getIssue.execute({ id: "ENG-1366" });
 } catch (error) {
   // Detailed error with context
   console.error(error.message);

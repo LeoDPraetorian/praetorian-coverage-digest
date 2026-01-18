@@ -15,26 +15,10 @@
     "types": ["node"]
   },
   "include": [
-    "create-comment.ts",
-    "create-issue.ts",
-    "create-project.ts",
-    "create-bug.ts",
-    "create-jira-bug.ts",
-    "find-issue.ts",
-    "find-user.ts",
-    "get-issue.ts",
-    "get-project.ts",
-    "get-team.ts",
-    "index.ts",
-    "list-comments.ts",
-    "list-cycles.ts",
-    "list-issues.ts",
-    "list-projects.ts",
-    "list-teams.ts",
-    "list-users.ts",
-    "update-cycle.ts",
-    "update-issue.ts",
-    "update-project.ts",
+    "*.ts",
+    "lib/*.ts",
+    "internal/*.ts",
+    "__tests__/*.ts",
     "../config/config-loader.ts",
     "../config/lib/mcp-client.ts",
     "../config/lib/sanitize.ts",
@@ -42,6 +26,7 @@
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "*.bak"
   ]
 }

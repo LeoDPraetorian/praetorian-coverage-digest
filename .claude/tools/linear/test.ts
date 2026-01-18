@@ -46,8 +46,9 @@ async function testLinearMCPConnection() {
 
       // Test 5: Get detailed information for first issue
       console.log('\nTest 5: Get Issue Details');
-      const issueDetails = await getIssue.execute({ id: myIssues.issues[0].identifier });
-      console.log(`✅ Retrieved issue: ${issueDetails.identifier}`);
+      const firstIssueId = myIssues.issues[0].identifier || myIssues.issues[0].id;
+      const issueDetails = await getIssue.execute({ id: firstIssueId });
+      console.log(`✅ Retrieved issue: ${issueDetails.identifier || issueDetails.id}`);
       console.log(`   Title: ${issueDetails.title}`);
       console.log(`   State: ${issueDetails.state?.name || 'N/A'}`);
       console.log(`   Priority: ${issueDetails.priorityLabel || 'N/A'}`);

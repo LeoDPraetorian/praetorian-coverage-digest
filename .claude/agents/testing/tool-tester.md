@@ -4,7 +4,7 @@ description: Use when testing tool wrappers (MCP servers and REST APIs) - unit t
 type: testing
 permissionMode: default
 tools: Bash, Edit, Glob, Grep, MultiEdit, Read, Skill, TodoWrite, WebFetch, WebSearch, Write
-skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, debugging-strategies, debugging-systematically, developing-with-tdd, enforcing-evidence-based-analysis, gateway-mcp-tools, gateway-testing, gateway-typescript, persisting-agent-outputs, semantic-code-operations, tracing-root-causes, using-skills, using-todowrite, verifying-before-completion
+skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, debugging-strategies, debugging-systematically, developing-with-tdd, enforcing-evidence-based-analysis, gateway-integrations, gateway-mcp-tools, gateway-testing, gateway-typescript, persisting-agent-outputs, semantic-code-operations, tracing-root-causes, using-skills, using-todowrite, verifying-before-completion
 model: sonnet
 color: pink
 ---

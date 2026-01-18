@@ -1,0 +1,40 @@
+# Changelog - using-linear-apis
+
+## 2026-01-17 - Initial Creation
+
+**RED Phase Documentation:**
+
+- **Gap Identified:** Engineers make assumptions about Linear API capabilities without knowing where API documentation lives in codebase
+- **Test Scenario:** "User asks whether Linear's project API supports templates. Find out if templates are supported and document how you determined this."
+- **Failure Observed:** Agent searched web (Linear docs, GitHub, Apollo Studio) and made "High Confidence (90%)" claims despite no direct schema access
+- **Critical Violations:**
+  - Didn't know `.claude/tools/linear/internal/*-discover.ts` scripts exist
+  - Didn't know to use `callMCPTool()` for direct API queries
+  - Didn't check wrapper file "Schema Discovery Results" comments as source of truth
+  - Relied on external docs instead of codebase sources
+
+**Skill Metadata:**
+
+- **Category:** library - integrations/
+- **Type:** Library/Framework (API documentation)
+- **Location:** `.claude/skill-library/integrations/using-linear-apis/`
+- **Line Count:** 409 lines (target <500)
+- **Reference Files Planned:** 8 files (sources-of-truth.md, wrapper-anatomy.md, discovery-script-pattern.md, field-verification.md, fixing-graphql-errors.md, adding-parameters.md, direct-querying.md, anti-patterns.md)
+
+**Skill Purpose:**
+
+Documents where Linear GraphQL API information lives in codebase, how to discover API capabilities using internal tools, and how to verify API changes without relying on external documentation.
+
+**Key Principles:**
+
+1. Codebase sources (wrapper comments, discovery scripts) are source of truth, not external docs
+2. Use schema discovery scripts to verify API capabilities
+3. Check "Schema Discovery Results" sections in wrapper files first
+4. Query API directly with `callMCPTool()` when in doubt
+5. Never assume field names or types - always verify
+
+**Integration:**
+
+- Called by: `/linear` command, `mcp-tools-linear` skill, `writing-linear-epics-stories` skill
+- Standalone documentation skill (no prerequisites)
+- Pairs with: `tool-manager` (wrapper updates), `debugging-systematically` (API errors)

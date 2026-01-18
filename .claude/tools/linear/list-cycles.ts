@@ -9,7 +9,7 @@
  * - vs Direct MCP: 46,000 tokens at start
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
  * - team: string (optional) - Team name or ID to filter cycles
@@ -101,7 +101,7 @@ export const listCyclesParams = z.object({
     .optional()
     .describe('Search query for cycle name'),
   includeArchived: z.boolean().default(false).optional(),
-  limit: z.number().min(1).max(250).default(50).optional()
+  limit: z.number().min(1).max(250).optional().default(50).optional()
 });
 
 export type ListCyclesInput = z.infer<typeof listCyclesParams>;

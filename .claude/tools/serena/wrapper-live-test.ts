@@ -27,7 +27,8 @@ async function testWrappers() {
     console.log('Test 2: getSymbolsOverview wrapper');
     const overview = await getSymbolsOverview.execute({
       relative_path: 'test.ts',
-      depth: 1
+      depth: 1,
+      max_answer_chars: 10000
     });
     console.log('Result:', JSON.stringify(overview, null, 2));
     console.log('✅ getSymbolsOverview wrapper works\n');
@@ -36,7 +37,13 @@ async function testWrappers() {
     console.log('Test 3: findSymbol wrapper');
     const symbols = await findSymbol.execute({
       name_path_pattern: 'Calculator',
-      depth: 1
+      depth: 1,
+      relative_path: '',
+      include_kinds: [],
+      exclude_kinds: [],
+      max_answer_chars: 10000,
+      include_body: false,
+      substring_matching: false
     });
     console.log('Result:', JSON.stringify(symbols, null, 2));
     console.log('✅ findSymbol wrapper works\n');
@@ -45,7 +52,9 @@ async function testWrappers() {
     console.log('Test 4: listDir wrapper');
     const dir = await listDir.execute({
       relative_path: '.',
-      recursive: false
+      recursive: false,
+      skip_ignored_files: true,
+      max_answer_chars: 10000
     });
     console.log('Result:', JSON.stringify(dir, null, 2));
     console.log('✅ listDir wrapper works\n');
@@ -54,7 +63,8 @@ async function testWrappers() {
     console.log('Test 5: writeMemory wrapper');
     const writeResult = await writeMemory.execute({
       memory_file_name: 'wrapper-test',
-      content: 'Testing from wrapper'
+      content: 'Testing from wrapper',
+      max_answer_chars: 10000
     });
     console.log('Result:', JSON.stringify(writeResult, null, 2));
     console.log('✅ writeMemory wrapper works\n');
@@ -62,7 +72,8 @@ async function testWrappers() {
     // Test 6: readMemory
     console.log('Test 6: readMemory wrapper');
     const readResult = await readMemory.execute({
-      memory_file_name: 'wrapper-test'
+      memory_file_name: 'wrapper-test',
+      max_answer_chars: 10000
     });
     console.log('Result:', JSON.stringify(readResult, null, 2));
     console.log('✅ readMemory wrapper works\n');

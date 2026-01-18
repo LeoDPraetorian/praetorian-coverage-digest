@@ -18,13 +18,20 @@ async function test() {
       arguments: { id: 'CHARIOT-2042' }
     });
 
-    const parsed = JSON.parse(result.content[0].text);
-    console.log('All fields in issue response:');
-    console.log(Object.keys(parsed).sort().join(', '));
-    console.log('\n\nCycle-related fields:');
-    Object.keys(parsed).filter(k => k.toLowerCase().includes('cycle')).forEach(k => {
-      console.log(`  ${k}:`, parsed[k]);
-    });
+    if (!result.content || !Array.isArray(result.content) || result.content.length === 0) {
+      console.error('No content in result');
+      return;
+    }
+    const textContent = result.content[0];
+    if ('text' in textContent) {
+      const parsed = JSON.parse(textContent.text);
+      console.log('All fields in issue response:');
+      console.log(Object.keys(parsed).sort().join(', '));
+      console.log('\n\nCycle-related fields:');
+      Object.keys(parsed).filter(k => k.toLowerCase().includes('cycle')).forEach(k => {
+        console.log(`  ${k}:`, parsed[k]);
+      });
+    }
   } finally {
     await client.close();
   }

@@ -4,7 +4,7 @@ description: Use when reviewing tool wrapper implementations (MCP servers and RE
 type: analysis
 permissionMode: plan
 tools: Glob, Grep, Read, Write, Skill, TodoWrite, WebFetch, WebSearch
-skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, debugging-systematically, enforcing-evidence-based-analysis, gateway-mcp-tools, gateway-typescript, persisting-agent-outputs, semantic-code-operations, using-skills, using-todowrite, verifying-before-completion
+skills: adhering-to-dry, adhering-to-yagni, calibrating-time-estimates, debugging-systematically, enforcing-evidence-based-analysis, gateway-integrations, gateway-mcp-tools, gateway-typescript, persisting-agent-outputs, semantic-code-operations, using-skills, using-todowrite, verifying-before-completion
 model: sonnet
 color: cyan
 ---

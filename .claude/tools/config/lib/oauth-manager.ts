@@ -46,6 +46,15 @@ export const OAuthTokensSchema = z.object({
 export type OAuthTokens = z.infer<typeof OAuthTokensSchema>;
 
 /**
+ * OAuth token response from provider
+ */
+const OAuthTokenResponseSchema = z.object({
+  access_token: z.string(),
+  refresh_token: z.string().optional(),
+  expires_in: z.number(),
+});
+
+/**
  * PKCE parameters for authorization
  */
 export interface PKCEParams {
@@ -207,7 +216,8 @@ export class OAuthTokenManager {
       throw new Error(`Token exchange failed: ${error}`);
     }
 
-    const data = await response.json();
+    const rawData = await response.json();
+    const data = OAuthTokenResponseSchema.parse(rawData);
 
     const tokens: OAuthTokens = {
       provider: this.config.provider,
@@ -246,7 +256,8 @@ export class OAuthTokenManager {
       throw new Error(`Token refresh failed: ${error}`);
     }
 
-    const data = await response.json();
+    const rawData = await response.json();
+    const data = OAuthTokenResponseSchema.parse(rawData);
 
     const tokens: OAuthTokens = {
       provider: this.config.provider,

@@ -17,21 +17,21 @@ import { callMCPTool } from '../../config/lib/mcp-client';
  */
 const testCases = [
   {
-    description: 'Normal case - CHARIOT-1516 (typical issue)',
+    description: 'Normal case - ENG-1516 (typical issue)',
     input: {
-      id: 'CHARIOT-1516',
+      id: 'ENG-1516',
     },
   },
   {
     description: 'Edge case - unassigned issue',
     input: {
-      id: 'CHARIOT-1234', // Adjust to actual unassigned issue if known
+      id: 'ENG-1234', // Adjust to actual unassigned issue if known
     },
   },
   {
     description: 'Edge case - minimal data (old issue)',
     input: {
-      id: 'CHARIOT-100', // Adjust to actual sparse issue if known
+      id: 'ENG-100', // Adjust to actual sparse issue if known
     },
   },
 ];

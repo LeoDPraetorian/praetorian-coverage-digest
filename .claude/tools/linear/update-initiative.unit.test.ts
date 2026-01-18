@@ -16,7 +16,7 @@ afterEach(() => server.resetHandlers());
 describe('updateInitiative', () => {
   it('should update initiative successfully', async () => {
     server.use(
-      graphql.link('https://api.linear.app/graphql').operation((req, res, ctx) => {
+      graphql.link('https://api.linear.app/graphql').operation(() => {
         return HttpResponse.json({
           data: {
             initiativeUpdate: {

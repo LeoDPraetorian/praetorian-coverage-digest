@@ -41,7 +41,7 @@ All Linear MCP wrappers have been validated using the systematic `mcp-code-test`
 
 **Real-World Test**:
 
-- Issue tested: CHARIOT-1516 ("Agent Load Status Covers New Agent Button")
+- Issue tested: ENG-1516 ("Agent Load Status Covers New Agent Button")
 - Token estimate accurate within expected range
 - Filtering preserves all essential information
 
@@ -225,7 +225,7 @@ priority: z.number().min(0).max(4).optional();
 
 **Problem**: Original schema assumed priority was a number, but actual API returns object `{name, value}`.
 
-**Fix**: Schema updated based on real-world testing with CHARIOT-1516:
+**Fix**: Schema updated based on real-world testing with ENG-1516:
 
 ```typescript
 // Before (incorrect)

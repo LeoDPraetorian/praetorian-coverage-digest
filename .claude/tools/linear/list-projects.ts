@@ -9,7 +9,7 @@
  * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
  * - team: string (optional) - Team name or ID to filter by
@@ -19,13 +19,15 @@
  * - limit: number (optional) - Max projects to return (1-250, default 50)
  * - orderBy: enum (optional) - Sort order: 'createdAt' | 'updatedAt'
  * - fullDescription: boolean (optional) - Return full description without truncation (default: false)
+ * - fullContent: boolean (optional) - Return full content without truncation (default: false)
  *
  * OUTPUT (after filtering):
  * - projects: array of project objects
  *   - id: string - Project UUID
  *   - name: string - Project display name
- *   - description: string (optional) - Project description (truncated to 200 chars)
- *   - state: object (optional) - Project state
+ *   - description: string (optional) - Project description (short summary, truncated to 200 chars)
+ *   - content: string (optional) - Project content in markdown format (full description, truncated to 500 chars)
+ *   - state: string (optional) - Project state (e.g., "In Progress")
  *   - lead: object (optional) - Project lead user
  *   - startDate: string (optional) - ISO date for project start
  *   - targetDate: string (optional) - ISO date for project deadline
@@ -37,18 +39,19 @@
  * Edge cases discovered:
  * - Body is truncated to 200 chars to reduce token usage
  * - Empty projects returns empty array, not null
- * - Description truncated to 200 chars for token efficiency
+ * - Description is short summary/tagline, truncated to 200 chars for token efficiency
+ * - Content is full markdown description, truncated to 500 chars for token efficiency (smaller than get-project due to list context)
  *
  * @example
  * ```typescript
- * // List all projects (descriptions truncated to 200 chars)
+ * // List all projects (descriptions and content truncated)
  * await listProjects.execute({});
  *
  * // Filter by team
  * await listProjects.execute({ team: 'Engineering' });
  *
- * // Search projects with full descriptions
- * await listProjects.execute({ query: 'Q2 2025', fullDescription: true });
+ * // Search projects with full descriptions and content
+ * await listProjects.execute({ query: 'Q2 2025', fullDescription: true, fullContent: true });
  * ```
  */
 
@@ -73,11 +76,8 @@ const LIST_PROJECTS_QUERY = `
         id
         name
         description
-        state {
-          id
-          name
-          type
-        }
+        content
+        state
         lead {
           id
           name
@@ -122,10 +122,12 @@ export const listProjectsParams = z.object({
     .optional()
     .describe('Search for content in project name'),
   includeArchived: z.boolean().default(false).optional(),
-  limit: z.number().min(1).max(250).default(50).optional(),
+  limit: z.number().min(1).max(250).optional().default(50).optional(),
   orderBy: z.enum(['createdAt', 'updatedAt']).default('updatedAt').optional(),
   fullDescription: z.boolean().default(false).optional()
-    .describe('Return full description without truncation (default: false for token efficiency)')
+    .describe('Return full description without truncation (default: false for token efficiency)'),
+  fullContent: z.boolean().default(false).optional()
+    .describe('Return full content without truncation (default: false for token efficiency)')
 });
 
 export type ListProjectsInput = z.infer<typeof listProjectsParams>;
@@ -138,11 +140,8 @@ export const listProjectsOutput = z.object({
     id: z.string(),
     name: z.string(),
     description: z.string().optional(),
-    state: z.object({
-      id: z.string(),
-      name: z.string(),
-      type: z.string()
-    }).optional(),
+    content: z.string().optional(),
+    state: z.string().optional(),  // Simple string, not object (matches GraphQL query)
     lead: z.object({
       id: z.string(),
       name: z.string()
@@ -168,11 +167,8 @@ interface ProjectsResponse {
       id: string;
       name: string;
       description?: string | null;
-      state?: {
-        id: string;
-        name: string;
-        type: string;
-      } | null;
+      content?: string | null;
+      state?: string | null;
       lead?: {
         id: string;
         name: string;
@@ -255,11 +251,10 @@ export const listProjects = {
         description: validated.fullDescription
           ? project.description || undefined
           : project.description?.substring(0, 200) || undefined, // Truncate for token efficiency when fullDescription is false
-        state: project.state ? {
-          id: project.state.id,
-          name: project.state.name,
-          type: project.state.type
-        } : undefined,
+        content: validated.fullContent
+          ? project.content || undefined
+          : project.content?.substring(0, 500) || undefined, // Truncate for token efficiency when fullContent is false (smaller than get-project due to list context)
+        state: project.state || undefined,
         lead: project.lead ? {
           id: project.lead.id,
           name: project.lead.name

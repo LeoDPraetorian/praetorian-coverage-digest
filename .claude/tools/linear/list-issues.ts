@@ -9,7 +9,7 @@
  * - vs MCP: 46,000 tokens at start
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS (all optional):
  * - assignee: string - User ID, name, email, or "me"
@@ -157,12 +157,22 @@ export const listIssuesParams = z.object({
     .refine(validateNoCommandInjection, 'Invalid characters detected')
     .optional()
     .describe('Search for content in title or description'),
-  limit: z.number().min(1).max(250).default(50).describe('Number of results (max 250)'),
+  limit: z.number().min(1).max(250).optional().default(50).describe('Number of results (max 250)'),
   includeArchived: z.boolean().default(true).optional(),
   orderBy: z.enum(['createdAt', 'updatedAt']).default('updatedAt').optional()
 });
 
-export type ListIssuesInput = z.infer<typeof listIssuesParams>;
+export type ListIssuesInput = {
+  query?: string;
+  state?: string;
+  team?: string;
+  assignee?: string;
+  includeArchived?: boolean;
+  orderBy?: 'createdAt' | 'updatedAt';
+  project?: string;
+  label?: string;
+  limit?: number;
+};
 
 /**
  * Output schema - minimal essential fields

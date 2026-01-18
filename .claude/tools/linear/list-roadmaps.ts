@@ -9,7 +9,7 @@
  * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
  * - limit: number (optional) - Maximum number of roadmaps to return (1-250, default 50)
@@ -69,7 +69,7 @@ const LIST_ROADMAPS_QUERY = `
  * Maps to list_roadmaps params
  */
 export const listRoadmapsParams = z.object({
-  limit: z.number().min(1).max(250).default(50).optional(),
+  limit: z.number().min(1).max(250).optional().default(50).optional(),
 });
 
 export type ListRoadmapsInput = z.infer<typeof listRoadmapsParams>;

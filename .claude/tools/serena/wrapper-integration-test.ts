@@ -96,6 +96,13 @@ async function main() {
     'Find Asset class in React frontend',
     () => findSymbol.execute({
       name_path_pattern: 'Asset',
+      relative_path: '',
+      include_kinds: [],
+      exclude_kinds: [],
+      max_answer_chars: 10000,
+      depth: 3,
+      include_body: false,
+      substring_matching: false,
       semanticContext: 'Find Asset class in React frontend',
     })
   ));
@@ -107,6 +114,8 @@ async function main() {
     () => listDir.execute({
       relative_path: '.',
       recursive: false,
+      skip_ignored_files: true,
+      max_answer_chars: 10000,
       semanticContext: 'List Python CLI source files',
     })
   ));
@@ -117,6 +126,8 @@ async function main() {
     'Search for import statements in Nuclei templates',
     () => searchForPattern.execute({
       pattern: 'import',
+      relative_path: '.',
+      max_answer_chars: 10000,
       semanticContext: 'Search for import statements in Nuclei templates',
     })
   ));

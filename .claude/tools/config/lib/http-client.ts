@@ -161,7 +161,7 @@ export function createHTTPClient(
     timeout: config.timeout ?? HTTP_DEFAULTS.timeout,
     retry: {
       limit: config.retry?.limit ?? HTTP_DEFAULTS.retry.limit,
-      methods: config.retry?.methods ?? HTTP_DEFAULTS.retry.methods,
+      methods: config.retry?.methods ?? [...HTTP_DEFAULTS.retry.methods],
       statusCodes: config.retry?.statusCodes ?? HTTP_DEFAULTS.retry.statusCodes,
     },
     hooks: {

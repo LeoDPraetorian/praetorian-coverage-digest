@@ -1,5 +1,90 @@
+## [2026-01-17] - Documentation Update for 57 Exported Wrappers
 
-## [$(date +%Y-%m-%d)] - Documentation Enhancement
+### Added
+- **Cycles Section** (4 wrappers): create-cycle, get-cycle, list-cycles, update-cycle - now exported
+- **Documents Section** (4 wrappers): create-document, get-document, list-documents, update-document - now exported
+- **Issue Relations Section** (3 wrappers): create-issue-relation, list-issue-relations, delete-issue-relation - now exported
+
+### Changed
+- Updated frontmatter description to reflect 57 exported wrappers (was 45)
+- Updated frontmatter description to include cycles, documents, and issue relations
+- Updated "Wrappers Exist But Not Exported" section:
+  - Removed Cycles (4 wrappers) - now exported
+  - Removed Documents (4 wrappers) - now exported
+  - Removed Issue Relations (3 wrappers) - now exported
+  - Removed delete-project (1 wrapper) - now exported
+  - Now only contains: Roadmaps (4 wrappers) and Special utilities (3 wrappers)
+  - Total reduced from 19 to 7 unexported wrappers
+- Added Roadmaps to "Linear APIs We Don't Wrap Yet" section (wrappers exist but not in index.ts yet)
+
+### Verified
+- All 57 wrappers exported in index.ts match documentation
+- All 7 unexported wrappers (roadmaps, special utilities) still accurate
+
+### Context
+- Cycles, Documents, Issue Relations, and delete-project were implemented and exported in index.ts
+- This update brings documentation in sync with actual exports
+
+---
+
+## [2026-01-17] - Document description vs content Field Distinction for Linear Projects
+
+### Added
+- **"Understanding Project Description vs Content" section** documenting two distinct text fields:
+  - `description` (NON_NULL) - Short summary/tagline for project cards and lists
+  - `content` (String) - Full markdown content for Project Overview tab
+- API field type documentation from GraphQL introspection
+- "When to Use Each Field" guidance
+- Anti-pattern example (WRONG vs RIGHT usage)
+- Content truncation behavior documentation:
+  - `get-project`: content truncated to 1000 chars by default
+  - `list-projects`: content truncated to 500 chars by default
+  - `fullContent: true` parameter to get untruncated content
+- Project template `templateData` JSON structure guidance
+- **Usage Examples:**
+  - "Get Project with Full Content" example showing `fullContent: true` parameter
+  - "Create Project with Description and Content" example showing both fields
+
+### Changed
+- Updated Projects table Key Parameters:
+  - `get-project`: Added `fullContent` (optional, default: false)
+  - `list-projects`: Added `fullContent` (optional, default: false)
+
+### Context
+- Wrappers `get-project.ts` and `list-projects.ts` were updated to expose `content` field
+- Both wrappers now have `fullContent` parameter for truncation control
+- This documentation update closes the gap preventing users from knowing about the `content` field
+- Prevents anti-pattern of putting full markdown in `description` field
+
+---
+
+## [2026-01-17] - Documentation Update for 45 Exported Wrappers
+
+### Added
+- **Labels Section** (5 wrappers): create-label, get-label, list-labels, update-label, delete-label
+- **Archive Operations Section** (3 wrappers): archive-issue, unarchive-issue, archive-project
+- **Workflow States Section** (4 wrappers): create-workflow-state, get-workflow-state, list-workflow-states, update-workflow-state
+- **Attachments Section** (4 wrappers): create-attachment, list-attachments, update-attachment, delete-attachment
+- **Reactions Section** (2 wrappers): create-reaction, delete-reaction
+- **Subscribers Section** (2 wrappers): subscribe-to-issue, unsubscribe-from-issue
+- **Favorites Section** (2 wrappers): create-favorite, delete-favorite
+
+### Changed
+- Updated frontmatter description to reflect 45 exported wrappers (was vague about count)
+- Removed Labels, Attachments, Workflow States, Reactions, Archive Ops, Subscribers, and Favorites from "Linear APIs We Don't Wrap Yet" section (they are now wrapped and exported)
+- Updated "Linear APIs We Don't Wrap Yet" section to only include Custom Views, Notifications, Webhooks, and Time Tracking
+
+### Verified
+- All 45 wrappers exported in index.ts match documentation
+- All 19 unexported wrappers (cycles, documents, roadmaps, issue relations, special wrappers) still accurate
+
+### Context
+- These wrappers were implemented and exported in index.ts but not yet documented in the skill
+- This update brings documentation in sync with actual exports
+
+---
+
+## [Previous Entry] - Documentation Enhancement
 
 ### Added
 - List Projects example in Common Operations section (after List Issues, before Update Issue)
@@ -17,4 +102,3 @@
 - Fixed list-projects.ts parsing bug (rawData.content vs rawData.projects)
 - Added CLI project parameter support to .claude/bin/linear.ts
 - Wrappers always supported these features; examples now document them for user discovery
-

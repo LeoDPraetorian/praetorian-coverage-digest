@@ -9,16 +9,16 @@
  * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
- * - id: string (required) - Issue ID or identifier (e.g., CHARIOT-1234 or UUID)
+ * - id: string (required) - Issue ID or identifier (e.g., ENG-1234 or UUID)
  * - title: string (optional) - New title for the issue
  * - description: string (optional) - New description in Markdown
  * - assignee: string (optional) - User ID, name, email, or "me"
  * - state: string (optional) - State type, name, or ID
  * - priority: number (optional) - 0=No priority, 1=Urgent, 2=High, 3=Normal, 4=Low
- * - project: string (optional) - Project name or ID
+ * - project: string | null (optional) - Project name or ID (set to null to remove from project)
  * - labels: string[] (optional) - Label names or IDs
  * - dueDate: string (optional) - Due date in ISO format
  * - parentId: string (optional) - Parent issue ID for sub-issues
@@ -26,14 +26,14 @@
  *
  * OUTPUT (after filtering):
  * - id: string - Linear internal UUID
- * - identifier: string - Human-readable ID (e.g., CHARIOT-1234)
+ * - identifier: string - Human-readable ID (e.g., ENG-1234)
  * - title: string - Issue title (updated or original)
  * - url: string - Direct link to the issue
  * - estimatedTokens: number - Token usage estimate
  *
  * Edge cases discovered:
  * - GraphQL returns {success, issue} structure via issueUpdate mutation
- * - Issue ID can be identifier (CHARIOT-1234) or UUID
+ * - Issue ID can be identifier (ENG-1234) or UUID
  * - Assignee "me" resolves to authenticated user (mapped to assigneeId)
  * - Only provided fields are updated; omitted fields remain unchanged
  * - Invalid issue ID returns descriptive error from Linear API
@@ -43,15 +43,21 @@
  * ```typescript
  * // Update assignee
  * await updateIssue.execute({
- *   id: 'CHARIOT-1366',
+ *   id: 'ENG-1366',
  *   assignee: 'me'
  * });
  *
  * // Update state and priority
  * await updateIssue.execute({
- *   id: 'CHARIOT-1366',
+ *   id: 'ENG-1366',
  *   state: 'In Progress',
  *   priority: 1
+ * });
+ *
+ * // Remove issue from project
+ * await updateIssue.execute({
+ *   id: 'ENG-1366',
+ *   project: null
  * });
  * ```
  */
@@ -138,8 +144,9 @@ export const updateIssueParams = z.object({
     .refine(validateNoControlChars, 'Control characters not allowed')
     .refine(validateNoPathTraversal, 'Path traversal not allowed')
     .refine(validateNoCommandInjection, 'Invalid characters detected')
+    .nullable()
     .optional()
-    .describe('Project name or ID'),
+    .describe('Project name or ID (set to null to remove issue from project)'),
   labels: z.array(z.string()
     .refine(validateNoControlChars, 'Control characters not allowed')
     .refine(validateNoCommandInjection, 'Invalid characters detected')
@@ -210,13 +217,13 @@ interface IssueUpdateResponse {
  *
  * // Update assignee
  * const result = await updateIssue.execute({
- *   id: 'CHARIOT-1366',
+ *   id: 'ENG-1366',
  *   assignee: 'me'
  * });
  *
  * // Update state and priority
  * const result2 = await updateIssue.execute({
- *   id: 'CHARIOT-1366',
+ *   id: 'ENG-1366',
  *   state: 'In Progress',
  *   priority: 1
  * });
@@ -258,7 +265,7 @@ export const updateIssue = {
       assigneeId?: string;
       stateId?: string;
       priority?: number;
-      projectId?: string;
+      projectId?: string | null;
       labelIds?: string[];
       dueDate?: string;
       parentId?: string;
@@ -283,9 +290,14 @@ export const updateIssue = {
     if (updateFields.priority !== undefined) {
       mutationInput.priority = updateFields.priority;
     }
-    if (updateFields.project) {
-      // Resolve project name to UUID
-      mutationInput.projectId = await resolveProjectId(client, updateFields.project);
+    if (updateFields.project !== undefined) {
+      if (updateFields.project === null) {
+        // Explicitly remove issue from project
+        mutationInput.projectId = null;
+      } else {
+        // Resolve project name to UUID
+        mutationInput.projectId = await resolveProjectId(client, updateFields.project);
+      }
     }
     if (updateFields.labels) {
       mutationInput.labelIds = updateFields.labels; // labels → labelIds
@@ -299,12 +311,6 @@ export const updateIssue = {
     if (updateFields.cycle) {
       mutationInput.cycleId = updateFields.cycle; // cycle → cycleId
     }
-
-    // DEBUG: Log mutation variables before sending
-    console.error('[DEBUG] IssueUpdate mutation variables:', JSON.stringify({
-      id,
-      input: mutationInput
-    }, null, 2));
 
     // Execute GraphQL mutation
     const response = await executeGraphQL<IssueUpdateResponse>(

@@ -12,7 +12,7 @@
  * - vs Direct MCP: 46,000 tokens at start
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
  * - query: string (required) - Issue ID, identifier, number, or search text
@@ -40,7 +40,7 @@
  *
  * Edge cases discovered:
  * - Uses get_issue for exact matches, list_issues for searches
- * - Number-only queries (e.g., "1561") try common prefixes: CHARIOT, ENG, PROD, DEV
+ * - Number-only queries (e.g., "1561") try common prefixes: ENG, PROD, DEV
  * - Single search result returns full issue details
  * - Multiple results return disambiguation with candidates
  * - Empty search returns not_found with helpful suggestions
@@ -48,7 +48,7 @@
  * @example
  * ```typescript
  * // Exact ID - returns directly
- * await findIssue.execute({ query: 'CHARIOT-1561' });
+ * await findIssue.execute({ query: 'ENG-1561' });
  *
  * // Partial ID - searches and finds match
  * await findIssue.execute({ query: '1561' });
@@ -86,10 +86,14 @@ export const findIssueParams = z.object({
     .refine(validateNoCommandInjection, 'Invalid characters detected')
     .optional()
     .describe('Team name to narrow search (optional)'),
-  maxResults: z.number().min(1).max(10).default(5).describe('Max matches to return for disambiguation')
+  maxResults: z.number().min(1).max(10).optional().default(5).describe('Max matches to return for disambiguation')
 });
 
-export type FindIssueInput = z.infer<typeof findIssueParams>;
+export type FindIssueInput = {
+  query: string;
+  team?: string;
+  maxResults?: number;
+};
 
 /**
  * Candidate issue for selection
@@ -189,7 +193,7 @@ interface SearchIssuesResponse {
 
 /**
  * Check if input looks like an issue identifier
- * Patterns: CHARIOT-1234, 1234, ABC-123, UUID
+ * Patterns: ENG-1234, 1234, ABC-123, UUID
  */
 function looksLikeIdentifier(input: string): boolean {
   // Full identifier: ABC-123
@@ -360,11 +364,11 @@ export const findIssue = {
       // For number-only inputs, try common prefixes FIRST
       if (isNumberOnly(query)) {
         // Try with common team prefixes
-        const commonPrefixes = ['CHARIOT', 'ENG', 'PROD', 'DEV'];
+        const commonPrefixes = ['ENG', 'PROD', 'DEV'];
         for (const prefix of commonPrefixes) {
           const fullId = `${prefix}-${query}`;
           // First attempt propagates errors (rate limit, server error, timeout)
-          const match = await tryExactMatch(fullId, testToken, prefix === 'CHARIOT');
+          const match = await tryExactMatch(fullId, testToken, prefix === 'ENG');
           if (match) {
             return {
               status: 'found',
@@ -417,7 +421,7 @@ export const findIssue = {
         suggestions: [
           'Try a different search term',
           'Check if the issue exists in a different team',
-          'Use the full issue identifier (e.g., CHARIOT-1234)'
+          'Use the full issue identifier (e.g., ENG-1234)'
         ]
       };
     }

@@ -9,20 +9,19 @@
  * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
  * - query: string (required) - Project UUID or name
  * - fullDescription: boolean (optional) - Return full description without truncation (default: false)
+ * - fullContent: boolean (optional) - Return full content without truncation (default: false)
  *
  * OUTPUT (after filtering):
  * - id: string - Project UUID
  * - name: string - Project display name
- * - description: string (optional) - Project description (truncated to 500 chars)
- * - state: object (optional) - Project state
- *   - id: string - State UUID
- *   - name: string - State name (e.g., "In Progress")
- *   - type: string - State type
+ * - description: string (optional) - Project description (short summary, truncated to 500 chars)
+ * - content: string (optional) - Project content in markdown format (full description, truncated to 1000 chars)
+ * - state: string (optional) - Project state (e.g., "In Progress")
  * - lead: object (optional) - Project lead user
  *   - id: string - User UUID
  *   - name: string - User name
@@ -35,15 +34,16 @@
  * Edge cases discovered:
  * - Query can match by UUID or name (fuzzy matching)
  * - Returns null/undefined if project not found
- * - Description truncated to 500 chars for token efficiency
+ * - Description is short summary/tagline, truncated to 500 chars for token efficiency
+ * - Content is full markdown description, truncated to 1000 chars for token efficiency
  *
  * @example
  * ```typescript
- * // Get by name (description truncated to 500 chars)
+ * // Get by name (description and content truncated)
  * await getProject.execute({ query: 'Q2 2025 Auth Overhaul' });
  *
- * // Get by ID with full description
- * await getProject.execute({ query: 'abc123...', fullDescription: true });
+ * // Get by ID with full description and content
+ * await getProject.execute({ query: 'abc123...', fullDescription: true, fullContent: true });
  * ```
  */
 
@@ -67,6 +67,7 @@ const GET_PROJECT_QUERY = `
       id
       name
       description
+      content
       state {
         id
         name
@@ -98,7 +99,9 @@ export const getProjectParams = z.object({
     .refine(validateNoCommandInjection, 'Invalid characters detected')
     .describe('Project ID or name'),
   fullDescription: z.boolean().default(false).optional()
-    .describe('Return full description without truncation (default: false for token efficiency)')
+    .describe('Return full description without truncation (default: false for token efficiency)'),
+  fullContent: z.boolean().default(false).optional()
+    .describe('Return full content without truncation (default: false for token efficiency)')
 });
 
 export type GetProjectInput = z.infer<typeof getProjectParams>;
@@ -110,6 +113,7 @@ export const getProjectOutput = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().optional(),
+  content: z.string().optional(),
   state: z.object({
     id: z.string(),
     name: z.string(),
@@ -137,6 +141,7 @@ interface ProjectResponse {
     id: string;
     name: string;
     description?: string | null;
+    content?: string | null;
     state?: {
       id: string;
       name: string;
@@ -161,11 +166,11 @@ interface ProjectResponse {
  * ```typescript
  * import { getProject } from './.claude/tools/linear';
  *
- * // Get by name (description truncated to 500 chars)
+ * // Get by name (description and content truncated)
  * const project = await getProject.execute({ query: 'Q2 2025 Auth Overhaul' });
  *
- * // Get by ID with full description
- * const project2 = await getProject.execute({ query: 'abc123...', fullDescription: true });
+ * // Get by ID with full description and content
+ * const project2 = await getProject.execute({ query: 'abc123...', fullDescription: true, fullContent: true });
  * ```
  */
 export const getProject = {
@@ -201,11 +206,10 @@ export const getProject = {
       description: validated.fullDescription
         ? response.project.description || undefined
         : response.project.description?.substring(0, 500) || undefined, // Truncate for token efficiency when fullDescription is false
-      state: response.project.state ? {
-        id: response.project.state.id,
-        name: response.project.state.name,
-        type: response.project.state.type
-      } : undefined,
+      content: validated.fullContent
+        ? response.project.content || undefined
+        : response.project.content?.substring(0, 1000) || undefined, // Truncate for token efficiency when fullContent is false
+      state: response.project.state || undefined,
       lead: response.project.lead ? {
         id: response.project.lead.id,
         name: response.project.lead.name,

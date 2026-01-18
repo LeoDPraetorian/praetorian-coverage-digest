@@ -9,7 +9,7 @@
  * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
  * - title: string (required) - Issue title
@@ -28,7 +28,7 @@
  * - success: boolean - Always true on successful creation
  * - issue: object
  *   - id: string - Linear internal UUID
- *   - identifier: string - Human-readable ID (e.g., CHARIOT-1234)
+ *   - identifier: string - Human-readable ID (e.g., ENG-1234)
  *   - title: string - Issue title as provided
  *   - url: string - Direct link to the issue
  *

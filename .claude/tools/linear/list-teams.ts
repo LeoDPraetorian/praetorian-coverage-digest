@@ -9,7 +9,7 @@
  * - vs MCP: Consistent behavior, no server dependency
  * - Reduction: 99%
  *
- * Schema Discovery Results (tested with CHARIOT workspace):
+ * Schema Discovery Results (tested with Praetorian workspace):
  *
  * INPUT FIELDS:
  * - query: string (optional) - Search query to filter teams
@@ -90,7 +90,7 @@ export const listTeamsParams = z.object({
     .optional()
     .describe('Search query'),
   includeArchived: z.boolean().default(false).optional(),
-  limit: z.number().min(1).max(250).default(50).optional(),
+  limit: z.number().min(1).max(250).optional().default(50).optional(),
   orderBy: z.enum(['createdAt', 'updatedAt']).default('updatedAt').optional()
 });
 

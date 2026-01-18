@@ -60,6 +60,7 @@ This gateway implements 3-tier loading:
 | "HackerOne" / "H1"                        | → `integrating-with-hackerone`      |
 | "Bitbucket" / "Bitbucket API"             | → `integrating-with-bitbucket`      |
 | "Jira" / "JQL" / "Atlassian"              | → `integrating-with-jira`           |
+| "Linear" / "Linear API" / "Linear GraphQL" | → `integrating-with-linear`         |
 | "OCI" / "Oracle Cloud" / "Oracle"         | → `integrating-with-oracle-cloud`   |
 | "Panorama" / "Palo Alto"                  | → `integrating-with-panorama`       |
 | "testing" (general)                       | → also invoke `gateway-testing`     |
@@ -106,6 +107,7 @@ This gateway implements 3-tier loading:
 | GitLab       | `.claude/skill-library/development/integrations/integrating-with-gitlab/SKILL.md`       | GitLab, GitLab API, CI/CD, runners, GATO, GLATO                                                                                             |
 | HackerOne    | `.claude/skill-library/development/integrations/integrating-with-hackerone/SKILL.md`    | HackerOne, H1                                                                                                                               |
 | Jira         | `.claude/skill-library/development/integrations/integrating-with-jira/SKILL.md`         | Jira, JQL, Atlassian                                                                                                                        |
+| Linear       | `.claude/skill-library/integrations/integrating-with-linear/SKILL.md`                   | Linear, Linear API, Linear GraphQL, schema discovery, wrapper anatomy, field verification, GraphQL errors, callMCPTool, MCP wrappers       |
 | Oracle Cloud | `.claude/skill-library/development/integrations/integrating-with-oracle-cloud/SKILL.md` | OCI, Oracle Cloud, Oracle                                                                                                                   |
 | Panorama     | `.claude/skill-library/development/integrations/integrating-with-panorama/SKILL.md`     | Panorama, Palo Alto                                                                                                                         |
 

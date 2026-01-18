@@ -52,7 +52,7 @@ describe('createInitiative (GraphQL)', () => {
       const input: CreateInitiativeInput = {
         name: 'Q2 2025 Product Roadmap',
       };
-      const result = await createInitiative.execute(input, { apiKey: 'test-api-key' });
+      const result = await createInitiative.execute(input, 'test-api-key');
 
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
@@ -65,7 +65,7 @@ describe('createInitiative (GraphQL)', () => {
         description: 'Modernize the entire platform infrastructure',
         targetDate: '2025-12-31',
       };
-      const result = await createInitiative.execute(input, { apiKey: 'test-api-key' });
+      const result = await createInitiative.execute(input, 'test-api-key');
 
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
@@ -164,7 +164,7 @@ describe('createInitiative (GraphQL)', () => {
 
       const result = await createInitiative.execute(
         { name: 'Q2 2025 Product Roadmap' },
-        { apiKey: 'test-api-key' }
+        'test-api-key'
       );
 
       expect(result.success).toBe(true);
@@ -175,7 +175,7 @@ describe('createInitiative (GraphQL)', () => {
     it('should include estimatedTokens in output', async () => {
       const result = await createInitiative.execute(
         { name: 'Test Initiative' },
-        { apiKey: 'test-api-key' }
+        'test-api-key'
       );
 
       expect(result.estimatedTokens).toBeDefined();
@@ -202,7 +202,7 @@ describe('createInitiative (GraphQL)', () => {
       );
 
       await expect(
-        createInitiative.execute({ name: 'Failed Initiative' }, { apiKey: 'test-api-key' })
+        createInitiative.execute({ name: 'Failed Initiative' }, 'test-api-key')
       ).rejects.toThrow(/Failed to create initiative/);
     });
 
@@ -221,7 +221,7 @@ describe('createInitiative (GraphQL)', () => {
       );
 
       await expect(
-        createInitiative.execute({ name: 'Duplicate Initiative' }, { apiKey: 'test-api-key' })
+        createInitiative.execute({ name: 'Duplicate Initiative' }, 'test-api-key')
       ).rejects.toThrow(/GraphQL errors/);
     });
 
@@ -229,14 +229,14 @@ describe('createInitiative (GraphQL)', () => {
       server.use(
         linearApi.mutation('InitiativeCreate', () => {
           return HttpResponse.json(
-            { error: 'Internal Server Error' },
+            { errors: [{ message: 'Internal Server Error' }] },
             { status: 500 }
           );
         })
       );
 
       await expect(
-        createInitiative.execute({ name: 'Test Initiative' }, { apiKey: 'test-api-key' })
+        createInitiative.execute({ name: 'Test Initiative' }, 'test-api-key')
       ).rejects.toThrow();
     });
 
@@ -258,7 +258,7 @@ describe('createInitiative (GraphQL)', () => {
       );
 
       await expect(
-        createInitiative.execute({ name: 'Test Initiative' }, { apiKey: 'test-api-key' })
+        createInitiative.execute({ name: 'Test Initiative' }, 'test-api-key')
       ).rejects.toThrow();
     });
 
@@ -280,7 +280,7 @@ describe('createInitiative (GraphQL)', () => {
       );
 
       await expect(
-        createInitiative.execute({ name: 'Test Initiative' }, { apiKey: 'test-api-key' })
+        createInitiative.execute({ name: 'Test Initiative' }, 'test-api-key')
       ).rejects.toThrow();
     });
   });
@@ -310,7 +310,7 @@ describe('createInitiative (GraphQL)', () => {
         })
       );
 
-      await createInitiative.execute({ name: 'Test' }, { apiKey: 'test-api-key' });
+      await createInitiative.execute({ name: 'Test' }, 'test-api-key');
 
       expect(capturedVariables).toEqual({
         input: {
@@ -345,7 +345,7 @@ describe('createInitiative (GraphQL)', () => {
           description: 'Detailed roadmap for Q2',
           targetDate: '2025-06-30',
         },
-        { apiKey: 'test-api-key' }
+        'test-api-key'
       );
 
       expect(capturedVariables).toEqual({
@@ -389,7 +389,7 @@ describe('createInitiative (GraphQL)', () => {
           description: 'Complete platform modernization initiative',
           targetDate: '2025-12-31',
         },
-        { apiKey: 'test-api-key' }
+        'test-api-key'
       );
 
       expect(result.success).toBe(true);
@@ -417,7 +417,7 @@ describe('createInitiative (GraphQL)', () => {
 
       const result = await createInitiative.execute(
         { name: 'Minimal Initiative' },
-        { apiKey: 'test-api-key' }
+        'test-api-key'
       );
 
       expect(result.success).toBe(true);
