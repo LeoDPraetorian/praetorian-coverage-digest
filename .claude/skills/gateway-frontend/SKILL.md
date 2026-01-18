@@ -57,6 +57,8 @@ This gateway implements 3-tier loading:
 | "form" / "validation" / "react-hook-form"                  | → `implementing-react-hook-form-zod`     |
 | "Shadcn" / "UI components" / "radix"                       | → `using-shadcn-ui`                      |
 | "performance" / "optimize" / "slow render"                 | → `optimizing-react-performance`         |
+| "prefetch" / "route loading" / "navigation delay"          | → `prefetching-react-routes`             |
+| "preload" / "resource" / "font" / "script" / "CDN"         | → `preloading-react-resources`           |
 | "large data" / "1000+" / "virtualization"                  | → `optimizing-large-data-visualization`  |
 | "interference" / "competing systems" / "async conflict"    | → `coordinating-competing-systems`       |
 | "Sigma.js" / "graph viz" / "WebGL graph"                   | → `working-with-sigma-js`                |
@@ -93,6 +95,8 @@ This gateway implements 3-tier loading:
 | Modern React Patterns          | `.claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md`                  | hooks, composition, patterns                                                |
 | React Hook Infinite Loops      | `.claude/skill-library/development/frontend/preventing-react-hook-infinite-loops/SKILL.md`         | infinite loop, useEffect, dependency                                        |
 | React Performance              | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`                 | performance, optimize, slow                                                 |
+| Prefetching React Routes       | `.claude/skill-library/development/frontend/prefetching-react-routes/SKILL.md`                     | prefetch, route loading, navigation delay, React Router                     |
+| Preloading React Resources     | `.claude/skill-library/development/frontend/preloading-react-resources/SKILL.md`                   | preload, resource, font, script, CDN, prefetchDNS, preconnect               |
 | Vite Build Optimization        | `.claude/skill-library/development/frontend/optimizing-vite-builds/SKILL.md`                       | vite, bundle, manualChunks, vendor, build, chunk                            |
 | Large Data Visualization       | `.claude/skill-library/development/frontend/graphing/optimizing-large-data-visualization/SKILL.md` | large data, 1000+, virtualization, LOD                                      |
 | Coordinating Competing Systems | `.claude/skill-library/development/frontend/graphing/coordinating-competing-systems/SKILL.md`      | interference, competing systems, async conflict, guard patterns, sequencing |

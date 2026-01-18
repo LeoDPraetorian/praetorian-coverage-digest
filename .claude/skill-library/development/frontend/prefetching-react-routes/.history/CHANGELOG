@@ -1,0 +1,65 @@
+# Changelog
+
+## 2026-01-18 - Initial Creation
+
+**RED Phase Documentation:**
+
+Agent tested without skill on scenario: "How do I optimize React Router navigation performance in my app? Routes are lazy loaded and there's a delay when clicking links."
+
+**Observed gaps:**
+- Mentioned `prefetch='intent'` but no explanation of other modes ('none', 'render', 'viewport')
+- Suggested manual `onMouseEnter` prefetching without explaining when to use vs built-in
+- No mention of React Router 7 specifically or evolution of prefetch features
+- Generic trade-offs without bandwidth measurements
+- No guidance on `navigator.connection` API for respecting user data preferences
+- Missing decision tree for "which strategy when?"
+- Custom `PrefetchLink` component without comparison to built-in `prefetch` prop
+- Suggested `setTimeout(1000ms)` preload but no explanation of delay rationale
+- No Chariot-specific prefetch map (assets → vulnerabilities → jobs flow)
+- No performance measurement specifics
+
+**Skill addresses these gaps by:**
+- Systematic coverage of all 4 prefetch modes with use cases
+- Decision tree for strategy selection
+- Network condition checks (saveData, effectiveType)
+- Route-based prediction map with Chariot examples
+- Performance measurement instrumentation
+- Integration with Vite code splitting
+
+**Category:** development/frontend
+**Skill Type:** Process/Pattern
+**Location:** Skill Library (on-demand loading via gateway-frontend)
+
+**Phase 6: Research skipped per user request**
+
+User chose to skip research phase. Content populated from original detailed request including:
+- React Router 7 built-in prefetch modes
+- Three prefetching strategies (Link/Eager/Prediction)
+- Network condition checks
+- Chariot-specific examples
+- Performance measurement
+
+**Reference files created (7 files, 1497 total lines):**
+- link-prefetch-pattern.md (95 lines)
+- eager-loading-pattern.md (169 lines)
+- route-prediction-pattern.md (253 lines)
+- implementation-checklist.md (253 lines)
+- network-conditions.md (171 lines)
+- performance-measurement.md (287 lines)
+- code-splitting-integration.md (269 lines)
+
+**Gateway update:** Added to gateway-frontend routing table with triggers: "prefetch", "route loading", "navigation delay"
+
+**Phase 9: REFACTOR Phase - Pressure testing**
+
+Pressure testing skipped per pressure-testing-skill-content guidance.
+
+**Rationale:** This skill is a reference/pattern skill without enforcement requirements:
+- Provides "how-to" guidance, not mandatory process
+- No compliance costs for agents to bypass
+- No discipline requirements (like TDD or verification-before-completion)
+- Agents benefit from using it (helps answer questions accurately)
+
+Falls into "Don't test" category: "Pure reference skills without rules to violate"
+
+**GREEN phase verification sufficient:** Agent successfully used skill to provide systematic guidance with decision trees, network checks, and verification steps (Phase 8.1 confirmed behavioral improvement over RED phase).

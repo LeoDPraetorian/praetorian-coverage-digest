@@ -1,0 +1,63 @@
+# Changelog: preloading-react-resources
+
+## 2026-01-18 - Initial Creation
+
+**Type**: Library/Framework skill
+**Category**: development/frontend
+**Location**: `.claude/skill-library/development/frontend/preloading-react-resources/`
+
+### RED Phase Failure Documentation
+
+**Test scenario**: A developer asks Claude to optimize a React 19 app that loads slowly by preloading critical fonts and prefetching CDN domains.
+
+**Agent behavior WITHOUT skill** (agent a37c911):
+
+1. ❌ Recommended HTML `<link rel="preload">` tags in `index.html` instead of React 19's declarative APIs
+2. ❌ Created manual `PerformanceOptimizer` component with `createElement()` DOM manipulation
+3. ❌ Never mentioned `import { prefetchDNS, preconnect, preload, preinit } from 'react-dom'`
+4. ❌ Confused document prefetching (`<link rel="prefetch" as="document">`) with resource preloading
+5. ❌ No distinction between `preload` (fetch only) vs `preinit` (fetch + execute)
+6. ❌ Missing `preloadModule` and `preinitModule` for ESM modules
+
+**Quote from agent**: "Use `<link rel="preload">` in the document `<head>` to load critical fonts"
+
+**Gap confirmed**: Claude defaults to HTML-based approaches and doesn't know React 19's specialized resource preloading APIs.
+
+### Skill Content
+
+**Core coverage**:
+- Six React 19 APIs: prefetchDNS, preconnect, preload, preinit, preloadModule, preinitModule
+- Quick decision tree for API selection
+- Resource priority relationships (highest to lowest)
+- Integration with React Router prefetching (complementary systems)
+- Framework integration notes (Next.js, Remix auto-handling)
+- Anti-patterns (over-preloading, wrong API priority)
+- Verification checklist
+
+**Reference files created**:
+- `references/api-reference.md` - Complete API documentation with TypeScript signatures, parameters, Chariot examples
+- `references/common-patterns.md` - 15+ production-ready patterns including Chariot-specific CDN/API/font patterns
+- `references/performance-measurement.md` - Core Web Vitals, Resource Timing API, Chrome DevTools, Lighthouse, RUM setup
+
+**Progressive disclosure**: SKILL.md at 333 lines (target: <500), detailed content extracted to references/
+
+### Research Sources
+
+Based on official React 19 documentation and community best practices:
+- https://react.dev/blog/2024/12/05/react-19 (React 19 release announcement)
+- https://react.dev/reference/react-dom/prefetchDNS (prefetchDNS API)
+- https://react.dev/reference/react-dom/preload (preload API)
+- https://www.callstack.com/blog/the-complete-developer-guide-to-react-19-part-3-upgraded-support
+- https://vercel.com/blog/whats-new-in-react-19
+
+### Gateway Integration
+
+Will be added to `gateway-frontend` routing table during Phase 7.
+
+### Key Design Decisions
+
+1. **Distinction from route prefetching**: Emphasized that resource preloading (this skill) is different from route chunk prefetching (React Router), but they work together
+2. **API priority hierarchy**: Clear ordering (preinit > preload > preconnect > prefetchDNS) to guide optimal usage
+3. **Chariot-specific patterns**: CloudFront CDN preloading, API domain preconnection, icon font strategies
+4. **Anti-pattern emphasis**: Critical rules like "always use crossOrigin for fonts", "limit to 1-2 fonts", "don't over-preload"
+5. **Measurement focus**: Dedicated reference for performance measurement to validate optimizations work
