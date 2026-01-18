@@ -53,6 +53,7 @@ This gateway implements 3-tier loading:
 | "Cognito" / "user pool" / "identity"                                                                 | → `aws-cognito`                          |
 | "error" / "wrapping" / "context"                                                                     | → `error-handling-patterns`              |
 | "Neo4j" / "Cypher" / "graph"                                                                         | → `querying-neo4j-with-cypher`           |
+| "Neo4j performance" / "query optimization" / "PROFILE" / "db hits" / "slow query"                    | → `optimizing-neo4j-queries`             |
 | "cloud" / "multi-region" / "HA"                                                                      | → `cloud-advanced-patterns`              |
 | "cost" / "optimization" / "budget"                                                                   | → `cloud-cost-optimization`              |
 | "Lambda" / "EC2" / "serverless decision"                                                             | → `cloud-lambda-vs-ec2-decisions`        |
@@ -111,7 +112,8 @@ This gateway implements 3-tier loading:
 
 | Skill        | Path                                                                    | Triggers             |
 | ------------ | ----------------------------------------------------------------------- | -------------------- |
-| Neo4j Cypher | `.claude/skill-library/development/querying-neo4j-with-cypher/SKILL.md` | Neo4j, Cypher, graph |
+| Neo4j Cypher        | `.claude/skill-library/development/neo4j/querying-neo4j-with-cypher/SKILL.md`               | Neo4j, Cypher, graph                                    |
+| Neo4j Optimization  | `.claude/skill-library/development/neo4j/optimizing-neo4j-queries/SKILL.md`           | Neo4j performance, PROFILE, db hits, slow query, index  |
 
 ### Cloud Infrastructure
 

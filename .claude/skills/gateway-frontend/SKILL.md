@@ -44,33 +44,34 @@ This gateway implements 3-tier loading:
 
 **Match your task to a routing pattern:**
 
-| Task Intent                                             | Route To                                 |
-| ------------------------------------------------------- | ---------------------------------------- |
-| "React 19" / "conventions" / "best practice"            | → `enforcing-react-19-conventions`       |
-| "modern patterns" / "hooks" / "composition"             | → `using-modern-react-patterns`          |
-| "infinite loop" / "useEffect" / "dependency"            | → `preventing-react-hook-infinite-loops` |
-| "TanStack Query" / "server state" / "cache"             | → `using-tanstack-query`                 |
-| "TanStack Table" / "data table" / "grid"                | → `using-tanstack-table`                 |
-| "TanStack Router" / "routing" / "navigation"            | → `using-tanstack-router`                |
-| "Zustand" / "client state" / "store"                    | → `using-zustand-state-management`       |
-| "Context API" / "provider" / "global state"             | → `using-context-api`                    |
-| "form" / "validation" / "react-hook-form"               | → `implementing-react-hook-form-zod`     |
-| "Shadcn" / "UI components" / "radix"                    | → `using-shadcn-ui`                      |
-| "performance" / "optimize" / "slow render"              | → `optimizing-react-performance`         |
-| "large data" / "1000+" / "virtualization"               | → `optimizing-large-data-visualization`  |
-| "interference" / "competing systems" / "async conflict" | → `coordinating-competing-systems`       |
-| "Sigma.js" / "graph viz" / "WebGL graph"                | → `working-with-sigma-js`                |
-| "E2E" / "Playwright" / "browser test"                   | → `frontend-e2e-testing-patterns`        |
-| "component test" / "vitest" / "unit test"               | → `frontend-testing-patterns`            |
-| "styling" / "brand" / "colors" / "design"               | → `chariot-brand-guidelines`             |
-| "security" / "XSS" / "auth"                             | → `securing-react-implementations`       |
-| "graph query" / "Neo4j" / "filter"                      | → `constructing-graph-queries`           |
-| "migrate" / "query builder" / "old format"              | → `migrating-saved-queries`              |
-| "architecture" / "state design"                         | → `architecting-state-management`        |
-| "review" / "code review" / "PR review"                  | → `reviewing-frontend-implementations`   |
-| "lint" / "eslint" / "code quality" / "before commit"    | → `using-eslint`                         |
-| "testing" (general)                                     | → also invoke `gateway-testing`          |
-| "TypeScript" / "types" / "Zod"                          | → also invoke `gateway-typescript`       |
+| Task Intent                                                | Route To                                 |
+| ---------------------------------------------------------- | ---------------------------------------- |
+| "React 19" / "conventions" / "best practice"               | → `enforcing-react-19-conventions`       |
+| "modern patterns" / "hooks" / "composition"                | → `using-modern-react-patterns`          |
+| "infinite loop" / "useEffect" / "dependency"               | → `preventing-react-hook-infinite-loops` |
+| "TanStack Query" / "server state" / "cache"                | → `using-tanstack-query`                 |
+| "TanStack Table" / "data table" / "grid"                   | → `using-tanstack-table`                 |
+| "TanStack Router" / "routing" / "navigation"               | → `using-tanstack-router`                |
+| "Zustand" / "client state" / "store"                       | → `using-zustand-state-management`       |
+| "Context API" / "provider" / "global state"                | → `using-context-api`                    |
+| "form" / "validation" / "react-hook-form"                  | → `implementing-react-hook-form-zod`     |
+| "Shadcn" / "UI components" / "radix"                       | → `using-shadcn-ui`                      |
+| "performance" / "optimize" / "slow render"                 | → `optimizing-react-performance`         |
+| "large data" / "1000+" / "virtualization"                  | → `optimizing-large-data-visualization`  |
+| "interference" / "competing systems" / "async conflict"    | → `coordinating-competing-systems`       |
+| "Sigma.js" / "graph viz" / "WebGL graph"                   | → `working-with-sigma-js`                |
+| "E2E" / "Playwright" / "browser test"                      | → `frontend-e2e-testing-patterns`        |
+| "component test" / "vitest" / "unit test"                  | → `frontend-testing-patterns`            |
+| "styling" / "brand" / "colors" / "design"                  | → `chariot-brand-guidelines`             |
+| "security" / "XSS" / "auth"                                | → `securing-react-implementations`       |
+| "graph query" / "Neo4j" / "filter"                         | → `constructing-graph-queries`           |
+| "Neo4j performance" / "slow query" / "PROFILE" / "db hits" | → `optimizing-neo4j-queries`             |
+| "migrate" / "query builder" / "old format"                 | → `migrating-saved-queries`              |
+| "architecture" / "state design"                            | → `architecting-state-management`        |
+| "review" / "code review" / "PR review"                     | → `reviewing-frontend-implementations`   |
+| "lint" / "eslint" / "code quality" / "before commit"       | → `using-eslint`                         |
+| "testing" (general)                                        | → also invoke `gateway-testing`          |
+| "TypeScript" / "types" / "Zod"                             | → also invoke `gateway-typescript`       |
 
 ## Routing Algorithm
 
@@ -86,15 +87,16 @@ This gateway implements 3-tier loading:
 
 ### Core Patterns
 
-| Skill                          | Path                                                                                       | Triggers                                                                    |
-| ------------------------------ | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| React 19 Conventions           | `.claude/skill-library/development/frontend/enforcing-react-19-conventions/SKILL.md`       | React 19, conventions, RSC                                                  |
-| Modern React Patterns          | `.claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md`          | hooks, composition, patterns                                                |
-| React Hook Infinite Loops      | `.claude/skill-library/development/frontend/preventing-react-hook-infinite-loops/SKILL.md` | infinite loop, useEffect, dependency                                        |
-| React Performance              | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`         | performance, optimize, slow                                                 |
+| Skill                          | Path                                                                                               | Triggers                                                                    |
+| ------------------------------ | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| React 19 Conventions           | `.claude/skill-library/development/frontend/enforcing-react-19-conventions/SKILL.md`               | React 19, conventions, RSC                                                  |
+| Modern React Patterns          | `.claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md`                  | hooks, composition, patterns                                                |
+| React Hook Infinite Loops      | `.claude/skill-library/development/frontend/preventing-react-hook-infinite-loops/SKILL.md`         | infinite loop, useEffect, dependency                                        |
+| React Performance              | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`                 | performance, optimize, slow                                                 |
+| Vite Build Optimization        | `.claude/skill-library/development/frontend/optimizing-vite-builds/SKILL.md`                       | vite, bundle, manualChunks, vendor, build, chunk                            |
 | Large Data Visualization       | `.claude/skill-library/development/frontend/graphing/optimizing-large-data-visualization/SKILL.md` | large data, 1000+, virtualization, LOD                                      |
-| Coordinating Competing Systems | `.claude/skill-library/development/frontend/graphing/coordinating-competing-systems/SKILL.md` | interference, competing systems, async conflict, guard patterns, sequencing |
-| Sigma.js Graph Visualization   | `.claude/skill-library/development/frontend/graphing/working-with-sigma-js/SKILL.md`       | Sigma.js, graph, WebGL, camera, layout                                      |
+| Coordinating Competing Systems | `.claude/skill-library/development/frontend/graphing/coordinating-competing-systems/SKILL.md`      | interference, competing systems, async conflict, guard patterns, sequencing |
+| Sigma.js Graph Visualization   | `.claude/skill-library/development/frontend/graphing/working-with-sigma-js/SKILL.md`               | Sigma.js, graph, WebGL, camera, layout                                      |
 
 ### State Management
 
@@ -143,17 +145,18 @@ This gateway implements 3-tier loading:
 
 ### Security & Data
 
-| Skill                   | Path                                                                                 | Triggers                           |
-| ----------------------- | ------------------------------------------------------------------------------------ | ---------------------------------- |
-| Securing React          | `.claude/skill-library/development/frontend/securing-react-implementations/SKILL.md` | security, XSS, CSRF                |
-| Graph Queries           | `.claude/skill-library/development/frontend/constructing-graph-queries/SKILL.md`     | graph, Neo4j, query                |
-| Migrating Saved Queries | `.claude/skill-library/development/frontend/migrating-saved-queries/SKILL.md`        | migrate, query builder, old format |
+| Skill                   | Path                                                                                 | Triggers                                        |
+| ----------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| Securing React          | `.claude/skill-library/development/frontend/securing-react-implementations/SKILL.md` | security, XSS, CSRF                             |
+| Graph Queries           | `.claude/skill-library/development/frontend/constructing-graph-queries/SKILL.md`     | graph, Neo4j, query                             |
+| Neo4j Optimization      | `.claude/skill-library/development/neo4j/optimizing-neo4j-queries/SKILL.md`          | Neo4j performance, PROFILE, db hits, slow query |
+| Migrating Saved Queries | `.claude/skill-library/development/frontend/migrating-saved-queries/SKILL.md`        | migrate, query builder, old format              |
 
 ### Code Quality
 
-| Skill        | Path                                                                      | Triggers                                 |
-| ------------ | ------------------------------------------------------------------------- | ---------------------------------------- |
-| Using ESLint | `.claude/skill-library/development/frontend/using-eslint/SKILL.md`        | lint, eslint, code quality, before commit |
+| Skill        | Path                                                               | Triggers                                  |
+| ------------ | ------------------------------------------------------------------ | ----------------------------------------- |
+| Using ESLint | `.claude/skill-library/development/frontend/using-eslint/SKILL.md` | lint, eslint, code quality, before commit |
 
 ### Code Review
 

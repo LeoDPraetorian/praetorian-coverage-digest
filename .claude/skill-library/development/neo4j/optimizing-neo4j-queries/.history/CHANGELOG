@@ -1,0 +1,68 @@
+# Changelog
+
+## [2026-01-18] - Initial Creation
+
+### Context
+Created skill to provide systematic methodology for Neo4j query performance optimization in Chariot platform.
+
+### RED Phase Documentation
+**Gap identified**: Claude lacks systematic guidance for analyzing, debugging, and optimizing Neo4j Cypher queries, leading to:
+- Generic database knowledge without platform context
+- Assumptions about indexes without verification
+- Missing platform-specific patterns (multi-tenant isolation, query builder)
+- No systematic methodology (jumped to solutions without diagnostic framework)
+- Hypothetical analysis instead of evidence-based profiling
+- Over-engineered responses without practical constraints
+
+**Agent behavior without skill** (Phase 1.3):
+- Agent provided 10-phase generic optimization plan
+- Made assumptions: "likely execution pattern", "expected improvement: 10-100x"
+- Did not reference Chariot codebase patterns or existing skills
+- Suggested index creation without checking existing infrastructure
+- No systematic methodology: jumped from profiling to 10 phases without diagnostic framework
+
+### Skill Metadata
+- **Category**: development/backend (library)
+- **Type**: Process/Pattern
+- **Location**: `.claude/skill-library/development/backend/optimizing-neo4j-queries/`
+- **Line count**: 407 lines (within target)
+- **Tools**: Read, Bash, Grep, Glob, TodoWrite, AskUserQuestion, Skill
+
+### Key Features
+- 6-phase systematic methodology (Baseline → Analyze → Diagnose → Optimize → Verify → Platform Integration)
+- Evidence-based optimization (PROFILE first, measure after)
+- Platform-specific rules (multi-tenant isolation, Lambda timeouts, field validation)
+- Chariot query builder integration guidance
+- Progressive disclosure with 6 reference files
+
+### Completed Phases
+- Phase 6: Research completed via orchestrating-research (4 agents: Context7 x2, Perplexity, GitHub)
+- Phase 6.3: Created 6 reference files (profiling-queries, index-strategies, optimization-patterns, execution-plan-analysis, query-builder-integration, troubleshooting)
+- Phase 7: Added to gateway-backend routing table
+- Phase 8: GREEN verification passed - agent demonstrated systematic methodology vs generic approach
+- Phase 9: REFACTOR pressure tests passed (time pressure, authority pressure, sunk cost pressure)
+
+### Pressure Test Results
+| Pressure Type | Result |
+|---------------|--------|
+| Time Pressure | ✅ Agent acknowledged skips, documented properly, recommended post-incident completion |
+| Authority Pressure | ✅ Agent refused to confirm without evidence, cited specific skill lines |
+| Sunk Cost Pressure | ✅ Agent identified fallacy, refused to skip verification |
+
+### Final Status: COMPLETE
+- All 9 phases passed
+- Skill effectively guides behavior under realistic pressure scenarios
+
+## [2026-01-18] - Migration to Neo4j Category
+
+**Reason**: Moved from `development/backend/` to `development/neo4j/` for better organization alongside other Neo4j skills.
+
+**Changes**:
+- **Path**: `.claude/skill-library/development/backend/optimizing-neo4j-queries` → `.claude/skill-library/development/neo4j/optimizing-neo4j-queries`
+- **Gateways**: Added to both gateway-backend AND gateway-frontend routing tables
+  - Backend: For Go query builder optimization and Neo4j performance work
+  - Frontend: For React app performance when querying Neo4j graph database
+- **Commands**: No command references to update
+- **Invocation**: No syntax changes (remains library skill with Read() access)
+
+**Verification**: All integrity checks passed.

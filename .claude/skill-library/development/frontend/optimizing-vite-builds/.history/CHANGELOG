@@ -1,0 +1,47 @@
+# Changelog
+
+## 2026-01-18 - Initial Creation
+
+**Type**: New Skill Creation
+**Category**: development/frontend
+**Skill Type**: Process/Pattern
+
+### RED Phase - Gap Documentation
+
+**Problem**: No comprehensive Vite-specific guidance on `manualChunks` configuration patterns for preventing bundle bloat through vendor chunk splitting.
+
+**Test Scenario**: "I need to optimize my Vite React bundle. The vendor-react chunk is 10+ MB. How do I configure manualChunks to split vendor code properly?"
+
+**Observed Failure** (without skill):
+- Agent suggested substring matching (`id.includes('react')`) which captures unintended packages
+- Recommended manual dependency lists instead of pattern-based chunking
+- No mention of exact path matching pattern (`/react/` vs `react`)
+- Missing category-based chunking strategy validated through research
+- Generic advice without real-world size targets
+
+**Existing Skills Checked**:
+- `optimizing-react-performance` - Covers route-level splitting, not Vite build config
+- `avoiding-barrel-files` - Covers tree-shaking, not vendor chunking
+- `using-tanstack-router/references/code-splitting.md` - Covers route patterns, not Vite manualChunks
+
+### Content Source
+
+Research conducted via web search (Perplexity) to gather 2025 best practices:
+- Exact path matching pattern (`/react/` vs substring matching)
+- Category-based vendor splitting strategy
+- Real-world Chariot platform implementation validated (vendor-react: 10.5 MB → 575 KB)
+- Industry sources: mykolaaleksandrov.dev, codeparrot.ai, dev.to articles
+
+### Initial Structure
+
+- SKILL.md: 357 lines (under 500-line target)
+- Progressive disclosure: Core patterns in main file, detailed content planned for references/
+- Integration section: Documents relationship with optimizing-react-performance and avoiding-barrel-files
+- Decision trees: Bundle size thresholds, optimization strategy selection
+
+### Next Steps
+
+- Phase 6: Populate reference files with detailed patterns
+- Phase 7: Add to gateway-frontend routing table
+- Phase 8: GREEN verification with agent test
+- Phase 9: REFACTOR pressure testing
