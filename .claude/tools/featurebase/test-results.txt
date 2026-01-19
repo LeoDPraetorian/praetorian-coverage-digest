@@ -1,0 +1,7 @@
+npm error Lifecycle script `test` failed with error:
+npm error workspace @claude-tools/featurebase@1.0.0
+npm error location /Users/nathansportsman/chariot-development-platform2/.claude/tools/featurebase
+npm error Missing script: "test"
+npm error
+npm error To see a list of scripts, run:
+npm error   npm run --workspace=@claude-tools/featurebase@1.0.0

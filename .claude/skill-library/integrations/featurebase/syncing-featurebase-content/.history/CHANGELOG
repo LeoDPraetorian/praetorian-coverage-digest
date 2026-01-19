@@ -1,0 +1,28 @@
+# Changelog
+
+## 2026-01-14 - Initial Creation
+
+**RED Phase Evidence:**
+- Gap: No operational workflow for FeatureBase bidirectional sync
+- Test scenario: User asks "Sync FeatureBase content"
+- Current failure: Claude searches tools, reads READMEs, doesn't know about conflicts, missing workflow steps
+- Expected with skill: Complete guided workflow with conflict handling
+
+**Category:** integrations/featurebase
+
+**Skill Type:** Process/Pattern (workflow for sync operations)
+
+**Initial Features:**
+- Phase 1: Determine sync direction (pull/push/bidirectional)
+- Phase 2A: Pull from FeatureBase (API → GitHub)
+- Phase 2B: Push to FeatureBase (GitHub → API)
+- Phase 3: Conflict resolution with user options
+- Phase 4: Verification and success criteria
+- Error handling for common issues (auth, validation, rate limits, network)
+- GitHub Actions integration (featurebase-pull.yml, featurebase-push.yml)
+- Troubleshooting guidance
+
+**Dependencies:**
+- MCP tools: sync-to-markdown, sync-from-markdown
+- GitHub Actions workflows: featurebase-pull.yml, featurebase-push.yml
+- Validation script: validate-frontmatter.ts

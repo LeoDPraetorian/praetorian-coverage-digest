@@ -20,5 +20,8 @@
     "security",
     "attack-surface-management"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "gray-matter": "^4.0.3"
+  }
 }

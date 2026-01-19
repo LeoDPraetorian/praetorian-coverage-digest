@@ -1,0 +1,28 @@
+# Changelog
+
+## 2026-01-14 - Initial Creation
+
+**RED Phase Evidence:**
+- Gap: No systematic workflow for debugging FeatureBase sync failures
+- Test scenario: User says "The FeatureBase sync failed"
+- Current failure: Generic suggestions, no structured approach, long debugging time
+- Expected with skill: Systematic diagnosis with failure-mode-specific fixes
+
+**Category:** integrations/featurebase
+
+**Skill Type:** Process/Pattern (debugging workflow)
+
+**Initial Features:**
+- Phase 1: Identify failure mode (GitHub Actions, MCP tool, validation)
+- Phase 2A: GitHub Actions workflow debugging (6 failure modes)
+- Phase 2B: MCP tool failures (status code specific fixes)
+- Phase 2C: YAML validation failures (syntax errors)
+- Phase 3: Verify fix and document root cause
+- Decision tree for failure mode identification
+- Common failure mode catalog
+- Integration with syncing-featurebase-content skill
+
+**Dependencies:**
+- GitHub CLI (gh) for workflow log access
+- validate-frontmatter.ts script
+- syncing-featurebase-content skill for re-running sync

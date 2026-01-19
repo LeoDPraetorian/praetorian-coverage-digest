@@ -424,16 +424,48 @@ for file in workflow.md advanced-patterns.md; do
 done
 ```
 
+**Cannot proceed to Phase 7 without ALL reference files created with >50 lines each** ✅
+
 **Rationalization counters:**
 
-- "I updated SKILL.md" → References/ holds detailed content, create ALL files
-- "Add references later" → Phase 7+ assumes they exist, complete before Phase 7
-- "Research lacked content" → That's Phase 6.2 failure, re-run or document gap
-- "50 lines of bullets is enough" → Substantive means code examples, patterns, citations
+- "I updated SKILL.md" → WRONG. References/ holds detailed content, create ALL files listed in SKILL.md
+- "Add references later" → WRONG. Phase 7+ assumes they exist, complete Phase 6.3 before Phase 7
+- "Research lacked content" → WRONG. That's Phase 6.2 failure, re-run research or document gap
+- "50 lines of bullets is enough" → WRONG. Substantive means code examples, patterns, citations, not bullets
+- "I have weblinks/research" → WRONG. Having research ≠ creating reference files. Write files NOW.
+- "User will populate later" → WRONG. Skill creator populates during Phase 6.3, not deferred to user
 
 **See:** [research-integration.md](references/research-integration.md) for complete integration workflow and anti-patterns.
 
 ## Phase 7: Gateway Update (Library Skills Only)
+
+**🚨 ENTRY REQUIREMENT**: Before starting Phase 7, verify Phase 6.3 is complete:
+
+```bash
+# List all reference files linked in SKILL.md
+grep -o "references/[^)]*\.md" $ROOT/{skill-path}/SKILL.md | sort -u > /tmp/required-refs.txt
+
+# Verify each file exists with >50 lines
+while read ref; do
+  file="$ROOT/{skill-path}/$ref"
+  if [ ! -f "$file" ]; then
+    echo "❌ BLOCKED: $ref does not exist"
+    echo "Phase 6.3 incomplete. Create ALL reference files before Phase 7."
+    exit 1
+  fi
+  lines=$(wc -l < "$file")
+  if [ "$lines" -lt 50 ]; then
+    echo "❌ BLOCKED: $ref has only $lines lines (need >50)"
+    echo "Phase 6.3 incomplete. Populate with substantive content."
+    exit 1
+  fi
+  echo "✅ $ref: $lines lines"
+done < /tmp/required-refs.txt
+```
+
+**If verification fails**: Return to Phase 6.3. Do NOT proceed.
+
+---
 
 If creating a library skill, add it to the appropriate gateway(s).
 

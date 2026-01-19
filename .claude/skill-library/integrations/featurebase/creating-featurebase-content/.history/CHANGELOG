@@ -1,0 +1,29 @@
+# Changelog
+
+## 2026-01-14 - Initial Creation
+
+**RED Phase Evidence:**
+- Gap: No guided workflow for creating FeatureBase content with proper frontmatter
+- Test scenario: User asks "Create a FeatureBase post about new feature"
+- Current failure: Invalid YAML, missing boardId, wrong file path, no API sync
+- Expected with skill: Template-based creation with validation and API sync
+
+**Category:** integrations/featurebase
+
+**Skill Type:** Process/Pattern (workflow for content creation)
+
+**Initial Features:**
+- Phase 1: Determine content type (post/changelog/article)
+- Phase 2: Gather required fields with validation
+- Phase 3: Generate frontmatter from templates
+- Phase 4: Generate file path following naming conventions
+- Phase 5: Create markdown file with content placeholders
+- Phase 6: Optional immediate API sync
+- Validation rules for all fields
+- Error handling for common issues
+- Success criteria checklist
+
+**Dependencies:**
+- MCP tools: create-post, create-changelog, create-article
+- Templates for each content type
+- Slug generation utility

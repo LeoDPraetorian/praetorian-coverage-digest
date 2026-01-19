@@ -50,6 +50,7 @@ This gateway implements 3-tier loading:
 | --------------------------------------------- | ------------------------------------------ |
 | "Chariot assets" / "risks" / "jobs"           | → `mcp-tools-praetorian-cli`               |
 | "Linear issues" / "projects" / "tickets"      | → `mcp-tools-linear`                       |
+| "Featurebase" / "changelog" / "feedback"      | → `mcp-tools-featurebase`                  |
 | "library docs" / "Context7" / "documentation" | → `mcp-tools-context7`                     |
 | "AI search" / "Perplexity" / "research"       | → `mcp-tools-perplexity`                   |
 | "browser" / "Playwright" / "screenshot"       | → `mcp-tools-chrome-devtools`              |
@@ -91,6 +92,12 @@ This gateway implements 3-tier loading:
 | Skill  | Path                                                               | Triggers                  |
 | ------ | ------------------------------------------------------------------ | ------------------------- |
 | Linear | `.claude/skill-library/claude/mcp-tools/mcp-tools-linear/SKILL.md` | issues, projects, tickets |
+
+### Feedback & Content Management
+
+| Skill       | Path                                                                    | Triggers                              |
+| ----------- | ----------------------------------------------------------------------- | ------------------------------------- |
+| Featurebase | `.claude/skill-library/claude/mcp-tools/mcp-tools-featurebase/SKILL.md` | feedback, changelog, articles, posts  |
 
 ### Documentation
 

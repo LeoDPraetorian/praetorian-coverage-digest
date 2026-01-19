@@ -1,0 +1,27 @@
+{
+  "name": "@claude-tools/featurebase",
+  "version": "1.0.0",
+  "description": "FeatureBase MCP wrappers for API automation and bidirectional sync",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@claude/testing": "*"
+  },
+  "keywords": [
+    "featurebase",
+    "api",
+    "mcp",
+    "wrapper",
+    "token-reduction"
+  ]
+}

@@ -1,0 +1,32 @@
+# CHANGELOG
+
+## 2026-01-18 - Critical API Documentation Fixes
+
+### Changed
+- Fixed authentication header across all files: Changed from `Authorization: Bearer` to `X-API-Key`
+- Updated base URL in posts-api.md from `https://api.featurebase.app` to `https://do.featurebase.app`
+- Fixed all Users API endpoint paths to use `/v2/organization/*` structure
+- Updated Posts API update method from POST to PATCH
+- Updated Comments API update method from PUT to PATCH
+
+### Files Modified
+- SKILL.md
+- references/articles-api.md
+- references/users-api.md
+- references/posts-api.md
+- references/custom-fields-api.md
+- references/changelog-api.md
+- references/comments-api.md
+
+### Compliance
+- ✅ SKILL.md: 305 lines (<500 limit)
+- ✅ All authentication headers corrected
+- ✅ All endpoint paths verified against official API docs
+- ✅ All HTTP methods corrected
+
+### Sources
+- https://docs.featurebase.app/authentication
+- https://docs.featurebase.app/identify
+- https://docs.featurebase.app/posts
+- https://docs.featurebase.app/comment
+

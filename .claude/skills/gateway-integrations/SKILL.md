@@ -52,19 +52,22 @@ This gateway implements 3-tier loading:
 | "mock collector" / "mock HTTP server"              | → `testing-integrations`            |
 | "integration test" / "API test"                    | → `writing-integration-tests-first` |
 | "AWS" / "Lambda" / "DynamoDB" / "S3"               | → `integrating-with-aws`            |
-| "Azure" / "Microsoft Azure" / "Key Vault" | → `integrating-with-azure`          |
-| "GCP" / "Google Cloud" / "Cloud Storage"  | → `integrating-with-gcp`            |
-| "Bugcrowd" / "bug bounty"                 | → `integrating-with-bugcrowd`       |
-| "GitHub" / "GitHub API" / "webhooks"      | → `integrating-with-github`         |
-| "GitLab" / "GitLab API" / "CI/CD"         | → `integrating-with-gitlab`         |
-| "HackerOne" / "H1"                        | → `integrating-with-hackerone`      |
-| "Bitbucket" / "Bitbucket API"             | → `integrating-with-bitbucket`      |
-| "Jira" / "JQL" / "Atlassian"              | → `integrating-with-jira`           |
-| "Linear" / "Linear API" / "Linear GraphQL" | → `integrating-with-linear`         |
-| "OCI" / "Oracle Cloud" / "Oracle"         | → `integrating-with-oracle-cloud`   |
-| "Panorama" / "Palo Alto"                  | → `integrating-with-panorama`       |
-| "testing" (general)                       | → also invoke `gateway-testing`     |
-| "Go patterns"                             | → also invoke `gateway-backend`     |
+| "Azure" / "Microsoft Azure" / "Key Vault"          | → `integrating-with-azure`          |
+| "GCP" / "Google Cloud" / "Cloud Storage"           | → `integrating-with-gcp`            |
+| "Bugcrowd" / "bug bounty"                          | → `integrating-with-bugcrowd`       |
+| "create FeatureBase" / "new post"                  | → `creating-featurebase-content`    |
+| "FeatureBase sync" / "sync content"                | → `syncing-featurebase-content`     |
+| "sync failed" / "debug sync"                       | → `troubleshooting-featurebase-sync`|
+| "GitHub" / "GitHub API" / "webhooks"               | → `integrating-with-github`         |
+| "GitLab" / "GitLab API" / "CI/CD"                  | → `integrating-with-gitlab`         |
+| "HackerOne" / "H1"                                 | → `integrating-with-hackerone`      |
+| "Bitbucket" / "Bitbucket API"                      | → `integrating-with-bitbucket`      |
+| "Jira" / "JQL" / "Atlassian"                       | → `integrating-with-jira`           |
+| "Linear" / "Linear API" / "Linear GraphQL"         | → `integrating-with-linear`         |
+| "OCI" / "Oracle Cloud" / "Oracle"                  | → `integrating-with-oracle-cloud`   |
+| "Panorama" / "Palo Alto"                           | → `integrating-with-panorama`       |
+| "testing" (general)                                | → also invoke `gateway-testing`     |
+| "Go patterns"                                      | → also invoke `gateway-backend`     |
 
 ## Routing Algorithm
 
@@ -96,20 +99,24 @@ This gateway implements 3-tier loading:
 
 ### Third-Party Integrations
 
-| Skill        | Path                                                                                    | Triggers                                                                                                                                    |
-| ------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| AWS          | `.claude/skill-library/development/integrations/integrating-with-aws/SKILL.md`          | AWS, Lambda, DynamoDB, S3, CloudFormation, SDK v2                                                                                           |
-| Azure        | `.claude/skill-library/development/integrations/integrating-with-azure/SKILL.md`        | Azure, Microsoft Azure, Key Vault, managed identity, DefaultAzureCredential, RBAC, service principal, Terraform Azure, Bicep, ARM templates |
-| Bitbucket    | `.claude/skill-library/development/integrations/integrating-with-bitbucket/SKILL.md`    | Bitbucket, Bitbucket API, API tokens                                                                                                        |
-| Bugcrowd     | `.claude/skill-library/development/integrations/integrating-with-bugcrowd/SKILL.md`     | Bugcrowd, bug bounty                                                                                                                        |
-| GCP          | `.claude/skill-library/development/integrations/integrating-with-gcp/SKILL.md`          | GCP, Google Cloud, Cloud Storage, Cloud Functions, Pub/Sub, BigQuery, Workload Identity, ADC                                                |
-| GitHub       | `.claude/skill-library/development/integrations/integrating-with-github/SKILL.md`       | GitHub, webhooks                                                                                                                            |
-| GitLab       | `.claude/skill-library/development/integrations/integrating-with-gitlab/SKILL.md`       | GitLab, GitLab API, CI/CD, runners, GATO, GLATO                                                                                             |
-| HackerOne    | `.claude/skill-library/development/integrations/integrating-with-hackerone/SKILL.md`    | HackerOne, H1                                                                                                                               |
-| Jira         | `.claude/skill-library/development/integrations/integrating-with-jira/SKILL.md`         | Jira, JQL, Atlassian                                                                                                                        |
-| Linear       | `.claude/skill-library/integrations/integrating-with-linear/SKILL.md`                   | Linear, Linear API, Linear GraphQL, schema discovery, wrapper anatomy, field verification, GraphQL errors, callMCPTool, MCP wrappers       |
-| Oracle Cloud | `.claude/skill-library/development/integrations/integrating-with-oracle-cloud/SKILL.md` | OCI, Oracle Cloud, Oracle                                                                                                                   |
-| Panorama     | `.claude/skill-library/development/integrations/integrating-with-panorama/SKILL.md`     | Panorama, Palo Alto                                                                                                                         |
+| Skill                          | Path                                                                                           | Triggers                                                                                                                                    |
+| ------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| AWS                            | `.claude/skill-library/development/integrations/integrating-with-aws/SKILL.md`                 | AWS, Lambda, DynamoDB, S3, CloudFormation, SDK v2                                                                                           |
+| Azure                          | `.claude/skill-library/development/integrations/integrating-with-azure/SKILL.md`               | Azure, Microsoft Azure, Key Vault, managed identity, DefaultAzureCredential, RBAC, service principal, Terraform Azure, Bicep, ARM templates |
+| Bitbucket                      | `.claude/skill-library/development/integrations/integrating-with-bitbucket/SKILL.md`           | Bitbucket, Bitbucket API, API tokens                                                                                                        |
+| Bugcrowd                       | `.claude/skill-library/development/integrations/integrating-with-bugcrowd/SKILL.md`            | Bugcrowd, bug bounty                                                                                                                        |
+| FeatureBase                    | `.claude/skill-library/development/integrations/integrating-with-featurebase/SKILL.md`         | FeatureBase API, feedback board, product roadmap, API integration, posts, changelog, articles, comments, votes, users, webhooks             |
+| FeatureBase Create             | `.claude/skill-library/integrations/featurebase/creating-featurebase-content/SKILL.md`         | create FeatureBase post, create changelog, create article, new FeatureBase content                                                          |
+| FeatureBase Sync               | `.claude/skill-library/integrations/featurebase/syncing-featurebase-content/SKILL.md`          | FeatureBase, sync content, bidirectional sync, pull from FeatureBase, push to FeatureBase, conflict resolution                              |
+| FeatureBase Troubleshooting    | `.claude/skill-library/integrations/featurebase/troubleshooting-featurebase-sync/SKILL.md`     | FeatureBase sync failed, debug sync error, YAML validation error, sync conflict                                                             |
+| GCP                            | `.claude/skill-library/development/integrations/integrating-with-gcp/SKILL.md`                 | GCP, Google Cloud, Cloud Storage, Cloud Functions, Pub/Sub, BigQuery, Workload Identity, ADC                                                |
+| GitHub                         | `.claude/skill-library/development/integrations/integrating-with-github/SKILL.md`              | GitHub, webhooks                                                                                                                            |
+| GitLab                         | `.claude/skill-library/development/integrations/integrating-with-gitlab/SKILL.md`              | GitLab, GitLab API, CI/CD, runners, GATO, GLATO                                                                                             |
+| HackerOne                      | `.claude/skill-library/development/integrations/integrating-with-hackerone/SKILL.md`           | HackerOne, H1                                                                                                                               |
+| Jira                           | `.claude/skill-library/development/integrations/integrating-with-jira/SKILL.md`                | Jira, JQL, Atlassian                                                                                                                        |
+| Linear                         | `.claude/skill-library/integrations/integrating-with-linear/SKILL.md`                          | Linear, Linear API, Linear GraphQL, schema discovery, wrapper anatomy, field verification, GraphQL errors, callMCPTool, MCP wrappers        |
+| Oracle Cloud                   | `.claude/skill-library/development/integrations/integrating-with-oracle-cloud/SKILL.md`        | OCI, Oracle Cloud, Oracle                                                                                                                   |
+| Panorama                       | `.claude/skill-library/development/integrations/integrating-with-panorama/SKILL.md`            | Panorama, Palo Alto                                                                                                                         |
 
 ## Cross-Gateway Routing
 
