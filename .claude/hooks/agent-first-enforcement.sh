@@ -12,15 +12,23 @@
 # - tool-developer → .ts files in .claude/tools/
 # - capability-developer → .vql, .yaml (nuclei templates)
 
-set -euo pipefail
+# Note: Using set -eu without pipefail to avoid jq exit code issues
+# jq returns non-zero on invalid JSON which causes pipefail to fail the whole script
+set -eu
 
 # Read input from stdin
 input=$(cat)
 
-# Extract tool name and file path (|| true prevents set -e exit on invalid JSON)
-tool_name=$(echo "$input" | jq -r '.tool_name // ""' 2>/dev/null) || true
-file_path=$(echo "$input" | jq -r '.tool_input.file_path // ""' 2>/dev/null) || true
-transcript_path=$(echo "$input" | jq -r '.transcript_path // ""' 2>/dev/null) || true
+# Validate we have input before proceeding
+if [[ -z "$input" ]]; then
+    exit 0
+fi
+
+# Extract tool name and file path using heredoc (avoids pipeline issues with jq)
+# Use || to provide default empty string on jq failure
+tool_name=$(jq -r '.tool_name // ""' <<< "$input" 2>/dev/null) || tool_name=""
+file_path=$(jq -r '.tool_input.file_path // ""' <<< "$input" 2>/dev/null) || file_path=""
+transcript_path=$(jq -r '.transcript_path // ""' <<< "$input" 2>/dev/null) || transcript_path=""
 
 # Only check Edit and Write tools
 if [[ "$tool_name" != "Edit" && "$tool_name" != "Write" ]]; then
